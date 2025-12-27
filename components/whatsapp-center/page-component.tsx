@@ -56,6 +56,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { WhatsappIcon } from "@/components/icons";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
@@ -111,6 +119,20 @@ interface AddonPurchaseResponse {
   config_id: string;
 }
 
+interface Employee {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  active: boolean;
+}
+
+interface EmployeesResponse {
+  current_page: number;
+  data: Employee[];
+  total: number;
+}
+
 export function WhatsAppCenterPage() {
   const [connectedNumbers, setConnectedNumbers] = useState<WhatsAppNumber[]>(
     [],
@@ -129,6 +151,12 @@ export function WhatsAppCenterPage() {
   const [error, setError] = useState<string | null>(null);
   const [togglingNumberId, setTogglingNumberId] = useState<number | null>(null);
   const [increaseLimitDialogOpen, setIncreaseLimitDialogOpen] = useState(false);
+  const [assignEmployeeDialogOpen, setAssignEmployeeDialogOpen] = useState(false);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
+  const [selectedNumberId, setSelectedNumberId] = useState<string>("");
+  const [assigningEmployee, setAssigningEmployee] = useState(false);
   const { userData } = useAuthStore();
   // Fetch WhatsApp data on component mount
   useEffect(() => {
@@ -271,6 +299,63 @@ export function WhatsAppCenterPage() {
       setError(err.response?.data?.message || "حدث خطأ أثناء ربط الرقم");
     } finally {
       setTogglingNumberId(null);
+    }
+  };
+
+  // Fetch employees when dialog opens
+  useEffect(() => {
+    if (assignEmployeeDialogOpen && userData?.token) {
+      const fetchEmployees = async () => {
+        try {
+          setLoadingEmployees(true);
+          const response = await axiosInstance.get<EmployeesResponse>("/v1/employees");
+          if (response.data && response.data.data) {
+            setEmployees(response.data.data);
+          }
+        } catch (err: any) {
+          console.error("Error fetching employees:", err);
+          setError(err.response?.data?.message || "حدث خطأ أثناء تحميل الموظفين");
+        } finally {
+          setLoadingEmployees(false);
+        }
+      };
+      fetchEmployees();
+    }
+  }, [assignEmployeeDialogOpen, userData?.token]);
+
+  const handleAssignEmployee = async () => {
+    if (!selectedNumberId || !selectedEmployeeId) {
+      setError("يرجى اختيار الرقم والموظف");
+      return;
+    }
+
+    try {
+      setAssigningEmployee(true);
+      setError(null);
+
+      const response = await axiosInstance.patch(`/whatsapp/${selectedNumberId}/employee`, {
+        employeeId: selectedEmployeeId === "none" ? null : Number(selectedEmployeeId),
+      });
+
+      if (response.data.success) {
+        // Refresh the numbers list
+        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+        if (fetchResponse.data.success && fetchResponse.data.data) {
+          setConnectedNumbers(fetchResponse.data.data.numbers || []);
+        }
+        setAssignEmployeeDialogOpen(false);
+        setSelectedEmployeeId("");
+        setSelectedNumberId("");
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 5000);
+      } else {
+        setError("فشل في ربط الرقم بالموظف");
+      }
+    } catch (err: any) {
+      console.error("Error assigning employee:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء ربط الرقم بالموظف");
+    } finally {
+      setAssigningEmployee(false);
     }
   };
 
@@ -642,6 +727,16 @@ export function WhatsAppCenterPage() {
                                       {number.status === "not_linked" ? "ربط" : "تفعيل"}
                                     </DropdownMenuItem>
                                   )}
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSelectedNumberId(String(number.id));
+                                      setAssignEmployeeDialogOpen(true);
+                                    }}
+                                    className="cursor-pointer"
+                                  >
+                                    <Settings className="h-4 w-4 ml-2" />
+                                    ربط بالموظف
+                                  </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                               <Button
@@ -766,6 +861,97 @@ export function WhatsAppCenterPage() {
                 <>
                   <Plus className="h-5 w-5" />
                   زيادة الحد
+                </>
+              )}
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
+
+      {/* Assign Employee Dialog */}
+      <CustomDialog
+        open={assignEmployeeDialogOpen}
+        onOpenChange={setAssignEmployeeDialogOpen}
+        maxWidth="max-w-md"
+      >
+        <CustomDialogContent>
+          <CustomDialogClose onClose={() => setAssignEmployeeDialogOpen(false)} />
+          <CustomDialogHeader>
+            <CustomDialogTitle>ربط الرقم بالموظف</CustomDialogTitle>
+          </CustomDialogHeader>
+          <div className="space-y-4 p-4 sm:p-6">
+            {/* Number Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="number-select">اختر الرقم</Label>
+              <Select
+                value={selectedNumberId}
+                onValueChange={setSelectedNumberId}
+              >
+                <SelectTrigger id="number-select">
+                  <SelectValue placeholder="اختر الرقم" />
+                </SelectTrigger>
+                <SelectContent>
+                  {connectedNumbers
+                    .filter((num) => num.status === "active")
+                    .map((number) => (
+                      <SelectItem key={number.id} value={String(number.id)}>
+                        {number.phoneNumber} {number.name ? `- ${number.name}` : ""}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Employee Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="employee-select">اختر الموظف</Label>
+              <Select
+                value={selectedEmployeeId}
+                onValueChange={setSelectedEmployeeId}
+                disabled={loadingEmployees}
+              >
+                <SelectTrigger id="employee-select">
+                  <SelectValue 
+                    placeholder={
+                      loadingEmployees 
+                        ? "جاري تحميل الموظفين..." 
+                        : "اختر الموظف"
+                    } 
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">لا يوجد موظف</SelectItem>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.id} value={String(employee.id)}>
+                      {employee.first_name} {employee.last_name} ({employee.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {loadingEmployees && (
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                  جاري تحميل الموظفين...
+                </p>
+              )}
+            </div>
+
+            {/* Assign Button */}
+            <Button
+              onClick={handleAssignEmployee}
+              disabled={assigningEmployee || !selectedNumberId || !selectedEmployeeId || loadingEmployees}
+              className="w-full bg-green-600 hover:bg-green-700 text-white gap-2"
+              size="lg"
+            >
+              {assigningEmployee ? (
+                <>
+                  <RefreshCw className="h-5 w-5 animate-spin" />
+                  جاري الربط...
+                </>
+              ) : (
+                <>
+                  <Settings className="h-5 w-5" />
+                  ربط بالموظف
                 </>
               )}
             </Button>
