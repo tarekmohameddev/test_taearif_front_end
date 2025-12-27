@@ -87,20 +87,14 @@ export function CustomDialog({
   if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onOpenChange(false);
-        }
-      }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-200"
         style={{
           opacity: open ? 1 : 0,
         }}
+        onClick={() => onOpenChange(false)}
       />
 
       {/* Dialog Content */}
