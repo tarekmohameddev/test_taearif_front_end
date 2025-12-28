@@ -16,7 +16,7 @@ const nextConfig = {
   experimental: {
     // في Next.js 16، Turbopack هو الافتراضي
     // تحسينات للأداء
-    optimizeCss: true,
+    // optimizeCss: true, // DISABLED - causes 45min+ build times with critters on large projects
     scrollRestoration: true,
   },
   // تحسينات للأداء
@@ -31,46 +31,19 @@ const nextConfig = {
   // تحسين البناء للصفحات الثابتة - معالجة مشكلة symlink على Windows
   output: process.platform === "win32" ? undefined : "standalone",
   // استبعاد مجلدات trash و docs من البناء
-  webpack: (config, { isServer }) => {
-    // استبعاد مجلدات trash و docs من المراقبة أثناء التطوير
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: [
-        ...(Array.isArray(config.watchOptions?.ignored)
-          ? config.watchOptions.ignored
-          : config.watchOptions?.ignored
-            ? [config.watchOptions.ignored]
-            : []),
-        "**/trash/**",
-        "**/docs/**",
-      ],
-    };
-
-    // تعديل القواعد الموجودة لاستبعاد هذه المجلدات
-    if (config.module?.rules) {
-      config.module.rules.forEach((rule) => {
-        if (rule && typeof rule === "object" && !Array.isArray(rule)) {
-          // إضافة exclude للقواعد الموجودة
-          if (rule.test && !rule.exclude) {
-            rule.exclude = [];
-          }
-          if (rule.exclude && Array.isArray(rule.exclude)) {
-            if (!rule.exclude.some((ex) => ex?.toString().includes("trash"))) {
-              rule.exclude.push(/trash/);
-            }
-            if (!rule.exclude.some((ex) => ex?.toString().includes("docs"))) {
-              rule.exclude.push(/docs/);
-            }
-          }
-        }
-      });
+  webpack: (config, { isServer, dev }) => {
+    // استبعاد مجلدات trash و docs من المراقبة أثناء التطوير فقط
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: /node_modules|\.git|trash|docs/,
+      };
     }
 
     return config;
   },
   // إعدادات Turbopack (Next.js 16)
-  // إضافة turbopack فارغة لإيقاف تحذير webpack config
-  turbopack: {},
+  // تم إزالة turbopack: {} الفارغة لتجنب مشاكل البناء
 };
 
 mergeConfig(nextConfig, userConfig);

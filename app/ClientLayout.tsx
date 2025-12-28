@@ -228,12 +228,7 @@ export default function ClientLayout({
         if (pathname !== "/onboarding") {
           try {
             const response = await axiosInstance.get("/user");
-            const userData = response.data.data;
-            // تحديد onboarding_completed بناءً على account_type
-            // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-            const accountType = userData.account_type || userData.user?.account_type;
-            const isEmployee = accountType === "employee";
-            const completed = isEmployee ? true : (userData.onboarding_completed ?? undefined);
+            const completed = response.data.data.onboarding_completed;
             setOnboardingCompleted(completed);
             if (completed == undefined) {
               router.push("/onboarding");
@@ -246,12 +241,7 @@ export default function ClientLayout({
         } else {
           try {
             const response = await axiosInstance.get("/user");
-            const userData = response.data.data;
-            // تحديد onboarding_completed بناءً على account_type
-            // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-            const accountType = userData.account_type || userData.user?.account_type;
-            const isEmployee = accountType === "employee";
-            const completed = isEmployee ? true : (userData.onboarding_completed ?? undefined);
+            const completed = response.data.data.onboarding_completed;
             setOnboardingCompleted(completed);
             if (completed == undefined) {
               router.push("/onboarding");
@@ -316,20 +306,11 @@ export default function ClientLayout({
           const response = await axiosInstance.get("/user");
           if (response.data && response.data.data) {
             const userApiData = response.data.data;
-            // تحديد onboarding_completed بناءً على account_type
-            // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-            const accountType = userApiData.account_type || userApiData.user?.account_type;
-            const isEmployee = accountType === "employee";
-            const onboardingCompleted = isEmployee 
-              ? true 
-              : (userApiData.onboarding_completed ?? userApiData.user?.onboarding_completed);
-            
             // تحديث userData في الـ store مع البيانات الجديدة
             const currentUserData = useAuthStore.getState().userData;
             useAuthStore.getState().setUserData({
               ...currentUserData,
               ...userApiData,
-              onboarding_completed: onboardingCompleted,
             });
             hasFetchedLiveEditorDataRef.current = true;
           }

@@ -55,14 +55,6 @@ const useAuthStore = create((set, get) => ({
       // استخراج بيانات المستخدم (قد تكون في subscriptionDATA.user أو subscriptionDATA مباشرة)
       const userData = subscriptionDATA.user || subscriptionDATA;
 
-      // تحديد onboarding_completed بناءً على account_type
-      // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-      const accountType = userData.account_type || subscriptionDATA.account_type || currentState.userData?.account_type;
-      const isEmployee = accountType === "employee";
-      const onboardingCompleted = isEmployee 
-        ? true 
-        : (subscriptionDATA.onboarding_completed ?? currentState.userData?.onboarding_completed ?? false);
-
       // دمج البيانات الجديدة مع البيانات الموجودة
       const updatedUserData = {
         ...currentState.userData,
@@ -111,16 +103,19 @@ const useAuthStore = create((set, get) => ({
           subscriptionDATA.company_name ||
           currentState.userData?.company_name ||
           null,
-        onboarding_completed: onboardingCompleted,
+        onboarding_completed:
+          subscriptionDATA.onboarding_completed ??
+          currentState.userData?.onboarding_completed ??
+          false,
         // الحفاظ على التوكن الموجود
         token: currentState.userData?.token || null,
         // الحفاظ على البيانات الأخرى
         permissions:
           userData.permissions || currentState.userData?.permissions || [],
         account_type:
-          userData.account_type || subscriptionDATA.account_type || currentState.userData?.account_type || null,
+          userData.account_type || currentState.userData?.account_type || null,
         tenant_id:
-          userData.tenant_id || subscriptionDATA.tenant_id || currentState.userData?.tenant_id || null,
+          userData.tenant_id || currentState.userData?.tenant_id || null,
       };
 
       // تحديث الـ store
@@ -128,7 +123,10 @@ const useAuthStore = create((set, get) => ({
         authenticated: true,
         UserIslogged: true,
         userData: updatedUserData,
-        onboarding_completed: onboardingCompleted,
+        onboarding_completed:
+          subscriptionDATA.onboarding_completed ??
+          currentState.onboarding_completed ??
+          false,
       });
 
       // حفظ البيانات في localStorage
@@ -155,7 +153,7 @@ const useAuthStore = create((set, get) => ({
             real_estate_limit_number:
               subscriptionDATA.membership?.package?.real_estate_limit_number ||
               null,
-            onboarding_completed: onboardingCompleted,
+            onboarding_completed: subscriptionDATA.onboarding_completed,
             fetched_at: Date.now(),
           };
           setPlanCookie(planData);
@@ -193,18 +191,11 @@ const useAuthStore = create((set, get) => ({
 
       const userData = await userInfoResponse.json();
       const currentState = get();
-      
-      // تحديد onboarding_completed بناءً على account_type
-      // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-      const accountType = userData.account_type || currentState.userData?.account_type;
-      const isEmployee = accountType === "employee";
-      const onboardingCompleted = isEmployee ? true : (userData.onboarding_completed || false);
-      
       set({
         UserIslogged: true,
         userData: {
           ...userData,
-          onboarding_completed: onboardingCompleted,
+          onboarding_completed: userData.onboarding_completed || false,
           message: currentState.userData?.message || null, // حفظ الـ message الموجود
         },
         IsLoading: true,
@@ -237,9 +228,15 @@ const useAuthStore = create((set, get) => ({
                   package_features: cachedPlan.package_features,
                   project_limit_number: cachedPlan.project_limit_number,
                   real_estate_limit_number: cachedPlan.real_estate_limit_number,
-                  onboarding_completed: onboardingCompleted,
+                  onboarding_completed:
+                    cachedPlan.onboarding_completed !== undefined
+                      ? cachedPlan.onboarding_completed
+                      : userData.onboarding_completed,
                 },
-                onboarding_completed: onboardingCompleted,
+                onboarding_completed:
+                  cachedPlan.onboarding_completed !== undefined
+                    ? cachedPlan.onboarding_completed
+                    : userData.onboarding_completed,
               });
               return; // لا حاجة لجلب البيانات من API
             }
@@ -253,14 +250,6 @@ const useAuthStore = create((set, get) => ({
       if (get().userData.is_free_plan == null) {
         const ress = await axiosInstance.get("/user");
         const subscriptionDATA = ress.data.data;
-
-        // تحديد onboarding_completed بناءً على account_type
-        // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-        const subscriptionAccountType = subscriptionDATA.account_type || subscriptionDATA.user?.account_type || userData.account_type;
-        const subscriptionIsEmployee = subscriptionAccountType === "employee";
-        const subscriptionOnboardingCompleted = subscriptionIsEmployee 
-          ? true 
-          : (subscriptionDATA.onboarding_completed || false);
 
         // حفظ البيانات في الكوكي
         if (typeof window !== "undefined") {
@@ -280,7 +269,7 @@ const useAuthStore = create((set, get) => ({
               real_estate_limit_number:
                 subscriptionDATA.membership.package.real_estate_limit_number ||
                 null,
-              onboarding_completed: subscriptionOnboardingCompleted,
+              onboarding_completed: subscriptionDATA.onboarding_completed,
               fetched_at: Date.now(),
             };
             setPlanCookie(planData);
@@ -307,11 +296,10 @@ const useAuthStore = create((set, get) => ({
             domain: subscriptionDATA.domain || null,
             message: subscriptionDATA.message || null,
             company_name: subscriptionDATA.company_name || null,
-            account_type: subscriptionAccountType || userData.account_type || null,
-            tenant_id: subscriptionDATA.tenant_id || subscriptionDATA.user?.tenant_id || userData.tenant_id || null,
-            onboarding_completed: subscriptionOnboardingCompleted,
+            onboarding_completed:
+              subscriptionDATA.onboarding_completed || false,
           },
-          onboarding_completed: subscriptionOnboardingCompleted,
+          onboarding_completed: subscriptionDATA.onboarding_completed || false,
         });
       }
 
@@ -380,12 +368,6 @@ const useAuthStore = create((set, get) => ({
 
       const { user, token: UserToken } = await externalResponse.json();
 
-      // تحديد onboarding_completed بناءً على account_type
-      // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-      const accountType = user.account_type;
-      const isEmployee = accountType === "employee";
-      const onboardingCompleted = isEmployee ? true : (user.onboarding_completed || false);
-
       const setAuthResponse = await fetch("/api/user/setAuth", {
         method: "POST",
         headers: {
@@ -413,9 +395,7 @@ const useAuthStore = create((set, get) => ({
         username: user.username,
         first_name: user.first_name,
         last_name: user.last_name,
-        account_type: user.account_type || null,
-        tenant_id: user.tenant_id || null,
-        onboarding_completed: onboardingCompleted,
+        onboarding_completed: user.onboarding_completed || false,
       };
       set({ UserIslogged: true, userData: safeUserData });
 
@@ -514,16 +494,10 @@ const useAuthStore = create((set, get) => ({
         response.data.user ||
         response.data;
 
-      // تحديد onboarding_completed بناءً على account_type
-      // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
-      const accountType = user.account_type;
-      const isEmployee = accountType === "employee";
-      const onboardingCompleted = isEmployee ? true : (user.onboarding_completed || false);
-
       const userData = {
         ...user,
         token,
-        onboarding_completed: onboardingCompleted,
+        onboarding_completed: user.onboarding_completed || false,
       };
 
       set({
