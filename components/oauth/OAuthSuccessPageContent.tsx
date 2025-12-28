@@ -40,13 +40,19 @@ export default function OAuthSuccessPageContent() {
 
         const userData = response.data.data;
 
+        // تحديد onboarding_completed بناءً على account_type
+        // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
+        const accountType = userData.account_type;
+        const isEmployee = accountType === "employee";
+        const onboardingCompleted = isEmployee ? true : (userData.onboarding_completed || false);
+
         // تحضير بيانات المستخدم للحفظ محلياً
         const user = {
           email: userData.email,
           username: userData.username,
           first_name: userData.first_name,
           last_name: userData.last_name,
-          onboarding_completed: userData.onboarding_completed || false,
+          onboarding_completed: onboardingCompleted,
         };
 
         // حفظ بيانات المستخدم والتوكن محلياً

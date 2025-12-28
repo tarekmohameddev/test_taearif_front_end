@@ -21,8 +21,16 @@ export default async function handler(req, res) {
             Authorization: `Bearer ${UserToken}`,
           },
         });
-        userData = response.data;
+        userData = response.data.data || response.data;
       }
+
+      // تحديد onboarding_completed بناءً على account_type
+      // إذا كان account_type == "employee"، يكون onboarding_completed = true دائماً
+      const accountType = userData.account_type || userData.user?.account_type;
+      const isEmployee = accountType === "employee";
+      const onboardingCompleted = isEmployee 
+        ? true 
+        : (userData.onboarding_completed === true);
 
       const token1 = jwt.sign(
         {
@@ -31,7 +39,7 @@ export default async function handler(req, res) {
           username: userData.username,
           first_name: userData.first_name,
           last_name: userData.last_name,
-          onboarding_completed: userData.onboarding_completed === true,
+          onboarding_completed: onboardingCompleted,
         },
         process.env.SECRET_KEY,
         { expiresIn: "30d" },
@@ -57,7 +65,7 @@ export default async function handler(req, res) {
           username: userData.username,
           first_name: userData.first_name,
           last_name: userData.last_name,
-          onboarding_completed: userData.onboarding_completed || false,
+          onboarding_completed: onboardingCompleted,
         },
       });
     } catch (error) {
