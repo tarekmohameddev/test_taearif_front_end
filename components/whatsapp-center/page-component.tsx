@@ -150,7 +150,6 @@ export function WhatsAppCenterPage() {
   const [numberToDelete, setNumberToDelete] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [togglingNumberId, setTogglingNumberId] = useState<number | null>(null);
-  const [increaseLimitDialogOpen, setIncreaseLimitDialogOpen] = useState(false);
   const [assignEmployeeDialogOpen, setAssignEmployeeDialogOpen] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
@@ -589,24 +588,14 @@ export function WhatsAppCenterPage() {
             {/* Connected Numbers Table */}
             <Card>
               <CardHeader>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <WhatsappIcon className="h-5 w-5 text-[#25D366]" />
-                      الأرقام المتصلة
-                    </CardTitle>
-                    <CardDescription>
-                      جميع أرقام الواتساب المرتبطة بحسابك
-                    </CardDescription>
-                  </div>
-                  <Button
-                    onClick={() => setIncreaseLimitDialogOpen(true)}
-                    variant="outline"
-                    className="gap-2 w-full md:w-auto border-green-700 text-green-700 hover:bg-green-50 hover:border-green-800 hover:text-green-800"
-                  >
-                    <Plus className="h-4 w-4" />
-                    زيادة الحد الحالي
-                  </Button>
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <WhatsappIcon className="h-5 w-5 text-[#25D366]" />
+                    الأرقام المتصلة
+                  </CardTitle>
+                  <CardDescription>
+                    جميع أرقام الواتساب المرتبطة بحسابك
+                  </CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
@@ -711,6 +700,7 @@ export function WhatsAppCenterPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
+
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button 
@@ -726,7 +716,7 @@ export function WhatsAppCenterPage() {
                               </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="rtl">
-                                  {number.status === "active" ? (
+                                  {number.status === "active" && (
                                     <DropdownMenuItem
                                       onClick={() => handleUnlinkNumber(number.id)}
                                       disabled={togglingNumberId === number.id}
@@ -734,15 +724,6 @@ export function WhatsAppCenterPage() {
                                     >
                                       <PowerOff className="h-4 w-4 ml-2" />
                                       إلغاء التفعيل
-                                    </DropdownMenuItem>
-                                  ) : (
-                                    <DropdownMenuItem
-                                      onClick={() => handleActivateNumber(number.id)}
-                                      disabled={togglingNumberId === number.id}
-                                      className="cursor-pointer"
-                                    >
-                                      <Power className="h-4 w-4 ml-2" />
-                                      {number.status === "not_linked" ? "ربط" : "تفعيل"}
                                     </DropdownMenuItem>
                                   )}
                                   <DropdownMenuItem
@@ -757,6 +738,7 @@ export function WhatsAppCenterPage() {
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
+                              
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -765,6 +747,26 @@ export function WhatsAppCenterPage() {
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
+                              {number.status !== "active" && (
+                                <Button
+                                  onClick={() => handleActivateNumber(number.id)}
+                                  disabled={togglingNumberId === number.id}
+                                  className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                                  size="default"
+                                >
+                                  {togglingNumberId === number.id ? (
+                                    <>
+                                      <RefreshCw className="h-4 w-4 animate-spin" />
+                                      جاري التفعيل...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Power className="h-4 w-4" />
+                                      تفعيل
+                                    </>
+                                  )}
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -836,55 +838,6 @@ export function WhatsAppCenterPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Increase Limit Dialog */}
-      <CustomDialog
-        open={increaseLimitDialogOpen}
-        onOpenChange={setIncreaseLimitDialogOpen}
-        maxWidth="max-w-md"
-      >
-        <CustomDialogContent>
-          <CustomDialogClose onClose={() => setIncreaseLimitDialogOpen(false)} />
-          <CustomDialogHeader>
-            <CustomDialogTitle>زيادة الحد</CustomDialogTitle>
-          </CustomDialogHeader>
-          <div className="space-y-4 p-4 sm:p-6">
-            {/* Limit Display */}
-            <div className="bg-muted rounded-lg p-4 text-center">
-              <p className="text-sm text-muted-foreground mb-2">الحد الحالي</p>
-              <div className="text-2xl font-bold text-green-600">
-                {isLoading ? "..." : `${usage} / ${quota}`}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                أرقام مستخدمة من أصل المتاحة
-              </p>
-            </div>
-
-            {/* Increase Limit Button */}
-            <Button
-              onClick={() => {
-                setIncreaseLimitDialogOpen(false);
-                handlePurchaseAddon();
-              }}
-              disabled={isPurchasing || isLoading || connectedNumbers.length === 0 || !selectedPlan}
-              className="w-full bg-green-600 hover:bg-green-700 text-white gap-2"
-              size="lg"
-            >
-              {isPurchasing ? (
-                <>
-                  <RefreshCw className="h-5 w-5 animate-spin" />
-                  جاري المعالجة...
-                </>
-              ) : (
-                <>
-                  <Plus className="h-5 w-5" />
-                  زيادة الحد
-                </>
-              )}
-            </Button>
-          </div>
-        </CustomDialogContent>
-      </CustomDialog>
 
       {/* Assign Employee Dialog */}
       <CustomDialog
