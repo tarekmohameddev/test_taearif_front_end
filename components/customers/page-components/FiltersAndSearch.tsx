@@ -311,11 +311,13 @@ export const FiltersAndSearch = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع الأنواع</SelectItem>
-            {filterData?.types?.map((type: any) => (
-              <SelectItem key={type.id} value={type.id.toString()}>
-                {translateType(type.name)}
-              </SelectItem>
-            ))}
+            {filterData?.types
+              ?.filter((type: any) => type.name !== "Both" && translateType(type.name) !== "كلاهما")
+              ?.map((type: any) => (
+                <SelectItem key={type.id} value={type.id.toString()}>
+                  {translateType(type.name)}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
 
