@@ -114,9 +114,22 @@ interface RedirectResponse {
 
 interface AddonPurchaseResponse {
   success: boolean;
-  redirect_url: string;
-  mode: string;
-  config_id: string;
+  redirect_url?: string;
+  mode?: string;
+  config_id?: string;
+  data?: {
+    whatsapp_number_id: number;
+    plan_id: number;
+    qty: number;
+    amount: string;
+    status: string;
+    payment_ref: string;
+    updated_at: string;
+    created_at: string;
+    id: number;
+  };
+  payment_url?: string;
+  message?: string;
 }
 
 interface Employee {
@@ -280,22 +293,66 @@ export function WhatsAppCenterPage() {
       setTogglingNumberId(id);
       setError(null);
       
-      const response = await axiosInstance.post(`/whatsapp/${id}/link`);
+      // Count active numbers
+      const activeNumbersCount = connectedNumbers.filter(
+        (num) => num.status === "active"
+      ).length;
       
-      if (response.data.success) {
-        // Refresh the numbers list
-        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
-        if (fetchResponse.data.success && fetchResponse.data.data) {
-          setConnectedNumbers(fetchResponse.data.data.numbers || []);
+      // Check if limit is reached
+      if (activeNumbersCount >= quota) {
+        // Limit reached, need to purchase addon
+        if (!selectedPlan) {
+          setError("يرجى اختيار خطة أولاً");
+          setTogglingNumberId(null);
+          return;
         }
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 5000);
+        
+        // Call the addon purchase API
+        const response = await axiosInstance.post<AddonPurchaseResponse>(
+          "/whatsapp/addons",
+          {
+            whatsapp_number_id: id,
+            qty: 1,
+            plan_id: selectedPlan,
+            payment_method: "test",
+          },
+        );
+        
+        if (response.data.success) {
+          if (response.data.payment_url) {
+            // Redirect to payment URL
+            window.location.href = response.data.payment_url;
+          } else {
+            // Refresh the numbers list
+            const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+            if (fetchResponse.data.success && fetchResponse.data.data) {
+              setConnectedNumbers(fetchResponse.data.data.numbers || []);
+            }
+            setShowSuccessAlert(true);
+            setTimeout(() => setShowSuccessAlert(false), 5000);
+          }
+        } else {
+          setError("فشل في إنشاء طلب الشراء");
+        }
       } else {
-        setError("فشل في ربط الرقم");
+        // Limit not reached, use normal activation
+        const response = await axiosInstance.post(`/whatsapp/${id}/link`);
+        
+        if (response.data.success) {
+          // Refresh the numbers list
+          const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+          if (fetchResponse.data.success && fetchResponse.data.data) {
+            setConnectedNumbers(fetchResponse.data.data.numbers || []);
+          }
+          setShowSuccessAlert(true);
+          setTimeout(() => setShowSuccessAlert(false), 5000);
+        } else {
+          setError("فشل في ربط الرقم");
+        }
       }
     } catch (err: any) {
-      console.error("Error linking number:", err);
-      setError(err.response?.data?.message || "حدث خطأ أثناء ربط الرقم");
+      console.error("Error activating number:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء تفعيل الرقم");
     } finally {
       setTogglingNumberId(null);
     }
@@ -747,26 +804,37 @@ export function WhatsAppCenterPage() {
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
-                              {number.status !== "active" && (
-                                <Button
-                                  onClick={() => handleActivateNumber(number.id)}
-                                  disabled={togglingNumberId === number.id}
-                                  className="bg-green-600 hover:bg-green-700 text-white gap-2"
-                                  size="default"
-                                >
-                                  {togglingNumberId === number.id ? (
-                                    <>
-                                      <RefreshCw className="h-4 w-4 animate-spin" />
-                                      جاري التفعيل...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Power className="h-4 w-4" />
-                                      تفعيل
-                                    </>
-                                  )}
-                                </Button>
-                              )}
+                              {number.status !== "active" && (() => {
+                                const activeNumbersCount = connectedNumbers.filter(
+                                  (num) => num.status === "active"
+                                ).length;
+                                const needsAddon = activeNumbersCount >= quota;
+                                
+                                return (
+                                  <Button
+                                    onClick={() => handleActivateNumber(number.id)}
+                                    disabled={togglingNumberId === number.id}
+                                    className={
+                                      needsAddon
+                                        ? "bg-green-600 hover:bg-green-700 text-white gap-2"
+                                        : "bg-blue-600 hover:bg-blue-700 text-white gap-2"
+                                    }
+                                    size="default"
+                                  >
+                                    {togglingNumberId === number.id ? (
+                                      <>
+                                        <RefreshCw className="h-4 w-4 animate-spin" />
+                                        {needsAddon ? "جاري التفعيل..." : "جاري الربط..."}
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Power className="h-4 w-4" />
+                                        {needsAddon ? "تفعيل" : "ربط"}
+                                      </>
+                                    )}
+                                  </Button>
+                                );
+                              })()}
                             </div>
                           </TableCell>
                         </TableRow>
