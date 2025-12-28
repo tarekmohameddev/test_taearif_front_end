@@ -451,17 +451,35 @@ export function WhatsAppCenterPage() {
             )}
 
             {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    الأرقام المتصلة
+                    الأرقام المسجلة
                   </CardTitle>
                   <Phone className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
                     {isLoading ? "..." : connectedNumbers.length}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    إجمالي الأرقام المسجلة
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    الأرقام النشطة
+                  </CardTitle>
+                  <Power className="h-4 w-4 text-green-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    {isLoading
+                      ? "..."
+                      : connectedNumbers.filter((num) => num.status === "active").length}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     أرقام واتساب نشطة
