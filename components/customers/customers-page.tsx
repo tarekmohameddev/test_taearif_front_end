@@ -140,6 +140,7 @@ export default function CustomersPage() {
     city_id: number | undefined;
     district_id: number | undefined;
     stage_id: number | undefined;
+    procedure_id: number | undefined;
   } | null>(null); // ← بيانات العميل المحدد
   const [editingCustomerId, setEditingCustomerId] = useState<number | null>(
     null,
@@ -321,6 +322,7 @@ export default function CustomersPage() {
       city_id: customer.city_id || undefined,
       district_id: customer.district?.id || undefined,
       stage_id: customer.stage?.id || undefined,
+      procedure_id: customer.procedure?.id || undefined,
     });
     setOpen(true);
   };

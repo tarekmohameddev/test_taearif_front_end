@@ -17,8 +17,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
+import { CustomerForm } from "./CustomerForm";
 import { Separator } from "@/components/ui/separator";
 import { StageAssignmentDialog } from "./StageAssignmentDialog";
 import { Pagination } from "./Pagination";
@@ -46,13 +52,6 @@ import { createPortal } from "react-dom";
 import useStore from "@/context/Store";
 import { WhatsAppSendDialog } from "@/components/marketing/whatsapp-send-dialog";
 import axiosInstance from "@/lib/axiosInstance";
-import {
-  CustomDialog,
-  CustomDialogContent,
-  CustomDialogHeader,
-  CustomDialogTitle,
-  CustomDialogClose,
-} from "@/components/customComponents/CustomDialog";
 import {
   Select,
   SelectContent,
@@ -475,6 +474,7 @@ export const CustomerTable = ({
                 <TableHead className="text-right">نوع العقار</TableHead>
                 <TableHead className="text-right">نوع الطلب</TableHead>
                 <TableHead className="text-right">الرسالة</TableHead>
+                <TableHead className="text-right">المرحلة</TableHead>
                 <TableHead className="text-right">الموقع</TableHead>
                 <TableHead className="w-[100px] text-right">
                   الإجراءات
@@ -580,6 +580,20 @@ export const CustomerTable = ({
                   </TableCell>
                   <TableCell className="max-w-[300px] min-w-[200px] sm:max-w-40 ">
                     {customer.inquiry?.message || "غير محدد"}
+                  </TableCell>
+                  <TableCell>
+                    {customer.stage?.name ? (
+                      <Badge
+                        variant="outline"
+                        className="border-gray-500 text-gray-700"
+                      >
+                        {customer.stage.name}
+                      </Badge>
+                    ) : (
+                      <div className="text-sm text-muted-foreground text-right italic">
+                        غير محدد
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
@@ -731,36 +745,35 @@ export const CustomerTable = ({
                         )}
                     </div>
 
-                    {/* Dialog للتعديل */}
+                    {/* Edit Customer Dialog */}
                     {formData && (
-                      <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>تعديل بيانات العميل</DialogTitle>
-                          </DialogHeader>
-                          <div className="grid gap-4">
-                            <Input
-                              id="name"
-                              value={formData.name}
-                              onChange={handleChange("name")}
+                      <CustomDialog open={open} onOpenChange={setOpen} maxWidth="max-w-4xl">
+                        <CustomDialogContent className="p-6">
+                          <CustomDialogHeader>
+                            <CustomDialogTitle>تعديل بيانات العميل</CustomDialogTitle>
+                            <CustomDialogClose onClose={() => setOpen(false)} />
+                          </CustomDialogHeader>
+                          <div className="py-4">
+                            <CustomerForm
+                              formData={{
+                                name: formData.name,
+                                email: formData.email,
+                                phone_number: formData.phone_number,
+                                city_id: formData.city_id || null,
+                                district_id: formData.district_id || null,
+                                note: formData.note || "",
+                                type_id: formData.type_id,
+                                priority_id: formData.priority_id,
+                                stage_id: formData.stage_id || null,
+                                procedure_id: formData.procedure_id || null,
+                              }}
+                              onChange={(field, value) => {
+                                handleChange(field)({ target: { value } } as any);
+                              }}
+                              errors={{}}
+                              isEditMode={true}
                             />
-                            <Input
-                              id="email"
-                              value={formData.email}
-                              onChange={handleChange("email")}
-                            />
-                            <Input
-                              id="phone"
-                              value={formData.phone_number}
-                              onChange={handleChange("phone_number")}
-                            />
-                            <Textarea
-                              id="note"
-                              value={formData.note}
-                              onChange={handleChange("note")}
-                            />
-
-                            <div className="flex justify-end gap-2">
+                            <div className="flex justify-end gap-2 pt-4 border-t">
                               <Button
                                 variant="outline"
                                 onClick={() => setOpen(false)}
@@ -772,8 +785,8 @@ export const CustomerTable = ({
                               </Button>
                             </div>
                           </div>
-                        </DialogContent>
-                      </Dialog>
+                        </CustomDialogContent>
+                      </CustomDialog>
                     )}
                   </TableCell>
                 </TableRow>
