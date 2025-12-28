@@ -67,6 +67,7 @@ import { Label } from "@/components/ui/label";
 import { WhatsappIcon } from "@/components/icons";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
 interface WhatsAppNumber {
   id: number;
@@ -113,7 +114,8 @@ interface RedirectResponse {
 }
 
 interface AddonPurchaseResponse {
-  success: boolean;
+  status?: string;
+  success?: boolean;
   redirect_url?: string;
   mode?: string;
   config_id?: string;
@@ -130,6 +132,10 @@ interface AddonPurchaseResponse {
   };
   payment_url?: string;
   message?: string;
+  total_amount?: number;
+  package_price?: number;
+  period?: number;
+  package_term?: string;
 }
 
 interface Employee {
@@ -169,6 +175,9 @@ export function WhatsAppCenterPage() {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
   const [selectedNumberId, setSelectedNumberId] = useState<string>("");
   const [assigningEmployee, setAssigningEmployee] = useState(false);
+  const [paymentPopupOpen, setPaymentPopupOpen] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
+  const [addonId, setAddonId] = useState<number | undefined>(undefined);
   const { userData } = useAuthStore();
   // Fetch WhatsApp data on component mount
   useEffect(() => {
@@ -318,10 +327,12 @@ export function WhatsAppCenterPage() {
           },
         );
         
-        if (response.data.success) {
+        if (response.data.status === "success" || response.data.success) {
           if (response.data.payment_url) {
-            // Redirect to payment URL
-            window.location.href = response.data.payment_url;
+            // Open payment popup with iframe
+            setPaymentUrl(response.data.payment_url);
+            setAddonId(response.data.data?.id);
+            setPaymentPopupOpen(true);
           } else {
             // Refresh the numbers list
             const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
@@ -997,6 +1008,31 @@ export function WhatsAppCenterPage() {
           </div>
         </CustomDialogContent>
       </CustomDialog>
+
+      {/* Payment Popup */}
+      {paymentPopupOpen && (
+        <PaymentPopup
+          paymentUrl={paymentUrl}
+          addonId={addonId}
+          onClose={() => {
+            setPaymentPopupOpen(false);
+            setPaymentUrl("");
+            setAddonId(undefined);
+            // Refresh the numbers list after closing popup
+            const refreshData = async () => {
+              try {
+                const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+                if (fetchResponse.data.success && fetchResponse.data.data) {
+                  setConnectedNumbers(fetchResponse.data.data.numbers || []);
+                }
+              } catch (err) {
+                console.error("Error refreshing data:", err);
+              }
+            };
+            refreshData();
+          }}
+        />
+      )}
     </div>
   );
 }
