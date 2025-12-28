@@ -490,6 +490,7 @@ export const FiltersAndSearch = ({
               onSelect={handleDateRangeChange}
               numberOfMonths={2}
               locale={ar}
+              toDate={new Date()}
             />
           </PopoverContent>
         </Popover>
