@@ -690,23 +690,6 @@ export const CustomerTable = ({
                               تعيين الموظف المسؤول
                             </button>
 
-                            {/* سجل النشاطات */}
-                            <button
-                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                              onClick={() => {
-                                setOpenDropdownId(null);
-                                setDropdownPosition(null);
-                                const url = `/dashboard/activity-logs/customer/${customer.id}`;
-                                window.open(url, "_blank");
-                              }}
-                            >
-                              <Activity className="ml-2 h-4 w-4" />
-                              سجل النشاطات
-                            </button>
-
-                            {/* Separator */}
-                            <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-
                             {/* إرسال واتساب */}
                             {hasValidWhatsAppChannel() && (
                               <button
@@ -727,30 +710,6 @@ export const CustomerTable = ({
                                 إرسال واتساب
                               </button>
                             )}
-
-                            {/* اتصال هاتفي */}
-                            <button
-                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                              onClick={() => {
-                                setOpenDropdownId(null);
-                                setDropdownPosition(null);
-                              }}
-                            >
-                              <Phone className="ml-2 h-4 w-4" />
-                              اتصال هاتفي
-                            </button>
-
-                            {/* إرسال بريد إلكتروني */}
-                            <button
-                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                              onClick={() => {
-                                setOpenDropdownId(null);
-                                setDropdownPosition(null);
-                              }}
-                            >
-                              <Mail className="ml-2 h-4 w-4" />
-                              إرسال بريد إلكتروني
-                            </button>
 
                             {/* Separator */}
                             <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
