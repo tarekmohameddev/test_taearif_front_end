@@ -39,12 +39,31 @@ import {
   CheckSquare,
   X,
   ArrowRight,
+  User,
 } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import useStore from "@/context/Store";
 import { WhatsAppSendDialog } from "@/components/marketing/whatsapp-send-dialog";
 import axiosInstance from "@/lib/axiosInstance";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Loader2, CheckCircle } from "lucide-react";
+import useAuthStore from "@/context/AuthContext";
+import toast from "react-hot-toast";
 
 export const CustomerTable = ({
   filteredAndSortedCustomers,
@@ -91,10 +110,133 @@ export const CustomerTable = ({
   const [customerDetails, setCustomerDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
+  // Employee Assignment Dialog State
+  const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
+  const [selectedCustomerForEmployee, setSelectedCustomerForEmployee] =
+    useState<any>(null);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(
+    null,
+  );
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [savingEmployee, setSavingEmployee] = useState(false);
+  const { userData } = useAuthStore();
+
   // جلب قنوات التسويق عند تحميل المكون
   useEffect(() => {
     fetchMarketingChannels();
   }, [fetchMarketingChannels]);
+
+  // جلب الموظفين عند فتح dialog تعيين الموظف
+  useEffect(() => {
+    if (showEmployeeDialog && userData?.token) {
+      fetchEmployees();
+    }
+  }, [showEmployeeDialog, userData?.token]);
+
+  // تعيين الموظف الحالي عند فتح dialog
+  useEffect(() => {
+    if (selectedCustomerForEmployee && employees.length > 0) {
+      const currentEmployeeId =
+        selectedCustomerForEmployee.responsible_employee?.id || null;
+      setSelectedEmployeeId(currentEmployeeId);
+    }
+  }, [selectedCustomerForEmployee, employees]);
+
+  // دالة لجلب الموظفين
+  const fetchEmployees = async () => {
+    if (!userData?.token) return;
+
+    setLoadingEmployees(true);
+    try {
+      const response = await axiosInstance.get("/v1/employees");
+      if (response.data && response.data.data) {
+        setEmployees(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      toast.error("حدث خطأ أثناء تحميل الموظفين", {
+        duration: 4000,
+        position: "top-center",
+      });
+    } finally {
+      setLoadingEmployees(false);
+    }
+  };
+
+  // دالة لحفظ تعيين الموظف
+  const handleAssignEmployee = async () => {
+    if (!selectedCustomerForEmployee) return;
+
+    if (!userData?.token) {
+      toast.error("يجب تسجيل الدخول أولاً", {
+        duration: 4000,
+        position: "top-center",
+      });
+      return;
+    }
+
+    setSavingEmployee(true);
+    try {
+      const customer = selectedCustomerForEmployee;
+
+      // إعداد البيانات للإرسال باستخدام بيانات العميل الموجودة
+      const updateData: any = {
+        stage_id: customer.stage?.id || null,
+        name: customer.name,
+        email: customer.email || "",
+        note: customer.note || "",
+        type_id: customer.type?.id || null,
+        procedure_id: customer.procedure?.id || null,
+        priority_id: customer.priority?.id || null,
+        city_id: customer.city_id || customer.district?.city_id || null,
+        district_id: customer.district?.id || null,
+        interested_category_ids:
+          customer.interested_categories?.map((cat: any) => cat.id) || null,
+        interested_property_ids:
+          customer.interested_properties?.map((prop: any) => prop.id) || null,
+        phone_number: customer.phone_number || "",
+        responsible_employee_id: selectedEmployeeId,
+      };
+
+      // إرسال طلب التحديث
+      await axiosInstance.put(`/customers/${customer.id}`, updateData);
+
+      toast.success("تم تعيين الموظف المسؤول بنجاح!", {
+        duration: 4000,
+        position: "top-center",
+      });
+
+      // تحديث الصفحة
+      if (onPageChange && pagination) {
+        onPageChange(pagination.current_page);
+      }
+
+      setShowEmployeeDialog(false);
+      setSelectedCustomerForEmployee(null);
+      setSelectedEmployeeId(null);
+    } catch (error: any) {
+      console.error("Error assigning employee:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "حدث خطأ أثناء تعيين الموظف المسؤول",
+        {
+          duration: 4000,
+          position: "top-center",
+          style: {
+            background: "#EF4444",
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: "16px",
+            padding: "12px 20px",
+            borderRadius: "8px",
+          },
+        },
+      );
+    } finally {
+      setSavingEmployee(false);
+    }
+  };
 
   // دالة لجلب تفاصيل العميل مع الاستفسارات
   const fetchCustomerDetails = async (customerId: string) => {
@@ -533,6 +675,21 @@ export const CustomerTable = ({
                               تعيين المرحلة
                             </button>
 
+                            {/* تعيين الموظف المسؤول */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                                setSelectedCustomerForEmployee(customer);
+                                setShowEmployeeDialog(true);
+                              }}
+                            >
+                              <User className="ml-2 h-4 w-4" />
+                              تعيين الموظف المسؤول
+                            </button>
+
                             {/* سجل النشاطات */}
                             <button
                               className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
@@ -700,6 +857,203 @@ export const CustomerTable = ({
         customerName={selectedCustomerForWhatsApp?.name}
         customerId={selectedCustomerForWhatsApp?.id}
       />
+
+      {/* Employee Assignment Dialog */}
+      <CustomDialog
+        open={showEmployeeDialog}
+        onOpenChange={setShowEmployeeDialog}
+        maxWidth="max-w-md"
+      >
+        <CustomDialogContent className="p-3">
+          <CustomDialogHeader>
+            <CustomDialogTitle className="flex items-center gap-3 ">
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
+                <div className="text-sm text-muted-foreground font-normal">
+                  اختر الموظف المسؤول عن هذا العميل
+                </div>
+              </div>
+            </CustomDialogTitle>
+            <CustomDialogClose
+              onClose={() => {
+                setShowEmployeeDialog(false);
+                setSelectedCustomerForEmployee(null);
+                setSelectedEmployeeId(null);
+              }}
+            />
+          </CustomDialogHeader>
+
+          <div className="space-y-6">
+            {/* معلومات العميل */}
+            {selectedCustomerForEmployee && (
+              <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="/placeholder.svg" />
+                  <AvatarFallback>
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-medium">
+                    {selectedCustomerForEmployee.name}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    عميل رقم #{selectedCustomerForEmployee.id}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* اختيار الموظف */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium">اختر الموظف:</label>
+              {loadingEmployees ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="mr-2 text-sm text-muted-foreground">
+                    جاري تحميل الموظفين...
+                  </span>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Select
+                    value={
+                      selectedEmployeeId
+                        ? selectedEmployeeId.toString()
+                        : undefined
+                    }
+                    onValueChange={(value) =>
+                      setSelectedEmployeeId(value ? Number(value) : null)
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="اختر الموظف" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employees.map((employee) => {
+                        // استخدام first_name و last_name إذا كانا متوفرين
+                        const employeeName = employee.first_name && employee.last_name
+                          ? `${employee.first_name} ${employee.last_name}`
+                          : employee.name || employee.email || `موظف #${employee.id}`;
+                        
+                        return (
+                          <SelectItem
+                            key={employee.id}
+                            value={employee.id.toString()}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{employeeName}</span>
+                              {employee.email && (
+                                <span className="text-xs text-muted-foreground">
+                                  ({employee.email})
+                                </span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  {selectedEmployeeId && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-muted-foreground"
+                      onClick={() => setSelectedEmployeeId(null)}
+                    >
+                      إلغاء تعيين الموظف
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* معاينة الموظف المختار */}
+            {selectedEmployeeId && (
+              <div className="p-4 border rounded-lg bg-card">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <span className="text-sm font-medium">الموظف المختار:</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const selectedEmployee = employees.find(
+                      (emp) => emp.id === selectedEmployeeId,
+                    );
+                    if (!selectedEmployee) return null;
+                    
+                    const employeeName =
+                      selectedEmployee.first_name && selectedEmployee.last_name
+                        ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+                        : selectedEmployee.name ||
+                          selectedEmployee.email ||
+                          `موظف #${selectedEmployee.id}`;
+                    
+                    return (
+                      <>
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={selectedEmployee.photo || "/placeholder.svg"} />
+                          <AvatarFallback>
+                            <User className="h-4 w-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{employeeName}</div>
+                          {selectedEmployee.email && (
+                            <div className="text-xs text-muted-foreground">
+                              {selectedEmployee.email}
+                            </div>
+                          )}
+                          {selectedEmployee.phone && (
+                            <div className="text-xs text-muted-foreground">
+                              {selectedEmployee.phone}
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* أزرار الحفظ والإلغاء */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEmployeeDialog(false);
+                setSelectedCustomerForEmployee(null);
+                setSelectedEmployeeId(null);
+              }}
+              disabled={savingEmployee}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleAssignEmployee}
+              disabled={savingEmployee || loadingEmployees}
+              className="min-w-[100px]"
+            >
+              {savingEmployee ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري الحفظ...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="ml-2 h-4 w-4" />
+                  تطبيق
+                </>
+              )}
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
 
       {/* Custom Customer Details Dialog */}
       {showCustomDialog &&
