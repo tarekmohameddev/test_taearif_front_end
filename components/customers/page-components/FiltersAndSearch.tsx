@@ -7,11 +7,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, RefreshCw, Loader2 } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Search, RefreshCw, Loader2, CalendarIcon, User, Phone } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
+import type { DateRange } from "react-day-picker";
 
 // Interface for filter data from API
 interface FilterData {
@@ -43,6 +52,11 @@ interface FilterData {
     color: string | null;
   }>;
   procedures: Array<{ id: number; name: string; icon: string; color: string }>;
+  employees: Array<{
+    id: number;
+    name: string;
+    email: string;
+  }>;
 }
 
 // Translation functions for filter data
@@ -92,6 +106,9 @@ export const FiltersAndSearch = ({
     filterCity,
     filterDistrict,
     filterPriority,
+    filterEmployee,
+    filterEmployeePhone,
+    dateRange,
     filterData,
     loadingFilters,
     setSearchTerm,
@@ -99,6 +116,9 @@ export const FiltersAndSearch = ({
     setFilterCity,
     setFilterDistrict,
     setFilterPriority,
+    setFilterEmployee,
+    setFilterEmployeePhone,
+    setDateRange,
     setFilterData,
     setLoadingFilters,
     clearAllFilters,
@@ -167,6 +187,18 @@ export const FiltersAndSearch = ({
       if (currentState.filterPriority !== "all") {
         params.append("priority_id", currentState.filterPriority);
       }
+      if (currentState.filterEmployee !== "all") {
+        params.append("responsible_employee_id", currentState.filterEmployee);
+      }
+      if (currentState.filterEmployeePhone.trim()) {
+        params.append("phone_number", currentState.filterEmployeePhone.trim());
+      }
+      if (currentState.dateRange.from) {
+        params.append("created_from", format(currentState.dateRange.from, "yyyy-MM-dd"));
+      }
+      if (currentState.dateRange.to) {
+        params.append("created_to", format(currentState.dateRange.to, "yyyy-MM-dd"));
+      }
 
       let response;
       // If there are any active filters or a search term, use the search endpoint.
@@ -232,9 +264,29 @@ export const FiltersAndSearch = ({
       case "priority":
         setFilterPriority(value);
         break;
+      case "employee":
+        setFilterEmployee(value);
+        break;
     }
 
     // Use setTimeout to ensure the state update is processed before triggering the search
+    setTimeout(performSearch, 0);
+  };
+
+  // Handle employee phone change
+  const handleEmployeePhoneChange = (value: string) => {
+    setFilterEmployeePhone(value);
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+    searchTimeout.current = setTimeout(() => {
+      performSearch();
+    }, 500);
+  };
+
+  // Handle date range change
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    setDateRange(range || { from: undefined, to: undefined });
     setTimeout(performSearch, 0);
   };
 
@@ -376,6 +428,71 @@ export const FiltersAndSearch = ({
             ))}
           </SelectContent>
         </Select>
+
+        {/* Employee Filter */}
+        <Select
+          value={filterEmployee}
+          onValueChange={(value) => handleFilterChange("employee", value)}
+        >
+          <SelectTrigger className="w-full sm:w-[140px] lg:w-[120px]">
+            <SelectValue placeholder="الموظف" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">جميع الموظفين</SelectItem>
+            {filterData?.employees?.map((employee: any) => (
+              <SelectItem key={employee.id} value={employee.id.toString()}>
+                {employee.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Employee Phone Filter */}
+        <div className="relative w-full sm:w-[180px] lg:w-[160px]">
+          <Phone className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="tel"
+            placeholder="رقم هاتف الموظف"
+            className="pr-8"
+            value={filterEmployeePhone}
+            onChange={(e) => handleEmployeePhoneChange(e.target.value)}
+          />
+        </div>
+
+        {/* Date Range Filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full sm:w-[140px] lg:w-[200px] justify-start text-right font-normal"
+            >
+              <CalendarIcon className="ml-2 h-4 w-4" />
+              {dateRange?.from ? (
+                dateRange.to ? (
+                  <>
+                    {format(dateRange.from, "yyyy-MM-dd", { locale: ar })} -{" "}
+                    {format(dateRange.to, "yyyy-MM-dd", { locale: ar })}
+                  </>
+                ) : (
+                  format(dateRange.from, "yyyy-MM-dd", { locale: ar })
+                )
+              ) : (
+                <span>نطاق التاريخ</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={dateRange?.from}
+              selected={dateRange}
+              onSelect={handleDateRangeChange}
+              numberOfMonths={2}
+              locale={ar}
+            />
+          </PopoverContent>
+        </Popover>
 
         {/* Reset Button */}
         <Button

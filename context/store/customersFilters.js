@@ -7,6 +7,9 @@ const useCustomersFiltersStore = create((set, get) => ({
   filterCity: "all",
   filterDistrict: "all",
   filterPriority: "all",
+  filterEmployee: "all",
+  filterEmployeePhone: "",
+  dateRange: { from: undefined, to: undefined },
 
   // Filter data from API - initialize with empty arrays to prevent undefined errors
   filterData: {
@@ -16,6 +19,7 @@ const useCustomersFiltersStore = create((set, get) => ({
     priorities: [],
     stages: [],
     procedures: [],
+    employees: [],
   },
   loadingFilters: true,
 
@@ -25,6 +29,9 @@ const useCustomersFiltersStore = create((set, get) => ({
   setFilterCity: (city) => set({ filterCity: city }),
   setFilterDistrict: (district) => set({ filterDistrict: district }),
   setFilterPriority: (priority) => set({ filterPriority: priority }),
+  setFilterEmployee: (employee) => set({ filterEmployee: employee }),
+  setFilterEmployeePhone: (phone) => set({ filterEmployeePhone: phone }),
+  setDateRange: (range) => set({ dateRange: range }),
 
   // Set filter data from API
   setFilterData: (data) =>
@@ -36,6 +43,7 @@ const useCustomersFiltersStore = create((set, get) => ({
         priorities: data?.priorities || [],
         stages: data?.stages || [],
         procedures: data?.procedures || [],
+        employees: data?.employees || [],
       },
       loadingFilters: false,
     }),
@@ -49,6 +57,9 @@ const useCustomersFiltersStore = create((set, get) => ({
       filterCity: "all",
       filterDistrict: "all",
       filterPriority: "all",
+      filterEmployee: "all",
+      filterEmployeePhone: "",
+      dateRange: { from: undefined, to: undefined },
     }),
 
   // Check if any filters are applied
@@ -59,7 +70,11 @@ const useCustomersFiltersStore = create((set, get) => ({
       state.filterType !== "all" ||
       state.filterCity !== "all" ||
       state.filterDistrict !== "all" ||
-      state.filterPriority !== "all"
+      state.filterPriority !== "all" ||
+      state.filterEmployee !== "all" ||
+      state.filterEmployeePhone.trim() ||
+      state.dateRange.from ||
+      state.dateRange.to
     );
   },
 
@@ -72,6 +87,9 @@ const useCustomersFiltersStore = create((set, get) => ({
       filterCity: state.filterCity,
       filterDistrict: state.filterDistrict,
       filterPriority: state.filterPriority,
+      filterEmployee: state.filterEmployee,
+      filterEmployeePhone: state.filterEmployeePhone,
+      dateRange: state.dateRange,
     };
   },
 }));
