@@ -43,7 +43,9 @@ const nextConfig = {
     return config;
   },
   // إعدادات Turbopack (Next.js 16)
-  // تم إزالة turbopack: {} الفارغة لتجنب مشاكل البناء
+  // إضافة turbopack: {} لإسكات الخطأ - Turbopack هو الافتراضي في Next.js 16
+  // يعمل فقط في وضع التطوير
+  ...(process.env.NODE_ENV === "development" && { turbopack: {} }),
 };
 
 mergeConfig(nextConfig, userConfig);
