@@ -277,7 +277,7 @@ export default function CrmFilters({
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-2">
-        <Button
+        {/* <Button
           variant={activeView === "pipeline" ? "default" : "outline"}
           onClick={() => setActiveView("pipeline")}
           className="flex items-center gap-2"
@@ -285,7 +285,7 @@ export default function CrmFilters({
           <Move className="h-4 w-4" />
           <span className="hidden sm:inline">مراحل العملاء</span>
           <span className="sm:hidden">المراحل</span>
-        </Button>
+        </Button> */}
         <Button
           variant="default"
           className="flex items-center gap-2"
