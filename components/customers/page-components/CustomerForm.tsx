@@ -258,7 +258,7 @@ export const CustomerForm = ({
               <SelectValue placeholder="اختر النوع" />
             </SelectTrigger>
             <SelectContent>
-              {filterData?.types?.map((type: any) => (
+              {filterData?.types?.filter((type: any) => type.name !== "Both").map((type: any) => (
                 <SelectItem key={type.id} value={type.id.toString()}>
                   {translateType(type.name)}
                 </SelectItem>
