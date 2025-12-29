@@ -846,7 +846,18 @@ export function WhatsAppCenterPage() {
                                       <Settings className="h-4 w-4 ml-2" />
                                       فك الربط عن الموظف
                                     </DropdownMenuItem>
-                                  ) : null}
+                                  ) : (
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setSelectedNumberId(String(number.id));
+                                        setAssignEmployeeDialogOpen(true);
+                                      }}
+                                      className="cursor-pointer"
+                                    >
+                                      <Settings className="h-4 w-4 ml-2" />
+                                      ربط بالموظف
+                                    </DropdownMenuItem>
+                                  )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                               
