@@ -21,77 +21,21 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
   const initialQuotaRef = useRef<number | null>(null);
   const initialUsageRef = useRef<number | null>(null);
 
-  // Log when component mounts and addonId changes
+  // Fallback: Monitor iframe src changes (URL access blocked by CORS)
   useEffect(() => {
-    console.log("PaymentPopup component rendered/mounted, addonId:", addonId);
-    // Reset initial values when popup opens
-    initialQuotaRef.current = null;
-    initialUsageRef.current = null;
-  }, [addonId]);
-
-  // Fallback: Monitor iframe URL changes and src changes
-  useEffect(() => {
-    console.log("Payment popup: Setting up iframe monitoring");
-    
-    const checkIframeUrl = () => {
-      try {
-        if (iframeRef.current?.contentWindow) {
-          const iframeUrl = iframeRef.current.contentWindow.location.href;
-          console.log("Checking iframe URL:", iframeUrl);
-          
-          // Check if iframe navigated to success URL
-          if (iframeUrl.includes("/payment/success/")) {
-            console.log("Payment success detected via iframe URL:", iframeUrl);
-            if (showSuccess || showFailed) return; // Prevent multiple calls
-            
-            setShowSuccess(true);
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
-            }
-            setTimeout(() => {
-              onClose();
-              // Call onPaymentSuccess callback if provided
-              if (onPaymentSuccess) {
-                onPaymentSuccess();
-              } else {
-                // Fallback to reload if no callback
-                window.location.reload();
-              }
-            }, 2000);
-          } else if (iframeUrl.includes("/payment/failed/")) {
-            console.log("Payment failed detected via iframe URL:", iframeUrl);
-            if (showSuccess || showFailed) return; // Prevent multiple calls
-            
-            setShowFailed(true);
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
-            }
-            setTimeout(() => {
-              onClose();
-              window.location.reload();
-            }, 2000);
-          }
-        }
-      } catch (e) {
-        // Cross-origin error is expected, ignore it
-        // This means we can't access iframe URL due to CORS
-        console.log("Cannot access iframe URL (CORS):", e);
-      }
-    };
-
-    // Also check iframe src attribute changes
     const checkIframeSrc = () => {
       if (iframeRef.current) {
         const currentSrc = iframeRef.current.src;
-        console.log("Checking iframe src:", currentSrc);
         
         if (currentSrc.includes("/payment/success/")) {
-          console.log("Payment success detected via iframe src:", currentSrc);
           if (showSuccess || showFailed) return;
           
           setShowSuccess(true);
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
+          }
+          if (statusPollingIntervalRef.current) {
+            clearInterval(statusPollingIntervalRef.current);
           }
           setTimeout(() => {
             onClose();
@@ -102,12 +46,14 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
             }
           }, 2000);
         } else if (currentSrc.includes("/payment/failed/")) {
-          console.log("Payment failed detected via iframe src:", currentSrc);
           if (showSuccess || showFailed) return;
           
           setShowFailed(true);
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
+          }
+          if (statusPollingIntervalRef.current) {
+            clearInterval(statusPollingIntervalRef.current);
           }
           setTimeout(() => {
             onClose();
@@ -117,17 +63,12 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
       }
     };
 
-    // Check iframe URL and src every 1 second as fallback
+    // Check iframe src every 2 seconds as fallback
     if (!showSuccess && !showFailed) {
-      console.log("Starting iframe monitoring interval");
-      pollingIntervalRef.current = setInterval(() => {
-        checkIframeUrl();
-        checkIframeSrc();
-      }, 1000);
+      pollingIntervalRef.current = setInterval(checkIframeSrc, 2000);
     }
 
     return () => {
-      console.log("Cleaning up iframe monitoring");
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
@@ -135,62 +76,50 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
   }, [showSuccess, showFailed, onClose, onPaymentSuccess]);
 
   useEffect(() => {
-    console.log("Payment popup: Setting up message listener");
-    console.log("Current window location:", window.location.href);
-    console.log("Current hostname:", window.location.hostname);
-    
     const handleMessage = (event: MessageEvent) => {
-      // Log ALL messages for debugging (even if not from expected origin)
-      console.log("Payment popup received message:", {
-        data: event.data,
-        origin: event.origin,
-        currentHostname: window.location.hostname,
-        currentOrigin: window.location.origin,
-        expectedOrigins: ["https://api.taearif.com", "https://taearif.vercel.app"]
-      });
+      // قبول الرسائل من api.taearif.com (أو أي origin لأن PHP يرسل إلى "*")
+      // التحقق من أن الرسالة هي payment_success أو payment_failed
+      const isValidPaymentMessage = 
+        event.data === "payment_success" || 
+        event.data === "payment_failed";
       
-      // Accept messages from api.taearif.com or any origin (for development)
+      // قبول الرسائل من api.taearif.com أو إذا كانت الرسالة صحيحة
       const isAllowedOrigin = 
         event.origin.includes("api.taearif.com") ||
-        event.origin.includes("taearif.vercel.app") ||
         event.origin.includes("taearif.com") ||
-        window.location.hostname === "localhost" || // Allow localhost for development
-        window.location.hostname.includes("mandhoor.com"); // Allow dev mode online
+        isValidPaymentMessage; // قبول إذا كانت الرسالة صحيحة (لأن PHP يرسل إلى "*")
       
-      if (!isAllowedOrigin) {
-        console.warn("Message from unauthorized origin:", event.origin, "Current origin:", window.location.origin);
-        // Still log the message data to see what we're receiving
-        if (event.data === "payment_success" || event.data === "payment_failed") {
-          console.warn("But message data matches payment status:", event.data);
-        }
+      if (!isAllowedOrigin || !isValidPaymentMessage) {
         return;
       }
       
       if (event.data === "payment_success") {
-        console.log("Payment success message received and processed");
         if (showSuccess || showFailed) return; // Prevent multiple calls
         
         setShowSuccess(true);
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
         }
+        if (statusPollingIntervalRef.current) {
+          clearInterval(statusPollingIntervalRef.current);
+        }
         setTimeout(() => {
           onClose();
-          // Call onPaymentSuccess callback if provided
           if (onPaymentSuccess) {
             onPaymentSuccess();
           } else {
-            // Fallback to reload if no callback
             window.location.reload();
           }
         }, 2000);
       } else if (event.data === "payment_failed") {
-        console.log("Payment failed message received and processed");
         if (showSuccess || showFailed) return; // Prevent multiple calls
         
         setShowFailed(true);
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
+        }
+        if (statusPollingIntervalRef.current) {
+          clearInterval(statusPollingIntervalRef.current);
         }
         setTimeout(() => {
           onClose();
@@ -200,127 +129,74 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
     };
 
     window.addEventListener("message", handleMessage);
-    console.log("Message listener added");
 
     return () => {
-      console.log("Cleaning up message listener");
       window.removeEventListener("message", handleMessage);
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
     };
   }, [onClose, onPaymentSuccess, showSuccess, showFailed]);
 
-  // API Polling: Check payment status via API (works without addonId)
+  // API Polling: Fallback only (starts after 60 seconds if postMessage fails)
   useEffect(() => {
     if (showSuccess || showFailed) {
-      console.log("Payment already processed, skipping API polling");
       return;
     }
     
-    console.log("Starting payment status polling (addonId:", addonId || "not provided", ")");
-    
-    const checkPaymentStatus = async () => {
-      try {
-        console.log("Checking payment status via plans endpoint");
-        
-        // Use plans endpoint to check quota/usage changes
-        const response = await axiosInstance.get("/api/whatsapp/addons/plans");
-        console.log("Plans endpoint response:", response.data);
-        
-        if (response.data.success && response.data.data) {
-          const currentQuota = response.data.data.quota || 0;
-          const currentUsage = response.data.data.usage || 0;
+    // Start polling only after 60 seconds as a fallback if postMessage doesn't work
+    const fallbackTimeout = setTimeout(() => {
+      const checkPaymentStatus = async () => {
+        try {
+          const response = await axiosInstance.get("/api/whatsapp/addons/plans");
           
-          // Store initial values on first check
-          if (initialQuotaRef.current === null || initialUsageRef.current === null) {
-            initialQuotaRef.current = currentQuota;
-            initialUsageRef.current = currentUsage;
-            console.log("Initial values stored - Quota:", initialQuotaRef.current, "Usage:", initialUsageRef.current);
-            return;
-          }
-          
-          console.log("Current values - Quota:", currentQuota, "Usage:", currentUsage);
-          console.log("Initial values - Quota:", initialQuotaRef.current, "Usage:", initialUsageRef.current);
-          
-          // Check if usage increased (indicates payment was processed)
-          // Or if quota increased (indicates addon was added)
-          if (currentUsage > initialUsageRef.current || currentQuota > initialQuotaRef.current) {
-            console.log("Payment success detected via API polling (quota/usage changed)");
-            if (showSuccess || showFailed) return;
+          if (response.data.success && response.data.data) {
+            const currentQuota = response.data.data.quota || 0;
+            const currentUsage = response.data.data.usage || 0;
             
-            setShowSuccess(true);
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
+            // Store initial values on first check
+            if (initialQuotaRef.current === null || initialUsageRef.current === null) {
+              initialQuotaRef.current = currentQuota;
+              initialUsageRef.current = currentUsage;
+              return;
             }
-            if (statusPollingIntervalRef.current) {
-              clearInterval(statusPollingIntervalRef.current);
-            }
-            setTimeout(() => {
-              onClose();
-              if (onPaymentSuccess) {
-                onPaymentSuccess();
-              } else {
-                window.location.reload();
-              }
-            }, 2000);
-            return;
-          }
-          
-          // If addonId is provided, try status endpoint
-          if (addonId) {
-            try {
-              const statusResponse = await axiosInstance.get(`/whatsapp/addons/${addonId}/status`);
-              console.log("Status endpoint response:", statusResponse.data);
+            
+            // Check if usage increased (indicates payment was processed)
+            if (currentUsage > initialUsageRef.current || currentQuota > initialQuotaRef.current) {
+              if (showSuccess || showFailed) return;
               
-              if (statusResponse.data.status === "paid" || 
-                  statusResponse.data.status === "success" ||
-                  statusResponse.data.success === true) {
-                console.log("Payment success detected via API polling (status endpoint)");
-                if (showSuccess || showFailed) return;
-                
-                setShowSuccess(true);
-                if (pollingIntervalRef.current) {
-                  clearInterval(pollingIntervalRef.current);
-                }
-                if (statusPollingIntervalRef.current) {
-                  clearInterval(statusPollingIntervalRef.current);
-                }
-                setTimeout(() => {
-                  onClose();
-                  if (onPaymentSuccess) {
-                    onPaymentSuccess();
-                  } else {
-                    window.location.reload();
-                  }
-                }, 2000);
-                return;
+              setShowSuccess(true);
+              if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
               }
-            } catch (statusErr: any) {
-              // Status endpoint might not exist, continue with quota/usage check
-              if (statusErr.response?.status === 404) {
-                console.log("Status endpoint not found (404), using quota/usage method");
+              if (statusPollingIntervalRef.current) {
+                clearInterval(statusPollingIntervalRef.current);
               }
+              setTimeout(() => {
+                onClose();
+                if (onPaymentSuccess) {
+                  onPaymentSuccess();
+                } else {
+                  window.location.reload();
+                }
+              }, 2000);
+              return;
             }
           }
+        } catch (err: any) {
+          // Silently continue polling
         }
-      } catch (err: any) {
-        console.error("Error checking payment status:", err);
-        // Don't stop polling on error, continue checking
-      }
-    };
-    
-    // Check immediately, then every 3 seconds
-    checkPaymentStatus();
-    statusPollingIntervalRef.current = setInterval(checkPaymentStatus, 3000);
+      };
+      
+      // Check every 10 seconds (less frequent than before)
+      checkPaymentStatus();
+      statusPollingIntervalRef.current = setInterval(checkPaymentStatus, 10000);
+    }, 60000); // Start after 60 seconds
     
     return () => {
-      console.log("Cleaning up payment status polling");
+      clearTimeout(fallbackTimeout);
       if (statusPollingIntervalRef.current) {
         clearInterval(statusPollingIntervalRef.current);
       }
     };
-  }, [addonId, showSuccess, showFailed, onClose, onPaymentSuccess]);
+  }, [showSuccess, showFailed, onClose, onPaymentSuccess]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -390,33 +266,8 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
                   src={paymentUrl}
                   className={`w-full h-[700px] border-0 ${isLoading ? "hidden" : "block"}`}
                   title="Payment Gateway"
-                  onLoad={(e) => {
-                    console.log("Iframe loaded, src:", e.currentTarget.src);
+                  onLoad={() => {
                     setIsLoading(false);
-                    // Check if src contains success/failed URL
-                    if (e.currentTarget.src.includes("/payment/success/")) {
-                      console.log("Success URL detected in iframe src on load");
-                      if (!showSuccess && !showFailed) {
-                        setShowSuccess(true);
-                        setTimeout(() => {
-                          onClose();
-                          if (onPaymentSuccess) {
-                            onPaymentSuccess();
-                          } else {
-                            window.location.reload();
-                          }
-                        }, 2000);
-                      }
-                    } else if (e.currentTarget.src.includes("/payment/failed/")) {
-                      console.log("Failed URL detected in iframe src on load");
-                      if (!showSuccess && !showFailed) {
-                        setShowFailed(true);
-                        setTimeout(() => {
-                          onClose();
-                          window.location.reload();
-                        }, 2000);
-                      }
-                    }
                   }}
                 />
 
