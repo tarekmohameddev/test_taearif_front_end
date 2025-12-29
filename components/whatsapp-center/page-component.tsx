@@ -170,11 +170,14 @@ export function WhatsAppCenterPage() {
   const [error, setError] = useState<string | null>(null);
   const [togglingNumberId, setTogglingNumberId] = useState<number | null>(null);
   const [assignEmployeeDialogOpen, setAssignEmployeeDialogOpen] = useState(false);
+  const [unlinkEmployeeDialogOpen, setUnlinkEmployeeDialogOpen] = useState(false);
+  const [numberToUnlink, setNumberToUnlink] = useState<number | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
   const [selectedNumberId, setSelectedNumberId] = useState<string>("");
   const [assigningEmployee, setAssigningEmployee] = useState(false);
+  const [unlinkingEmployee, setUnlinkingEmployee] = useState(false);
   const [paymentPopupOpen, setPaymentPopupOpen] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string>("");
   const [addonId, setAddonId] = useState<number | undefined>(undefined);
@@ -427,6 +430,40 @@ export function WhatsAppCenterPage() {
       setError(err.response?.data?.message || "حدث خطأ أثناء ربط الرقم بالموظف");
     } finally {
       setAssigningEmployee(false);
+    }
+  };
+
+  const handleUnlinkEmployee = async () => {
+    if (!numberToUnlink) {
+      return;
+    }
+
+    try {
+      setUnlinkingEmployee(true);
+      setError(null);
+
+      const response = await axiosInstance.patch(`/whatsapp/${numberToUnlink}/employee`, {
+        employeeId: null,
+      });
+
+      if (response.data.success) {
+        // Refresh the numbers list
+        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+        if (fetchResponse.data.success && fetchResponse.data.data) {
+          setConnectedNumbers(fetchResponse.data.data.numbers || []);
+        }
+        setUnlinkEmployeeDialogOpen(false);
+        setNumberToUnlink(null);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 5000);
+      } else {
+        setError("فشل في فك الربط عن الموظف");
+      }
+    } catch (err: any) {
+      console.error("Error unlinking employee:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء فك الربط عن الموظف");
+    } finally {
+      setUnlinkingEmployee(false);
     }
   };
 
@@ -798,16 +835,18 @@ export function WhatsAppCenterPage() {
                                       إلغاء التفعيل
                                     </DropdownMenuItem>
                                   )}
-                                  <DropdownMenuItem
-                                    onClick={() => {
-                                      setSelectedNumberId(String(number.id));
-                                      setAssignEmployeeDialogOpen(true);
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    <Settings className="h-4 w-4 ml-2" />
-                                    ربط بالموظف
-                                  </DropdownMenuItem>
+                                  {number.employee ? (
+                                    <DropdownMenuItem
+                                      onClick={() => {
+                                        setNumberToUnlink(number.id);
+                                        setUnlinkEmployeeDialogOpen(true);
+                                      }}
+                                      className="cursor-pointer text-destructive"
+                                    >
+                                      <Settings className="h-4 w-4 ml-2" />
+                                      فك الربط عن الموظف
+                                    </DropdownMenuItem>
+                                  ) : null}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                               
@@ -1016,6 +1055,52 @@ export function WhatsAppCenterPage() {
                 </>
               )}
             </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
+
+      {/* Unlink Employee Confirmation Dialog */}
+      <CustomDialog
+        open={unlinkEmployeeDialogOpen}
+        onOpenChange={setUnlinkEmployeeDialogOpen}
+        maxWidth="max-w-md"
+      >
+        <CustomDialogContent>
+          <CustomDialogClose onClose={() => setUnlinkEmployeeDialogOpen(false)} />
+          <CustomDialogHeader>
+            <CustomDialogTitle>تأكيد فك الربط</CustomDialogTitle>
+          </CustomDialogHeader>
+          <div className="space-y-4 p-4 sm:p-6">
+            <p className="text-gray-700">
+              هل أنت متأكد من رغبتك في فك الربط عن الموظف؟
+            </p>
+            
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setUnlinkEmployeeDialogOpen(false);
+                  setNumberToUnlink(null);
+                }}
+                disabled={unlinkingEmployee}
+              >
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleUnlinkEmployee}
+                disabled={unlinkingEmployee}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {unlinkingEmployee ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 ml-2 animate-spin" />
+                    جاري فك الربط...
+                  </>
+                ) : (
+                  "تأكيد فك الربط"
+                )}
+              </Button>
+            </div>
           </div>
         </CustomDialogContent>
       </CustomDialog>
