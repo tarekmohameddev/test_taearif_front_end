@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Customer, PipelineStage, Appointment } from "@/types/crm";
+import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 interface Reminder {
   id: string | number;
@@ -68,6 +70,13 @@ interface CrmStore {
   procedures: CrmProcedure[];
   priorities: CrmPriority[];
   types: CrmType[];
+
+  // Additional CRM Data
+  crmData: any | null;
+  inquiriesData: any[];
+  totalCustomers: number;
+  lastFetched: number | null;
+  isInitialized: boolean;
 
   // Cache
   customersCache: Map<string, Customer>;
@@ -175,6 +184,25 @@ interface CrmStore {
     } | null,
   ) => void;
   clearNewDealData: () => void;
+
+  // Data fetching functions
+  fetchCrmData: () => Promise<void>;
+  fetchAppointmentsData: () => Promise<void>;
+  fetchRemindersData: () => Promise<void>;
+  fetchInquiriesData: () => Promise<void>;
+  refreshAllData: () => Promise<void>;
+  shouldFetchData: () => boolean;
+
+  // Additional actions
+  addAppointment: (appointment: Appointment) => void;
+  updateAppointment: (appointmentId: string, updates: Partial<Appointment>) => void;
+  removeAppointment: (appointmentId: string) => void;
+  addInquiry: (inquiry: any) => void;
+  updateInquiry: (inquiryId: string, updates: Partial<any>) => void;
+  removeInquiry: (inquiryId: string) => void;
+  setCrmData: (data: any) => void;
+  setInquiriesData: (data: any[]) => void;
+  setTotalCustomers: (total: number) => void;
 }
 
 const useCrmStore = create<CrmStore>()(
@@ -188,6 +216,13 @@ const useCrmStore = create<CrmStore>()(
       procedures: [],
       priorities: [],
       types: [],
+
+      // Additional CRM Data
+      crmData: null,
+      inquiriesData: [],
+      totalCustomers: 0,
+      lastFetched: null,
+      isInitialized: false,
 
       // Cache
       customersCache: new Map(),
@@ -446,6 +481,301 @@ const useCrmStore = create<CrmStore>()(
       },
       setNewDealData: (data) => set({ newDealData: data }),
       clearNewDealData: () => set({ newDealData: null }),
+
+      // Helper function for priority label
+      getPriorityLabel: (priority: number) => {
+        switch (priority) {
+          case 0:
+            return "منخفضة";
+          case 1:
+            return "متوسطة";
+          case 2:
+            return "عالية";
+          default:
+            return "متوسطة";
+        }
+      },
+
+      // Check if data should be fetched
+      shouldFetchData: () => {
+        const { isInitialized, customers, pipelineStages } = get();
+        // Fetch if not initialized or if data is empty
+        return !isInitialized || customers.length === 0 || pipelineStages.length === 0;
+      },
+
+      // Set CRM data
+      setCrmData: (data) => set({ crmData: data }),
+      setInquiriesData: (data) => set({ inquiriesData: data }),
+      setTotalCustomers: (total) => set({ totalCustomers: total }),
+
+      // Add appointment
+      addAppointment: (appointment) => {
+        const { appointments } = get();
+        set({ appointments: [...appointments, appointment] });
+      },
+
+      // Update appointment
+      updateAppointment: (appointmentId, updates) => {
+        const { appointments } = get();
+        const updatedAppointments = appointments.map((appointment) =>
+          appointment.id.toString() === appointmentId
+            ? { ...appointment, ...updates }
+            : appointment,
+        );
+        set({ appointments: updatedAppointments });
+      },
+
+      // Remove appointment
+      removeAppointment: (appointmentId) => {
+        const { appointments } = get();
+        const updatedAppointments = appointments.filter(
+          (appointment) => appointment.id.toString() !== appointmentId,
+        );
+        set({ appointments: updatedAppointments });
+      },
+
+      // Add inquiry
+      addInquiry: (inquiry) => {
+        const { inquiriesData } = get();
+        set({ inquiriesData: [...inquiriesData, inquiry] });
+      },
+
+      // Update inquiry
+      updateInquiry: (inquiryId, updates) => {
+        const { inquiriesData } = get();
+        const updatedInquiries = inquiriesData.map((inquiry) =>
+          inquiry.id.toString() === inquiryId ? { ...inquiry, ...updates } : inquiry,
+        );
+        set({ inquiriesData: updatedInquiries });
+      },
+
+      // Remove inquiry
+      removeInquiry: (inquiryId) => {
+        const { inquiriesData } = get();
+        const updatedInquiries = inquiriesData.filter(
+          (inquiry) => inquiry.id.toString() !== inquiryId,
+        );
+        set({ inquiriesData: updatedInquiries });
+      },
+
+      // Fetch CRM data
+      fetchCrmData: async () => {
+        const userData = useAuthStore.getState().userData;
+        if (!userData?.token) {
+          console.log("No token available, skipping fetchCrmData");
+          return;
+        }
+
+        const { setLoading, setError, setCustomers, setPipelineStages, setCrmData, setTotalCustomers } = get();
+        setLoading(true);
+        setError(null);
+
+        try {
+          const response = await axiosInstance.get("/v1/crm/requests");
+          const crmData = response.data;
+
+          if (crmData.status === "success") {
+            const { stages, statistics } = crmData.data || {};
+
+            // Transform stages data from new API format
+            const transformedStages = (stages || []).map((stage: any) => ({
+              id: String(stage.id),
+              name: stage.stage_name,
+              color: stage.color || "#6366f1",
+              icon: stage.icon || "Target",
+              count: stage.requests?.length || 0,
+              value: 0,
+            }));
+
+            // Transform requests to customers format for compatibility
+            const allCustomers = (stages || []).flatMap((stage: any) =>
+              (stage.requests || []).map((request: any) => {
+                const customer = request.customer || {};
+                const propertyBasic = request.property_basic || {};
+                const propertySpecs = request.property_specifications || {};
+
+                // Extract property data
+                const basicInfo = propertySpecs.basic_information || {};
+                const facilities = propertySpecs.facilities || {};
+
+                const getPriorityLabel = (priority: number) => {
+                  switch (priority) {
+                    case 0:
+                      return "منخفضة";
+                    case 1:
+                      return "متوسطة";
+                    case 2:
+                      return "عالية";
+                    default:
+                      return "متوسطة";
+                  }
+                };
+
+                return {
+                  // Request data
+                  id: request.id,
+                  request_id: request.id,
+                  user_id: request.user_id || 0,
+                  stage_id: request.stage_id || stage.id,
+                  property_id: request.property_id,
+                  has_property: request.has_property || false,
+                  property_source: request.property_source || null,
+                  position: request.position || 0,
+                  created_at: request.created_at || "",
+                  updated_at: request.updated_at || "",
+
+                  // Customer data
+                  customer_id: customer.id || request.customer_id,
+                  name: customer.name || "",
+                  phone_number: customer.phone_number || "",
+                  phone: customer.phone_number || "",
+                  email: null,
+                  note: null,
+                  customer_type: null,
+                  priority: customer.priority_id || 1,
+                  priority_id: customer.priority_id || null,
+                  type_id: customer.type_id || null,
+                  procedure_id: null,
+                  city_id: null,
+                  district_id: null,
+                  responsible_employee: customer.responsible_employee || null,
+
+                  // Backward compatibility fields
+                  nameEn: customer.name || "",
+                  whatsapp: "",
+                  city: propertyBasic.address
+                    ? propertyBasic.address.split(",")[1]?.trim() || ""
+                    : "",
+                  district: "",
+                  assignedAgent: "",
+                  lastContact: "",
+                  urgency: customer.priority_id
+                    ? getPriorityLabel(customer.priority_id)
+                    : "",
+                  pipelineStage: String(request.stage_id || stage.id),
+                  dealValue: propertyBasic.price
+                    ? parseFloat(propertyBasic.price)
+                    : basicInfo.price || 0,
+                  probability: 0,
+                  avatar: propertyBasic.featured_image || "",
+                  reminders: [],
+                  interactions: [],
+                  appointments: [],
+                  notes: "",
+                  joinDate: request.created_at || "",
+                  nationality: "",
+                  familySize: 0,
+                  leadSource: "",
+                  satisfaction: 0,
+                  communicationPreference: "",
+                  expectedCloseDate: "",
+
+                  // Property data (for compatibility)
+                  property_basic: propertyBasic,
+                  property_specifications: propertySpecs,
+                };
+              }),
+            );
+
+            // Update store
+            setPipelineStages(transformedStages);
+            setCustomers(allCustomers);
+            setCrmData(crmData);
+            setTotalCustomers(statistics?.total_requests || allCustomers.length);
+            set({ lastFetched: Date.now(), isInitialized: true });
+          }
+        } catch (err: any) {
+          console.error("Error fetching CRM data:", err);
+          setError(err.response?.data?.message || "فشل في تحميل بيانات الـ CRM");
+        } finally {
+          setLoading(false);
+        }
+      },
+
+      // Fetch appointments data
+      fetchAppointmentsData: async () => {
+        const userData = useAuthStore.getState().userData;
+        if (!userData?.token) {
+          console.log("No token available, skipping fetchAppointmentsData");
+          return;
+        }
+
+        const { setAppointments } = get();
+        try {
+          const response = await axiosInstance.get("/crm/customer-appointments");
+          const appointmentsResponse = response.data;
+
+          if (appointmentsResponse.status === "success") {
+            setAppointments(appointmentsResponse.data || []);
+          }
+        } catch (err) {
+          console.error("Error fetching appointments data:", err);
+        }
+      },
+
+      // Fetch reminders data
+      fetchRemindersData: async () => {
+        const userData = useAuthStore.getState().userData;
+        if (!userData?.token) {
+          console.log("No token available, skipping fetchRemindersData");
+          return;
+        }
+
+        const { setReminders } = get();
+        try {
+          const response = await axiosInstance.get("/crm/customer-reminders");
+          const remindersResponse = response.data;
+
+          if (remindersResponse.status === "success") {
+            // Transform API data to match component interface
+            const transformedReminders = (remindersResponse.data || []).map(
+              (reminder: any) => ({
+                id: reminder.id,
+                title: reminder.title,
+                priority: reminder.priority,
+                priority_label: reminder.priority_label,
+                datetime: reminder.datetime,
+                customer: reminder.customer,
+              }),
+            );
+            setReminders(transformedReminders);
+          }
+        } catch (err) {
+          console.error("Error fetching reminders data:", err);
+        }
+      },
+
+      // Fetch inquiries data
+      fetchInquiriesData: async () => {
+        const userData = useAuthStore.getState().userData;
+        if (!userData?.token) {
+          console.log("No token available, skipping fetchInquiriesData");
+          return;
+        }
+
+        const { setInquiriesData } = get();
+        try {
+          const response = await axiosInstance.get("/v1/inquiry");
+          const inquiriesResponse = response.data;
+
+          if (inquiriesResponse.status === "success") {
+            setInquiriesData(inquiriesResponse.data.inquiries || []);
+          }
+        } catch (err) {
+          console.error("Error fetching inquiries data:", err);
+        }
+      },
+
+      // Refresh all data
+      refreshAllData: async () => {
+        const { fetchCrmData, fetchAppointmentsData, fetchRemindersData, fetchInquiriesData } = get();
+        await Promise.all([
+          fetchCrmData(),
+          fetchAppointmentsData(),
+          fetchRemindersData(),
+          fetchInquiriesData(),
+        ]);
+      },
     }),
     {
       name: "crm-store",
@@ -457,6 +787,11 @@ const useCrmStore = create<CrmStore>()(
         procedures: state.procedures,
         priorities: state.priorities,
         types: state.types,
+        crmData: state.crmData,
+        inquiriesData: state.inquiriesData,
+        totalCustomers: state.totalCustomers,
+        lastFetched: state.lastFetched,
+        isInitialized: state.isInitialized,
         newDealData: state.newDealData, // Include newDealData for persistence
       }),
     },

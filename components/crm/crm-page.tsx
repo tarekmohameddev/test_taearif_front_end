@@ -36,7 +36,6 @@ import {
   DragDropHandler,
   KeyboardNavigation,
   EnhancedDragDrop,
-  DataHandler,
   Utilities,
   CustomerDetailDialog,
   AddNoteDialog,
@@ -288,33 +287,19 @@ const CrmStatisticsCards = ({
 };
 
 export default function CrmPage() {
-  // Loading and error states
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // CRM data states
-  const [crmData, setCrmData] = useState<any>(null);
-  const [appointmentsData, setAppointmentsData] = useState<Appointment[]>([]);
-  const [remindersData, setRemindersData] = useState<
-    {
-      id: number;
-      title: string;
-      priority: number;
-      priority_label: string;
-      datetime: string;
-      customer: {
-        id: number;
-        name: string;
-      };
-    }[]
-  >([]);
-  const [inquiriesData, setInquiriesData] = useState<any[]>([]);
-  const [totalCustomers, setTotalCustomers] = useState(0);
 
   // Get data from store
   const {
     customers: rawCustomersData,
     pipelineStages: rawPipelineStages,
+    appointments: appointmentsData,
+    reminders: remindersData,
+    inquiriesData,
+    crmData,
+    totalCustomers,
+    isLoading: loading,
+    error,
+    isInitialized,
     selectedStage,
     selectedCustomer,
     selectedAppointment,
@@ -352,6 +337,18 @@ export default function CrmPage() {
     updateCustomer,
     setPipelineStages,
     setCustomers,
+    fetchCrmData,
+    fetchAppointmentsData,
+    fetchRemindersData,
+    fetchInquiriesData,
+    refreshAllData,
+    shouldFetchData,
+    addAppointment,
+    addReminder,
+    updateReminder,
+    addInquiry,
+    updateAppointment,
+    updateInquiry,
   } = useCrmStore();
   const { userData } = useAuthStore();
 
@@ -379,240 +376,37 @@ export default function CrmPage() {
   const [focusedCustomer, setFocusedCustomer] = useState<Customer | null>(null);
   const [focusedStage, setFocusedStage] = useState<PipelineStage | null>(null);
 
-  // Initialize handlers
-  const dataHandler = {
-    fetchCrmData: async () => {
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        console.log("No token available, skipping fetchCrmData");
-        return;
-      }
+  // Helper function for updateCustomerStage API call
+  const updateCustomerStageAPI = async (customerId: string, stageId: string) => {
+    if (!userData?.token) {
+      console.log("No token available, skipping updateCustomerStage");
+      return false;
+    }
 
-      setLoading(true);
-      try {
-        const response = await axiosInstance.get("/v1/crm/requests");
-        const crmData = response.data;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        if (crmData.status === "success") {
-          const { stages, statistics } = crmData.data || {};
+      const response = await axiosInstance.post(
+        `/v1/crm/requests/${customerId}/change-stage`,
+        {
+          stage_id: parseInt(stageId),
+        },
+        {
+          signal: controller.signal,
+        },
+      );
 
-          // Transform stages data from new API format
-          const transformedStages = (stages || []).map((stage: any) => ({
-            id: String(stage.id),
-            name: stage.stage_name,
-            color: stage.color || "#6366f1",
-            icon: stage.icon || "Target",
-            count: stage.requests?.length || 0,
-            value: 0,
-          }));
+      clearTimeout(timeoutId);
 
-          // Transform requests to customers format for compatibility
-          const allCustomers = (stages || []).flatMap((stage: any) =>
-            (stage.requests || []).map((request: any) => {
-              const customer = request.customer || {};
-              const propertyBasic = request.property_basic || {};
-              const propertySpecs = request.property_specifications || {};
-
-              // Extract property data
-              const basicInfo = propertySpecs.basic_information || {};
-              const facilities = propertySpecs.facilities || {};
-
-              return {
-                // Request data
-                id: request.id,
-                request_id: request.id,
-                user_id: request.user_id || 0,
-                stage_id: request.stage_id || stage.id,
-                property_id: request.property_id,
-                has_property: request.has_property || false,
-                property_source: request.property_source || null,
-                position: request.position || 0,
-                created_at: request.created_at || "",
-                updated_at: request.updated_at || "",
-
-                // Customer data
-                customer_id: customer.id || request.customer_id,
-                name: customer.name || "",
-                phone_number: customer.phone_number || "",
-                phone: customer.phone_number || "",
-                email: null,
-                note: null,
-                customer_type: null,
-                priority: customer.priority_id || 1,
-                priority_id: customer.priority_id || null,
-                type_id: customer.type_id || null,
-                procedure_id: null,
-                city_id: null,
-                district_id: null,
-                responsible_employee: customer.responsible_employee || null,
-
-                // Backward compatibility fields
-                nameEn: customer.name || "",
-                whatsapp: "",
-                city: propertyBasic.address
-                  ? propertyBasic.address.split(",")[1]?.trim() || ""
-                  : "",
-                district: "",
-                assignedAgent: "",
-                lastContact: "",
-                urgency: customer.priority_id
-                  ? getPriorityLabel(customer.priority_id)
-                  : "",
-                pipelineStage: String(request.stage_id || stage.id),
-                dealValue: propertyBasic.price
-                  ? parseFloat(propertyBasic.price)
-                  : basicInfo.price || 0,
-                probability: 0,
-                avatar: propertyBasic.featured_image || "",
-                reminders: [],
-                interactions: [],
-                appointments: [],
-                notes: "",
-                joinDate: request.created_at || "",
-                nationality: "",
-                familySize: 0,
-                leadSource: "",
-                satisfaction: 0,
-                communicationPreference: "",
-                expectedCloseDate: "",
-
-                // Property data (for compatibility)
-                property_basic: propertyBasic,
-                property_specifications: propertySpecs,
-              };
-            }),
-          );
-
-          // Update store
-          setPipelineStages(transformedStages);
-          setCustomers(allCustomers);
-          setCrmData(crmData);
-          setTotalCustomers(statistics?.total_requests || allCustomers.length);
-        }
-      } catch (err) {
-        console.error("Error fetching CRM data:", err);
-        setError("فشل في تحميل بيانات الـ CRM");
-      } finally {
-        setLoading(false);
-      }
-    },
-    fetchAppointmentsData: async () => {
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        console.log("No token available, skipping fetchAppointmentsData");
-        return;
-      }
-
-      try {
-        const response = await axiosInstance.get("/crm/customer-appointments");
-        const appointmentsResponse = response.data;
-
-        if (appointmentsResponse.status === "success") {
-          setAppointmentsData(appointmentsResponse.data || []);
-        }
-      } catch (err) {
-        console.error("Error fetching appointments data:", err);
-      }
-    },
-    fetchRemindersData: async () => {
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        console.log("No token available, skipping fetchRemindersData");
-        return;
-      }
-
-      try {
-        const response = await axiosInstance.get("/crm/customer-reminders");
-        const remindersResponse = response.data;
-
-        if (remindersResponse.status === "success") {
-          // Transform API data to match component interface
-          const transformedReminders = (remindersResponse.data || []).map(
-            (reminder: any) => ({
-              id: reminder.id,
-              title: reminder.title,
-              priority: reminder.priority,
-              priority_label: reminder.priority_label,
-              datetime: reminder.datetime,
-              customer: reminder.customer,
-            }),
-          );
-          setRemindersData(transformedReminders);
-        }
-      } catch (err) {
-        console.error("Error fetching reminders data:", err);
-      }
-    },
-    fetchInquiriesData: async () => {
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        console.log("No token available, skipping fetchInquiriesData");
-        return;
-      }
-
-      try {
-        const response = await axiosInstance.get("/v1/inquiry");
-        const inquiriesResponse = response.data;
-
-        if (inquiriesResponse.status === "success") {
-          setInquiriesData(inquiriesResponse.data.inquiries || []);
-        }
-      } catch (err) {
-        console.error("Error fetching inquiries data:", err);
-      }
-    },
-    updateCustomerStage: async (customerId: string, stageId: string) => {
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        console.log("No token available, skipping updateCustomerStage");
-        return false;
-      }
-
-      try {
-        // Use a faster timeout for better UX
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-        // customerId is actually request_id in new API format
-        const response = await axiosInstance.post(
-          `/v1/crm/requests/${customerId}/change-stage`,
-          {
-            stage_id: parseInt(stageId),
-          },
-          {
-            signal: controller.signal,
-          },
-        );
-
-        clearTimeout(timeoutId);
-
-        if (
-          response.data.status === "success" ||
-          response.data.status === true
-        ) {
-          return true;
-        }
-        return false;
-      } catch (err) {
-        console.error("Error updating customer stage:", err);
-        return false;
-      }
-    },
-    updateCustomer: async (customerId: string, updates: any) => {
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        console.log("No token available, skipping updateCustomer");
-        return false;
-      }
-
-      try {
-        await axiosInstance.put(`/crm/customers/${customerId}`, updates);
+      if (response.data.status === "success" || response.data.status === true) {
         return true;
-      } catch (err) {
-        console.error(err);
-        return false;
       }
-    },
+      return false;
+    } catch (err) {
+      console.error("Error updating customer stage:", err);
+      return false;
+    }
   };
 
   const utilities = Utilities({
@@ -682,8 +476,7 @@ export default function CrmPage() {
         utilities.showSuccessAnimation(stageId);
         utilities.announceToScreenReader(`تم نقل العميل ${customerName} بنجاح`);
 
-        dataHandler
-          .updateCustomerStage(dragPreview.id.toString(), stageId)
+        updateCustomerStageAPI(dragPreview.id.toString(), stageId)
           .then((success) => {
             if (!success) {
               // Revert if API fails
@@ -730,7 +523,7 @@ export default function CrmPage() {
     pipelineStages,
     onKeyDown: (e, customer, stageId) => {},
     onMoveCustomerToStage: async (customer, targetStageId) => {
-      const success = await dataHandler.updateCustomerStage(
+      const success = await updateCustomerStageAPI(
         customer.id.toString(),
         targetStageId,
       );
@@ -744,41 +537,27 @@ export default function CrmPage() {
   });
 
   const updateRemindersList = (newReminder: any) => {
-    setRemindersData((prev) => [newReminder, ...prev]);
+    addReminder(newReminder);
   };
 
   const updateAppointmentsList = (newAppointment: any) => {
-    setAppointmentsData((prev) => [newAppointment, ...prev]);
+    addAppointment(newAppointment);
   };
 
   const updateInquiriesList = (newInquiry: any) => {
-    setInquiriesData((prev) => [newInquiry, ...prev]);
+    addInquiry(newInquiry);
   };
 
   const updateReminderInList = (updatedReminder: any) => {
-    setRemindersData((prev) =>
-      prev.map((reminder) =>
-        reminder.id === updatedReminder.id ? updatedReminder : reminder,
-      ),
-    );
+    updateReminder(updatedReminder.id.toString(), updatedReminder);
   };
 
   const updateAppointmentInList = (updatedAppointment: any) => {
-    setAppointmentsData((prev) =>
-      prev.map((appointment) =>
-        appointment.id === updatedAppointment.id
-          ? updatedAppointment
-          : appointment,
-      ),
-    );
+    updateAppointment(updatedAppointment.id.toString(), updatedAppointment);
   };
 
   const updateInquiryInList = (updatedInquiry: any) => {
-    setInquiriesData((prev) =>
-      prev.map((inquiry) =>
-        inquiry.id === updatedInquiry.id ? updatedInquiry : inquiry,
-      ),
-    );
+    updateInquiry(updatedInquiry.id.toString(), updatedInquiry);
   };
 
   const updateStagesList = (newStage: any) => {
@@ -802,11 +581,15 @@ export default function CrmPage() {
   useEffect(() => {
     // التحقق من وجود التوكن قبل استدعاء الـ API
     if (userData?.token) {
-      dataHandler.fetchCrmData();
-      dataHandler.fetchAppointmentsData();
-      dataHandler.fetchRemindersData();
-      dataHandler.fetchInquiriesData();
+      // جلب البيانات فقط إذا لم تكن موجودة في الـ cache
+      if (shouldFetchData()) {
+        fetchCrmData();
+        fetchAppointmentsData();
+        fetchRemindersData();
+        fetchInquiriesData();
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData?.token]);
 
   const filteredCustomers = customersData.filter((customer: Customer) => {
@@ -886,10 +669,7 @@ export default function CrmPage() {
 
   // Event handlers
   const handleRefresh = () => {
-    dataHandler.fetchCrmData();
-    dataHandler.fetchAppointmentsData();
-    dataHandler.fetchRemindersData();
-    dataHandler.fetchInquiriesData();
+    refreshAllData();
   };
 
   const handleSettings = () => {
@@ -1098,7 +878,7 @@ export default function CrmPage() {
                 onAddNote={handleAddNote}
                 onAddReminder={handleAddReminder}
                 onAddInteraction={handleAddInteraction}
-                onUpdateCustomerStage={dataHandler.updateCustomerStage}
+                onUpdateCustomerStage={updateCustomerStageAPI}
               />
             )}
 
@@ -1118,7 +898,14 @@ export default function CrmPage() {
             {/* التذكيرات */}
             {activeView === "reminders" && (
               <RemindersList
-                remindersData={remindersData}
+                remindersData={remindersData.map((reminder) => ({
+                  id: typeof reminder.id === "string" ? parseInt(reminder.id) : reminder.id,
+                  title: reminder.title,
+                  priority: typeof reminder.priority === "string" ? parseInt(reminder.priority) : reminder.priority,
+                  priority_label: reminder.priority_label || "",
+                  datetime: reminder.datetime,
+                  customer: reminder.customer || { id: 0, name: "" },
+                }))}
                 searchTerm={searchTerm}
                 filterStage={filterStage}
                 filterUrgency={filterUrgency}
@@ -1194,9 +981,7 @@ export default function CrmPage() {
             {showAddDealDialog && (
               <AddDealDialog
                 onDealAdded={() => {
-                  dataHandler.fetchCrmData();
-                  dataHandler.fetchAppointmentsData();
-                  dataHandler.fetchRemindersData();
+                  refreshAllData();
                 }}
               />
             )}
