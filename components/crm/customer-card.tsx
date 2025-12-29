@@ -182,41 +182,55 @@ export default function CustomerCard({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-5 flex-shrink-0"
+                onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => router.push(`/dashboard/crm/${customer.id}`)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/dashboard/crm/${customer.id}`);
+                }}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddNote(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddNote(customer);
+                }}
                 onSelect={() => {}}
               >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddReminder(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddReminder(customer);
+                }}
                 onSelect={() => {}}
               >
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddInteraction(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddInteraction(customer);
+                }}
                 onSelect={() => {}}
               >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   const url = `/dashboard/activity-logs/customer/${customer.id}`;
                   window.open(url, "_blank");
                 }}
@@ -225,7 +239,9 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
@@ -338,41 +354,55 @@ export default function CustomerCard({
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6 flex-shrink-0"
+                onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => router.push(`/dashboard/crm/${customer.id}`)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/dashboard/crm/${customer.id}`);
+                }}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddNote(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddNote(customer);
+                }}
                 onSelect={() => {}}
               >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddReminder(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddReminder(customer);
+                }}
                 onSelect={() => {}}
               >
                 <Bell className="ml-2 h-4 w-4" />
                 إضافة تذكير
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddInteraction(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddInteraction(customer);
+                }}
                 onSelect={() => {}}
               >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   const url = `/dashboard/activity-logs/customer/${customer.id}`;
                   window.open(url, "_blank");
                 }}
@@ -381,7 +411,9 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
@@ -390,7 +422,7 @@ export default function CustomerCard({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setDesktopMenuOpen(false);
+                    setTabletMenuOpen(false);
                     setTimeout(() => setShowWhatsAppDialog(true), 50);
                   }}
                 >
@@ -485,27 +517,41 @@ export default function CustomerCard({
             onOpenChange={setDesktopMenuOpen}
           >
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                onClick={() => router.push(`/dashboard/crm/${customer.id}`)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/dashboard/crm/${customer.id}`);
+                }}
                 onSelect={() => {}}
               >
                 <Eye className="ml-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddNote(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddNote(customer);
+                }}
                 onSelect={() => {}}
               >
                 <StickyNote className="ml-2 h-4 w-4" />
                 إضافة ملاحظة
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onAddReminder(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddReminder(customer);
+                }}
                 onSelect={() => {}}
               >
                 <Bell className="ml-2 h-4 w-4" />
@@ -525,14 +571,18 @@ export default function CustomerCard({
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem
-                onClick={() => onAddInteraction(customer)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddInteraction(customer);
+                }}
                 onSelect={() => {}}
               >
                 <Activity className="ml-2 h-4 w-4" />
                 تسجيل تفاعل
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   const url = `/dashboard/activity-logs/customer/${customer.id}`;
                   window.open(url, "_blank");
                 }}
@@ -541,7 +591,9 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
