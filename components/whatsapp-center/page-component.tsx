@@ -621,9 +621,7 @@ export function WhatsAppCenterPage() {
                     {isLoading ? "..." : quota.toLocaleString()}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {quota > 0 
-                      ? `المستخدم: ${usage.toLocaleString()} من ${quota.toLocaleString()}`
-                      : "لا يوجد حد محدد"}
+                    {`المستخدم: ${usage.toLocaleString()} من ${quota.toLocaleString()}`}
                   </p>
                 </CardContent>
               </Card>
