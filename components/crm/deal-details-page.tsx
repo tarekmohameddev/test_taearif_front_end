@@ -720,10 +720,26 @@ export default function DealDetailsPage() {
             {propertySpecsData || propertyBasicData ? (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Home className="h-5 w-5" />
-                    معلومات العقار
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <Home className="h-5 w-5" />
+                      معلومات العقار
+                    </CardTitle>
+                    {request.property_id && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          router.push(`/dashboard/properties/${request.property_id}`)
+                        }
+                        className="gap-2"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                        <span className="hidden sm:inline">تفاصيل العقار</span>
+                        <span className="sm:hidden">التفاصيل</span>
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-6 md:grid-cols-2">
