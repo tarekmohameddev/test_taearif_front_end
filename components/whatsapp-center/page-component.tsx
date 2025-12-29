@@ -691,7 +691,7 @@ export function WhatsAppCenterPage() {
                           الاسم المعروض
                         </TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
-                        <TableHead className="text-right">حالة الطلب</TableHead>
+                        {/* <TableHead className="text-right">حالة الطلب</TableHead> */}
                         <TableHead className="text-right">
                           تاريخ الربط
                         </TableHead>
@@ -731,7 +731,7 @@ export function WhatsAppCenterPage() {
                                     : number.status}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          {/* <TableCell>
                             <Badge
                               variant={
                                 number.request_status === "active"
@@ -754,7 +754,7 @@ export function WhatsAppCenterPage() {
                                   ? "قيد الانتظار"
                                   : number.request_status}
                             </Badge>
-                          </TableCell>
+                          </TableCell> */}
                           <TableCell>
                             {new Date(number.created_at).toLocaleDateString(
                               "ar-US",
@@ -993,7 +993,14 @@ export function WhatsAppCenterPage() {
             {/* Assign Button */}
             <Button
               onClick={handleAssignEmployee}
-              disabled={assigningEmployee || !selectedNumberId || !selectedEmployeeId || loadingEmployees}
+              disabled={
+                assigningEmployee || 
+                !selectedNumberId || 
+                !selectedEmployeeId || 
+                selectedEmployeeId === "none" ||
+                loadingEmployees ||
+                employees.length < 1
+              }
               className="w-full bg-green-600 hover:bg-green-700 text-white gap-2"
               size="lg"
             >
