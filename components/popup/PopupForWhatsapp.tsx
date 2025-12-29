@@ -2,23 +2,22 @@
 import { useEffect, useState, useRef } from "react";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { ShieldCheck } from "lucide-react";
-import axiosInstance from "@/lib/axiosInstance";
 
 interface PaymentPopupProps {
   paymentUrl: string;
   onClose: () => void;
-  addonId?: number; // ID from payment response if available
+  onPaymentSuccess?: () => void;
+  addonId?: number;
 }
 
-const PaymentPopup = ({ paymentUrl, onClose, addonId }: PaymentPopupProps) => {
+const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: PaymentPopupProps) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showFailed, setShowFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [errorMessage, setErrorMessage] = useState("");
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Monitor iframe URL changes to detect payment success
+  // Fallback: Monitor iframe URL changes
   useEffect(() => {
     const checkIframeUrl = () => {
       try {
@@ -26,18 +25,28 @@ const PaymentPopup = ({ paymentUrl, onClose, addonId }: PaymentPopupProps) => {
           const iframeUrl = iframeRef.current.contentWindow.location.href;
           
           // Check if iframe navigated to success URL
-          if (iframeUrl.includes("/payment/success/") || iframeUrl.includes("success")) {
-            // Payment gateway redirected to success page
-            // Even if POST fails, the redirect indicates payment was processed
+          if (iframeUrl.includes("/payment/success/")) {
+            console.log("Payment success detected via iframe URL:", iframeUrl);
+            if (showSuccess || showFailed) return; // Prevent multiple calls
+            
             setShowSuccess(true);
             if (pollingIntervalRef.current) {
               clearInterval(pollingIntervalRef.current);
             }
             setTimeout(() => {
               onClose();
-              window.location.reload();
+              // Call onPaymentSuccess callback if provided
+              if (onPaymentSuccess) {
+                onPaymentSuccess();
+              } else {
+                // Fallback to reload if no callback
+                window.location.reload();
+              }
             }, 2000);
-          } else if (iframeUrl.includes("/payment/failed/") || iframeUrl.includes("failed")) {
+          } else if (iframeUrl.includes("/payment/failed/")) {
+            console.log("Payment failed detected via iframe URL:", iframeUrl);
+            if (showSuccess || showFailed) return; // Prevent multiple calls
+            
             setShowFailed(true);
             if (pollingIntervalRef.current) {
               clearInterval(pollingIntervalRef.current);
@@ -54,7 +63,7 @@ const PaymentPopup = ({ paymentUrl, onClose, addonId }: PaymentPopupProps) => {
       }
     };
 
-    // Check iframe URL every 2 seconds
+    // Check iframe URL every 2 seconds as fallback
     if (!showSuccess && !showFailed) {
       pollingIntervalRef.current = setInterval(checkIframeUrl, 2000);
     }
@@ -64,98 +73,61 @@ const PaymentPopup = ({ paymentUrl, onClose, addonId }: PaymentPopupProps) => {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [showSuccess, showFailed, onClose]);
+  }, [showSuccess, showFailed, onClose, onPaymentSuccess]);
 
   useEffect(() => {
-    // Suppress console errors for POST method not supported (payment gateway callback issue)
-    const originalError = console.error;
-    console.error = (...args) => {
-      const errorMessage = args.join(" ");
-      // Ignore POST method errors from payment gateway callbacks
-      // These errors occur because payment gateway tries POST but route only supports GET
-      // The payment is still processed successfully, just the callback fails
-      if (errorMessage.includes("POST method is not supported") || 
-          errorMessage.includes("INTERNAL_ERROR") ||
-          errorMessage.includes("api[REDACTED]") ||
-          errorMessage.includes("The POST method is not supported")) {
-        // Silently ignore these errors - payment is still successful
-        // The redirect to success URL indicates payment was processed
+    const handleMessage = (event: MessageEvent) => {
+      // Log all messages for debugging
+      console.log("Payment popup received message:", {
+        data: event.data,
+        origin: event.origin,
+        currentHostname: window.location.hostname,
+        expectedOrigins: ["https://api.taearif.com", "https://taearif.vercel.app"]
+      });
+      
+      // Accept messages from api.taearif.com or any origin (for development)
+      const isAllowedOrigin = 
+        event.origin.includes("api.taearif.com") ||
+        event.origin.includes("taearif.vercel.app") ||
+        event.origin.includes("taearif.com") ||
+        window.location.hostname === "localhost" || // Allow localhost for development
+        window.location.hostname.includes("mandhoor.com"); // Allow dev mode online
+      
+      if (!isAllowedOrigin) {
+        console.warn("Message from unauthorized origin:", event.origin);
         return;
       }
-      originalError.apply(console, args);
-    };
-
-    const handleMessage = (event: MessageEvent) => {
-      // Log for debugging
-      console.log("Payment popup received message:", event.data, event.origin);
       
-      // Handle string messages
-      if (typeof event.data === "string") {
-        if (event.data === "payment_success" || event.data.includes("success")) {
-          setShowSuccess(true);
-          if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-          }
-          setTimeout(() => {
-            onClose();
-            window.location.reload();
-          }, 2000);
-        } else if (event.data === "payment_failed" || event.data.includes("failed") || event.data.includes("error")) {
-          setShowFailed(true);
-          if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-          }
-          setTimeout(() => {
-            onClose();
-            window.location.reload();
-          }, 2000);
+      if (event.data === "payment_success") {
+        console.log("Payment success message received");
+        if (showSuccess || showFailed) return; // Prevent multiple calls
+        
+        setShowSuccess(true);
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
         }
-      }
-      
-      // Handle object messages
-      if (typeof event.data === "object" && event.data !== null) {
-        if (event.data.status === "success" || event.data.success === true) {
-          setShowSuccess(true);
-          if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-          }
-          setTimeout(() => {
-            onClose();
-            window.location.reload();
-          }, 2000);
-        } else if (event.data.status === "error" || event.data.status === "failed" || event.data.success === false) {
-          // Check if it's the POST method error
-          const isPostMethodError = 
-            event.data.message?.includes("POST method is not supported") ||
-            event.data.message?.includes("The POST method is not supported") ||
-            event.data.code === "INTERNAL_ERROR" ||
-            (event.data.message?.includes("api[REDACTED]") && event.data.message?.includes("POST"));
-          
-          if (isPostMethodError) {
-            // POST method error - payment gateway redirected to success URL, so payment is successful
-            // The error occurs because callback route doesn't support POST, but payment was processed
-            console.log("POST method error detected - payment was successful, callback route issue only");
-            setShowSuccess(true);
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
-            }
-            setTimeout(() => {
-              onClose();
-              window.location.reload();
-            }, 2000);
+        setTimeout(() => {
+          onClose();
+          // Call onPaymentSuccess callback if provided
+          if (onPaymentSuccess) {
+            onPaymentSuccess();
           } else {
-            // Real payment error
-            setShowFailed(true);
-            setErrorMessage(event.data.message || "فشلت عملية الدفع");
-            if (pollingIntervalRef.current) {
-              clearInterval(pollingIntervalRef.current);
-            }
-            setTimeout(() => {
-              onClose();
-              window.location.reload();
-            }, 2000);
+            // Fallback to reload if no callback
+            window.location.reload();
           }
+        }, 2000);
+      } else if (event.data === "payment_failed") {
+        console.log("Payment failed message received");
+        if (showSuccess || showFailed) return; // Prevent multiple calls
+        
+        setShowFailed(true);
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
         }
+        setTimeout(() => {
+          onClose();
+          window.location.reload();
+        }, 2000);
       }
     };
 
@@ -163,13 +135,11 @@ const PaymentPopup = ({ paymentUrl, onClose, addonId }: PaymentPopupProps) => {
 
     return () => {
       window.removeEventListener("message", handleMessage);
-      // Restore original console.error
-      console.error = originalError;
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [onClose]);
+  }, [onClose, onPaymentSuccess, showSuccess, showFailed]);
 
   const handleLoad = () => {
     setIsLoading(false);
@@ -195,9 +165,6 @@ const PaymentPopup = ({ paymentUrl, onClose, addonId }: PaymentPopupProps) => {
             <h2 className="text-3xl font-bold text-red-700 mb-2">
               فشلت عملية الدفع!
             </h2>
-            {errorMessage && (
-              <p className="text-lg text-red-600 mb-2">{errorMessage}</p>
-            )}
             <p className="text-lg text-gray-600">
               سيتم إغلاق النافذة تلقائياً...
             </p>
@@ -242,9 +209,7 @@ const PaymentPopup = ({ paymentUrl, onClose, addonId }: PaymentPopupProps) => {
                   src={paymentUrl}
                   className={`w-full h-[700px] border-0 ${isLoading ? "hidden" : "block"}`}
                   title="Payment Gateway"
-                  onLoad={handleLoad}
-                  onError={handleIframeError}
-                  sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation"
+                  onLoad={() => setIsLoading(false)}
                 />
 
                 <div className="text-center text-sm mt-4">

@@ -179,39 +179,41 @@ export function WhatsAppCenterPage() {
   const [paymentUrl, setPaymentUrl] = useState<string>("");
   const [addonId, setAddonId] = useState<number | undefined>(undefined);
   const { userData } = useAuthStore();
+  
+  // Fetch WhatsApp data function (reusable)
+  const fetchWhatsAppData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      // axiosInstance interceptor will automatically add the Authorization header
+      const response = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+
+      if (response.data.success && response.data.data) {
+        const numbers = response.data.data.numbers || [];
+        const plansData = response.data.data.plans || [];
+        
+        setConnectedNumbers(numbers);
+        setPlans(plansData);
+        
+        setQuota(response.data.data.quota || 0);
+        setUsage(response.data.data.usage || 0);
+      } else {
+        setError("فشل في تحميل البيانات");
+      }
+    } catch (err: any) {
+      console.error("Error fetching WhatsApp data:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء تحميل البيانات");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Fetch WhatsApp data on component mount
   useEffect(() => {
     // Wait for userData to be available before making the request
     if (!userData?.token) {
       return;
     }
-
-    const fetchWhatsAppData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        // axiosInstance interceptor will automatically add the Authorization header
-        const response = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
-
-        if (response.data.success && response.data.data) {
-          const numbers = response.data.data.numbers || [];
-          const plansData = response.data.data.plans || [];
-          
-          setConnectedNumbers(numbers);
-          setPlans(plansData);
-          
-          setQuota(response.data.data.quota || 0);
-          setUsage(response.data.data.usage || 0);
-        } else {
-          setError("فشل في تحميل البيانات");
-        }
-      } catch (err: any) {
-        console.error("Error fetching WhatsApp data:", err);
-        setError(err.response?.data?.message || "حدث خطأ أثناء تحميل البيانات");
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
     fetchWhatsAppData();
   }, [userData?.token]);
@@ -1018,18 +1020,14 @@ export function WhatsAppCenterPage() {
             setPaymentPopupOpen(false);
             setPaymentUrl("");
             setAddonId(undefined);
-            // Refresh the numbers list after closing popup
-            const refreshData = async () => {
-              try {
-                const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
-                if (fetchResponse.data.success && fetchResponse.data.data) {
-                  setConnectedNumbers(fetchResponse.data.data.numbers || []);
-                }
-              } catch (err) {
-                console.error("Error refreshing data:", err);
-              }
-            };
-            refreshData();
+          }}
+          onPaymentSuccess={() => {
+            // Close popup first
+            setPaymentPopupOpen(false);
+            setPaymentUrl("");
+            setAddonId(undefined);
+            // Then refresh data with loading skeleton
+            fetchWhatsAppData();
           }}
         />
       )}
