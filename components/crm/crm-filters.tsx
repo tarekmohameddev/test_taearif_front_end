@@ -117,6 +117,8 @@ export default function CrmFilters({
     filterProcedure,
     filterName,
     filterEmail,
+    filterEmployee,
+    filterEmployeePhone,
     interestedCategoryIds,
     interestedPropertyIds,
     sortBy,
@@ -131,6 +133,8 @@ export default function CrmFilters({
     setFilterProcedure,
     setFilterName,
     setFilterEmail,
+    setFilterEmployee,
+    setFilterEmployeePhone,
     setInterestedCategoryIds,
     setInterestedPropertyIds,
     setSortBy,
@@ -151,7 +155,7 @@ export default function CrmFilters({
     const fetchFilters = async () => {
       try {
         setLoadingFilters(true);
-        const response = await axiosInstance.get("/customers/filters");
+        const response = await axiosInstance.get("/crm/customers/filters");
 
         if (response.data.status === "success") {
           setFilterData(response.data.data);
@@ -215,6 +219,16 @@ export default function CrmFilters({
           params.append("district_id", filterDistrict);
         }
 
+        // Employee filters - Active
+        // Filter by employee ID (responsible employee)
+        if (filterEmployee !== "all") {
+          params.append("responsible_employee_id", filterEmployee);
+        }
+        // Filter by employee WhatsApp number (NOT customer WhatsApp)
+        if (filterEmployeePhone && filterEmployeePhone !== "all" && filterEmployeePhone.trim()) {
+          params.append("employee_whatsapp_number", filterEmployeePhone);
+        }
+
         // Commented out filters - can be enabled later
         // if (filterType !== "all") {
         //   params.append("type_id", filterType);
@@ -245,10 +259,10 @@ export default function CrmFilters({
         //   params.append("sort_dir", sortDir);
         // }
 
-        // Use /customers/search endpoint with all filters
+        // Use /crm/customers/search endpoint with all filters
         const url = params.toString()
-          ? `/customers/search?${params.toString()}`
-          : "/customers/search";
+          ? `/crm/customers/search?${params.toString()}`
+          : "/crm/customers/search";
 
         const response = await axiosInstance.get(url);
         const crmData = response.data;
@@ -323,6 +337,8 @@ export default function CrmFilters({
       dateRange,
       filterCity,
       filterDistrict,
+      filterEmployee,
+      filterEmployeePhone,
       // Commented out dependencies - can be enabled later
       // filterType,
       // filterProcedure,
@@ -368,7 +384,7 @@ export default function CrmFilters({
     setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
   };
 
-  // Handle filter changes for City and District - Active
+  // Handle filter changes for City, District, and Employee - Active
   const handleFilterChange = (filterName: string, value: string) => {
     switch (filterName) {
       case "city":
@@ -377,6 +393,12 @@ export default function CrmFilters({
         break;
       case "district":
         setFilterDistrict(value);
+        break;
+      case "employee":
+        setFilterEmployee(value);
+        break;
+      case "employeePhone":
+        setFilterEmployeePhone(value);
         break;
       // Commented out cases - can be enabled later
       // case "type":
@@ -628,6 +650,52 @@ export default function CrmFilters({
               />
             </PopoverContent>
           </Popover>
+
+          {/* Employee Filter - Active */}
+          <Select
+            value={filterEmployee}
+            onValueChange={(value) => handleFilterChange("employee", value)}
+          >
+            <SelectTrigger className="w-full sm:w-[140px] lg:w-[150px]">
+              <SelectValue placeholder="الموظف" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الموظفين</SelectItem>
+              {filterData?.employees?.map((employee: any) => (
+                <SelectItem key={employee.id} value={employee.id.toString()}>
+                  {employee.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Employee WhatsApp Number Filter - Active */}
+          {/* This filters by EMPLOYEE WhatsApp number, NOT customer WhatsApp */}
+          <Select
+            value={filterEmployeePhone}
+            onValueChange={(value) => handleFilterChange("employeePhone", value)}
+          >
+            <SelectTrigger className="w-full sm:w-[140px] lg:w-[150px]">
+              <SelectValue placeholder="واتساب الموظف" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الأرقام</SelectItem>
+              {filterData?.employees
+                ?.filter((employee: any) => employee.phone_number || employee.whatsapp_number || employee.phone)
+                ?.map((employee: any) => {
+                  // Get employee WhatsApp number (not customer)
+                  const phoneNumber = employee.phone_number || employee.whatsapp_number || employee.phone || "";
+                  return (
+                    <SelectItem 
+                      key={`phone-${employee.id}`} 
+                      value={phoneNumber}
+                    >
+                      {employee.name} - {phoneNumber}
+                    </SelectItem>
+                  );
+                })}
+            </SelectContent>
+          </Select>
 
           {/* Type Filter - Commented out */}
           {/* <Select
