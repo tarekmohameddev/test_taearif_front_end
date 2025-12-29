@@ -826,9 +826,6 @@ export default function CrmPage() {
 
     const matchesStage =
       filterStage === "all" ||
-      (filterStage === "unassigned" &&
-        !customer.pipelineStage &&
-        !customer.stage_id) ||
       customer.pipelineStage === filterStage ||
       (customer.stage_id && String(customer.stage_id) === filterStage);
     const matchesType =

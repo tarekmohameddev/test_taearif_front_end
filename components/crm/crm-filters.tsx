@@ -356,7 +356,6 @@ export default function CrmFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع المراحل</SelectItem>
-              <SelectItem value="unassigned">غير محدد</SelectItem>
               {pipelineStages.map((stage) => (
                 <SelectItem key={stage.id} value={stage.id}>
                   {stage.name}

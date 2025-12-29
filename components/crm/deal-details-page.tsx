@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ArrowRight,
   Phone,
@@ -32,6 +31,7 @@ import {
   Property,
 } from "@/components/crm/dialogs/crm-activity-card";
 import { AddActivityForm } from "@/components/crm/dialogs/add-activity-form";
+import useCrmStore from "@/context/store/crm";
 
 interface DealDetailsData {
   request: {
@@ -117,6 +117,7 @@ export default function DealDetailsPage() {
   const router = useRouter();
   const dealId = (params?.id as string) || "";
   const [activeTab, setActiveTab] = useState("crm");
+  const { pipelineStages, getStageById, setPipelineStages } = useCrmStore();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -158,6 +159,32 @@ export default function DealDetailsPage() {
       fetchDealDetails();
     }
   }, [dealId]);
+
+  // Fetch pipeline stages if not in store
+  useEffect(() => {
+    const fetchStages = async () => {
+      if (pipelineStages.length === 0) {
+        try {
+          const response = await axiosInstance.get("/v1/crm/requests");
+          if (response.data.status === "success") {
+            const { stages } = response.data.data || {};
+            const transformedStages = (stages || []).map((stage: any) => ({
+              id: String(stage.id),
+              name: stage.stage_name,
+              color: stage.color || "#6366f1",
+              icon: stage.icon || "Target",
+              count: stage.requests?.length || 0,
+              value: 0,
+            }));
+            setPipelineStages(transformedStages);
+          }
+        } catch (err) {
+          console.error("Error fetching stages:", err);
+        }
+      }
+    };
+    fetchStages();
+  }, [pipelineStages.length, setPipelineStages]);
 
   // Fetch cards, projects, and properties (from popup)
   useEffect(() => {
@@ -570,22 +597,11 @@ export default function DealDetailsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback>
-                        {customer.name
-                          ?.split(" ")
-                          .map((n: string) => n[0])
-                          .join("")
-                          .toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-lg">{customer.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        العميل #{customer.id}
-                      </p>
-                    </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">{customer.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      العميل #{customer.id}
+                    </p>
                   </div>
 
                   <div className="space-y-3 pt-4 border-t">
@@ -632,7 +648,10 @@ export default function DealDetailsPage() {
                         <span className="text-sm text-muted-foreground">
                           المرحلة:
                         </span>
-                        <Badge variant="secondary">#{request.stage_id}</Badge>
+                        <Badge variant="secondary">
+                          {getStageById(String(request.stage_id))?.name ||
+                            `#${request.stage_id}`}
+                        </Badge>
                       </div>
                     </div>
                   ) : null}
@@ -657,7 +676,10 @@ export default function DealDetailsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">المرحلة</p>
-                      <Badge variant="secondary">#{request.stage_id}</Badge>
+                      <Badge variant="secondary">
+                        {getStageById(String(request.stage_id))?.name ||
+                          `#${request.stage_id}`}
+                      </Badge>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">
