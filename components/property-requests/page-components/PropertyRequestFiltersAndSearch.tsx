@@ -93,7 +93,7 @@ export const PropertyRequestFiltersAndSearch = ({
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
+      {/* Search Bar and Clear Filters Button */}
       <div className="flex items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -105,17 +105,35 @@ export const PropertyRequestFiltersAndSearch = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        {hasActiveFilters && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onResetFilters}
-            className="flex items-center gap-2"
-          >
-            <X className="h-4 w-4" />
-            إعادة تعيين الفلاتر
-          </Button>
-        )}
+        <Button
+          variant={hasActiveFilters ? "destructive" : "outline"}
+          size="default"
+          onClick={onResetFilters}
+          disabled={!hasActiveFilters}
+          className={`flex items-center gap-2 transition-all ${
+            hasActiveFilters
+              ? "bg-red-500 hover:bg-red-600 text-white shadow-md"
+              : "opacity-50 cursor-not-allowed"
+          }`}
+          title={hasActiveFilters ? "إزالة جميع الفلاتر والبحث" : "لا توجد فلاتر نشطة"}
+        >
+          <FilterX className="h-4 w-4" />
+          <span className="font-semibold">إزالة الفلاتر</span>
+          {hasActiveFilters && (
+            <span className="mr-1 px-1.5 py-0.5 text-xs bg-white/20 rounded-full">
+              {[
+                cityId,
+                districtId,
+                categoryId,
+                propertyType,
+                purchaseGoal,
+                seriousness,
+                isRead !== "",
+                searchTerm,
+              ].filter(Boolean).length}
+            </span>
+          )}
+        </Button>
       </div>
 
       {/* Filters Row */}

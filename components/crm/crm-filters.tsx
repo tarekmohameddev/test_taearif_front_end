@@ -207,13 +207,15 @@ export default function CrmFilters({
           params.append("created_to", format(dateRange.to, "yyyy-MM-dd"));
         }
 
+        // City and District filters - Active
+        if (filterCity !== "all") {
+          params.append("city_id", filterCity);
+        }
+        if (filterDistrict !== "all") {
+          params.append("district_id", filterDistrict);
+        }
+
         // Commented out filters - can be enabled later
-        // if (filterCity !== "all") {
-        //   params.append("city_id", filterCity);
-        // }
-        // if (filterDistrict !== "all") {
-        //   params.append("district_id", filterDistrict);
-        // }
         // if (filterType !== "all") {
         //   params.append("type_id", filterType);
         // }
@@ -319,9 +321,9 @@ export default function CrmFilters({
       onSearchResults,
       userData?.token,
       dateRange,
+      filterCity,
+      filterDistrict,
       // Commented out dependencies - can be enabled later
-      // filterCity,
-      // filterDistrict,
       // filterType,
       // filterProcedure,
       // filterName,
@@ -366,16 +368,37 @@ export default function CrmFilters({
     setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
   };
 
+  // Handle filter changes for City and District - Active
+  const handleFilterChange = (filterName: string, value: string) => {
+    switch (filterName) {
+      case "city":
+        setFilterCity(value);
+        setFilterDistrict("all");
+        break;
+      case "district":
+        setFilterDistrict(value);
+        break;
+      // Commented out cases - can be enabled later
+      // case "type":
+      //   setFilterType(value);
+      //   break;
+      // case "priority":
+      //   setFilterPriority(value);
+      //   break;
+      // case "procedure":
+      //   setFilterProcedure(value);
+      //   break;
+      // case "sortBy":
+      //   setSortBy(value);
+      //   break;
+      // case "sortDir":
+      //   setSortDir(value);
+      //   break;
+    }
+    setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
+  };
+
   // Commented out handlers - can be enabled later
-  // const handleFilterChange = (filterName: string, value: string) => {
-  //   switch (filterName) {
-  //     case "city":
-  //       setFilterCity(value);
-  //       setFilterDistrict("all");
-  //       break;
-  //     case "district":
-  //       setFilterDistrict(value);
-  //       break;
   //     case "type":
   //       setFilterType(value);
   //       break;
@@ -443,15 +466,15 @@ export default function CrmFilters({
   //   setTimeout(() => performSearch("", "all", "all"), 0);
   // };
 
-  // Get filtered districts based on selected city - Commented out
-  // const getFilteredDistricts = () => {
-  //   if (!filterData?.districts || filterCity === "all") {
-  //     return filterData?.districts || [];
-  //   }
-  //   return filterData.districts.filter(
-  //     (district: any) => district.city_id.toString() === filterCity,
-  //   );
-  // };
+  // Get filtered districts based on selected city - Active
+  const getFilteredDistricts = () => {
+    if (!filterData?.districts || filterCity === "all") {
+      return filterData?.districts || [];
+    }
+    return filterData.districts.filter(
+      (district: any) => district.city_id.toString() === filterCity,
+    );
+  };
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -626,8 +649,8 @@ export default function CrmFilters({
             </SelectContent>
           </Select> */}
 
-          {/* City Filter - Commented out */}
-          {/* <Select
+          {/* City Filter - Active */}
+          <Select
             value={filterCity}
             onValueChange={(value) => handleFilterChange("city", value)}
           >
@@ -642,10 +665,10 @@ export default function CrmFilters({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select> */}
+          </Select>
 
-          {/* District Filter - Commented out */}
-          {/* <Select
+          {/* District Filter - Active */}
+          <Select
             value={filterDistrict}
             onValueChange={(value) => handleFilterChange("district", value)}
             disabled={filterCity === "all"}
@@ -661,7 +684,7 @@ export default function CrmFilters({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select> */}
+          </Select>
 
           {/* Procedure Filter - Commented out */}
           {/* <Select
