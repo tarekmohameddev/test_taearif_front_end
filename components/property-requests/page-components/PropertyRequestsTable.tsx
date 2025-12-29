@@ -45,6 +45,63 @@ import {
   X,
   ArrowRight,
 } from "lucide-react";
+import { Pagination } from "@/components/customers/page-components/Pagination";
+
+// Import PropertyRequest interface from parent
+interface PropertyRequest {
+  id: number;
+  user_id: number;
+  region: string;
+  property_type: string;
+  category_id: number;
+  city_id: number;
+  districts_id: number;
+  category: string | null;
+  neighborhoods: string[] | null;
+  area_from: number | null;
+  area_to: number | null;
+  purchase_method: string;
+  budget_from: number;
+  budget_to: number;
+  seriousness: string;
+  purchase_goal: string;
+  wants_similar_offers: boolean;
+  full_name: string;
+  phone: string;
+  contact_on_whatsapp: boolean;
+  notes: string;
+  is_read: number;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PropertyRequestsTableProps {
+  filteredAndSortedPropertyRequests: PropertyRequest[];
+  selectedPropertyRequests: number[];
+  handleSelectAll: () => void;
+  handleSelectPropertyRequest: (id: number) => void;
+  sortField: string;
+  sortDirection: string;
+  handleSort: (field: keyof PropertyRequest) => void;
+  setSelectedPropertyRequest: (request: PropertyRequest) => void;
+  setShowPropertyRequestDialog: (show: boolean) => void;
+  openEditDialog: (request: PropertyRequest) => void;
+  handleDelete: (id: number) => void;
+  formData: any;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  handleChange: (field: keyof PropertyRequest) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleUpdatePropertyRequest: () => void;
+  showBulkActionsDialog: boolean;
+  setShowBulkActionsDialog: (show: boolean) => void;
+  setSelectedPropertyRequests: (ids: number[]) => void;
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
+  totalItems?: number;
+  perPage?: number;
+}
 
 export const PropertyRequestsTable = ({
   filteredAndSortedPropertyRequests,
@@ -66,7 +123,12 @@ export const PropertyRequestsTable = ({
   showBulkActionsDialog,
   setShowBulkActionsDialog,
   setSelectedPropertyRequests,
-}: any) => {
+  currentPage = 1,
+  totalPages = 1,
+  onPageChange,
+  totalItems = 0,
+  perPage = 20,
+}: PropertyRequestsTableProps) => {
   const openWhatsApp = (raw: string) => {
     const phone = raw.replace(/\D/g, ""); // remove non-digits
     let full = "";
@@ -289,7 +351,8 @@ export const PropertyRequestsTable = ({
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <DropdownMenu>
+                      {/* DropdownMenu - Hidden */}
+                      {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
                             <MoreHorizontal className="h-4 w-4" />
@@ -374,7 +437,7 @@ export const PropertyRequestsTable = ({
                             حذف
                           </DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                      </DropdownMenu> */}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -383,6 +446,22 @@ export const PropertyRequestsTable = ({
           </Table>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {onPageChange && totalPages > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            lastPage={totalPages}
+            total={totalItems}
+            perPage={perPage}
+            from={(currentPage - 1) * perPage + 1}
+            to={Math.min(currentPage * perPage, totalItems)}
+            onPageChange={onPageChange}
+            loading={false}
+          />
+        </div>
+      )}
     </div>
   );
 };

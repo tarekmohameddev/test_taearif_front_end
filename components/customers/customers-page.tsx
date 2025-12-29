@@ -221,6 +221,14 @@ export default function CustomersPage() {
         filterCity,
         filterDistrict,
         filterPriority,
+        filterProcedure,
+        filterStage,
+        filterName,
+        filterEmail,
+        interestedCategoryIds,
+        interestedPropertyIds,
+        sortBy,
+        sortDir,
       } = useCustomersFiltersStore.getState();
 
       // Build query parameters
@@ -242,16 +250,51 @@ export default function CustomersPage() {
       if (filterPriority !== "all") {
         params.append("priority_id", filterPriority);
       }
+      if (filterProcedure !== "all") {
+        params.append("procedure_id", filterProcedure);
+      }
+      if (filterStage !== "all") {
+        params.append("stage_id", filterStage);
+      }
+      if (filterName.trim()) {
+        params.append("name", filterName.trim());
+      }
+      if (filterEmail.trim()) {
+        params.append("email", filterEmail.trim());
+      }
+      if (interestedCategoryIds.length > 0) {
+        interestedCategoryIds.forEach((id: string | number) => {
+          params.append("interested_category_ids", id.toString());
+        });
+      }
+      if (interestedPropertyIds.length > 0) {
+        interestedPropertyIds.forEach((id: string | number) => {
+          params.append("interested_property_ids", id.toString());
+        });
+      }
+      if (sortBy) {
+        params.append("sort_by", sortBy);
+      }
+      if (sortDir) {
+        params.append("sort_dir", sortDir);
+      }
 
       // Use search endpoint if there are filters, otherwise use regular endpoint
-      const endpoint =
+      const hasFilters =
         params.toString().includes("q=") ||
         params.toString().includes("city_id=") ||
         params.toString().includes("district_id=") ||
         params.toString().includes("type_id=") ||
-        params.toString().includes("priority_id=")
-          ? "/customers/search"
-          : "/customers";
+        params.toString().includes("priority_id=") ||
+        params.toString().includes("procedure_id=") ||
+        params.toString().includes("stage_id=") ||
+        params.toString().includes("name=") ||
+        params.toString().includes("email=") ||
+        params.toString().includes("interested_category_ids=") ||
+        params.toString().includes("interested_property_ids=") ||
+        params.toString().includes("sort_by=");
+
+      const endpoint = hasFilters ? "/customers/search" : "/customers";
 
       // Fetch data with current filters and new page
       const fetchData = async () => {

@@ -7,73 +7,224 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, RefreshCw } from "lucide-react";
+import { Search, RefreshCw, X, FilterX, RotateCcw } from "lucide-react";
+
+interface FilterCity {
+  id: number;
+  name_ar: string;
+  name_en: string;
+}
+
+interface FilterDistrict {
+  id: number;
+  city_id: number;
+  name_ar: string;
+  name_en: string;
+}
+
+interface FilterCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+}
+
+interface FiltersData {
+  cities: FilterCity[];
+  districts: FilterDistrict[];
+  categories: FilterCategory[];
+  property_types: string[];
+  purchase_goals: string[];
+  seriousness_options: string[];
+}
+
+interface PropertyRequestFiltersAndSearchProps {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  cityId: string;
+  setCityId: (value: string) => void;
+  districtId: string;
+  setDistrictId: (value: string) => void;
+  categoryId: string;
+  setCategoryId: (value: string) => void;
+  propertyType: string;
+  setPropertyType: (value: string) => void;
+  purchaseGoal: string;
+  setPurchaseGoal: (value: string) => void;
+  seriousness: string;
+  setSeriousness: (value: string) => void;
+  isRead: string;
+  setIsRead: (value: string) => void;
+  filtersData: FiltersData;
+  filteredDistricts: FilterDistrict[];
+  onResetFilters: () => void;
+}
 
 export const PropertyRequestFiltersAndSearch = ({
   searchTerm,
   setSearchTerm,
-  filterStatus,
-  setFilterStatus,
-  filterType,
-  setFilterType,
-  filterCity,
-  setFilterCity,
-}: any) => {
+  cityId,
+  setCityId,
+  districtId,
+  setDistrictId,
+  categoryId,
+  setCategoryId,
+  propertyType,
+  setPropertyType,
+  purchaseGoal,
+  setPurchaseGoal,
+  seriousness,
+  setSeriousness,
+  isRead,
+  setIsRead,
+  filtersData,
+  filteredDistricts,
+  onResetFilters,
+}: PropertyRequestFiltersAndSearchProps) => {
+  const hasActiveFilters =
+    cityId ||
+    districtId ||
+    categoryId ||
+    propertyType ||
+    purchaseGoal ||
+    seriousness ||
+    isRead !== "" ||
+    searchTerm;
+
   return (
-    <div className="flex items-center justify-between">
-      <div className="relative">
-        <Search className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="البحث في العملاء..."
-          className="pr-8 w-[300px]"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+    <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="البحث في طلبات العقارات..."
+            className="pr-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        {hasActiveFilters && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onResetFilters}
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            إعادة تعيين الفلاتر
+          </Button>
+        )}
       </div>
-      <div className="flex items-center gap-2">
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="الحالة" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">جميع الحالات</SelectItem>
-            <SelectItem value="نشط">نشط</SelectItem>
-            <SelectItem value="غير نشط">غير نشط</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="النوع" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">جميع الأنواع</SelectItem>
-            <SelectItem value="مشتري">مشتري</SelectItem>
-            <SelectItem value="بائع">بائع</SelectItem>
-            <SelectItem value="مستأجر">مستأجر</SelectItem>
-            <SelectItem value="مؤجر">مؤجر</SelectItem>
-            <SelectItem value="مستثمر">مستثمر</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={filterCity} onValueChange={setFilterCity}>
-          <SelectTrigger className="w-[120px]">
+
+      {/* Filters Row */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* City Filter */}
+        <Select value={cityId || "all"} onValueChange={(value) => setCityId(value === "all" ? "" : value)}>
+          <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="المدينة" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع المدن</SelectItem>
-            <SelectItem value="الرياض">الرياض</SelectItem>
-            <SelectItem value="جدة">جدة</SelectItem>
-            <SelectItem value="الدمام">الدمام</SelectItem>
-            <SelectItem value="مكة">مكة المكرمة</SelectItem>
-            <SelectItem value="المدينة">المدينة المنورة</SelectItem>
-            <SelectItem value="الطائف">الطائف</SelectItem>
-            <SelectItem value="الخبر">الخبر</SelectItem>
-            <SelectItem value="القطيف">القطيف</SelectItem>
+            {filtersData.cities.map((city) => (
+              <SelectItem key={city.id} value={city.id.toString()}>
+                {city.name_ar}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        <Button variant="outline" size="icon">
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+
+        {/* District Filter */}
+        <Select
+          value={districtId || "all"}
+          onValueChange={(value) => setDistrictId(value === "all" ? "" : value)}
+          disabled={!cityId}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="الحي" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">جميع الأحياء</SelectItem>
+            {filteredDistricts.map((district) => (
+              <SelectItem key={district.id} value={district.id.toString()}>
+                {district.name_ar}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Category Filter */}
+        <Select value={categoryId || "all"} onValueChange={(value) => setCategoryId(value === "all" ? "" : value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="الفئة" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">جميع الفئات</SelectItem>
+            {filtersData.categories.map((category) => (
+              <SelectItem key={category.id} value={category.id.toString()}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Property Type Filter */}
+        <Select value={propertyType || "all"} onValueChange={(value) => setPropertyType(value === "all" ? "" : value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="نوع العقار" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">جميع الأنواع</SelectItem>
+            {filtersData.property_types.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type === "Residential" ? "سكني" : "زراعي"}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Purchase Goal Filter */}
+        <Select value={purchaseGoal || "all"} onValueChange={(value) => setPurchaseGoal(value === "all" ? "" : value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="هدف الشراء" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">جميع الأهداف</SelectItem>
+            {filtersData.purchase_goals.map((goal) => (
+              <SelectItem key={goal} value={goal}>
+                {goal}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Seriousness Filter */}
+        <Select value={seriousness || "all"} onValueChange={(value) => setSeriousness(value === "all" ? "" : value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="الجدية" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">جميع المستويات</SelectItem>
+            {filtersData.seriousness_options.map((option) => (
+              <SelectItem key={option} value={option}>
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Read Status Filter */}
+        <Select value={isRead || "all"} onValueChange={(value) => setIsRead(value === "all" ? "" : value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="حالة القراءة" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">الكل</SelectItem>
+            <SelectItem value="0">غير مقروء</SelectItem>
+            <SelectItem value="1">مقروء</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

@@ -10,6 +10,14 @@ const useCustomersFiltersStore = create((set, get) => ({
   filterEmployee: "all",
   filterEmployeePhone: "",
   dateRange: { from: undefined, to: undefined },
+  filterProcedure: "all",
+  filterStage: "all",
+  filterName: "",
+  filterEmail: "",
+  interestedCategoryIds: [],
+  interestedPropertyIds: [],
+  sortBy: "created_at",
+  sortDir: "asc",
 
   // Filter data from API - initialize with empty arrays to prevent undefined errors
   filterData: {
@@ -20,6 +28,8 @@ const useCustomersFiltersStore = create((set, get) => ({
     stages: [],
     procedures: [],
     employees: [],
+    categories: [],
+    properties: [],
   },
   loadingFilters: true,
 
@@ -32,6 +42,14 @@ const useCustomersFiltersStore = create((set, get) => ({
   setFilterEmployee: (employee) => set({ filterEmployee: employee }),
   setFilterEmployeePhone: (phone) => set({ filterEmployeePhone: phone }),
   setDateRange: (range) => set({ dateRange: range }),
+  setFilterProcedure: (procedure) => set({ filterProcedure: procedure }),
+  setFilterStage: (stage) => set({ filterStage: stage }),
+  setFilterName: (name) => set({ filterName: name }),
+  setFilterEmail: (email) => set({ filterEmail: email }),
+  setInterestedCategoryIds: (ids) => set({ interestedCategoryIds: ids }),
+  setInterestedPropertyIds: (ids) => set({ interestedPropertyIds: ids }),
+  setSortBy: (sortBy) => set({ sortBy: sortBy }),
+  setSortDir: (sortDir) => set({ sortDir: sortDir }),
 
   // Set filter data from API
   setFilterData: (data) =>
@@ -44,6 +62,8 @@ const useCustomersFiltersStore = create((set, get) => ({
         stages: data?.stages || [],
         procedures: data?.procedures || [],
         employees: data?.employees || [],
+        categories: data?.categories || [],
+        properties: data?.properties || [],
       },
       loadingFilters: false,
     }),
@@ -60,6 +80,14 @@ const useCustomersFiltersStore = create((set, get) => ({
       filterEmployee: "all",
       filterEmployeePhone: "",
       dateRange: { from: undefined, to: undefined },
+      filterProcedure: "all",
+      filterStage: "all",
+      filterName: "",
+      filterEmail: "",
+      interestedCategoryIds: [],
+      interestedPropertyIds: [],
+      sortBy: "created_at",
+      sortDir: "asc",
     }),
 
   // Check if any filters are applied
@@ -74,7 +102,15 @@ const useCustomersFiltersStore = create((set, get) => ({
       state.filterEmployee !== "all" ||
       state.filterEmployeePhone.trim() ||
       state.dateRange.from ||
-      state.dateRange.to
+      state.dateRange.to ||
+      state.filterProcedure !== "all" ||
+      state.filterStage !== "all" ||
+      state.filterName.trim() ||
+      state.filterEmail.trim() ||
+      state.interestedCategoryIds.length > 0 ||
+      state.interestedPropertyIds.length > 0 ||
+      state.sortBy !== "created_at" ||
+      state.sortDir !== "asc"
     );
   },
 
@@ -90,6 +126,14 @@ const useCustomersFiltersStore = create((set, get) => ({
       filterEmployee: state.filterEmployee,
       filterEmployeePhone: state.filterEmployeePhone,
       dateRange: state.dateRange,
+      filterProcedure: state.filterProcedure,
+      filterStage: state.filterStage,
+      filterName: state.filterName,
+      filterEmail: state.filterEmail,
+      interestedCategoryIds: state.interestedCategoryIds,
+      interestedPropertyIds: state.interestedPropertyIds,
+      sortBy: state.sortBy,
+      sortDir: state.sortDir,
     };
   },
 }));

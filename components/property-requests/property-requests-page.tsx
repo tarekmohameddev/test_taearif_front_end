@@ -58,6 +58,39 @@ interface PropertyRequestsResponse {
   };
 }
 
+// Filters interfaces
+interface FilterCity {
+  id: number;
+  name_ar: string;
+  name_en: string;
+}
+
+interface FilterDistrict {
+  id: number;
+  city_id: number;
+  name_ar: string;
+  name_en: string;
+}
+
+interface FilterCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+}
+
+interface FiltersResponse {
+  status: string;
+  data: {
+    cities: FilterCity[];
+    districts: FilterDistrict[];
+    categories: FilterCategory[];
+    property_types: string[];
+    purchase_goals: string[];
+    seriousness_options: string[];
+  };
+}
+
 export default function PropertyRequestsPage() {
   const [activeTab, setActiveTab] = useState("property-requests");
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,9 +101,28 @@ export default function PropertyRequestsPage() {
   >([]);
   const [sortField, setSortField] = useState("created_at");
   const [sortDirection, setSortDirection] = useState("desc");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterType, setFilterType] = useState("all");
-  const [filterCity, setFilterCity] = useState("all");
+  
+  // Filter states
+  const [cityId, setCityId] = useState<string>("");
+  const [districtId, setDistrictId] = useState<string>("");
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [propertyType, setPropertyType] = useState<string>("");
+  const [purchaseGoal, setPurchaseGoal] = useState<string>("");
+  const [seriousness, setSeriousness] = useState<string>("");
+  const [isRead, setIsRead] = useState<string>("");
+  
+  // Filters data
+  const [filtersData, setFiltersData] = useState<FiltersResponse["data"] | null>(null);
+  const [loadingFilters, setLoadingFilters] = useState(true);
+  const [filteredDistricts, setFilteredDistricts] = useState<FilterDistrict[]>([]);
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage] = useState(20);
+  
+  // Sorted property requests
+  const [filteredAndSortedPropertyRequests, setFilteredAndSortedPropertyRequests] = useState<PropertyRequest[]>([]);
+  
   const [showPropertyRequestDialog, setShowPropertyRequestDialog] =
     useState(false);
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
@@ -111,6 +163,32 @@ export default function PropertyRequestsPage() {
   });
   const { userData } = useAuthStore();
 
+  // Fetch filters data
+  useEffect(() => {
+    const fetchFilters = async () => {
+      if (!userData?.token) {
+        console.log("No token available, skipping fetchFilters");
+        setLoadingFilters(false);
+        return;
+      }
+
+      try {
+        const response = await axiosInstance.get<FiltersResponse>(
+          "/v1/property-requests/filters"
+        );
+        setFiltersData(response.data.data);
+      } catch (err) {
+        console.error("Error fetching filters:", err);
+        toast.error("حدث خطأ أثناء تحميل بيانات الفلاتر");
+      } finally {
+        setLoadingFilters(false);
+      }
+    };
+
+    fetchFilters();
+  }, [userData?.token]);
+
+  // Fetch property requests with filters
   useEffect(() => {
     const fetchPropertyRequests = async () => {
       // التحقق من وجود التوكن قبل إجراء الطلب
@@ -121,20 +199,82 @@ export default function PropertyRequestsPage() {
       }
 
       try {
-        const response = await axiosInstance.get("/v1/property-requests");
+        setLoading(true);
+        
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (cityId) params.append("city_id", cityId);
+        if (districtId) params.append("district_id", districtId);
+        if (categoryId) params.append("category_id", categoryId);
+        if (propertyType) params.append("property_type", propertyType);
+        if (purchaseGoal) params.append("purchase_goal", purchaseGoal);
+        if (seriousness) params.append("seriousness", seriousness);
+        if (isRead !== "") params.append("is_read", isRead);
+        if (searchTerm) params.append("q", searchTerm);
+        params.append("per_page", perPage.toString());
+        params.append("page", currentPage.toString());
+
+        const response = await axiosInstance.get<PropertyRequestsResponse>(
+          `/v1/property-requests?${params.toString()}`
+        );
         const { property_requests, pagination } = response.data.data;
         setPropertyRequestsData(property_requests);
         setTotalPropertyRequests(pagination.total);
       } catch (err) {
         console.error("Error fetching property requests:", err);
         setError("حدث خطأ أثناء تحميل البيانات.");
+        toast.error("حدث خطأ أثناء تحميل البيانات");
       } finally {
         setLoading(false);
       }
     };
 
     fetchPropertyRequests();
-  }, [userData?.token]);
+  }, [userData?.token, cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, isRead, searchTerm, currentPage, perPage]);
+
+  // Reset district when city changes
+  useEffect(() => {
+    setDistrictId("");
+  }, [cityId]);
+
+  // Filter districts based on selected city
+  useEffect(() => {
+    if (!filtersData || !cityId) {
+      setFilteredDistricts([]);
+      return;
+    }
+    const filtered = filtersData.districts.filter(
+      (district) => district.city_id === parseInt(cityId)
+    );
+    setFilteredDistricts(filtered);
+  }, [filtersData, cityId]);
+
+  // Sort property requests (data is already filtered by API)
+  useEffect(() => {
+    const sorted = [...propertyRequestsData].sort((a, b) => {
+      let aValue = a[sortField as keyof PropertyRequest];
+      let bValue = b[sortField as keyof PropertyRequest];
+
+      // Handle cases where values might not be strings
+      const aStr = String(aValue ?? "").toLowerCase();
+      const bStr = String(bValue ?? "").toLowerCase();
+
+      if (sortDirection === "asc") {
+        return aStr.localeCompare(bStr);
+      } else {
+        return bStr.localeCompare(aStr);
+      }
+    });
+    setFilteredAndSortedPropertyRequests(sorted);
+  }, [propertyRequestsData, sortField, sortDirection]);
+
+  // Reset to page 1 when any filter changes (but not when currentPage changes)
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, isRead, searchTerm]);
 
   const handleNewPropertyRequestChange =
     (field: keyof typeof newPropertyRequest) => (value: any) => {
@@ -412,46 +552,6 @@ export default function PropertyRequestsPage() {
       setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
-  // Filter and sort property requests
-  const filteredAndSortedPropertyRequests = propertyRequestsData
-    .filter((propertyRequest) => {
-      const matchesSearch =
-        propertyRequest.full_name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        propertyRequest.phone.includes(searchTerm) ||
-        propertyRequest.property_type
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        propertyRequest.region
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        propertyRequest.notes.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesStatus =
-        filterStatus === "all" ||
-        propertyRequest.is_active === (filterStatus === "نشط" ? 1 : 0);
-      const matchesType =
-        filterType === "all" || propertyRequest.property_type === filterType;
-      const matchesCity =
-        filterCity === "all" || propertyRequest.region === filterCity;
-
-      return matchesSearch && matchesStatus && matchesType && matchesCity;
-    })
-    .sort((a, b) => {
-      let aValue = a[sortField as keyof PropertyRequest];
-      let bValue = b[sortField as keyof PropertyRequest];
-
-      // Handle cases where values might not be strings
-      const aStr = String(aValue ?? "").toLowerCase();
-      const bStr = String(bValue ?? "").toLowerCase();
-
-      if (sortDirection === "asc") {
-        return aStr.localeCompare(bStr);
-      } else {
-        return bStr.localeCompare(aStr);
-      }
-    });
 
   const handleSort = (field: keyof PropertyRequest) => {
     if (sortField === field) {
@@ -551,6 +651,41 @@ export default function PropertyRequestsPage() {
               investorCount={investorCount}
             /> */}
 
+            {/* Filters and Search */}
+            {!loadingFilters && filtersData && (
+              <PropertyRequestFiltersAndSearch
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                cityId={cityId}
+                setCityId={setCityId}
+                districtId={districtId}
+                setDistrictId={setDistrictId}
+                categoryId={categoryId}
+                setCategoryId={setCategoryId}
+                propertyType={propertyType}
+                setPropertyType={setPropertyType}
+                purchaseGoal={purchaseGoal}
+                setPurchaseGoal={setPurchaseGoal}
+                seriousness={seriousness}
+                setSeriousness={setSeriousness}
+                isRead={isRead}
+                setIsRead={setIsRead}
+                filtersData={filtersData}
+                filteredDistricts={filteredDistricts}
+                onResetFilters={() => {
+                  setCityId("");
+                  setDistrictId("");
+                  setCategoryId("");
+                  setPropertyType("");
+                  setPurchaseGoal("");
+                  setSeriousness("");
+                  setIsRead("");
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
+              />
+            )}
+
             {/* Main Content */}
             <PropertyRequestsTable
               filteredAndSortedPropertyRequests={
@@ -574,6 +709,11 @@ export default function PropertyRequestsPage() {
               showBulkActionsDialog={showBulkActionsDialog}
               setShowBulkActionsDialog={setShowBulkActionsDialog}
               setSelectedPropertyRequests={setSelectedPropertyRequests}
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalPropertyRequests / perPage)}
+              onPageChange={setCurrentPage}
+              totalItems={totalPropertyRequests}
+              perPage={perPage}
             />
 
             {/* Property Request Detail Dialog */}
