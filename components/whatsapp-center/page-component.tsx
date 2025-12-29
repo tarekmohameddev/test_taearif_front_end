@@ -332,6 +332,8 @@ export function WhatsAppCenterPage() {
         if (response.data.status === "success" || response.data.success) {
           if (response.data.payment_url) {
             // Open payment popup with iframe
+            console.log("Payment response data:", response.data);
+            console.log("Addon ID from response:", response.data.data?.id);
             setPaymentUrl(response.data.payment_url);
             setAddonId(response.data.data?.id);
             setPaymentPopupOpen(true);
