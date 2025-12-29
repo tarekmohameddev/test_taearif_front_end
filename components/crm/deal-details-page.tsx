@@ -591,10 +591,26 @@ export default function DealDetailsPage() {
               {/* معلومات العميل */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    معلومات العميل
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      معلومات العميل
+                    </CardTitle>
+                    {customer?.id && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          router.push(`/dashboard/customers/${customer.id}`)
+                        }
+                        className="gap-2"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                        <span className="hidden sm:inline">عرض التفاصيل</span>
+                        <span className="sm:hidden">التفاصيل</span>
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
