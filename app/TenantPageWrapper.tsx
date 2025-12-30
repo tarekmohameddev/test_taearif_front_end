@@ -166,11 +166,18 @@ const loadFooterComponent = (componentName: string) => {
 };
 
 const loadComponent = (section: string, componentName: string) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:168',message:'loadComponent called',data:{section,componentName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   if (!componentName) return null;
   const match = componentName?.match(/^(.*?)(\d+)$/);
   if (!match) return null;
   let baseName = match[1];
   const number = match[2];
+
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:172',message:'Parsed component name',data:{baseName,number},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
 
   // ⭐ Handle special case: propertyDetail -> propertyDetail
   // Convert propertyDetail to propertyDetail to match COMPONENTS key
@@ -182,16 +189,26 @@ const loadComponent = (section: string, componentName: string) => {
   const sectionPath = getSectionPath(section) || section;
 
   if (!sectionPath) {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:184',message:'Invalid sectionPath',data:{section,sectionPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     return null;
   }
 
   // استخدام القائمة المركزية للحصول على مسارات المكونات الفرعية
   // ⭐ IMPORTANT: baseName should be "propertyDetail" (with capital P and D) to match COMPONENTS key
   const subPath = getComponentSubPath(baseName);
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:190',message:'Got subPath from getComponentSubPath',data:{baseName,subPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
   if (!subPath) {
     // استخدام fallback للمكونات غير المعروفة
     const fallbackPath = "hero"; // استخدام hero كـ fallback
     const fallbackFullPath = `${fallbackPath}/${componentName}`;
+
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:193',message:'No subPath found, using fallback',data:{baseName,fallbackFullPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
 
     return lazy(() =>
       import(`@/components/tenant/${fallbackFullPath}`).catch(() => ({
@@ -223,10 +240,23 @@ const loadComponent = (section: string, componentName: string) => {
   }
   const fullPath = `${subPath}/${fileName}`;
 
-  return lazy(() =>
-    import(`@/components/tenant/${fullPath}`).catch(() => ({
-      default: () => <div>Component {componentName} not found</div>,
-    })),
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:224',message:'Constructed fullPath for import',data:{componentName,baseName,subPath,fileName,fullPath},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'E'})}).catch(()=>{});
+  // #endregion
+
+  // ⭐ Use next/dynamic instead of lazy() for better production build support
+  // This ensures webpack can properly analyze and bundle the component in production
+  return dynamic(
+    () =>
+      import(`@/components/tenant/${fullPath}`).catch((error) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:227',message:'Import failed',data:{componentName,fullPath,error:error?.message||String(error),stack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'F'})}).catch(()=>{});
+        // #endregion
+        return {
+          default: () => <div>Component {componentName} not found</div>,
+        };
+      }),
+    { ssr: false },
   );
 };
 
