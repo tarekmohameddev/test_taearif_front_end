@@ -15,6 +15,8 @@ import Header2 from "@/components/tenant/header/header2";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import Footer1 from "@/components/tenant/footer/footer1";
 import Footer2 from "@/components/tenant/footer/footer2";
+import PropertyDetail1 from "@/components/tenant/propertyDetail/propertyDetail1";
+import PropertyDetail2 from "@/components/tenant/propertyDetail/propertyDetail2";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
 import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
@@ -45,6 +47,9 @@ const headerComponentsCache = new Map<string, any>();
 
 // ⭐ Cache للـ footer components
 const footerComponentsCache = new Map<string, any>();
+
+// ⭐ Cache للـ propertyDetail components
+const propertyDetailComponentsCache = new Map<string, any>();
 
 // Load header component dynamically
 const loadHeaderComponent = (componentName: string) => {
@@ -166,18 +171,18 @@ const loadFooterComponent = (componentName: string) => {
 };
 
 const loadComponent = (section: string, componentName: string) => {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:168',message:'loadComponent called',data:{section,componentName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   if (!componentName) return null;
+  
+  // ⭐ Check cache first
+  const cacheKey = `${section}-${componentName}`;
+  if (propertyDetailComponentsCache.has(cacheKey)) {
+    return propertyDetailComponentsCache.get(cacheKey);
+  }
+
   const match = componentName?.match(/^(.*?)(\d+)$/);
   if (!match) return null;
   let baseName = match[1];
   const number = match[2];
-
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:172',message:'Parsed component name',data:{baseName,number},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
 
   // ⭐ Handle special case: propertyDetail -> propertyDetail
   // Convert propertyDetail to propertyDetail to match COMPONENTS key
@@ -185,30 +190,45 @@ const loadComponent = (section: string, componentName: string) => {
     baseName = "propertyDetail";
   }
 
+  // ⭐ Direct import for known propertyDetail components (more reliable than dynamic import)
+  // This fixes the case-sensitivity issue on Linux/Vercel
+  if (baseName === "propertyDetail") {
+    const propertyDetailComponentMap: Record<string, any> = {
+      propertyDetail1: PropertyDetail1,
+      propertyDetail2: PropertyDetail2,
+    };
+
+    if (propertyDetailComponentMap[componentName]) {
+      // Wrap in lazy for Suspense compatibility
+      const component = lazy(() =>
+        Promise.resolve({ default: propertyDetailComponentMap[componentName] }),
+      );
+      propertyDetailComponentsCache.set(cacheKey, component);
+      return component;
+    }
+  }
+
   // استخدام القائمة المركزية للحصول على مسارات الأقسام
   const sectionPath = getSectionPath(section) || section;
 
   if (!sectionPath) {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:184',message:'Invalid sectionPath',data:{section,sectionPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[Component Loader] Invalid section: ${section} for component: ${componentName}`);
+    }
     return null;
   }
 
   // استخدام القائمة المركزية للحصول على مسارات المكونات الفرعية
   // ⭐ IMPORTANT: baseName should be "propertyDetail" (with capital P and D) to match COMPONENTS key
   const subPath = getComponentSubPath(baseName);
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:190',message:'Got subPath from getComponentSubPath',data:{baseName,subPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
   if (!subPath) {
     // استخدام fallback للمكونات غير المعروفة
     const fallbackPath = "hero"; // استخدام hero كـ fallback
     const fallbackFullPath = `${fallbackPath}/${componentName}`;
 
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:193',message:'No subPath found, using fallback',data:{baseName,fallbackFullPath},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[Component Loader] Unknown component type: ${baseName}, using fallback: ${fallbackFullPath}`);
+    }
 
     return lazy(() =>
       import(`@/components/tenant/${fallbackFullPath}`).catch(() => ({
@@ -240,24 +260,33 @@ const loadComponent = (section: string, componentName: string) => {
   }
   const fullPath = `${subPath}/${fileName}`;
 
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:224',message:'Constructed fullPath for import',data:{componentName,baseName,subPath,fileName,fullPath},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'E'})}).catch(()=>{});
-  // #endregion
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[Component Loader] Loading component: ${componentName} from path: ${fullPath}`);
+  }
 
-  // ⭐ Use next/dynamic instead of lazy() for better production build support
-  // This ensures webpack can properly analyze and bundle the component in production
-  return dynamic(
-    () =>
-      import(`@/components/tenant/${fullPath}`).catch((error) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/b2e4014a-2f41-4a09-841a-7c7dd6b3e80a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TenantPageWrapper.tsx:227',message:'Import failed',data:{componentName,fullPath,error:error?.message||String(error),stack:error?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'F'})}).catch(()=>{});
-        // #endregion
-        return {
-          default: () => <div>Component {componentName} not found</div>,
-        };
-      }),
-    { ssr: false },
+  const component = lazy(() =>
+    import(`@/components/tenant/${fullPath}`).catch((error) => {
+      if (process.env.NODE_ENV === "development") {
+        console.error(`[Component Loader] Failed to load component ${componentName} from ${fullPath}:`, error);
+      }
+      return {
+        default: () => (
+          <div className="p-4 bg-red-50 border border-red-200 rounded text-center">
+            <div className="text-red-600 font-semibold mb-2">
+              Component {componentName} not found
+            </div>
+            <div className="text-red-500 text-sm">
+              Path: {fullPath}
+            </div>
+          </div>
+        ),
+      };
+    }),
   );
+
+  // Cache the component
+  propertyDetailComponentsCache.set(cacheKey, component);
+  return component;
 };
 
 interface TenantPageWrapperProps {
