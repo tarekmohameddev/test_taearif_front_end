@@ -193,20 +193,16 @@ const loadComponent = (section: string, componentName: string) => {
   // ⭐ Direct import for known propertyDetail components (more reliable than dynamic import)
   // This fixes the case-sensitivity issue on Linux/Vercel
   if (baseName === "propertyDetail") {
-    // Use dynamic import with explicit paths for better production compatibility
-    // This ensures Next.js can properly bundle the components
-    if (componentName === "propertyDetail1") {
+    const propertyDetailComponentMap: Record<string, any> = {
+      propertyDetail1: PropertyDetail1,
+      propertyDetail2: PropertyDetail2,
+    };
+
+    if (propertyDetailComponentMap[componentName]) {
+      // Use dynamic from Next.js (better for production than lazy)
+      // Wrap the component in a promise to match dynamic() API
       const component = dynamic(
-        () => import("@/components/tenant/propertyDetail/propertyDetail1"),
-        { ssr: false }
-      );
-      propertyDetailComponentsCache.set(cacheKey, component);
-      return component;
-    }
-    
-    if (componentName === "propertyDetail2") {
-      const component = dynamic(
-        () => import("@/components/tenant/propertyDetail/propertyDetail2"),
+        () => Promise.resolve({ default: propertyDetailComponentMap[componentName] }),
         { ssr: false }
       );
       propertyDetailComponentsCache.set(cacheKey, component);
