@@ -1,6 +1,6 @@
 "use client";
 
-import PropertyDetail from "@/components/tenant/propertyDetail/propertyDetail1";
+import PropertyDetail from "@/components/tenant/propertyDetail/propertyDetail1.tsx";
 
 interface propertyDetail1Props {
   propertySlug: string;
