@@ -789,7 +789,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
 
   return (
     <section
-      className="py-12 px-4"
+      className=""
       style={{
         backgroundColor: mergedData.styling?.backgroundColor || "#efe5dc",
         paddingTop: mergedData.layout?.padding?.top || "3rem",

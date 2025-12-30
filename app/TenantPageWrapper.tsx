@@ -48,9 +48,6 @@ const headerComponentsCache = new Map<string, any>();
 // ⭐ Cache للـ footer components
 const footerComponentsCache = new Map<string, any>();
 
-// ⭐ Cache للـ propertyDetail components
-const propertyDetailComponentsCache = new Map<string, any>();
-
 // Load header component dynamically
 const loadHeaderComponent = (componentName: string) => {
   if (!componentName) return null;
@@ -172,12 +169,6 @@ const loadFooterComponent = (componentName: string) => {
 
 const loadComponent = (section: string, componentName: string) => {
   if (!componentName) return null;
-  
-  // ⭐ Check cache first
-  const cacheKey = `${section}-${componentName}`;
-  if (propertyDetailComponentsCache.has(cacheKey)) {
-    return propertyDetailComponentsCache.get(cacheKey);
-  }
 
   const match = componentName?.match(/^(.*?)(\d+)$/);
   if (!match) return null;
@@ -188,42 +179,6 @@ const loadComponent = (section: string, componentName: string) => {
   // Convert propertyDetail to propertyDetail to match COMPONENTS key
   if (baseName === "propertyDetail" || baseName.toLowerCase() === "propertydetail") {
     baseName = "propertyDetail";
-  }
-
-  // ⭐ Handle propertyDetail components - use lazy() like projectDetails (which works in production)
-  // This ensures the component loads correctly in production
-  if (baseName === "propertyDetail") {
-    // Get the subPath first to ensure correct path construction
-    const subPath = getComponentSubPath(baseName);
-    if (subPath) {
-      // Extract the number from componentName (e.g., "2" from "propertyDetail2")
-      const number = componentName.match(/\d+$/)?.[0] || '';
-      // Always construct as propertyDetail + number to ensure correct casing
-      const fileName = `propertyDetail${number}`;
-      const fullPath = `${subPath}/${fileName}`;
-
-      // Use lazy() from React (same as projectDetails which works correctly)
-      // This works in production because React.lazy handles dynamic imports better
-      const component = lazy(() =>
-        import(`@/components/tenant/${fullPath}`).catch((error) => {
-          console.error(`[PropertyDetail Loader] Failed to load ${componentName} from ${fullPath}:`, error);
-          return {
-            default: () => (
-              <div className="p-4 bg-red-50 border border-red-200 rounded text-center">
-                <div className="text-red-600 font-semibold mb-2">
-                  Component {componentName} not found
-                </div>
-                <div className="text-red-500 text-sm">
-                  Path: {fullPath}, Section: {section}
-                </div>
-              </div>
-            ),
-          };
-        }),
-      );
-      propertyDetailComponentsCache.set(cacheKey, component);
-      return component;
-    }
   }
 
   // استخدام القائمة المركزية للحصول على مسارات الأقسام
@@ -302,8 +257,6 @@ const loadComponent = (section: string, componentName: string) => {
     }),
   );
 
-  // Cache the component
-  propertyDetailComponentsCache.set(cacheKey, component);
   return component;
 };
 
