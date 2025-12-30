@@ -1,6 +1,6 @@
 "use client";
 
-import PropertyDetail2 from "@/components/tenant/propertyDetail/propertyDetail2.tsx";
+import PropertyDetail2 from "@/components/tenant/propertyDetail/propertyDetail2";
 
 interface propertyDetail2Props {
   // Component-specific props
