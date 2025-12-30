@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -97,15 +97,20 @@ export default function CrmFilters({
   setFilterStage,
   filterUrgency,
   setFilterUrgency,
-  pipelineStages,
+  pipelineStages: rawPipelineStages,
   onSearchResults,
 }: CrmFiltersProps) {
+  // Filter out "unassigned" stage
+  const pipelineStages = Array.isArray(rawPipelineStages)
+    ? rawPipelineStages.filter((stage) => stage.id !== "unassigned" && stage.id !== "غير معين")
+    : [];
   const { userData } = useAuthStore();
   const { setShowAddDealDialog } = useCrmStore();
   const [isSearching, setIsSearching] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null,
   );
+  const hasPerformedInitialSearchRef = useRef(false);
   const { setCustomers, setPipelineStages } = useCrmStore();
 
   // Get additional filters from store
@@ -271,53 +276,101 @@ export default function CrmFilters({
           const { customers, summary, pagination } = crmData.data || {};
 
           // Transform customers data to match CRM format
-          const transformedCustomers = (customers || []).map((customer: any) => ({
-            id: customer.id,
-            request_id: customer.id,
-            customer_id: customer.id,
-            name: customer.name || "",
-            phone_number: customer.phone_number || "",
-            phone: customer.phone_number || "",
-            email: customer.email || null,
-            stage_id: customer.stage_id || null,
-            priority_id: customer.priority_id || null,
-            type_id: customer.type_id || null,
-            procedure_id: customer.procedure_id || null,
-            city_id: customer.city_id || null,
-            district_id: customer.district_id || null,
-            pipelineStage: String(customer.stage_id || ""),
-            urgency: customer.priority_id
-              ? getPriorityLabel(customer.priority_id)
-              : "",
-            created_at: customer.created_at || "",
-            updated_at: customer.updated_at || "",
-          }));
+          const transformedCustomers = (customers || []).map((customer: any) => {
+            // Handle stage_id properly - if null, set pipelineStage to null (not empty string)
+            const stageId = customer.stage?.id || customer.stage_id || null;
+            const pipelineStage = stageId !== null ? String(stageId) : null;
+            
+            // Get priority label from priority object or priority_id
+            // Use priority.name if available, otherwise try to convert priority_id
+            const priorityId = customer.priority?.id || customer.priority_id || null;
+            let urgency = "";
+            if (customer.priority?.name) {
+              // Map English priority names to Arabic
+              const priorityMap: { [key: string]: string } = {
+                "High": "عالية",
+                "Medium": "متوسطة",
+                "Low": "منخفضة",
+                "عالية": "عالية",
+                "متوسطة": "متوسطة",
+                "منخفضة": "منخفضة",
+              };
+              urgency = priorityMap[customer.priority.name] || customer.priority.name;
+            } else if (priorityId !== null) {
+              urgency = getPriorityLabel(priorityId);
+            }
+            
+            return {
+              id: customer.id,
+              request_id: customer.id,
+              customer_id: customer.id,
+              name: customer.name || "",
+              phone_number: customer.phone_number || "",
+              phone: customer.phone_number || "",
+              email: customer.email || null,
+              stage_id: stageId,
+              priority_id: priorityId,
+              type_id: customer.type?.id || customer.type_id || null,
+              procedure_id: customer.procedure?.id || customer.procedure_id || null,
+              city_id: customer.city?.id || customer.city_id || null,
+              district_id: customer.district?.id || customer.district_id || null,
+              pipelineStage: pipelineStage,
+              urgency: urgency,
+              created_at: customer.created_at || "",
+              updated_at: customer.updated_at || "",
+              // Additional fields for compatibility
+              city: customer.city?.name_ar || customer.city?.name_en || null,
+              district: customer.district?.name_ar || customer.district?.name_en || null,
+              type: customer.type?.name || null,
+              priority: customer.priority?.name || null,
+              procedure: customer.procedure?.name || null,
+              responsible_employee: customer.responsible_employee || null,
+              note: customer.note || "",
+              interested_categories: customer.interested_categories || [],
+              interested_properties: customer.interested_properties || [],
+            };
+          });
 
           // Group customers by stage for pipeline view
           const stagesMap = new Map();
-          pipelineStages.forEach((stage) => {
-            stagesMap.set(stage.id, {
-              id: String(stage.id),
-              name: stage.name,
-              color: stage.color || "#6366f1",
-              icon: stage.icon || "Target",
-              count: 0,
-              value: 0,
+          
+          // Use only stages from pipelineStages (from backend)
+          if (pipelineStages && pipelineStages.length > 0) {
+            pipelineStages.forEach((stage) => {
+              stagesMap.set(String(stage.id), {
+                id: String(stage.id),
+                name: stage.name,
+                color: stage.color || "#6366f1",
+                icon: stage.icon || "Target",
+                count: 0,
+                value: 0,
+              });
             });
-          });
+          }
 
+          // Count customers only for stages that exist in pipelineStages
+          // Ignore customers with stage_id = null (they won't appear in any stage)
           transformedCustomers.forEach((customer: any) => {
-            const stageId = customer.stage_id?.toString() || "all";
-            if (stagesMap.has(stageId)) {
+            const stageId = customer.stage_id !== null ? customer.stage_id.toString() : null;
+            // Only count customers that have a valid stage_id that exists in stagesMap
+            if (stageId !== null && stagesMap.has(stageId)) {
               const stage = stagesMap.get(stageId);
-              stage.count += 1;
+              if (stage) {
+                stage.count += 1;
+              }
             }
+            // Customers with stage_id = null are ignored (not shown in any stage)
           });
 
-          const transformedStages = Array.from(stagesMap.values());
+          const transformedStages = Array.from(stagesMap.values())
+            .filter((stage) => stage.id !== "unassigned" && stage.id !== "غير معين");
 
-          // Update store
-          setPipelineStages(transformedStages);
+          // Update store - only update customers, keep pipelineStages from backend
+          // Don't update pipelineStages if they come from props (backend)
+          if (!pipelineStages || pipelineStages.length === 0) {
+            // Only update stages if we don't have them from backend
+            setPipelineStages(transformedStages);
+          }
           setCustomers(transformedCustomers);
           if (onSearchResults) {
             onSearchResults(transformedCustomers);
@@ -339,6 +392,7 @@ export default function CrmFilters({
       filterDistrict,
       filterEmployee,
       filterEmployeePhone,
+      pipelineStages,
       // Commented out dependencies - can be enabled later
       // filterType,
       // filterProcedure,
@@ -507,10 +561,14 @@ export default function CrmFilters({
     };
   }, [searchTimeout]);
 
-  // Load all customers on component mount
+  // Load all customers on component mount - only once
   useEffect(() => {
-    performSearch("", "all", "all");
-  }, []);
+    // Only perform search if we haven't done it yet and we have a token
+    if (!hasPerformedInitialSearchRef.current && userData?.token) {
+      hasPerformedInitialSearchRef.current = true;
+      performSearch("", "all", "all");
+    }
+  }, [userData?.token, performSearch]);
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -717,8 +775,8 @@ export default function CrmFilters({
             </SelectContent>
           </Select> */}
 
-          {/* City Filter - Active */}
-          <Select
+          {/* City Filter - Hidden */}
+          {/* <Select
             value={filterCity}
             onValueChange={(value) => handleFilterChange("city", value)}
           >
@@ -733,10 +791,10 @@ export default function CrmFilters({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
 
-          {/* District Filter - Active */}
-          <Select
+          {/* District Filter - Hidden */}
+          {/* <Select
             value={filterDistrict}
             onValueChange={(value) => handleFilterChange("district", value)}
             disabled={filterCity === "all"}
@@ -752,7 +810,7 @@ export default function CrmFilters({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
 
           {/* Procedure Filter - Commented out */}
           {/* <Select

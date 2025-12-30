@@ -352,9 +352,9 @@ export default function CrmPage() {
   } = useCrmStore();
   const { userData } = useAuthStore();
 
-  // Ensure pipelineStages is always an array
+  // Ensure pipelineStages is always an array and filter out "unassigned" stage
   const pipelineStages = Array.isArray(rawPipelineStages)
-    ? rawPipelineStages
+    ? rawPipelineStages.filter((stage) => stage.id !== "unassigned" && stage.id !== "غير معين")
     : [];
   const customersData = Array.isArray(rawCustomersData) ? rawCustomersData : [];
 
@@ -627,29 +627,25 @@ export default function CrmPage() {
     );
   });
 
-  const pipelineStats = pipelineStages.map((stage: PipelineStage) => ({
-    ...stage,
-    count: customersData.filter((c: Customer) => {
-      if (stage.id === "unassigned") {
-        return !c.pipelineStage && !c.stage_id;
-      }
-      return (
-        c.pipelineStage === stage.id ||
-        (c.stage_id && String(c.stage_id) === stage.id)
-      );
-    }).length,
-    value: customersData
-      .filter((c: Customer) => {
-        if (stage.id === "unassigned") {
-          return !c.pipelineStage && !c.stage_id;
-        }
+  const pipelineStats = pipelineStages
+    .filter((stage: PipelineStage) => stage.id !== "unassigned" && stage.id !== "غير معين")
+    .map((stage: PipelineStage) => ({
+      ...stage,
+      count: customersData.filter((c: Customer) => {
         return (
           c.pipelineStage === stage.id ||
           (c.stage_id && String(c.stage_id) === stage.id)
         );
-      })
-      .reduce((sum: number, c: Customer) => sum + (c.dealValue || 0), 0),
-  }));
+      }).length,
+      value: customersData
+        .filter((c: Customer) => {
+          return (
+            c.pipelineStage === stage.id ||
+            (c.stage_id && String(c.stage_id) === stage.id)
+          );
+        })
+        .reduce((sum: number, c: Customer) => sum + (c.dealValue || 0), 0),
+    }));
 
   // Appointment statistics
   const allAppointments = customersData.flatMap(
