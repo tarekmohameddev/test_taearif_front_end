@@ -417,6 +417,11 @@ function ProjectCard({ property }: { property: Property }) {
     return num.toLocaleString("ar-SA");
   };
 
+  // Check if title is longer than 20 characters
+  const isLongTitle = property.title && property.title.length > 20;
+  const titleFontSize = isLongTitle ? "text-base" : "text-xl";
+  const titleMaxWidth = isLongTitle ? "max-w-full lg:max-w-[200px]" : "max-w-full";
+
   const CardContent = (
     <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
       {/* Image Section */}
@@ -440,19 +445,19 @@ function ProjectCard({ property }: { property: Property }) {
       {/* Content Section */}
       <div className="p-4 space-y-4">
         {/* Title and Status */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <h4 className="text-xl font-bold text-black mb-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-4">
+            <h4 className={`${titleFontSize} ${titleMaxWidth} font-bold text-black break-words flex-1`}>
               {property.title}
             </h4>
-            <div className="flex items-center gap-2 text-sm text-black">
-              <span>في {property.city}</span>
-              <span>-</span>
-              <span>{property.district}</span>
+            <div className="text-green-600 font-semibold text-lg">
+              {property.status}
             </div>
           </div>
-          <div className="text-green-600 font-semibold text-lg">
-            {property.status}
+          <div className="flex items-center gap-2 text-sm text-black">
+            <span>في {property.city}</span>
+            <span>-</span>
+            <span>{property.district}</span>
           </div>
         </div>
 
@@ -557,6 +562,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // State for API data
   const [apiProperties, setApiProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   // ─────────────────────────────────────────────────────────
   // 2.5. FETCH PROPERTIES FROM API
@@ -660,6 +666,22 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
       fetchTenantData(tenantId);
     }
   }, [tenantId, fetchTenantData]);
+
+  // Track screen size for responsive grid
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsLargeScreen(window.innerWidth >= 1000);
+    };
+
+    // Check on mount
+    checkScreenSize();
+
+    // Add event listener
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
@@ -873,10 +895,12 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
           </div>
         ) : properties.length > 0 ? (
           <div
-            className="grid gap-6"
+            className="grid gap-6 grid-cols-1"
             style={{
-              gridTemplateColumns: `repeat(${mergedData.layout?.columns?.desktop || 3}, 1fr)`,
               gap: mergedData.layout?.gap || "1.5rem",
+              ...(isLargeScreen && {
+                gridTemplateColumns: `repeat(${mergedData.layout?.columns?.desktop || 3}, 1fr)`,
+              }),
             }}
           >
             {properties.map((property: Property, index: number) => (
