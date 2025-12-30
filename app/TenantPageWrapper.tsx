@@ -190,19 +190,37 @@ const loadComponent = (section: string, componentName: string) => {
     baseName = "propertyDetail";
   }
 
-  // ⭐ Direct import for known propertyDetail components (more reliable than dynamic import)
-  // This fixes the case-sensitivity issue on Linux/Vercel
+  // ⭐ Handle propertyDetail components with explicit dynamic import
+  // This ensures Next.js can properly bundle the components in production
+  // Same approach as projectDetails which works correctly
   if (baseName === "propertyDetail") {
-    const propertyDetailComponentMap: Record<string, any> = {
-      propertyDetail1: PropertyDetail1,
-      propertyDetail2: PropertyDetail2,
-    };
+    // Get the subPath first to ensure correct path construction
+    const subPath = getComponentSubPath(baseName);
+    if (subPath) {
+      // Extract the number from componentName (e.g., "2" from "propertyDetail2")
+      const number = componentName.match(/\d+$/)?.[0] || '';
+      // Always construct as propertyDetail + number to ensure correct casing
+      const fileName = `propertyDetail${number}`;
+      const fullPath = `${subPath}/${fileName}`;
 
-    if (propertyDetailComponentMap[componentName]) {
-      // Use dynamic from Next.js (better for production than lazy)
-      // Wrap the component in a promise to match dynamic() API
+      // Use dynamic import with explicit path (same as projectDetails)
+      // This works in production because Next.js can see the import path at build time
       const component = dynamic(
-        () => Promise.resolve({ default: propertyDetailComponentMap[componentName] }),
+        () => import(`@/components/tenant/${fullPath}`).catch((error) => {
+          console.error(`[PropertyDetail Loader] Failed to load ${componentName} from ${fullPath}:`, error);
+          return {
+            default: () => (
+              <div className="p-4 bg-red-50 border border-red-200 rounded text-center">
+                <div className="text-red-600 font-semibold mb-2">
+                  Component {componentName} not found
+                </div>
+                <div className="text-red-500 text-sm">
+                  Path: {fullPath}, Section: {section}
+                </div>
+              </div>
+            ),
+          };
+        }),
         { ssr: false }
       );
       propertyDetailComponentsCache.set(cacheKey, component);
