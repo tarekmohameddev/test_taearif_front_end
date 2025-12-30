@@ -190,9 +190,8 @@ const loadComponent = (section: string, componentName: string) => {
     baseName = "propertyDetail";
   }
 
-  // ⭐ Handle propertyDetail components with explicit dynamic import
-  // This ensures Next.js can properly bundle the components in production
-  // Same approach as projectDetails which works correctly
+  // ⭐ Handle propertyDetail components - use lazy() like projectDetails (which works in production)
+  // This ensures the component loads correctly in production
   if (baseName === "propertyDetail") {
     // Get the subPath first to ensure correct path construction
     const subPath = getComponentSubPath(baseName);
@@ -203,10 +202,10 @@ const loadComponent = (section: string, componentName: string) => {
       const fileName = `propertyDetail${number}`;
       const fullPath = `${subPath}/${fileName}`;
 
-      // Use dynamic import with explicit path (same as projectDetails)
-      // This works in production because Next.js can see the import path at build time
-      const component = dynamic(
-        () => import(`@/components/tenant/${fullPath}`).catch((error) => {
+      // Use lazy() from React (same as projectDetails which works correctly)
+      // This works in production because React.lazy handles dynamic imports better
+      const component = lazy(() =>
+        import(`@/components/tenant/${fullPath}`).catch((error) => {
           console.error(`[PropertyDetail Loader] Failed to load ${componentName} from ${fullPath}:`, error);
           return {
             default: () => (
@@ -221,7 +220,6 @@ const loadComponent = (section: string, componentName: string) => {
             ),
           };
         }),
-        { ssr: false }
       );
       propertyDetailComponentsCache.set(cacheKey, component);
       return component;
