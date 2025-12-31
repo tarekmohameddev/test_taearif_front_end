@@ -58,8 +58,12 @@ import {
   Search,
   BarChart3,
   Database,
+  UserCheck,
+  AlertCircle,
+  TrendingUp,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
+import { useUserStore } from "@/store/userStore";
 
 // Types
 interface Employee {
@@ -259,6 +263,9 @@ interface UpdateEmployeeRequest {
 
 export default function AccessControlPage() {
   const router = useRouter();
+  const userData = useUserStore((state) => state.userData);
+  const employeesData = userData?.employees;
+  
   const [activeTab, setActiveTab] = useState("employees");
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1277,6 +1284,11 @@ export default function AccessControlPage() {
   useEffect(() => {
     fetchEmployees();
     fetchAvailablePermissions();
+    // Fetch user data if not already loaded
+    const userStore = useUserStore.getState();
+    if (!userStore.userData || !userStore.userData.employees) {
+      userStore.fetchUserData();
+    }
   }, []);
 
   // Monitor availablePermissions changes
@@ -1397,6 +1409,125 @@ export default function AccessControlPage() {
                 إدارة الموظفين
               </h1>
             </div>
+
+            {/* Employee Stats Cards */}
+            {employeesData ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                {/* Quota Card */}
+                <Card className="hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-1">
+                          الحد من الاستخدام
+                        </p>
+                        <p className="text-2xl font-bold text-blue-600">
+                          {employeesData.max_employees || employeesData.quota || 0}
+                        </p>
+                      </div>
+                      <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <TrendingUp className="h-6 w-6 text-blue-600" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Total Employees Card */}
+                <Card className="hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-1">
+                          عدد الموظفين
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {employeesData.total_count || employeesData.usage || 0}
+                        </p>
+                      </div>
+                      <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Users className="h-6 w-6 text-gray-900" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Active Employees Card */}
+                <Card className="hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-1">
+                          الموظفين النشطين
+                        </p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {employeesData.active_count || 0}
+                        </p>
+                      </div>
+                      <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <UserCheck className="h-6 w-6 text-green-600" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Usage Status Card */}
+                <Card className={`hover:shadow-lg transition-all duration-300 ${employeesData.is_over_limit ? 'border-red-300' : ''}`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-1">
+                          حالة الاستخدام
+                        </p>
+                        {employeesData.is_over_limit ? (
+                          <div className="flex items-center gap-2">
+                            <p className="text-2xl font-bold text-red-600">
+                              {employeesData.max_employees ? 
+                                Math.round(((employeesData.usage || employeesData.total_count || 0) / employeesData.max_employees) * 100) : 0
+                              }%
+                            </p>
+                            <AlertCircle className="h-5 w-5 text-red-600" />
+                          </div>
+                        ) : (
+                          <p className="text-2xl font-bold text-gray-700">
+                            {employeesData.max_employees ? 
+                              Math.round(((employeesData.usage || employeesData.total_count || 0) / employeesData.max_employees) * 100) : 0
+                            }%
+                          </p>
+                        )}
+                        {employeesData.is_over_limit && (
+                          <p className="text-xs text-red-600 mt-1">
+                            تجاوز الحد المسموح
+                          </p>
+                        )}
+                      </div>
+                      <div className={`h-12 w-12 ${employeesData.is_over_limit ? 'bg-red-100' : 'bg-gray-100'} rounded-lg flex items-center justify-center`}>
+                        {employeesData.is_over_limit ? (
+                          <AlertCircle className="h-6 w-6 text-red-600" />
+                        ) : (
+                          <BarChart3 className="h-6 w-6 text-gray-700" />
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-200 rounded w-24 mb-2 animate-pulse"></div>
+                          <div className="h-8 bg-gray-200 rounded w-16 animate-pulse"></div>
+                        </div>
+                        <div className="h-12 w-12 bg-gray-200 rounded-lg animate-pulse"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
 
             {/* Employees Content */}
             <div className="mt-6">
