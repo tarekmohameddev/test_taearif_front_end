@@ -13,17 +13,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
   Search,
   RefreshCw,
   Loader2,
   CalendarIcon,
-  User,
-  Phone,
-  Mail,
-  ArrowUpDown,
 } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import axiosInstance from "@/lib/axiosInstance";
@@ -90,15 +84,6 @@ const translateType = (name: string): string => {
     Rented: "مؤجر",
     Sold: "مباع",
     Both: "كلاهما",
-  };
-  return translations[name] || name;
-};
-
-const translatePriority = (name: string): string => {
-  const translations: { [key: string]: string } = {
-    Low: "منخفضة",
-    Medium: "متوسطة",
-    High: "عالية",
   };
   return translations[name] || name;
 };
@@ -358,60 +343,6 @@ export const FiltersAndSearch = ({
     setTimeout(performSearch, 0);
   };
 
-  // Handle employee phone change
-  const handleEmployeePhoneChange = (value: string) => {
-    setFilterEmployeePhone(value);
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
-    searchTimeout.current = setTimeout(() => {
-      performSearch();
-    }, 500);
-  };
-
-  // Handle name filter change
-  const handleNameChange = (value: string) => {
-    setFilterName(value);
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
-    searchTimeout.current = setTimeout(() => {
-      performSearch();
-    }, 500);
-  };
-
-  // Handle email filter change
-  const handleEmailChange = (value: string) => {
-    setFilterEmail(value);
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
-    searchTimeout.current = setTimeout(() => {
-      performSearch();
-    }, 500);
-  };
-
-  // Handle category selection (multi-select)
-  const handleCategoryToggle = (categoryId: string | number) => {
-    const idStr = categoryId.toString();
-    const currentIds = interestedCategoryIds;
-    const newIds = currentIds.includes(idStr)
-      ? currentIds.filter((id) => id !== idStr)
-      : [...currentIds, idStr];
-    setInterestedCategoryIds(newIds);
-    setTimeout(performSearch, 0);
-  };
-
-  // Handle property selection (multi-select)
-  const handlePropertyToggle = (propertyId: string | number) => {
-    const idStr = propertyId.toString();
-    const currentIds = interestedPropertyIds;
-    const newIds = currentIds.includes(idStr)
-      ? currentIds.filter((id) => id !== idStr)
-      : [...currentIds, idStr];
-    setInterestedPropertyIds(newIds);
-    setTimeout(performSearch, 0);
-  };
 
   // Handle date range change
   const handleDateRangeChange = (range: DateRange | undefined) => {
@@ -542,25 +473,6 @@ export const FiltersAndSearch = ({
           </SelectContent>
         </Select>
 
-        {/* Priority Filter */}
-        <Select
-          value={filterPriority}
-          onValueChange={(value) => handleFilterChange("priority", value)}
-        >
-          <SelectTrigger className="w-full sm:w-[140px] lg:w-[120px]">
-            <SelectValue placeholder="الأولوية" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">جميع الأولويات</SelectItem>
-            {filterData?.priorities?.map((priority: any) => (
-              // **FIX**: The value is now `priority.id` as requested by the user.
-              <SelectItem key={priority.id} value={priority.id.toString()}>
-                {translatePriority(priority.name)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
         {/* Employee Filter */}
         <Select
           value={filterEmployee}
@@ -578,18 +490,6 @@ export const FiltersAndSearch = ({
             ))}
           </SelectContent>
         </Select>
-
-        {/* Employee Phone Filter */}
-        <div className="relative w-full sm:w-[180px] lg:w-[160px]">
-          <Phone className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="tel"
-            placeholder="رقم هاتف الموظف"
-            className="pr-8"
-            value={filterEmployeePhone}
-            onChange={(e) => handleEmployeePhoneChange(e.target.value)}
-          />
-        </div>
 
         {/* Date Range Filter */}
         <Popover>
@@ -660,172 +560,6 @@ export const FiltersAndSearch = ({
                 {stage.name}
               </SelectItem>
             ))}
-          </SelectContent>
-        </Select>
-
-        {/* Name Filter */}
-        <div className="relative w-full sm:w-[180px] lg:w-[160px]">
-          <User className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="الاسم"
-            className="pr-8"
-            value={filterName}
-            onChange={(e) => handleNameChange(e.target.value)}
-          />
-        </div>
-
-        {/* Email Filter */}
-        <div className="relative w-full sm:w-[180px] lg:w-[160px]">
-          <Mail className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="email"
-            placeholder="البريد الإلكتروني"
-            className="pr-8"
-            value={filterEmail}
-            onChange={(e) => handleEmailChange(e.target.value)}
-          />
-        </div>
-
-        {/* Interested Categories Filter */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full sm:w-[180px] lg:w-[160px] justify-start text-right font-normal"
-            >
-              <span className="truncate">
-                {interestedCategoryIds.length > 0
-                  ? `الفئات (${interestedCategoryIds.length})`
-                  : "الفئات المهتمة"}
-              </span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[250px] p-4" align="end">
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold">اختر الفئات</Label>
-              <div className="max-h-[300px] overflow-y-auto space-y-2">
-                {filterData?.categories && filterData.categories.length > 0 ? (
-                  filterData.categories.map((category: any) => (
-                    <div
-                      key={category.id}
-                      className="flex items-center space-x-2 space-x-reverse"
-                    >
-                      <Checkbox
-                        id={`category-${category.id}`}
-                        checked={interestedCategoryIds.includes(
-                          category.id.toString(),
-                        )}
-                        onCheckedChange={() =>
-                          handleCategoryToggle(category.id)
-                        }
-                      />
-                      <Label
-                        htmlFor={`category-${category.id}`}
-                        className="text-sm font-normal cursor-pointer flex-1"
-                      >
-                        {category.name_ar || category.name_en || category.name}
-                      </Label>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    لا توجد فئات متاحة
-                  </p>
-                )}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        {/* Interested Properties Filter */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full sm:w-[180px] lg:w-[160px] justify-start text-right font-normal"
-            >
-              <span className="truncate">
-                {interestedPropertyIds.length > 0
-                  ? `العقارات (${interestedPropertyIds.length})`
-                  : "العقارات المهتمة"}
-              </span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[250px] p-4" align="end">
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold">اختر العقارات</Label>
-              <div className="max-h-[300px] overflow-y-auto space-y-2">
-                {filterData?.properties && filterData.properties.length > 0 ? (
-                  filterData.properties.map((property: any) => (
-                    <div
-                      key={property.id}
-                      className="flex items-center space-x-2 space-x-reverse"
-                    >
-                      <Checkbox
-                        id={`property-${property.id}`}
-                        checked={interestedPropertyIds.includes(
-                          property.id.toString(),
-                        )}
-                        onCheckedChange={() =>
-                          handlePropertyToggle(property.id)
-                        }
-                      />
-                      <Label
-                        htmlFor={`property-${property.id}`}
-                        className="text-sm font-normal cursor-pointer flex-1"
-                      >
-                        {property.name_ar || property.name_en || property.name}
-                      </Label>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    لا توجد عقارات متاحة
-                  </p>
-                )}
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        {/* Sort By Filter */}
-        <Select
-          value={sortBy}
-          onValueChange={(value) => handleFilterChange("sortBy", value)}
-        >
-          <SelectTrigger className="w-full sm:w-[140px] lg:w-[120px]">
-            <SelectValue placeholder="ترتيب حسب" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="created_at">تاريخ الإنشاء</SelectItem>
-            <SelectItem value="name">الاسم</SelectItem>
-            <SelectItem value="email">البريد الإلكتروني</SelectItem>
-            <SelectItem value="updated_at">تاريخ التحديث</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Sort Direction Filter */}
-        <Select
-          value={sortDir}
-          onValueChange={(value) => handleFilterChange("sortDir", value)}
-        >
-          <SelectTrigger className="w-full sm:w-[100px] lg:w-[100px]">
-            <SelectValue placeholder="الاتجاه" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="asc">
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="h-3 w-3 rotate-180" />
-                <span>تصاعدي</span>
-              </div>
-            </SelectItem>
-            <SelectItem value="desc">
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="h-3 w-3" />
-                <span>تنازلي</span>
-              </div>
-            </SelectItem>
           </SelectContent>
         </Select>
 
