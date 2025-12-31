@@ -25,7 +25,6 @@ import {
   CustomDialogTitle,
   CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
-import { CustomerForm } from "./CustomerForm";
 import { Separator } from "@/components/ui/separator";
 import { StageAssignmentDialog } from "./StageAssignmentDialog";
 import { Pagination } from "./Pagination";
@@ -76,11 +75,6 @@ export const CustomerTable = ({
   handleSort,
   openEditDialog,
   handleDelete,
-  formData,
-  open,
-  setOpen,
-  handleChange,
-  handleUpdateCustomer,
   showBulkActionsDialog,
   setShowBulkActionsDialog,
   setSelectedCustomers,
@@ -687,7 +681,7 @@ export const CustomerTable = ({
                                 e.preventDefault();
                                 setOpenDropdownId(null);
                                 setDropdownPosition(null);
-                                openEditDialog(customer);
+                                router.push(`/dashboard/customers/${customer.id}/edit`);
                               }}
                             >
                               <Edit className="ml-2 h-4 w-4" />
@@ -806,50 +800,6 @@ export const CustomerTable = ({
         customerName={selectedCustomerForWhatsApp?.name}
         customerId={selectedCustomerForWhatsApp?.id}
       />
-
-      {/* Edit Customer Dialog */}
-      {formData && (
-        <CustomDialog open={open} onOpenChange={setOpen} maxWidth="max-w-4xl">
-          <CustomDialogContent className="p-6">
-            <CustomDialogHeader>
-              <CustomDialogTitle>تعديل بيانات العميل</CustomDialogTitle>
-              <CustomDialogClose onClose={() => setOpen(false)} />
-            </CustomDialogHeader>
-            <div className="py-4">
-              <CustomerForm
-                formData={{
-                  name: formData.name,
-                  email: formData.email,
-                  phone_number: formData.phone_number,
-                  city_id: formData.city_id || null,
-                  district_id: formData.district_id || null,
-                  note: formData.note || "",
-                  type_id: formData.type_id,
-                  priority_id: formData.priority_id,
-                  stage_id: formData.stage_id || null,
-                  procedure_id: formData.procedure_id || null,
-                }}
-                onChange={(field, value) => {
-                  handleChange(field)({ target: { value } } as any);
-                }}
-                errors={{}}
-                isEditMode={true}
-              />
-              <div className="flex justify-end gap-2 pt-4 border-t">
-                <Button
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                >
-                  إلغاء
-                </Button>
-                <Button onClick={handleUpdateCustomer}>
-                  تعديل
-                </Button>
-              </div>
-            </div>
-          </CustomDialogContent>
-        </CustomDialog>
-      )}
 
       {/* Employee Assignment Dialog */}
       <CustomDialog

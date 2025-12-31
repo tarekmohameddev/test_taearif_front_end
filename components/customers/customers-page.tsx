@@ -130,22 +130,6 @@ export default function CustomersPage() {
     from: number;
     to: number;
   } | null>(null);
-  const [formData, setFormData] = useState<{
-    name: string;
-    email: string;
-    phone_number: string;
-    note: string;
-    type_id: number;
-    priority_id: number;
-    city_id: number | undefined;
-    district_id: number | undefined;
-    stage_id: number | undefined;
-    procedure_id: number | undefined;
-  } | null>(null); // ← بيانات العميل المحدد
-  const [editingCustomerId, setEditingCustomerId] = useState<number | null>(
-    null,
-  ); // ← ID العميل الجاري تعديله
-  const [open, setOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string[]>
   >({});
@@ -354,20 +338,8 @@ export default function CustomersPage() {
   };
 
   const openEditDialog = (customer: Customer) => {
-    setEditingCustomerId(customer.id);
-    setFormData({
-      name: customer.name || "",
-      email: customer.email || "",
-      phone_number: customer.phone_number || "",
-      note: customer.note || "",
-      type_id: customer.type?.id || 1,
-      priority_id: customer.priority?.id || 1,
-      city_id: customer.city_id || undefined,
-      district_id: customer.district?.id || undefined,
-      stage_id: customer.stage?.id || undefined,
-      procedure_id: customer.procedure?.id || undefined,
-    });
-    setOpen(true);
+    // تم نقل منطق التعديل إلى صفحة منفصلة
+    // يتم التعامل معه الآن في CustomerTable باستخدام router.push
   };
 
   // التحقق من وجود التوكن قبل عرض المحتوى
@@ -551,32 +523,6 @@ export default function CustomersPage() {
 
   if (error) return <p>{error}</p>;
 
-  const handleUpdateCustomer = async () => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      alert("Authentication required. Please login.");
-      return;
-    }
-
-    try {
-      await axiosInstance.put(`/customers/${editingCustomerId}`, formData);
-
-      // Refresh the current page to update data
-      handlePageChange(pagination?.current_page || 1);
-      setOpen(false);
-    } catch (error) {
-      console.error("Error updating customer:", error);
-    }
-  };
-
-  const handleChange =
-    (field: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFormData((prev) =>
-        prev ? { ...prev, [field]: e.target.value } : null,
-      );
-    };
-
   const handleStageUpdated = (customerId: number, newStageId: number) => {
     // Refresh the current page to update data
     handlePageChange(pagination?.current_page || 1);
@@ -718,11 +664,6 @@ export default function CustomersPage() {
               handleSort={handleSort}
               openEditDialog={openEditDialog}
               handleDelete={handleDelete}
-              formData={formData}
-              open={open}
-              setOpen={setOpen}
-              handleChange={handleChange}
-              handleUpdateCustomer={handleUpdateCustomer}
               showBulkActionsDialog={showBulkActionsDialog}
               setShowBulkActionsDialog={setShowBulkActionsDialog}
               setSelectedCustomers={setSelectedCustomers}
