@@ -20,6 +20,7 @@ import {
   Clock,
   MessageSquare,
   PlusCircle,
+  Edit,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
@@ -585,6 +586,15 @@ export default function DealDetailsPage() {
                   </p>
                 </div>
               </div>
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/dashboard/crm/${dealId}/edit`)}
+                className="gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                <span className="hidden sm:inline">تعديل الصفقة</span>
+                <span className="sm:hidden">تعديل</span>
+              </Button>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">

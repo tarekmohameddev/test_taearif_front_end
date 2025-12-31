@@ -61,6 +61,7 @@ const translateErrorMessage = (message: string): string => {
 };
 
 
+
 export const CustomerPageHeader = ({
   showAddCustomerDialog,
   setShowAddCustomerDialog,
