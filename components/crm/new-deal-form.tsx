@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
@@ -47,8 +48,15 @@ export default function NewDealForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("crm");
 
+  // Customer selection mode: "existing" or "new"
+  const [customerMode, setCustomerMode] = useState<"existing" | "new">("new");
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+
   const [formData, setFormData] = useState({
-    // Customer info (from cache)
+    // Customer info (from cache or manual input)
+    customer_id: null as number | null,
     customer_name: "",
     customer_phone: "",
     stage_id: "",
@@ -118,6 +126,27 @@ export default function NewDealForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newDealData]); // Run only on mount
+
+  // Fetch customers from /customers endpoint
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      if (!userData?.token) return;
+
+      setLoadingCustomers(true);
+      try {
+        const response = await axiosInstance.get("/customers");
+        if (response.data.status === "success") {
+          setCustomers(response.data.data.customers || []);
+        }
+      } catch (err) {
+        console.error("Error fetching customers:", err);
+      } finally {
+        setLoadingCustomers(false);
+      }
+    };
+
+    fetchCustomers();
+  }, [userData?.token]);
 
   // Fetch categories, projects, buildings
   useEffect(() => {
@@ -201,6 +230,51 @@ export default function NewDealForm() {
     }
   };
 
+  // Handle customer selection change
+  const handleCustomerSelect = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    const selectedCustomer = customers.find(
+      (c) => c.id.toString() === customerId,
+    );
+    if (selectedCustomer) {
+      setFormData((prev) => ({
+        ...prev,
+        customer_id: selectedCustomer.id,
+        customer_name: selectedCustomer.name || "",
+        customer_phone: selectedCustomer.phone_number || "",
+      }));
+    }
+    if (errors.customer_id || errors.customer_name || errors.customer_phone) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.customer_id;
+        delete newErrors.customer_name;
+        delete newErrors.customer_phone;
+        return newErrors;
+      });
+    }
+  };
+
+  // Handle customer mode change
+  const handleCustomerModeChange = (mode: "existing" | "new") => {
+    setCustomerMode(mode);
+    // Reset customer data when switching modes
+    setSelectedCustomerId("");
+    setFormData((prev) => ({
+      ...prev,
+      customer_id: null,
+      customer_name: "",
+      customer_phone: "",
+    }));
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.customer_id;
+      delete newErrors.customer_name;
+      delete newErrors.customer_phone;
+      return newErrors;
+    });
+  };
+
   const handleStringNumberChange = (
     name: string,
     value: string,
@@ -239,10 +313,21 @@ export default function NewDealForm() {
   };
 
   const buildRequestData = () => {
-    return {
+    const baseData: any = {
       stage_id: parseInt(formData.stage_id),
-      customer_name: formData.customer_name,
-      customer_phone: formData.customer_phone,
+    };
+
+    // If existing customer is selected, use customer_id
+    if (customerMode === "existing" && formData.customer_id) {
+      baseData.customer_id = formData.customer_id;
+    } else {
+      // If new customer, use customer_name and customer_phone
+      baseData.customer_name = formData.customer_name;
+      baseData.customer_phone = formData.customer_phone;
+    }
+
+    return {
+      ...baseData,
       property_specifications: {
         basic_information: {
           address: formData.address || null,
@@ -302,12 +387,20 @@ export default function NewDealForm() {
 
     // Validation
     const newErrors: Record<string, string> = {};
-    if (!formData.customer_name.trim()) {
-      newErrors.customer_name = "اسم العميل مطلوب";
+    
+    if (customerMode === "existing") {
+      if (!formData.customer_id) {
+        newErrors.customer_id = "يرجى اختيار عميل موجود";
+      }
+    } else {
+      if (!formData.customer_name.trim()) {
+        newErrors.customer_name = "اسم العميل مطلوب";
+      }
+      if (!formData.customer_phone.trim()) {
+        newErrors.customer_phone = "رقم الهاتف مطلوب";
+      }
     }
-    if (!formData.customer_phone.trim()) {
-      newErrors.customer_phone = "رقم الهاتف مطلوب";
-    }
+    
     if (!formData.stage_id) {
       newErrors.stage_id = "المرحلة مطلوبة";
     }
@@ -374,77 +467,174 @@ export default function NewDealForm() {
                 <CardHeader>
                   <CardTitle>معلومات العميل</CardTitle>
                   <CardDescription>
-                    بيانات العميل المحفوظة من صفحة CRM
+                    اختر عميل موجود أو أدخل بيانات عميل جديد
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="customer_name">اسم العميل *</Label>
-                      <Input
-                        id="customer_name"
-                        name="customer_name"
-                        value={formData.customer_name}
-                        onChange={handleInputChange}
-                        placeholder="أدخل اسم العميل"
-                        required
-                        className={errors.customer_name ? "border-red-500" : ""}
-                      />
-                      {errors.customer_name && (
-                        <p className="text-sm text-red-500">
-                          {errors.customer_name}
-                        </p>
-                      )}
-                    </div>
+                  {/* Customer Mode Selection */}
+                  <div className="space-y-2">
+                    <Label>نوع العميل *</Label>
+                    <RadioGroup
+                      value={customerMode}
+                      onValueChange={(value) =>
+                        handleCustomerModeChange(value as "existing" | "new")
+                      }
+                      className="flex flex-row gap-6"
+                    >
+                      <div className="flex items-center space-x-2 space-x-reverse">
+                        <RadioGroupItem value="existing" id="existing" />
+                        <Label
+                          htmlFor="existing"
+                          className="font-normal cursor-pointer"
+                        >
+                          عميل موجود
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2 space-x-reverse">
+                        <RadioGroupItem value="new" id="new" />
+                        <Label
+                          htmlFor="new"
+                          className="font-normal cursor-pointer"
+                        >
+                          عميل جديد
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
 
+                  {/* Existing Customer Selection */}
+                  {customerMode === "existing" && (
                     <div className="space-y-2">
-                      <Label htmlFor="customer_phone">رقم هاتف العميل *</Label>
-                      <Input
-                        id="customer_phone"
-                        name="customer_phone"
-                        value={formData.customer_phone}
-                        onChange={handleInputChange}
-                        placeholder="+966500000000"
-                        required
-                        className={
-                          errors.customer_phone ? "border-red-500" : ""
-                        }
-                      />
-                      {errors.customer_phone && (
-                        <p className="text-sm text-red-500">
-                          {errors.customer_phone}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="stage_id">المرحلة *</Label>
+                      <Label htmlFor="customer_id">اختر العميل *</Label>
                       <Select
-                        value={formData.stage_id}
-                        onValueChange={(value) =>
-                          handleSelectChange("stage_id", value)
-                        }
+                        value={selectedCustomerId}
+                        onValueChange={handleCustomerSelect}
+                        disabled={loadingCustomers}
                       >
                         <SelectTrigger
-                          id="stage_id"
-                          className={errors.stage_id ? "border-red-500" : ""}
+                          id="customer_id"
+                          className={
+                            errors.customer_id ? "border-red-500" : ""
+                          }
                         >
-                          <SelectValue placeholder="اختر المرحلة" />
+                          <SelectValue
+                            placeholder={
+                              loadingCustomers
+                                ? "جاري تحميل العملاء..."
+                                : "اختر عميل موجود"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
-                          {pipelineStages.map((stage) => (
-                            <SelectItem key={stage.id} value={stage.id}>
-                              {stage.name}
+                          {customers.length === 0 ? (
+                            <SelectItem value="no-customers" disabled>
+                              لا توجد عملاء متاحة
                             </SelectItem>
-                          ))}
+                          ) : (
+                            customers.map((customer) => (
+                              <SelectItem
+                                key={customer.id}
+                                value={customer.id.toString()}
+                              >
+                                {customer.name} - {customer.phone_number}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
-                      {errors.stage_id && (
+                      {errors.customer_id && (
                         <p className="text-sm text-red-500">
-                          {errors.stage_id}
+                          {errors.customer_id}
                         </p>
                       )}
+                      {selectedCustomerId && (
+                        <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">الاسم:</span>{" "}
+                            {formData.customer_name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">الهاتف:</span>{" "}
+                            {formData.customer_phone}
+                          </p>
+                        </div>
+                      )}
                     </div>
+                  )}
+
+                  {/* New Customer Input Fields */}
+                  {customerMode === "new" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="customer_name">اسم العميل *</Label>
+                        <Input
+                          id="customer_name"
+                          name="customer_name"
+                          value={formData.customer_name}
+                          onChange={handleInputChange}
+                          placeholder="أدخل اسم العميل"
+                          required
+                          className={
+                            errors.customer_name ? "border-red-500" : ""
+                          }
+                        />
+                        {errors.customer_name && (
+                          <p className="text-sm text-red-500">
+                            {errors.customer_name}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="customer_phone">
+                          رقم هاتف العميل *
+                        </Label>
+                        <Input
+                          id="customer_phone"
+                          name="customer_phone"
+                          value={formData.customer_phone}
+                          onChange={handleInputChange}
+                          placeholder="+966500000000"
+                          required
+                          className={
+                            errors.customer_phone ? "border-red-500" : ""
+                          }
+                        />
+                        {errors.customer_phone && (
+                          <p className="text-sm text-red-500">
+                            {errors.customer_phone}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Stage Selection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="stage_id">المرحلة *</Label>
+                    <Select
+                      value={formData.stage_id}
+                      onValueChange={(value) =>
+                        handleSelectChange("stage_id", value)
+                      }
+                    >
+                      <SelectTrigger
+                        id="stage_id"
+                        className={errors.stage_id ? "border-red-500" : ""}
+                      >
+                        <SelectValue placeholder="اختر المرحلة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {pipelineStages.map((stage) => (
+                          <SelectItem key={stage.id} value={stage.id}>
+                            {stage.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.stage_id && (
+                      <p className="text-sm text-red-500">{errors.stage_id}</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
