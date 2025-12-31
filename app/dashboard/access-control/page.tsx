@@ -64,6 +64,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { useUserStore } from "@/store/userStore";
+import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
 // Types
 interface Employee {
@@ -448,6 +449,11 @@ export default function AccessControlPage() {
   const [deleteEmployeeError, setDeleteEmployeeError] = useState<string | null>(
     null,
   );
+
+  // Payment popup state
+  const [paymentPopupOpen, setPaymentPopupOpen] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
+  const [isPurchasingAddon, setIsPurchasingAddon] = useState(false);
 
   // Filter permissions based on search query
   const filteredPermissions = permissionsTabData
@@ -1177,6 +1183,48 @@ export default function AccessControlPage() {
     }
   };
 
+  // Purchase employee addon (increase limit)
+  const handlePurchaseEmployeeAddon = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    
+    setIsPurchasingAddon(true);
+    setError(null);
+
+    try {
+      const response = await axiosInstance.post("/employee/addons", {
+        qty: 1,
+        plan_id: 1,
+      });
+
+      if (response.data.status === "success" && response.data.payment_url) {
+        setPaymentUrl(response.data.payment_url);
+        setPaymentPopupOpen(true);
+      } else {
+        setError("فشل في إنشاء طلب الشراء");
+      }
+    } catch (err: any) {
+      console.error("Error purchasing employee addon:", err);
+      setError(err.response?.data?.message || "حدث خطأ أثناء شراء الحد الإضافي");
+    } finally {
+      setIsPurchasingAddon(false);
+    }
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = async () => {
+    setPaymentPopupOpen(false);
+    setPaymentUrl("");
+    
+    // Refresh user data to get updated employees quota
+    const userStore = useUserStore.getState();
+    await userStore.refreshUserData();
+    
+    // Refresh employees list
+    await fetchEmployees();
+  };
+
   // Handle permission selection
   const handlePermissionChange = (permissionName: string, checked: boolean) => {
     setSelectedPermissions((prev) => ({
@@ -1499,6 +1547,12 @@ export default function AccessControlPage() {
                             تجاوز الحد المسموح
                           </p>
                         )}
+                        {!employeesData.is_over_limit && employeesData.max_employees && 
+                         ((employeesData.usage || employeesData.total_count || 0) / employeesData.max_employees) >= 1 && (
+                          <p className="text-xs text-orange-600 mt-1">
+                            الحد الأقصى
+                          </p>
+                        )}
                       </div>
                       <div className={`h-12 w-12 ${employeesData.is_over_limit ? 'bg-red-100' : 'bg-gray-100'} rounded-lg flex items-center justify-center`}>
                         {employeesData.is_over_limit ? (
@@ -1561,17 +1615,79 @@ export default function AccessControlPage() {
                               <Shield className="h-4 w-4 ml-2" />
                               إدارة الأدوار
                             </Button> */}
-                            <Button
-                              className="bg-black hover:bg-gray-800 text-white"
-                              onClick={() =>
-                                router.push(
-                                  "/dashboard/access-control/create-employee",
-                                )
+                            {(() => {
+                              if (!employeesData || !employeesData.max_employees) {
+                                return (
+                                  <Button
+                                    type="button"
+                                    className="bg-black hover:bg-gray-800 text-white"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      router.push(
+                                        "/dashboard/access-control/create-employee",
+                                      );
+                                    }}
+                                  >
+                                    <UserPlus className="h-4 w-4 ml-2" />
+                                    إضافة موظف جديد
+                                  </Button>
+                                );
                               }
-                            >
-                              <UserPlus className="h-4 w-4 ml-2" />
-                              إضافة موظف جديد
-                            </Button>
+                              
+                              const usage = employeesData.usage || employeesData.total_count || 0;
+                              const maxEmployees = employeesData.max_employees;
+                              const usagePercentage = usage / maxEmployees;
+                              const isAtLimit = usagePercentage >= 1;
+                              
+                              if (isAtLimit) {
+                                return (
+                                  <Button
+                                    type="button"
+                                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      if (e.nativeEvent) {
+                                        e.nativeEvent.stopImmediatePropagation();
+                                      }
+                                      handlePurchaseEmployeeAddon(e);
+                                      return false;
+                                    }}
+                                    disabled={isPurchasingAddon}
+                                  >
+                                    {isPurchasingAddon ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                        جاري المعالجة...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <TrendingUp className="h-4 w-4 ml-2" />
+                                        زيادة الحد المسموح
+                                      </>
+                                    )}
+                                  </Button>
+                                );
+                              }
+                              
+                              return (
+                                <Button
+                                  type="button"
+                                  className="bg-black hover:bg-gray-800 text-white"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    router.push(
+                                      "/dashboard/access-control/create-employee",
+                                    );
+                                  }}
+                                >
+                                  <UserPlus className="h-4 w-4 ml-2" />
+                                  إضافة موظف جديد
+                                </Button>
+                              );
+                            })()}
                           </div>
                         </div>
 
@@ -2482,6 +2598,18 @@ export default function AccessControlPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Payment Popup */}
+      {paymentPopupOpen && (
+        <PaymentPopup
+          paymentUrl={paymentUrl}
+          onClose={() => {
+            setPaymentPopupOpen(false);
+            setPaymentUrl("");
+          }}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   );
 }
