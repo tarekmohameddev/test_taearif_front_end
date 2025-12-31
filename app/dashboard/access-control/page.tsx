@@ -1225,6 +1225,29 @@ export default function AccessControlPage() {
     await fetchEmployees();
   };
 
+  // Navigate to create employee page (only if within limit)
+  const handleNavigateToCreateEmployee = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Check if we can add employee (within limit)
+    if (!employeesData || !employeesData.max_employees) {
+      // No limit set, can add employee
+      router.push("/dashboard/access-control/create-employee");
+      return;
+    }
+    
+    const usage = employeesData.usage || employeesData.total_count || 0;
+    const maxEmployees = employeesData.max_employees;
+    const usagePercentage = usage / maxEmployees;
+    const isAtLimit = usagePercentage >= 1;
+    
+    // Only navigate if not at limit
+    if (!isAtLimit) {
+      router.push("/dashboard/access-control/create-employee");
+    }
+  };
+
   // Handle permission selection
   const handlePermissionChange = (permissionName: string, checked: boolean) => {
     setSelectedPermissions((prev) => ({
@@ -1621,13 +1644,7 @@ export default function AccessControlPage() {
                                   <Button
                                     type="button"
                                     className="bg-black hover:bg-gray-800 text-white"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      router.push(
-                                        "/dashboard/access-control/create-employee",
-                                      );
-                                    }}
+                                    onClick={handleNavigateToCreateEmployee}
                                   >
                                     <UserPlus className="h-4 w-4 ml-2" />
                                     إضافة موظف جديد
@@ -1675,13 +1692,7 @@ export default function AccessControlPage() {
                                 <Button
                                   type="button"
                                   className="bg-black hover:bg-gray-800 text-white"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    router.push(
-                                      "/dashboard/access-control/create-employee",
-                                    );
-                                  }}
+                                  onClick={handleNavigateToCreateEmployee}
                                 >
                                   <UserPlus className="h-4 w-4 ml-2" />
                                   إضافة موظف جديد
