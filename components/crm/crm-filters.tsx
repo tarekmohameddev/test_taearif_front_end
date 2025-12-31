@@ -264,12 +264,10 @@ export default function CrmFilters({
         //   params.append("sort_dir", sortDir);
         // }
 
-        // Use /crm/customers/search endpoint with all filters
-        const url = params.toString()
-          ? `/crm/customers/search?${params.toString()}`
-          : "/crm/customers/search";
-
-        const response = await axiosInstance.get(url);
+        // Use /api/v1/crm/requests endpoint with all filters
+        const endpoint = "/api/v1/crm/requests";
+        
+        const response = await axiosInstance.get(endpoint, { params });
         const crmData = response.data;
 
         if (crmData.status === "success") {
