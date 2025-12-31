@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -106,8 +107,9 @@ export default function CrmFilters({
         (stage) => stage.id !== "unassigned" && stage.id !== "غير معين",
       )
     : [];
+  const router = useRouter();
   const { userData } = useAuthStore();
-  const { setShowAddDealDialog, customers: storeCustomers } = useCrmStore();
+  const { customers: storeCustomers } = useCrmStore();
   const [isSearching, setIsSearching] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null,
@@ -609,7 +611,7 @@ export default function CrmFilters({
         <Button
           variant="default"
           className="flex items-center gap-2"
-          onClick={() => setShowAddDealDialog(true)}
+          onClick={() => router.push("/dashboard/crm/new-deal")}
         >
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">انشاء صفقة جديدة</span>
