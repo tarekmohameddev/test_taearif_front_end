@@ -86,11 +86,7 @@ export function LiveEditorHeader({
               }`}
               title={t("live_editor.mobile_view")}
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17 2H7C5.9 2 5 2.9 5 4V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V4C19 2.9 18.1 2 17 2ZM17 20H7V4H17V20Z" />
                 <path d="M12 18C12.83 18 13.5 17.33 13.5 16.5C13.5 15.67 12.83 15 12 15C11.17 15 10.5 15.67 10.5 16.5C10.5 17.33 11.17 18 12 18Z" />
               </svg>
@@ -104,11 +100,7 @@ export function LiveEditorHeader({
               }`}
               title={t("live_editor.tablet_view")}
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 0H5C3.9 0 3 0.9 3 2V22C3 23.1 3.9 24 5 24H19C20.1 24 21 23.1 21 22V2C21 0.9 20.1 0 19 0ZM19 22H5V2H19V22Z" />
                 <path d="M12 20C12.83 20 13.5 19.33 13.5 18.5C13.5 17.67 12.83 17 12 17C11.17 17 10.5 17.67 10.5 18.5C10.5 19.33 11.17 20 12 20Z" />
               </svg>
@@ -122,11 +114,7 @@ export function LiveEditorHeader({
               }`}
               title={t("live_editor.desktop_view")}
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21 2H3C1.9 2 1 2.9 1 4V16C1 17.1 1.9 18 3 18H10V20H8V22H16V20H14V18H21C22.1 18 23 17.1 23 16V4C23 2.9 22.1 2 21 2ZM21 16H3V4H21V16Z" />
               </svg>
             </button>
@@ -283,11 +271,7 @@ export function LiveEditorHeader({
               }`}
               title={t("live_editor.mobile_view")}
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17 2H7C5.9 2 5 2.9 5 4V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V4C19 2.9 18.1 2 17 2ZM17 20H7V4H17V20Z" />
                 <path d="M12 18C12.83 18 13.5 17.33 13.5 16.5C13.5 15.67 12.83 15 12 15C11.17 15 10.5 15.67 10.5 16.5C10.5 17.33 11.17 18 12 18Z" />
               </svg>
@@ -301,11 +285,7 @@ export function LiveEditorHeader({
               }`}
               title={t("live_editor.tablet_view")}
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 0H5C3.9 0 3 0.9 3 2V22C3 23.1 3.9 24 5 24H19C20.1 24 21 23.1 21 22V2C21 0.9 20.1 0 19 0ZM19 22H5V2H19V22Z" />
                 <path d="M12 20C12.83 20 13.5 19.33 13.5 18.5C13.5 17.67 12.83 17 12 17C11.17 17 10.5 17.67 10.5 18.5C10.5 19.33 11.17 20 12 20Z" />
               </svg>
@@ -319,11 +299,7 @@ export function LiveEditorHeader({
               }`}
               title={t("live_editor.desktop_view")}
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21 2H3C1.9 2 1 2.9 1 4V16C1 17.1 1.9 18 3 18H10V20H8V22H16V20H14V18H21C22.1 18 23 17.1 23 16V4C23 2.9 22.1 2 21 2ZM21 16H3V4H21V16Z" />
               </svg>
             </button>
@@ -435,5 +411,3 @@ export function LiveEditorHeader({
     </div>
   );
 }
-
-

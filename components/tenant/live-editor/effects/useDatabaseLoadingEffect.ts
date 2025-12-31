@@ -19,7 +19,11 @@ interface UseDatabaseLoadingEffectProps {
   tenantLoading: boolean;
   tenantData: any;
   slug: string;
-  setPageComponents: (components: ComponentInstance[] | ((prev: ComponentInstance[]) => ComponentInstance[])) => void;
+  setPageComponents: (
+    components:
+      | ComponentInstance[]
+      | ((prev: ComponentInstance[]) => ComponentInstance[]),
+  ) => void;
   setInitialized: (initialized: boolean) => void;
 }
 
@@ -36,17 +40,16 @@ export const useDatabaseLoadingEffect = ({
   useEffect(() => {
     // Always load data into editorStore when tenantData is available
     const editorStore = useEditorStore.getState();
-    
+
     // Check if this is a static page
     const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
-    
-    // For static pages, always check even if initialized
-    const shouldLoad = pageIsStatic 
-      ? (!authLoading && !tenantLoading && tenantData)
-      : (!initialized && !authLoading && !tenantLoading && tenantData);
-    
-    if (shouldLoad) {
 
+    // For static pages, always check even if initialized
+    const shouldLoad = pageIsStatic
+      ? !authLoading && !tenantLoading && tenantData
+      : !initialized && !authLoading && !tenantLoading && tenantData;
+
+    if (shouldLoad) {
       // ⭐ CRITICAL: Check if theme was recently changed
       // If themeChangeTimestamp > 0, prioritize pageComponentsByPage from store
       // over tenantData.componentSettings to avoid loading old theme data
@@ -68,96 +71,115 @@ export const useDatabaseLoadingEffect = ({
       editorStore.loadFromDatabase(tenantData);
 
       // Re-check store after loadFromDatabase (in case it was updated)
-      const storePageComponentsAfterLoad = editorStore.pageComponentsByPage[slug];
-      
+      const storePageComponentsAfterLoad =
+        editorStore.pageComponentsByPage[slug];
+
       // ⭐ STATIC PAGES: Load with priority from tenantData.StaticPages
       if (pageIsStatic) {
         // ⭐ PRIORITY 0: If theme was recently changed, prioritize staticPagesData from store
         // This ensures we use the new theme data instead of old tenantData.StaticPages
         if (hasRecentThemeChange) {
           const staticPageDataFromStore = editorStore.getStaticPageData(slug);
-          const staticPageComponentsFromStore = staticPageDataFromStore?.components || [];
-          
+          const staticPageComponentsFromStore =
+            staticPageDataFromStore?.components || [];
+
           if (staticPageComponentsFromStore.length > 0) {
             const staticComponents = formatStaticPageComponents(
               staticPageComponentsFromStore,
-              slug
+              slug,
             );
-            
+
             setPageComponents(staticComponents);
             setInitialized(true);
             return; // Skip further loading logic
           }
         }
-        
+
         // ⭐ PRIORITY 1: Check tenantData.StaticPages[slug] first (from getTenant)
         // ⭐ CRITICAL: Skip tenantData.StaticPages if theme was recently changed
         // This ensures we use the new theme data from staticPagesData instead of old database data
         if (!hasRecentThemeChange) {
           const staticPageFromTenant = tenantData?.StaticPages?.[slug];
-          
+
           // Handle different formats: [slug, components] or { slug, components }
           let tenantComponents: any[] = [];
-          
+
           if (staticPageFromTenant) {
             // Format 1: Array format [slug, components]
-            if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
-              tenantComponents = Array.isArray(staticPageFromTenant[1]) ? staticPageFromTenant[1] : [];
+            if (
+              Array.isArray(staticPageFromTenant) &&
+              staticPageFromTenant.length === 2
+            ) {
+              tenantComponents = Array.isArray(staticPageFromTenant[1])
+                ? staticPageFromTenant[1]
+                : [];
             }
             // Format 2: Object format { slug, components }
-            else if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
-              tenantComponents = Array.isArray(staticPageFromTenant.components) 
-                ? staticPageFromTenant.components 
+            else if (
+              typeof staticPageFromTenant === "object" &&
+              !Array.isArray(staticPageFromTenant)
+            ) {
+              tenantComponents = Array.isArray(staticPageFromTenant.components)
+                ? staticPageFromTenant.components
                 : [];
             }
           }
-          
+
           const hasStaticPageInTenant = tenantComponents.length > 0;
 
           if (hasStaticPageInTenant) {
             // Convert static page components to the format expected by setPageComponents
-            const staticComponents = formatStaticPageComponents(tenantComponents, slug);
-            
+            const staticComponents = formatStaticPageComponents(
+              tenantComponents,
+              slug,
+            );
+
             setPageComponents(staticComponents);
             setInitialized(true);
             return; // Skip further loading logic
           }
         }
-        
+
         // ⭐ PRIORITY 2: Check editorStore.staticPagesData[slug] (after loadFromDatabase)
         let staticPageData = editorStore.getStaticPageData(slug);
         let staticPageComponents = staticPageData?.components || [];
-        
+
         // ⭐ PRIORITY 3: If no components, add default component
         if (staticPageComponents.length === 0) {
           const defaultComponent = getDefaultComponentForStaticPage(slug);
-          
+
           if (defaultComponent) {
             // Add to staticPagesData
             editorStore.setStaticPageData(slug, {
               slug,
               components: [defaultComponent],
             });
-            
+
             // Re-read staticPageData after adding
             staticPageData = editorStore.getStaticPageData(slug);
             staticPageComponents = staticPageData?.components || [];
           } else {
-            console.warn("⚠️ No default component found for static page:", slug);
+            console.warn(
+              "⚠️ No default component found for static page:",
+              slug,
+            );
           }
         }
-        
+
         // Load components from staticPagesData
         if (staticPageComponents.length > 0) {
           // Convert static page components to the format expected by setPageComponents
-          const staticComponents = formatStaticPageComponents(staticPageComponents, slug);
-          
+          const staticComponents = formatStaticPageComponents(
+            staticPageComponents,
+            slug,
+          );
+
           setPageComponents(staticComponents);
           setInitialized(true);
           return; // Skip regular page loading logic
         }
       }
-      
+
       if (hasRecentThemeChange && storePageComponentsAfterLoad !== undefined) {
         // Theme was recently changed - use store data (new theme) instead of tenantData (old theme)
         setPageComponents(storePageComponentsAfterLoad || []);
@@ -176,7 +198,7 @@ export const useDatabaseLoadingEffect = ({
               comp,
               correctType,
               getComponentDisplayName,
-              createDefaultData
+              createDefaultData,
             );
           },
         );
@@ -245,4 +267,3 @@ export const useDatabaseLoadingEffect = ({
     setInitialized,
   ]);
 };
-

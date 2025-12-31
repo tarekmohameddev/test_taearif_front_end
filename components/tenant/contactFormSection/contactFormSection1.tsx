@@ -383,7 +383,9 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
 
   // Ensure text color is never the same as background color
   // If they match, use a very dark version of the background color
-  if (submitButtonTextColor.toLowerCase() === submitButtonBgColor.toLowerCase()) {
+  if (
+    submitButtonTextColor.toLowerCase() === submitButtonBgColor.toLowerCase()
+  ) {
     submitButtonTextColor = darkenColor(submitButtonBgColor, 80);
   }
 

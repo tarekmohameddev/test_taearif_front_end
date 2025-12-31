@@ -107,27 +107,25 @@ export const getDefaultFooterData = (): ComponentData => ({
 // Default footer2 data structure (ThemeTwo)
 export const getDefaultFooter2Data = (): ComponentData => ({
   visible: true,
-  
+
   background: {
     type: "color",
     image: "",
     alt: "",
     color: "#8b5f46", // Default background color
-    
+
     gradient: {
       enabled: false,
       direction: "to-r",
       startColor: "#1f2937",
       endColor: "#374151",
       middleColor: "#4b5563",
-      
     },
     overlay: {
       enabled: false,
       opacity: "0.7",
       color: "#000000",
       blendMode: "multiply",
-      
     },
   },
   layout: {
@@ -135,10 +133,8 @@ export const getDefaultFooter2Data = (): ComponentData => ({
     spacing: "8",
     padding: "16",
     maxWidth: "6xl",
-    
   },
   content: {
-    
     companyInfo: {
       enabled: true,
       name: "تعاريف العقارية",
@@ -146,7 +142,6 @@ export const getDefaultFooter2Data = (): ComponentData => ({
         "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
       tagline: "",
       logo: "/images/main/logo.png",
-      
     },
     newsletter: {
       enabled: true,
@@ -155,7 +150,6 @@ export const getDefaultFooter2Data = (): ComponentData => ({
         "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
       placeholder: "رقم الواتساب",
       buttonText: "اشترك الآن",
-      
     },
     contactInfo: {
       enabled: true,
@@ -163,7 +157,6 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       email: "contact@baheya.co",
       whatsapp: "0542120011",
       whatsappUrl: "https://wa.link/0ysvug",
-      
     },
     socialMedia: {
       enabled: true,
@@ -171,77 +164,63 @@ export const getDefaultFooter2Data = (): ComponentData => ({
         {
           name: "Facebook",
           url: "#",
-          
         },
         {
           name: "YouTube",
           url: "#",
-          
         },
         {
           name: "Instagram",
           url: "#",
-          
         },
         {
           name: "X (Twitter)",
           url: "#",
-          
         },
         {
           name: "Snapchat",
           url: "#",
-          
         },
       ],
-      
     },
   },
   footerBottom: {
     enabled: true,
-    copyright:
-      "جميع الحقوق محفوظة لشركة تعاريف العقارية 2025©",
+    copyright: "جميع الحقوق محفوظة لشركة تعاريف العقارية 2025©",
     companyUrl: "https://baheya.co",
     designerUrl: "http://souhailagency.com",
     legalLinks: [
       { text: "سياسة الخصوصية", url: "/privacy-policy", ThemeTwo: "ThemeTwo" },
       { text: "سياسة الاستخدام", url: "/terms-of-use", ThemeTwo: "ThemeTwo" },
     ],
-    
   },
   floatingWhatsApp: {
     enabled: true,
     url: "https://wa.link/0ysvug",
-    
   },
   styling: {
-    
     colors: {
       textPrimary: "#ffffff",
       textSecondary: "#ffffff",
       textMuted: "rgba(255, 255, 255, 0.9)",
       accent: "#a67c5a",
       border: "rgba(255, 255, 255, 0.2)",
-      
     },
     typography: {
       titleSize: "xl",
       titleWeight: "bold",
       bodySize: "base",
       bodyWeight: "normal",
-      
     },
     spacing: {
       sectionPadding: "16",
       columnGap: "8",
       itemGap: "3",
-      
     },
     effects: {
       hoverTransition: "0.3s",
       shadow: "none",
       borderRadius: "lg",
-      
     },
   },
 });

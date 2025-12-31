@@ -91,7 +91,9 @@ interface PropertyRequestsTableProps {
   formData: any;
   open: boolean;
   setOpen: (open: boolean) => void;
-  handleChange: (field: keyof PropertyRequest) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    field: keyof PropertyRequest,
+  ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleUpdatePropertyRequest: () => void;
   showBulkActionsDialog: boolean;
   setShowBulkActionsDialog: (show: boolean) => void;

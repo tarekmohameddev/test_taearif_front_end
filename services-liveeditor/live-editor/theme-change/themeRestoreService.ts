@@ -2,25 +2,28 @@
  * ============================================================================
  * Theme Restore Service
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على خدمات استعادة الثيم من النسخ الاحتياطي.
  * This file contains services for restoring theme from backup.
- * 
+ *
  * المسؤوليات:
  * - استعادة الثيم من النسخ الاحتياطي
  * - استخراج رقم الثيم من مفتاح النسخ الاحتياطي
  * - استعادة جميع الصفحات والمكونات من النسخ الاحتياطي
- * 
+ *
  * Responsibilities:
  * - Restore theme from backup
  * - Extract theme number from backup key
  * - Restore all pages and components from backup
- * 
+ *
  * ============================================================================
  */
 
 import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { extractThemeNumberFromBackupKey, loadThemeData } from "./themeDataLoader";
+import {
+  extractThemeNumberFromBackupKey,
+  loadThemeData,
+} from "./themeDataLoader";
 import { restoreStaticPagesFromBackup } from "./staticPagesService";
 import { restoreGlobalComponents } from "./globalComponentsService";
 import { restorePageComponentsFromBackup } from "./pageComponentsService";
@@ -32,22 +35,22 @@ import type { ThemeNumber } from "./types";
 /**
  * تسجيل بيانات الصفحات الثابتة قبل وبعد الاستعادة
  * Log static pages data before and after restore
- * 
+ *
  * تقوم هذه الدالة بتسجيل بيانات الصفحات الثابتة قبل وبعد الاستعادة
  * مع مقارنة للتغييرات.
- * 
+ *
  * This function logs static pages data before and after restore
  * with comparison of changes.
- * 
+ *
  * @param store - حالة Editor Store
  *              Editor Store state
- * 
+ *
  * @param backup - بيانات النسخ الاحتياطي
  *               Backup data
- * 
+ *
  * @param backupKey - مفتاح النسخ الاحتياطي
  *                   Backup key
- * 
+ *
  * @example
  * ```typescript
  * logStaticPagesRestore(store, backup, "Theme1Backup");
@@ -56,7 +59,7 @@ import type { ThemeNumber } from "./types";
 function logStaticPagesRestore(
   store: ReturnType<typeof useEditorStore.getState>,
   backup: Record<string, any>,
-  backupKey: string
+  backupKey: string,
 ): void {
   // ⭐ LOGGING: عرض بيانات الصفحات الثابتة قبل الاستعادة
   // ⭐ LOGGING: Show static pages data BEFORE restore
@@ -81,7 +84,7 @@ function logStaticPagesRestore(
   console.log("Static Pages Data Before Restore:", staticPagesBeforeRestore);
   console.log(
     "Has Static Pages in Backup:",
-    Object.keys(staticPagesBackupData).length > 0
+    Object.keys(staticPagesBackupData).length > 0,
   );
   console.groupEnd();
 
@@ -98,14 +101,14 @@ function logStaticPagesRestore(
   ) {
     const restoredThemeNumber = extractThemeNumberFromBackupKey(backupKey);
     console.log(
-      `[restoreThemeFromBackup] No static pages in backup, loading from theme data for Theme ${restoredThemeNumber}`
+      `[restoreThemeFromBackup] No static pages in backup, loading from theme data for Theme ${restoredThemeNumber}`,
     );
     if (restoredThemeNumber) {
       const themeData = loadThemeData(restoredThemeNumber as ThemeNumber);
       if (themeData.staticPages) {
         console.log(
           `[restoreThemeFromBackup] Applying static pages from theme data:`,
-          Object.keys(themeData.staticPages)
+          Object.keys(themeData.staticPages),
         );
         applyStaticPagesFromTheme(themeData);
       }
@@ -159,7 +162,7 @@ function logStaticPagesRestore(
     });
   } else {
     console.log(
-      "📊 No backup data to compare - static pages loaded from theme data"
+      "📊 No backup data to compare - static pages loaded from theme data",
     );
   }
   console.groupEnd();
@@ -168,19 +171,19 @@ function logStaticPagesRestore(
 /**
  * إجبار تحديث الصفحة الحالية بعد الاستعادة
  * Force update current page after restore
- * 
+ *
  * تقوم هذه الدالة بإجبار تحديث الصفحة الحالية بعد استعادة الثيم.
  * تتعامل مع الصفحات الثابتة والصفحات العادية.
- * 
+ *
  * This function forces update of current page after restoring theme.
  * Handles static pages and regular pages.
- * 
+ *
  * @param store - حالة Editor Store
  *              Editor Store state
- * 
+ *
  * @param backup - بيانات النسخ الاحتياطي
  *               Backup data
- * 
+ *
  * @example
  * ```typescript
  * forceUpdateCurrentPageAfterRestore(store, backup);
@@ -188,7 +191,7 @@ function logStaticPagesRestore(
  */
 function forceUpdateCurrentPageAfterRestore(
   store: ReturnType<typeof useEditorStore.getState>,
-  backup: Record<string, any>
+  backup: Record<string, any>,
 ): void {
   // ⭐ CRITICAL: إضافة تأخير صغير لضمان انتشار تحديثات store
   // ثم إجبار تحديث إضافي لضمان المزامنة
@@ -237,12 +240,9 @@ function forceUpdateCurrentPageAfterRestore(
             componentCount: finalComponents.length,
             isStaticPage: !!staticPageData,
             componentNames: finalComponents.map((c: any) => c.componentName),
-          }
+          },
         );
-        finalStore.forceUpdatePageComponents(
-          finalCurrentPage,
-          finalComponents
-        );
+        finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
       }
     }
   }, 100);
@@ -251,7 +251,7 @@ function forceUpdateCurrentPageAfterRestore(
 /**
  * استعادة الثيم من النسخ الاحتياطي
  * Restore theme from backup
- * 
+ *
  * هذه هي الدالة الرئيسية لاستعادة الثيم من النسخ الاحتياطي.
  * تقوم بـ:
  * 1. مسح جميع الحالات قبل الاستعادة
@@ -261,7 +261,7 @@ function forceUpdateCurrentPageAfterRestore(
  * 5. تحديث currentTheme
  * 6. إجبار تحديث الصفحة الحالية
  * 7. مزامنة Tenant Store مع Editor Store
- * 
+ *
  * This is the main function to restore theme from backup.
  * It:
  * 1. Clears all states before restore
@@ -271,21 +271,19 @@ function forceUpdateCurrentPageAfterRestore(
  * 5. Updates currentTheme
  * 6. Forces update of current page
  * 7. Syncs Tenant Store with Editor Store
- * 
+ *
  * @param backupKey - مفتاح النسخ الاحتياطي (مثل "Theme1Backup")
  *                   Backup key (e.g., "Theme1Backup")
- * 
+ *
  * @throws Error إذا لم يتم العثور على النسخ الاحتياطي
  *         Error if backup not found
- * 
+ *
  * @example
  * ```typescript
  * await restoreThemeFromBackup("Theme1Backup");
  * ```
  */
-export async function restoreThemeFromBackup(
-  backupKey: string
-): Promise<void> {
+export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
   const store = useEditorStore.getState();
 
   // قراءة النسخ الاحتياطي من WebsiteLayout بدلاً من themeBackup
@@ -344,4 +342,3 @@ export async function restoreThemeFromBackup(
   // 8. ⭐ CRITICAL: Update tenantStore to sync with editorStore
   syncTenantStoreFromBackup(backup);
 }
-

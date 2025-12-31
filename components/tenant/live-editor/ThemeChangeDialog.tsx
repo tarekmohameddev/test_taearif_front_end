@@ -10,7 +10,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useEditorT, useEditorLocale } from "@/context-liveeditor/editorI18nStore";
+import {
+  useEditorT,
+  useEditorLocale,
+} from "@/context-liveeditor/editorI18nStore";
 import { Palette, AlertTriangle, Loader2 } from "lucide-react";
 import { ThemeNumber } from "@/services-liveeditor/live-editor/themeChangeService";
 
@@ -94,7 +97,10 @@ export function ThemeChangeDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir={isRTL ? "rtl" : "ltr"}>
+      <DialogContent
+        className="max-w-4xl max-h-[90vh] overflow-y-auto"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Palette className="w-5 h-5 text-indigo-600" />
@@ -225,4 +231,3 @@ export function ThemeChangeDialog({
     </Dialog>
   );
 }
-

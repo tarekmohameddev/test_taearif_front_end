@@ -15,7 +15,7 @@ export async function generateMetadata({
   const tenantId = headersList.get("x-tenant-id");
   const locale = headersList.get("x-locale") || "ar";
   const { slug: slugArray } = await params;
-  
+
   // Join slug array to create path (e.g., ["project", "samy"] -> "/project/samy")
   const slugPath = `/${slugArray?.join("/") || ""}`;
 
@@ -122,9 +122,8 @@ export default async function TenantPage({
   // Or single slug: ["about"] -> slug: "about", dynamicSlug: undefined
   const slug = slugArray?.[0] || "";
   const isMultiLevel = isMultiLevelPage(slug);
-  const dynamicSlug = isMultiLevel && slugArray?.length > 1 
-    ? slugArray[1] 
-    : undefined;
+  const dynamicSlug =
+    isMultiLevel && slugArray?.length > 1 ? slugArray[1] : undefined;
 
   console.log("🔍 [...slug]/page.tsx - Processed:", {
     slug,
@@ -147,4 +146,3 @@ export default async function TenantPage({
     />
   );
 }
-

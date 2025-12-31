@@ -3,11 +3,13 @@
 ## 🔴 المشكلة
 
 المكون يعرض **فقط البيانات الافتراضية (default data)** ولا يحمل البيانات من:
+
 - ❌ الـ Store (editorStore)
 - ❌ الـ Tenant Data (من الـ API/Backend)
 - ❌ الـ Props
 
 **الأعراض:**
+
 - المكون يظهر دائماً بنفس البيانات الافتراضية
 - التعديلات في الـ Live Editor لا تظهر
 - البيانات المحفوظة في الـ Database لا تُحمّل
@@ -30,44 +32,48 @@ const Component1 = (props) => {
 ### الخطوة 2: تحقق من المصادر التالية
 
 1. **هل يستورد البيانات الافتراضية من functions file؟**
+
    ```typescript
    // ❌ خطأ: دالة محلية
    const getDefaultData = () => ({ ... });
-   
+
    // ✅ صحيح: استيراد من functions file
    import { getDefaultComponentData } from "@/context-liveeditor/editorStoreFunctions/componentFunctions";
    ```
 
 2. **هل يستخدم `ensureComponentVariant` بشكل صحيح؟**
+
    ```typescript
    // ❌ خطأ: يستخدم variantId بدلاً من uniqueId
    ensureComponentVariant("component", variantId, initialData);
-   
+
    // ✅ صحيح: يستخدم uniqueId
    ensureComponentVariant("component", uniqueId, props);
    ```
 
 3. **هل يقرأ البيانات من الـ Store؟**
+
    ```typescript
    // ❌ خطأ: لا يقرأ من store
    const data = defaultData;
-   
+
    // ✅ صحيح: يقرأ من store
    const storeData = getComponentData("component", uniqueId);
    const currentStoreData = componentStates[uniqueId] || {};
    ```
 
 4. **هل يدمج البيانات بالترتيب الصحيح؟**
+
    ```typescript
    // ❌ خطأ: ترتيب خاطئ أو لا يدمج
    const mergedData = { ...defaultData, ...props };
-   
+
    // ✅ صحيح: ترتيب صحيح
    const mergedData = {
-     ...defaultData,        // Base (99%)
-     ...props,              // Props
+     ...defaultData, // Base (99%)
+     ...props, // Props
      ...tenantComponentData, // Backend
-     ...currentStoreData,   // Store (highest priority)
+     ...currentStoreData, // Store (highest priority)
    };
    ```
 
@@ -78,6 +84,7 @@ const Component1 = (props) => {
 ### الخطوة 1: استيراد البيانات الافتراضية من Functions File
 
 **قبل:**
+
 ```typescript
 // ❌ دالة محلية في المكون
 const getDefaultComponentData = () => ({
@@ -88,6 +95,7 @@ const getDefaultComponentData = () => ({
 ```
 
 **بعد:**
+
 ```typescript
 // ✅ استيراد من functions file
 import { getDefaultComponentData } from "@/context-liveeditor/editorStoreFunctions/componentFunctions";
@@ -100,6 +108,7 @@ import { getDefaultComponentData } from "@/context-liveeditor/editorStoreFunctio
 ### الخطوة 2: تبسيط ensureComponentVariant
 
 **قبل:**
+
 ```typescript
 // ❌ معقد: يدمج البيانات قبل الاستدعاء
 useEffect(() => {
@@ -114,6 +123,7 @@ useEffect(() => {
 ```
 
 **بعد:**
+
 ```typescript
 // ✅ بسيط: يمرر props مباشرة (مثل hero1.tsx)
 useEffect(() => {
@@ -124,6 +134,7 @@ useEffect(() => {
 ```
 
 **ملاحظات:**
+
 - استخدم `uniqueId` (ليس `variantId`)
 - استخدم `useStore` من props (ليس `props.useStore`)
 - مرر `props` مباشرة (لا تدمج قبل الاستدعاء)
@@ -133,17 +144,17 @@ useEffect(() => {
 ### الخطوة 3: قراءة البيانات من الـ Store
 
 **قبل:**
+
 ```typescript
 // ❌ لا يقرأ من store
 const data = getDefaultComponentData();
 ```
 
 **بعد:**
+
 ```typescript
 // ✅ يقرأ من store (مثل hero1.tsx)
-const storeData = useStore
-  ? getComponentData("component", uniqueId) || {}
-  : {};
+const storeData = useStore ? getComponentData("component", uniqueId) || {} : {};
 
 // Subscribe to store updates
 const componentStates = useEditorStore((s) => s.componentStates);
@@ -151,6 +162,7 @@ const currentStoreData = useStore ? componentStates[uniqueId] || {} : {};
 ```
 
 **ملاحظات:**
+
 - استخدم `getComponentData` للحصول على البيانات
 - اشترك في `componentStates` للحصول على التحديثات
 - استخدم `uniqueId` كـ key
@@ -160,19 +172,21 @@ const currentStoreData = useStore ? componentStates[uniqueId] || {} : {};
 ### الخطوة 4: قراءة البيانات من الـ Tenant (Backend)
 
 **قبل:**
+
 ```typescript
 // ❌ لا يقرأ من tenant
 const tenantData = {};
 ```
 
 **بعد:**
+
 ```typescript
 // ✅ يقرأ من tenant (مثل hero1.tsx)
 const getTenantComponentData = () => {
   if (!tenantData?.componentSettings) {
     return {};
   }
-  
+
   // Search through all pages
   for (const [pageSlug, pageComponents] of Object.entries(
     tenantData.componentSettings,
@@ -199,6 +213,7 @@ const tenantComponentData = getTenantComponentData();
 ```
 
 **ملاحظات:**
+
 - تأكد من استخدام `componentId === id` (ليس `componentId === variantId`)
 - ابحث في جميع الصفحات (`componentSettings`)
 - تحقق من `type` و `componentName` و `id`
@@ -208,6 +223,7 @@ const tenantComponentData = getTenantComponentData();
 ### الخطوة 5: دمج البيانات بالترتيب الصحيح
 
 **قبل:**
+
 ```typescript
 // ❌ ترتيب خاطئ أو لا يدمج من store/tenant
 const mergedData = {
@@ -217,19 +233,21 @@ const mergedData = {
 ```
 
 **بعد:**
+
 ```typescript
 // ✅ ترتيب صحيح (مثل hero1.tsx)
 const defaultData = getDefaultComponentData();
 
 const mergedData = {
-  ...defaultData,           // 99% - Base data (lowest priority)
-  ...props,                 // Props from parent
-  ...tenantComponentData,   // Backend data (tenant)
-  ...currentStoreData,      // Store data (highest priority)
+  ...defaultData, // 99% - Base data (lowest priority)
+  ...props, // Props from parent
+  ...tenantComponentData, // Backend data (tenant)
+  ...currentStoreData, // Store data (highest priority)
 };
 ```
 
 **ترتيب الأولوية (من الأقل إلى الأعلى):**
+
 1. `defaultData` - البيانات الافتراضية (99% من البيانات)
 2. `props` - البيانات من الـ parent component
 3. `tenantComponentData` - البيانات من الـ Backend/API
@@ -240,6 +258,7 @@ const mergedData = {
 ### الخطوة 6: إزالة منطق الاشتراك المعقد
 
 **قبل:**
+
 ```typescript
 // ❌ منطق معقد للاشتراك
 const [forceUpdate, setForceUpdate] = useState(0);
@@ -257,6 +276,7 @@ useEffect(() => {
 ```
 
 **بعد:**
+
 ```typescript
 // ✅ بسيط: الاعتماد على Zustand reactivity
 // لا حاجة لـ useState أو useEffect للاشتراك
@@ -266,6 +286,7 @@ const currentStoreData = useStore ? componentStates[uniqueId] || {} : {};
 ```
 
 **ملاحظات:**
+
 - Zustand يتعامل مع التحديثات تلقائياً
 - لا حاجة لـ `useState` أو `forceUpdate`
 - لا حاجة لـ `useEffect` للاشتراك اليدوي
@@ -283,10 +304,11 @@ ensureVariant: (state, variantId, initial?) => {
     state.componentStates[variantId] = initial || defaultData;
   }
   return { componentStates: { ...state.componentStates } };
-}
+};
 ```
 
 **بعد (مثل heroFunctions.ts):**
+
 ```typescript
 // ✅ صحيح: يتحقق من البيانات الموجودة
 ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
@@ -308,7 +330,7 @@ ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
       [variantId]: data,
     },
   } as any;
-}
+};
 ```
 
 **تحقق من `getData` في functions file:**
@@ -321,15 +343,16 @@ getData: (state, variantId) => {
     return getDefaultComponentData(); // ❌ خطأ
   }
   return data;
-}
+};
 ```
 
 **بعد (مثل heroFunctions.ts):**
+
 ```typescript
 // ✅ صحيح: يرجع كائن فارغ
 getData: (state: any, variantId: string) => {
   return state.componentStates?.[variantId] || {};
-}
+};
 ```
 
 ---
@@ -337,6 +360,7 @@ getData: (state: any, variantId: string) => {
 ## 📋 Checklist - التحقق من الإصلاح
 
 ### ✅ قبل الإصلاح
+
 - [ ] المكون يعرض فقط default data
 - [ ] التعديلات في Live Editor لا تظهر
 - [ ] البيانات من Backend لا تُحمّل
@@ -518,4 +542,3 @@ export default Component1;
 ---
 
 **آخر تحديث:** بعد إصلاح `contactCards1.tsx` - 2024
-

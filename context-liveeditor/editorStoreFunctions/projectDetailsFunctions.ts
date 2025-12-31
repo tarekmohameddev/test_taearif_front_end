@@ -259,7 +259,10 @@ export const projectDetailsFunctions = {
 
     // Return new state
     return {
-      projectDetailsStates: { ...state.projectDetailsStates, [variantId]: data },
+      projectDetailsStates: {
+        ...state.projectDetailsStates,
+        [variantId]: data,
+      },
     } as any;
   },
 
@@ -273,7 +276,7 @@ export const projectDetailsFunctions = {
   getData: (state: any, variantId: string) => {
     const stored = state.projectDetailsStates[variantId];
     if (stored) return stored;
-    
+
     // Return appropriate default based on variant
     return variantId === "projectDetails2"
       ? getDefaultProjectDetails2Data()
@@ -310,8 +313,10 @@ export const projectDetailsFunctions = {
     const newData = updateDataByPath(source, path, value);
 
     return {
-      projectDetailsStates: { ...state.projectDetailsStates, [variantId]: newData },
+      projectDetailsStates: {
+        ...state.projectDetailsStates,
+        [variantId]: newData,
+      },
     } as any;
   },
 };
-

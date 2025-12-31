@@ -27,7 +27,7 @@ export function useGlobalComponents() {
   const globalHeaderVariant = useMemo(() => {
     // ⭐ CRITICAL: If theme was recently changed, prioritize store variant
     const hasRecentThemeChange = themeChangeTimestamp > 0;
-    
+
     // If globalHeaderVariantFromStore is the default value, prioritize tenantData/globalHeaderData
     // This handles the case when Live Editor first opens
     const isDefaultVariant = globalHeaderVariantFromStore === "StaticHeader1";
@@ -57,7 +57,7 @@ export function useGlobalComponents() {
   const globalFooterVariant = useMemo(() => {
     // ⭐ CRITICAL: If theme was recently changed, prioritize store variant
     const hasRecentThemeChange = themeChangeTimestamp > 0;
-    
+
     const isDefaultVariant = globalFooterVariantFromStore === "StaticFooter1";
 
     // Priority logic:
@@ -164,5 +164,3 @@ export function useGlobalComponents() {
     globalFooterData,
   };
 }
-
-

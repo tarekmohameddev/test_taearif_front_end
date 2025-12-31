@@ -14,7 +14,10 @@ interface SelectFieldRendererProps {
   normalizedPath: string;
   value: any;
   updateValue: (path: string, value: any) => void;
-  getIconComponent: (iconName: string, iconLibrary?: string) => React.ComponentType<any> | null;
+  getIconComponent: (
+    iconName: string,
+    iconLibrary?: string,
+  ) => React.ComponentType<any> | null;
   isReactIcon: (iconName: string) => boolean;
 }
 
@@ -77,9 +80,7 @@ export const SelectFieldRenderer: React.FC<SelectFieldRendererProps> = ({
             {def.label}
           </span>
           {def.description && (
-            <p className="text-xs text-slate-500 mt-1">
-              {def.description}
-            </p>
+            <p className="text-xs text-slate-500 mt-1">{def.description}</p>
           )}
         </div>
       </label>
@@ -185,9 +186,7 @@ export const SelectFieldRenderer: React.FC<SelectFieldRendererProps> = ({
                     className="cursor-pointer"
                   >
                     <span className="flex-1">{opt.label}</span>
-                    {isSelected && (
-                      <Check className="h-4 w-4 text-green-500" />
-                    )}
+                    {isSelected && <Check className="h-4 w-4 text-green-500" />}
                   </DropdownMenuItem>
                 );
               })}
@@ -213,12 +212,9 @@ export const SelectFieldRenderer: React.FC<SelectFieldRendererProps> = ({
               options: JSON.stringify(def.options || []),
             })}
           </div>
-          <div>
-            {t("editor_sidebar.path_debug", { path: normalizedPath })}
-          </div>
+          <div>{t("editor_sidebar.path_debug", { path: normalizedPath })}</div>
         </div>
       )}
     </div>
   );
 };
-

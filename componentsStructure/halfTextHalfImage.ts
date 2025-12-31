@@ -1910,9 +1910,21 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                   showIcons: true, // Flag to show icons in dropdown
                   options: [
                     // Legacy icons for backward compatibility
-                    { value: "transparency", label: "Transparency", iconLibrary: "lucide" },
-                    { value: "commitment", label: "Commitment", iconLibrary: "lucide" },
-                    { value: "innovation", label: "Innovation", iconLibrary: "lucide" },
+                    {
+                      value: "transparency",
+                      label: "Transparency",
+                      iconLibrary: "lucide",
+                    },
+                    {
+                      value: "commitment",
+                      label: "Commitment",
+                      iconLibrary: "lucide",
+                    },
+                    {
+                      value: "innovation",
+                      label: "Innovation",
+                      iconLibrary: "lucide",
+                    },
                     // Lucide Icons - Most Common
                     { value: "Search", label: "Search", iconLibrary: "lucide" },
                     {
@@ -2196,9 +2208,21 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                   showIcons: true, // Flag to show icons in dropdown
                   options: [
                     // Legacy icons for backward compatibility
-                    { value: "transparency", label: "Transparency", iconLibrary: "lucide" },
-                    { value: "commitment", label: "Commitment", iconLibrary: "lucide" },
-                    { value: "innovation", label: "Innovation", iconLibrary: "lucide" },
+                    {
+                      value: "transparency",
+                      label: "Transparency",
+                      iconLibrary: "lucide",
+                    },
+                    {
+                      value: "commitment",
+                      label: "Commitment",
+                      iconLibrary: "lucide",
+                    },
+                    {
+                      value: "innovation",
+                      label: "Innovation",
+                      iconLibrary: "lucide",
+                    },
                     // Lucide Icons - Most Common
                     { value: "Search", label: "Search", iconLibrary: "lucide" },
                     {

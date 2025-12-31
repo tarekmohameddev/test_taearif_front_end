@@ -11,7 +11,12 @@ interface PaymentPopupProps {
   addonId?: number;
 }
 
-const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: PaymentPopupProps) => {
+const PaymentPopup = ({
+  paymentUrl,
+  onClose,
+  onPaymentSuccess,
+  addonId,
+}: PaymentPopupProps) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showFailed, setShowFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,10 +31,10 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
     const checkIframeSrc = () => {
       if (iframeRef.current) {
         const currentSrc = iframeRef.current.src;
-        
+
         if (currentSrc.includes("/payment/success/")) {
           if (showSuccess || showFailed) return;
-          
+
           setShowSuccess(true);
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
@@ -47,7 +52,7 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
           }, 2000);
         } else if (currentSrc.includes("/payment/failed/")) {
           if (showSuccess || showFailed) return;
-          
+
           setShowFailed(true);
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
@@ -79,23 +84,22 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
     const handleMessage = (event: MessageEvent) => {
       // قبول الرسائل من api.taearif.com (أو أي origin لأن PHP يرسل إلى "*")
       // التحقق من أن الرسالة هي payment_success أو payment_failed
-      const isValidPaymentMessage = 
-        event.data === "payment_success" || 
-        event.data === "payment_failed";
-      
+      const isValidPaymentMessage =
+        event.data === "payment_success" || event.data === "payment_failed";
+
       // قبول الرسائل من api.taearif.com أو إذا كانت الرسالة صحيحة
-      const isAllowedOrigin = 
+      const isAllowedOrigin =
         event.origin.includes("api.taearif.com") ||
         event.origin.includes("taearif.com") ||
         isValidPaymentMessage; // قبول إذا كانت الرسالة صحيحة (لأن PHP يرسل إلى "*")
-      
+
       if (!isAllowedOrigin || !isValidPaymentMessage) {
         return;
       }
-      
+
       if (event.data === "payment_success") {
         if (showSuccess || showFailed) return; // Prevent multiple calls
-        
+
         setShowSuccess(true);
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
@@ -113,7 +117,7 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
         }, 2000);
       } else if (event.data === "payment_failed") {
         if (showSuccess || showFailed) return; // Prevent multiple calls
-        
+
         setShowFailed(true);
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
@@ -140,28 +144,36 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
     if (showSuccess || showFailed) {
       return;
     }
-    
+
     // Start polling only after 60 seconds as a fallback if postMessage doesn't work
     const fallbackTimeout = setTimeout(() => {
       const checkPaymentStatus = async () => {
         try {
-          const response = await axiosInstance.get("/api/whatsapp/addons/plans");
-          
+          const response = await axiosInstance.get(
+            "/api/whatsapp/addons/plans",
+          );
+
           if (response.data.success && response.data.data) {
             const currentQuota = response.data.data.quota || 0;
             const currentUsage = response.data.data.usage || 0;
-            
+
             // Store initial values on first check
-            if (initialQuotaRef.current === null || initialUsageRef.current === null) {
+            if (
+              initialQuotaRef.current === null ||
+              initialUsageRef.current === null
+            ) {
               initialQuotaRef.current = currentQuota;
               initialUsageRef.current = currentUsage;
               return;
             }
-            
+
             // Check if usage increased (indicates payment was processed)
-            if (currentUsage > initialUsageRef.current || currentQuota > initialQuotaRef.current) {
+            if (
+              currentUsage > initialUsageRef.current ||
+              currentQuota > initialQuotaRef.current
+            ) {
               if (showSuccess || showFailed) return;
-              
+
               setShowSuccess(true);
               if (pollingIntervalRef.current) {
                 clearInterval(pollingIntervalRef.current);
@@ -184,12 +196,12 @@ const PaymentPopup = ({ paymentUrl, onClose, onPaymentSuccess, addonId }: Paymen
           // Silently continue polling
         }
       };
-      
+
       // Check every 10 seconds (less frequent than before)
       checkPaymentStatus();
       statusPollingIntervalRef.current = setInterval(checkPaymentStatus, 10000);
     }, 60000); // Start after 60 seconds
-    
+
     return () => {
       clearTimeout(fallbackTimeout);
       if (statusPollingIntervalRef.current) {

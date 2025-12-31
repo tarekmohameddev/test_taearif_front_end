@@ -5,7 +5,7 @@
  */
 export function extractComponentType(comp: any): string {
   let correctType = comp.type;
-  
+
   if (comp.type === "unknown" || !comp.type) {
     // محاولة استخراج النوع من componentName أولاً
     if (comp.componentName && comp.componentName !== "undefined") {
@@ -28,8 +28,7 @@ export function extractComponentType(comp: any): string {
         if (idType === "header") correctType = "header";
         else if (idType === "hero") correctType = "hero";
         else if (idType === "half") correctType = "halfTextHalfImage";
-        else if (idType === "property")
-          correctType = "propertySlider";
+        else if (idType === "property") correctType = "propertySlider";
         else if (idType === "cta") correctType = "ctaValuation";
         else if (idType === "22821795") {
           // هذا يبدو أنه UUID، نحتاج إلى تحديد النوع بناءً على position والصفحة
@@ -46,7 +45,7 @@ export function extractComponentType(comp: any): string {
       }
     }
   }
-  
+
   return correctType;
 }
 
@@ -64,15 +63,12 @@ export function createComponentFromDbData(
   comp: any,
   correctType: string,
   getComponentDisplayName: (type: string) => string | null,
-  createDefaultData: (type: string) => any
+  createDefaultData: (type: string) => any,
 ): any {
   return {
     id: id,
     type: correctType,
-    name:
-      comp.name ||
-      getComponentDisplayName(correctType) ||
-      "Component",
+    name: comp.name || getComponentDisplayName(correctType) || "Component",
     // Debug log for cards components
     ...(correctType === "cards" && {
       debug: {
@@ -117,4 +113,3 @@ export function createComponentFromDbData(
     },
   };
 }
-

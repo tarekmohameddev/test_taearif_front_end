@@ -115,7 +115,9 @@ export default function Video1(props: VideoProps = {}) {
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const videoStates = useEditorStore((s) => s.videoStates);
 
@@ -137,15 +139,23 @@ export default function Video1(props: VideoProps = {}) {
 
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "video" && component.componentName === variantId) {
+        if (
+          component.type === "video" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
 
     if (tenantData?.componentSettings) {
-      for (const [, pageComponents] of Object.entries(tenantData.componentSettings)) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+      for (const [, pageComponents] of Object.entries(
+        tenantData.componentSettings,
+      )) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [, component] of Object.entries(pageComponents as any)) {
             if (
               (component as any).type === "video" &&
@@ -232,7 +242,10 @@ export default function Video1(props: VideoProps = {}) {
       params.append("playlist", videoInfo.videoId || "");
     }
     if (!mergedData.playback?.controls) params.append("controls", "0");
-    params.append("playsinline", mergedData.playback?.playsInline !== false ? "1" : "0");
+    params.append(
+      "playsinline",
+      mergedData.playback?.playsInline !== false ? "1" : "0",
+    );
     return params.toString();
   };
 
@@ -296,7 +309,8 @@ export default function Video1(props: VideoProps = {}) {
           <div
             className="absolute inset-0 z-10 pointer-events-none"
             style={{
-              background: mergedData.styling.overlay.color || "rgba(0,0,0,0.35)",
+              background:
+                mergedData.styling.overlay.color || "rgba(0,0,0,0.35)",
               borderRadius: mergedData.styling.borderRadius || "12px",
             }}
           />
@@ -369,9 +383,15 @@ export default function Video1(props: VideoProps = {}) {
         {/* Title and Description Overlay */}
         {(mergedData.video?.title || mergedData.video?.description) && (
           <div className="absolute inset-x-0 bottom-0 z-20 p-4 text-white bg-gradient-to-t from-black/60 to-transparent">
-            {mergedData.video?.title && <h3 className="text-lg font-semibold">{mergedData.video.title}</h3>}
+            {mergedData.video?.title && (
+              <h3 className="text-lg font-semibold">
+                {mergedData.video.title}
+              </h3>
+            )}
             {mergedData.video?.description && (
-              <p className="text-sm opacity-90 mt-1">{mergedData.video.description}</p>
+              <p className="text-sm opacity-90 mt-1">
+                {mergedData.video.description}
+              </p>
             )}
           </div>
         )}
@@ -379,4 +399,3 @@ export default function Video1(props: VideoProps = {}) {
     </section>
   );
 }
-

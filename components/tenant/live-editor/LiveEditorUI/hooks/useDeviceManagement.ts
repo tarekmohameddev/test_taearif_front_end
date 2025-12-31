@@ -13,7 +13,10 @@ interface UseDeviceManagementProps {
   state: any;
 }
 
-export function useDeviceManagement({ pageComponents, state }: UseDeviceManagementProps) {
+export function useDeviceManagement({
+  pageComponents,
+  state,
+}: UseDeviceManagementProps) {
   const t = useEditorT();
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>("laptop");
   const [screenWidth, setScreenWidth] = useState(0);
@@ -84,5 +87,3 @@ export function useDeviceManagement({ pageComponents, state }: UseDeviceManageme
     screenWidth,
   };
 }
-
-

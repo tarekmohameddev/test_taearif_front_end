@@ -110,21 +110,27 @@ export const PropertyRequestFiltersAndSearch = ({
               ? "bg-red-500 hover:bg-red-600 text-white shadow-md"
               : "opacity-50 cursor-not-allowed"
           }`}
-          title={hasActiveFilters ? "إزالة جميع الفلاتر والبحث" : "لا توجد فلاتر نشطة"}
+          title={
+            hasActiveFilters
+              ? "إزالة جميع الفلاتر والبحث"
+              : "لا توجد فلاتر نشطة"
+          }
         >
           <FilterX className="h-4 w-4" />
           <span className="font-semibold">إزالة الفلاتر</span>
           {hasActiveFilters && (
             <span className="mr-1 px-1.5 py-0.5 text-xs bg-white/20 rounded-full">
-              {[
-                cityId,
-                districtId,
-                categoryId,
-                propertyType,
-                purchaseGoal,
-                seriousness,
-                searchTerm,
-              ].filter(Boolean).length}
+              {
+                [
+                  cityId,
+                  districtId,
+                  categoryId,
+                  propertyType,
+                  purchaseGoal,
+                  seriousness,
+                  searchTerm,
+                ].filter(Boolean).length
+              }
             </span>
           )}
         </Button>
@@ -133,7 +139,10 @@ export const PropertyRequestFiltersAndSearch = ({
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-2">
         {/* City Filter */}
-        <Select value={cityId || "all"} onValueChange={(value) => setCityId(value === "all" ? "" : value)}>
+        <Select
+          value={cityId || "all"}
+          onValueChange={(value) => setCityId(value === "all" ? "" : value)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="المدينة" />
           </SelectTrigger>
@@ -167,7 +176,10 @@ export const PropertyRequestFiltersAndSearch = ({
         </Select>
 
         {/* Category Filter */}
-        <Select value={categoryId || "all"} onValueChange={(value) => setCategoryId(value === "all" ? "" : value)}>
+        <Select
+          value={categoryId || "all"}
+          onValueChange={(value) => setCategoryId(value === "all" ? "" : value)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="الفئة" />
           </SelectTrigger>
@@ -182,7 +194,12 @@ export const PropertyRequestFiltersAndSearch = ({
         </Select>
 
         {/* Property Type Filter */}
-        <Select value={propertyType || "all"} onValueChange={(value) => setPropertyType(value === "all" ? "" : value)}>
+        <Select
+          value={propertyType || "all"}
+          onValueChange={(value) =>
+            setPropertyType(value === "all" ? "" : value)
+          }
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="نوع العقار" />
           </SelectTrigger>
@@ -197,7 +214,12 @@ export const PropertyRequestFiltersAndSearch = ({
         </Select>
 
         {/* Purchase Goal Filter */}
-        <Select value={purchaseGoal || "all"} onValueChange={(value) => setPurchaseGoal(value === "all" ? "" : value)}>
+        <Select
+          value={purchaseGoal || "all"}
+          onValueChange={(value) =>
+            setPurchaseGoal(value === "all" ? "" : value)
+          }
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="هدف الشراء" />
           </SelectTrigger>
@@ -212,7 +234,12 @@ export const PropertyRequestFiltersAndSearch = ({
         </Select>
 
         {/* Seriousness Filter */}
-        <Select value={seriousness || "all"} onValueChange={(value) => setSeriousness(value === "all" ? "" : value)}>
+        <Select
+          value={seriousness || "all"}
+          onValueChange={(value) =>
+            setSeriousness(value === "all" ? "" : value)
+          }
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="الجدية" />
           </SelectTrigger>

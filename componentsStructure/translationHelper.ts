@@ -223,8 +223,10 @@ export function translateLabel(
     Unset: "components_structure.basic.unset",
 
     // PhotosGrid specific labels
-    "Photos Grid 1 - Responsive gallery": "components_structure.photosGrid.photos_grid_1",
-    "Photos Grid 2 - Images only (no card)": "components_structure.photosGrid.photos_grid_2",
+    "Photos Grid 1 - Responsive gallery":
+      "components_structure.photosGrid.photos_grid_1",
+    "Photos Grid 2 - Images only (no card)":
+      "components_structure.photosGrid.photos_grid_2",
     "Grid Columns": "components_structure.photosGrid.grid_columns",
     "Mobile Columns": "components_structure.photosGrid.mobile_columns",
     "Tablet Columns": "components_structure.photosGrid.tablet_columns",
@@ -237,20 +239,23 @@ export function translateLabel(
     "Eyebrow Text": "components_structure.photosGrid.eyebrow_text",
     "Section Title": "components_structure.photosGrid.section_title",
     "Section Subtitle": "components_structure.photosGrid.section_subtitle",
-    "Photos": "components_structure.photosGrid.photos",
+    Photos: "components_structure.photosGrid.photos",
     "Add Photo": "components_structure.photosGrid.add_photo",
-    "Photo": "components_structure.photosGrid.photo",
+    Photo: "components_structure.photosGrid.photo",
     "Photo ID": "components_structure.photosGrid.photo_id",
     "Image Source": "components_structure.photosGrid.image_source",
     "Tag / Category": "components_structure.photosGrid.tag_category",
     "Card Border Radius": "components_structure.photosGrid.card_border_radius",
-    "Image Border Radius": "components_structure.photosGrid.image_border_radius",
+    "Image Border Radius":
+      "components_structure.photosGrid.image_border_radius",
     "Card Shadow": "components_structure.photosGrid.card_shadow",
     "Hover Scale": "components_structure.photosGrid.hover_scale",
     "Title Typography": "components_structure.photosGrid.title_typography",
-    "Subtitle Typography": "components_structure.photosGrid.subtitle_typography",
+    "Subtitle Typography":
+      "components_structure.photosGrid.subtitle_typography",
     "Caption Typography": "components_structure.photosGrid.caption_typography",
-    "Responsive Breakpoints": "components_structure.photosGrid.responsive_breakpoints",
+    "Responsive Breakpoints":
+      "components_structure.photosGrid.responsive_breakpoints",
     "Mobile Breakpoint": "components_structure.photosGrid.mobile_breakpoint",
     "Tablet Breakpoint": "components_structure.photosGrid.tablet_breakpoint",
     "Desktop Breakpoint": "components_structure.photosGrid.desktop_breakpoint",
@@ -270,22 +275,23 @@ export function translateLabel(
     "Aspect Ratio": "components_structure.video.aspect_ratio",
 
     // ResponsiveImage specific labels
-    "Responsive Image 1 - متجاوب لجميع الشاشات": "components_structure.responsiveImage.responsive_image_1",
+    "Responsive Image 1 - متجاوب لجميع الشاشات":
+      "components_structure.responsiveImage.responsive_image_1",
     "Image URL": "components_structure.responsiveImage.image_url",
     "Max Width": "components_structure.responsiveImage.max_width",
-    "Alignment": "components_structure.responsiveImage.alignment",
+    Alignment: "components_structure.responsiveImage.alignment",
     "Object Fit": "components_structure.responsiveImage.object_fit",
-    "Cover": "components_structure.responsiveImage.cover",
-    "Contain": "components_structure.responsiveImage.contain",
-    "Fill": "components_structure.responsiveImage.fill",
+    Cover: "components_structure.responsiveImage.cover",
+    Contain: "components_structure.responsiveImage.contain",
+    Fill: "components_structure.responsiveImage.fill",
     "Scale Down": "components_structure.responsiveImage.scale_down",
     "Border Enabled": "components_structure.responsiveImage.border_enabled",
     "Border Width": "components_structure.responsiveImage.border_width",
     "Border Style": "components_structure.responsiveImage.border_style",
-    "Solid": "components_structure.responsiveImage.solid",
-    "Dashed": "components_structure.responsiveImage.dashed",
-    "Dotted": "components_structure.responsiveImage.dotted",
-    "Double": "components_structure.responsiveImage.double",
+    Solid: "components_structure.responsiveImage.solid",
+    Dashed: "components_structure.responsiveImage.dashed",
+    Dotted: "components_structure.responsiveImage.dotted",
+    Double: "components_structure.responsiveImage.double",
 
     // Title specific labels
     "Title 1 - Centered Heading": "components_structure.title.title_1",

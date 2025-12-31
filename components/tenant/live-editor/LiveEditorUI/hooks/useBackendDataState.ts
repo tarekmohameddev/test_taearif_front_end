@@ -58,15 +58,21 @@ export function useBackendDataState({
     const currentStaticPagesDataStr = JSON.stringify(staticPagesData);
 
     // Check if anything actually changed
-    const pageComponentsChanged = prevPageComponentsRef.current !== currentPageComponentsStr;
-    const globalHeaderChanged = prevGlobalHeaderDataRef.current !== currentGlobalHeaderDataStr;
-    const globalFooterChanged = prevGlobalFooterDataRef.current !== currentGlobalFooterDataStr;
+    const pageComponentsChanged =
+      prevPageComponentsRef.current !== currentPageComponentsStr;
+    const globalHeaderChanged =
+      prevGlobalHeaderDataRef.current !== currentGlobalHeaderDataStr;
+    const globalFooterChanged =
+      prevGlobalFooterDataRef.current !== currentGlobalFooterDataStr;
     const slugChanged = prevSlugRef.current !== slug;
-    const themeChanged = prevThemeChangeTimestampRef.current !== themeChangeTimestamp;
-    const staticPagesChanged = prevStaticPagesDataRef.current !== currentStaticPagesDataStr;
+    const themeChanged =
+      prevThemeChangeTimestampRef.current !== themeChangeTimestamp;
+    const staticPagesChanged =
+      prevStaticPagesDataRef.current !== currentStaticPagesDataStr;
 
     // Check if globalFooterVariant changed
-    const globalFooterVariantChanged = prevGlobalFooterVariantRef.current !== globalFooterVariant;
+    const globalFooterVariantChanged =
+      prevGlobalFooterVariantRef.current !== globalFooterVariant;
 
     // If nothing changed, skip update
     if (
@@ -118,12 +124,12 @@ export function useBackendDataState({
         if (isStaticPage && staticPageData) {
           // First try to find by id, then by componentName (in case id changed)
           let storeComp = staticPageData.components.find(
-            (sc: any) => sc.id === component.id
+            (sc: any) => sc.id === component.id,
           );
           // If not found by id, try to find by componentName (for cases where id was updated)
           if (!storeComp) {
             storeComp = staticPageData.components.find(
-              (sc: any) => sc.componentName === component.componentName
+              (sc: any) => sc.componentName === component.componentName,
             );
           }
           if (storeComp) {
@@ -173,5 +179,3 @@ export function useBackendDataState({
 
   return { backendDataState, setBackendDataState };
 }
-
-

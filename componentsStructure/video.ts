@@ -22,8 +22,10 @@ export const videoStructure: ComponentStructure = {
               key: "src",
               label: "Video URL",
               type: "text",
-              placeholder: "YouTube: https://youtube.com/watch?v=... أو Vimeo: https://vimeo.com/...",
-              description: "يمكنك إضافة رابط من YouTube أو Vimeo أو رابط مباشر للفيديو (MP4)",
+              placeholder:
+                "YouTube: https://youtube.com/watch?v=... أو Vimeo: https://vimeo.com/...",
+              description:
+                "يمكنك إضافة رابط من YouTube أو Vimeo أو رابط مباشر للفيديو (MP4)",
             },
             {
               key: "poster",
@@ -131,4 +133,3 @@ export const videoStructure: ComponentStructure = {
     },
   ],
 };
-

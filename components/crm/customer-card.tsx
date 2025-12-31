@@ -239,9 +239,7 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={(e) => e.stopPropagation()}
-              >
+              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
@@ -411,9 +409,7 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={(e) => e.stopPropagation()}
-              >
+              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>
@@ -591,9 +587,7 @@ export default function CustomerCard({
                 سجل النشاطات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={(e) => e.stopPropagation()}
-              >
+              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                 <Phone className="ml-2 h-4 w-4" />
                 اتصال
               </DropdownMenuItem>

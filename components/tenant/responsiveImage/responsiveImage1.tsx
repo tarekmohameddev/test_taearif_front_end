@@ -81,9 +81,7 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
     (s) => s.ensureComponentVariant,
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
-  const responsiveImageStates = useEditorStore(
-    (s) => s.responsiveImageStates,
-  );
+  const responsiveImageStates = useEditorStore((s) => s.responsiveImageStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -160,12 +158,7 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
       // Initialize in store
       ensureComponentVariant("responsiveImage", uniqueId, initialData);
     }
-  }, [
-    uniqueId,
-    props.useStore,
-    ensureComponentVariant,
-    tenantComponentData,
-  ]); // ✅ Add tenantComponentData dependency
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]); // ✅ Add tenantComponentData dependency
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
@@ -204,8 +197,8 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
     center: "mx-auto",
     right: "ml-auto mr-0",
   };
-  const alignmentKey =
-    (mergedData.alignment || "center") as keyof typeof alignmentClasses;
+  const alignmentKey = (mergedData.alignment ||
+    "center") as keyof typeof alignmentClasses;
 
   // Get shadow classes
   const shadowClasses = {
@@ -216,8 +209,8 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
     xl: "shadow-xl",
     "2xl": "shadow-2xl",
   };
-  const shadowKey =
-    (mergedData.styling?.shadow || "none") as keyof typeof shadowClasses;
+  const shadowKey = (mergedData.styling?.shadow ||
+    "none") as keyof typeof shadowClasses;
 
   // Build responsive width styles
   const enforcedMaxWidth = "1200px";
@@ -262,24 +255,23 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
         marginRight: mergedData.spacing?.margin?.right || "auto",
       }}
     >
-      <div
-        className="responsive-image-wrapper"
-        style={widthStyles}
-      >
+      <div className="responsive-image-wrapper" style={widthStyles}>
         <style jsx>{`
           .responsive-image-wrapper {
             width: ${mergedData.width?.mobile || "100%"};
             max-width: min(${enforcedMaxWidth}, 100%);
           }
 
-          @media (min-width: ${mergedData.responsive?.tabletBreakpoint || "1024px"}) {
+          @media (min-width: ${mergedData.responsive?.tabletBreakpoint ||
+            "1024px"}) {
             .responsive-image-wrapper {
               width: ${mergedData.width?.tablet || "80%"};
               max-width: min(${enforcedMaxWidth}, 100%);
             }
           }
 
-          @media (min-width: ${mergedData.responsive?.desktopBreakpoint || "1280px"}) {
+          @media (min-width: ${mergedData.responsive?.desktopBreakpoint ||
+            "1280px"}) {
             .responsive-image-wrapper {
               width: ${mergedData.width?.desktop || "70%"};
               max-width: min(${enforcedMaxWidth}, 100%);
@@ -317,4 +309,3 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
     </div>
   );
 }
-

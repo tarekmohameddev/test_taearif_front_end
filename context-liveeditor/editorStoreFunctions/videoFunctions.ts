@@ -48,7 +48,10 @@ export const videoFunctions = {
    * ensureVariant - Initialize component in store if not exists
    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (state.videoStates[variantId] && Object.keys(state.videoStates[variantId]).length > 0) {
+    if (
+      state.videoStates[variantId] &&
+      Object.keys(state.videoStates[variantId]).length > 0
+    ) {
       return {} as any;
     }
 
@@ -85,4 +88,3 @@ export const videoFunctions = {
     } as any;
   },
 };
-

@@ -77,7 +77,13 @@ export const useSaveHandler = ({
     const currentPage = store.currentPage || "homepage";
 
     if (componentId === "global-header") {
-      logChange(componentId, "header1", "header", latestTempData, "GLOBAL_HEADER");
+      logChange(
+        componentId,
+        "header1",
+        "header",
+        latestTempData,
+        "GLOBAL_HEADER",
+      );
 
       setGlobalHeaderData(latestTempData);
       setGlobalComponentsData({
@@ -95,7 +101,13 @@ export const useSaveHandler = ({
     }
 
     if (componentId === "global-footer") {
-      logChange(componentId, "footer1", "footer", latestTempData, "GLOBAL_FOOTER");
+      logChange(
+        componentId,
+        "footer1",
+        "footer",
+        latestTempData,
+        "GLOBAL_FOOTER",
+      );
 
       setGlobalFooterData(latestTempData);
       setGlobalComponentsData({
@@ -119,8 +131,7 @@ export const useSaveHandler = ({
   ) => {
     const store = useEditorStore.getState();
     const currentPage = store.currentPage || "homepage";
-    const pageComponentsBefore =
-      store.pageComponentsByPage[currentPage] || [];
+    const pageComponentsBefore = store.pageComponentsByPage[currentPage] || [];
 
     console.group("🔍 Initial Save Debug");
     console.log("Selected Component:", component);
@@ -161,10 +172,7 @@ export const useSaveHandler = ({
     // Merge tempData with store data to preserve all changes
     // Priority: actualTempData (latest changes) > storeData (previous changes) > existingComponent.data (old changes)
     const mergedData = existingComponent?.data
-      ? deepMerge(
-          deepMerge(existingComponent.data, storeData),
-          actualTempData,
-        )
+      ? deepMerge(deepMerge(existingComponent.data, storeData), actualTempData)
       : deepMerge(storeData, actualTempData);
 
     console.group("🔧 Merge Process Debug");
@@ -182,10 +190,7 @@ export const useSaveHandler = ({
       "SearchButton in TempData:",
       actualTempData?.styling?.searchButton,
     );
-    console.log(
-      "SearchButton in StoreData:",
-      storeData?.styling?.searchButton,
-    );
+    console.log("SearchButton in StoreData:", storeData?.styling?.searchButton);
     console.log(
       "SearchButton in MergedData:",
       mergedData?.styling?.searchButton,
@@ -285,4 +290,3 @@ export const useSaveHandler = ({
     handleSave,
   };
 };
-

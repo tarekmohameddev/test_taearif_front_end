@@ -132,7 +132,9 @@ export function CustomDialogContent({
   className = "",
 }: CustomDialogContentProps) {
   return (
-    <div className={`overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] ${className}`}>
+    <div
+      className={`overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] ${className}`}
+    >
       {children}
     </div>
   );
@@ -143,7 +145,9 @@ export function CustomDialogHeader({
   className = "",
 }: CustomDialogHeaderProps) {
   return (
-    <div className={`border-b border-gray-200 pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6 flex-shrink-0 ${className}`}>
+    <div
+      className={`border-b border-gray-200 pb-3 sm:pb-4 px-4 sm:px-6 pt-4 sm:pt-6 flex-shrink-0 ${className}`}
+    >
       {children}
     </div>
   );
@@ -154,7 +158,9 @@ export function CustomDialogTitle({
   className = "",
 }: CustomDialogTitleProps) {
   return (
-    <h2 className={`text-lg sm:text-xl md:text-2xl font-bold text-black ${className}`}>
+    <h2
+      className={`text-lg sm:text-xl md:text-2xl font-bold text-black ${className}`}
+    >
       {children}
     </h2>
   );
@@ -196,4 +202,3 @@ export function CustomDialogClose({
     </button>
   );
 }
-

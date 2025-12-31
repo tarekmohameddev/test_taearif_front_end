@@ -11,4 +11,3 @@ export const useCurrentPageEffect = ({ slug }: UseCurrentPageEffectProps) => {
     useEditorStore.getState().setCurrentPage(slug);
   }, [slug]);
 };
-

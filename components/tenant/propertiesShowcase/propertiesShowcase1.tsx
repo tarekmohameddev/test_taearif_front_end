@@ -206,7 +206,7 @@ const convertApiPropertyToShowcaseFormat = (property: any): Property => {
 
   const propertyId = property.id || property.slug || String(Date.now());
   const propertySlug = property.slug || property.id || String(Date.now());
-  
+
   return {
     ThemeTwo: "property",
     id: propertyId,
@@ -290,7 +290,7 @@ const convertApiProjectToShowcaseFormat = (project: any): Property => {
 
   const projectId = project.id || project.slug || String(Date.now());
   const projectSlug = project.slug || project.id || String(Date.now());
-  
+
   return {
     ThemeTwo: "property",
     id: projectId,
@@ -420,7 +420,9 @@ function ProjectCard({ property }: { property: Property }) {
   // Check if title is longer than 20 characters
   const isLongTitle = property.title && property.title.length > 20;
   const titleFontSize = isLongTitle ? "text-base" : "text-xl";
-  const titleMaxWidth = isLongTitle ? "max-w-full lg:max-w-[200px]" : "max-w-full";
+  const titleMaxWidth = isLongTitle
+    ? "max-w-full lg:max-w-[200px]"
+    : "max-w-full";
 
   const CardContent = (
     <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
@@ -447,7 +449,9 @@ function ProjectCard({ property }: { property: Property }) {
         {/* Title and Status */}
         <div className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-4">
-            <h4 className={`${titleFontSize} ${titleMaxWidth} font-bold text-black break-words flex-1`}>
+            <h4
+              className={`${titleFontSize} ${titleMaxWidth} font-bold text-black break-words flex-1`}
+            >
               {property.title}
             </h4>
             <div className="text-green-600 font-semibold text-lg">

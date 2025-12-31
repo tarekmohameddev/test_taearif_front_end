@@ -39,8 +39,10 @@ export function useLiveEditorEffects(state: any) {
   } = state;
 
   // Get theme change timestamp for useThemeChangeEffect
-  const themeChangeTimestamp = useEditorStore((state) => state.themeChangeTimestamp);
-  
+  const themeChangeTimestamp = useEditorStore(
+    (state) => state.themeChangeTimestamp,
+  );
+
   // Get staticPagesData for useStaticPagesSyncEffect
   const staticPagesData = useEditorStore((state) => state.staticPagesData);
 

@@ -309,35 +309,28 @@ export const getDefaultHero3Data = (): ComponentData => ({
 
 // Default hero4 data structure
 export const getDefaultHero4Data = (): ComponentData => ({
-  
   visible: true,
   title: "عن تعاريفالعقارية",
   backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
   barType: "default", // "default" | "contact" | "propertyFilter"
   contact: false,
   background: {
-    
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
     alt: "صورة خلفية",
     overlay: {
-      
       enabled: true,
       opacity: "0.3",
       color: "#000000",
     },
   },
   content: {
-    
     title: "عن تعاريفالعقارية",
     alignment: "center",
     maxWidth: "5xl",
     font: {
-      
       title: {
-        
         family: "Tajawal",
         size: {
-          
           desktop: "4xl",
           tablet: "3xl",
           mobile: "2xl",
@@ -349,9 +342,7 @@ export const getDefaultHero4Data = (): ComponentData => ({
     },
   },
   animations: {
-    
     title: {
-      
       enabled: true,
       type: "fade-up",
       duration: 600,

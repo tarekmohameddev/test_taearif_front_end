@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { ComponentInstance } from "@/lib-liveeditor/types";
-import { isStaticPage, getDefaultComponentForStaticPage } from "./utils/staticPageHelpers";
+import {
+  isStaticPage,
+  getDefaultComponentForStaticPage,
+} from "./utils/staticPageHelpers";
 import { formatStaticPageComponents } from "./utils/staticPageHelpers";
 
 interface UseStoreSyncEffectProps {
@@ -9,7 +12,11 @@ interface UseStoreSyncEffectProps {
   slug: string;
   tenantData: any;
   pageComponents: ComponentInstance[];
-  setPageComponents: (components: ComponentInstance[] | ((prev: ComponentInstance[]) => ComponentInstance[])) => void;
+  setPageComponents: (
+    components:
+      | ComponentInstance[]
+      | ((prev: ComponentInstance[]) => ComponentInstance[]),
+  ) => void;
   lastSyncedRef: React.MutableRefObject<string>;
 }
 
@@ -23,12 +30,16 @@ export const useStoreSyncEffect = ({
 }: UseStoreSyncEffectProps) => {
   // Subscribe to pageComponentsByPage changes for current page
   const storePageComponents = useEditorStore(
-    (state) => state.pageComponentsByPage[slug]
+    (state) => state.pageComponentsByPage[slug],
   );
-  
+
   // Subscribe to currentTheme changes to detect theme restore
-  const currentTheme = useEditorStore((state) => state.WebsiteLayout?.currentTheme);
-  const themeChangeTimestamp = useEditorStore((state) => state.themeChangeTimestamp);
+  const currentTheme = useEditorStore(
+    (state) => state.WebsiteLayout?.currentTheme,
+  );
+  const themeChangeTimestamp = useEditorStore(
+    (state) => state.themeChangeTimestamp,
+  );
   const staticPagesData = useEditorStore((state) => state.staticPagesData);
 
   // Create a more comprehensive signature that includes data hash
@@ -46,11 +57,11 @@ export const useStoreSyncEffect = ({
 
   // ⭐ CRITICAL: Use ref to track if we're currently updating to prevent loops
   const isUpdatingRef = useRef(false);
-  
+
   useEffect(() => {
     // Only sync if already initialized to avoid conflicts with initial load
     if (!initialized) return;
-    
+
     // ⭐ CRITICAL: Prevent recursive updates
     if (isUpdatingRef.current) {
       return;
@@ -62,20 +73,24 @@ export const useStoreSyncEffect = ({
     const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
     const currentThemeChangeTimestamp = editorStore.themeChangeTimestamp;
     const hasRecentThemeChange = currentThemeChangeTimestamp > 0;
-    
+
     if (pageIsStatic) {
       const staticPageData = editorStore.getStaticPageData(slug);
       const staticPageComponents = staticPageData?.components || [];
-      
+
       if (staticPageComponents.length > 0) {
-        const staticComponents = formatStaticPageComponents(staticPageComponents, slug);
-        
+        const staticComponents = formatStaticPageComponents(
+          staticPageComponents,
+          slug,
+        );
+
         const staticSignature = createSignature(staticComponents);
-        
+
         // ⭐ CRITICAL: Force update if theme was recently changed, even if signature matches
         // This ensures static pages are updated immediately after theme change
-        const shouldUpdate = hasRecentThemeChange || lastSyncedRef.current !== staticSignature;
-        
+        const shouldUpdate =
+          hasRecentThemeChange || lastSyncedRef.current !== staticSignature;
+
         if (shouldUpdate) {
           isUpdatingRef.current = true;
           setPageComponents(staticComponents);
@@ -99,18 +114,21 @@ export const useStoreSyncEffect = ({
       // Get fresh data from store (bypass subscription timing issues)
       const store = useEditorStore.getState();
       const freshStorePageComponents = store.pageComponentsByPage[slug];
-      
+
       // ⭐ NEW: For static pages, check staticPagesData first (even if freshStorePageComponents exists)
       // This ensures static pages are updated from staticPagesData after theme change
       const pageIsStatic = isStaticPage(slug, tenantData, store);
-      
+
       if (pageIsStatic) {
         const staticPageData = store.getStaticPageData(slug);
         const staticPageComponents = staticPageData?.components || [];
-        
+
         if (staticPageComponents.length > 0) {
-          const staticComponents = formatStaticPageComponents(staticPageComponents, slug);
-          
+          const staticComponents = formatStaticPageComponents(
+            staticPageComponents,
+            slug,
+          );
+
           const staticSignature = createSignature(staticComponents);
           if (lastSyncedRef.current !== staticSignature) {
             isUpdatingRef.current = true;
@@ -123,7 +141,7 @@ export const useStoreSyncEffect = ({
           return;
         }
       }
-      
+
       if (freshStorePageComponents !== undefined) {
         const storeSignature = createSignature(freshStorePageComponents);
         if (lastSyncedRef.current !== storeSignature) {
@@ -139,7 +157,7 @@ export const useStoreSyncEffect = ({
         // If storePageComponents is undefined, set to empty array to clear iframe
         // BUT: Skip for static pages if they have components in staticPagesData
         const pageIsStatic = isStaticPage(slug, tenantData, store);
-        
+
         if (pageIsStatic) {
           const staticPageData = store.getStaticPageData(slug);
           if (staticPageData?.components?.length > 0) {
@@ -187,15 +205,18 @@ export const useStoreSyncEffect = ({
       // ⭐ NEW: For static pages, check staticPagesData before clearing
       const editorStore = useEditorStore.getState();
       const pageIsStatic = isStaticPage(slug, tenantData, editorStore);
-      
+
       if (pageIsStatic) {
         const staticPageData = editorStore.getStaticPageData(slug);
         const staticPageComponents = staticPageData?.components || [];
-        
+
         if (staticPageComponents.length > 0) {
           // Convert static page components to the format expected by setPageComponents
-          const staticComponents = formatStaticPageComponents(staticPageComponents, slug);
-          
+          const staticComponents = formatStaticPageComponents(
+            staticPageComponents,
+            slug,
+          );
+
           const staticSignature = createSignature(staticComponents);
           if (lastSyncedRef.current !== staticSignature) {
             isUpdatingRef.current = true;
@@ -208,7 +229,7 @@ export const useStoreSyncEffect = ({
           }
         }
       }
-      
+
       // ⭐ NEW: If storePageComponents is undefined but we have pageComponents, clear them
       // This handles the case where clearAllStates() was called but pageComponents wasn't updated
       // BUT: Skip this for static pages if they have components in staticPagesData
@@ -221,6 +242,16 @@ export const useStoreSyncEffect = ({
         }, 0);
       }
     }
-  }, [initialized, slug, storePageComponents, setPageComponents, currentTheme, themeChangeTimestamp, staticPagesData, tenantData, pageComponents, lastSyncedRef]);
+  }, [
+    initialized,
+    slug,
+    storePageComponents,
+    setPageComponents,
+    currentTheme,
+    themeChangeTimestamp,
+    staticPagesData,
+    tenantData,
+    pageComponents,
+    lastSyncedRef,
+  ]);
 };
-

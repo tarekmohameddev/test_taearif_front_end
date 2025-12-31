@@ -2,22 +2,22 @@
  * ============================================================================
  * Page Components Service
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على خدمات إدارة مكونات الصفحات.
  * This file contains services for managing page components.
- * 
+ *
  * المسؤوليات:
  * - تطبيق مكونات الصفحات من بيانات الثيم
  * - استعادة مكونات الصفحات من النسخ الاحتياطي
  * - تحويل البيانات إلى تنسيق pageComponents
  * - تحديث حالات المكونات
- * 
+ *
  * Responsibilities:
  * - Apply page components from theme data
  * - Restore page components from backup
  * - Convert data to pageComponents format
  * - Update component states
- * 
+ *
  * ============================================================================
  */
 
@@ -27,26 +27,26 @@ import { createDefaultComponentData } from "./utils";
 /**
  * تحويل بيانات المكونات إلى تنسيق pageComponents
  * Convert component data to pageComponents format
- * 
+ *
  * تقوم هذه الدالة بتحويل بيانات المكونات من تنسيقات مختلفة
  * (Array أو Object) إلى تنسيق pageComponents موحد.
- * 
+ *
  * This function converts component data from different formats
  * (Array or Object) to unified pageComponents format.
- * 
+ *
  * @param pageComponents - بيانات المكونات (Array أو Object)
  *                        Component data (Array or Object)
- * 
+ *
  * @returns مصفوفة من المكونات بتنسيق pageComponents
  *          Array of components in pageComponents format
- * 
+ *
  * @example
  * ```typescript
  * const components = convertToPageComponentsFormat(pageData.components);
  * ```
  */
 export function convertToPageComponentsFormat(
-  pageComponents: any[] | Record<string, any>
+  pageComponents: any[] | Record<string, any>,
 ): any[] {
   // التحقق من نوع البيانات
   // Check data type
@@ -63,24 +63,25 @@ export function convertToPageComponentsFormat(
           position: comp.position ?? index,
           layout: comp.layout,
         },
-        index
-      )
+        index,
+      ),
     );
   } else if (pageComponents && typeof pageComponents === "object") {
     // تنسيق Object: { id1: component1, id2: component2, ... }
     // Object format: { id1: component1, id2: component2, ... }
-    return Object.entries(pageComponents).map(([id, comp]: [string, any], index) =>
-      createDefaultComponentData(
-        {
-          id: id || comp.id || `comp-${index}`,
-          type: comp.type,
-          componentName: comp.componentName,
-          data: comp.data || {},
-          position: comp.position ?? index,
-          layout: comp.layout,
-        },
-        index
-      )
+    return Object.entries(pageComponents).map(
+      ([id, comp]: [string, any], index) =>
+        createDefaultComponentData(
+          {
+            id: id || comp.id || `comp-${index}`,
+            type: comp.type,
+            componentName: comp.componentName,
+            data: comp.data || {},
+            position: comp.position ?? index,
+            layout: comp.layout,
+          },
+          index,
+        ),
     );
   }
 
@@ -92,16 +93,16 @@ export function convertToPageComponentsFormat(
 /**
  * تحديث حالات المكونات في Editor Store
  * Update component states in Editor Store
- * 
+ *
  * تقوم هذه الدالة بتحديث حالات المكونات في Editor Store
  * لكل مكون في الصفحة.
- * 
+ *
  * This function updates component states in Editor Store
  * for each component in the page.
- * 
+ *
  * @param components - مكونات الصفحة
  *                    Page components
- * 
+ *
  * @example
  * ```typescript
  * updateComponentStates(components);
@@ -123,19 +124,19 @@ export function updateComponentStates(components: any[]): void {
 /**
  * تطبيق مكونات الصفحات من بيانات الثيم
  * Apply page components from theme data
- * 
+ *
  * تقوم هذه الدالة بتطبيق مكونات الصفحات من بيانات الثيم
  * على Editor Store.
- * 
+ *
  * This function applies page components from theme data
  * to Editor Store.
- * 
+ *
  * @param themeData - بيانات الثيم
  *                  Theme data
- * 
+ *
  * @returns كائن يحتوي على pageComponentsByPage
  *          Object containing pageComponentsByPage
- * 
+ *
  * @example
  * ```typescript
  * const pageComponents = applyPageComponentsFromTheme(themeData);
@@ -179,7 +180,7 @@ export function applyPageComponentsFromTheme(themeData: {
     if (currentPage && newPageComponentsByPage[currentPage]) {
       store.forceUpdatePageComponents(
         currentPage,
-        newPageComponentsByPage[currentPage]
+        newPageComponentsByPage[currentPage],
       );
     }
   }
@@ -190,23 +191,23 @@ export function applyPageComponentsFromTheme(themeData: {
 /**
  * استعادة مكونات الصفحات من النسخ الاحتياطي
  * Restore page components from backup
- * 
+ *
  * تقوم هذه الدالة باستعادة مكونات الصفحات من النسخ الاحتياطي
  * على Editor Store.
- * 
+ *
  * This function restores page components from backup
  * to Editor Store.
- * 
+ *
  * @param backup - بيانات النسخ الاحتياطي
  *               Backup data
- * 
+ *
  * @example
  * ```typescript
  * restorePageComponentsFromBackup(backup);
  * ```
  */
 export function restorePageComponentsFromBackup(
-  backup: Record<string, any>
+  backup: Record<string, any>,
 ): void {
   const store = useEditorStore.getState();
 
@@ -258,4 +259,3 @@ export function restorePageComponentsFromBackup(
     currentPageComponents = store.pageComponentsByPage[currentPage];
   }
 }
-

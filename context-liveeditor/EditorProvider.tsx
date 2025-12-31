@@ -42,9 +42,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     const footerVariant = state.globalFooterVariant || "StaticFooter1";
 
     // Get static page slugs to exclude them from pages and componentSettings
-    const staticPageSlugs = new Set(
-      Object.keys(state.staticPagesData || {})
-    );
+    const staticPageSlugs = new Set(Object.keys(state.staticPagesData || {}));
 
     // Convert pageComponentsByPage (array format) to componentSettings (object format)
     // ⚠️ Exclude static pages - they should only be in StaticPages, not in pages/componentSettings
@@ -112,7 +110,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     // Exclude the current theme (it's already in pages and globalComponentsData)
     const themesBackup: Record<string, any> = {};
     const currentTheme = state.WebsiteLayout?.currentTheme;
-    
+
     // Iterate through WebsiteLayout keys to find Theme*Backup keys
     // Regex pattern /^Theme\d+Backup$/ supports any number (1, 2, 10, 11, 100, etc.)
     if (state.WebsiteLayout) {
@@ -120,16 +118,21 @@ export function EditorProvider({ children }: { children: ReactNode }) {
         if (key.match(/^Theme\d+Backup$/)) {
           // Extract theme number from backup key (Theme1Backup -> 1, Theme10Backup -> 10, etc.)
           const themeMatch = key.match(/^Theme(\d+)Backup$/);
-          const backupThemeNumber = themeMatch ? parseInt(themeMatch[1], 10) : null;
-          
+          const backupThemeNumber = themeMatch
+            ? parseInt(themeMatch[1], 10)
+            : null;
+
           // Only include backups that are NOT the current theme
-          if (backupThemeNumber !== null && backupThemeNumber !== currentTheme) {
+          if (
+            backupThemeNumber !== null &&
+            backupThemeNumber !== currentTheme
+          ) {
             themesBackup[key] = (state.WebsiteLayout as any)[key];
           }
         }
       });
     }
-    
+
     // Add ThemesBackup to payload if it has any backups
     if (Object.keys(themesBackup).length > 0) {
       payload.ThemesBackup = themesBackup;
@@ -162,7 +165,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
         if (currentTenantData) {
           // Get static page slugs to exclude them from componentSettings
           const staticPageSlugs = new Set(
-            Object.keys(state.staticPagesData || {})
+            Object.keys(state.staticPagesData || {}),
           );
 
           // Convert pageComponentsByPage to componentSettings format

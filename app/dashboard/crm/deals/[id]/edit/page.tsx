@@ -205,8 +205,15 @@ export default function EditDealPage() {
           axiosInstance.get("/properties"),
         ]);
 
-        if (cardsRes.data.status === "success" || cardsRes.data.status === true) {
-          const cardsData = (cardsRes.data.data?.cards || cardsRes.data.data || []).map(
+        if (
+          cardsRes.data.status === "success" ||
+          cardsRes.data.status === true
+        ) {
+          const cardsData = (
+            cardsRes.data.data?.cards ||
+            cardsRes.data.data ||
+            []
+          ).map(
             (card: any): CrmCard => ({
               id: card.id,
               user_id: card.user_id,
@@ -217,9 +224,7 @@ export default function EditDealPage() {
               card_project: card.card_project ?? null,
               card_property: card.card_property ?? null,
               card_date:
-                card.card_date ||
-                card.created_at ||
-                new Date().toISOString(),
+                card.card_date || card.created_at || new Date().toISOString(),
               created_at: card.created_at,
               updated_at: card.updated_at,
               deleted_at: card.deleted_at,
@@ -284,7 +289,9 @@ export default function EditDealPage() {
       const payload = {
         ...cardData,
         card_request_id: parseInt(dealId),
-        card_customer_id: selectedCustomerId ? parseInt(selectedCustomerId) : null,
+        card_customer_id: selectedCustomerId
+          ? parseInt(selectedCustomerId)
+          : null,
       };
 
       const response = await axiosInstance.post("/v1/crm/cards", payload);
@@ -318,7 +325,10 @@ export default function EditDealPage() {
         stage_id: parseInt(stageId),
       };
 
-      const response = await axiosInstance.put(`/v1/crm/requests/${dealId}`, payload);
+      const response = await axiosInstance.put(
+        `/v1/crm/requests/${dealId}`,
+        payload,
+      );
 
       if (response.data.status === "success" || response.data.status === true) {
         toast.success("تم تحديث الصفقة بنجاح!");
@@ -328,9 +338,7 @@ export default function EditDealPage() {
       }
     } catch (err: any) {
       console.error("Failed to update deal:", err);
-      toast.error(
-        err.response?.data?.message || "حدث خطأ أثناء تحديث الصفقة",
-      );
+      toast.error(err.response?.data?.message || "حدث خطأ أثناء تحديث الصفقة");
     } finally {
       setIsSubmitting(false);
     }
@@ -429,7 +437,9 @@ export default function EditDealPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="customer">العميل <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="customer">
+                    العميل <span className="text-red-500">*</span>
+                  </Label>
                   {loadingCustomers ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -452,7 +462,9 @@ export default function EditDealPage() {
                             value={customer.id.toString()}
                           >
                             <div className="flex flex-col">
-                              <span className="font-medium">{customer.name}</span>
+                              <span className="font-medium">
+                                {customer.name}
+                              </span>
                               {customer.phone_number && (
                                 <span className="text-xs text-muted-foreground">
                                   {customer.phone_number}
@@ -467,7 +479,9 @@ export default function EditDealPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="stage">المرحلة <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="stage">
+                    المرحلة <span className="text-red-500">*</span>
+                  </Label>
                   <Select value={stageId} onValueChange={setStageId}>
                     <SelectTrigger id="stage">
                       <SelectValue placeholder="اختر المرحلة" />
@@ -508,7 +522,9 @@ export default function EditDealPage() {
                             className="gap-2"
                           >
                             <ArrowRight className="h-4 w-4" />
-                            <span className="hidden sm:inline">عرض التفاصيل</span>
+                            <span className="hidden sm:inline">
+                              عرض التفاصيل
+                            </span>
                             <span className="sm:hidden">التفاصيل</span>
                           </Button>
                         )}
@@ -566,7 +582,10 @@ export default function EditDealPage() {
                             <div className="flex items-center gap-2">
                               <Phone className="h-3 w-3 text-muted-foreground" />
                               <span className="text-xs text-muted-foreground">
-                                {selectedCustomer.responsible_employee.whatsapp_number}
+                                {
+                                  selectedCustomer.responsible_employee
+                                    .whatsapp_number
+                                }
                               </span>
                             </div>
                           </div>
@@ -599,7 +618,9 @@ export default function EditDealPage() {
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-muted-foreground">المرحلة</p>
+                          <p className="text-sm text-muted-foreground">
+                            المرحلة
+                          </p>
                           <Badge variant="secondary">
                             {getStageById(stageId)?.name || "غير محدد"}
                           </Badge>
@@ -712,7 +733,9 @@ export default function EditDealPage() {
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/crm/deals/${dealId}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/crm/deals/${dealId}`)
+                    }
                     disabled={isSubmitting}
                   >
                     إلغاء
@@ -743,4 +766,3 @@ export default function EditDealPage() {
     </div>
   );
 }
-

@@ -2,20 +2,20 @@
  * ============================================================================
  * Backup Service
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على خدمات النسخ الاحتياطي للثيمات.
  * This file contains backup services for themes.
- * 
+ *
  * المسؤوليات:
  * - نسخ إعدادات المكونات الحالية قبل تغيير الثيم
  * - نسخ الصفحات الثابتة
  * - حفظ النسخ الاحتياطي في Store
- * 
+ *
  * Responsibilities:
  * - Backup current component settings before theme change
  * - Backup static pages
  * - Save backup in Store
- * 
+ *
  * ============================================================================
  */
 
@@ -27,16 +27,16 @@ import type { BackupResult } from "./types";
 /**
  * نسخ إعدادات المكونات الحالية
  * Backup current component settings
- * 
+ *
  * تقوم هذه الدالة بإنشاء نسخة احتياطية كاملة من إعدادات المكونات الحالية
  * قبل تغيير الثيم. تحافظ على التنسيق الأصلي (Array أو Object).
- * 
+ *
  * This function creates a complete backup of current component settings
  * before changing the theme. Preserves original format (Array or Object).
- * 
+ *
  * @returns كائن يحتوي على بيانات النسخ الاحتياطي ومفتاحه
  *          Object containing backup data and its key
- * 
+ *
  * @example
  * ```typescript
  * const { backup, backupKey } = backupCurrentComponentSettings();
@@ -146,10 +146,7 @@ export function backupCurrentComponentSettings(): BackupResult {
 
   // نسخ بيانات الصفحات الثابتة
   // Backup static pages data
-  if (
-    store.staticPagesData &&
-    Object.keys(store.staticPagesData).length > 0
-  ) {
+  if (store.staticPagesData && Object.keys(store.staticPagesData).length > 0) {
     backup._staticPagesData = { ...store.staticPagesData };
   }
 
@@ -159,14 +156,14 @@ export function backupCurrentComponentSettings(): BackupResult {
 /**
  * نسخ الصفحات الثابتة فقط
  * Backup static pages only
- * 
+ *
  * تقوم هذه الدالة بإنشاء نسخة احتياطية من الصفحات الثابتة فقط.
- * 
+ *
  * This function creates a backup of static pages only.
- * 
+ *
  * @returns بيانات الصفحات الثابتة أو كائن فارغ
  *          Static pages data or empty object
- * 
+ *
  * @example
  * ```typescript
  * const staticPagesBackup = backupStaticPages();
@@ -174,18 +171,15 @@ export function backupCurrentComponentSettings(): BackupResult {
  */
 export function backupStaticPages(): Record<string, any> {
   const store = useEditorStore.getState();
-  
+
   // التحقق من وجود بيانات الصفحات الثابتة
   // Check if static pages data exists
-  if (
-    store.staticPagesData &&
-    Object.keys(store.staticPagesData).length > 0
-  ) {
+  if (store.staticPagesData && Object.keys(store.staticPagesData).length > 0) {
     // إرجاع نسخة من البيانات
     // Return copy of data
     return { ...store.staticPagesData };
   }
-  
+
   // إرجاع كائن فارغ إذا لم تكن هناك بيانات
   // Return empty object if no data
   return {};
@@ -194,19 +188,19 @@ export function backupStaticPages(): Record<string, any> {
 /**
  * حفظ النسخ الاحتياطي في Store
  * Save backup in Store
- * 
+ *
  * تقوم هذه الدالة بحفظ النسخ الاحتياطي في Editor Store
  * وفي WebsiteLayout للاستمرارية.
- * 
+ *
  * This function saves the backup in Editor Store
  * and in WebsiteLayout for persistence.
- * 
+ *
  * @param backupKey - مفتاح النسخ الاحتياطي
  *                   Backup key
- * 
+ *
  * @param backup - بيانات النسخ الاحتياطي
  *                Backup data
- * 
+ *
  * @example
  * ```typescript
  * const { backup, backupKey } = backupCurrentComponentSettings();
@@ -217,7 +211,7 @@ export function backupStaticPages(): Record<string, any> {
  */
 export function saveBackupInStore(
   backupKey: string,
-  backup: Record<string, any>
+  backup: Record<string, any>,
 ): void {
   const store = useEditorStore.getState();
 
@@ -232,4 +226,3 @@ export function saveBackupInStore(
     [backupKey]: backup,
   });
 }
-

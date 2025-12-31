@@ -195,7 +195,10 @@ interface CrmStore {
 
   // Additional actions
   addAppointment: (appointment: Appointment) => void;
-  updateAppointment: (appointmentId: string, updates: Partial<Appointment>) => void;
+  updateAppointment: (
+    appointmentId: string,
+    updates: Partial<Appointment>,
+  ) => void;
   removeAppointment: (appointmentId: string) => void;
   addInquiry: (inquiry: any) => void;
   updateInquiry: (inquiryId: string, updates: Partial<any>) => void;
@@ -500,7 +503,11 @@ const useCrmStore = create<CrmStore>()(
       shouldFetchData: () => {
         const { isInitialized, customers, pipelineStages } = get();
         // Fetch if not initialized or if data is empty
-        return !isInitialized || customers.length === 0 || pipelineStages.length === 0;
+        return (
+          !isInitialized ||
+          customers.length === 0 ||
+          pipelineStages.length === 0
+        );
       },
 
       // Set CRM data
@@ -544,7 +551,9 @@ const useCrmStore = create<CrmStore>()(
       updateInquiry: (inquiryId, updates) => {
         const { inquiriesData } = get();
         const updatedInquiries = inquiriesData.map((inquiry) =>
-          inquiry.id.toString() === inquiryId ? { ...inquiry, ...updates } : inquiry,
+          inquiry.id.toString() === inquiryId
+            ? { ...inquiry, ...updates }
+            : inquiry,
         );
         set({ inquiriesData: updatedInquiries });
       },
@@ -566,7 +575,14 @@ const useCrmStore = create<CrmStore>()(
           return;
         }
 
-        const { setLoading, setError, setCustomers, setPipelineStages, setCrmData, setTotalCustomers } = get();
+        const {
+          setLoading,
+          setError,
+          setCustomers,
+          setPipelineStages,
+          setCrmData,
+          setTotalCustomers,
+        } = get();
         setLoading(true);
         setError(null);
 
@@ -681,12 +697,16 @@ const useCrmStore = create<CrmStore>()(
             setPipelineStages(transformedStages);
             setCustomers(allCustomers);
             setCrmData(crmData);
-            setTotalCustomers(statistics?.total_requests || allCustomers.length);
+            setTotalCustomers(
+              statistics?.total_requests || allCustomers.length,
+            );
             set({ lastFetched: Date.now(), isInitialized: true });
           }
         } catch (err: any) {
           console.error("Error fetching CRM data:", err);
-          setError(err.response?.data?.message || "فشل في تحميل بيانات الـ CRM");
+          setError(
+            err.response?.data?.message || "فشل في تحميل بيانات الـ CRM",
+          );
         } finally {
           setLoading(false);
         }
@@ -702,7 +722,9 @@ const useCrmStore = create<CrmStore>()(
 
         const { setAppointments } = get();
         try {
-          const response = await axiosInstance.get("/crm/customer-appointments");
+          const response = await axiosInstance.get(
+            "/crm/customer-appointments",
+          );
           const appointmentsResponse = response.data;
 
           if (appointmentsResponse.status === "success") {
@@ -768,7 +790,12 @@ const useCrmStore = create<CrmStore>()(
 
       // Refresh all data
       refreshAllData: async () => {
-        const { fetchCrmData, fetchAppointmentsData, fetchRemindersData, fetchInquiriesData } = get();
+        const {
+          fetchCrmData,
+          fetchAppointmentsData,
+          fetchRemindersData,
+          fetchInquiriesData,
+        } = get();
         await Promise.all([
           fetchCrmData(),
           fetchAppointmentsData(),

@@ -113,7 +113,8 @@ export const photosGridStructure: ComponentStructure = {
               key: "description",
               label: "Description",
               type: "text",
-              placeholder: "Discover highlights from recent projects and campaigns.",
+              placeholder:
+                "Discover highlights from recent projects and campaigns.",
             },
           ],
         },
@@ -136,7 +137,8 @@ export const photosGridStructure: ComponentStructure = {
               key: "src",
               label: "Image Source",
               type: "text",
-              placeholder: "/images/placeholders/responsiveImage/responsiveImage.jpg",
+              placeholder:
+                "/images/placeholders/responsiveImage/responsiveImage.jpg",
             },
             {
               key: "alt",
@@ -243,9 +245,24 @@ export const photosGridStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "2xl" },
-                    { key: "tablet", label: "Tablet", type: "text", placeholder: "3xl" },
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "4xl" },
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "2xl",
+                    },
+                    {
+                      key: "tablet",
+                      label: "Tablet",
+                      type: "text",
+                      placeholder: "3xl",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "4xl",
+                    },
                   ],
                 },
                 {
@@ -272,9 +289,24 @@ export const photosGridStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "lg" },
-                    { key: "tablet", label: "Tablet", type: "text", placeholder: "xl" },
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "2xl" },
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "lg",
+                    },
+                    {
+                      key: "tablet",
+                      label: "Tablet",
+                      type: "text",
+                      placeholder: "xl",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "2xl",
+                    },
                   ],
                 },
                 {
@@ -301,9 +333,24 @@ export const photosGridStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "sm" },
-                    { key: "tablet", label: "Tablet", type: "text", placeholder: "sm" },
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "base" },
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "sm",
+                    },
+                    {
+                      key: "tablet",
+                      label: "Tablet",
+                      type: "text",
+                      placeholder: "sm",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "base",
+                    },
                   ],
                 },
                 {
@@ -362,9 +409,24 @@ export const photosGridStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "type", label: "Animation Type", type: "text", placeholder: "fade-up" },
-                { key: "duration", label: "Duration (ms)", type: "number", placeholder: "600" },
-                { key: "delay", label: "Delay (ms)", type: "number", placeholder: "120" },
+                {
+                  key: "type",
+                  label: "Animation Type",
+                  type: "text",
+                  placeholder: "fade-up",
+                },
+                {
+                  key: "duration",
+                  label: "Duration (ms)",
+                  type: "number",
+                  placeholder: "600",
+                },
+                {
+                  key: "delay",
+                  label: "Delay (ms)",
+                  type: "number",
+                  placeholder: "120",
+                },
               ],
             },
             {
@@ -373,10 +435,30 @@ export const photosGridStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "type", label: "Animation Type", type: "text", placeholder: "fade-up" },
-                { key: "duration", label: "Duration (ms)", type: "number", placeholder: "600" },
-                { key: "delay", label: "Delay (ms)", type: "number", placeholder: "180" },
-                { key: "stagger", label: "Stagger (ms)", type: "number", placeholder: "100" },
+                {
+                  key: "type",
+                  label: "Animation Type",
+                  type: "text",
+                  placeholder: "fade-up",
+                },
+                {
+                  key: "duration",
+                  label: "Duration (ms)",
+                  type: "number",
+                  placeholder: "600",
+                },
+                {
+                  key: "delay",
+                  label: "Delay (ms)",
+                  type: "number",
+                  placeholder: "180",
+                },
+                {
+                  key: "stagger",
+                  label: "Stagger (ms)",
+                  type: "number",
+                  placeholder: "100",
+                },
               ],
             },
           ],
@@ -501,7 +583,8 @@ export const photosGridStructure: ComponentStructure = {
               key: "description",
               label: "Description",
               type: "text",
-              placeholder: "Discover highlights from recent projects and campaigns.",
+              placeholder:
+                "Discover highlights from recent projects and campaigns.",
             },
           ],
         },
@@ -524,7 +607,8 @@ export const photosGridStructure: ComponentStructure = {
               key: "src",
               label: "Image Source",
               type: "text",
-              placeholder: "/images/placeholders/responsiveImage/responsiveImage.jpg",
+              placeholder:
+                "/images/placeholders/responsiveImage/responsiveImage.jpg",
             },
             {
               key: "alt",
@@ -615,9 +699,24 @@ export const photosGridStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "2xl" },
-                    { key: "tablet", label: "Tablet", type: "text", placeholder: "3xl" },
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "4xl" },
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "2xl",
+                    },
+                    {
+                      key: "tablet",
+                      label: "Tablet",
+                      type: "text",
+                      placeholder: "3xl",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "4xl",
+                    },
                   ],
                 },
                 {
@@ -644,9 +743,24 @@ export const photosGridStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "lg" },
-                    { key: "tablet", label: "Tablet", type: "text", placeholder: "xl" },
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "2xl" },
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "lg",
+                    },
+                    {
+                      key: "tablet",
+                      label: "Tablet",
+                      type: "text",
+                      placeholder: "xl",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "2xl",
+                    },
                   ],
                 },
                 {
@@ -673,9 +787,24 @@ export const photosGridStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "sm" },
-                    { key: "tablet", label: "Tablet", type: "text", placeholder: "sm" },
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "base" },
+                    {
+                      key: "mobile",
+                      label: "Mobile",
+                      type: "text",
+                      placeholder: "sm",
+                    },
+                    {
+                      key: "tablet",
+                      label: "Tablet",
+                      type: "text",
+                      placeholder: "sm",
+                    },
+                    {
+                      key: "desktop",
+                      label: "Desktop",
+                      type: "text",
+                      placeholder: "base",
+                    },
                   ],
                 },
                 {
@@ -734,9 +863,24 @@ export const photosGridStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "type", label: "Animation Type", type: "text", placeholder: "fade-up" },
-                { key: "duration", label: "Duration (ms)", type: "number", placeholder: "600" },
-                { key: "delay", label: "Delay (ms)", type: "number", placeholder: "120" },
+                {
+                  key: "type",
+                  label: "Animation Type",
+                  type: "text",
+                  placeholder: "fade-up",
+                },
+                {
+                  key: "duration",
+                  label: "Duration (ms)",
+                  type: "number",
+                  placeholder: "600",
+                },
+                {
+                  key: "delay",
+                  label: "Delay (ms)",
+                  type: "number",
+                  placeholder: "120",
+                },
               ],
             },
             {
@@ -745,10 +889,30 @@ export const photosGridStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "type", label: "Animation Type", type: "text", placeholder: "fade-up" },
-                { key: "duration", label: "Duration (ms)", type: "number", placeholder: "600" },
-                { key: "delay", label: "Delay (ms)", type: "number", placeholder: "180" },
-                { key: "stagger", label: "Stagger (ms)", type: "number", placeholder: "100" },
+                {
+                  key: "type",
+                  label: "Animation Type",
+                  type: "text",
+                  placeholder: "fade-up",
+                },
+                {
+                  key: "duration",
+                  label: "Duration (ms)",
+                  type: "number",
+                  placeholder: "600",
+                },
+                {
+                  key: "delay",
+                  label: "Delay (ms)",
+                  type: "number",
+                  placeholder: "180",
+                },
+                {
+                  key: "stagger",
+                  label: "Stagger (ms)",
+                  type: "number",
+                  placeholder: "100",
+                },
               ],
             },
           ],
@@ -765,4 +929,3 @@ export const photosGridStructure: ComponentStructure = {
     },
   ],
 };
-

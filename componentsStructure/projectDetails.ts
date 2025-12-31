@@ -490,8 +490,16 @@ export const projectDetailsStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.badgeText", label: "Badge Text", type: "text" },
         { key: "styling.primaryColor", label: "Primary Color", type: "color" },
-        { key: "displaySettings.showSimilarProjects", label: "Show Similar Projects", type: "boolean" },
-        { key: "displaySettings.showShareButton", label: "Show Share Button", type: "boolean" },
+        {
+          key: "displaySettings.showSimilarProjects",
+          label: "Show Similar Projects",
+          type: "boolean",
+        },
+        {
+          key: "displaySettings.showShareButton",
+          label: "Show Share Button",
+          type: "boolean",
+        },
       ],
     },
     {
@@ -743,10 +751,17 @@ export const projectDetailsStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "styling.primaryColor", label: "Primary Color", type: "color" },
-        { key: "displaySettings.showContactForm", label: "Show Contact Form", type: "boolean" },
-        { key: "displaySettings.showDescription", label: "Show Description", type: "boolean" },
+        {
+          key: "displaySettings.showContactForm",
+          label: "Show Contact Form",
+          type: "boolean",
+        },
+        {
+          key: "displaySettings.showDescription",
+          label: "Show Description",
+          type: "boolean",
+        },
       ],
     },
   ],
 };
-

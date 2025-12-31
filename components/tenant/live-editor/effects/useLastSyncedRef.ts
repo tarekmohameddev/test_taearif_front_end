@@ -8,4 +8,3 @@ export const useLastSyncedRef = () => {
   const lastSyncedRef = useRef<string>("");
   return lastSyncedRef;
 };
-

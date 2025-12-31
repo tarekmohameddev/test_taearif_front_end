@@ -7,16 +7,13 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 
 export const getDefaultContactUsHomePageData = (): ComponentData => ({
   visible: true,
-  
 
   // Background configuration
   background: {
-    
     image:
       "https://baheya.co/wp-content/uploads/2025/09/Screenshot-2025-09-21-005950.png",
     alt: "خلفية",
     overlay: {
-      
       enabled: true,
       color: "rgba(139, 95, 70, 0.8)",
     },
@@ -24,15 +21,12 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 
   // Header text
   header: {
-    
     text: "سنعثر لك على مستأجر موثوق ونتولى إدارة عملية الإيجار بالكامل بكل احترافية.\nنضمن لك مستأجرًا موثوقًا ونتكفّل بجميع خطوات التأجير نيابةً عنك.",
   },
 
   // Form configuration
   form: {
-    
     submitButton: {
-      
       text: "اشترك الآن",
       loadingText: "جاري الإرسال...",
       backgroundColor: "#c9a882",
@@ -40,85 +34,74 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
       textColor: "#ffffff",
     },
     fields: {
-      
       fullName: {
-        
         label: "الاسم الكامل",
         placeholder: "الاسم الكامل",
         required: true,
         type: "text",
       },
       whatsappNumber: {
-        
         label: "رقم الواتساب",
         placeholder: "رقم الواتساب",
         required: true,
         type: "tel",
       },
       email: {
-        
         label: "البريد الالكتروني",
         placeholder: "البريد الالكتروني",
         required: true,
         type: "email",
       },
       paymentMethod: {
-        
         label: "طريقة الدفع",
         placeholder: "اختر طريقة الدفع",
         required: true,
         type: "select",
         options: [
-          {  value: "بنك مدعوم", label: "بنك مدعوم" },
+          { value: "بنك مدعوم", label: "بنك مدعوم" },
           {
-            
             value: "بنك غير مدعوم",
             label: "بنك غير مدعوم",
           },
-          {  value: "كاش", label: "كاش" },
+          { value: "كاش", label: "كاش" },
         ],
       },
       city: {
-        
         label: "المدينة",
         placeholder: "اختر المدينة",
         required: true,
         type: "select",
         options: [
-          {  value: "الرياض", label: "الرياض" },
-          {  value: "جدة", label: "جدة" },
-          {  value: "مكة المكرمة", label: "مكة المكرمة" },
+          { value: "الرياض", label: "الرياض" },
+          { value: "جدة", label: "جدة" },
+          { value: "مكة المكرمة", label: "مكة المكرمة" },
           {
-            
             value: "المدينة المنورة",
             label: "المدينة المنورة",
           },
-          {  value: "الدمام", label: "الدمام" },
+          { value: "الدمام", label: "الدمام" },
         ],
       },
       unitType: {
-        
         label: "نوع الوحدة",
         placeholder: "اختر نوع الوحدة",
         required: true,
         type: "select",
         options: [
-          {  value: "أدوار", label: "أدوار" },
-          {  value: "بنتهاوس", label: "بنتهاوس" },
-          {  value: "تاون هاوس", label: "تاون هاوس" },
-          {  value: "شقق", label: "شقق" },
-          {  value: "فيلا", label: "فيلا" },
+          { value: "أدوار", label: "أدوار" },
+          { value: "بنتهاوس", label: "بنتهاوس" },
+          { value: "تاون هاوس", label: "تاون هاوس" },
+          { value: "شقق", label: "شقق" },
+          { value: "فيلا", label: "فيلا" },
         ],
       },
       budget: {
-        
         label: "الميزانية",
         placeholder: "الميزانية",
         required: true,
         type: "number",
       },
       message: {
-        
         label: "محتوى الرسالة",
         placeholder: "محتوى الرسالة",
         required: true,
@@ -130,7 +113,6 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 
   // Styling
   styling: {
-    
     inputBackground: "#f5f0e8",
     inputBorder: "#c4b5a0",
     inputText: "#ffffff",
@@ -142,16 +124,13 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 
   // Layout
   layout: {
-    
     maxWidth: "4xl",
     padding: {
-      
       mobile: "1rem",
       tablet: "2rem",
       desktop: "3rem",
     },
     gap: {
-      
       mobile: "1rem",
       tablet: "1.5rem",
       desktop: "1.5rem",

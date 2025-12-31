@@ -441,12 +441,19 @@ export const propertyDetailStructure: ComponentStructure = {
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
-        { key: "content.descriptionTitle", label: "Description Title", type: "text" },
+        {
+          key: "content.descriptionTitle",
+          label: "Description Title",
+          type: "text",
+        },
         { key: "content.specsTitle", label: "Specs Title", type: "text" },
-        { key: "content.contactFormTitle", label: "Contact Form Title", type: "text" },
+        {
+          key: "content.contactFormTitle",
+          label: "Contact Form Title",
+          type: "text",
+        },
         { key: "styling.primaryColor", label: "Primary Color", type: "color" },
       ],
     },
   ],
 };
-

@@ -1408,7 +1408,6 @@ function PropertyCard({
         >
           {property.status}
         </div>
-      
       </div>
       <CardHeader className="p-4">
         <div className="flex items-start justify-between">
@@ -1537,7 +1536,9 @@ function PropertyCard({
             </>
           )}
         </div>
-        <div className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-4" : "grid-cols-3"}`}>
+        <div
+          className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-4" : "grid-cols-3"}`}
+        >
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">مشاهدات</span>
             <span className="font-medium flex items-center gap-1">
@@ -1561,10 +1562,10 @@ function PropertyCard({
             <div className="flex flex-col items-end justify-center">
               <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white mt-1">
                 {property.creator.name === "User"
-                    ? userData?.first_name && userData?.last_name
-                      ? `${userData.first_name} ${userData.last_name}`
-                      : userData?.username || userData?.first_name || "User"
-                    : property.creator.name}
+                  ? userData?.first_name && userData?.last_name
+                    ? `${userData.first_name} ${userData.last_name}`
+                    : userData?.username || userData?.first_name || "User"
+                  : property.creator.name}
               </div>
             </div>
           )}

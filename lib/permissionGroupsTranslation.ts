@@ -95,4 +95,3 @@ export function getPermissionGroupAr(groupName: string): string {
 export function getPermissionGroupEn(groupName: string): string {
   return translatePermissionGroup(groupName, "en");
 }
-

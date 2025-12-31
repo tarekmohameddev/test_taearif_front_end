@@ -56,7 +56,8 @@ const listItem = {
 export const ComponentsSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] = useState(true);
+  const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] =
+    useState(true);
   const t = useEditorT();
 
   // الحصول على الأقسام المترجمة
@@ -70,9 +71,7 @@ export const ComponentsSidebar = () => {
       availableSections.filter(
         (section) =>
           section.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          section.description
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()),
+          section.description.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
     [availableSections, searchTerm],
   );
@@ -221,7 +220,9 @@ export const ComponentsSidebar = () => {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    animate={{ rotate: isBasicComponentsDropdownOpen ? 180 : 0 }}
+                    animate={{
+                      rotate: isBasicComponentsDropdownOpen ? 180 : 0,
+                    }}
                     transition={{ type: "tween", duration: 0.2 }}
                   >
                     <path
@@ -248,18 +249,26 @@ export const ComponentsSidebar = () => {
                             componentType="responsiveImage"
                             section="homepage"
                             data={{
-                              label: basicComponentsInfo.responsiveImage.displayName || "Responsive Image",
-                              description: basicComponentsInfo.responsiveImage.description || "",
-                              icon: basicComponentsInfo.responsiveImage.icon || "🖼️",
+                              label:
+                                basicComponentsInfo.responsiveImage
+                                  .displayName || "Responsive Image",
+                              description:
+                                basicComponentsInfo.responsiveImage
+                                  .description || "",
+                              icon:
+                                basicComponentsInfo.responsiveImage.icon ||
+                                "🖼️",
                             }}
                           >
                             <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
                               <div className="flex flex-col items-center justify-center text-center space-y-1">
                                 <div className="text-xl">
-                                  {basicComponentsInfo.responsiveImage.icon || "🖼️"}
+                                  {basicComponentsInfo.responsiveImage.icon ||
+                                    "🖼️"}
                                 </div>
                                 <h3 className="font-medium text-gray-900 text-xs leading-tight">
-                                  {basicComponentsInfo.responsiveImage.displayName || "Responsive Image"}
+                                  {basicComponentsInfo.responsiveImage
+                                    .displayName || "Responsive Image"}
                                 </h3>
                               </div>
                             </div>
@@ -272,8 +281,11 @@ export const ComponentsSidebar = () => {
                             componentType="title"
                             section="homepage"
                             data={{
-                              label: basicComponentsInfo.title.displayName || "Title",
-                              description: basicComponentsInfo.title.description || "",
+                              label:
+                                basicComponentsInfo.title.displayName ||
+                                "Title",
+                              description:
+                                basicComponentsInfo.title.description || "",
                               icon: basicComponentsInfo.title.icon || "🔠",
                             }}
                           >
@@ -283,7 +295,8 @@ export const ComponentsSidebar = () => {
                                   {basicComponentsInfo.title.icon || "🔠"}
                                 </div>
                                 <h3 className="font-medium text-gray-900 text-xs leading-tight">
-                                  {basicComponentsInfo.title.displayName || "Title"}
+                                  {basicComponentsInfo.title.displayName ||
+                                    "Title"}
                                 </h3>
                               </div>
                             </div>
@@ -296,8 +309,11 @@ export const ComponentsSidebar = () => {
                             componentType="video"
                             section="homepage"
                             data={{
-                              label: basicComponentsInfo.video.displayName || "Video",
-                              description: basicComponentsInfo.video.description || "",
+                              label:
+                                basicComponentsInfo.video.displayName ||
+                                "Video",
+                              description:
+                                basicComponentsInfo.video.description || "",
                               icon: basicComponentsInfo.video.icon || "🎥",
                             }}
                           >
@@ -307,7 +323,8 @@ export const ComponentsSidebar = () => {
                                   {basicComponentsInfo.video.icon || "🎥"}
                                 </div>
                                 <h3 className="font-medium text-gray-900 text-xs leading-tight">
-                                  {basicComponentsInfo.video.displayName || "Video"}
+                                  {basicComponentsInfo.video.displayName ||
+                                    "Video"}
                                 </h3>
                               </div>
                             </div>
@@ -320,8 +337,12 @@ export const ComponentsSidebar = () => {
                             componentType="photosGrid"
                             section="homepage"
                             data={{
-                              label: basicComponentsInfo.photosGrid.displayName || "Photos Grid",
-                              description: basicComponentsInfo.photosGrid.description || "",
+                              label:
+                                basicComponentsInfo.photosGrid.displayName ||
+                                "Photos Grid",
+                              description:
+                                basicComponentsInfo.photosGrid.description ||
+                                "",
                               icon: basicComponentsInfo.photosGrid.icon || "📷",
                               variant: "photosGrid1",
                             }}
@@ -332,7 +353,8 @@ export const ComponentsSidebar = () => {
                                   {basicComponentsInfo.photosGrid.icon || "📷"}
                                 </div>
                                 <h3 className="font-medium text-gray-900 text-xs leading-tight">
-                                  {basicComponentsInfo.photosGrid.displayName || "Photos Grid"}
+                                  {basicComponentsInfo.photosGrid.displayName ||
+                                    "Photos Grid"}
                                 </h3>
                               </div>
                             </div>
@@ -345,8 +367,12 @@ export const ComponentsSidebar = () => {
                             componentType="photosGrid"
                             section="homepage"
                             data={{
-                              label: t("components.photosGrid.photos_grid_2") || "Photos Grid 2",
-                              description: basicComponentsInfo.photosGrid.description || "",
+                              label:
+                                t("components.photosGrid.photos_grid_2") ||
+                                "Photos Grid 2",
+                              description:
+                                basicComponentsInfo.photosGrid.description ||
+                                "",
                               icon: basicComponentsInfo.photosGrid.icon || "🖼️",
                               variant: "photosGrid2",
                             }}
@@ -357,7 +383,8 @@ export const ComponentsSidebar = () => {
                                   {basicComponentsInfo.photosGrid.icon || "🖼️"}
                                 </div>
                                 <h3 className="font-medium text-gray-900 text-xs leading-tight">
-                                  {t("components.photosGrid.photos_grid_2") || "Photos Grid 2"}
+                                  {t("components.photosGrid.photos_grid_2") ||
+                                    "Photos Grid 2"}
                                 </h3>
                               </div>
                             </div>
@@ -434,4 +461,3 @@ export const ComponentsSidebar = () => {
     </motion.div>
   );
 };
-

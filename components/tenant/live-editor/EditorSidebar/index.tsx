@@ -112,13 +112,12 @@ export function EditorSidebar({
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 bg-gradient-to-b from-slate-50/50 to-white mt-[5rem]">
           {view === "main" && (
-            <MainView
-              onPageThemeChange={onPageThemeChange}
-              setView={setView}
-            />
+            <MainView onPageThemeChange={onPageThemeChange} setView={setView} />
           )}
 
-          {view === "add-section" && <AddSectionView onSectionAdd={onSectionAdd} />}
+          {view === "add-section" && (
+            <AddSectionView onSectionAdd={onSectionAdd} />
+          )}
 
           {view === "branding-settings" && <BrandingSettings />}
 

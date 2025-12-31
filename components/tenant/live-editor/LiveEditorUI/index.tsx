@@ -73,21 +73,20 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     staticPagesData,
   });
 
-  const {
-    selectedDevice,
-    handleDeviceChange,
-    screenWidth,
-  } = useDeviceManagement({
-    pageComponents,
-    state,
-  });
+  const { selectedDevice, handleDeviceChange, screenWidth } =
+    useDeviceManagement({
+      pageComponents,
+      state,
+    });
 
   // Local state
   const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
   const [iframeReady, setIframeReady] = useState(false);
   const [isComponentsSidebarOpen, setIsComponentsSidebarOpen] = useState(false);
-  const [wasComponentsSidebarManuallyClosed, setWasComponentsSidebarManuallyClosed] =
-    useState(false);
+  const [
+    wasComponentsSidebarManuallyClosed,
+    setWasComponentsSidebarManuallyClosed,
+  ] = useState(false);
   const [showChangesDialog, setShowChangesDialog] = useState(false);
   const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
   const [debugInfo, setDebugInfo] = useState<PositionDebugInfo | null>(null);
@@ -96,7 +95,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     useState<PositionValidation | null>(null);
   const [showDebugControls, setShowDebugControls] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  
+
   // ⭐ CRITICAL: Use ref to track previous pageComponents to prevent infinite loops
   const prevPageComponentsRef = useRef<string>("");
 
@@ -193,15 +192,15 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     // ⭐ CRITICAL: Check if pageComponents actually changed using JSON.stringify
     // This prevents infinite loops from reference changes
     const currentPageComponentsStr = JSON.stringify(pageComponents);
-    
+
     // If pageComponents didn't actually change, skip update
     if (prevPageComponentsRef.current === currentPageComponentsStr) {
       return; // No actual changes, skip update
     }
-    
+
     // Update ref
     prevPageComponentsRef.current = currentPageComponentsStr;
-    
+
     if (pageComponents.length > 0) {
       const componentsWithCorrectPositions = pageComponents.map(
         (comp: any, index: number) => {
@@ -379,9 +378,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
                     : deviceDimensions[selectedDevice].height,
                 maxWidth: selectedDevice === "laptop" ? "100%" : "100%",
                 maxHeight:
-                  selectedDevice === "laptop"
-                    ? "100%"
-                    : "calc(100vh - 200px)",
+                  selectedDevice === "laptop" ? "100%" : "calc(100vh - 200px)",
                 overflow: "auto",
               }}
             >
@@ -493,5 +490,3 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     </EnhancedLiveEditorDragDropContext>
   );
 }
-
-

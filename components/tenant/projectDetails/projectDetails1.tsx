@@ -177,7 +177,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const projectDetailsStates = useEditorStore((s) => s.projectDetailsStates);
 
@@ -215,7 +217,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -253,12 +258,7 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
       // Initialize in store
       ensureComponentVariant("projectDetails", uniqueId, initialData);
     }
-  }, [
-    uniqueId,
-    props.useStore,
-    ensureComponentVariant,
-    tenantComponentData,
-  ]);
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
@@ -340,14 +340,17 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
   const { tenantId: hookTenantId, isLoading: tenantLoading } = useTenantId();
 
   // Check if we're in Live Editor
-  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+  const isLiveEditor =
+    typeof window !== "undefined" &&
+    window.location.pathname.includes("/live-editor");
 
   // Mock data for Live Editor
   const mockProject: Project = {
     id: "mock-project-1",
     slug: "mock-project",
     title: "مشروع عقاري متميز",
-    description: "هذا مشروع عقاري متميز يقع في موقع استراتيجي ويوفر جميع المرافق والخدمات الحديثة. المشروع مصمم بأحدث المعايير العالمية ويوفر تجربة سكنية فريدة.",
+    description:
+      "هذا مشروع عقاري متميز يقع في موقع استراتيجي ويوفر جميع المرافق والخدمات الحديثة. المشروع مصمم بأحدث المعايير العالمية ويوفر تجربة سكنية فريدة.",
     address: "الرياض، حي النرجس، شارع الملك فهد",
     district: "حي النرجس",
     developer: "شركة التطوير العقاري المتميزة",
@@ -368,7 +371,14 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
     ],
     videoUrl: null,
-    amenities: ["موقف سيارات", "حديقة", "صالة ألعاب", "مسبح", "نادي صحي", "أمن 24/7"],
+    amenities: [
+      "موقف سيارات",
+      "حديقة",
+      "صالة ألعاب",
+      "مسبح",
+      "نادي صحي",
+      "أمن 24/7",
+    ],
     featured: true,
     published: true,
     location: {
@@ -446,9 +456,24 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
     // ⭐ NEW: Use mock data in Live Editor
     if (isLiveEditor) {
       const mockSimilarProjects: Project[] = [
-        { ...mockProject, id: "mock-2", title: "مشروع عقاري ثاني", district: "حي العليا" },
-        { ...mockProject, id: "mock-3", title: "مشروع عقاري ثالث", district: "حي المطار" },
-        { ...mockProject, id: "mock-4", title: "مشروع عقاري رابع", district: "حي الياسمين" },
+        {
+          ...mockProject,
+          id: "mock-2",
+          title: "مشروع عقاري ثاني",
+          district: "حي العليا",
+        },
+        {
+          ...mockProject,
+          id: "mock-3",
+          title: "مشروع عقاري ثالث",
+          district: "حي المطار",
+        },
+        {
+          ...mockProject,
+          id: "mock-4",
+          title: "مشروع عقاري رابع",
+          district: "حي الياسمين",
+        },
       ];
       setSimilarProjects(mockSimilarProjects);
       setLoadingSimilar(false);
@@ -617,7 +642,13 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
         fetchSimilarProjects();
       }
     }
-  }, [hookTenantId, tenantId, props.projectSlug, mergedData.similarProjects?.enabled, isLiveEditor]);
+  }, [
+    hookTenantId,
+    tenantId,
+    props.projectSlug,
+    mergedData.similarProjects?.enabled,
+    isLiveEditor,
+  ]);
 
   // تحديث الصورة الرئيسية عند تحميل المشروع
   useEffect(() => {
@@ -629,10 +660,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
   // صور المشروع - computed value
   const projectImages =
     project && project.image
-      ? [
-          project.image,
-          ...(project.images || []),
-        ].filter((img) => img && img.trim() !== "")
+      ? [project.image, ...(project.images || [])].filter(
+          (img) => img && img.trim() !== "",
+        )
       : [];
 
   // Show skeleton loading while tenant or project is loading
@@ -818,8 +848,8 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                     project.maxPrice.trim() !== "" &&
                     parseFloat(project.maxPrice) > 0) ||
                   (project.price && project.price.trim() !== "")) &&
-                  (mergedData.displaySettings?.showMinPrice ||
-                    mergedData.displaySettings?.showMaxPrice) ? (
+                (mergedData.displaySettings?.showMinPrice ||
+                  mergedData.displaySettings?.showMaxPrice) ? (
                   <p
                     className="text-2xl leading-7 font-bold md:text-3xl lg:leading-9 flex items-center gap-2"
                     style={{ color: primaryColor }}
@@ -865,7 +895,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.address.trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <MapPinIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <MapPinIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -888,7 +921,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.developer.trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <BuildingIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <BuildingIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -911,7 +947,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.units > 0 && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <HomeIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <HomeIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -934,7 +973,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.completionDate.trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <CalendarIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <CalendarIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -946,7 +988,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                         className="font-bold leading-4 text-xs xs:text-sm md:text-base"
                         style={{ color: mergedData.styling?.textColor }}
                       >
-                        {new Date(project.completionDate).toLocaleDateString("ar-US")}
+                        {new Date(project.completionDate).toLocaleDateString(
+                          "ar-US",
+                        )}
                       </p>
                     </div>
                   )}
@@ -957,7 +1001,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.completeStatus.trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <WrenchIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <WrenchIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -969,7 +1016,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                         className="font-bold leading-4 text-xs xs:text-sm md:text-base"
                         style={{ color: mergedData.styling?.textColor }}
                       >
-                        {project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء"}
+                        {project.completeStatus === "1"
+                          ? "مكتمل"
+                          : "قيد الإنشاء"}
                       </p>
                     </div>
                   )}
@@ -1026,7 +1075,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.videoUrl.trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <PlayIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <PlayIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -1054,7 +1106,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                       project.location.address.trim() !== "")) && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <MapPinIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <MapPinIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                       </div>
                       {project.location.lat && project.location.lng ? (
                         <a
@@ -1083,7 +1138,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.createdAt.trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <CalendarIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <CalendarIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -1095,7 +1153,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                         className="font-bold leading-4 text-xs xs:text-sm md:text-base"
                         style={{ color: mergedData.styling?.textColor }}
                       >
-                        {new Date(project.createdAt).toLocaleDateString("ar-US")}
+                        {new Date(project.createdAt).toLocaleDateString(
+                          "ar-US",
+                        )}
                       </p>
                     </div>
                   )}
@@ -1106,7 +1166,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                   project.updatedAt.trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
-                        <ClockIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                        <ClockIcon
+                          className="w-4 h-4"
+                          style={{ color: primaryColor }}
+                        />
                         <p
                           className="font-normal text-xs xs:text-sm md:text-base leading-4"
                           style={{ color: primaryColor }}
@@ -1118,7 +1181,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                         className="font-bold leading-4 text-xs xs:text-sm md:text-base"
                         style={{ color: mergedData.styling?.textColor }}
                       >
-                        {new Date(project.updatedAt).toLocaleDateString("ar-US")}
+                        {new Date(project.updatedAt).toLocaleDateString(
+                          "ar-US",
+                        )}
                       </p>
                     </div>
                   )}
@@ -1130,7 +1195,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                     <div className="col-span-2">
                       <div className="flex flex-row gap-x-2 md:gap-x-6">
                         <div className="flex flex-row gap-x-2">
-                          <StarIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                          <StarIcon
+                            className="w-4 h-4"
+                            style={{ color: primaryColor }}
+                          />
                           <p
                             className="font-normal text-xs xs:text-sm md:text-base leading-4"
                             style={{ color: primaryColor }}
@@ -1163,7 +1231,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                     <div className="col-span-2">
                       <div className="flex flex-row gap-x-2 md:gap-x-6">
                         <div className="flex flex-row gap-x-2">
-                          <WrenchIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                          <WrenchIcon
+                            className="w-4 h-4"
+                            style={{ color: primaryColor }}
+                          />
                           <p
                             className="font-normal text-xs xs:text-sm md:text-base leading-4"
                             style={{ color: primaryColor }}
@@ -1194,7 +1265,10 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                     <div className="col-span-2">
                       <div className="flex flex-row gap-x-2 md:gap-x-6">
                         <div className="flex flex-row gap-x-2">
-                          <TagIcon className="w-4 h-4" style={{ color: primaryColor }} />
+                          <TagIcon
+                            className="w-4 h-4"
+                            style={{ color: primaryColor }}
+                          />
                           <p
                             className="font-normal text-xs xs:text-sm md:text-base leading-4"
                             style={{ color: primaryColor }}
@@ -1341,7 +1415,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                                   }
                                 : {}
                             }
-                            onClick={() => handleThumbnailClick(imageSrc, index)}
+                            onClick={() =>
+                              handleThumbnailClick(imageSrc, index)
+                            }
                           />
                           <div className="absolute bottom-2 right-2 opacity-80">
                             <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
@@ -1367,7 +1443,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
               {mergedData.displaySettings?.showFloorplans &&
                 project.floorplans &&
                 project.floorplans.length > 0 &&
-                project.floorplans.some((plan) => plan && plan.trim() !== "") && (
+                project.floorplans.some(
+                  (plan) => plan && plan.trim() !== "",
+                ) && (
                   <div className="mt-8">
                     <h3
                       className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
@@ -1435,14 +1513,16 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                         className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
                         style={{ backgroundColor: primaryColor }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = primaryColorHover;
+                          e.currentTarget.style.backgroundColor =
+                            primaryColorHover;
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.backgroundColor = primaryColor;
                         }}
                       >
                         <MapPinIcon className="w-4 h-4" />
-                        {mergedData.content?.openInGoogleMapsText || "فتح في خرائط جوجل"}
+                        {mergedData.content?.openInGoogleMapsText ||
+                          "فتح في خرائط جوجل"}
                       </a>
                     </div>
                   </div>
@@ -1462,7 +1542,8 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                     className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    {mergedData.content?.similarProjectsTitle || "مشاريع مشابهة"}
+                    {mergedData.content?.similarProjectsTitle ||
+                      "مشاريع مشابهة"}
                   </h3>
 
                   {/* عرض المشاريع المشابهة للديسكتوب */}
@@ -1558,10 +1639,14 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                                         : similarProject.price
                                           ? similarProject.price
                                           : similarProject.minPrice &&
-                                              parseFloat(similarProject.minPrice) > 0
+                                              parseFloat(
+                                                similarProject.minPrice,
+                                              ) > 0
                                             ? similarProject.minPrice
                                             : similarProject.maxPrice &&
-                                                parseFloat(similarProject.maxPrice) > 0
+                                                parseFloat(
+                                                  similarProject.maxPrice,
+                                                ) > 0
                                               ? similarProject.maxPrice
                                               : null}
                                     </p>
@@ -1607,7 +1692,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                             >
                               <div className="relative w-full h-64 overflow-hidden">
                                 <Image
-                                  src={similarProject.image ?? "/placeholder.jpg"}
+                                  src={
+                                    similarProject.image ?? "/placeholder.jpg"
+                                  }
                                   alt={similarProject.title}
                                   fill
                                   className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -1645,7 +1732,8 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                                         </div>
                                       )}
                                     {similarProject.units &&
-                                      typeof similarProject.units === "number" &&
+                                      typeof similarProject.units ===
+                                        "number" &&
                                       similarProject.units > 0 && (
                                         <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
                                           <HomeIcon className="w-3 h-3" />
@@ -1670,23 +1758,29 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                                     parseFloat(similarProject.minPrice) > 0) ||
                                     (similarProject.maxPrice &&
                                       similarProject.maxPrice.trim() !== "" &&
-                                      parseFloat(similarProject.maxPrice) > 0) ||
+                                      parseFloat(similarProject.maxPrice) >
+                                        0) ||
                                     (similarProject.price &&
                                       similarProject.price.trim() !== "")) && (
                                     <div className="flex items-center gap-1">
                                       <p className="text-lg font-bold text-white">
                                         {similarProject.minPrice &&
                                         similarProject.maxPrice &&
-                                        parseFloat(similarProject.minPrice) > 0 &&
+                                        parseFloat(similarProject.minPrice) >
+                                          0 &&
                                         parseFloat(similarProject.maxPrice) > 0
                                           ? `${similarProject.minPrice} - ${similarProject.maxPrice}`
                                           : similarProject.price
                                             ? similarProject.price
                                             : similarProject.minPrice &&
-                                                parseFloat(similarProject.minPrice) > 0
+                                                parseFloat(
+                                                  similarProject.minPrice,
+                                                ) > 0
                                               ? similarProject.minPrice
                                               : similarProject.maxPrice &&
-                                                  parseFloat(similarProject.maxPrice) > 0
+                                                  parseFloat(
+                                                    similarProject.maxPrice,
+                                                  ) > 0
                                                 ? similarProject.maxPrice
                                                 : null}
                                       </p>
@@ -1695,7 +1789,8 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                                         alt="ريال سعودي"
                                         className="w-4 h-4"
                                         style={{
-                                          filter: "brightness(0) saturate(100%)",
+                                          filter:
+                                            "brightness(0) saturate(100%)",
                                         }}
                                       />
                                     </div>
@@ -1766,7 +1861,8 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-center text-gray-600 text-sm">
-              {mergedData.content?.shareDescription || "شارك هذا المشروع مع أصدقائك"}
+              {mergedData.content?.shareDescription ||
+                "شارك هذا المشروع مع أصدقائك"}
             </p>
 
             {/* Social Media Icons */}
@@ -1826,4 +1922,3 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
     </section>
   );
 }
-

@@ -209,8 +209,7 @@ export const CustomerTable = ({
     } catch (error: any) {
       console.error("Error assigning employee:", error);
       toast.error(
-        error.response?.data?.message ||
-          "حدث خطأ أثناء تعيين الموظف المسؤول",
+        error.response?.data?.message || "حدث خطأ أثناء تعيين الموظف المسؤول",
         {
           duration: 4000,
           position: "top-center",
@@ -450,318 +449,322 @@ export const CustomerTable = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                // Loading Skeleton Rows
-                [...Array(8)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <Skeleton className="h-4 w-4" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-5 w-32" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-2">
+              {loading
+                ? // Loading Skeleton Rows
+                  [...Array(8)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Skeleton className="h-4 w-4" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-32" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-40" />
+                          <Skeleton className="h-4 w-32" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                      </TableCell>
+                      <TableCell>
                         <Skeleton className="h-4 w-40" />
-                        <Skeleton className="h-4 w-32" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-6 w-16 rounded-full" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-6 w-16 rounded-full" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-40" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-6 w-16 rounded-full" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-20" />
-                        <Skeleton className="h-3 w-16" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Skeleton className="h-8 w-8 rounded" />
-                        <Skeleton className="h-8 w-8 rounded" />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                filteredAndSortedCustomers.map((customer: any) => (
-                <TableRow
-                  key={customer.id}
-                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                  onClick={() => handleRowClick(customer.id)}
-                >
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <Checkbox
-                      checked={selectedCustomers.includes(customer.id)}
-                      onCheckedChange={() => handleSelectCustomer(customer.id)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <div>
-                        <div className="font-medium text-right">
-                          {customer.name}
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-20" />
+                          <Skeleton className="h-3 w-16" />
                         </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      {/* Email */}
-                      {customer.email && (
-                        <div className="flex items-center text-sm">
-                          <Mail className="ml-2 h-3 w-3 text-blue-600" />
-                          <span className="font-medium">{customer.email}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Skeleton className="h-8 w-8 rounded" />
+                          <Skeleton className="h-8 w-8 rounded" />
                         </div>
-                      )}
-
-                      {/* Phone Number */}
-                      {customer.phone_number ? (
-                        <div className="flex items-center text-sm">
-                          <Phone className="ml-2 h-3 w-3 text-green-600" />
-                          <span className="font-medium">
-                            {customer.phone_number}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Phone className="ml-2 h-3 w-3" />
-                          <span className="italic">لا يوجد رقم هاتف</span>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {customer.responsible_employee ? (
-                      <div className="space-y-1 text-right">
-                        <div className="font-medium text-sm">
-                          {customer.responsible_employee.name}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {customer.responsible_employee.whatsapp_number}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-muted-foreground text-right italic">
-                        لا يوجد موظف مسؤول
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={
-                        customer.type?.name === "Buyer" ||
-                        customer.type?.name === "مشتري"
-                          ? "border-blue-500 text-blue-700"
-                          : customer.type?.name === "Seller" ||
-                              customer.type?.name === "بائع"
-                            ? "border-green-500 text-green-700"
-                            : customer.type?.name === "Rented" ||
-                                customer.type?.name === "مستأجر"
-                              ? "border-purple-500 text-purple-700"
-                              : customer.type?.name === "Landlord" ||
-                                  customer.type?.name === "مؤجر"
-                                ? "border-orange-500 text-orange-700"
-                                : customer.type?.name === "Investor" ||
-                                    customer.type?.name === "مستثمر"
-                                  ? "border-red-500 text-red-700"
-                                  : "border-gray-500 text-gray-700"
-                      }
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : filteredAndSortedCustomers.map((customer: any) => (
+                    <TableRow
+                      key={customer.id}
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                      onClick={() => handleRowClick(customer.id)}
                     >
-                      {customer.inquiry?.property_type || "غير محدد"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className="border-gray-500 text-gray-700"
-                    >
-                      {customer.inquiry?.inquiry_type || "غير محدد"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="max-w-[300px] min-w-[200px] sm:max-w-40 ">
-                    {customer.inquiry?.message || "غير محدد"}
-                  </TableCell>
-                  <TableCell>
-                    {customer.stage?.name ? (
-                      <Badge
-                        variant="outline"
-                        className="border-gray-500 text-gray-700"
-                      >
-                        {customer.stage.name}
-                      </Badge>
-                    ) : (
-                      <div className="text-sm text-muted-foreground text-right italic">
-                        غير محدد
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      {/* City */}
-                      <div className="font-medium text-right">
-                        {customer.district?.city_name_ar || "غير محدد"}
-                      </div>
-                      {/* District */}
-                      <div className="text-sm text-muted-foreground text-right">
-                        {customer.district?.name_ar || "لا يوجد حي محدد"}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRowClick(customer.id);
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-
-                      {/* Custom Dropdown Menu */}
-                      <Button
-                        ref={(el) => {
-                          buttonRefs.current[customer.id] = el;
-                        }}
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (openDropdownId === customer.id) {
-                            setOpenDropdownId(null);
-                            setDropdownPosition(null);
-                          } else {
-                            setOpenDropdownId(customer.id);
-                            // استخدام requestAnimationFrame للتأكد من حساب الموقع بعد الرسم
-                            requestAnimationFrame(() => {
-                              calculateDropdownPosition(customer.id);
-                            });
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedCustomers.includes(customer.id)}
+                          onCheckedChange={() =>
+                            handleSelectCustomer(customer.id)
                           }
-                        }}
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <div className="font-medium text-right">
+                              {customer.name}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          {/* Email */}
+                          {customer.email && (
+                            <div className="flex items-center text-sm">
+                              <Mail className="ml-2 h-3 w-3 text-blue-600" />
+                              <span className="font-medium">
+                                {customer.email}
+                              </span>
+                            </div>
+                          )}
 
-                      {/* Dropdown Menu using Portal */}
-                      {openDropdownId === customer.id &&
-                        dropdownPosition &&
-                        typeof window !== "undefined" &&
-                        createPortal(
-                          <div
-                            ref={dropdownRef}
-                            className="w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 max-h-[calc(100vh-16px)] overflow-y-auto"
-                            style={{
-                              position: "fixed",
-                              top: `${dropdownPosition.top}px`,
-                              left: `${dropdownPosition.left}px`,
-                              zIndex: 9999,
-                              direction: "rtl",
+                          {/* Phone Number */}
+                          {customer.phone_number ? (
+                            <div className="flex items-center text-sm">
+                              <Phone className="ml-2 h-3 w-3 text-green-600" />
+                              <span className="font-medium">
+                                {customer.phone_number}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Phone className="ml-2 h-3 w-3" />
+                              <span className="italic">لا يوجد رقم هاتف</span>
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {customer.responsible_employee ? (
+                          <div className="space-y-1 text-right">
+                            <div className="font-medium text-sm">
+                              {customer.responsible_employee.name}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {customer.responsible_employee.whatsapp_number}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-muted-foreground text-right italic">
+                            لا يوجد موظف مسؤول
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={
+                            customer.type?.name === "Buyer" ||
+                            customer.type?.name === "مشتري"
+                              ? "border-blue-500 text-blue-700"
+                              : customer.type?.name === "Seller" ||
+                                  customer.type?.name === "بائع"
+                                ? "border-green-500 text-green-700"
+                                : customer.type?.name === "Rented" ||
+                                    customer.type?.name === "مستأجر"
+                                  ? "border-purple-500 text-purple-700"
+                                  : customer.type?.name === "Landlord" ||
+                                      customer.type?.name === "مؤجر"
+                                    ? "border-orange-500 text-orange-700"
+                                    : customer.type?.name === "Investor" ||
+                                        customer.type?.name === "مستثمر"
+                                      ? "border-red-500 text-red-700"
+                                      : "border-gray-500 text-gray-700"
+                          }
+                        >
+                          {customer.inquiry?.property_type || "غير محدد"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className="border-gray-500 text-gray-700"
+                        >
+                          {customer.inquiry?.inquiry_type || "غير محدد"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-[300px] min-w-[200px] sm:max-w-40 ">
+                        {customer.inquiry?.message || "غير محدد"}
+                      </TableCell>
+                      <TableCell>
+                        {customer.stage?.name ? (
+                          <Badge
+                            variant="outline"
+                            className="border-gray-500 text-gray-700"
+                          >
+                            {customer.stage.name}
+                          </Badge>
+                        ) : (
+                          <div className="text-sm text-muted-foreground text-right italic">
+                            غير محدد
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          {/* City */}
+                          <div className="font-medium text-right">
+                            {customer.district?.city_name_ar || "غير محدد"}
+                          </div>
+                          {/* District */}
+                          <div className="text-sm text-muted-foreground text-right">
+                            {customer.district?.name_ar || "لا يوجد حي محدد"}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRowClick(customer.id);
                             }}
                           >
-                            {/* تعديل العميل */}
-                            <button
-                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                              onClick={(e) => {
-                                e.preventDefault();
+                            <Eye className="h-4 w-4" />
+                          </Button>
+
+                          {/* Custom Dropdown Menu */}
+                          <Button
+                            ref={(el) => {
+                              buttonRefs.current[customer.id] = el;
+                            }}
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (openDropdownId === customer.id) {
                                 setOpenDropdownId(null);
                                 setDropdownPosition(null);
-                                router.push(`/dashboard/customers/${customer.id}/edit`);
-                              }}
-                            >
-                              <Edit className="ml-2 h-4 w-4" />
-                              تعديل العميل
-                            </button>
+                              } else {
+                                setOpenDropdownId(customer.id);
+                                // استخدام requestAnimationFrame للتأكد من حساب الموقع بعد الرسم
+                                requestAnimationFrame(() => {
+                                  calculateDropdownPosition(customer.id);
+                                });
+                              }
+                            }}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
 
-                            {/* تعيين المرحلة */}
-                            <button
-                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setOpenDropdownId(null);
-                                setDropdownPosition(null);
-                                setSelectedCustomerForStage(customer);
-                                setShowStageDialog(true);
-                              }}
-                            >
-                              <ArrowRight className="ml-2 h-4 w-4" />
-                              تعيين المرحلة
-                            </button>
-
-                            {/* تعيين الموظف المسؤول */}
-                            <button
-                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setOpenDropdownId(null);
-                                setDropdownPosition(null);
-                                setSelectedCustomerForEmployee(customer);
-                                setShowEmployeeDialog(true);
-                              }}
-                            >
-                              <User className="ml-2 h-4 w-4" />
-                              تعيين الموظف المسؤول
-                            </button>
-
-                            {/* إرسال واتساب */}
-                            {hasValidWhatsAppChannel() && (
-                              <button
-                                className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setOpenDropdownId(null);
-                                  setDropdownPosition(null);
-                                  setSelectedCustomerForWhatsApp(customer);
-                                  setTimeout(
-                                    () => setShowWhatsAppDialog(true),
-                                    50,
-                                  );
+                          {/* Dropdown Menu using Portal */}
+                          {openDropdownId === customer.id &&
+                            dropdownPosition &&
+                            typeof window !== "undefined" &&
+                            createPortal(
+                              <div
+                                ref={dropdownRef}
+                                className="w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 max-h-[calc(100vh-16px)] overflow-y-auto"
+                                style={{
+                                  position: "fixed",
+                                  top: `${dropdownPosition.top}px`,
+                                  left: `${dropdownPosition.left}px`,
+                                  zIndex: 9999,
+                                  direction: "rtl",
                                 }}
                               >
-                                <MessageSquare className="ml-2 h-4 w-4" />
-                                إرسال واتساب
-                              </button>
+                                {/* تعديل العميل */}
+                                <button
+                                  className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setOpenDropdownId(null);
+                                    setDropdownPosition(null);
+                                    router.push(
+                                      `/dashboard/customers/${customer.id}/edit`,
+                                    );
+                                  }}
+                                >
+                                  <Edit className="ml-2 h-4 w-4" />
+                                  تعديل العميل
+                                </button>
+
+                                {/* تعيين المرحلة */}
+                                <button
+                                  className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setOpenDropdownId(null);
+                                    setDropdownPosition(null);
+                                    setSelectedCustomerForStage(customer);
+                                    setShowStageDialog(true);
+                                  }}
+                                >
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                                  تعيين المرحلة
+                                </button>
+
+                                {/* تعيين الموظف المسؤول */}
+                                <button
+                                  className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setOpenDropdownId(null);
+                                    setDropdownPosition(null);
+                                    setSelectedCustomerForEmployee(customer);
+                                    setShowEmployeeDialog(true);
+                                  }}
+                                >
+                                  <User className="ml-2 h-4 w-4" />
+                                  تعيين الموظف المسؤول
+                                </button>
+
+                                {/* إرسال واتساب */}
+                                {hasValidWhatsAppChannel() && (
+                                  <button
+                                    className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setOpenDropdownId(null);
+                                      setDropdownPosition(null);
+                                      setSelectedCustomerForWhatsApp(customer);
+                                      setTimeout(
+                                        () => setShowWhatsAppDialog(true),
+                                        50,
+                                      );
+                                    }}
+                                  >
+                                    <MessageSquare className="ml-2 h-4 w-4" />
+                                    إرسال واتساب
+                                  </button>
+                                )}
+
+                                {/* Separator */}
+                                <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+
+                                {/* حذف */}
+                                <button
+                                  className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center transition-colors"
+                                  onClick={() => {
+                                    setOpenDropdownId(null);
+                                    setDropdownPosition(null);
+                                    handleDelete(customer.id);
+                                  }}
+                                >
+                                  <Trash2 className="ml-2 h-4 w-4" />
+                                  حذف
+                                </button>
+                              </div>,
+                              document.body,
                             )}
-
-                            {/* Separator */}
-                            <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
-
-                            {/* حذف */}
-                            <button
-                              className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center transition-colors"
-                              onClick={() => {
-                                setOpenDropdownId(null);
-                                setDropdownPosition(null);
-                                handleDelete(customer.id);
-                              }}
-                            >
-                              <Trash2 className="ml-2 h-4 w-4" />
-                              حذف
-                            </button>
-                          </div>,
-                          document.body,
-                        )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-                ))
-              )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
         </CardContent>
@@ -814,7 +817,9 @@ export const CustomerTable = ({
                 <User className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
+                <div className="text-lg font-semibold">
+                  تعيين الموظف المسؤول
+                </div>
                 <div className="text-sm text-muted-foreground font-normal">
                   اختر الموظف المسؤول عن هذا العميل
                 </div>
@@ -878,10 +883,13 @@ export const CustomerTable = ({
                     <SelectContent>
                       {employees.map((employee) => {
                         // استخدام first_name و last_name إذا كانا متوفرين
-                        const employeeName = employee.first_name && employee.last_name
-                          ? `${employee.first_name} ${employee.last_name}`
-                          : employee.name || employee.email || `موظف #${employee.id}`;
-                        
+                        const employeeName =
+                          employee.first_name && employee.last_name
+                            ? `${employee.first_name} ${employee.last_name}`
+                            : employee.name ||
+                              employee.email ||
+                              `موظف #${employee.id}`;
+
                         return (
                           <SelectItem
                             key={employee.id}
@@ -927,18 +935,20 @@ export const CustomerTable = ({
                       (emp) => emp.id === selectedEmployeeId,
                     );
                     if (!selectedEmployee) return null;
-                    
+
                     const employeeName =
                       selectedEmployee.first_name && selectedEmployee.last_name
                         ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
                         : selectedEmployee.name ||
                           selectedEmployee.email ||
                           `موظف #${selectedEmployee.id}`;
-                    
+
                     return (
                       <>
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={selectedEmployee.photo || "/placeholder.svg"} />
+                          <AvatarImage
+                            src={selectedEmployee.photo || "/placeholder.svg"}
+                          />
                           <AvatarFallback>
                             <User className="h-4 w-4" />
                           </AvatarFallback>
@@ -997,7 +1007,6 @@ export const CustomerTable = ({
           </div>
         </CustomDialogContent>
       </CustomDialog>
-
     </div>
   );
 };

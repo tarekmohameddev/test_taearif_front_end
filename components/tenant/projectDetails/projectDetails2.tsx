@@ -7,11 +7,7 @@ import { useTenantId } from "@/hooks/useTenantId";
 import useTenantStore from "@/context-liveeditor/tenantStore";
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { getDefaultProjectDetails2Data } from "@/context-liveeditor/editorStoreFunctions/projectDetailsFunctions";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { MapPinIcon } from "lucide-react";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
@@ -112,7 +108,9 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
   // ─────────────────────────────────────────────────────────
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const projectDetailsStates = useEditorStore((s) => s.projectDetailsStates);
 
@@ -148,7 +146,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -184,12 +185,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
 
       ensureComponentVariant("projectDetails", uniqueId, initialData);
     }
-  }, [
-    uniqueId,
-    props.useStore,
-    ensureComponentVariant,
-    tenantComponentData,
-  ]);
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
@@ -326,14 +322,17 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   const { tenantId: hookTenantId, isLoading: tenantLoading } = useTenantId();
 
   // Check if we're in Live Editor
-  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+  const isLiveEditor =
+    typeof window !== "undefined" &&
+    window.location.pathname.includes("/live-editor");
 
   // Mock data for Live Editor
   const mockProject: Project = {
     id: "mock-project-1",
     slug: "mock-project",
     title: "مشروع عقاري متميز",
-    description: "هذا مشروع عقاري متميز يقع في موقع استراتيجي ويوفر جميع المرافق والخدمات الحديثة. المشروع مصمم بأحدث المعايير العالمية ويوفر تجربة سكنية فريدة.",
+    description:
+      "هذا مشروع عقاري متميز يقع في موقع استراتيجي ويوفر جميع المرافق والخدمات الحديثة. المشروع مصمم بأحدث المعايير العالمية ويوفر تجربة سكنية فريدة.",
     address: "الرياض، حي النرجس، شارع الملك فهد",
     district: "حي النرجس",
     developer: "شركة التطوير العقاري المتميزة",
@@ -353,7 +352,14 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
     ],
     videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    amenities: ["موقف سيارات", "حديقة", "صالة ألعاب", "مسبح", "نادي صحي", "أمن 24/7"],
+    amenities: [
+      "موقف سيارات",
+      "حديقة",
+      "صالة ألعاب",
+      "مسبح",
+      "نادي صحي",
+      "أمن 24/7",
+    ],
     location: {
       lat: 24.7136,
       lng: 46.6753,
@@ -417,7 +423,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({
       ...formData,
@@ -450,10 +456,9 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   // صور المشروع
   const projectImages =
     project && project.image
-      ? [
-          project.image,
-          ...(project.images || []),
-        ].filter((img) => img && img.trim() !== "")
+      ? [project.image, ...(project.images || [])].filter(
+          (img) => img && img.trim() !== "",
+        )
       : [];
 
   // Get all images (main images + floor planning images)
@@ -690,61 +695,60 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         {/* END: Hero Section */}
 
         {/* BEGIN: Gallery Thumbnails */}
-        {mergedData.gallery?.showThumbnails &&
-          projectImages.length > 0 && (
-            <section className="mt-4" data-purpose="image-gallery">
-              {projectImages.length > 1 && (
-                <p className="text-xs text-gray-500 mb-2 text-center">
-                  اضغط على أي صورة لفتحها في نافذة منبثقة
-                </p>
-              )}
-              <SwiperCarousel
-                items={projectImages
-                  .filter((imageSrc) => imageSrc && imageSrc.trim() !== "")
-                  .map((imageSrc, index) => (
-                    <div key={index} className="relative h-[10rem] md:h-24">
-                      <Image
-                        src={imageSrc}
-                        alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
-                        fill
-                        className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
-                          mainImage === imageSrc ? "" : "border-transparent"
-                        }`}
-                        style={
-                          mainImage === imageSrc
-                            ? {
-                                borderColor: primaryColor,
-                                borderWidth: "2px",
-                              }
-                            : {}
-                        }
-                        onClick={() => {
-                          setMainImage(imageSrc);
-                          handleThumbnailClick(imageSrc, index);
-                        }}
-                      />
-                      {logoImage && (
-                        <div className="absolute bottom-2 right-2 opacity-80">
-                          <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                            <Image
-                              src={logoImage}
-                              alt="Logo"
-                              width={160}
-                              height={80}
-                              className="object-contain"
-                            />
-                          </div>
+        {mergedData.gallery?.showThumbnails && projectImages.length > 0 && (
+          <section className="mt-4" data-purpose="image-gallery">
+            {projectImages.length > 1 && (
+              <p className="text-xs text-gray-500 mb-2 text-center">
+                اضغط على أي صورة لفتحها في نافذة منبثقة
+              </p>
+            )}
+            <SwiperCarousel
+              items={projectImages
+                .filter((imageSrc) => imageSrc && imageSrc.trim() !== "")
+                .map((imageSrc, index) => (
+                  <div key={index} className="relative h-[10rem] md:h-24">
+                    <Image
+                      src={imageSrc}
+                      alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
+                      fill
+                      className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
+                        mainImage === imageSrc ? "" : "border-transparent"
+                      }`}
+                      style={
+                        mainImage === imageSrc
+                          ? {
+                              borderColor: primaryColor,
+                              borderWidth: "2px",
+                            }
+                          : {}
+                      }
+                      onClick={() => {
+                        setMainImage(imageSrc);
+                        handleThumbnailClick(imageSrc, index);
+                      }}
+                    />
+                    {logoImage && (
+                      <div className="absolute bottom-2 right-2 opacity-80">
+                        <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
+                          <Image
+                            src={logoImage}
+                            alt="Logo"
+                            width={160}
+                            height={80}
+                            className="object-contain"
+                          />
                         </div>
-                      )}
-                    </div>
-                  ))}
-                space={16}
-                autoplay={true}
-                desktopCount={4}
-                slideClassName="!h-[10rem] md:!h-[96px]"
-              />
-            </section>
-          )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              space={16}
+              autoplay={true}
+              desktopCount={4}
+              slideClassName="!h-[10rem] md:!h-[96px]"
+            />
+          </section>
+        )}
         {/* END: Gallery Thumbnails */}
 
         {/* BEGIN: Property Description */}
@@ -779,7 +783,9 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
               <section className="bg-transparent" data-purpose="property-specs">
                 <h2
                   className="text-3xl font-bold mb-8 text-right"
-                  style={{ color: mergedData.styling?.textColor || primaryColor }}
+                  style={{
+                    color: mergedData.styling?.textColor || primaryColor,
+                  }}
                 >
                   {mergedData.content?.specsTitle || "مواصفات المشروع"}
                 </h2>
@@ -806,7 +812,9 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                       </div>
                       <span
                         className="font-bold text-lg"
-                        style={{ color: mergedData.styling?.textColor || primaryColor }}
+                        style={{
+                          color: mergedData.styling?.textColor || primaryColor,
+                        }}
                       >
                         المطور: {project.developer}
                       </span>
@@ -835,7 +843,9 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                       </div>
                       <span
                         className="font-bold text-lg"
-                        style={{ color: mergedData.styling?.textColor || primaryColor }}
+                        style={{
+                          color: mergedData.styling?.textColor || primaryColor,
+                        }}
                       >
                         عدد الوحدات: {project.units}
                       </span>
@@ -843,34 +853,40 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   )}
 
                   {/* Completion Date */}
-                  {project.completionDate && project.completionDate.trim() !== "" && (
-                    <div className="flex flex-col items-center justify-center">
-                      <div style={{ color: primaryColor }} className="mb-3">
-                        <svg
-                          className="h-8 w-8"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
+                  {project.completionDate &&
+                    project.completionDate.trim() !== "" && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div style={{ color: primaryColor }} className="mb-3">
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{
+                            color:
+                              mergedData.styling?.textColor || primaryColor,
+                          }}
                         >
-                          <path
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="1.5"
-                          ></path>
-                        </svg>
+                          تاريخ التسليم:{" "}
+                          {new Date(project.completionDate).toLocaleDateString(
+                            "ar-US",
+                          )}
+                        </span>
                       </div>
-                      <span
-                        className="font-bold text-lg"
-                        style={{ color: mergedData.styling?.textColor || primaryColor }}
-                      >
-                        تاريخ التسليم:{" "}
-                        {new Date(project.completionDate).toLocaleDateString("ar-US")}
-                      </span>
-                    </div>
-                  )}
+                    )}
 
                   {/* Address */}
                   {project.address && project.address.trim() !== "" && (
@@ -900,7 +916,9 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                       </div>
                       <span
                         className="font-bold text-lg text-center"
-                        style={{ color: mergedData.styling?.textColor || primaryColor }}
+                        style={{
+                          color: mergedData.styling?.textColor || primaryColor,
+                        }}
                       >
                         {project.address}
                       </span>
@@ -917,7 +935,8 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                             className="px-3 py-1 text-xs rounded-full"
                             style={{
                               backgroundColor: `${primaryColor}20`,
-                              color: mergedData.styling?.textColor || primaryColor,
+                              color:
+                                mergedData.styling?.textColor || primaryColor,
                             }}
                           >
                             {amenity}
@@ -936,15 +955,19 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 className="text-white p-8 rounded-lg h-fit"
                 data-purpose="contact-form"
                 style={{
-                  backgroundColor: mergedData.styling?.formBackgroundColor || primaryColor,
+                  backgroundColor:
+                    mergedData.styling?.formBackgroundColor || primaryColor,
                   boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
                 }}
               >
                 <h2
                   className="text-2xl font-bold mb-2 text-right"
-                  style={{ color: mergedData.styling?.formTextColor || "#ffffff" }}
+                  style={{
+                    color: mergedData.styling?.formTextColor || "#ffffff",
+                  }}
                 >
-                  {mergedData.content?.contactFormTitle || "استفسر عن هذا المشروع"}
+                  {mergedData.content?.contactFormTitle ||
+                    "استفسر عن هذا المشروع"}
                 </h2>
                 <p
                   className="text-sm mb-6 text-right"
@@ -963,9 +986,11 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                     <div>
                       <input
                         className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
-                        style={{
-                          "--tw-ring-color": primaryColor,
-                        } as React.CSSProperties}
+                        style={
+                          {
+                            "--tw-ring-color": primaryColor,
+                          } as React.CSSProperties
+                        }
                         placeholder="اسم العميل"
                         type="text"
                         name="name"
@@ -977,9 +1002,11 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                     <div>
                       <input
                         className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
-                        style={{
-                          "--tw-ring-color": primaryColor,
-                        } as React.CSSProperties}
+                        style={
+                          {
+                            "--tw-ring-color": primaryColor,
+                          } as React.CSSProperties
+                        }
                         placeholder="رقم الهاتف"
                         type="tel"
                         name="phone"
@@ -991,9 +1018,11 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                     <div>
                       <input
                         className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
-                        style={{
-                          "--tw-ring-color": primaryColor,
-                        } as React.CSSProperties}
+                        style={
+                          {
+                            "--tw-ring-color": primaryColor,
+                          } as React.CSSProperties
+                        }
                         placeholder="البريد الإلكتروني"
                         type="email"
                         name="email"
@@ -1006,9 +1035,11 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   <div>
                     <textarea
                       className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
-                      style={{
-                        "--tw-ring-color": primaryColor,
-                      } as React.CSSProperties}
+                      style={
+                        {
+                          "--tw-ring-color": primaryColor,
+                        } as React.CSSProperties
+                      }
                       placeholder="الرسالة"
                       rows={4}
                       name="message"
@@ -1021,8 +1052,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                     className="w-full font-bold py-3 rounded transition-colors shadow-md text-lg"
                     style={{
                       backgroundColor:
-                        mergedData.styling?.formButtonBackgroundColor || "#d4b996",
-                      color: mergedData.styling?.formButtonTextColor || "#7a5c43",
+                        mergedData.styling?.formButtonBackgroundColor ||
+                        "#d4b996",
+                      color:
+                        mergedData.styling?.formButtonTextColor || "#7a5c43",
                     }}
                     type="submit"
                     onMouseEnter={(e) => {
@@ -1055,7 +1088,12 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                     <div
                       key={index}
                       className="relative group"
-                      onClick={() => handleThumbnailClick(planImage, projectImages.length + index)}
+                      onClick={() =>
+                        handleThumbnailClick(
+                          planImage,
+                          projectImages.length + index,
+                        )
+                      }
                     >
                       <Image
                         src={planImage}
@@ -1143,7 +1181,8 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                       className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
                       style={{ backgroundColor: primaryColor }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = primaryColorHover;
+                        e.currentTarget.style.backgroundColor =
+                          primaryColorHover;
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = primaryColor;

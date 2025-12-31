@@ -29,5 +29,3 @@ export const getDeviceDimensions = (t: any) => ({
     name: t("live_editor.responsive.desktop"),
   },
 });
-
-

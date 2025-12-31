@@ -740,7 +740,9 @@ export default function DealDetailsPage() {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          router.push(`/dashboard/properties/${request.property_id}`)
+                          router.push(
+                            `/dashboard/properties/${request.property_id}`,
+                          )
                         }
                         className="gap-2"
                       >

@@ -2,20 +2,20 @@
  * ============================================================================
  * Global Components Service
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على خدمات إدارة المكونات العامة (Header و Footer).
  * This file contains services for managing global components (Header and Footer).
- * 
+ *
  * المسؤوليات:
  * - تطبيق Header و Footer من بيانات الثيم
  * - استعادة المكونات العامة من النسخ الاحتياطي
  * - دمج بيانات المكونات العامة
- * 
+ *
  * Responsibilities:
  * - Apply Header and Footer from theme data
  * - Restore global components from backup
  * - Merge global components data
- * 
+ *
  * ============================================================================
  */
 
@@ -26,19 +26,19 @@ import type { ThemeData } from "./types";
 /**
  * تطبيق Header من بيانات الثيم
  * Apply Header from theme data
- * 
+ *
  * تقوم هذه الدالة بتطبيق Header من بيانات الثيم على Editor Store.
  * تدمج البيانات الافتراضية مع بيانات الثيم.
- * 
+ *
  * This function applies Header from theme data to Editor Store.
  * Merges default data with theme data.
- * 
+ *
  * @param headerData - بيانات Header من الثيم
  *                   Header data from theme
- * 
+ *
  * @param headerVariant - نوع Header (مثل "StaticHeader1" أو "StaticHeader2")
  *                      Header variant (e.g., "StaticHeader1" or "StaticHeader2")
- * 
+ *
  * @example
  * ```typescript
  * applyGlobalHeader(themeData.globalComponentsData?.header, "StaticHeader2");
@@ -46,7 +46,7 @@ import type { ThemeData } from "./types";
  */
 export function applyGlobalHeader(
   headerData: any,
-  headerVariant: string
+  headerVariant: string,
 ): void {
   const store = useEditorStore.getState();
 
@@ -89,19 +89,19 @@ export function applyGlobalHeader(
 /**
  * تطبيق Footer من بيانات الثيم
  * Apply Footer from theme data
- * 
+ *
  * تقوم هذه الدالة بتطبيق Footer من بيانات الثيم على Editor Store.
  * تدمج البيانات الافتراضية مع بيانات الثيم.
- * 
+ *
  * This function applies Footer from theme data to Editor Store.
  * Merges default data with theme data.
- * 
+ *
  * @param footerData - بيانات Footer من الثيم
  *                   Footer data from theme
- * 
+ *
  * @param footerVariant - نوع Footer (مثل "StaticFooter1" أو "StaticFooter2")
  *                      Footer variant (e.g., "StaticFooter1" or "StaticFooter2")
- * 
+ *
  * @example
  * ```typescript
  * applyGlobalFooter(themeData.globalComponentsData?.footer, "StaticFooter2");
@@ -109,7 +109,7 @@ export function applyGlobalHeader(
  */
 export function applyGlobalFooter(
   footerData: any,
-  footerVariant: string
+  footerVariant: string,
 ): void {
   const store = useEditorStore.getState();
 
@@ -152,22 +152,20 @@ export function applyGlobalFooter(
 /**
  * تطبيق المكونات العامة من بيانات الثيم
  * Apply global components from theme data
- * 
+ *
  * تقوم هذه الدالة بتطبيق Header و Footer من بيانات الثيم.
- * 
+ *
  * This function applies Header and Footer from theme data.
- * 
+ *
  * @param themeData - بيانات الثيم
  *                  Theme data
- * 
+ *
  * @example
  * ```typescript
  * applyGlobalComponentsFromTheme(themeData);
  * ```
  */
-export function applyGlobalComponentsFromTheme(
-  themeData: ThemeData
-): void {
+export function applyGlobalComponentsFromTheme(themeData: ThemeData): void {
   if (!themeData.globalComponentsData) {
     return;
   }
@@ -197,24 +195,22 @@ export function applyGlobalComponentsFromTheme(
 /**
  * دمج بيانات المكونات العامة مع النسخ الاحتياطي
  * Merge global components data with backup
- * 
+ *
  * تقوم هذه الدالة بدمج بيانات المكونات العامة من النسخ الاحتياطي
  * مع بيانات الثيم الجديدة. تحافظ على تخصيصات المستخدم من النسخ الاحتياطي.
- * 
+ *
  * This function merges global components data from backup
  * with new theme data. Preserves user customizations from backup.
- * 
+ *
  * @param themeData - بيانات الثيم الجديدة
  *                  New theme data
- * 
+ *
  * @example
  * ```typescript
  * mergeGlobalComponentsWithBackup(themeData);
  * ```
  */
-export function mergeGlobalComponentsWithBackup(
-  themeData: ThemeData
-): void {
+export function mergeGlobalComponentsWithBackup(themeData: ThemeData): void {
   const store = useEditorStore.getState();
 
   if (!themeData.globalComponentsData) {
@@ -237,7 +233,10 @@ export function mergeGlobalComponentsWithBackup(
 
     // الحصول على البيانات الافتراضية لنوع Header الجديد
     // Get default data for the new header variant
-    const newDefaultHeaderData = createDefaultData("header", globalHeaderVariant);
+    const newDefaultHeaderData = createDefaultData(
+      "header",
+      globalHeaderVariant,
+    );
 
     // دمج بيانات Header الحالية (من النسخ الاحتياطي) مع البيانات الافتراضية وبيانات الثيم
     // Merge current header data (from backup) with default data and theme data
@@ -269,7 +268,10 @@ export function mergeGlobalComponentsWithBackup(
 
     // الحصول على البيانات الافتراضية لنوع Footer الجديد
     // Get default data for the new footer variant
-    const newDefaultFooterData = createDefaultData("footer", globalFooterVariant);
+    const newDefaultFooterData = createDefaultData(
+      "footer",
+      globalFooterVariant,
+    );
 
     // دمج بيانات Footer الحالية (من النسخ الاحتياطي) مع البيانات الافتراضية وبيانات الثيم
     // Merge current footer data (from backup) with default data and theme data
@@ -298,16 +300,16 @@ export function mergeGlobalComponentsWithBackup(
 /**
  * استعادة المكونات العامة من النسخ الاحتياطي
  * Restore global components from backup
- * 
+ *
  * تقوم هذه الدالة باستعادة Header و Footer من النسخ الاحتياطي.
  * تستبدل البيانات بالكامل (لا دمج).
- * 
+ *
  * This function restores Header and Footer from backup.
  * Replaces data completely (no merge).
- * 
+ *
  * @param globalData - بيانات المكونات العامة من النسخ الاحتياطي
  *                   Global components data from backup
- * 
+ *
  * @example
  * ```typescript
  * restoreGlobalComponents(backup._globalComponentsData);
@@ -377,4 +379,3 @@ export function restoreGlobalComponents(globalData: any): void {
 
   store.setGlobalComponentsData(restoredGlobalComponentsData);
 }
-

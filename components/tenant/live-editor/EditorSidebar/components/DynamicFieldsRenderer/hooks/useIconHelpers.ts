@@ -127,4 +127,3 @@ export const useIconHelpers = () => {
 
   return { iconCache, getIconComponent, isReactIcon };
 };
-

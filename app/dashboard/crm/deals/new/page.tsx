@@ -215,7 +215,9 @@ export default function CreateDealPage() {
     const newCard: CrmCard = {
       id: Date.now(), // Temporary ID
       user_id: userData?.id || 0,
-      card_customer_id: selectedCustomerId ? parseInt(selectedCustomerId) : null,
+      card_customer_id: selectedCustomerId
+        ? parseInt(selectedCustomerId)
+        : null,
       card_request_id: null, // Will be set after deal creation
       card_content: cardData.card_content || "",
       card_procedure: cardData.card_procedure || "note",
@@ -247,7 +249,8 @@ export default function CreateDealPage() {
       const response = await axiosInstance.post("/v1/crm/requests", payload);
 
       if (response.data.status === "success" || response.data.status === true) {
-        const dealId = response.data.data?.request?.id || response.data.data?.id;
+        const dealId =
+          response.data.data?.request?.id || response.data.data?.id;
 
         // Save cards if any
         if (cards.length > 0 && dealId) {
@@ -271,9 +274,7 @@ export default function CreateDealPage() {
       }
     } catch (err: any) {
       console.error("Failed to create deal:", err);
-      toast.error(
-        err.response?.data?.message || "حدث خطأ أثناء إنشاء الصفقة",
-      );
+      toast.error(err.response?.data?.message || "حدث خطأ أثناء إنشاء الصفقة");
     } finally {
       setIsSubmitting(false);
     }
@@ -330,7 +331,9 @@ export default function CreateDealPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="customer">العميل <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="customer">
+                    العميل <span className="text-red-500">*</span>
+                  </Label>
                   {loadingCustomers ? (
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -353,7 +356,9 @@ export default function CreateDealPage() {
                             value={customer.id.toString()}
                           >
                             <div className="flex flex-col">
-                              <span className="font-medium">{customer.name}</span>
+                              <span className="font-medium">
+                                {customer.name}
+                              </span>
                               {customer.phone_number && (
                                 <span className="text-xs text-muted-foreground">
                                   {customer.phone_number}
@@ -368,7 +373,9 @@ export default function CreateDealPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="stage">المرحلة <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="stage">
+                    المرحلة <span className="text-red-500">*</span>
+                  </Label>
                   <Select value={stageId} onValueChange={setStageId}>
                     <SelectTrigger id="stage">
                       <SelectValue placeholder="اختر المرحلة" />
@@ -409,7 +416,9 @@ export default function CreateDealPage() {
                             className="gap-2"
                           >
                             <ArrowRight className="h-4 w-4" />
-                            <span className="hidden sm:inline">عرض التفاصيل</span>
+                            <span className="hidden sm:inline">
+                              عرض التفاصيل
+                            </span>
                             <span className="sm:hidden">التفاصيل</span>
                           </Button>
                         )}
@@ -467,7 +476,10 @@ export default function CreateDealPage() {
                             <div className="flex items-center gap-2">
                               <Phone className="h-3 w-3 text-muted-foreground" />
                               <span className="text-xs text-muted-foreground">
-                                {selectedCustomer.responsible_employee.whatsapp_number}
+                                {
+                                  selectedCustomer.responsible_employee
+                                    .whatsapp_number
+                                }
                               </span>
                             </div>
                           </div>
@@ -500,7 +512,9 @@ export default function CreateDealPage() {
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-muted-foreground">المرحلة</p>
+                          <p className="text-sm text-muted-foreground">
+                            المرحلة
+                          </p>
                           <Badge variant="secondary">
                             {getStageById(stageId)?.name || "غير محدد"}
                           </Badge>
@@ -637,4 +651,3 @@ export default function CreateDealPage() {
     </div>
   );
 }
-

@@ -334,11 +334,11 @@ GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=1020000500
 
 ## 📊 Results Summary
 
-**Date Tested:** ********\_********
+**Date Tested:** **\*\*\*\***\_**\*\*\*\***
 
-**Tester:** ********\_********
+**Tester:** **\*\*\*\***\_**\*\*\*\***
 
-**Environment:** ********\_********
+**Environment:** **\*\*\*\***\_**\*\*\*\***
 
 ### Test Results
 
@@ -373,9 +373,9 @@ GET /v1/tenant-website/123/properties?purpose=rent&city_id=5&state_id=1020000500
 
 **Feature Ready for Production:** ☐ Yes ☐ No
 
-**Approved By:** ********\_********
+**Approved By:** **\*\*\*\***\_**\*\*\*\***
 
-**Date:** ********\_********
+**Date:** **\*\*\*\***\_**\*\*\*\***
 
 ---
 

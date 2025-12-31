@@ -89,4 +89,3 @@ export const AddSectionView: React.FC<AddSectionViewProps> = ({
     </div>
   );
 };
-

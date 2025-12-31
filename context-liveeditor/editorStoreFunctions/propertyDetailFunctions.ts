@@ -114,7 +114,10 @@ export const propertyDetailFunctions = {
 
     // Return new state
     return {
-      propertyDetailStates: { ...state.propertyDetailStates, [variantId]: data },
+      propertyDetailStates: {
+        ...state.propertyDetailStates,
+        [variantId]: data,
+      },
     } as any;
   },
 
@@ -150,12 +153,15 @@ export const propertyDetailFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.propertyDetailStates[variantId] || getDefaultpropertyDetail2Data();
+    const source =
+      state.propertyDetailStates[variantId] || getDefaultpropertyDetail2Data();
     const newData = updateDataByPath(source, path, value);
 
     return {
-      propertyDetailStates: { ...state.propertyDetailStates, [variantId]: newData },
+      propertyDetailStates: {
+        ...state.propertyDetailStates,
+        [variantId]: newData,
+      },
     } as any;
   },
 };
-

@@ -5,6 +5,7 @@
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx`
 
 ### States الموجودة:
+
 - localZones (useState)
 - dragAxis (useState)
 - hover (useState)
@@ -16,9 +17,11 @@
 #### States Implementation:
 
 ##### localZones
+
 ```typescript
 const [localZones, setLocalZones] = useState<Record<string, boolean>>({});
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 60)
 
 ```typescript
@@ -33,44 +36,57 @@ const registerLocalZone = useCallback(
   [setLocalZones, ctx],
 );
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 63-72)
 
 ##### dragAxis
+
 ```typescript
 const [dragAxis, setDragAxis] = useState(userDragAxis || autoDragAxis);
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 61)
 
 ##### hover
+
 ```typescript
 const [hover, setHover] = useState(false);
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 151)
 
 ##### isVisible
+
 ```typescript
 const [isVisible, setIsVisible] = useState(false);
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 152)
 
 ##### dragFinished
+
 ```typescript
 const [dragFinished, setDragFinished] = useState(true);
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 153)
 
 #### Dependencies:
 
 ##### 1. dropZoneContext
+
 ```typescript
 const ctx = useContext(dropZoneContext);
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 57)
 
 ##### 2. ZoneStoreContext
+
 ```typescript
 const zoneStore = useContext(ZoneStoreContext);
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\DraggableComponent.tsx` (line 58)
 
 ---
@@ -80,6 +96,7 @@ const zoneStore = useContext(ZoneStoreContext);
 **الموقع**: `services-liveeditor\live-editor\dragDrop\useSensors.ts`
 
 ### States الموجودة:
+
 - sensors (useState)
 
 ### الاستدعاءات والاستخدامات:
@@ -87,6 +104,7 @@ const zoneStore = useContext(ZoneStoreContext);
 #### States Implementation:
 
 ##### sensors
+
 ```typescript
 const [sensors] = useState(() => {
   return [
@@ -99,14 +117,17 @@ const [sensors] = useState(() => {
   ];
 });
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\useSensors.ts` (line 41)
 
 #### Dependencies:
 
 ##### 1. PointerSensor من @dnd-kit/core
+
 ```typescript
 import { PointerSensor } from "@dnd-kit/core";
 ```
+
 **الموقع**: `services-liveeditor\live-editor\dragDrop\useSensors.ts`
 
 ---
@@ -116,6 +137,7 @@ import { PointerSensor } from "@dnd-kit/core";
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx`
 
 ### States الموجودة:
+
 - sidebarWidth (useState)
 - initialized (useState)
 - pageComponents (useState)
@@ -135,98 +157,121 @@ import { PointerSensor } from "@dnd-kit/core";
 #### States Implementation:
 
 ##### sidebarWidth
+
 ```typescript
 const [sidebarWidth, setSidebarWidth] = useState(600);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 30)
 
 ##### initialized
+
 ```typescript
 const [initialized, setInitialized] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 31)
 
 ##### pageComponents
+
 ```typescript
-const [pageComponents, setPageComponents] = useState<ComponentInstance[]>(
-  () => createInitialComponents(slug),
+const [pageComponents, setPageComponents] = useState<ComponentInstance[]>(() =>
+  createInitialComponents(slug),
 );
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 34-36)
 
 ##### registeredComponents
+
 ```typescript
 const [registeredComponents, setRegisteredComponents] = useState<
   Record<string, any>
 >({});
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 38-40)
 
 ##### activeId
+
 ```typescript
 const [activeId, setActiveId] = useState<string | null>(null);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 42)
 
 ##### sidebarOpen
+
 ```typescript
 const [sidebarOpen, setSidebarOpen] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 43)
 
 ##### sidebarView
+
 ```typescript
 const [sidebarView, setSidebarView] = useState<
   "main" | "add-section" | "edit-component" | "branding-settings"
 >("main");
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 44-46)
 
 ##### selectedComponentId
+
 ```typescript
 const [selectedComponentId, setSelectedComponentId] = useState<string | null>(
   null,
 );
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 48-50)
 
 ##### deleteDialogOpen
+
 ```typescript
 const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 52)
 
 ##### componentToDelete
+
 ```typescript
-const [componentToDelete, setComponentToDelete] = useState<string | null>(
-  null,
-);
+const [componentToDelete, setComponentToDelete] = useState<string | null>(null);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 53-55)
 
 ##### deletePageDialogOpen
+
 ```typescript
 const [deletePageDialogOpen, setDeletePageDialogOpen] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 57)
 
 ##### deletePageConfirmation
+
 ```typescript
 const [deletePageConfirmation, setDeletePageConfirmation] = useState("");
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 58)
 
 ##### dropIndicator
+
 ```typescript
-const [dropIndicator, setDropIndicator] = useState<DropIndicator | null>(
-  null,
-);
+const [dropIndicator, setDropIndicator] = useState<DropIndicator | null>(null);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 61-63)
 
 #### Dependencies:
 
 ##### 1. useTenantStore
+
 ```typescript
 const tenantId = useTenantStore((s) => s.tenantId);
 const {
@@ -236,27 +281,34 @@ const {
   tenantData,
 } = useTenantStore();
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 18, 22-27)
 
 ##### 2. useAuth
+
 ```typescript
 const { user, loading: authLoading } = useAuth();
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 21)
 
 ##### 3. useParams
+
 ```typescript
 const slug = useParams<{ slug?: string }>()?.slug || "homepage";
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 19)
 
 ##### 4. createInitialComponents
+
 ```typescript
 import {
   createInitialComponents,
   PAGE_DEFINITIONS,
 } from "@/services-liveeditor/live-editor";
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorHooks.tsx` (line 8-11)
 
 ---
@@ -266,6 +318,7 @@ import {
 **الموقع**: `components\tenant\live-editor\EditorSidebar\UnifiedSidebar.tsx`
 
 ### States الموجودة:
+
 - expanded (useState)
 
 ### الاستدعاءات والاستخدامات:
@@ -273,14 +326,17 @@ import {
 #### States Implementation:
 
 ##### expanded
+
 ```typescript
 const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\UnifiedSidebar.tsx` (line 41)
 
 #### Dependencies:
 
 ##### 1. useSidebarStateManager
+
 ```typescript
 const {
   selectedComponent: sidebarSelectedComponent,
@@ -295,12 +351,15 @@ const {
   setCurrentPage,
 } = useSidebarStateManager();
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\UnifiedSidebar.tsx` (line 28-39)
 
 ##### 2. useEditorT
+
 ```typescript
 const t = useEditorT();
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\UnifiedSidebar.tsx` (line 27)
 
 ---
@@ -310,6 +369,7 @@ const t = useEditorT();
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx`
 
 ### States الموجودة:
+
 - loaded (useState)
 - mountTarget (useState)
 - stylesLoaded (useState)
@@ -331,36 +391,47 @@ const t = useEditorT();
 #### States Implementation:
 
 ##### loaded (في AutoFrame)
+
 ```typescript
 const [loaded, setLoaded] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 256)
 
 ##### mountTarget (في AutoFrame)
+
 ```typescript
 const [mountTarget, setMountTarget] = useState<HTMLElement | null>(null);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 257)
 
 ##### stylesLoaded (في AutoFrame)
+
 ```typescript
 const [stylesLoaded, setStylesLoaded] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 258)
 
 ##### showChangesDialog
+
 ```typescript
 const [showChangesDialog, setShowChangesDialog] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 499)
 
 ##### previousHasChangesMade
+
 ```typescript
 const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 500)
 
 ##### backendDataState
+
 ```typescript
 const [backendDataState, setBackendDataState] = useState<{
   componentsWithMergedData: Array<{
@@ -375,67 +446,87 @@ const [backendDataState, setBackendDataState] = useState<{
   globalFooterData: null,
 });
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 503-514)
 
 ##### sidebarWidth
+
 ```typescript
 const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 709)
 
 ##### selectedDevice
+
 ```typescript
 const [selectedDevice, setSelectedDevice] = useState<DeviceType>("laptop");
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 710)
 
 ##### iframeReady
+
 ```typescript
 const [iframeReady, setIframeReady] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 711)
 
 ##### isComponentsSidebarOpen
+
 ```typescript
 const [isComponentsSidebarOpen, setIsComponentsSidebarOpen] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 712)
 
 ##### screenWidth
+
 ```typescript
 const [screenWidth, setScreenWidth] = useState(0);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 717)
 
 ##### debugInfo
+
 ```typescript
 const [debugInfo, setDebugInfo] = useState<PositionDebugInfo | null>(null);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 721)
 
 ##### showDebugPanel
+
 ```typescript
 const [showDebugPanel, setShowDebugPanel] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 722)
 
 ##### positionValidation
+
 ```typescript
 const [positionValidation, setPositionValidation] = useState<ReturnType<
   typeof validatePosition
 > | null>(null);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 723-725)
 
 ##### showDebugControls
+
 ```typescript
 const [showDebugControls, setShowDebugControls] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 726)
 
 #### Dependencies:
 
 ##### 1. useEditorStore
+
 ```typescript
 const globalHeaderData = useEditorStore((s) => s.globalHeaderData);
 const globalFooterData = useEditorStore((s) => s.globalFooterData);
@@ -450,24 +541,31 @@ const setGlobalHeaderData = useEditorStore((s) => s.setGlobalHeaderData);
 const setGlobalFooterData = useEditorStore((s) => s.setGlobalFooterData);
 const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 487-498)
 
 ##### 2. useTenantStore
+
 ```typescript
 const tenantData = useTenantStore((s) => s.tenantData);
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 517)
 
 ##### 3. useEditorT
+
 ```typescript
 const t = useEditorT();
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 467)
 
 ##### 4. EnhancedLiveEditorDragDropContext
+
 ```typescript
 import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-editor/dragDrop/EnhancedLiveEditorDragDropContext";
 ```
+
 **الموقع**: `components\tenant\live-editor\LiveEditorUI.tsx` (line 27)
 
 ---
@@ -477,6 +575,7 @@ import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-ed
 **الموقع**: `components\tenant\live-editor\ComponentsSidebar.tsx`
 
 ### States الموجودة:
+
 - isExpanded (useState)
 - searchTerm (useState)
 - isBasicComponentsDropdownOpen (useState)
@@ -486,37 +585,48 @@ import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-ed
 #### States Implementation:
 
 ##### isExpanded
+
 ```typescript
 const [isExpanded, setIsExpanded] = useState(true);
 ```
+
 **الموقع**: `components\tenant\live-editor\ComponentsSidebar.tsx` (line 57)
 
 ##### searchTerm
+
 ```typescript
 const [searchTerm, setSearchTerm] = useState("");
 ```
+
 **الموقع**: `components\tenant\live-editor\ComponentsSidebar.tsx` (line 58)
 
 ##### isBasicComponentsDropdownOpen
+
 ```typescript
-const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] = useState(true);
+const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] =
+  useState(true);
 ```
+
 **الموقع**: `components\tenant\live-editor\ComponentsSidebar.tsx` (line 59)
 
 #### Dependencies:
 
 ##### 1. useEditorT
+
 ```typescript
 const t = useEditorT();
 ```
+
 **الموقع**: `components\tenant\live-editor\ComponentsSidebar.tsx` (line 60)
 
 ##### 2. getAvailableSectionsTranslated
+
 ```typescript
 const availableSections = useMemo(() => {
   return getAvailableSectionsTranslated(t);
 }, [t]);
 ```
+
 **الموقع**: `components\tenant\live-editor\ComponentsSidebar.tsx` (line 63-65)
 
 ---
@@ -526,6 +636,7 @@ const availableSections = useMemo(() => {
 **الموقع**: `components\tenant\live-editor\ThemeChangeDialog.tsx`
 
 ### States الموجودة:
+
 - selectedTheme (useState)
 - showWarning (useState)
 - isApplying (useState)
@@ -535,31 +646,42 @@ const availableSections = useMemo(() => {
 #### States Implementation:
 
 ##### selectedTheme
+
 ```typescript
 const [selectedTheme, setSelectedTheme] = useState<ThemeNumber | null>(null);
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeChangeDialog.tsx` (line 60)
 
 ##### showWarning
+
 ```typescript
 const [showWarning, setShowWarning] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeChangeDialog.tsx` (line 61)
 
 ##### isApplying
+
 ```typescript
 const [isApplying, setIsApplying] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeChangeDialog.tsx` (line 62)
 
 #### Dependencies:
 
 ##### 1. useEditorT و useEditorLocale
+
 ```typescript
-import { useEditorT, useEditorLocale } from "@/context-liveeditor/editorI18nStore";
+import {
+  useEditorT,
+  useEditorLocale,
+} from "@/context-liveeditor/editorI18nStore";
 const t = useEditorT();
 const { locale } = useEditorLocale();
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeChangeDialog.tsx` (line 13, 58-59)
 
 ---
@@ -569,6 +691,7 @@ const { locale } = useEditorLocale();
 **الموقع**: `components\tenant\live-editor\ThemeSelector.tsx`
 
 ### States الموجودة:
+
 - isOpen (useState)
 - selectedTheme (useState)
 - themeOptions (useState)
@@ -578,15 +701,19 @@ const { locale } = useEditorLocale();
 #### States Implementation:
 
 ##### isOpen
+
 ```typescript
 const [isOpen, setIsOpen] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeSelector.tsx` (line 40)
 
 ##### selectedTheme
+
 ```typescript
 const [selectedTheme, setSelectedTheme] = useState(currentTheme);
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeSelector.tsx` (line 41)
 
 ```typescript
@@ -594,22 +721,27 @@ useEffect(() => {
   setSelectedTheme(currentTheme);
 }, [currentTheme]);
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeSelector.tsx` (line 44-46)
 
 ##### themeOptions
+
 ```typescript
-const [themeOptions, setThemeOptions] = useState<
-  Record<string, ThemeOption[]>
->({});
+const [themeOptions, setThemeOptions] = useState<Record<string, ThemeOption[]>>(
+  {},
+);
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeSelector.tsx` (line 48-50)
 
 #### Dependencies:
 
 ##### 1. useEditorT
+
 ```typescript
 const t = useEditorT();
 ```
+
 **الموقع**: `components\tenant\live-editor\ThemeSelector.tsx` (line 39)
 
 ---
@@ -619,6 +751,7 @@ const t = useEditorT();
 **الموقع**: `components\tenant\live-editor\LanguageDropdown.tsx`
 
 ### States الموجودة:
+
 - isChanging (useState)
 - selectedLang (useState)
 - isOpen (useState)
@@ -628,36 +761,46 @@ const t = useEditorT();
 #### States Implementation:
 
 ##### isChanging
+
 ```typescript
 const [isChanging, setIsChanging] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LanguageDropdown.tsx` (line 26)
 
 ##### selectedLang
+
 ```typescript
 const [selectedLang, setSelectedLang] = useState<string>("");
 ```
+
 **الموقع**: `components\tenant\live-editor\LanguageDropdown.tsx` (line 27)
 
 ##### isOpen
+
 ```typescript
 const [isOpen, setIsOpen] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\LanguageDropdown.tsx` (line 28)
 
 #### Dependencies:
 
 ##### 1. useEditorLocale
+
 ```typescript
 import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
 const { setLocale } = useEditorLocale();
 ```
+
 **الموقع**: `components\tenant\live-editor\LanguageDropdown.tsx` (line 11, 25)
 
 ##### 2. useRouter
+
 ```typescript
 const router = useRouter();
 ```
+
 **الموقع**: `components\tenant\live-editor\LanguageDropdown.tsx` (line 24)
 
 ---
@@ -667,6 +810,7 @@ const router = useRouter();
 **الموقع**: `app\live-editor\layout.tsx`
 
 ### States الموجودة:
+
 - internalOpen (useState)
 - isLoading (useState)
 - formData (useState)
@@ -678,18 +822,23 @@ const router = useRouter();
 #### States Implementation:
 
 ##### internalOpen
+
 ```typescript
 const [internalOpen, setInternalOpen] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 53)
 
 ##### isLoading
+
 ```typescript
 const [isLoading, setIsLoading] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 56)
 
 ##### formData
+
 ```typescript
 const [formData, setFormData] = useState({
   slug: "",
@@ -723,39 +872,50 @@ const [formData, setFormData] = useState({
   "og:image:alt": "",
 });
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 57-87)
 
 ##### errors
+
 ```typescript
 const [errors, setErrors] = useState<Record<string, string>>({});
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 88)
 
 ##### showAdvanced
+
 ```typescript
 const [showAdvanced, setShowAdvanced] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 89)
 
 #### Dependencies:
 
 ##### 1. useEditorT و useEditorLocale
+
 ```typescript
 const t = useEditorT();
 const { locale } = useEditorLocale();
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 90, 95)
 
 ##### 2. useTenantStore
+
 ```typescript
 const { tenantData } = useTenantStore();
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 92)
 
 ##### 3. useAuthStore
+
 ```typescript
 const { userData } = useAuthStore();
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 93)
 
 ---
@@ -765,6 +925,7 @@ const { userData } = useAuthStore();
 **الموقع**: `app\live-editor\layout.tsx`
 
 ### States الموجودة:
+
 - recentlyAddedPages (useState)
 - isDropdownOpen (useState)
 - isPagesDropdownOpen (useState)
@@ -782,93 +943,119 @@ const { userData } = useAuthStore();
 #### States Implementation:
 
 ##### recentlyAddedPages
+
 ```typescript
 const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 905)
 
 ##### isDropdownOpen
+
 ```typescript
 const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 906)
 
 ##### isPagesDropdownOpen
+
 ```typescript
 const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 907)
 
 ##### isAddPageDialogOpen
+
 ```typescript
 const [isAddPageDialogOpen, setIsAddPageDialogOpen] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 908)
 
 ##### isThemeDialogOpen
+
 ```typescript
 const [isThemeDialogOpen, setIsThemeDialogOpen] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 909)
 
 ##### isLoading
+
 ```typescript
 const [isLoading, setIsLoading] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 910)
 
 ##### showAdvanced
+
 ```typescript
 const [showAdvanced, setShowAdvanced] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 911)
 
 ##### formData
+
 ```typescript
 const [formData, setFormData] = useState({
   slug: "",
   // ... same structure as AddPageDialog
 });
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 930-961)
 
 ##### errors
+
 ```typescript
 const [errors, setErrors] = useState<Record<string, string>>({});
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 961)
 
 ##### showArrowTooltip
+
 ```typescript
 const [showArrowTooltip, setShowArrowTooltip] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 3302)
 
 ##### previousHasChangesMade
+
 ```typescript
 const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 3303)
 
 #### Dependencies:
 
 ##### 1. useEditorStore
+
 ```typescript
 const requestSave = useEditorStore((state) => state.requestSave);
-const editorStoreWebsiteLayout = useEditorStore(
-  (state) => state.WebsiteLayout,
+const editorStoreWebsiteLayout = useEditorStore((state) => state.WebsiteLayout);
+const currentTheme = useEditorStore(
+  (state) => state.WebsiteLayout?.currentTheme,
 );
-const currentTheme = useEditorStore((state) => state.WebsiteLayout?.currentTheme);
 const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 897, 1006-1008, 1010, 3304)
 
 ##### 2. useEditorLocale و useEditorT
+
 ```typescript
 const { locale } = useEditorLocale();
 const t = useEditorT();
 const { setLocale } = useEditorLocale();
 ```
+
 **الموقع**: `app\live-editor\layout.tsx` (line 904, 962, 3297-3298)
 
 ---
@@ -878,6 +1065,7 @@ const { setLocale } = useEditorLocale();
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx`
 
 ### States الموجودة:
+
 - isOpen (useState)
 - hue (useState)
 - saturation (useState)
@@ -890,39 +1078,51 @@ const { setLocale } = useEditorLocale();
 #### States Implementation:
 
 ##### isOpen
+
 ```typescript
 const [isOpen, setIsOpen] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx` (line 15)
 
 ##### hue
+
 ```typescript
 const [hue, setHue] = useState(0);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx` (line 16)
 
 ##### saturation
+
 ```typescript
 const [saturation, setSaturation] = useState(100);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx` (line 17)
 
 ##### lightness
+
 ```typescript
 const [lightness, setLightness] = useState(50);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx` (line 18)
 
 ##### alpha
+
 ```typescript
 const [alpha, setAlpha] = useState(1);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx` (line 19)
 
 ##### hexInput
+
 ```typescript
 const [hexInput, setHexInput] = useState(value || "#000000");
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\ModernColorPicker.tsx` (line 20)
 
 ---
@@ -932,6 +1132,7 @@ const [hexInput, setHexInput] = useState(value || "#000000");
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers\ArrayFieldRenderer.tsx`
 
 ### States الموجودة:
+
 - expanded (useState)
 - allCollapsed (useState)
 - nestedExpanded (useState)
@@ -942,29 +1143,37 @@ const [hexInput, setHexInput] = useState(value || "#000000");
 #### States Implementation:
 
 ##### expanded
+
 ```typescript
 const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers\ArrayFieldRenderer.tsx` (line 22)
 
 ##### allCollapsed
+
 ```typescript
 const [allCollapsed, setAllCollapsed] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers\ArrayFieldRenderer.tsx` (line 23)
 
 ##### nestedExpanded
+
 ```typescript
 const [nestedExpanded, setNestedExpanded] = useState<Record<string, boolean>>(
   {},
 );
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers\ArrayFieldRenderer.tsx` (line 24-26)
 
 ##### fieldTypes
+
 ```typescript
 const [fieldTypes, setFieldTypes] = useState<Record<string, string>>({});
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers\ArrayFieldRenderer.tsx` (line 27)
 
 ---
@@ -974,6 +1183,7 @@ const [fieldTypes, setFieldTypes] = useState<Record<string, string>>({});
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers.tsx`
 
 ### States الموجودة:
+
 - localValue (useState)
 - isUploading (useState)
 
@@ -982,9 +1192,11 @@ const [fieldTypes, setFieldTypes] = useState<Record<string, string>>({});
 #### States Implementation:
 
 ##### localValue
+
 ```typescript
 const [localValue, setLocalValue] = useState(stringValue);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers.tsx` (line 27)
 
 ```typescript
@@ -992,12 +1204,15 @@ React.useEffect(() => {
   setLocalValue(stringValue);
 }, [stringValue]);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers.tsx` (line 30-32)
 
 ##### isUploading
+
 ```typescript
 const [isUploading, setIsUploading] = useState(false);
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\FieldRenderers.tsx` (line 134)
 
 ---
@@ -1007,6 +1222,7 @@ const [isUploading, setIsUploading] = useState(false);
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\BrandingSettings.tsx`
 
 ### States الموجودة:
+
 - brandingData (useState)
 
 ### الاستدعاءات والاستخدامات:
@@ -1014,6 +1230,7 @@ const [isUploading, setIsUploading] = useState(false);
 #### States Implementation:
 
 ##### brandingData
+
 ```typescript
 const [brandingData, setBrandingData] = useState({
   colors: {
@@ -1024,17 +1241,17 @@ const [brandingData, setBrandingData] = useState({
   mainBgColor: "",
 });
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\BrandingSettings.tsx` (line 18-25)
 
 #### Dependencies:
 
 ##### 1. useEditorStore
+
 ```typescript
-const {
-  WebsiteLayout,
-  setWebsiteLayout,
-} = useEditorStore();
+const { WebsiteLayout, setWebsiteLayout } = useEditorStore();
 ```
+
 **الموقع**: `components\tenant\live-editor\EditorSidebar\components\BrandingSettings.tsx` (line 14-16)
 
 ---
@@ -1044,16 +1261,19 @@ const {
 ### Component States تستخدم:
 
 #### Zustand Stores:
+
 - **useEditorStore**: LiveEditorUI, BrandingSettings, LiveEditorLayout
 - **useTenantStore**: LiveEditorHooks, LiveEditorLayout
 - **useEditorI18nStore**: UnifiedSidebar, ComponentsSidebar, ThemeChangeDialog, ThemeSelector, LanguageDropdown, LiveEditorLayout
 
 #### React Contexts:
+
 - **dropZoneContext**: DraggableComponent
 - **ZoneStoreContext**: DraggableComponent
 - **useSidebarStateManager**: UnifiedSidebar
 
 #### Hooks:
+
 - **useAuth**: LiveEditorHooks
 - **useParams**: LiveEditorHooks
 - **useRouter**: LanguageDropdown
@@ -1061,6 +1281,7 @@ const {
 - **useEditorLocale**: ThemeChangeDialog, LanguageDropdown, LiveEditorLayout
 
 #### Services/Functions:
+
 - **createInitialComponents**: LiveEditorHooks
 - **getAvailableSectionsTranslated**: ComponentsSidebar
 
@@ -1102,6 +1323,7 @@ LiveEditorLayout (app/live-editor/layout.tsx)
 ### إحصائيات Component Local States:
 
 #### حسب النوع:
+
 - **Drag & Drop Components**: 2 (DraggableComponent, useSensors)
 - **Live Editor Core**: 2 (LiveEditorHooks, LiveEditorUI)
 - **Sidebar Components**: 1 (UnifiedSidebar)
@@ -1110,12 +1332,14 @@ LiveEditorLayout (app/live-editor/layout.tsx)
 - **EditorSidebar Components**: 4 (ModernColorPicker, ArrayFieldRenderer, FieldRenderers, BrandingSettings)
 
 #### إجمالي:
+
 - **إجمالي Components**: 15 components
 - **إجمالي useState Hooks**: 60+ useState hook
 - **إجمالي States**: 60+ state
 - **إجمالي الاستدعاءات**: 100+ استدعاء
 
 #### أكثر Components استخداماً للـ States:
+
 1. **LiveEditorUI**: 15 states
 2. **LiveEditorHooks**: 13 states
 3. **LiveEditorLayout (Main)**: 11 states
@@ -1123,9 +1347,9 @@ LiveEditorLayout (app/live-editor/layout.tsx)
 5. **ArrayFieldRenderer**: 4 states
 
 #### العلاقات:
+
 - **LiveEditorHooks** → يوفر states لـ LiveEditor component
 - **LiveEditorUI** → يستخدم states من LiveEditorHooks + states محلية
 - **EditorSidebar Components** → تستخدم useState محلي فقط
 - **Dialog Components** → تستخدم useState لإدارة UI state
 - **Layout Components** → تستخدم useState لإدارة forms و dialogs
-

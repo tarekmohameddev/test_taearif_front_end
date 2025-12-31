@@ -101,7 +101,7 @@ export default function PropertyRequestsPage() {
   >([]);
   const [sortField, setSortField] = useState("created_at");
   const [sortDirection, setSortDirection] = useState("desc");
-  
+
   // Filter states
   const [cityId, setCityId] = useState<string>("");
   const [districtId, setDistrictId] = useState<string>("");
@@ -109,19 +109,26 @@ export default function PropertyRequestsPage() {
   const [propertyType, setPropertyType] = useState<string>("");
   const [purchaseGoal, setPurchaseGoal] = useState<string>("");
   const [seriousness, setSeriousness] = useState<string>("");
-  
+
   // Filters data
-  const [filtersData, setFiltersData] = useState<FiltersResponse["data"] | null>(null);
+  const [filtersData, setFiltersData] = useState<
+    FiltersResponse["data"] | null
+  >(null);
   const [loadingFilters, setLoadingFilters] = useState(true);
-  const [filteredDistricts, setFilteredDistricts] = useState<FilterDistrict[]>([]);
-  
+  const [filteredDistricts, setFilteredDistricts] = useState<FilterDistrict[]>(
+    [],
+  );
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(20);
-  
+
   // Sorted property requests
-  const [filteredAndSortedPropertyRequests, setFilteredAndSortedPropertyRequests] = useState<PropertyRequest[]>([]);
-  
+  const [
+    filteredAndSortedPropertyRequests,
+    setFilteredAndSortedPropertyRequests,
+  ] = useState<PropertyRequest[]>([]);
+
   const [showPropertyRequestDialog, setShowPropertyRequestDialog] =
     useState(false);
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
@@ -173,7 +180,7 @@ export default function PropertyRequestsPage() {
 
       try {
         const response = await axiosInstance.get<FiltersResponse>(
-          "/v1/property-requests/filters"
+          "/v1/property-requests/filters",
         );
         setFiltersData(response.data.data);
       } catch (err) {
@@ -199,7 +206,7 @@ export default function PropertyRequestsPage() {
 
       try {
         setLoading(true);
-        
+
         // Build query parameters
         const params = new URLSearchParams();
         if (cityId) params.append("city_id", cityId);
@@ -213,7 +220,7 @@ export default function PropertyRequestsPage() {
         params.append("page", currentPage.toString());
 
         const response = await axiosInstance.get<PropertyRequestsResponse>(
-          `/v1/property-requests?${params.toString()}`
+          `/v1/property-requests?${params.toString()}`,
         );
         const { property_requests, pagination } = response.data.data;
         setPropertyRequestsData(property_requests);
@@ -228,7 +235,18 @@ export default function PropertyRequestsPage() {
     };
 
     fetchPropertyRequests();
-  }, [userData?.token, cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, searchTerm, currentPage, perPage]);
+  }, [
+    userData?.token,
+    cityId,
+    districtId,
+    categoryId,
+    propertyType,
+    purchaseGoal,
+    seriousness,
+    searchTerm,
+    currentPage,
+    perPage,
+  ]);
 
   // Reset district when city changes
   useEffect(() => {
@@ -242,7 +260,7 @@ export default function PropertyRequestsPage() {
       return;
     }
     const filtered = filtersData.districts.filter(
-      (district) => district.city_id === parseInt(cityId)
+      (district) => district.city_id === parseInt(cityId),
     );
     setFilteredDistricts(filtered);
   }, [filtersData, cityId]);
@@ -272,7 +290,15 @@ export default function PropertyRequestsPage() {
       setCurrentPage(1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, searchTerm]);
+  }, [
+    cityId,
+    districtId,
+    categoryId,
+    propertyType,
+    purchaseGoal,
+    seriousness,
+    searchTerm,
+  ]);
 
   const handleNewPropertyRequestChange =
     (field: keyof typeof newPropertyRequest) => (value: any) => {
@@ -549,7 +575,6 @@ export default function PropertyRequestsPage() {
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     };
-
 
   const handleSort = (field: keyof PropertyRequest) => {
     if (sortField === field) {

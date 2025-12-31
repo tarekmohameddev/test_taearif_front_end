@@ -98,17 +98,11 @@ function getTenantIdFromHost(host: string): string | null {
     const parts = host.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
       const potentialTenantId = parts[0];
-      console.log(
-        "🔍 Proxy: Potential tenant ID (local):",
-        potentialTenantId,
-      );
+      console.log("🔍 Proxy: Potential tenant ID (local):", potentialTenantId);
 
       // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
       if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
-        console.log(
-          "✅ Proxy: Valid tenant ID (local):",
-          potentialTenantId,
-        );
+        console.log("✅ Proxy: Valid tenant ID (local):", potentialTenantId);
         return potentialTenantId;
       } else {
         console.log("❌ Proxy: Reserved word (local):", potentialTenantId);
@@ -440,4 +434,3 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
-

@@ -289,7 +289,10 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                     mergedData.image?.src ||
                     "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000"
                   }
-                  alt={mergedData.image?.alt || t("components.halfTextHalfImage.default_image_alt")}
+                  alt={
+                    mergedData.image?.alt ||
+                    t("components.halfTextHalfImage.default_image_alt")
+                  }
                   fill
                   className="object-cover"
                   priority
@@ -312,7 +315,8 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                     color: mergedData.styling?.titleColor || "#000000",
                   }}
                 >
-                  {mergedData.content?.title || t("components.halfTextHalfImage.default_title")}
+                  {mergedData.content?.title ||
+                    t("components.halfTextHalfImage.default_title")}
                 </h3>
                 {/* Divider */}
                 <div
@@ -336,90 +340,92 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                     },
                     index: number,
                   ) => (
-                  <div
-                    key={feature.id || index}
-                    className="flex items-start gap-4"
-                  >
                     <div
-                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{
-                        backgroundColor:
-                          mergedData.styling?.iconBackgroundColor || "#d4a574",
-                      }}
+                      key={feature.id || index}
+                      className="flex items-start gap-4"
                     >
-                      {(() => {
-                        const iconName = feature.icon || "Shield";
-                        const IconComponent = getFeatureIcon(iconName);
-                        const iconColor =
-                          mergedData.styling?.iconColor || "#896042";
+                      <div
+                        className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
+                        style={{
+                          backgroundColor:
+                            mergedData.styling?.iconBackgroundColor ||
+                            "#d4a574",
+                        }}
+                      >
+                        {(() => {
+                          const iconName = feature.icon || "Shield";
+                          const IconComponent = getFeatureIcon(iconName);
+                          const iconColor =
+                            mergedData.styling?.iconColor || "#896042";
 
-                        // Check if it's a React Icon (from react-icons) by checking the icon name pattern
-                        const isReactIcon =
-                          iconName.startsWith("Fa") ||
-                          iconName.startsWith("Md") ||
-                          iconName.startsWith("Io") ||
-                          iconName.startsWith("Bi") ||
-                          iconName.startsWith("Bs") ||
-                          iconName.startsWith("Hi") ||
-                          iconName.startsWith("Ai") ||
-                          iconName.startsWith("Ti") ||
-                          iconName.startsWith("Gi") ||
-                          iconName.startsWith("Si") ||
-                          iconName.startsWith("Ri") ||
-                          iconName.startsWith("Tb") ||
-                          iconName.startsWith("Vsc") ||
-                          iconName.startsWith("Wi") ||
-                          iconName.startsWith("Di") ||
-                          iconName.startsWith("Im");
+                          // Check if it's a React Icon (from react-icons) by checking the icon name pattern
+                          const isReactIcon =
+                            iconName.startsWith("Fa") ||
+                            iconName.startsWith("Md") ||
+                            iconName.startsWith("Io") ||
+                            iconName.startsWith("Bi") ||
+                            iconName.startsWith("Bs") ||
+                            iconName.startsWith("Hi") ||
+                            iconName.startsWith("Ai") ||
+                            iconName.startsWith("Ti") ||
+                            iconName.startsWith("Gi") ||
+                            iconName.startsWith("Si") ||
+                            iconName.startsWith("Ri") ||
+                            iconName.startsWith("Tb") ||
+                            iconName.startsWith("Vsc") ||
+                            iconName.startsWith("Wi") ||
+                            iconName.startsWith("Di") ||
+                            iconName.startsWith("Im");
 
-                        // For React Icons, use style with fontSize
-                        if (isReactIcon) {
+                          // For React Icons, use style with fontSize
+                          if (isReactIcon) {
+                            return (
+                              <IconComponent
+                                className="w-6 h-6"
+                                style={{
+                                  color: iconColor,
+                                  fontSize: "24px",
+                                  width: "24px",
+                                  height: "24px",
+                                }}
+                              />
+                            );
+                          }
+
+                          // For Lucide icons, use size prop
                           return (
                             <IconComponent
-                              className="w-6 h-6"
+                              size={24}
                               style={{
                                 color: iconColor,
-                                fontSize: "24px",
-                                width: "24px",
-                                height: "24px",
                               }}
                             />
                           );
-                        }
-
-                        // For Lucide icons, use size prop
-                        return (
-                          <IconComponent
-                            size={24}
-                            style={{
-                              color: iconColor,
-                            }}
-                          />
-                        );
-                      })()}
+                        })()}
+                      </div>
+                      <div className="flex-1">
+                        <h4
+                          className="text-lg md:text-xl font-bold mb-2"
+                          style={{
+                            color:
+                              mergedData.styling?.featureTitleColor ||
+                              "#8b5f46",
+                          }}
+                        >
+                          {feature.title || ""}
+                        </h4>
+                        <p
+                          className="text-sm md:text-base leading-relaxed"
+                          style={{
+                            color:
+                              mergedData.styling?.featureDescriptionColor ||
+                              "#8b5f46",
+                          }}
+                        >
+                          {feature.description || ""}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h4
-                        className="text-lg md:text-xl font-bold mb-2"
-                        style={{
-                          color:
-                            mergedData.styling?.featureTitleColor || "#8b5f46",
-                        }}
-                      >
-                        {feature.title || ""}
-                      </h4>
-                      <p
-                        className="text-sm md:text-base leading-relaxed"
-                        style={{
-                          color:
-                            mergedData.styling?.featureDescriptionColor ||
-                            "#8b5f46",
-                        }}
-                      >
-                        {feature.description || ""}
-                      </p>
-                    </div>
-                  </div>
                   ),
                 )}
               </div>
@@ -430,10 +436,3 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     </section>
   );
 }
-
-
-
-
-
-
-

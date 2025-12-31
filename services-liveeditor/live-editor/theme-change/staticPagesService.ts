@@ -2,22 +2,22 @@
  * ============================================================================
  * Static Pages Service
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على خدمات إدارة الصفحات الثابتة (static pages).
  * This file contains services for managing static pages.
- * 
+ *
  * المسؤوليات:
  * - تطبيق الصفحات الثابتة من بيانات الثيم
  * - استعادة الصفحات الثابتة من النسخ الاحتياطي
  * - تحديث meta tags للصفحات الثابتة
  * - تحضير مكونات الصفحات الثابتة
- * 
+ *
  * Responsibilities:
  * - Apply static pages from theme data
  * - Restore static pages from backup
  * - Update meta tags for static pages
  * - Prepare static page components
- * 
+ *
  * ============================================================================
  */
 
@@ -32,19 +32,19 @@ import {
 /**
  * تحضير مكونات الصفحة الثابتة
  * Prepare static page components
- * 
+ *
  * تقوم هذه الدالة بتحضير مكونات الصفحة الثابتة مع التأكد من أن
  * id يطابق componentName (مهم جداً للصفحات الثابتة).
- * 
+ *
  * This function prepares static page components ensuring that
  * id matches componentName (critical for static pages).
- * 
+ *
  * @param components - مكونات الصفحة من بيانات الثيم
  *                    Page components from theme data
- * 
+ *
  * @returns مكونات الصفحة المحضرة مع id و forceUpdate
  *          Prepared page components with id and forceUpdate
- * 
+ *
  * @example
  * ```typescript
  * const preparedComponents = prepareStaticPageComponents(pageData.components);
@@ -71,19 +71,19 @@ function prepareStaticPageComponents(components: any[]): any[] {
 /**
  * تحديث حالات المكونات للصفحة الثابتة
  * Update component states for static page
- * 
+ *
  * تقوم هذه الدالة بتحديث حالات المكونات في Editor Store
  * للصفحة الثابتة.
- * 
+ *
  * This function updates component states in Editor Store
  * for the static page.
- * 
+ *
  * @param components - مكونات الصفحة
  *                    Page components
- * 
+ *
  * @param slug - معرف الصفحة (slug)
  *             Page identifier (slug)
- * 
+ *
  * @example
  * ```typescript
  * updateStaticPageComponentStates(components, "project");
@@ -91,7 +91,7 @@ function prepareStaticPageComponents(components: any[]): any[] {
  */
 function updateStaticPageComponentStates(
   components: any[],
-  slug: string
+  slug: string,
 ): void {
   const store = useEditorStore.getState();
 
@@ -103,13 +103,16 @@ function updateStaticPageComponentStates(
       // This ensures projectDetails1 uses "projectDetails1" as variantId, not a UUID
       const variantId = comp.componentName || comp.id;
 
-      console.log(`[updateStaticPageComponentStates] Setting component state:`, {
-        slug,
-        type: comp.type,
-        id: comp.id,
-        componentName: comp.componentName,
-        variantId: variantId,
-      });
+      console.log(
+        `[updateStaticPageComponentStates] Setting component state:`,
+        {
+          slug,
+          type: comp.type,
+          id: comp.id,
+          componentName: comp.componentName,
+          variantId: variantId,
+        },
+      );
 
       // ✅ التأكد من وجود variant وتعيين البيانات
       // ✅ Ensure variant exists and set data
@@ -122,19 +125,19 @@ function updateStaticPageComponentStates(
 /**
  * تحديث meta tags للصفحة الثابتة
  * Update meta tags for static page
- * 
+ *
  * تقوم هذه الدالة بتحديث meta tags في WebsiteLayout
  * للصفحة الثابتة.
- * 
+ *
  * This function updates meta tags in WebsiteLayout
  * for the static page.
- * 
+ *
  * @param slug - معرف الصفحة (slug)
  *             Page identifier (slug)
- * 
+ *
  * @param pageData - بيانات الصفحة
  *                 Page data
- * 
+ *
  * @example
  * ```typescript
  * updateStaticPageMetaTags("project", pageData);
@@ -151,7 +154,7 @@ function updateStaticPageMetaTags(slug: string, pageData: any): void {
   // التحقق من وجود الصفحة في metaTags
   // Check if page exists in metaTags
   const existingPageIndex = staticPagesMetaTags.findIndex(
-    (page: any) => page.slug === slug || page.path === `/${slug}`
+    (page: any) => page.slug === slug || page.path === `/${slug}`,
   );
 
   // إنشاء بيانات meta للصفحة
@@ -182,16 +185,16 @@ function updateStaticPageMetaTags(slug: string, pageData: any): void {
 /**
  * تطبيق الصفحات الثابتة من بيانات الثيم
  * Apply static pages from theme data
- * 
+ *
  * تقوم هذه الدالة بتطبيق جميع الصفحات الثابتة من بيانات الثيم
  * على Editor Store.
- * 
+ *
  * This function applies all static pages from theme data
  * to Editor Store.
- * 
+ *
  * @param themeData - بيانات الثيم
  *                  Theme data
- * 
+ *
  * @example
  * ```typescript
  * applyStaticPagesFromTheme(themeData);
@@ -202,14 +205,14 @@ export function applyStaticPagesFromTheme(themeData: ThemeData): void {
 
   // التحقق من وجود صفحات ثابتة في بيانات الثيم
   // Check if static pages exist in theme data
-  if (!themeData.staticPages || !('staticPages' in themeData)) {
+  if (!themeData.staticPages || !("staticPages" in themeData)) {
     console.log("[applyStaticPagesFromTheme] No static pages in theme data");
     return;
   }
 
   console.log(
     "[applyStaticPagesFromTheme] Applying static pages from theme:",
-    Object.keys(themeData.staticPages)
+    Object.keys(themeData.staticPages),
   );
 
   // تطبيق كل صفحة ثابتة من الثيم
@@ -218,7 +221,9 @@ export function applyStaticPagesFromTheme(themeData: ThemeData): void {
     if (pageData && pageData.components && Array.isArray(pageData.components)) {
       // ⭐ CRITICAL: تحضير المكونات مع التأكد من أن id يطابق componentName
       // ⭐ CRITICAL: Prepare components ensuring id matches componentName
-      const updatedComponents = prepareStaticPageComponents(pageData.components);
+      const updatedComponents = prepareStaticPageComponents(
+        pageData.components,
+      );
 
       // تعيين بيانات الصفحة الثابتة
       // Set static page data
@@ -246,23 +251,23 @@ export function applyStaticPagesFromTheme(themeData: ThemeData): void {
 /**
  * استعادة الصفحات الثابتة من النسخ الاحتياطي
  * Restore static pages from backup
- * 
+ *
  * تقوم هذه الدالة باستعادة جميع الصفحات الثابتة من النسخ الاحتياطي
  * على Editor Store.
- * 
+ *
  * This function restores all static pages from backup
  * to Editor Store.
- * 
+ *
  * @param backup - بيانات النسخ الاحتياطي
  *               Backup data
- * 
+ *
  * @example
  * ```typescript
  * restoreStaticPagesFromBackup(backup);
  * ```
  */
 export function restoreStaticPagesFromBackup(
-  backup: Record<string, any>
+  backup: Record<string, any>,
 ): void {
   const store = useEditorStore.getState();
 
@@ -270,51 +275,53 @@ export function restoreStaticPagesFromBackup(
   // Get static pages data from backup
   const staticPagesBackup = backup._staticPagesData;
   if (!staticPagesBackup || Object.keys(staticPagesBackup).length === 0) {
-    console.log(
-      "[restoreStaticPagesFromBackup] No static pages in backup"
-    );
+    console.log("[restoreStaticPagesFromBackup] No static pages in backup");
     return;
   }
 
   console.log(
     "[restoreStaticPagesFromBackup] Restoring static pages from backup:",
-    Object.keys(staticPagesBackup)
+    Object.keys(staticPagesBackup),
   );
 
   // استعادة كل صفحة ثابتة من النسخ الاحتياطي
   // Restore each static page from backup
-  Object.entries(staticPagesBackup).forEach(([slug, pageData]: [
-    string,
-    any
-  ]) => {
-    if (pageData && pageData.components && Array.isArray(pageData.components)) {
-      // ⭐ CRITICAL: تحضير المكونات مع التأكد من أن id يطابق componentName
-      // ⭐ CRITICAL: Prepare components ensuring id matches componentName
-      const updatedComponents = prepareStaticPageComponents(pageData.components);
+  Object.entries(staticPagesBackup).forEach(
+    ([slug, pageData]: [string, any]) => {
+      if (
+        pageData &&
+        pageData.components &&
+        Array.isArray(pageData.components)
+      ) {
+        // ⭐ CRITICAL: تحضير المكونات مع التأكد من أن id يطابق componentName
+        // ⭐ CRITICAL: Prepare components ensuring id matches componentName
+        const updatedComponents = prepareStaticPageComponents(
+          pageData.components,
+        );
 
-      // تعيين بيانات الصفحة الثابتة
-      // Set static page data
-      store.setStaticPageData(slug, {
-        slug: pageData.slug || slug,
-        components: updatedComponents,
-        apiEndpoints: pageData.apiEndpoints || {},
-      });
+        // تعيين بيانات الصفحة الثابتة
+        // Set static page data
+        store.setStaticPageData(slug, {
+          slug: pageData.slug || slug,
+          components: updatedComponents,
+          apiEndpoints: pageData.apiEndpoints || {},
+        });
 
-      // تحديث حالات المكونات
-      // Update component states
-      updateStaticPageComponentStates(updatedComponents, slug);
+        // تحديث حالات المكونات
+        // Update component states
+        updateStaticPageComponentStates(updatedComponents, slug);
 
-      // تحديث meta tags
-      // Update meta tags
-      updateStaticPageMetaTags(slug, pageData);
+        // تحديث meta tags
+        // Update meta tags
+        updateStaticPageMetaTags(slug, pageData);
 
-      console.log(
-        `[restoreStaticPagesFromBackup] Restored static page: ${slug}`,
-        {
-          componentCount: pageData.components.length,
-        }
-      );
-    }
-  });
+        console.log(
+          `[restoreStaticPagesFromBackup] Restored static page: ${slug}`,
+          {
+            componentCount: pageData.components.length,
+          },
+        );
+      }
+    },
+  );
 }
-

@@ -1,633 +1,633 @@
 {
-    "username": "te51st-site",
-    "websiteName": "te51st-site",
-    "componentSettings": {
-      "about-us": [
-        {
-          "id": "0",
-          "type": "hero",
-          "name": "Hero",
-          "componentName": "hero2",
-          "data": {
-            "visible": true,
-            "height": {
-              "desktop": "90vh",
-              "tablet": "90vh",
-              "mobile": "90vh"
-            },
-            "minHeight": {
-              "desktop": "520px",
-              "tablet": "520px",
-              "mobile": "520px"
-            },
-            "background": {
-              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-              "alt": "صورة خلفية لغرفة معيشة حديثة",
-              "overlay": {
-                "enabled": true,
-                "opacity": "0.45",
-                "color": "#000000"
-              }
-            },
-            "content": {
-              "title": "اكتشف عقارك المثالي في أفضل المواقع",
-              "description": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
-              "alignment": "center",
-              "maxWidth": "5xl",
-              "font": {
-                "title": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "36px",
-                    "tablet": "36px",
-                    "mobile": "36px"
-                  },
-                  "weight": "bold",
-                  "color": "#ffffff",
-                  "lineHeight": "1.25"
-                },
-                "subtitle": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "15px",
-                    "tablet": "15px",
-                    "mobile": "15px"
-                  },
-                  "weight": "normal",
-                  "color": "#ffffff"
-                }
-              }
-            },
-            "animations": {
+  "username": "te51st-site",
+  "websiteName": "te51st-site",
+  "componentSettings": {
+    "about-us": [
+      {
+        "id": "0",
+        "type": "hero",
+        "name": "Hero",
+        "componentName": "hero2",
+        "data": {
+          "visible": true,
+          "height": {
+            "desktop": "90vh",
+            "tablet": "90vh",
+            "mobile": "90vh"
+          },
+          "minHeight": {
+            "desktop": "520px",
+            "tablet": "520px",
+            "mobile": "520px"
+          },
+          "background": {
+            "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+            "alt": "صورة خلفية لغرفة معيشة حديثة",
+            "overlay": {
+              "enabled": true,
+              "opacity": "0.45",
+              "color": "#000000"
+            }
+          },
+          "content": {
+            "title": "اكتشف عقارك المثالي في أفضل المواقع",
+            "description": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+            "alignment": "center",
+            "maxWidth": "5xl",
+            "font": {
               "title": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "36px",
+                  "tablet": "36px",
+                  "mobile": "36px"
+                },
+                "weight": "bold",
+                "color": "#ffffff",
+                "lineHeight": "1.25"
               },
-              "description": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
+              "subtitle": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "15px",
+                  "tablet": "15px",
+                  "mobile": "15px"
+                },
+                "weight": "normal",
+                "color": "#ffffff"
               }
             }
           },
-          "position": 0,
-          "layout": {
-            "row": 0,
-            "col": 0,
-            "span": 2
-          }
-        }
-      ]
-    },
-    "globalComponentsData": {
-      "header": {
-        "visible": true,
-        "position": {
-          "type": "sticky",
-          "top": 0,
-          "zIndex": 50
-        },
-        "height": {
-          "desktop": 96,
-          "tablet": 80,
-          "mobile": 64
-        },
-        "background": {
-          "type": "solid",
-          "opacity": "0.8",
-          "blur": true,
-          "colors": {
-            "from": "#ffffff",
-            "to": "#ffffff"
+          "animations": {
+            "title": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "description": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            }
           }
         },
-        "colors": {
-          "text": "#1f2937",
-          "link": "#374151",
-          "linkHover": "#1f2937",
-          "linkActive": "#059669",
-          "icon": "#374151",
-          "iconHover": "#1f2937",
-          "border": "#e5e7eb",
-          "accent": "#059669"
-        },
-        "logo": {
-          "type": "image+text",
-          "image": "https://dalel-lovat.vercel.app/images/logo.svg",
-          "text": "الشركة العقارية",
-          "font": {
-            "family": "Tajawal",
-            "size": 24,
-            "weight": "600"
-          },
-          "url": "/",
-          "clickAction": "navigate"
-        },
-        "menu": [
-          {
-            "id": "home",
-            "type": "link",
-            "text": "الرئيسية",
-            "url": "/"
-          },
-          {
-            "id": "about",
-            "type": "link",
-            "text": "حول",
-            "url": "/about-us"
-          },
-          {
-            "id": "services",
-            "type": "link",
-            "text": "الخدمات",
-            "url": "/services"
-          },
-          {
-            "id": "contact",
-            "type": "link",
-            "text": "اتصل بنا",
-            "url": "/contact-us"
-          }
-        ],
-        "actions": {
-          "search": {
-            "enabled": false,
-            "placeholder": "بحث..."
-          },
-          "user": {
-            "showProfile": true,
-            "showCart": false,
-            "showWishlist": false,
-            "showNotifications": false
-          },
-          "mobile": {
-            "showLogo": true,
-            "showLanguageToggle": false,
-            "showSearch": false
-          }
-        },
-        "responsive": {
-          "breakpoints": {
-            "mobile": 768,
-            "tablet": 1024,
-            "desktop": 1280
-          },
-          "mobileMenu": {
-            "side": "right",
-            "width": 320,
-            "overlay": true
-          }
-        },
-        "animations": {
-          "menuItems": {
-            "enabled": true,
-            "duration": 200,
-            "delay": 50
-          },
-          "mobileMenu": {
-            "enabled": true,
-            "duration": 300,
-            "easing": "ease-in-out"
-          }
-        },
-        "variant": "header2"
-      },
-      "footer": {
-        "visible": true,
-        "ThemeTwo": "ThemeTwo",
-        "background": {
-          "type": "color",
-          "image": null,
-          "alt": null,
-          "color": "#8b5f46",
-          "ThemeTwo": "ThemeTwo",
-          "gradient": {
-            "enabled": false,
-            "direction": "to-r",
-            "startColor": "#1f2937",
-            "endColor": "#374151",
-            "middleColor": "#4b5563",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "overlay": {
-            "enabled": false,
-            "opacity": "0.7",
-            "color": "#000000",
-            "blendMode": "multiply",
-            "ThemeTwo": "ThemeTwo"
-          }
-        },
+        "position": 0,
         "layout": {
-          "columns": "2",
-          "spacing": "8",
-          "padding": "16",
-          "maxWidth": "6xl",
+          "row": 0,
+          "col": 0,
+          "span": 2
+        }
+      }
+    ]
+  },
+  "globalComponentsData": {
+    "header": {
+      "visible": true,
+      "position": {
+        "type": "sticky",
+        "top": 0,
+        "zIndex": 50
+      },
+      "height": {
+        "desktop": 96,
+        "tablet": 80,
+        "mobile": 64
+      },
+      "background": {
+        "type": "solid",
+        "opacity": "0.8",
+        "blur": true,
+        "colors": {
+          "from": "#ffffff",
+          "to": "#ffffff"
+        }
+      },
+      "colors": {
+        "text": "#1f2937",
+        "link": "#374151",
+        "linkHover": "#1f2937",
+        "linkActive": "#059669",
+        "icon": "#374151",
+        "iconHover": "#1f2937",
+        "border": "#e5e7eb",
+        "accent": "#059669"
+      },
+      "logo": {
+        "type": "image+text",
+        "image": "https://dalel-lovat.vercel.app/images/logo.svg",
+        "text": "الشركة العقارية",
+        "font": {
+          "family": "Tajawal",
+          "size": 24,
+          "weight": "600"
+        },
+        "url": "/",
+        "clickAction": "navigate"
+      },
+      "menu": [
+        {
+          "id": "home",
+          "type": "link",
+          "text": "الرئيسية",
+          "url": "/"
+        },
+        {
+          "id": "about",
+          "type": "link",
+          "text": "حول",
+          "url": "/about-us"
+        },
+        {
+          "id": "services",
+          "type": "link",
+          "text": "الخدمات",
+          "url": "/services"
+        },
+        {
+          "id": "contact",
+          "type": "link",
+          "text": "اتصل بنا",
+          "url": "/contact-us"
+        }
+      ],
+      "actions": {
+        "search": {
+          "enabled": false,
+          "placeholder": "بحث..."
+        },
+        "user": {
+          "showProfile": true,
+          "showCart": false,
+          "showWishlist": false,
+          "showNotifications": false
+        },
+        "mobile": {
+          "showLogo": true,
+          "showLanguageToggle": false,
+          "showSearch": false
+        }
+      },
+      "responsive": {
+        "breakpoints": {
+          "mobile": 768,
+          "tablet": 1024,
+          "desktop": 1280
+        },
+        "mobileMenu": {
+          "side": "right",
+          "width": 320,
+          "overlay": true
+        }
+      },
+      "animations": {
+        "menuItems": {
+          "enabled": true,
+          "duration": 200,
+          "delay": 50
+        },
+        "mobileMenu": {
+          "enabled": true,
+          "duration": 300,
+          "easing": "ease-in-out"
+        }
+      },
+      "variant": "header2"
+    },
+    "footer": {
+      "visible": true,
+      "ThemeTwo": "ThemeTwo",
+      "background": {
+        "type": "color",
+        "image": null,
+        "alt": null,
+        "color": "#8b5f46",
+        "ThemeTwo": "ThemeTwo",
+        "gradient": {
+          "enabled": false,
+          "direction": "to-r",
+          "startColor": "#1f2937",
+          "endColor": "#374151",
+          "middleColor": "#4b5563",
           "ThemeTwo": "ThemeTwo"
         },
-        "content": {
-          "ThemeTwo": "ThemeTwo",
-          "companyInfo": {
-            "enabled": true,
-            "name": "تعاريفالعقارية",
-            "description": "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
-            "tagline": null,
-            "logo": "/images/main/logo.png",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "newsletter": {
-            "enabled": true,
-            "title": "اشترك في النشرة البريدية",
-            "description": "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
-            "placeholder": "رقم الواتساب",
-            "buttonText": "اشترك الآن",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "contactInfo": {
-            "enabled": true,
-            "address": "المملكة العربية السعودية - الرياض",
-            "email": "contact@baheya.co",
-            "whatsapp": "0542120011",
-            "whatsappUrl": "https://wa.link/0ysvug",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "socialMedia": {
-            "enabled": true,
-            "platforms": [
-              {
-                "name": "Facebook",
-                "url": "https://www.facebook.com/share/1C974jrjRc/",
-                "ThemeTwo": "ThemeTwo"
-              },
-              {
-                "name": "YouTube",
-                "url": "https://youtube.com/channel/UCVru6ldyQvpyuxl1lkd_oUQ?si=v6LprF-hXxagAhrp",
-                "ThemeTwo": "ThemeTwo"
-              },
-              {
-                "name": "Instagram",
-                "url": "https://www.instagram.com/baheyarealestat?igsh=enA3cW1tbjRjbHU4",
-                "ThemeTwo": "ThemeTwo"
-              },
-              {
-                "name": "X (Twitter)",
-                "url": "https://x.com/bahiarealstate?t=U_Fm4pDkJj73HPkY_mHDWQ&s=08",
-                "ThemeTwo": "ThemeTwo"
-              },
-              {
-                "name": "Snapchat",
-                "url": "https://www.snapchat.com/add/baheyarealstate?share_id=CH-Am1w1NlU&locale=ar-AE",
-                "ThemeTwo": "ThemeTwo"
-              }
-            ],
-            "ThemeTwo": "ThemeTwo"
-          }
-        },
-        "footerBottom": {
+        "overlay": {
+          "enabled": false,
+          "opacity": "0.7",
+          "color": "#000000",
+          "blendMode": "multiply",
+          "ThemeTwo": "ThemeTwo"
+        }
+      },
+      "layout": {
+        "columns": "2",
+        "spacing": "8",
+        "padding": "16",
+        "maxWidth": "6xl",
+        "ThemeTwo": "ThemeTwo"
+      },
+      "content": {
+        "ThemeTwo": "ThemeTwo",
+        "companyInfo": {
           "enabled": true,
-          "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025©",
-          "companyUrl": "https://baheya.co",
-          "designerUrl": "http://souhailagency.com",
-          "legalLinks": [
+          "name": "تعاريفالعقارية",
+          "description": "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
+          "tagline": null,
+          "logo": "/images/main/logo.png",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "newsletter": {
+          "enabled": true,
+          "title": "اشترك في النشرة البريدية",
+          "description": "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
+          "placeholder": "رقم الواتساب",
+          "buttonText": "اشترك الآن",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "contactInfo": {
+          "enabled": true,
+          "address": "المملكة العربية السعودية - الرياض",
+          "email": "contact@baheya.co",
+          "whatsapp": "0542120011",
+          "whatsappUrl": "https://wa.link/0ysvug",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "socialMedia": {
+          "enabled": true,
+          "platforms": [
             {
-              "text": "سياسة الخصوصية",
-              "url": "/privacy-policy",
+              "name": "Facebook",
+              "url": "https://www.facebook.com/share/1C974jrjRc/",
               "ThemeTwo": "ThemeTwo"
             },
             {
-              "text": "سياسة الاستخدام",
-              "url": "/terms-of-use",
+              "name": "YouTube",
+              "url": "https://youtube.com/channel/UCVru6ldyQvpyuxl1lkd_oUQ?si=v6LprF-hXxagAhrp",
+              "ThemeTwo": "ThemeTwo"
+            },
+            {
+              "name": "Instagram",
+              "url": "https://www.instagram.com/baheyarealestat?igsh=enA3cW1tbjRjbHU4",
+              "ThemeTwo": "ThemeTwo"
+            },
+            {
+              "name": "X (Twitter)",
+              "url": "https://x.com/bahiarealstate?t=U_Fm4pDkJj73HPkY_mHDWQ&s=08",
+              "ThemeTwo": "ThemeTwo"
+            },
+            {
+              "name": "Snapchat",
+              "url": "https://www.snapchat.com/add/baheyarealstate?share_id=CH-Am1w1NlU&locale=ar-AE",
               "ThemeTwo": "ThemeTwo"
             }
           ],
           "ThemeTwo": "ThemeTwo"
-        },
-        "floatingWhatsApp": {
-          "enabled": true,
-          "url": "https://wa.link/0ysvug",
+        }
+      },
+      "footerBottom": {
+        "enabled": true,
+        "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025©",
+        "companyUrl": "https://baheya.co",
+        "designerUrl": "http://souhailagency.com",
+        "legalLinks": [
+          {
+            "text": "سياسة الخصوصية",
+            "url": "/privacy-policy",
+            "ThemeTwo": "ThemeTwo"
+          },
+          {
+            "text": "سياسة الاستخدام",
+            "url": "/terms-of-use",
+            "ThemeTwo": "ThemeTwo"
+          }
+        ],
+        "ThemeTwo": "ThemeTwo"
+      },
+      "floatingWhatsApp": {
+        "enabled": true,
+        "url": "https://wa.link/0ysvug",
+        "ThemeTwo": "ThemeTwo"
+      },
+      "styling": {
+        "ThemeTwo": "ThemeTwo",
+        "colors": {
+          "textPrimary": "#ffffff",
+          "textSecondary": "#ffffff",
+          "textMuted": "rgba(255, 255, 255, 0.9)",
+          "accent": "#a67c5a",
+          "border": "rgba(255, 255, 255, 0.2)",
           "ThemeTwo": "ThemeTwo"
         },
-        "styling": {
-          "ThemeTwo": "ThemeTwo",
-          "colors": {
-            "textPrimary": "#ffffff",
-            "textSecondary": "#ffffff",
-            "textMuted": "rgba(255, 255, 255, 0.9)",
-            "accent": "#a67c5a",
-            "border": "rgba(255, 255, 255, 0.2)",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "typography": {
-            "titleSize": "xl",
-            "titleWeight": "bold",
-            "bodySize": "base",
-            "bodyWeight": "normal",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "spacing": {
-            "sectionPadding": "16",
-            "columnGap": "8",
-            "itemGap": "3",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "effects": {
-            "hoverTransition": "0.3s",
-            "shadow": "none",
-            "borderRadius": "lg",
-            "ThemeTwo": "ThemeTwo"
-          }
+        "typography": {
+          "titleSize": "xl",
+          "titleWeight": "bold",
+          "bodySize": "base",
+          "bodyWeight": "normal",
+          "ThemeTwo": "ThemeTwo"
         },
-        "variant": "footer2"
+        "spacing": {
+          "sectionPadding": "16",
+          "columnGap": "8",
+          "itemGap": "3",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "effects": {
+          "hoverTransition": "0.3s",
+          "shadow": "none",
+          "borderRadius": "lg",
+          "ThemeTwo": "ThemeTwo"
+        }
       },
-      "globalHeaderVariant": "header2",
-      "globalFooterVariant": "footer2"
+      "variant": "footer2"
     },
-    "WebsiteLayout": {
-      "metaTags": {
-        "pages": [
-          {
-            "path": "/",
-            "TitleAr": "الصفحة الرئيسية",
-            "TitleEn": "Homepage",
-            "DescriptionAr": "مرحباً بكم في موقعنا - الصفحة الرئيسية",
-            "DescriptionEn": "Welcome to our website - Homepage",
-            "KeywordsAr": "الرئيسية, الموقع, الصفحة الرئيسية",
-            "KeywordsEn": "homepage, main, website",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "الصفحة الرئيسية",
-            "og:description": "مرحباً بكم في موقعنا",
-            "og:keywords": "الرئيسية, الموقع",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "الصفحة الرئيسية"
-          },
-          {
-            "path": "/create-request",
-            "TitleAr": "إنشاء طلب",
-            "TitleEn": "Create Request",
-            "DescriptionAr": "إنشاء طلب جديد للحصول على الخدمات",
-            "DescriptionEn": "Create a new request to get our services",
-            "KeywordsAr": "إنشاء طلب, خدمات, طلب جديد",
-            "KeywordsEn": "create request, services, new request",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "إنشاء طلب",
-            "og:description": "إنشاء طلب جديد للحصول على الخدمات",
-            "og:keywords": "إنشاء طلب, خدمات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "إنشاء طلب"
-          },
-          {
-            "path": "/for-rent",
-            "TitleAr": "للإيجار",
-            "TitleEn": "For Rent",
-            "DescriptionAr": "عقارات متاحة للإيجار",
-            "DescriptionEn": "Properties available for rent",
-            "KeywordsAr": "للإيجار, عقارات, شقق, منازل",
-            "KeywordsEn": "for rent, properties, apartments, houses",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "للإيجار",
-            "og:description": "عقارات متاحة للإيجار",
-            "og:keywords": "للإيجار, عقارات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "للإيجار"
-          },
-          {
-            "path": "/for-sale",
-            "TitleAr": "للبيع",
-            "TitleEn": "For Sale",
-            "DescriptionAr": "عقارات متاحة للبيع",
-            "DescriptionEn": "Properties available for sale",
-            "KeywordsAr": "للبيع, عقارات, شقق, منازل",
-            "KeywordsEn": "for sale, properties, apartments, houses",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "للبيع",
-            "og:description": "عقارات متاحة للبيع",
-            "og:keywords": "للبيع, عقارات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "للبيع"
-          },
-          {
-            "path": "/projects",
-            "TitleAr": "المشاريع",
-            "TitleEn": "Projects",
-            "DescriptionAr": "مشاريعنا العقارية المتميزة",
-            "DescriptionEn": "Our distinguished real estate projects",
-            "KeywordsAr": "مشاريع, عقارية, تطوير, بناء",
-            "KeywordsEn": "projects, real estate, development, construction",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "المشاريع",
-            "og:description": "مشاريعنا العقارية المتميزة",
-            "og:keywords": "مشاريع, عقارية",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "المشاريع"
-          },
-          {
-            "path": "/contact-us",
-            "TitleAr": "اتصل بنا",
-            "TitleEn": "Contact Us",
-            "DescriptionAr": "تواصل معنا للحصول على المساعدة",
-            "DescriptionEn": "Contact us for assistance",
-            "KeywordsAr": "اتصل بنا, تواصل, مساعدة, خدمة العملاء",
-            "KeywordsEn": "contact us, communication, help, customer service",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "اتصل بنا",
-            "og:description": "تواصل معنا للحصول على المساعدة",
-            "og:keywords": "اتصل بنا, تواصل",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "اتصل بنا"
-          },
-          {
-            "path": "/about-us",
-            "TitleAr": "من نحن",
-            "TitleEn": "About Us",
-            "DescriptionAr": "تعرف على شركتنا وخدماتنا",
-            "DescriptionEn": "Learn about our company and services",
-            "KeywordsAr": "من نحن, شركة, خدمات, معلومات",
-            "KeywordsEn": "about us, company, services, information",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "من نحن",
-            "og:description": "تعرف على شركتنا وخدماتنا",
-            "og:keywords": "من نحن, شركة",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "من نحن"
-          },
-          {
-            "path": "/about",
-            "TitleAr": "حول",
-            "TitleEn": "About",
-            "DescriptionAr": "معلومات حول شركتنا",
-            "DescriptionEn": "Information about our company",
-            "KeywordsAr": "حول, معلومات, شركة",
-            "KeywordsEn": "about, information, company",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "حول",
-            "og:description": "معلومات حول شركتنا",
-            "og:keywords": "حول, معلومات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "حول"
-          },
-          {
-            "path": "/contact",
-            "TitleAr": "تواصل",
-            "TitleEn": "Contact",
-            "DescriptionAr": "تواصل معنا",
-            "DescriptionEn": "Contact us",
-            "KeywordsAr": "تواصل, اتصال, مساعدة",
-            "KeywordsEn": "contact, communication, help",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "تواصل",
-            "og:description": "تواصل معنا",
-            "og:keywords": "تواصل, اتصال",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "تواصل"
-          },
-          {
-            "TitleAr": "للبيع",
-            "TitleEn": "for-sale",
-            "DescriptionAr": "للبيع",
-            "DescriptionEn": "for-sale",
-            "KeywordsAr": "للبيع",
-            "KeywordsEn": "for-sale",
-            "Author": "للبيع",
-            "AuthorEn": "for-sale",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "للبيع",
-            "og:description": "للبيع",
-            "og:keywords": "للبيع",
-            "og:author": "للبيع",
-            "og:robots": "index, follow",
-            "og:url": "/for-sale",
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "للبيع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "للبيع",
-            "path": "/for-sale"
-          }
-        ]
-      }
+    "globalHeaderVariant": "header2",
+    "globalFooterVariant": "footer2"
+  },
+  "WebsiteLayout": {
+    "metaTags": {
+      "pages": [
+        {
+          "path": "/",
+          "TitleAr": "الصفحة الرئيسية",
+          "TitleEn": "Homepage",
+          "DescriptionAr": "مرحباً بكم في موقعنا - الصفحة الرئيسية",
+          "DescriptionEn": "Welcome to our website - Homepage",
+          "KeywordsAr": "الرئيسية, الموقع, الصفحة الرئيسية",
+          "KeywordsEn": "homepage, main, website",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "الصفحة الرئيسية",
+          "og:description": "مرحباً بكم في موقعنا",
+          "og:keywords": "الرئيسية, الموقع",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "الصفحة الرئيسية"
+        },
+        {
+          "path": "/create-request",
+          "TitleAr": "إنشاء طلب",
+          "TitleEn": "Create Request",
+          "DescriptionAr": "إنشاء طلب جديد للحصول على الخدمات",
+          "DescriptionEn": "Create a new request to get our services",
+          "KeywordsAr": "إنشاء طلب, خدمات, طلب جديد",
+          "KeywordsEn": "create request, services, new request",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "إنشاء طلب",
+          "og:description": "إنشاء طلب جديد للحصول على الخدمات",
+          "og:keywords": "إنشاء طلب, خدمات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "إنشاء طلب"
+        },
+        {
+          "path": "/for-rent",
+          "TitleAr": "للإيجار",
+          "TitleEn": "For Rent",
+          "DescriptionAr": "عقارات متاحة للإيجار",
+          "DescriptionEn": "Properties available for rent",
+          "KeywordsAr": "للإيجار, عقارات, شقق, منازل",
+          "KeywordsEn": "for rent, properties, apartments, houses",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "للإيجار",
+          "og:description": "عقارات متاحة للإيجار",
+          "og:keywords": "للإيجار, عقارات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "للإيجار"
+        },
+        {
+          "path": "/for-sale",
+          "TitleAr": "للبيع",
+          "TitleEn": "For Sale",
+          "DescriptionAr": "عقارات متاحة للبيع",
+          "DescriptionEn": "Properties available for sale",
+          "KeywordsAr": "للبيع, عقارات, شقق, منازل",
+          "KeywordsEn": "for sale, properties, apartments, houses",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "للبيع",
+          "og:description": "عقارات متاحة للبيع",
+          "og:keywords": "للبيع, عقارات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "للبيع"
+        },
+        {
+          "path": "/projects",
+          "TitleAr": "المشاريع",
+          "TitleEn": "Projects",
+          "DescriptionAr": "مشاريعنا العقارية المتميزة",
+          "DescriptionEn": "Our distinguished real estate projects",
+          "KeywordsAr": "مشاريع, عقارية, تطوير, بناء",
+          "KeywordsEn": "projects, real estate, development, construction",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "المشاريع",
+          "og:description": "مشاريعنا العقارية المتميزة",
+          "og:keywords": "مشاريع, عقارية",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "المشاريع"
+        },
+        {
+          "path": "/contact-us",
+          "TitleAr": "اتصل بنا",
+          "TitleEn": "Contact Us",
+          "DescriptionAr": "تواصل معنا للحصول على المساعدة",
+          "DescriptionEn": "Contact us for assistance",
+          "KeywordsAr": "اتصل بنا, تواصل, مساعدة, خدمة العملاء",
+          "KeywordsEn": "contact us, communication, help, customer service",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "اتصل بنا",
+          "og:description": "تواصل معنا للحصول على المساعدة",
+          "og:keywords": "اتصل بنا, تواصل",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "اتصل بنا"
+        },
+        {
+          "path": "/about-us",
+          "TitleAr": "من نحن",
+          "TitleEn": "About Us",
+          "DescriptionAr": "تعرف على شركتنا وخدماتنا",
+          "DescriptionEn": "Learn about our company and services",
+          "KeywordsAr": "من نحن, شركة, خدمات, معلومات",
+          "KeywordsEn": "about us, company, services, information",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "من نحن",
+          "og:description": "تعرف على شركتنا وخدماتنا",
+          "og:keywords": "من نحن, شركة",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "من نحن"
+        },
+        {
+          "path": "/about",
+          "TitleAr": "حول",
+          "TitleEn": "About",
+          "DescriptionAr": "معلومات حول شركتنا",
+          "DescriptionEn": "Information about our company",
+          "KeywordsAr": "حول, معلومات, شركة",
+          "KeywordsEn": "about, information, company",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "حول",
+          "og:description": "معلومات حول شركتنا",
+          "og:keywords": "حول, معلومات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "حول"
+        },
+        {
+          "path": "/contact",
+          "TitleAr": "تواصل",
+          "TitleEn": "Contact",
+          "DescriptionAr": "تواصل معنا",
+          "DescriptionEn": "Contact us",
+          "KeywordsAr": "تواصل, اتصال, مساعدة",
+          "KeywordsEn": "contact, communication, help",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "تواصل",
+          "og:description": "تواصل معنا",
+          "og:keywords": "تواصل, اتصال",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "تواصل"
+        },
+        {
+          "TitleAr": "للبيع",
+          "TitleEn": "for-sale",
+          "DescriptionAr": "للبيع",
+          "DescriptionEn": "for-sale",
+          "KeywordsAr": "للبيع",
+          "KeywordsEn": "for-sale",
+          "Author": "للبيع",
+          "AuthorEn": "for-sale",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "للبيع",
+          "og:description": "للبيع",
+          "og:keywords": "للبيع",
+          "og:author": "للبيع",
+          "og:robots": "index, follow",
+          "og:url": "/for-sale",
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "للبيع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "للبيع",
+          "path": "/for-sale"
+        }
+      ]
     }
   }
+}

@@ -86,9 +86,7 @@ export default function EditCustomerPage() {
 
   // دالة معالجة التغييرات في النموذج
   const handleChange = (field: string) => (value: any) => {
-    setFormData((prev) =>
-      prev ? { ...prev, [field]: value } : null,
-    );
+    setFormData((prev) => (prev ? { ...prev, [field]: value } : null));
     // إزالة الأخطاء عند التعديل
     if (validationErrors[field]) {
       setValidationErrors((prev) => {
@@ -157,12 +155,12 @@ export default function EditCustomerPage() {
       router.push(`/dashboard/customers/${customerId}`);
     } catch (error: any) {
       console.error("Error updating customer:", error);
-      
+
       // معالجة أخطاء التحقق من الخادم
       if (error.response?.data?.errors) {
         setValidationErrors(error.response.data.errors);
       }
-      
+
       toast.error(
         error.response?.data?.message || "حدث خطأ أثناء تحديث بيانات العميل",
         {
@@ -331,4 +329,3 @@ export default function EditCustomerPage() {
     </div>
   );
 }
-

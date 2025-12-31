@@ -5,10 +5,12 @@
 **الموقع**: `context-liveeditor\EditorContext.tsx`
 
 ### States الموجودة:
+
 - showDialog (useState)
 - openSaveDialogFn (useState)
 
 ### Context Definition:
+
 ```typescript
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
 ```
@@ -16,6 +18,7 @@ const EditorContext = createContext<EditorContextType | undefined>(undefined);
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 22)
 
 ### Interface:
+
 ```typescript
 interface EditorContextType {
   requestSave: () => void;
@@ -28,15 +31,18 @@ interface EditorContextType {
 ### States داخل EditorProvider (في EditorContext.tsx):
 
 #### showDialog
+
 ```typescript
 const [showDialog, setShowDialog] = useState(false);
 ```
+
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 28)
 
 ```typescript
 const requestSave = () => setShowDialog(true);
 const closeDialog = () => setShowDialog(false);
 ```
+
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 30-31)
 
 ```typescript
@@ -46,14 +52,17 @@ const closeDialog = () => setShowDialog(false);
   onConfirm={confirmSave}
 />
 ```
+
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 51-55)
 
 #### openSaveDialogFn
+
 ```typescript
 const [openSaveDialogFn, setOpenSaveDialogFn] = useState<OpenDialogFn>(
   () => () => {},
 );
 ```
+
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 25-27)
 
 ```typescript
@@ -61,6 +70,7 @@ const handleSetOpenSaveDialog = useCallback((fn: OpenDialogFn) => {
   setOpenSaveDialogFn(() => fn);
 }, []);
 ```
+
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 39-41)
 
 ```typescript
@@ -70,13 +80,15 @@ const confirmSave = () => {
   toast.success("Changes saved successfully!"); // عرض رسالة نجاح
 };
 ```
+
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 33-37)
 
 ### Context Provider:
+
 ```typescript
 export const EditorProvider: FC<{ children: ReactNode }> = ({ children }) => {
   // ... states and functions ...
-  
+
   const value = {
     requestSave,
     setOpenSaveDialog: handleSetOpenSaveDialog,
@@ -98,6 +110,7 @@ export const EditorProvider: FC<{ children: ReactNode }> = ({ children }) => {
 **الموقع**: `context-liveeditor\EditorContext.tsx` (line 24-57)
 
 ### Hook للاستخدام:
+
 ```typescript
 export function useEditor() {
   const context = useContext(EditorContext);
@@ -113,6 +126,7 @@ export function useEditor() {
 ### الاستدعاءات والاستخدامات:
 
 #### Import Statement
+
 ```typescript
 // لا يوجد استخدام فعلي لـ EditorContext أو useEditor في الكود الحالي
 // هذا Context يعتبر Legacy/Unused
@@ -127,16 +141,19 @@ export function useEditor() {
 **الموقع**: `context-liveeditor\EditorProvider.tsx`
 
 ### الوصف:
+
 EditorProvider الحالي لا يستخدم React Context، بل يستخدم Zustand store (editorStore) مباشرة. هو Provider component فقط لتوفير SaveConfirmationDialog.
 
 ### الاستدعاءات والاستخدامات:
 
 #### 1. Import Statement
+
 ```typescript
 import { EditorProvider } from "@/context-liveeditor/EditorProvider";
 ```
 
 **المواقع**:
+
 - `app\live-editor\layout.tsx` (line 7)
 - `components\live-editor\LiveEditorPage.tsx` (line 7)
 
@@ -149,7 +166,7 @@ export default function LiveEditorLayout({
   children: ReactNode;
 }) {
   // ... code ...
-  
+
   return (
     <I18nProvider>
       <AuthProvider>
@@ -173,6 +190,7 @@ export default function LiveEditorLayout({
 ### Implementation Details:
 
 #### EditorProvider Component:
+
 ```typescript
 export function EditorProvider({ children }: { children: ReactNode }) {
   const { showDialog, closeDialog, openSaveDialogFn } = useEditorStore();
@@ -206,22 +224,27 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 #### EditorProvider يستخدم:
 
 ##### 1. useEditorStore (Zustand)
+
 ```typescript
 import { useEditorStore } from "./editorStore";
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 7)
 
 ```typescript
 const { showDialog, closeDialog, openSaveDialogFn } = useEditorStore();
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 12)
 
 ```typescript
 const state = useEditorStore.getState();
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 22)
 
 **States المستخدمة من editorStore**:
+
 - `showDialog` - للتحكم في عرض SaveConfirmationDialog
 - `closeDialog` - لإغلاق الـ dialog
 - `openSaveDialogFn` - دالة الحفظ الديناميكية
@@ -234,27 +257,33 @@ const state = useEditorStore.getState();
 - `state.WebsiteLayout[Theme*Backup]` - backups للـ themes
 
 ##### 2. useAuthStore (Zustand)
+
 ```typescript
 import useAuthStore from "@/context/AuthContext";
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 8)
 
 ```typescript
 const { userData } = useAuthStore();
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 13)
 
 ```typescript
 const tenantId = userData?.username;
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 15)
 
 **الغرض**: الحصول على tenantId من userData لإرساله مع payload الحفظ
 
 ##### 3. axiosInstance
+
 ```typescript
 import axiosInstance from "@/lib/axiosInstance";
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 9)
 
 ```typescript
@@ -272,14 +301,17 @@ await axiosInstance
     );
   });
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 88-100)
 
 **الغرض**: إرسال البيانات المحفوظة إلى الـ backend
 
 ##### 4. SaveConfirmationDialog Component
+
 ```typescript
 import SaveConfirmationDialog from "@/components/SaveConfirmationDialog";
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 6)
 
 ```typescript
@@ -290,26 +322,29 @@ import SaveConfirmationDialog from "@/components/SaveConfirmationDialog";
   onConfirm={confirmSave}
 />
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 106-111)
 
 **الغرض**: عرض dialog تأكيد الحفظ
 
 ##### 5. toast (react-hot-toast)
+
 ```typescript
 import toast from "react-hot-toast";
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 5)
 
 ```typescript
 toast.success("Changes saved successfully!");
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 92)
 
 ```typescript
-toast.error(
-  e.response?.data?.message || e.message || "Failed to save changes",
-);
+toast.error(e.response?.data?.message || e.message || "Failed to save changes");
 ```
+
 **الموقع**: `context-liveeditor\EditorProvider.tsx` (line 97-99)
 
 **الغرض**: عرض رسائل النجاح/الفشل
@@ -384,12 +419,14 @@ app/live-editor/layout.tsx
 ## ملخص العلاقات:
 
 ### EditorContext (Legacy):
+
 - ❌ **غير مستخدم** في الكود الحالي
 - ✅ موجود في `context-liveeditor\EditorContext.tsx`
 - ✅ يحتوي على EditorContext و EditorProvider و useEditor hook
 - ❌ لا يوجد استدعاءات له في الكود
 
 ### EditorProvider (Current):
+
 - ✅ **مستخدم بشكل نشط** في `app/live-editor/layout.tsx`
 - ✅ موجود في `context-liveeditor\EditorProvider.tsx`
 - ✅ يستخدم Zustand stores (editorStore, useAuthStore)
@@ -398,6 +435,7 @@ app/live-editor/layout.tsx
 - ✅ جزء من Provider hierarchy: I18nProvider → AuthProvider → EditorProvider
 
 ### العلاقات:
+
 - EditorProvider → useEditorStore (للحصول على showDialog, closeDialog, pageComponentsByPage, etc.)
 - EditorProvider → useAuthStore (للحصول على userData/tenantId)
 - EditorProvider → axiosInstance (لإرسال البيانات إلى الـ backend)
@@ -409,6 +447,7 @@ app/live-editor/layout.tsx
 ## ملخص شامل:
 
 ### EditorContext (Legacy):
+
 - **Status**: ❌ غير مستخدم
 - **Location**: `context-liveeditor\EditorContext.tsx`
 - **States**: showDialog, openSaveDialogFn
@@ -416,6 +455,7 @@ app/live-editor/layout.tsx
 - **ملاحظة**: موجود في الكود لكن لا يتم استخدامه
 
 ### EditorProvider (Current):
+
 - **Status**: ✅ مستخدم بشكل نشط
 - **Location**: `context-liveeditor\EditorProvider.tsx`
 - **Used in**: `app\live-editor\layout.tsx` (line 3545)
@@ -424,8 +464,8 @@ app/live-editor/layout.tsx
 - **Provider Hierarchy**: I18nProvider → AuthProvider → EditorProvider
 
 ### إحصائيات:
+
 - **إجمالي React Contexts**: 2 contexts
 - **Contexts المستخدمة**: 1 (EditorProvider)
 - **Contexts غير المستخدمة**: 1 (EditorContext - Legacy)
 - **إجمالي الاستدعاءات**: 2+ استدعاء
-

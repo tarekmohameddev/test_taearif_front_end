@@ -102,7 +102,9 @@ export default function CrmFilters({
 }: CrmFiltersProps) {
   // Filter out "unassigned" stage
   const pipelineStages = Array.isArray(rawPipelineStages)
-    ? rawPipelineStages.filter((stage) => stage.id !== "unassigned" && stage.id !== "غير معين")
+    ? rawPipelineStages.filter(
+        (stage) => stage.id !== "unassigned" && stage.id !== "غير معين",
+      )
     : [];
   const { userData } = useAuthStore();
   const { setShowAddDealDialog } = useCrmStore();
@@ -230,7 +232,11 @@ export default function CrmFilters({
           params.append("responsible_employee_id", filterEmployee);
         }
         // Filter by employee WhatsApp number (NOT customer WhatsApp)
-        if (filterEmployeePhone && filterEmployeePhone !== "all" && filterEmployeePhone.trim()) {
+        if (
+          filterEmployeePhone &&
+          filterEmployeePhone !== "all" &&
+          filterEmployeePhone.trim()
+        ) {
           params.append("employee_whatsapp_number", filterEmployeePhone);
         }
 
@@ -266,7 +272,7 @@ export default function CrmFilters({
 
         // Use /api/v1/crm/requests endpoint with all filters
         const endpoint = "/api/v1/crm/requests";
-        
+
         const response = await axiosInstance.get(endpoint, { params });
         const crmData = response.data;
 
@@ -274,64 +280,73 @@ export default function CrmFilters({
           const { customers, summary, pagination } = crmData.data || {};
 
           // Transform customers data to match CRM format
-          const transformedCustomers = (customers || []).map((customer: any) => {
-            // Handle stage_id properly - if null, set pipelineStage to null (not empty string)
-            const stageId = customer.stage?.id || customer.stage_id || null;
-            const pipelineStage = stageId !== null ? String(stageId) : null;
-            
-            // Get priority label from priority object or priority_id
-            // Use priority.name if available, otherwise try to convert priority_id
-            const priorityId = customer.priority?.id || customer.priority_id || null;
-            let urgency = "";
-            if (customer.priority?.name) {
-              // Map English priority names to Arabic
-              const priorityMap: { [key: string]: string } = {
-                "High": "عالية",
-                "Medium": "متوسطة",
-                "Low": "منخفضة",
-                "عالية": "عالية",
-                "متوسطة": "متوسطة",
-                "منخفضة": "منخفضة",
+          const transformedCustomers = (customers || []).map(
+            (customer: any) => {
+              // Handle stage_id properly - if null, set pipelineStage to null (not empty string)
+              const stageId = customer.stage?.id || customer.stage_id || null;
+              const pipelineStage = stageId !== null ? String(stageId) : null;
+
+              // Get priority label from priority object or priority_id
+              // Use priority.name if available, otherwise try to convert priority_id
+              const priorityId =
+                customer.priority?.id || customer.priority_id || null;
+              let urgency = "";
+              if (customer.priority?.name) {
+                // Map English priority names to Arabic
+                const priorityMap: { [key: string]: string } = {
+                  High: "عالية",
+                  Medium: "متوسطة",
+                  Low: "منخفضة",
+                  عالية: "عالية",
+                  متوسطة: "متوسطة",
+                  منخفضة: "منخفضة",
+                };
+                urgency =
+                  priorityMap[customer.priority.name] || customer.priority.name;
+              } else if (priorityId !== null) {
+                urgency = getPriorityLabel(priorityId);
+              }
+
+              return {
+                id: customer.id,
+                request_id: customer.id,
+                customer_id: customer.id,
+                name: customer.name || "",
+                phone_number: customer.phone_number || "",
+                phone: customer.phone_number || "",
+                email: customer.email || null,
+                stage_id: stageId,
+                priority_id: priorityId,
+                type_id: customer.type?.id || customer.type_id || null,
+                procedure_id:
+                  customer.procedure?.id || customer.procedure_id || null,
+                city_id: customer.city?.id || customer.city_id || null,
+                district_id:
+                  customer.district?.id || customer.district_id || null,
+                pipelineStage: pipelineStage,
+                urgency: urgency,
+                created_at: customer.created_at || "",
+                updated_at: customer.updated_at || "",
+                // Additional fields for compatibility
+                city: customer.city?.name_ar || customer.city?.name_en || null,
+                district:
+                  customer.district?.name_ar ||
+                  customer.district?.name_en ||
+                  null,
+                type: customer.type?.name || null,
+                priority: customer.priority?.name || null,
+                procedure: customer.procedure?.name || null,
+                responsible_employee: customer.responsible_employee || null,
+                note: customer.note || "",
+                interested_categories: customer.interested_categories || [],
+                interested_properties: customer.interested_properties || [],
               };
-              urgency = priorityMap[customer.priority.name] || customer.priority.name;
-            } else if (priorityId !== null) {
-              urgency = getPriorityLabel(priorityId);
-            }
-            
-            return {
-              id: customer.id,
-              request_id: customer.id,
-              customer_id: customer.id,
-              name: customer.name || "",
-              phone_number: customer.phone_number || "",
-              phone: customer.phone_number || "",
-              email: customer.email || null,
-              stage_id: stageId,
-              priority_id: priorityId,
-              type_id: customer.type?.id || customer.type_id || null,
-              procedure_id: customer.procedure?.id || customer.procedure_id || null,
-              city_id: customer.city?.id || customer.city_id || null,
-              district_id: customer.district?.id || customer.district_id || null,
-              pipelineStage: pipelineStage,
-              urgency: urgency,
-              created_at: customer.created_at || "",
-              updated_at: customer.updated_at || "",
-              // Additional fields for compatibility
-              city: customer.city?.name_ar || customer.city?.name_en || null,
-              district: customer.district?.name_ar || customer.district?.name_en || null,
-              type: customer.type?.name || null,
-              priority: customer.priority?.name || null,
-              procedure: customer.procedure?.name || null,
-              responsible_employee: customer.responsible_employee || null,
-              note: customer.note || "",
-              interested_categories: customer.interested_categories || [],
-              interested_properties: customer.interested_properties || [],
-            };
-          });
+            },
+          );
 
           // Group customers by stage for pipeline view
           const stagesMap = new Map();
-          
+
           // Use only stages from pipelineStages (from backend)
           if (pipelineStages && pipelineStages.length > 0) {
             pipelineStages.forEach((stage) => {
@@ -349,7 +364,8 @@ export default function CrmFilters({
           // Count customers only for stages that exist in pipelineStages
           // Ignore customers with stage_id = null (they won't appear in any stage)
           transformedCustomers.forEach((customer: any) => {
-            const stageId = customer.stage_id !== null ? customer.stage_id.toString() : null;
+            const stageId =
+              customer.stage_id !== null ? customer.stage_id.toString() : null;
             // Only count customers that have a valid stage_id that exists in stagesMap
             if (stageId !== null && stagesMap.has(stageId)) {
               const stage = stagesMap.get(stageId);
@@ -360,8 +376,9 @@ export default function CrmFilters({
             // Customers with stage_id = null are ignored (not shown in any stage)
           });
 
-          const transformedStages = Array.from(stagesMap.values())
-            .filter((stage) => stage.id !== "unassigned" && stage.id !== "غير معين");
+          const transformedStages = Array.from(stagesMap.values()).filter(
+            (stage) => stage.id !== "unassigned" && stage.id !== "غير معين",
+          );
 
           // Update store - only update customers, keep pipelineStages from backend
           // Don't update pipelineStages if they come from props (backend)
@@ -729,7 +746,9 @@ export default function CrmFilters({
           {/* This filters by EMPLOYEE WhatsApp number, NOT customer WhatsApp */}
           <Select
             value={filterEmployeePhone}
-            onValueChange={(value) => handleFilterChange("employeePhone", value)}
+            onValueChange={(value) =>
+              handleFilterChange("employeePhone", value)
+            }
           >
             <SelectTrigger className="w-full sm:w-[140px] lg:w-[150px]">
               <SelectValue placeholder="واتساب الموظف" />
@@ -737,13 +756,22 @@ export default function CrmFilters({
             <SelectContent>
               <SelectItem value="all">جميع الأرقام</SelectItem>
               {filterData?.employees
-                ?.filter((employee: any) => employee.phone_number || employee.whatsapp_number || employee.phone)
+                ?.filter(
+                  (employee: any) =>
+                    employee.phone_number ||
+                    employee.whatsapp_number ||
+                    employee.phone,
+                )
                 ?.map((employee: any) => {
                   // Get employee WhatsApp number (not customer)
-                  const phoneNumber = employee.phone_number || employee.whatsapp_number || employee.phone || "";
+                  const phoneNumber =
+                    employee.phone_number ||
+                    employee.whatsapp_number ||
+                    employee.phone ||
+                    "";
                   return (
-                    <SelectItem 
-                      key={`phone-${employee.id}`} 
+                    <SelectItem
+                      key={`phone-${employee.id}`}
                       value={phoneNumber}
                     >
                       {employee.name} - {phoneNumber}

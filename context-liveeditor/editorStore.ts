@@ -214,7 +214,7 @@ interface EditorStore {
   themeBackup: Record<string, any> | null;
   themeBackupKey: string | null;
   setThemeBackup: (key: string, backup: Record<string, any>) => void;
-  
+
   // Theme change timestamp for forcing sync after theme restore
   themeChangeTimestamp: number;
 
@@ -583,11 +583,7 @@ interface EditorStore {
   ensurePhotosGridVariant: (variantId: string, initial?: ComponentData) => void;
   getPhotosGridData: (variantId: string) => ComponentData;
   setPhotosGridData: (variantId: string, data: ComponentData) => void;
-  updatePhotosGridByPath: (
-    variantId: string,
-    path: string,
-    value: any,
-  ) => void;
+  updatePhotosGridByPath: (variantId: string, path: string, value: any) => void;
 
   // Video states
   videoStates: Record<string, ComponentData>;
@@ -698,11 +694,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   propertySliderStates: {},
   ctaValuationStates: {},
   stepsSectionStates: {},
-        testimonialsStates: {},
-        projectDetailsStates: {},
-        propertyDetailStates: {},
-        propertiesShowcaseStates: {},
-        card4States: {},
+  testimonialsStates: {},
+  projectDetailsStates: {},
+  propertyDetailStates: {},
+  propertiesShowcaseStates: {},
+  card4States: {},
   card5States: {},
   logosTickerStates: {},
   partnersStates: {},
@@ -1214,32 +1210,33 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       if (!initial) {
         return; // Don't call set() at all - prevents any store update
       }
-      
+
       // Initial data provided - but if it's a props object, it changes on every render
       // So we need to be more careful. Only update if initial is clearly different.
       // For props objects, we'll skip the update to prevent infinite loops
       // Components should use setComponentData explicitly if they need to update
-      
+
       // Check if initial is a props-like object (has common React props)
-      const isPropsLike = initial && typeof initial === 'object' && (
-        'useStore' in initial ||
-        'variant' in initial ||
-        'id' in initial ||
-        'className' in initial ||
-        'style' in initial
-      );
-      
+      const isPropsLike =
+        initial &&
+        typeof initial === "object" &&
+        ("useStore" in initial ||
+          "variant" in initial ||
+          "id" in initial ||
+          "className" in initial ||
+          "style" in initial);
+
       // If it's props-like and data exists, skip update to prevent loops
       // Components should initialize once, then use setComponentData for updates
       if (isPropsLike) {
         return; // Skip update - props change on every render
       }
-      
+
       // For non-props initial data, do deep comparison
       try {
         const existingDataStr = JSON.stringify(existingData);
         const initialDataStr = JSON.stringify(initial);
-        
+
         if (existingDataStr === initialDataStr) {
           // Data is the same - skip update to prevent unnecessary re-renders
           return;
@@ -1255,7 +1252,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => {
       // Use specific component functions first for better consistency
       let result: any;
-      
+
       switch (componentType) {
         case "hero":
           result = heroFunctions.ensureVariant(state, variantId, initial);
@@ -1285,9 +1282,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         case "testimonials":
           return testimonialsFunctions.ensureVariant(state, variantId, initial);
         case "projectDetails":
-          return projectDetailsFunctions.ensureVariant(state, variantId, initial);
+          return projectDetailsFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
         case "propertyDetail":
-          return propertyDetailFunctions.ensureVariant(state, variantId, initial);
+          return propertyDetailFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
         case "logosTicker":
           return logosTickerFunctions.ensureVariant(state, variantId, initial);
         case "partners":
@@ -1348,8 +1353,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             variantId,
             initial,
           );
-      case "title":
-        return titleFunctions.ensureVariant(state, variantId, initial);
+        case "title":
+          return titleFunctions.ensureVariant(state, variantId, initial);
         case "responsiveImage":
           return responsiveImageFunctions.ensureVariant(
             state,
@@ -1358,8 +1363,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
         case "photosGrid":
           return photosGridFunctions.ensureVariant(state, variantId, initial);
-      case "video":
-        return videoFunctions.ensureVariant(state, variantId, initial);
+        case "video":
+          return videoFunctions.ensureVariant(state, variantId, initial);
         case "propertiesShowcase":
           return propertiesShowcaseFunctions.ensureVariant(
             state,
@@ -1399,14 +1404,17 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             },
           } as any;
       }
-      
+
       // ⭐ CRITICAL: If result is empty object (no changes), return state unchanged
       // This prevents Zustand from triggering unnecessary updates
       // Note: Zustand should handle {} automatically, but we're being explicit
-      if (!result || (typeof result === 'object' && Object.keys(result).length === 0)) {
+      if (
+        !result ||
+        (typeof result === "object" && Object.keys(result).length === 0)
+      ) {
         return state;
       }
-      
+
       return result;
     });
   },
@@ -1636,9 +1644,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         case "blogsSections":
           newState = blogsSectionsFunctions.setData(state, variantId, data);
           break;
-      case "title":
-        newState = titleFunctions.setData(state, variantId, data);
-        break;
+        case "title":
+          newState = titleFunctions.setData(state, variantId, data);
+          break;
         case "responsiveImage":
           newState = responsiveImageFunctions.setData(state, variantId, data);
           break;
@@ -1925,12 +1933,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
           break;
         case "title":
-          newState = titleFunctions.updateByPath(
-            state,
-            variantId,
-            path,
-            value,
-          );
+          newState = titleFunctions.updateByPath(state, variantId, path, value);
           break;
         case "responsiveImage":
           newState = responsiveImageFunctions.updateByPath(
@@ -2472,9 +2475,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     return responsiveImageFunctions.getData(state, variantId);
   },
   setResponsiveImageData: (variantId, data) =>
-    set((state) =>
-      responsiveImageFunctions.setData(state, variantId, data),
-    ),
+    set((state) => responsiveImageFunctions.setData(state, variantId, data)),
   updateResponsiveImageByPath: (variantId, path, value) =>
     set((state) =>
       responsiveImageFunctions.updateByPath(state, variantId, path, value),
@@ -2532,12 +2533,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       console.log(`📝 Setting static page data for: ${slug}`, data);
 
       // ⭐ NEW: If theme change is in progress, ensure immediate update
-      // If themeChangeTimestamp is recent (within last 5 seconds), 
+      // If themeChangeTimestamp is recent (within last 5 seconds),
       // this is likely a theme change - ensure update
-      const isThemeChangeInProgress = state.themeChangeTimestamp > Date.now() - 5000;
-      
+      const isThemeChangeInProgress =
+        state.themeChangeTimestamp > Date.now() - 5000;
+
       if (isThemeChangeInProgress) {
-        console.log(`[setStaticPageData] Theme change in progress, ensuring immediate update for: ${slug}`);
+        console.log(
+          `[setStaticPageData] Theme change in progress, ensuring immediate update for: ${slug}`,
+        );
       }
 
       return {
@@ -2615,20 +2619,25 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
       // Load theme backups from ThemesBackup object (supports unlimited themes)
       // Regex pattern /^Theme\d+Backup$/ supports any number (1, 2, 10, 11, 100, etc.)
-      if (tenantData.ThemesBackup && typeof tenantData.ThemesBackup === 'object') {
+      if (
+        tenantData.ThemesBackup &&
+        typeof tenantData.ThemesBackup === "object"
+      ) {
         // Initialize WebsiteLayout if it doesn't exist
         if (!newState.WebsiteLayout) {
           newState.WebsiteLayout = {
             metaTags: { pages: [] },
           };
         }
-        
+
         // Copy all backups from ThemesBackup to WebsiteLayout
-        Object.entries(tenantData.ThemesBackup).forEach(([backupKey, backupData]) => {
-          if (backupKey.match(/^Theme\d+Backup$/)) {
-            newState.WebsiteLayout[backupKey] = backupData;
-          }
-        });
+        Object.entries(tenantData.ThemesBackup).forEach(
+          ([backupKey, backupData]) => {
+            if (backupKey.match(/^Theme\d+Backup$/)) {
+              newState.WebsiteLayout[backupKey] = backupData;
+            }
+          },
+        );
 
         // Auto-detect and set themeBackup and themeBackupKey from loaded backups
         // Find first available backup that is NOT the current theme
@@ -2636,21 +2645,33 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         let foundBackupKey: string | null = null;
         let foundBackupData: Record<string, any> | null = null;
 
-        Object.entries(tenantData.ThemesBackup).forEach(([backupKey, backupData]) => {
-          if (backupKey.match(/^Theme\d+Backup$/)) {
-            // Extract theme number from backup key
-            const themeMatch = backupKey.match(/^Theme(\d+)Backup$/);
-            const backupThemeNumber = themeMatch ? parseInt(themeMatch[1], 10) : null;
-            
-            // Only use backup if it's not the current theme and we haven't found one yet
-            if (backupThemeNumber !== null && backupThemeNumber !== currentTheme && !foundBackupKey) {
-              if (backupData && typeof backupData === 'object' && Object.keys(backupData).length > 0) {
-                foundBackupKey = backupKey;
-                foundBackupData = backupData as Record<string, any>;
+        Object.entries(tenantData.ThemesBackup).forEach(
+          ([backupKey, backupData]) => {
+            if (backupKey.match(/^Theme\d+Backup$/)) {
+              // Extract theme number from backup key
+              const themeMatch = backupKey.match(/^Theme(\d+)Backup$/);
+              const backupThemeNumber = themeMatch
+                ? parseInt(themeMatch[1], 10)
+                : null;
+
+              // Only use backup if it's not the current theme and we haven't found one yet
+              if (
+                backupThemeNumber !== null &&
+                backupThemeNumber !== currentTheme &&
+                !foundBackupKey
+              ) {
+                if (
+                  backupData &&
+                  typeof backupData === "object" &&
+                  Object.keys(backupData).length > 0
+                ) {
+                  foundBackupKey = backupKey;
+                  foundBackupData = backupData as Record<string, any>;
+                }
               }
             }
-          }
-        });
+          },
+        );
 
         // Set themeBackup and themeBackupKey if we found a valid backup
         if (foundBackupKey && foundBackupData) {
@@ -2658,7 +2679,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           newState.themeBackupKey = foundBackupKey;
         }
       }
-      
+
       // Preserve existing backup state if not in tenantData
       if (!tenantData.ThemesBackup) {
         newState.themeBackup = state.themeBackup;
@@ -2708,23 +2729,31 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       }
 
       // Load StaticPages data (separate from regular pages)
-      if (tenantData.StaticPages && typeof tenantData.StaticPages === "object") {
+      if (
+        tenantData.StaticPages &&
+        typeof tenantData.StaticPages === "object"
+      ) {
         // Convert StaticPages format: handle both [slug, components] and { slug, components }
         const convertedStaticPages: Record<string, any> = {};
-        
-        Object.entries(tenantData.StaticPages).forEach(([pageSlug, pageData]: [string, any]) => {
-          if (Array.isArray(pageData) && pageData.length === 2) {
-            // Format: [slug, components]
-            convertedStaticPages[pageSlug] = {
-              slug: pageData[0] || pageSlug,
-              components: Array.isArray(pageData[1]) ? pageData[1] : [],
-            };
-          } else if (typeof pageData === "object" && !Array.isArray(pageData)) {
-            // Format: { slug, components }
-            convertedStaticPages[pageSlug] = pageData;
-          }
-        });
-        
+
+        Object.entries(tenantData.StaticPages).forEach(
+          ([pageSlug, pageData]: [string, any]) => {
+            if (Array.isArray(pageData) && pageData.length === 2) {
+              // Format: [slug, components]
+              convertedStaticPages[pageSlug] = {
+                slug: pageData[0] || pageSlug,
+                components: Array.isArray(pageData[1]) ? pageData[1] : [],
+              };
+            } else if (
+              typeof pageData === "object" &&
+              !Array.isArray(pageData)
+            ) {
+              // Format: { slug, components }
+              convertedStaticPages[pageSlug] = pageData;
+            }
+          },
+        );
+
         newState.staticPagesData = {
           ...state.staticPagesData,
           ...convertedStaticPages,

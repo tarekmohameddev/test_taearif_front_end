@@ -29,7 +29,7 @@ export default function AutoFrame({
   // ⭐ CRITICAL: Store callbacks in refs to prevent dependency changes
   const onReadyRef = useRef(onReady);
   const onNotReadyRef = useRef(onNotReady);
-  
+
   // Update refs when callbacks change
   useEffect(() => {
     onReadyRef.current = onReady;
@@ -181,7 +181,7 @@ export default function AutoFrame({
         if (doc.body) {
           doc.body.setAttribute("dir", "rtl");
         }
-        
+
         // نسخ الـ styles أولاً
         copyStylesToIframe(doc);
 
@@ -277,5 +277,3 @@ export default function AutoFrame({
     </iframe>
   );
 }
-
-

@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
     // Save theme backups dynamically (supports unlimited themes)
     // Regex pattern /^Theme\d+Backup$/ supports any number (1, 2, 10, 11, 100, etc.)
-    if (ThemesBackup && typeof ThemesBackup === 'object') {
+    if (ThemesBackup && typeof ThemesBackup === "object") {
       Object.entries(ThemesBackup).forEach(([backupKey, backupData]) => {
         if (backupKey.match(/^Theme\d+Backup$/)) {
           setOps[backupKey] = backupData;

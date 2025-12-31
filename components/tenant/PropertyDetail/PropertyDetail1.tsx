@@ -329,7 +329,9 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
   const { tenantId, isLoading: tenantLoading } = useTenantId();
 
   // Check if we're in Live Editor
-  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+  const isLiveEditor =
+    typeof window !== "undefined" &&
+    window.location.pathname.includes("/live-editor");
 
   // Mock data for Live Editor
   const mockProperty: Property = {
@@ -356,7 +358,8 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
     ],
-    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
+    description:
+      "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
     status: "available",
     location: {
       lat: 24.7136,
@@ -698,9 +701,27 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
     // ⭐ NEW: Use mock data in Live Editor
     if (isLiveEditor) {
       const mockSimilarProperties: Property[] = [
-        { ...mockProperty, id: "mock-2", title: "عقار فاخر ثاني", district: "حي العليا", price: "1,500,000" },
-        { ...mockProperty, id: "mock-3", title: "عقار فاخر ثالث", district: "حي المطار", price: "2,000,000" },
-        { ...mockProperty, id: "mock-4", title: "عقار فاخر رابع", district: "حي الياسمين", price: "1,800,000" },
+        {
+          ...mockProperty,
+          id: "mock-2",
+          title: "عقار فاخر ثاني",
+          district: "حي العليا",
+          price: "1,500,000",
+        },
+        {
+          ...mockProperty,
+          id: "mock-3",
+          title: "عقار فاخر ثالث",
+          district: "حي المطار",
+          price: "2,000,000",
+        },
+        {
+          ...mockProperty,
+          id: "mock-4",
+          title: "عقار فاخر رابع",
+          district: "حي الياسمين",
+          price: "1,800,000",
+        },
       ];
       setSimilarProperties(mockSimilarProperties);
       setLoadingSimilar(false);

@@ -14,14 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Edit,
-  Users,
-  CheckCircle,
-  XCircle,
-  Loader2,
-  Save,
-} from "lucide-react";
+import { Edit, Users, CheckCircle, XCircle, Loader2, Save } from "lucide-react";
 import { PermissionsDropdown } from "./PermissionsDropdown";
 
 // Types
@@ -343,4 +336,3 @@ export function EditEmployeeDialog({
     </CustomDialog>
   );
 }
-

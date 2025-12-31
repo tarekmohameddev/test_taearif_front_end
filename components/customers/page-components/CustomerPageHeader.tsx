@@ -60,8 +60,6 @@ const translateErrorMessage = (message: string): string => {
   return errorTranslations[message] || message;
 };
 
-
-
 export const CustomerPageHeader = ({
   showAddCustomerDialog,
   setShowAddCustomerDialog,
@@ -329,7 +327,14 @@ export const CustomerPageHeader = ({
               <CustomerForm
                 formData={newCustomer}
                 onChange={(field, value) => {
-                  if (field === "type_id" || field === "priority_id" || field === "procedure_id" || field === "stage_id" || field === "city_id" || field === "district_id") {
+                  if (
+                    field === "type_id" ||
+                    field === "priority_id" ||
+                    field === "procedure_id" ||
+                    field === "stage_id" ||
+                    field === "city_id" ||
+                    field === "district_id"
+                  ) {
                     handleNewCustomerChange(field)(value);
                   } else {
                     handleNewCustomerInputChange(field)({

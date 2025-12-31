@@ -9,5 +9,3 @@ export interface LiveEditorUIProps {
 }
 
 export type DeviceType = "phone" | "tablet" | "laptop";
-
-

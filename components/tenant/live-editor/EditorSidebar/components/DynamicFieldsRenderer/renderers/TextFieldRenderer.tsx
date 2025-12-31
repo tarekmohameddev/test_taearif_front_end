@@ -41,9 +41,7 @@ export const TextFieldRenderer: React.FC<TextFieldRendererProps> = ({
             {def.label}
           </span>
           {def.description && (
-            <p className="text-xs text-slate-500 mt-1">
-              {def.description}
-            </p>
+            <p className="text-xs text-slate-500 mt-1">{def.description}</p>
           )}
         </div>
       </label>
@@ -77,14 +75,12 @@ export const TextFieldRenderer: React.FC<TextFieldRendererProps> = ({
       </div>
       {def.min && value && value.length < def.min && (
         <p className="text-xs text-red-500 mt-2">
-          Minimum {def.min} characters required ({value?.length || 0}/
-          {def.min})
+          Minimum {def.min} characters required ({value?.length || 0}/{def.min})
         </p>
       )}
       {def.max && value && value.length > def.max && (
         <p className="text-xs text-red-500 mt-2">
-          Maximum {def.max} characters allowed ({value?.length || 0}/
-          {def.max})
+          Maximum {def.max} characters allowed ({value?.length || 0}/{def.max})
         </p>
       )}
       {def.max && value && value.length <= def.max && (
@@ -95,4 +91,3 @@ export const TextFieldRenderer: React.FC<TextFieldRendererProps> = ({
     </div>
   );
 };
-

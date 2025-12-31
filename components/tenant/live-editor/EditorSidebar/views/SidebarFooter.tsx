@@ -32,8 +32,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       const store = useEditorStore.getState();
       const defaultData = getDefaultHeaderData();
       const originalData =
-        store.globalHeaderData &&
-        Object.keys(store.globalHeaderData).length > 0
+        store.globalHeaderData && Object.keys(store.globalHeaderData).length > 0
           ? store.globalHeaderData
           : defaultData;
       setTempData(originalData);
@@ -44,8 +43,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       const defaultData = createDefaultData("footer", currentVariant);
 
       const originalData =
-        store.globalFooterData &&
-        Object.keys(store.globalFooterData).length > 0
+        store.globalFooterData && Object.keys(store.globalFooterData).length > 0
           ? store.globalFooterData
           : defaultData;
       setTempData(originalData);
@@ -176,4 +174,3 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
     </div>
   );
 };
-

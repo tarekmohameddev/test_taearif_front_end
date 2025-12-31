@@ -52,7 +52,9 @@ export default function Title1(props: TitleProps = {}) {
   const uniqueId = props.id || variantId;
 
   // 2. Connect to stores
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const titleStates = useEditorStore((s) => s.titleStates);
 
@@ -72,15 +74,23 @@ export default function Title1(props: TitleProps = {}) {
 
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "title" && component.componentName === variantId) {
+        if (
+          component.type === "title" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
 
     if (tenantData?.componentSettings) {
-      for (const [, pageComponents] of Object.entries(tenantData.componentSettings)) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+      for (const [, pageComponents] of Object.entries(
+        tenantData.componentSettings,
+      )) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [, component] of Object.entries(pageComponents as any)) {
             if (
               (component as any).type === "title" &&
@@ -114,7 +124,13 @@ export default function Title1(props: TitleProps = {}) {
 
       ensureComponentVariant("title", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData, props]);
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // 4. Retrieve data from store
   const storeData = titleStates?.[uniqueId];
@@ -166,13 +182,22 @@ export default function Title1(props: TitleProps = {}) {
           }}
           className="mx-auto max-w-5xl"
         >
-          <span className="block md:hidden" style={{ fontSize: fontSizeMobile }}>
+          <span
+            className="block md:hidden"
+            style={{ fontSize: fontSizeMobile }}
+          >
             {mergedData.content?.title}
           </span>
-          <span className="hidden md:inline lg:hidden" style={{ fontSize: fontSizeTablet }}>
+          <span
+            className="hidden md:inline lg:hidden"
+            style={{ fontSize: fontSizeTablet }}
+          >
             {mergedData.content?.title}
           </span>
-          <span className="hidden lg:inline" style={{ fontSize: fontSizeDesktop }}>
+          <span
+            className="hidden lg:inline"
+            style={{ fontSize: fontSizeDesktop }}
+          >
             {mergedData.content?.title}
           </span>
         </h1>
@@ -180,4 +205,3 @@ export default function Title1(props: TitleProps = {}) {
     </section>
   );
 }
-

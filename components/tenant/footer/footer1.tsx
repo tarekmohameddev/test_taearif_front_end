@@ -321,7 +321,11 @@ export default function Footer(props: FooterProps = {}) {
 
   // Force re-render when globalFooterData changes
   useEffect(() => {
-    if (isGlobalFooter && globalFooterData && Object.keys(globalFooterData).length > 0) {
+    if (
+      isGlobalFooter &&
+      globalFooterData &&
+      Object.keys(globalFooterData).length > 0
+    ) {
       setForceUpdate((prev) => prev + 1);
     }
   }, [isGlobalFooter, globalFooterData]);

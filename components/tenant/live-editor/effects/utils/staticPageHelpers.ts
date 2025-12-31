@@ -29,7 +29,7 @@ export function getDefaultComponentForStaticPage(slug: string) {
     // products: { ... },
     // checkout: { ... },
   };
-  
+
   return defaults[slug] || null;
 }
 
@@ -43,36 +43,42 @@ export function getDefaultComponentForStaticPage(slug: string) {
 export function isStaticPage(
   slug: string,
   tenantData: any,
-  editorStore: any
+  editorStore: any,
 ): boolean {
   if (!slug) return false;
-  
+
   // ⭐ NEW: Check if page is a multi-level page (like "property", "project")
   // These pages should always be treated as static pages, even if no data exists
   if (isMultiLevelPage(slug)) {
     return true;
   }
-  
+
   // Check if page exists in tenantData.StaticPages
   // Handle both formats: [slug, components] or { slug, components }
   const staticPageFromTenant = tenantData?.StaticPages?.[slug];
   if (staticPageFromTenant) {
     // Format 1: Array [slug, components]
-    if (Array.isArray(staticPageFromTenant) && staticPageFromTenant.length === 2) {
+    if (
+      Array.isArray(staticPageFromTenant) &&
+      staticPageFromTenant.length === 2
+    ) {
       return true;
     }
     // Format 2: Object { slug, components }
-    if (typeof staticPageFromTenant === "object" && !Array.isArray(staticPageFromTenant)) {
+    if (
+      typeof staticPageFromTenant === "object" &&
+      !Array.isArray(staticPageFromTenant)
+    ) {
       return true;
     }
   }
-  
+
   // Check if page exists in editorStore.staticPagesData
   const staticPageData = editorStore.getStaticPageData(slug);
   if (staticPageData) {
     return true;
   }
-  
+
   return false;
 }
 
@@ -84,19 +90,21 @@ export function isStaticPage(
  */
 export function formatStaticPageComponents(
   components: any[],
-  slug: string
+  slug: string,
 ): any[] {
   const defaultComponent = getDefaultComponentForStaticPage(slug);
-  
+
   return components.map((comp: any) => {
     // Use componentName as id if it exists (for static pages, id should match componentName)
-    const finalId = comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
-    
+    const finalId =
+      comp.componentName || comp.id || defaultComponent?.id || `${slug}1`;
+
     return {
       id: finalId, // ⭐ FIX: Use componentName as id to match variantId in states
       type: comp.type || defaultComponent?.type || slug,
       name: comp.name || defaultComponent?.name || slug,
-      componentName: comp.componentName || defaultComponent?.componentName || `${slug}1`,
+      componentName:
+        comp.componentName || defaultComponent?.componentName || `${slug}1`,
       data: comp.data || defaultComponent?.data || {},
       position: comp.position || 0,
       layout: comp.layout || { row: 0, col: 0, span: 2 },
@@ -104,4 +112,3 @@ export function formatStaticPageComponents(
     };
   });
 }
-

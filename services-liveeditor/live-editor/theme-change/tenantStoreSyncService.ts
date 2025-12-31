@@ -2,20 +2,20 @@
  * ============================================================================
  * Tenant Store Sync Service
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على خدمات مزامنة Tenant Store مع Editor Store.
  * This file contains services for syncing Tenant Store with Editor Store.
- * 
+ *
  * المسؤوليات:
  * - مزامنة Tenant Store مع Editor Store بعد تغيير الثيم
  * - تحويل pageComponents إلى componentSettings
  * - تحديث بيانات المكونات العامة في Tenant Store
- * 
+ *
  * Responsibilities:
  * - Sync Tenant Store with Editor Store after theme change
  * - Convert pageComponents to componentSettings
  * - Update global components data in Tenant Store
- * 
+ *
  * ============================================================================
  */
 
@@ -26,27 +26,27 @@ import type { ThemeData } from "./types";
 /**
  * تحويل pageComponents إلى componentSettings
  * Convert pageComponents to componentSettings
- * 
+ *
  * تقوم هذه الدالة بتحويل pageComponents من Editor Store
  * إلى تنسيق componentSettings لـ Tenant Store.
  * تحافظ على التنسيق الأصلي (Array أو Object).
- * 
+ *
  * This function converts pageComponents from Editor Store
  * to componentSettings format for Tenant Store.
  * Preserves original format (Array or Object).
- * 
+ *
  * @param pageComponentsByPage - مكونات الصفحات من Editor Store
  *                              Page components from Editor Store
- * 
+ *
  * @param originalComponentSettings - إعدادات المكونات الأصلية من Tenant Store
  *                                  Original component settings from Tenant Store
- * 
+ *
  * @param themePagesData - بيانات صفحات الثيم (للتنسيق)
  *                       Theme pages data (for format)
- * 
+ *
  * @returns componentSettings محولة
  *          Converted componentSettings
- * 
+ *
  * @example
  * ```typescript
  * const componentSettings = convertPageComponentsToComponentSettings(
@@ -59,7 +59,7 @@ import type { ThemeData } from "./types";
 export function convertPageComponentsToComponentSettings(
   pageComponentsByPage: Record<string, any[]>,
   originalComponentSettings: Record<string, any>,
-  themePagesData: Record<string, any>
+  themePagesData: Record<string, any>,
 ): Record<string, any> {
   const updatedComponentSettings: Record<string, any> = {};
 
@@ -113,16 +113,16 @@ export function convertPageComponentsToComponentSettings(
 /**
  * تحديث بيانات المكونات العامة في Tenant Store
  * Update global components data in Tenant Store
- * 
+ *
  * تقوم هذه الدالة بتحديث بيانات المكونات العامة (Header و Footer)
  * في Tenant Store من Editor Store.
- * 
+ *
  * This function updates global components data (Header and Footer)
  * in Tenant Store from Editor Store.
- * 
+ *
  * @returns بيانات المكونات العامة المحدثة
  *          Updated global components data
- * 
+ *
  * @example
  * ```typescript
  * const globalComponentsData = updateTenantGlobalComponentsData();
@@ -149,28 +149,26 @@ export function updateTenantGlobalComponentsData(): any {
 /**
  * مزامنة Tenant Store مع Editor Store
  * Sync Tenant Store with Editor Store
- * 
+ *
  * تقوم هذه الدالة بمزامنة Tenant Store مع Editor Store
  * بعد تغيير الثيم. تضمن أن tenantData.componentSettings
  * يطابق pageComponentsByPage وأن tenantData.globalComponentsData
  * يطابق globalComponentsData.
- * 
+ *
  * This function syncs Tenant Store with Editor Store
  * after theme change. Ensures that tenantData.componentSettings
  * matches pageComponentsByPage and tenantData.globalComponentsData
  * matches globalComponentsData.
- * 
+ *
  * @param themeData - بيانات الثيم (للتنسيق)
  *                  Theme data (for format)
- * 
+ *
  * @example
  * ```typescript
  * syncTenantStoreWithEditorStore(themeData);
  * ```
  */
-export function syncTenantStoreWithEditorStore(
-  themeData?: ThemeData
-): void {
+export function syncTenantStoreWithEditorStore(themeData?: ThemeData): void {
   const store = useEditorStore.getState();
   const tenantStore = useTenantStore.getState();
   const currentTenantData = tenantStore.tenantData;
@@ -183,13 +181,12 @@ export function syncTenantStoreWithEditorStore(
   // Preserve original format (Array or Object) from themeData or tenantData
   // Convert pageComponentsByPage to componentSettings format
   const originalComponentSettings = currentTenantData.componentSettings || {};
-  const themePagesData =
-    themeData?.componentSettings || themeData?.pages || {};
+  const themePagesData = themeData?.componentSettings || themeData?.pages || {};
 
   const updatedComponentSettings = convertPageComponentsToComponentSettings(
     store.pageComponentsByPage,
     originalComponentSettings,
-    themePagesData
+    themePagesData,
   );
 
   // تحديث بيانات المكونات العامة في Tenant Store
@@ -222,24 +219,22 @@ export function syncTenantStoreWithEditorStore(
 /**
  * مزامنة Tenant Store من النسخ الاحتياطي
  * Sync Tenant Store from backup
- * 
+ *
  * تقوم هذه الدالة بمزامنة Tenant Store من النسخ الاحتياطي
  * بعد استعادة الثيم.
- * 
+ *
  * This function syncs Tenant Store from backup
  * after restoring theme.
- * 
+ *
  * @param backup - بيانات النسخ الاحتياطي
  *               Backup data
- * 
+ *
  * @example
  * ```typescript
  * syncTenantStoreFromBackup(backup);
  * ```
  */
-export function syncTenantStoreFromBackup(
-  backup: Record<string, any>
-): void {
+export function syncTenantStoreFromBackup(backup: Record<string, any>): void {
   const store = useEditorStore.getState();
   const tenantStore = useTenantStore.getState();
   const currentTenantData = tenantStore.tenantData;
@@ -321,4 +316,3 @@ export function syncTenantStoreFromBackup(
     hasStaticPagesData: Object.keys(updatedStaticPagesData).length > 0,
   });
 }
-

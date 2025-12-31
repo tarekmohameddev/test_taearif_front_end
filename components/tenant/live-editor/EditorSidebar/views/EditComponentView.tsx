@@ -103,10 +103,7 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
   const handleUpdateByPath = (path: string, value: any) => {
     // Validate input
     if (!path || path.trim() === "") {
-      console.error(
-        "❌ [EditorSidebar] Invalid path provided:",
-        path,
-      );
+      console.error("❌ [EditorSidebar] Invalid path provided:", path);
       return;
     }
 
@@ -318,10 +315,7 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                 currentTheme={selectedComponent.componentName}
                 onThemeChange={(newTheme) => {
                   if (onComponentThemeChange && selectedComponent) {
-                    onComponentThemeChange(
-                      selectedComponent.id,
-                      newTheme,
-                    );
+                    onComponentThemeChange(selectedComponent.id, newTheme);
                   }
                 }}
                 className="w-full"
@@ -410,4 +404,3 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
     </div>
   );
 };
-

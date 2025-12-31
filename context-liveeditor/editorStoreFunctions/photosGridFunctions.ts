@@ -190,7 +190,8 @@ export const photosGridFunctions = {
    * updateByPath - Update specific field in component data
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.photosGridStates[variantId] || getDefaultPhotosGridData();
+    const source =
+      state.photosGridStates[variantId] || getDefaultPhotosGridData();
     const newData = updateDataByPath(source, path, value);
 
     return {
@@ -198,23 +199,3 @@ export const photosGridFunctions = {
     } as any;
   },
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

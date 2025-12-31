@@ -27,7 +27,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-, "components/tenant/property/propertyDetail1.jsx", "components/tenant/property/propertyDetail2.jsx"  ],
+    ".next/dev/types/**/*.ts",
+    "components/tenant/property/propertyDetail1.jsx",
+    "components/tenant/property/propertyDetail2.jsx"
+  ],
   "exclude": ["node_modules", "trash", "docs"]
 }

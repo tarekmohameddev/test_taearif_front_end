@@ -614,7 +614,9 @@ function ProjectCard({ project }: { project: IProject }) {
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <div className="text-lg font-semibold">{project.price_range || ""}</div>
+          <div className="text-lg font-semibold">
+            {project.price_range || ""}
+          </div>
           {((typeof project.published === "number" && project.published == 1) ||
             project.published === true) &&
             project.creator && (

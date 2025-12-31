@@ -263,7 +263,7 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
     if (fieldPath.includes("textColor") || fieldPath.includes("Text")) {
       return "#000000"; // Black for text
     }
-    
+
     let defaultGlobalColorType = "primary";
     const brandingColor =
       brandingColors[defaultGlobalColorType as keyof typeof brandingColors] ||

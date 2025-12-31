@@ -14,7 +14,7 @@ export const useSaveFunctionEffect = ({
 }: UseSaveFunctionEffectProps) => {
   // Use ref to store latest pageComponents to avoid recreating function on every change
   const pageComponentsRef = useRef<ComponentInstance[]>(pageComponents);
-  
+
   // Update ref whenever pageComponents changes
   useEffect(() => {
     pageComponentsRef.current = pageComponents;
@@ -26,7 +26,7 @@ export const useSaveFunctionEffect = ({
       const store = useEditorStore.getState();
       // Get fresh pageComponents from ref (always has latest value)
       const currentPageComponents = pageComponentsRef.current;
-      
+
       // Get fresh staticPagesData from store (has latest componentName updates)
       const staticPageData = store.getStaticPageData(slug);
       const isStatic = !!staticPageData;
@@ -39,28 +39,31 @@ export const useSaveFunctionEffect = ({
         const currentStaticPageData = store.getStaticPageData(slug);
         if (currentStaticPageData) {
           // Merge: use componentName and id from staticPagesData (up-to-date), but keep other data from pageComponents
-          const mergedComponents = currentPageComponents.map((localComp: any) => {
-            // Find matching component in staticPagesData to get latest componentName and id
-            // First try to find by id, then by componentName (in case id changed)
-            let storeComp = currentStaticPageData.components.find(
-              (sc: any) => sc.id === localComp.id
-            );
-            // If not found by id, try to find by componentName (for cases where id was updated)
-            if (!storeComp) {
-              storeComp = currentStaticPageData.components.find(
-                (sc: any) => sc.componentName === localComp.componentName
+          const mergedComponents = currentPageComponents.map(
+            (localComp: any) => {
+              // Find matching component in staticPagesData to get latest componentName and id
+              // First try to find by id, then by componentName (in case id changed)
+              let storeComp = currentStaticPageData.components.find(
+                (sc: any) => sc.id === localComp.id,
               );
-            }
-            // ✅ Use componentName and id from staticPagesData (more up-to-date than pageComponents)
-            // For static pages, id should match componentName
-            return {
-              ...localComp,
-              id: storeComp?.id || localComp.id, // ✅ Sync id (should match componentName for static pages)
-              componentName: storeComp?.componentName || localComp.componentName,
-              forceUpdate: (localComp.forceUpdate || 0) + 1, // Ensure forceUpdate is incremented
-            };
-          });
-          
+              // If not found by id, try to find by componentName (for cases where id was updated)
+              if (!storeComp) {
+                storeComp = currentStaticPageData.components.find(
+                  (sc: any) => sc.componentName === localComp.componentName,
+                );
+              }
+              // ✅ Use componentName and id from staticPagesData (more up-to-date than pageComponents)
+              // For static pages, id should match componentName
+              return {
+                ...localComp,
+                id: storeComp?.id || localComp.id, // ✅ Sync id (should match componentName for static pages)
+                componentName:
+                  storeComp?.componentName || localComp.componentName,
+                forceUpdate: (localComp.forceUpdate || 0) + 1, // Ensure forceUpdate is incremented
+              };
+            },
+          );
+
           // ✅ Update staticPagesData with merged components (includes latest componentName)
           store.setStaticPageData(slug, {
             ...currentStaticPageData,
@@ -83,4 +86,3 @@ export const useSaveFunctionEffect = ({
     };
   }, [slug]); // Only depend on slug, not pageComponents
 };
-

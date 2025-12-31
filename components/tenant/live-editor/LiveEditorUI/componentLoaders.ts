@@ -161,5 +161,3 @@ export const loadFooterComponent = (componentName: string) => {
   footerComponentsCache.set(componentName, component);
   return component;
 };
-
-

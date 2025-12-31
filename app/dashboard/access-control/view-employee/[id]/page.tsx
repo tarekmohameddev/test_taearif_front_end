@@ -161,9 +161,7 @@ export default function ViewEmployeePage() {
         setEmployeeDetails(response.data.data);
       } catch (err: any) {
         console.error("Error fetching employee details:", err);
-        setError(
-          err.response?.data?.message || "حدث خطأ في جلب تفاصيل الموظف",
-        );
+        setError(err.response?.data?.message || "حدث خطأ في جلب تفاصيل الموظف");
       } finally {
         setDetailsLoading(false);
       }
@@ -425,4 +423,3 @@ export default function ViewEmployeePage() {
     </div>
   );
 }
-

@@ -58,7 +58,8 @@ export function useComponentHandlers({
 
       // استخدام variant من sourceData إذا كان موجوداً، وإلا استخدم getComponentNameWithOne
       const componentName =
-        componentData.variant || getComponentNameWithOne(normalizedComponentType);
+        componentData.variant ||
+        getComponentNameWithOne(normalizedComponentType);
 
       const newComponent = {
         id: uuidv4(),
@@ -94,7 +95,12 @@ export function useComponentHandlers({
       // إعادة تعيين علامة الإغلاق اليدوي عند إضافة مكون جديد
       setWasComponentsSidebarManuallyClosed(false);
     },
-    [pageComponents, state, getComponentNameWithOne, setWasComponentsSidebarManuallyClosed],
+    [
+      pageComponents,
+      state,
+      getComponentNameWithOne,
+      setWasComponentsSidebarManuallyClosed,
+    ],
   );
 
   // دالة نقل مكون محسنة - تستقبل النتيجة المعالجة مسبقاً
@@ -186,7 +192,13 @@ export function useComponentHandlers({
         setDebugInfo(result.debugInfo);
       }
     },
-    [pageComponents, state, selectedComponentId, setDebugInfo, setPositionValidation],
+    [
+      pageComponents,
+      state,
+      selectedComponentId,
+      setDebugInfo,
+      setPositionValidation,
+    ],
   );
 
   // دالة معالجة معلومات التصحيح
@@ -230,5 +242,3 @@ export function useComponentHandlers({
     getComponentNameWithOne,
   };
 }
-
-

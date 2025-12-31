@@ -131,11 +131,11 @@ export const CustomerForm = ({
     return error || "";
   };
 
-  const handleInputChange = (field: string) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    onChange(field, e.target.value);
-  };
+  const handleInputChange =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      onChange(field, e.target.value);
+    };
 
   return (
     <div className="grid gap-6">
@@ -157,7 +157,9 @@ export const CustomerForm = ({
             }
           />
           {hasError("name") && (
-            <p className="text-red-500 text-sm mt-1">{getErrorMessage("name")}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {getErrorMessage("name")}
+            </p>
           )}
         </div>
         <div>
@@ -250,19 +252,19 @@ export const CustomerForm = ({
           >
             <SelectTrigger
               className={
-                hasError("type_id")
-                  ? "border-red-500 focus:border-red-500"
-                  : ""
+                hasError("type_id") ? "border-red-500 focus:border-red-500" : ""
               }
             >
               <SelectValue placeholder="اختر النوع" />
             </SelectTrigger>
             <SelectContent>
-              {filterData?.types?.filter((type: any) => type.name !== "Both").map((type: any) => (
-                <SelectItem key={type.id} value={type.id.toString()}>
-                  {translateType(type.name)}
-                </SelectItem>
-              )) || [
+              {filterData?.types
+                ?.filter((type: any) => type.name !== "Both")
+                .map((type: any) => (
+                  <SelectItem key={type.id} value={type.id.toString()}>
+                    {translateType(type.name)}
+                  </SelectItem>
+                )) || [
                 <SelectItem key="1" value="1">
                   مشتري
                 </SelectItem>,
@@ -396,7 +398,10 @@ export const CustomerForm = ({
           ) : (
             <Select
               onValueChange={(value) =>
-                onChange("stage_id", value === "none" ? null : parseInt(value, 10))
+                onChange(
+                  "stage_id",
+                  value === "none" ? null : parseInt(value, 10),
+                )
               }
               value={formData.stage_id?.toString() || "none"}
             >
@@ -452,7 +457,9 @@ export const CustomerForm = ({
           <DistrictSelector
             selectedCityId={formData.city_id}
             selectedDistrictId={formData.district_id}
-            onDistrictSelect={(districtId) => onChange("district_id", districtId)}
+            onDistrictSelect={(districtId) =>
+              onChange("district_id", districtId)
+            }
             className={hasError("district_id") ? "border-red-500" : ""}
           />
           {hasError("district_id") && (
@@ -475,4 +482,3 @@ export const CustomerForm = ({
     </div>
   );
 };
-

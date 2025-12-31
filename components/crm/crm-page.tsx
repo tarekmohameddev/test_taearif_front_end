@@ -287,7 +287,6 @@ const CrmStatisticsCards = ({
 };
 
 export default function CrmPage() {
-
   // Get data from store
   const {
     customers: rawCustomersData,
@@ -354,7 +353,9 @@ export default function CrmPage() {
 
   // Ensure pipelineStages is always an array and filter out "unassigned" stage
   const pipelineStages = Array.isArray(rawPipelineStages)
-    ? rawPipelineStages.filter((stage) => stage.id !== "unassigned" && stage.id !== "غير معين")
+    ? rawPipelineStages.filter(
+        (stage) => stage.id !== "unassigned" && stage.id !== "غير معين",
+      )
     : [];
   const customersData = Array.isArray(rawCustomersData) ? rawCustomersData : [];
 
@@ -377,7 +378,10 @@ export default function CrmPage() {
   const [focusedStage, setFocusedStage] = useState<PipelineStage | null>(null);
 
   // Helper function for updateCustomerStage API call
-  const updateCustomerStageAPI = async (customerId: string, stageId: string) => {
+  const updateCustomerStageAPI = async (
+    customerId: string,
+    stageId: string,
+  ) => {
     if (!userData?.token) {
       console.log("No token available, skipping updateCustomerStage");
       return false;
@@ -628,7 +632,10 @@ export default function CrmPage() {
   });
 
   const pipelineStats = pipelineStages
-    .filter((stage: PipelineStage) => stage.id !== "unassigned" && stage.id !== "غير معين")
+    .filter(
+      (stage: PipelineStage) =>
+        stage.id !== "unassigned" && stage.id !== "غير معين",
+    )
     .map((stage: PipelineStage) => ({
       ...stage,
       count: customersData.filter((c: Customer) => {
@@ -895,9 +902,15 @@ export default function CrmPage() {
             {activeView === "reminders" && (
               <RemindersList
                 remindersData={remindersData.map((reminder) => ({
-                  id: typeof reminder.id === "string" ? parseInt(reminder.id) : reminder.id,
+                  id:
+                    typeof reminder.id === "string"
+                      ? parseInt(reminder.id)
+                      : reminder.id,
                   title: reminder.title,
-                  priority: typeof reminder.priority === "string" ? parseInt(reminder.priority) : reminder.priority,
+                  priority:
+                    typeof reminder.priority === "string"
+                      ? parseInt(reminder.priority)
+                      : reminder.priority,
                   priority_label: reminder.priority_label || "",
                   datetime: reminder.datetime,
                   customer: reminder.customer || { id: 0, name: "" },

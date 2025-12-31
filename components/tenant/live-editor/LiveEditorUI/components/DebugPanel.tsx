@@ -98,14 +98,16 @@ export function DebugPanel({
             </div>
             {!positionValidation.isValid && (
               <div className="space-y-1">
-                {positionValidation.issues?.map((issue: string, index: number) => (
-                  <div
-                    key={index}
-                    className="text-xs text-red-600 bg-red-50 p-2 rounded"
-                  >
-                    {issue}
-                  </div>
-                ))}
+                {positionValidation.issues?.map(
+                  (issue: string, index: number) => (
+                    <div
+                      key={index}
+                      className="text-xs text-red-600 bg-red-50 p-2 rounded"
+                    >
+                      {issue}
+                    </div>
+                  ),
+                )}
                 {positionValidation.suggestions?.map(
                   (suggestion: string, index: number) => (
                     <div
@@ -180,13 +182,15 @@ export function DebugPanel({
             <div className="text-xs bg-gray-50 p-2 rounded border">
               <div>
                 <strong>{t("live_editor.component")}:</strong>{" "}
-                {typeof debugInfo.operation === "object" && debugInfo.operation?.componentName
+                {typeof debugInfo.operation === "object" &&
+                debugInfo.operation?.componentName
                   ? debugInfo.operation.componentName
                   : String(debugInfo.operation)}
               </div>
               <div>
                 <strong>{t("live_editor.from")}:</strong>{" "}
-                {typeof debugInfo.operation === "object" && debugInfo.operation?.sourceIndex
+                {typeof debugInfo.operation === "object" &&
+                debugInfo.operation?.sourceIndex
                   ? debugInfo.operation.sourceIndex
                   : "N/A"}{" "}
                 → <strong>{t("live_editor.to")}:</strong>{" "}
@@ -204,7 +208,8 @@ export function DebugPanel({
               )}
               <div>
                 <strong>{t("live_editor.timestamp")}:</strong>{" "}
-                {typeof debugInfo.operation === "object" && debugInfo.operation?.timestamp
+                {typeof debugInfo.operation === "object" &&
+                debugInfo.operation?.timestamp
                   ? new Date(debugInfo.operation.timestamp).toLocaleTimeString()
                   : "N/A"}
               </div>
@@ -241,5 +246,3 @@ export function DebugPanel({
     </motion.div>
   );
 }
-
-

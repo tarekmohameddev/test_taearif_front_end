@@ -113,8 +113,7 @@ export const responsiveImageFunctions = {
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.responsiveImageStates[variantId] ||
-    getDefaultResponsiveImageData(),
+    state.responsiveImageStates[variantId] || getDefaultResponsiveImageData(),
 
   /**
    * setData - Set/replace component data completely
@@ -140,15 +139,9 @@ export const responsiveImageFunctions = {
    * @param value - New value for the field
    * @returns New state object
    */
-  updateByPath: (
-    state: any,
-    variantId: string,
-    path: string,
-    value: any,
-  ) => {
+  updateByPath: (state: any, variantId: string, path: string, value: any) => {
     const source =
-      state.responsiveImageStates[variantId] ||
-      getDefaultResponsiveImageData();
+      state.responsiveImageStates[variantId] || getDefaultResponsiveImageData();
     const newData = updateDataByPath(source, path, value);
 
     return {
@@ -159,4 +152,3 @@ export const responsiveImageFunctions = {
     } as any;
   },
 };
-

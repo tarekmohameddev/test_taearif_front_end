@@ -2,30 +2,36 @@
  * ============================================================================
  * Theme Application Service
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على الدالة الرئيسية لتطبيق الثيم على جميع الصفحات.
  * This file contains the main function to apply theme to all pages.
- * 
+ *
  * المسؤوليات:
  * - تطبيق الثيم على جميع الصفحات والمكونات
  * - معالجة النسخ الاحتياطي قبل التطبيق
  * - تطبيق الثيم الافتراضي أو استعادة من النسخ الاحتياطي
  * - إجبار تحديث الصفحة الحالية
- * 
+ *
  * Responsibilities:
  * - Apply theme to all pages and components
  * - Handle backup before application
  * - Apply default theme or restore from backup
  * - Force update current page
- * 
+ *
  * ============================================================================
  */
 
 import { useEditorStore } from "@/context-liveeditor/editorStore";
 import { loadThemeData } from "./themeDataLoader";
-import { backupCurrentComponentSettings, saveBackupInStore } from "./backupService";
+import {
+  backupCurrentComponentSettings,
+  saveBackupInStore,
+} from "./backupService";
 import { applyStaticPagesFromTheme } from "./staticPagesService";
-import { applyGlobalComponentsFromTheme, mergeGlobalComponentsWithBackup } from "./globalComponentsService";
+import {
+  applyGlobalComponentsFromTheme,
+  mergeGlobalComponentsWithBackup,
+} from "./globalComponentsService";
 import { applyPageComponentsFromTheme } from "./pageComponentsService";
 import { syncTenantStoreWithEditorStore } from "./tenantStoreSyncService";
 import { normalizeComponentId } from "./utils";
@@ -35,22 +41,24 @@ import type { ThemeNumber, ThemeData } from "./types";
 /**
  * إجبار تحديث الصفحة الحالية
  * Force update current page
- * 
+ *
  * تقوم هذه الدالة بإجبار تحديث الصفحة الحالية بعد تطبيق الثيم.
  * تتعامل مع الصفحات الثابتة والصفحات العادية.
- * 
+ *
  * This function forces update of current page after applying theme.
  * Handles static pages and regular pages.
- * 
+ *
  * @param store - حالة Editor Store
  *              Editor Store state
- * 
+ *
  * @example
  * ```typescript
  * forceUpdateCurrentPage(store);
  * ```
  */
-function forceUpdateCurrentPage(store: ReturnType<typeof useEditorStore.getState>): void {
+function forceUpdateCurrentPage(
+  store: ReturnType<typeof useEditorStore.getState>,
+): void {
   // ⭐ CRITICAL: إضافة تأخير صغير لضمان انتشار تحديثات store
   // ثم إجبار تحديث إضافي لضمان المزامنة (نفس منطق restoreThemeFromBackup)
   // ⭐ CRITICAL: Add a small delay to ensure store updates are propagated
@@ -98,7 +106,7 @@ function forceUpdateCurrentPage(store: ReturnType<typeof useEditorStore.getState
             componentCount: finalComponents.length,
             isStaticPage: !!staticPageData,
             componentNames: finalComponents.map((c: any) => c.componentName),
-          }
+          },
         );
         finalStore.forceUpdatePageComponents(finalCurrentPage, finalComponents);
       }
@@ -109,17 +117,17 @@ function forceUpdateCurrentPage(store: ReturnType<typeof useEditorStore.getState
 /**
  * إجبار تحديث جميع الصفحات الثابتة
  * Force update all static pages
- * 
+ *
  * تقوم هذه الدالة بإجبار تحديث جميع الصفحات الثابتة في pageComponentsByPage.
- * 
+ *
  * This function forces update of all static pages in pageComponentsByPage.
- * 
+ *
  * @param store - حالة Editor Store
  *              Editor Store state
- * 
+ *
  * @param themeData - بيانات الثيم
  *                  Theme data
- * 
+ *
  * @example
  * ```typescript
  * forceUpdateAllStaticPages(store, themeData);
@@ -127,7 +135,7 @@ function forceUpdateCurrentPage(store: ReturnType<typeof useEditorStore.getState
  */
 function forceUpdateAllStaticPages(
   store: ReturnType<typeof useEditorStore.getState>,
-  themeData: ThemeData
+  themeData: ThemeData,
 ): void {
   // إجبار تحديث جميع الصفحات الثابتة (ليس فقط الصفحة الحالية)
   // This ensures all static pages are updated in pageComponentsByPage
@@ -158,7 +166,7 @@ function forceUpdateAllStaticPages(
             position: comp.position || 0,
             layout: comp.layout || { row: 0, col: 0, span: 2 },
           };
-        }
+        },
       );
 
       console.log(
@@ -170,7 +178,7 @@ function forceUpdateAllStaticPages(
             id: c.id,
             componentName: c.componentName,
           })),
-        }
+        },
       );
 
       // إجبار تحديث pageComponentsByPage لهذه الصفحة الثابتة
@@ -184,22 +192,22 @@ function forceUpdateAllStaticPages(
 /**
  * تسجيل بيانات الصفحات الثابتة قبل وبعد تغيير الثيم
  * Log static pages data before and after theme change
- * 
+ *
  * تقوم هذه الدالة بتسجيل بيانات الصفحات الثابتة قبل وبعد تغيير الثيم
  * مع مقارنة للتغييرات.
- * 
+ *
  * This function logs static pages data before and after theme change
  * with comparison of changes.
- * 
+ *
  * @param store - حالة Editor Store
  *              Editor Store state
- * 
+ *
  * @param themeData - بيانات الثيم
  *                  Theme data
- * 
+ *
  * @param themeNumber - رقم الثيم
  *                    Theme number
- * 
+ *
  * @example
  * ```typescript
  * logStaticPagesChange(store, themeData, 1);
@@ -208,12 +216,12 @@ function forceUpdateAllStaticPages(
 function logStaticPagesChange(
   store: ReturnType<typeof useEditorStore.getState>,
   themeData: ThemeData,
-  themeNumber: ThemeNumber
+  themeNumber: ThemeNumber,
 ): void {
   // ⭐ LOGGING: عرض بيانات الصفحات الثابتة قبل تغيير الثيم
   // ⭐ LOGGING: Show static pages data BEFORE theme change
   console.group(
-    `🎨 [Theme Change] Static Pages - BEFORE (Theme ${themeNumber})`
+    `🎨 [Theme Change] Static Pages - BEFORE (Theme ${themeNumber})`,
   );
   const staticPagesBefore: Record<string, any> = {};
   Object.keys(themeData.staticPages || {}).forEach((slug) => {
@@ -241,7 +249,7 @@ function logStaticPagesChange(
   // ⭐ LOGGING: عرض بيانات الصفحات الثابتة بعد تغيير الثيم
   // ⭐ LOGGING: Show static pages data AFTER theme change
   console.group(
-    `🎨 [Theme Change] Static Pages - AFTER (Theme ${themeNumber})`
+    `🎨 [Theme Change] Static Pages - AFTER (Theme ${themeNumber})`,
   );
   const staticPagesAfter: Record<string, any> = {};
   Object.keys(themeData.staticPages || {}).forEach((slug) => {
@@ -285,22 +293,22 @@ function logStaticPagesChange(
 /**
  * تطبيق الثيم الافتراضي
  * Apply default theme
- * 
+ *
  * تقوم هذه الدالة بتطبيق الثيم الافتراضي من بيانات الثيم
  * (عند عدم وجود نسخ احتياطي).
- * 
+ *
  * This function applies default theme from theme data
  * (when no backup exists).
- * 
+ *
  * @param store - حالة Editor Store
  *              Editor Store state
- * 
+ *
  * @param themeData - بيانات الثيم
  *                  Theme data
- * 
+ *
  * @param themeNumber - رقم الثيم
  *                    Theme number
- * 
+ *
  * @example
  * ```typescript
  * applyDefaultTheme(store, themeData, 1);
@@ -309,7 +317,7 @@ function logStaticPagesChange(
 function applyDefaultTheme(
   store: ReturnType<typeof useEditorStore.getState>,
   themeData: ThemeData,
-  themeNumber: ThemeNumber
+  themeNumber: ThemeNumber,
 ): void {
   // تطبيق componentSettings أو pages إلى pageComponentsByPage
   // Apply componentSettings or pages to pageComponentsByPage
@@ -345,22 +353,22 @@ function applyDefaultTheme(
 /**
  * معالجة استعادة النسخ الاحتياطي
  * Handle backup restore
- * 
+ *
  * تقوم هذه الدالة بمعالجة استعادة الثيم من النسخ الاحتياطي
  * مع تطبيق variants من بيانات الثيم.
- * 
+ *
  * This function handles restoring theme from backup
  * with applying variants from theme data.
- * 
+ *
  * @param store - حالة Editor Store
  *              Editor Store state
- * 
+ *
  * @param themeData - بيانات الثيم
  *                  Theme data
- * 
+ *
  * @param targetBackupKey - مفتاح النسخ الاحتياطي المستهدف
  *                        Target backup key
- * 
+ *
  * @example
  * ```typescript
  * await handleThemeBackupRestore(store, themeData, "Theme1Backup");
@@ -369,7 +377,7 @@ function applyDefaultTheme(
 async function handleThemeBackupRestore(
   store: ReturnType<typeof useEditorStore.getState>,
   themeData: ThemeData,
-  targetBackupKey: string
+  targetBackupKey: string,
 ): Promise<void> {
   // استعادة الثيم من النسخ الاحتياطي
   // Restore theme from backup
@@ -387,7 +395,7 @@ async function handleThemeBackupRestore(
 /**
  * تطبيق الثيم على جميع الصفحات والمكونات العامة
  * Apply theme to all pages and global components
- * 
+ *
  * هذه هي الدالة الرئيسية لتطبيق الثيم على النظام بالكامل.
  * تقوم بـ:
  * 1. نسخ إعدادات المكونات الحالية قبل التغيير
@@ -395,7 +403,7 @@ async function handleThemeBackupRestore(
  * 3. التحقق من وجود نسخ احتياطي للثيم المستهدف
  * 4. استعادة من النسخ الاحتياطي أو تطبيق الثيم الافتراضي
  * 5. مزامنة Tenant Store مع Editor Store
- * 
+ *
  * This is the main function to apply theme to the entire system.
  * It:
  * 1. Backs up current component settings before change
@@ -403,17 +411,17 @@ async function handleThemeBackupRestore(
  * 3. Checks if backup exists for target theme
  * 4. Restores from backup or applies default theme
  * 5. Syncs Tenant Store with Editor Store
- * 
+ *
  * @param themeNumber - رقم الثيم المطلوب تطبيقه (1 أو 2)
  *                    Theme number to apply (1 or 2)
- * 
+ *
  * @example
  * ```typescript
  * await applyThemeToAllPages(1);
  * ```
  */
 export async function applyThemeToAllPages(
-  themeNumber: ThemeNumber
+  themeNumber: ThemeNumber,
 ): Promise<void> {
   const store = useEditorStore.getState();
 
@@ -463,4 +471,3 @@ export async function applyThemeToAllPages(
   // 4. If no backup exists, continue with default theme application from lib folder
   applyDefaultTheme(store, themeData, themeNumber);
 }
-

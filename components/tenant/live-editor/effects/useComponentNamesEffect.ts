@@ -7,7 +7,11 @@ interface UseComponentNamesEffectProps {
   registeredComponents: Record<string, any>;
   slug: string;
   pageComponents: ComponentInstance[];
-  setPageComponents: (components: ComponentInstance[] | ((prev: ComponentInstance[]) => ComponentInstance[])) => void;
+  setPageComponents: (
+    components:
+      | ComponentInstance[]
+      | ((prev: ComponentInstance[]) => ComponentInstance[]),
+  ) => void;
 }
 
 export const useComponentNamesEffect = ({
@@ -45,4 +49,3 @@ export const useComponentNamesEffect = ({
     }
   }, [registeredComponents, slug, setPageComponents]);
 };
-

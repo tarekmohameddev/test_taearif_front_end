@@ -96,7 +96,6 @@ interface ContactCardProps {
   };
 }
 
-
 interface ContactCardsProps {
   useStore?: boolean;
   variant?: string;
@@ -143,9 +142,7 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   const storeData = useStore
     ? getComponentData("contactCards", uniqueId) || {}
     : {};
-  const currentStoreData = useStore
-    ? contactCardsStates[uniqueId] || {}
-    : {};
+  const currentStoreData = useStore ? contactCardsStates[uniqueId] || {} : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
@@ -320,138 +317,146 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
         className={`grid ${mergedData.layout?.grid?.columns?.mobile || "grid-cols-1"} ${mergedData.layout?.grid?.columns?.desktop || "md:grid-cols-3"} ${mergedData.layout?.grid?.gap || "gap-[24px]"} ${mergedData.layout?.grid?.borderRadius || "rounded-[10px]"}`}
       >
         {/* Use mergedData.cards directly like stepsSection1.tsx uses mergedData.steps */}
-        {(mergedData.cards || defaultData.cards || []).map((card: any, index: number) => {
-          // Process card data inline to ensure it uses latest mergedData
-          const processedCard: ContactCardProps = {
-            ...card,
-            icon: {
-              ...card.icon,
-              // Only support icon.type/name (lucide-react or react-icons)
-              type: card.icon?.type,
-              name: card.icon?.name,
-              size: card.icon?.size || (typeof card.icon?.size === "object" ? card.icon.size : 40),
-              className:
-                card.icon?.className ||
-                (typeof card.icon?.size === "object"
-                  ? `${card.icon.size?.mobile || "w-[40px] h-[40px]"} ${card.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`
-                  : "w-[40px] h-[40px] md:w-[60px] md:h-[60px]"),
-            },
-            cardStyle: {
-              ...(defaultData.cards?.[0]?.cardStyle || {}),
-              ...card.cardStyle,
-            },
-          };
+        {(mergedData.cards || defaultData.cards || []).map(
+          (card: any, index: number) => {
+            // Process card data inline to ensure it uses latest mergedData
+            const processedCard: ContactCardProps = {
+              ...card,
+              icon: {
+                ...card.icon,
+                // Only support icon.type/name (lucide-react or react-icons)
+                type: card.icon?.type,
+                name: card.icon?.name,
+                size:
+                  card.icon?.size ||
+                  (typeof card.icon?.size === "object" ? card.icon.size : 40),
+                className:
+                  card.icon?.className ||
+                  (typeof card.icon?.size === "object"
+                    ? `${card.icon.size?.mobile || "w-[40px] h-[40px]"} ${card.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`
+                    : "w-[40px] h-[40px] md:w-[60px] md:h-[60px]"),
+              },
+              cardStyle: {
+                ...(defaultData.cards?.[0]?.cardStyle || {}),
+                ...card.cardStyle,
+              },
+            };
 
-          return (
-            <div
-              key={`card-${index}-${processedCard.icon?.type || processedCard.icon?.name || index}`}
-              className={`w-full flex flex-col ${processedCard.cardStyle.alignment.horizontal} ${processedCard.cardStyle.alignment.vertical} ${processedCard.cardStyle.height.mobile} ${processedCard.cardStyle.height.desktop} ${processedCard.cardStyle.gap.main}`}
-              style={
-                processedCard.cardStyle.shadow.enabled
-                  ? { boxShadow: processedCard.cardStyle.shadow.value }
-                  : {}
-              }
-            >
-              {(() => {
-                // Render icon component (lucide-react or react-icons only)
-                // Priority: name > type > default
-                const iconNameOrType =
-                  processedCard.icon?.name || processedCard.icon?.type || "MapPin";
-                const IconComponent = getContactCardIcon(iconNameOrType);
-
-                // Get icon size
-                const iconSize =
-                  typeof processedCard.icon?.size === "number"
-                    ? processedCard.icon.size
-                    : typeof processedCard.icon?.size === "object"
-                      ? 40 // Default size for object-based sizing
-                      : parseInt(String(processedCard.icon?.size || "40"));
-
-                // Get icon className
-                const iconClassName =
-                  processedCard.icon?.className ||
-                  (typeof processedCard.icon?.size === "object"
-                    ? `${processedCard.icon.size?.mobile || "w-[40px] h-[40px]"} ${processedCard.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`
-                    : "w-[40px] h-[40px] md:w-[60px] md:h-[60px]");
-
-              // Check if it's a React Icon (from react-icons) by checking the icon name pattern
-              const isReactIcon =
-                iconNameOrType.startsWith("Fa") ||
-                iconNameOrType.startsWith("Md") ||
-                iconNameOrType.startsWith("Io") ||
-                iconNameOrType.startsWith("Bi") ||
-                iconNameOrType.startsWith("Bs") ||
-                iconNameOrType.startsWith("Hi") ||
-                iconNameOrType.startsWith("Ai") ||
-                iconNameOrType.startsWith("Ti") ||
-                iconNameOrType.startsWith("Gi") ||
-                iconNameOrType.startsWith("Si") ||
-                iconNameOrType.startsWith("Ri") ||
-                iconNameOrType.startsWith("Tb") ||
-                iconNameOrType.startsWith("Vsc") ||
-                iconNameOrType.startsWith("Wi") ||
-                iconNameOrType.startsWith("Di") ||
-                iconNameOrType.startsWith("Im");
-
-              // For React Icons, use style with fontSize
-              if (isReactIcon) {
-                return (
-                  <IconComponent
-                    className={iconClassName}
-                    style={{
-                      color: iconColor,
-                      fontSize: `${iconSize}px`,
-                      width: `${iconSize}px`,
-                      height: `${iconSize}px`,
-                    }}
-                  />
-                );
-              }
-
-              // For Lucide icons, use size prop
-              return (
-                <IconComponent
-                  size={iconSize}
-                  className={iconClassName}
-                  style={{
-                    color: iconColor,
-                  }}
-                />
-              );
-            })()}
+            return (
               <div
-                className={`flex flex-col ${processedCard.cardStyle?.alignment?.horizontal || "items-center"} ${processedCard.cardStyle?.alignment?.vertical || "justify-center"} ${processedCard.cardStyle?.gap?.content?.mobile || "gap-y-[8px]"} ${processedCard.cardStyle?.gap?.content?.desktop || "md:gap-y-[16px]"}`}
+                key={`card-${index}-${processedCard.icon?.type || processedCard.icon?.name || index}`}
+                className={`w-full flex flex-col ${processedCard.cardStyle.alignment.horizontal} ${processedCard.cardStyle.alignment.vertical} ${processedCard.cardStyle.height.mobile} ${processedCard.cardStyle.height.desktop} ${processedCard.cardStyle.gap.main}`}
+                style={
+                  processedCard.cardStyle.shadow.enabled
+                    ? { boxShadow: processedCard.cardStyle.shadow.value }
+                    : {}
+                }
               >
-                <h2
-                  className={`${processedCard.title?.style?.color || "#525252"} ${processedCard.title?.style?.weight || "font-bold"} ${processedCard.title?.style?.size?.mobile || "text-[16px]"} ${processedCard.title?.style?.size?.desktop || "md:text-[24px]"} ${processedCard.title?.style?.lineHeight || "leading-[35px]"}`}
+                {(() => {
+                  // Render icon component (lucide-react or react-icons only)
+                  // Priority: name > type > default
+                  const iconNameOrType =
+                    processedCard.icon?.name ||
+                    processedCard.icon?.type ||
+                    "MapPin";
+                  const IconComponent = getContactCardIcon(iconNameOrType);
+
+                  // Get icon size
+                  const iconSize =
+                    typeof processedCard.icon?.size === "number"
+                      ? processedCard.icon.size
+                      : typeof processedCard.icon?.size === "object"
+                        ? 40 // Default size for object-based sizing
+                        : parseInt(String(processedCard.icon?.size || "40"));
+
+                  // Get icon className
+                  const iconClassName =
+                    processedCard.icon?.className ||
+                    (typeof processedCard.icon?.size === "object"
+                      ? `${processedCard.icon.size?.mobile || "w-[40px] h-[40px]"} ${processedCard.icon.size?.desktop || "md:w-[60px] md:h-[60px]"}`
+                      : "w-[40px] h-[40px] md:w-[60px] md:h-[60px]");
+
+                  // Check if it's a React Icon (from react-icons) by checking the icon name pattern
+                  const isReactIcon =
+                    iconNameOrType.startsWith("Fa") ||
+                    iconNameOrType.startsWith("Md") ||
+                    iconNameOrType.startsWith("Io") ||
+                    iconNameOrType.startsWith("Bi") ||
+                    iconNameOrType.startsWith("Bs") ||
+                    iconNameOrType.startsWith("Hi") ||
+                    iconNameOrType.startsWith("Ai") ||
+                    iconNameOrType.startsWith("Ti") ||
+                    iconNameOrType.startsWith("Gi") ||
+                    iconNameOrType.startsWith("Si") ||
+                    iconNameOrType.startsWith("Ri") ||
+                    iconNameOrType.startsWith("Tb") ||
+                    iconNameOrType.startsWith("Vsc") ||
+                    iconNameOrType.startsWith("Wi") ||
+                    iconNameOrType.startsWith("Di") ||
+                    iconNameOrType.startsWith("Im");
+
+                  // For React Icons, use style with fontSize
+                  if (isReactIcon) {
+                    return (
+                      <IconComponent
+                        className={iconClassName}
+                        style={{
+                          color: iconColor,
+                          fontSize: `${iconSize}px`,
+                          width: `${iconSize}px`,
+                          height: `${iconSize}px`,
+                        }}
+                      />
+                    );
+                  }
+
+                  // For Lucide icons, use size prop
+                  return (
+                    <IconComponent
+                      size={iconSize}
+                      className={iconClassName}
+                      style={{
+                        color: iconColor,
+                      }}
+                    />
+                  );
+                })()}
+                <div
+                  className={`flex flex-col ${processedCard.cardStyle?.alignment?.horizontal || "items-center"} ${processedCard.cardStyle?.alignment?.vertical || "justify-center"} ${processedCard.cardStyle?.gap?.content?.mobile || "gap-y-[8px]"} ${processedCard.cardStyle?.gap?.content?.desktop || "md:gap-y-[16px]"}`}
                 >
-                  {processedCard.title?.text || ""}
-                </h2>
-                {processedCard.content?.type === "links" ? (
-                  <div
-                    className={`flex flex-row items-between justify-between w-full ${processedCard.cardStyle?.gap?.links || "gap-x-[50px]"}`}
+                  <h2
+                    className={`${processedCard.title?.style?.color || "#525252"} ${processedCard.title?.style?.weight || "font-bold"} ${processedCard.title?.style?.size?.mobile || "text-[16px]"} ${processedCard.title?.style?.size?.desktop || "md:text-[24px]"} ${processedCard.title?.style?.lineHeight || "leading-[35px]"}`}
                   >
-                    {processedCard.content?.links?.map((item: any, i: number) => (
-                      <a
-                        key={i}
-                        href={item.href}
-                        className={`${processedCard.content?.style?.color || "#525252"} ${processedCard.content?.style?.weight || "font-normal"} ${processedCard.content?.style?.size?.mobile || "text-[16px]"} ${processedCard.content?.style?.size?.desktop || "md:text-[20px]"} ${processedCard.content?.style?.lineHeight || "leading-[35px]"}`}
-                      >
-                        {item.text}
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <p
-                    className={`${processedCard.content?.style?.color || "#525252"} ${processedCard.content?.style?.weight || "font-normal"} ${processedCard.content?.style?.size?.mobile || "text-[16px]"} ${processedCard.content?.style?.size?.desktop || "md:text-[20px]"} ${processedCard.content?.style?.lineHeight || "leading-[35px]"}`}
-                  >
-                    {processedCard.content?.text || ""}
-                  </p>
-                )}
+                    {processedCard.title?.text || ""}
+                  </h2>
+                  {processedCard.content?.type === "links" ? (
+                    <div
+                      className={`flex flex-row items-between justify-between w-full ${processedCard.cardStyle?.gap?.links || "gap-x-[50px]"}`}
+                    >
+                      {processedCard.content?.links?.map(
+                        (item: any, i: number) => (
+                          <a
+                            key={i}
+                            href={item.href}
+                            className={`${processedCard.content?.style?.color || "#525252"} ${processedCard.content?.style?.weight || "font-normal"} ${processedCard.content?.style?.size?.mobile || "text-[16px]"} ${processedCard.content?.style?.size?.desktop || "md:text-[20px]"} ${processedCard.content?.style?.lineHeight || "leading-[35px]"}`}
+                          >
+                            {item.text}
+                          </a>
+                        ),
+                      )}
+                    </div>
+                  ) : (
+                    <p
+                      className={`${processedCard.content?.style?.color || "#525252"} ${processedCard.content?.style?.weight || "font-normal"} ${processedCard.content?.style?.size?.mobile || "text-[16px]"} ${processedCard.content?.style?.size?.desktop || "md:text-[20px]"} ${processedCard.content?.style?.lineHeight || "leading-[35px]"}`}
+                    >
+                      {processedCard.content?.text || ""}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          },
+        )}
       </div>
     </div>
   );

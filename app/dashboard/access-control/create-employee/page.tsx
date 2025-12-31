@@ -1,4 +1,4 @@
-"use client";       
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -91,8 +91,7 @@ export default function CreateEmployeePage() {
     const fetchPermissions = async () => {
       setPermissionsLoading(true);
       try {
-        const response =
-          await axiosInstance.get("/v1/permissions");
+        const response = await axiosInstance.get("/v1/permissions");
         setPermissions(response.data);
       } catch (err: any) {
         console.error("Error fetching permissions:", err);
@@ -113,10 +112,7 @@ export default function CreateEmployeePage() {
   };
 
   // Handle group permission change
-  const handleGroupPermissionChange = (
-    groupName: string,
-    checked: boolean,
-  ) => {
+  const handleGroupPermissionChange = (groupName: string, checked: boolean) => {
     if (!permissions || !permissions.grouped[groupName]) return;
 
     const groupPermissions = permissions.grouped[groupName];
@@ -130,7 +126,7 @@ export default function CreateEmployeePage() {
   };
 
   // Create employee
-  const createEmployee = async () => { 
+  const createEmployee = async () => {
     setCreateLoading(true);
     setCreateError(null);
 
@@ -169,9 +165,7 @@ export default function CreateEmployeePage() {
       }, 2000);
     } catch (err: any) {
       console.error("Error creating employee:", err);
-      setCreateError(
-        err.response?.data?.message || "حدث خطأ في إنشاء الموظف",
-      );
+      setCreateError(err.response?.data?.message || "حدث خطأ في إنشاء الموظف");
     } finally {
       setCreateLoading(false);
     }
@@ -179,9 +173,9 @@ export default function CreateEmployeePage() {
 
   return (
     <div className="flex min-h-screen flex-col h-screen bg-gray-50">
-        <DashboardHeader />
+      <DashboardHeader />
       <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
-      <EnhancedSidebar />
+        <EnhancedSidebar />
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
@@ -386,15 +380,17 @@ export default function CreateEmployeePage() {
                           الصلاحيات
                         </Label>
 
-                      <div className="">
-                      <PermissionsDropdown
-                          permissions={permissions}
-                          selectedPermissions={selectedPermissions}
-                          handlePermissionChange={handlePermissionChange}
-                          handleGroupPermissionChange={handleGroupPermissionChange}
-                          isLoading={permissionsLoading}
-                        />
-                      </div>
+                        <div className="">
+                          <PermissionsDropdown
+                            permissions={permissions}
+                            selectedPermissions={selectedPermissions}
+                            handlePermissionChange={handlePermissionChange}
+                            handleGroupPermissionChange={
+                              handleGroupPermissionChange
+                            }
+                            isLoading={permissionsLoading}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -404,37 +400,39 @@ export default function CreateEmployeePage() {
               {/* Footer Actions - Fixed at bottom on mobile */}
               <div className="flex-shrink-0 bg-white sm:pt-[300px] border-t border-gray-200 sm:border-none">
                 <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-3 px-4 sm:px-6 pb-3 sm:pb-4">
-                <Button
-                  variant="outline"
-                  onClick={() => router.back()}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto"
-                >
-                  إلغاء
-                </Button>
-                <Button
-                  onClick={createEmployee}
-                  disabled={
-                    createLoading ||
-                    !formData.first_name ||
-                    !formData.last_name ||
-                    !formData.email ||
-                    !formData.phone ||
-                    !formData.password
-                  }
-                  className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
-                >
-                  {createLoading ? (
-                    <>
-                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
-                      <span className="text-xs sm:text-sm">جاري الإنشاء...</span>
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                      <span className="text-xs sm:text-sm">إنشاء الموظف</span>
-                    </>
-                  )}
-                </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.back()}
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto"
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    onClick={createEmployee}
+                    disabled={
+                      createLoading ||
+                      !formData.first_name ||
+                      !formData.last_name ||
+                      !formData.email ||
+                      !formData.phone ||
+                      !formData.password
+                    }
+                    className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
+                  >
+                    {createLoading ? (
+                      <>
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
+                        <span className="text-xs sm:text-sm">
+                          جاري الإنشاء...
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                        <span className="text-xs sm:text-sm">إنشاء الموظف</span>
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -444,4 +442,3 @@ export default function CreateEmployeePage() {
     </div>
   );
 }
-

@@ -267,10 +267,7 @@ export default function CustomerDetailsPage() {
                         </Avatar>
                         <div className="flex-1">
                           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            {
-                              customerDetails.customer.responsible_employee
-                                .name
-                            }
+                            {customerDetails.customer.responsible_employee.name}
                           </h4>
                           <div className="space-y-2">
                             {customerDetails.customer.responsible_employee
@@ -434,4 +431,3 @@ export default function CustomerDetailsPage() {
     </div>
   );
 }
-

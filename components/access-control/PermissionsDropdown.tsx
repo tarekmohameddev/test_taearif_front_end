@@ -59,7 +59,9 @@ export function PermissionsDropdown({
   handleGroupPermissionChange,
   isLoading = false,
 }: PermissionsDropdownProps) {
-  const [menuPortalTarget, setMenuPortalTarget] = useState<HTMLElement | null>(null);
+  const [menuPortalTarget, setMenuPortalTarget] = useState<HTMLElement | null>(
+    null,
+  );
 
   useEffect(() => {
     setMenuPortalTarget(document.body);
@@ -71,29 +73,32 @@ export function PermissionsDropdown({
 
     const formattedOptions: OptionType[] = [];
 
-    Object.entries(permissions.grouped).forEach(([groupName, groupPermissions]) => {
-      // Add parent option (group) - as header only, not selectable
-      const groupLabel = getPermissionGroupAr(groupName) || groupName.replace(/\./g, " ");
-      formattedOptions.push({
-        value: `group:${groupName}`,
-        label: `${groupLabel} (${groupPermissions.length} صلاحية)`,
-        isGroup: true,
-        groupName: groupName,
-      });
-
-      // Add child options (permissions)
-      groupPermissions.forEach((permission) => {
-        const permissionLabel =
-          permission.name_ar || permission.name_en || permission.name;
+    Object.entries(permissions.grouped).forEach(
+      ([groupName, groupPermissions]) => {
+        // Add parent option (group) - as header only, not selectable
+        const groupLabel =
+          getPermissionGroupAr(groupName) || groupName.replace(/\./g, " ");
         formattedOptions.push({
-          value: `permission:${permission.name}`,
-          label: permissionLabel,
-          isGroup: false,
+          value: `group:${groupName}`,
+          label: `${groupLabel} (${groupPermissions.length} صلاحية)`,
+          isGroup: true,
           groupName: groupName,
-          permission: permission,
         });
-      });
-    });
+
+        // Add child options (permissions)
+        groupPermissions.forEach((permission) => {
+          const permissionLabel =
+            permission.name_ar || permission.name_en || permission.name;
+          formattedOptions.push({
+            value: `permission:${permission.name}`,
+            label: permissionLabel,
+            isGroup: false,
+            groupName: groupName,
+            permission: permission,
+          });
+        });
+      },
+    );
 
     return formattedOptions;
   }, [permissions]);
@@ -105,21 +110,23 @@ export function PermissionsDropdown({
     if (!permissions || !permissions.grouped) return values;
 
     // Only add individual permissions, never add groups
-    Object.entries(permissions.grouped).forEach(([groupName, groupPermissions]) => {
-      groupPermissions.forEach((permission) => {
-        if (selectedPermissions[permission.name]) {
-          const permissionLabel =
-            permission.name_ar || permission.name_en || permission.name;
-          values.push({
-            value: `permission:${permission.name}`,
-            label: permissionLabel,
-            isGroup: false,
-            groupName: groupName,
-            permission: permission,
-          });
-        }
-      });
-    });
+    Object.entries(permissions.grouped).forEach(
+      ([groupName, groupPermissions]) => {
+        groupPermissions.forEach((permission) => {
+          if (selectedPermissions[permission.name]) {
+            const permissionLabel =
+              permission.name_ar || permission.name_en || permission.name;
+            values.push({
+              value: `permission:${permission.name}`,
+              label: permissionLabel,
+              isGroup: false,
+              groupName: groupName,
+              permission: permission,
+            });
+          }
+        });
+      },
+    );
 
     return values;
   }, [permissions, selectedPermissions]);
@@ -272,9 +279,10 @@ export function PermissionsDropdown({
 
     if (data.isGroup) {
       // Group is a header - make it clickable to select all permissions
-      const allSelected = permissions?.grouped[data.groupName]?.every(
-        (p: Permission) => selectedPermissions[p.name] === true
-      ) || false;
+      const allSelected =
+        permissions?.grouped[data.groupName]?.every(
+          (p: Permission) => selectedPermissions[p.name] === true,
+        ) || false;
 
       return (
         <div
@@ -387,4 +395,3 @@ export function PermissionsDropdown({
     </div>
   );
 }
-

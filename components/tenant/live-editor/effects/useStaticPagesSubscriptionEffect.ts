@@ -6,7 +6,11 @@ import { isStaticPage } from "./utils/staticPageHelpers";
 interface UseStaticPagesSubscriptionEffectProps {
   slug: string;
   pageComponents: ComponentInstance[];
-  setPageComponents: (components: ComponentInstance[] | ((prev: ComponentInstance[]) => ComponentInstance[])) => void;
+  setPageComponents: (
+    components:
+      | ComponentInstance[]
+      | ((prev: ComponentInstance[]) => ComponentInstance[]),
+  ) => void;
 }
 
 export const useStaticPagesSubscriptionEffect = ({
@@ -33,25 +37,38 @@ export const useStaticPagesSubscriptionEffect = ({
         // Use functional update to access latest pageComponents (avoids stale closure)
         setPageComponents((currentPageComponents) => {
           // Check if staticPagesData has different componentName than pageComponents
-          const needsUpdate = staticPageData.components.some((storeComp: any) => {
-            const localComp = currentPageComponents.find((lc: any) => lc.id === storeComp.id);
-            return localComp && localComp.componentName !== storeComp.componentName;
-          });
+          const needsUpdate = staticPageData.components.some(
+            (storeComp: any) => {
+              const localComp = currentPageComponents.find(
+                (lc: any) => lc.id === storeComp.id,
+              );
+              return (
+                localComp && localComp.componentName !== storeComp.componentName
+              );
+            },
+          );
 
           if (needsUpdate) {
             // Update pageComponents to match staticPagesData (especially componentName and id)
             return currentPageComponents.map((localComp: any) => {
               const storeComp = staticPageData.components.find(
-                (sc: any) => sc.id === localComp.id || sc.componentName === localComp.componentName
+                (sc: any) =>
+                  sc.id === localComp.id ||
+                  sc.componentName === localComp.componentName,
               );
-              if (storeComp && (storeComp.componentName !== localComp.componentName || storeComp.id !== localComp.id)) {
+              if (
+                storeComp &&
+                (storeComp.componentName !== localComp.componentName ||
+                  storeComp.id !== localComp.id)
+              ) {
                 // Use componentName and id from staticPagesData (more up-to-date)
                 // For static pages, id should match componentName
                 return {
                   ...localComp,
                   id: storeComp.id, // ✅ Sync id (should match componentName for static pages)
                   componentName: storeComp.componentName,
-                  forceUpdate: storeComp.forceUpdate || localComp.forceUpdate || 0, // ✅ Sync forceUpdate
+                  forceUpdate:
+                    storeComp.forceUpdate || localComp.forceUpdate || 0, // ✅ Sync forceUpdate
                 };
               }
               return localComp;
@@ -59,10 +76,9 @@ export const useStaticPagesSubscriptionEffect = ({
           }
           return currentPageComponents;
         });
-      }
+      },
     );
 
     return unsubscribe;
   }, [slug, setPageComponents]); // ✅ Removed pageComponents from dependencies to avoid stale closure
 };
-

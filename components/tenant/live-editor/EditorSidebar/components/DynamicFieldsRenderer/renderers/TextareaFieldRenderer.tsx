@@ -40,9 +40,7 @@ export const TextareaFieldRenderer: React.FC<TextareaFieldRendererProps> = ({
             {def.label}
           </span>
           {def.description && (
-            <p className="text-xs text-slate-500 mt-1">
-              {def.description}
-            </p>
+            <p className="text-xs text-slate-500 mt-1">{def.description}</p>
           )}
         </div>
       </label>
@@ -56,9 +54,7 @@ export const TextareaFieldRenderer: React.FC<TextareaFieldRendererProps> = ({
               : "border-slate-200"
           }`}
           rows={4}
-          placeholder={
-            def.placeholder || t("editor_sidebar.enter_your_text")
-          }
+          placeholder={def.placeholder || t("editor_sidebar.enter_your_text")}
         />
         {value && value.length > 0 && (
           <div className="absolute right-3 top-3">
@@ -78,14 +74,12 @@ export const TextareaFieldRenderer: React.FC<TextareaFieldRendererProps> = ({
       </div>
       {def.min && value && value.length < def.min && (
         <p className="text-xs text-red-500 mt-2">
-          Minimum {def.min} characters required ({value?.length || 0}/
-          {def.min})
+          Minimum {def.min} characters required ({value?.length || 0}/{def.min})
         </p>
       )}
       {def.max && value && value.length > def.max && (
         <p className="text-xs text-red-500 mt-2">
-          Maximum {def.max} characters allowed ({value?.length || 0}/
-          {def.max})
+          Maximum {def.max} characters allowed ({value?.length || 0}/{def.max})
         </p>
       )}
       {def.max && value && value.length <= def.max && (
@@ -96,4 +90,3 @@ export const TextareaFieldRenderer: React.FC<TextareaFieldRendererProps> = ({
     </div>
   );
 };
-

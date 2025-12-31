@@ -1303,9 +1303,8 @@ export default function AccessControlPage() {
   const fetchPermissions = async () => {
     setPermissionsLoading(true);
     try {
-      const response = await axiosInstance.get<PermissionsResponse>(
-        "/v1/permissions",
-      );
+      const response =
+        await axiosInstance.get<PermissionsResponse>("/v1/permissions");
       setPermissions(response.data);
     } catch (err: any) {
       console.error("Error fetching permissions:", err);
@@ -1387,9 +1386,9 @@ export default function AccessControlPage() {
 
   return (
     <div className="flex min-h-screen flex-col h-screen bg-gray-50">
-        <DashboardHeader />
+      <DashboardHeader />
       <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
-      <EnhancedSidebar />
+        <EnhancedSidebar />
 
         <div className="flex-1 overflow-auto p-6">
           <div className=" mx-auto">
@@ -1606,7 +1605,6 @@ export default function AccessControlPage() {
                     )}
                   </CardContent>
                 </Card>
-
               </TabsContent>
 
               {/* Roles Tab */}

@@ -1,20 +1,20 @@
 /**
  * قائمة الصفحات التي تعتمد على ما بعد السلاش
  * أي صفحة في هذه القائمة ستُعالج كصفحة متعددة المستويات
- * 
+ *
  * أمثلة:
  * - "project" → /project/[slug]
  * - "property" → /property/[slug]
  * - "blog" → /blog/[slug]
  */
 export const MULTI_LEVEL_PAGES = [
-  "project",    // /project/[slug]
-  "property",   // /property/[slug]
-  "blog",       // /blog/[slug]
+  "project", // /project/[slug]
+  "property", // /property/[slug]
+  "blog", // /blog/[slug]
   // يمكن إضافة المزيد لاحقاً
 ] as const;
 
-export type MultiLevelPageSlug = typeof MULTI_LEVEL_PAGES[number];
+export type MultiLevelPageSlug = (typeof MULTI_LEVEL_PAGES)[number];
 
 /**
  * التحقق من كون الصفحة متعددة المستويات
@@ -34,18 +34,3 @@ export function isMultiLevelPage(slug: string): boolean {
 export function getSlugPropertyName(slug: string): string {
   return `${slug}Slug`;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

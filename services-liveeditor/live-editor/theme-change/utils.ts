@@ -2,41 +2,41 @@
  * ============================================================================
  * Theme Change Utilities
  * ============================================================================
- * 
+ *
  * هذا الملف يحتوي على الدوال المساعدة المستخدمة في نظام تغيير الثيمات.
  * This file contains utility functions used in the theme change system.
- * 
+ *
  * المسؤوليات:
  * - إنشاء بيانات meta للصفحات
  * - تطبيع معرفات المكونات
  * - تسجيل تغييرات الثيم
  * - دوال مساعدة أخرى
- * 
+ *
  * Responsibilities:
  * - Create page meta data
  * - Normalize component IDs
  * - Log theme changes
  * - Other utility functions
- * 
+ *
  * ============================================================================
  */
 
 /**
  * إنشاء بيانات meta للصفحة الثابتة
  * Create meta data for static page
- * 
+ *
  * تقوم هذه الدالة بإنشاء بيانات meta tags للصفحات الثابتة
  * (project أو property) باللغتين العربية والإنجليزية.
- * 
+ *
  * This function creates meta tags data for static pages
  * (project or property) in both Arabic and English.
- * 
+ *
  * @param slug - معرف الصفحة (slug)
  *             Page identifier (slug)
- * 
+ *
  * @returns بيانات meta tags للصفحة
  *          Meta tags data for the page
- * 
+ *
  * @example
  * ```typescript
  * const projectMeta = createPageMetaData("project");
@@ -70,19 +70,19 @@ export function createPageMetaData(slug: string): {
 /**
  * تطبيع معرف المكون
  * Normalize component ID
- * 
+ *
  * تقوم هذه الدالة بتطبيع معرف المكون لضمان أن id يطابق componentName
  * للصفحات الثابتة. هذا مهم جداً لضمان عمل النظام بشكل صحيح.
- * 
+ *
  * This function normalizes component ID to ensure that id matches componentName
  * for static pages. This is critical for the system to work correctly.
- * 
+ *
  * @param component - بيانات المكون
  *                   Component data
- * 
+ *
  * @returns معرف المكون المطبيع
  *          Normalized component ID
- * 
+ *
  * @example
  * ```typescript
  * const normalizedId = normalizeComponentId({
@@ -105,22 +105,22 @@ export function normalizeComponentId(component: {
 /**
  * تسجيل تغيير الثيم في console
  * Log theme change in console
- * 
+ *
  * تقوم هذه الدالة بتسجيل معلومات تغيير الثيم في console
  * مع تنسيق جميل باستخدام console.group.
- * 
+ *
  * This function logs theme change information in console
  * with nice formatting using console.group.
- * 
+ *
  * @param title - عنوان المجموعة
  *              Group title
- * 
+ *
  * @param data - البيانات المراد تسجيلها
  *             Data to log
- * 
+ *
  * @param isGroup - هل استخدام console.group (افتراضي: true)
  *                Whether to use console.group (default: true)
- * 
+ *
  * @example
  * ```typescript
  * logThemeChange("Theme Change", { theme: 1, pages: 5 });
@@ -129,7 +129,7 @@ export function normalizeComponentId(component: {
 export function logThemeChange(
   title: string,
   data: any,
-  isGroup: boolean = true
+  isGroup: boolean = true,
 ): void {
   if (isGroup) {
     console.group(title);
@@ -143,19 +143,19 @@ export function logThemeChange(
 /**
  * التحقق من صحة بيانات المكون
  * Validate component data
- * 
+ *
  * تقوم هذه الدالة بالتحقق من أن بيانات المكون صحيحة
  * قبل استخدامها في النظام.
- * 
+ *
  * This function validates that component data is correct
  * before using it in the system.
- * 
+ *
  * @param component - بيانات المكون للتحقق منها
  *                   Component data to validate
- * 
+ *
  * @returns true إذا كانت البيانات صحيحة، false خلاف ذلك
  *          true if data is valid, false otherwise
- * 
+ *
  * @example
  * ```typescript
  * const isValid = validateComponentData({
@@ -193,22 +193,22 @@ export function validateComponentData(component: {
 /**
  * إنشاء بيانات مكون افتراضية
  * Create default component data
- * 
+ *
  * تقوم هذه الدالة بإنشاء بيانات مكون افتراضية
  * مع القيم الافتراضية المطلوبة.
- * 
+ *
  * This function creates default component data
  * with required default values.
- * 
+ *
  * @param component - بيانات المكون الأساسية
  *                   Base component data
- * 
+ *
  * @param index - الفهرس الافتراضي (للموضع والتخطيط)
  *              Default index (for position and layout)
- * 
+ *
  * @returns بيانات المكون الكاملة مع القيم الافتراضية
  *          Complete component data with default values
- * 
+ *
  * @example
  * ```typescript
  * const defaultComponent = createDefaultComponentData({
@@ -227,7 +227,7 @@ export function createDefaultComponentData(
     position?: number;
     layout?: { row: number; col: number; span: number };
   },
-  index: number = 0
+  index: number = 0,
 ): {
   id: string;
   type: string;
@@ -244,8 +244,6 @@ export function createDefaultComponentData(
     componentName: component.componentName || `${component.type}1`,
     data: component.data || {},
     position: component.position ?? index,
-    layout:
-      component.layout || { row: index, col: 0, span: 2 },
+    layout: component.layout || { row: index, col: 0, span: 2 },
   };
 }
-

@@ -104,8 +104,7 @@ export default function PropertyDetailsPage() {
       } catch (err: any) {
         console.error("Error fetching property details:", err);
         setError(
-          err.response?.data?.message ||
-            "حدث خطأ أثناء تحميل بيانات العقار",
+          err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات العقار",
         );
       } finally {
         setLoading(false);
@@ -117,8 +116,7 @@ export default function PropertyDetailsPage() {
 
   const formatCurrency = (amount: string | number) => {
     if (!amount) return "غير محدد";
-    const numAmount =
-      typeof amount === "string" ? parseFloat(amount) : amount;
+    const numAmount = typeof amount === "string" ? parseFloat(amount) : amount;
     return new Intl.NumberFormat("ar-SA", {
       style: "currency",
       currency: "SAR",
@@ -230,7 +228,9 @@ export default function PropertyDetailsPage() {
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => router.push(`/dashboard/properties/${propertyId}/edit`)}
+                  onClick={() =>
+                    router.push(`/dashboard/properties/${propertyId}/edit`)
+                  }
                   className="gap-2"
                 >
                   <Edit className="h-4 w-4" />
@@ -295,7 +295,8 @@ export default function PropertyDetailsPage() {
                         </p>
                         {property.pricePerMeter && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            السعر للمتر: {formatCurrency(property.pricePerMeter)}
+                            السعر للمتر:{" "}
+                            {formatCurrency(property.pricePerMeter)}
                           </p>
                         )}
                       </div>
@@ -340,12 +341,12 @@ export default function PropertyDetailsPage() {
 
                   {/* الحالة */}
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      الحالة
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-1">الحالة</p>
                     <div className="flex items-center gap-2">
                       <Badge
-                        variant={property.status === 1 ? "default" : "secondary"}
+                        variant={
+                          property.status === 1 ? "default" : "secondary"
+                        }
                       >
                         {property.status === 1 ? "منشور" : "مسودة"}
                       </Badge>
@@ -418,7 +419,9 @@ export default function PropertyDetailsPage() {
                           المشاهدات
                         </p>
                       </div>
-                      <p className="font-semibold text-lg">{property.views || 0}</p>
+                      <p className="font-semibold text-lg">
+                        {property.views || 0}
+                      </p>
                     </div>
                   </div>
 
@@ -589,4 +592,3 @@ export default function PropertyDetailsPage() {
     </div>
   );
 }
-

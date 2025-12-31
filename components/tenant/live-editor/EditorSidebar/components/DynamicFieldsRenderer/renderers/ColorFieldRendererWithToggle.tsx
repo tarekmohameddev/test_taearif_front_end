@@ -12,13 +12,9 @@ interface ColorFieldRendererWithToggleProps {
   getValueByPath: (path: string) => any;
 }
 
-export const ColorFieldRendererWithToggle: React.FC<ColorFieldRendererWithToggleProps> = ({
-  def,
-  normalizedPath,
-  value,
-  updateValue,
-  getValueByPath,
-}) => {
+export const ColorFieldRendererWithToggle: React.FC<
+  ColorFieldRendererWithToggleProps
+> = ({ def, normalizedPath, value, updateValue, getValueByPath }) => {
   const t = useEditorT();
   const { tenantData } = useTenantStore();
 
@@ -38,9 +34,7 @@ export const ColorFieldRendererWithToggle: React.FC<ColorFieldRendererWithToggle
       : (def.useDefaultColor ?? true)
     : false;
   const globalColorTypeValue =
-    getValueByPath(globalColorTypePath) ??
-    def.globalColorType ??
-    "primary";
+    getValueByPath(globalColorTypePath) ?? def.globalColorType ?? "primary";
 
   // Get branding colors from WebsiteLayout
   const primaryColor =
@@ -83,8 +77,7 @@ export const ColorFieldRendererWithToggle: React.FC<ColorFieldRendererWithToggle
           <label className="flex items-center space-x-3">
             <span className="text-sm font-semibold text-slate-700">
               {def.label} -{" "}
-              {t("editor_sidebar.use_default_color") ||
-                "Use Default Color"}
+              {t("editor_sidebar.use_default_color") || "Use Default Color"}
             </span>
           </label>
           <button
@@ -110,8 +103,7 @@ export const ColorFieldRendererWithToggle: React.FC<ColorFieldRendererWithToggle
           {useDefaultColorValue
             ? t("editor_sidebar.using_branding_color") ||
               "Using branding color from general settings"
-            : t("editor_sidebar.using_custom_color") ||
-              "Using custom color"}
+            : t("editor_sidebar.using_custom_color") || "Using custom color"}
         </p>
       </div>
 
@@ -135,16 +127,13 @@ export const ColorFieldRendererWithToggle: React.FC<ColorFieldRendererWithToggle
               </svg>
             </div>
             <span className="text-sm font-semibold text-slate-700">
-              {t("editor_sidebar.branding_color_type") ||
-                "Branding Color Type"}
+              {t("editor_sidebar.branding_color_type") || "Branding Color Type"}
             </span>
           </label>
           <div className="relative">
             <select
               value={globalColorTypeValue}
-              onChange={(e) =>
-                updateValue(globalColorTypePath, e.target.value)
-              }
+              onChange={(e) => updateValue(globalColorTypePath, e.target.value)}
               className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200 text-slate-700 font-medium appearance-none cursor-pointer pr-10 ${
                 globalColorTypeValue && globalColorTypeValue.length > 0
                   ? "border-green-300 bg-green-50"
@@ -189,8 +178,7 @@ export const ColorFieldRendererWithToggle: React.FC<ColorFieldRendererWithToggle
             // Update both the color value and useDefaultColor in a single operation
             updateValue(colorPath, colorValue);
             // Explicitly set useDefaultColor to false to prevent it from reverting to true
-            const currentUseDefaultColor =
-              getValueByPath(useDefaultColorPath);
+            const currentUseDefaultColor = getValueByPath(useDefaultColorPath);
             if (currentUseDefaultColor !== false) {
               updateValue(useDefaultColorPath, false);
             }
@@ -200,4 +188,3 @@ export const ColorFieldRendererWithToggle: React.FC<ColorFieldRendererWithToggle
     </div>
   );
 };
-

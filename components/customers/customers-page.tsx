@@ -366,7 +366,7 @@ export default function CustomersPage() {
   // Note: Loading skeleton is now handled inside CustomerTable component
   // Only show full page skeleton on initial load (when there's no data)
   const isInitialLoad = loading && customersData.length === 0;
-  
+
   if (isInitialLoad) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">

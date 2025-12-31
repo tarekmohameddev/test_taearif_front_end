@@ -666,12 +666,3 @@ export default function Card5(props: Card5Props) {
 
   return CardContent;
 }
-
-
-
-
-
-
-
-
-

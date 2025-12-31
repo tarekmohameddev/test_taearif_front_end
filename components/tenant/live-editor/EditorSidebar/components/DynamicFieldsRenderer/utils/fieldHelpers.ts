@@ -14,8 +14,7 @@ export function hasGradientPair(fields: FieldDefinition[]): boolean {
  */
 export function getBackgroundMode(
   value: any,
-  hasGradientPair: boolean
+  hasGradientPair: boolean,
 ): string {
   return value || (hasGradientPair ? "gradient" : "solid");
 }
-

@@ -22,7 +22,7 @@ export const useVariantInitialization = ({
     // ⭐ CRITICAL: Get fresh store state inside effect to avoid stale closures
     // Don't subscribe to store functions - they're stable but can cause loops in deps
     const store = useEditorStore.getState();
-    
+
     // Initialize variant (ensureComponentVariant checks if exists before creating)
     // This is safe to call multiple times - it only creates if doesn't exist
     store.ensureComponentVariant(componentType, variantId);
@@ -32,10 +32,7 @@ export const useVariantInitialization = ({
       const componentData = store.getComponentData(componentType, variantId);
 
       // Only update if tempData is empty and we have component data
-      if (
-        componentData &&
-        (!tempData || Object.keys(tempData).length === 0)
-      ) {
+      if (componentData && (!tempData || Object.keys(tempData).length === 0)) {
         // Initialize tempData with current component data for live editing
         store.setComponentData(componentType, variantId, componentData);
       }
@@ -46,4 +43,3 @@ export const useVariantInitialization = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [componentType, variantId]);
 };
-

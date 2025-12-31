@@ -60,7 +60,9 @@ export default function PhotosGrid1(props: PhotosGridProps) {
   const gridElementId = `photos-grid-${uniqueId}`;
 
   // 2. CONNECT TO STORES
-  const ensureComponentVariant = useEditorStore((s) => s.ensureComponentVariant);
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const photosGridStates = useEditorStore((s) => s.photosGridStates);
 
@@ -80,14 +82,19 @@ export default function PhotosGrid1(props: PhotosGridProps) {
 
     if (tenantData.components && Array.isArray(tenantData.components)) {
       for (const component of tenantData.components) {
-        if (component.type === "photosGrid" && component.componentName === variantId) {
+        if (
+          component.type === "photosGrid" &&
+          component.componentName === variantId
+        ) {
           return component.data;
         }
       }
     }
 
     if (tenantData?.componentSettings) {
-      for (const pageSettings of Object.values(tenantData.componentSettings) as any[]) {
+      for (const pageSettings of Object.values(
+        tenantData.componentSettings,
+      ) as any[]) {
         if (!pageSettings || typeof pageSettings !== "object") continue;
         for (const [componentId, component] of Object.entries(pageSettings)) {
           if (
@@ -126,7 +133,13 @@ export default function PhotosGrid1(props: PhotosGridProps) {
 
       ensureComponentVariant("photosGrid", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData, props]);
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // 4. RETRIEVE DATA FROM STORE
   const storeData = photosGridStates[uniqueId];
@@ -149,7 +162,8 @@ export default function PhotosGrid1(props: PhotosGridProps) {
   const columnsTablet = mergedData.layout?.columns?.tablet || columnsMobile;
   const columnsDesktop = mergedData.layout?.columns?.desktop || columnsTablet;
   const tabletBreakpoint = mergedData.responsive?.tabletBreakpoint || "768px";
-  const desktopBreakpoint = mergedData.responsive?.desktopBreakpoint || "1024px";
+  const desktopBreakpoint =
+    mergedData.responsive?.desktopBreakpoint || "1024px";
   const hoverScale = mergedData.styling?.hoverScale || "1.02";
   const cardShadow =
     mergedData.styling?.cardShadow || "0 10px 30px rgba(0,0,0,0.06)";
@@ -295,7 +309,8 @@ export default function PhotosGrid1(props: PhotosGridProps) {
                   <p
                     style={{
                       color: mergedData.styling?.captionColor,
-                      fontSize: mergedData.typography?.caption?.fontSize?.desktop,
+                      fontSize:
+                        mergedData.typography?.caption?.fontSize?.desktop,
                       fontWeight: mergedData.typography?.caption?.fontWeight,
                       fontFamily: mergedData.typography?.caption?.fontFamily,
                     }}
@@ -306,7 +321,8 @@ export default function PhotosGrid1(props: PhotosGridProps) {
                     <span
                       style={{
                         color: mergedData.styling?.descriptionColor,
-                        fontSize: mergedData.typography?.caption?.fontSize?.mobile,
+                        fontSize:
+                          mergedData.typography?.caption?.fontSize?.mobile,
                       }}
                     >
                       {photo.alt}
@@ -333,4 +349,3 @@ export default function PhotosGrid1(props: PhotosGridProps) {
     </section>
   );
 }
-

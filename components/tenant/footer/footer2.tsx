@@ -273,7 +273,11 @@ export default function Footer2(props: Footer2Props) {
 
   // Force re-render when globalFooterData changes (for global footers)
   useEffect(() => {
-    if (isGlobalFooter && globalFooterData && Object.keys(globalFooterData).length > 0) {
+    if (
+      isGlobalFooter &&
+      globalFooterData &&
+      Object.keys(globalFooterData).length > 0
+    ) {
       setForceUpdate((prev) => prev + 1);
     }
   }, [isGlobalFooter, globalFooterData]);
@@ -307,9 +311,7 @@ export default function Footer2(props: Footer2Props) {
   // دالة لاستبدال "باهية" بـ "تعاريف" و "Baheya" بـ "taearif" تلقائياً
   const replaceBaheya = (text: string | undefined): string => {
     if (!text) return "";
-    return text
-      .replace(/باهية/g, "تعاريف")
-      .replace(/Baheya/gi, "taearif"); // case-insensitive للغة الإنجليزية
+    return text.replace(/باهية/g, "تعاريف").replace(/Baheya/gi, "taearif"); // case-insensitive للغة الإنجليزية
   };
 
   return (
@@ -330,7 +332,7 @@ export default function Footer2(props: Footer2Props) {
                       src={mergedData.content.companyInfo.logo}
                       alt={replaceBaheya(
                         mergedData.content?.companyInfo?.name ||
-                          "Baheya Real Estate"
+                          "Baheya Real Estate",
                       )}
                       width={100}
                       height={100}
@@ -428,7 +430,7 @@ export default function Footer2(props: Footer2Props) {
               <p className="text-base leading-relaxed text-white/90">
                 {replaceBaheya(
                   mergedData.content?.companyInfo?.description ||
-                    "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية."
+                    "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
                 )}
               </p>
             </div>
@@ -438,13 +440,13 @@ export default function Footer2(props: Footer2Props) {
               <h5 className="text-xl font-bold text-white mb-4">
                 {replaceBaheya(
                   mergedData.content?.newsletter?.title ||
-                    "اشترك في النشرة البريدية"
+                    "اشترك في النشرة البريدية",
                 )}
               </h5>
               <p className="text-base leading-relaxed text-white/90 mb-6">
                 {replaceBaheya(
                   mergedData.content?.newsletter?.description ||
-                    "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد"
+                    "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
                 )}
               </p>
 
@@ -459,7 +461,7 @@ export default function Footer2(props: Footer2Props) {
                   onChange={(e) => setWhatsappNumber(e.target.value)}
                   placeholder={replaceBaheya(
                     mergedData.content?.newsletter?.placeholder ||
-                      "رقم الواتساب"
+                      "رقم الواتساب",
                   )}
                   required
                   pattern="[0-9()#&+*-=.]+"
@@ -471,7 +473,7 @@ export default function Footer2(props: Footer2Props) {
                   className="px-6 py-3 rounded-lg bg-[#a67c5a] text-white font-semibold hover:bg-[#9a6f4f] transition-colors whitespace-nowrap"
                 >
                   {replaceBaheya(
-                    mergedData.content?.newsletter?.buttonText || "اشترك الآن"
+                    mergedData.content?.newsletter?.buttonText || "اشترك الآن",
                   )}
                 </button>
               </form>
@@ -550,10 +552,14 @@ export default function Footer2(props: Footer2Props) {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-base text-white/90 text-center md:text-right">
                 {(() => {
-                  const copyright = mergedData.footerBottom?.copyright || 
+                  const copyright =
+                    mergedData.footerBottom?.copyright ||
                     `جميع الحقوق محفوظة لشركة تعاريف العقارية 2025© | صمم من طرف وكالة سهيل`;
                   // إزالة " | صمم من طرف وكالة سهيل" تلقائياً إذا كان موجوداً
-                  let cleaned = copyright.replace(/\s*\|\s*صمم من طرف وكالة سهيل\s*/g, '');
+                  let cleaned = copyright.replace(
+                    /\s*\|\s*صمم من طرف وكالة سهيل\s*/g,
+                    "",
+                  );
                   // استبدال "باهية" بـ "تعاريف" تلقائياً
                   return replaceBaheya(cleaned);
                 })()}

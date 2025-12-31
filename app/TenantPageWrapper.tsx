@@ -40,7 +40,10 @@ import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 import GA4Provider from "@/components/GA4Provider";
 import GTMProvider from "@/components/GTMProvider";
 import { trackProjectView } from "@/lib/ga4-tracking";
-import { isMultiLevelPage, getSlugPropertyName } from "@/lib-liveeditor/multiLevelPages";
+import {
+  isMultiLevelPage,
+  getSlugPropertyName,
+} from "@/lib-liveeditor/multiLevelPages";
 
 // ⭐ Cache للـ header components
 const headerComponentsCache = new Map<string, any>();
@@ -94,7 +97,6 @@ const loadHeaderComponent = (componentName: string) => {
   }
 
   const fullPath = `${subPath}/${componentName}`;
-
 
   const component = dynamic(
     () =>
@@ -177,7 +179,10 @@ const loadComponent = (section: string, componentName: string) => {
 
   // ⭐ Handle special case: propertyDetail -> propertyDetail
   // Convert propertyDetail to propertyDetail to match COMPONENTS key
-  if (baseName === "propertyDetail" || baseName.toLowerCase() === "propertydetail") {
+  if (
+    baseName === "propertyDetail" ||
+    baseName.toLowerCase() === "propertydetail"
+  ) {
     baseName = "propertyDetail";
   }
 
@@ -186,7 +191,9 @@ const loadComponent = (section: string, componentName: string) => {
 
   if (!sectionPath) {
     if (process.env.NODE_ENV === "development") {
-      console.warn(`[Component Loader] Invalid section: ${section} for component: ${componentName}`);
+      console.warn(
+        `[Component Loader] Invalid section: ${section} for component: ${componentName}`,
+      );
     }
     return null;
   }
@@ -200,7 +207,9 @@ const loadComponent = (section: string, componentName: string) => {
     const fallbackFullPath = `${fallbackPath}/${componentName}`;
 
     if (process.env.NODE_ENV === "development") {
-      console.warn(`[Component Loader] Unknown component type: ${baseName}, using fallback: ${fallbackFullPath}`);
+      console.warn(
+        `[Component Loader] Unknown component type: ${baseName}, using fallback: ${fallbackFullPath}`,
+      );
     }
 
     return lazy(() =>
@@ -225,22 +234,30 @@ const loadComponent = (section: string, componentName: string) => {
   // جميع المكونات الآن مستقلة في مجلدات خاصة بها
   // Handle special case for propertyDetail components (propertyDetail1 -> propertyDetail1, propertyDetail1 -> propertyDetail1)
   let fileName = componentName;
-  if (baseName === "propertyDetail" || baseName.toLowerCase() === "propertydetail") {
+  if (
+    baseName === "propertyDetail" ||
+    baseName.toLowerCase() === "propertydetail"
+  ) {
     // Extract the number from componentName (e.g., "1" from "propertyDetail1" or "propertyDetail1")
-    const number = componentName.match(/\d+$/)?.[0] || '';
+    const number = componentName.match(/\d+$/)?.[0] || "";
     // Always construct as propertyDetail + number to ensure correct casing
     fileName = `propertyDetail${number}`;
   }
   const fullPath = `${subPath}/${fileName}`;
 
   if (process.env.NODE_ENV === "development") {
-    console.log(`[Component Loader] Loading component: ${componentName} from path: ${fullPath}`);
+    console.log(
+      `[Component Loader] Loading component: ${componentName} from path: ${fullPath}`,
+    );
   }
 
   const component = lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch((error) => {
       if (process.env.NODE_ENV === "development") {
-        console.error(`[Component Loader] Failed to load component ${componentName} from ${fullPath}:`, error);
+        console.error(
+          `[Component Loader] Failed to load component ${componentName} from ${fullPath}:`,
+          error,
+        );
       }
       return {
         default: () => (
@@ -248,9 +265,7 @@ const loadComponent = (section: string, componentName: string) => {
             <div className="text-red-600 font-semibold mb-2">
               Component {componentName} not found
             </div>
-            <div className="text-red-500 text-sm">
-              Path: {fullPath}
-            </div>
+            <div className="text-red-500 text-sm">Path: {fullPath}</div>
           </div>
         ),
       };
@@ -364,7 +379,13 @@ export default function TenantPageWrapper({
     }
 
     return false;
-  }, [tenantData?.componentSettings, tenantData?.StaticPages, slug, getStaticPageData, dynamicSlug]);
+  }, [
+    tenantData?.componentSettings,
+    tenantData?.StaticPages,
+    slug,
+    getStaticPageData,
+    dynamicSlug,
+  ]);
 
   // Get global header data and variant
   const globalHeaderData = tenantData?.globalComponentsData?.header;
@@ -374,7 +395,6 @@ export default function TenantPageWrapper({
       globalHeaderData?.variant ||
       tenantData?.globalComponentsData?.globalHeaderVariant ||
       "StaticHeader1";
-
 
     return variant;
   }, [
@@ -391,7 +411,6 @@ export default function TenantPageWrapper({
       globalFooterData?.variant ||
       tenantData?.globalComponentsData?.globalFooterVariant ||
       "StaticFooter1";
-
 
     return variant;
   }, [
@@ -418,7 +437,7 @@ export default function TenantPageWrapper({
     if (isMultiLevelPage(slug) && dynamicSlug) {
       // Get the slug property name (e.g., "projectSlug", "propertySlug")
       const slugPropertyName = getSlugPropertyName(slug);
-      
+
       // ⭐ Priority 1.1: Try to get from staticPagesData[slug]
       const staticPageData = getStaticPageData(slug);
       if (staticPageData && Array.isArray(staticPageData.components)) {
@@ -436,7 +455,7 @@ export default function TenantPageWrapper({
       // Handle both formats: { components: [...] } or [slug, [components...]]
       if (tenantData?.StaticPages?.[slug]) {
         const staticPage = tenantData.StaticPages[slug];
-        
+
         // Format 1: Array format [slug, [components...]]
         if (Array.isArray(staticPage) && staticPage.length >= 2) {
           const components = staticPage[1];
@@ -451,9 +470,13 @@ export default function TenantPageWrapper({
               .sort((a: any, b: any) => a.position - b.position);
           }
         }
-        
+
         // Format 2: Object format { components: [...] }
-        if (staticPage && typeof staticPage === "object" && !Array.isArray(staticPage)) {
+        if (
+          staticPage &&
+          typeof staticPage === "object" &&
+          !Array.isArray(staticPage)
+        ) {
           if (Array.isArray(staticPage.components)) {
             return staticPage.components
               .map((component: any) => ({
@@ -471,7 +494,7 @@ export default function TenantPageWrapper({
       // For project, use projectDetails1; for property, use propertyDetail2; for others, can be customized
       let defaultComponentName = `${slug}1`;
       let defaultComponentType = slug;
-      
+
       if (slug === "project") {
         defaultComponentName = "projectDetails1";
         defaultComponentType = "projectDetails";
@@ -479,7 +502,7 @@ export default function TenantPageWrapper({
         defaultComponentName = "propertyDetail2";
         defaultComponentType = "propertyDetail";
       }
-      
+
       return [
         {
           id: defaultComponentName,
@@ -507,7 +530,7 @@ export default function TenantPageWrapper({
     // ⭐ Priority 3: Check tenantData.StaticPages
     if (tenantData?.StaticPages?.[slug]) {
       const staticPage = tenantData.StaticPages[slug];
-      
+
       // Format 1: Array format [slug, [components...]]
       if (Array.isArray(staticPage) && staticPage.length >= 2) {
         const components = staticPage[1];
@@ -522,9 +545,13 @@ export default function TenantPageWrapper({
             .sort((a: any, b: any) => a.position - b.position);
         }
       }
-      
+
       // Format 2: Object format { components: [...] }
-      if (staticPage && typeof staticPage === "object" && !Array.isArray(staticPage)) {
+      if (
+        staticPage &&
+        typeof staticPage === "object" &&
+        !Array.isArray(staticPage)
+      ) {
         if (Array.isArray(staticPage.components)) {
           return staticPage.components
             .map((component: any) => ({
@@ -575,7 +602,14 @@ export default function TenantPageWrapper({
     }
 
     return [];
-  }, [tenantData?.componentSettings, tenantData?.StaticPages, slug, dynamicSlug, staticPagesData, getStaticPageData]);
+  }, [
+    tenantData?.componentSettings,
+    tenantData?.StaticPages,
+    slug,
+    dynamicSlug,
+    staticPagesData,
+    getStaticPageData,
+  ]);
 
   // دالة لتحديد الـ skeleton المناسب حسب الـ slug
   const renderSkeletonContent = () => {
@@ -683,7 +717,6 @@ export default function TenantPageWrapper({
 
                   const componentName =
                     componentMap[globalHeaderVariant] || "StaticHeader1";
-
 
                   const HeaderComponent = loadHeaderComponent(componentName);
 

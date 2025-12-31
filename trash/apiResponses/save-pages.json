@@ -1,3032 +1,3004 @@
 {
-    "tenantId": "te51st-site",
-    "pages": {
-      "about-us": [
-        {
-          "id": "0",
-          "type": "hero",
-          "name": "Hero",
-          "componentName": "hero2",
-          "data": {
-            "visible": true,
-            "height": {
-              "desktop": "90vh",
-              "tablet": "90vh",
-              "mobile": "90vh"
-            },
-            "minHeight": {
-              "desktop": "520px",
-              "tablet": "520px",
-              "mobile": "520px"
-            },
-            "background": {
-              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-              "alt": "صورة خلفية لغرفة معيشة حديثة",
-              "overlay": {
-                "enabled": true,
-                "opacity": "0.45",
-                "color": "#000000"
-              }
-            },
-            "content": {
-              "title": "اكتشف عقارك المثالي في أفضل المواقع",
-              "description": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
-              "alignment": "center",
-              "maxWidth": "5xl",
-              "font": {
-                "title": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "36px",
-                    "tablet": "36px",
-                    "mobile": "36px"
-                  },
-                  "weight": "bold",
-                  "color": "#ffffff",
-                  "lineHeight": "1.25"
-                },
-                "subtitle": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "15px",
-                    "tablet": "15px",
-                    "mobile": "15px"
-                  },
-                  "weight": "normal",
-                  "color": "#ffffff"
-                }
-              }
-            },
-            "animations": {
-              "title": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
-              },
-              "description": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
-              }
-            }
+  "tenantId": "te51st-site",
+  "pages": {
+    "about-us": [
+      {
+        "id": "0",
+        "type": "hero",
+        "name": "Hero",
+        "componentName": "hero2",
+        "data": {
+          "visible": true,
+          "height": {
+            "desktop": "90vh",
+            "tablet": "90vh",
+            "mobile": "90vh"
           },
-          "position": 0,
-          "layout": {
-            "row": 0,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "1",
-          "type": "halfTextHalfImage",
-          "name": "HalfTextHalfImage",
-          "componentName": "halfTextHalfImage6",
-          "data": {
-            "visible": true,
-            "layout": {
-              "direction": "rtl",
-              "textWidth": 52.8,
-              "imageWidth": 47.2,
-              "gap": "16",
-              "minHeight": "369px",
-              "ThemeTwo": "ThemeTwo",
-              "maxWidth": "1280px"
-            },
-            "spacing": {
-              "padding": {
-                "top": "5rem",
-                "bottom": "3rem",
-                "left": 4,
-                "right": 4,
-                "ThemeTwo": "ThemeTwo"
-              },
-              "margin": {
-                "top": 0,
-                "bottom": 0,
-                "left": 0,
-                "right": 0
-              },
-              "ThemeTwo": "ThemeTwo"
-            },
-            "content": {
-              "eyebrow": "شريك موثوق",
-              "title": "خبراء في خدمتك – نرافقك نحو استثمار آمن",
-              "description": "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
-              "button": {
-                "text": "تعرف علينا",
-                "enabled": true,
-                "url": "/about-us",
-                "style": {
-                  "backgroundColor": "#059669",
-                  "textColor": "#ffffff",
-                  "hoverBackgroundColor": "#047857",
-                  "hoverTextColor": "#ffffff",
-                  "width": "119px",
-                  "height": "46px",
-                  "borderRadius": "10px"
-                }
-              },
-              "ThemeTwo": "ThemeTwo",
-              "titleUnderlined": "خبراء في",
-              "paragraph": "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم."
-            },
-            "typography": {
-              "eyebrow": {
-                "size": "text-xs md:text-base xl:text-lg",
-                "weight": "font-normal",
-                "color": "text-muted-foreground",
-                "lineHeight": "leading-[22.5px]"
-              },
-              "title": {
-                "size": "section-title-large",
-                "weight": "font-normal",
-                "color": "text-foreground",
-                "lineHeight": "lg:leading-[64px]"
-              },
-              "description": {
-                "size": "text-sm md:text-sm xl:text-xl",
-                "weight": "font-normal",
-                "color": "text-muted-foreground",
-                "lineHeight": "leading-[35px]"
-              }
-            },
-            "image": {
-              "src": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",
-              "alt": "صورة",
-              "style": {
-                "aspectRatio": "800/500",
-                "objectFit": "contain",
-                "borderRadius": "0"
-              },
-              "background": {
-                "enabled": true,
-                "color": "#059669",
-                "width": 54,
-                "borderRadius": "5px"
-              },
-              "ThemeTwo": "ThemeTwo",
-              "visible": true
-            },
-            "responsive": {
-              "mobile": {
-                "textOrder": 2,
-                "imageOrder": 1,
-                "textWidth": "w-full",
-                "imageWidth": "w-full",
-                "marginBottom": "mb-10"
-              },
-              "tablet": {
-                "textOrder": 2,
-                "imageOrder": 1,
-                "textWidth": "w-full",
-                "imageWidth": "w-full",
-                "marginBottom": "mb-10"
-              },
-              "desktop": {
-                "textOrder": 1,
-                "imageOrder": 2,
-                "textWidth": "md:w-[52.8%]",
-                "imageWidth": "md:w-[47.2%]",
-                "marginBottom": "md:mb-0"
-              }
-            },
-            "animations": {
-              "text": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
-              },
-              "image": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
-              }
-            },
-            "ThemeTwo": "ThemeTwo",
-            "styling": {
-              "ThemeTwo": "ThemeTwo",
-              "backgroundColor": "#f5f0e8",
-              "titleColor": "#000000",
-              "paragraphColor": "#000000",
-              "dividerColor": "#8b5f46"
-            }
+          "minHeight": {
+            "desktop": "520px",
+            "tablet": "520px",
+            "mobile": "520px"
           },
-          "position": 1,
-          "layout": {
-            "row": 1,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "09df9d73-5c66-432f-84b7-3ae3b3dbc6b9",
-          "type": "halfTextHalfImage",
-          "name": "HalfTextHalfImage",
-          "componentName": "halfTextHalfImage7",
-          "data": {
-            "visible": true,
-            "layout": {
-              "direction": "rtl",
-              "textWidth": 52.8,
-              "imageWidth": 47.2,
-              "gap": "16",
-              "minHeight": "369px",
-              "ThemeTwo": "ThemeTwo",
-              "maxWidth": "1350px"
-            },
-            "spacing": {
-              "padding": {
-                "top": "3rem",
-                "bottom": "4rem",
-                "left": "1rem",
-                "right": "1rem",
-                "ThemeTwo": "ThemeTwo"
-              },
-              "margin": {
-                "top": 0,
-                "bottom": 0,
-                "left": 0,
-                "right": 0
-              },
-              "ThemeTwo": "ThemeTwo"
-            },
-            "content": {
-              "eyebrow": "شريك موثوق",
-              "title": "خدمات موثوقة تستحق ثقتك",
-              "description": "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
-              "button": {
-                "text": "تعرف علينا",
-                "enabled": true,
-                "url": "/about-us",
-                "style": {
-                  "backgroundColor": "#059669",
-                  "textColor": "#ffffff",
-                  "hoverBackgroundColor": "#047857",
-                  "hoverTextColor": "#ffffff",
-                  "width": "119px",
-                  "height": "46px",
-                  "borderRadius": "10px"
-                }
-              },
-              "ThemeTwo": "ThemeTwo",
-              "features": [
-                {
-                  "ThemeTwo": "ThemeTwo",
-                  "id": "1",
-                  "title": "الشفافية",
-                  "description": "نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية، دون مفاجآت أو معلومات مخفية.",
-                  "icon": "transparency"
-                },
-                {
-                  "ThemeTwo": "ThemeTwo",
-                  "id": "2",
-                  "title": "الالتزام",
-                  "description": "نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك، سواء بالشراء أو الاستثمار",
-                  "icon": "commitment"
-                },
-                {
-                  "ThemeTwo": "ThemeTwo",
-                  "id": "3",
-                  "title": "الابتكار",
-                  "description": "نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة، والراحة.",
-                  "icon": "innovation"
-                }
-              ]
-            },
-            "typography": {
-              "eyebrow": {
-                "size": "text-xs md:text-base xl:text-lg",
-                "weight": "font-normal",
-                "color": "text-muted-foreground",
-                "lineHeight": "leading-[22.5px]"
-              },
-              "title": {
-                "size": "section-title-large",
-                "weight": "font-normal",
-                "color": "text-foreground",
-                "lineHeight": "lg:leading-[64px]"
-              },
-              "description": {
-                "size": "text-sm md:text-sm xl:text-xl",
-                "weight": "font-normal",
-                "color": "text-muted-foreground",
-                "lineHeight": "leading-[35px]"
-              }
-            },
-            "image": {
-              "src": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",
-              "alt": "صورة",
-              "style": {
-                "aspectRatio": "800/500",
-                "objectFit": "contain",
-                "borderRadius": "0"
-              },
-              "background": {
-                "enabled": true,
-                "color": "#059669",
-                "width": 54,
-                "borderRadius": "5px"
-              },
-              "ThemeTwo": "ThemeTwo",
-              "visible": true
-            },
-            "responsive": {
-              "mobile": {
-                "textOrder": 2,
-                "imageOrder": 1,
-                "textWidth": "w-full",
-                "imageWidth": "w-full",
-                "marginBottom": "mb-10",
-                "ThemeTwo": "ThemeTwo",
-                "imageHeight": "h-[300px]"
-              },
-              "tablet": {
-                "textOrder": 2,
-                "imageOrder": 1,
-                "textWidth": "w-full",
-                "imageWidth": "w-full",
-                "marginBottom": "mb-10"
-              },
-              "desktop": {
-                "textOrder": 1,
-                "imageOrder": 2,
-                "textWidth": "md:w-[52.8%]",
-                "imageWidth": "md:w-[47.2%]",
-                "marginBottom": "md:mb-0",
-                "ThemeTwo": "ThemeTwo",
-                "imageHeight": "md:min-h-[500px]"
-              },
-              "ThemeTwo": "ThemeTwo"
-            },
-            "animations": {
-              "text": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
-              },
-              "image": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
-              }
-            },
-            "ThemeTwo": "ThemeTwo",
-            "styling": {
-              "ThemeTwo": "ThemeTwo",
-              "backgroundColor": "#f5f0e8",
-              "titleColor": "#000000",
-              "dividerColor": "#8b5f46",
-              "featureTitleColor": "#8b5f46",
-              "featureDescriptionColor": "#8b5f46",
-              "iconBackgroundColor": "#d4a574",
-              "iconColor": "#896042"
-            }
-          },
-          "layout": {
-            "row": 2,
-            "col": 0,
-            "span": 2
-          },
-          "position": 2
-        }
-      ],
-      "contact-us": [
-        {
-          "id": "2c7b970d-f5ea-418f-915b-0e69109f13bf",
-          "type": "hero",
-          "name": "Hero",
-          "componentName": "hero4",
-          "data": {
-            "visible": true,
-            "height": {
-              "desktop": "90vh",
-              "tablet": "90vh",
-              "mobile": "90vh"
-            },
-            "minHeight": {
-              "desktop": "520px",
-              "tablet": "520px",
-              "mobile": "520px"
-            },
-            "background": {
-              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-              "alt": "صورة خلفية لغرفة معيشة حديثة",
-              "overlay": {
-                "enabled": true,
-                "opacity": "0.45",
-                "color": "#000000"
-              }
-            },
-            "content": {
-              "title": "اكتشف عقارك المثالي في أفضل المواقع",
-              "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
-              "font": {
-                "title": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "5xl",
-                    "tablet": "4xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "extrabold",
-                  "color": "#ffffff",
-                  "lineHeight": "1.25"
-                },
-                "subtitle": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "2xl",
-                    "tablet": "2xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "normal",
-                  "color": "rgba(255, 255, 255, 0.85)"
-                }
-              },
-              "alignment": "center",
-              "maxWidth": "5xl",
-              "paddingTop": "200px"
-            },
-            "searchForm": {
+          "background": {
+            "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+            "alt": "صورة خلفية لغرفة معيشة حديثة",
+            "overlay": {
               "enabled": true,
-              "position": "bottom",
-              "offset": "32",
-              "background": {
-                "color": "#ffffff",
-                "opacity": "1",
-                "shadow": "2xl",
-                "border": "1px solid rgba(0, 0, 0, 0.05)",
-                "borderRadius": "lg"
-              },
-              "fields": {
-                "purpose": {
-                  "enabled": true,
-                  "options": [
-                    {
-                      "value": "rent",
-                      "label": "إيجار"
-                    },
-                    {
-                      "value": "sell",
-                      "label": "بيع"
-                    }
-                  ],
-                  "default": "rent"
-                },
-                "city": {
-                  "enabled": true,
-                  "placeholder": "أدخل المدينة أو المنطقة",
-                  "icon": "MapPin"
-                },
-                "type": {
-                  "enabled": true,
-                  "placeholder": "نوع العقار",
-                  "icon": "Home",
-                  "options": [
-                    "شقة",
-                    "فيلا",
-                    "دوبلكس",
-                    "أرض",
-                    "شاليه",
-                    "مكتب"
-                  ]
-                },
-                "price": {
-                  "enabled": true,
-                  "placeholder": "السعر",
-                  "icon": "CircleDollarSign",
-                  "options": [
-                    {
-                      "id": "any",
-                      "label": "أي سعر"
-                    },
-                    {
-                      "id": "0-200k",
-                      "label": "0 - 200 ألف"
-                    },
-                    {
-                      "id": "200k-500k",
-                      "label": "200 - 500 ألف"
-                    },
-                    {
-                      "id": "500k-1m",
-                      "label": "500 ألف - 1 مليون"
-                    },
-                    {
-                      "id": "1m+",
-                      "label": "أكثر من 1 مليون"
-                    }
-                  ]
-                },
-                "keywords": {
-                  "enabled": true,
-                  "placeholder": "كلمات مفتاحية..."
-                }
-              },
-              "responsive": {
-                "desktop": "all-in-row",
-                "tablet": "two-rows",
-                "mobile": "stacked"
-              }
-            },
-            "animations": {
-              "title": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
-              },
-              "subtitle": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
-              },
-              "searchForm": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 600
-              }
-            },
-            "barType": "contact"
-          },
-          "layout": {
-            "row": 0,
-            "col": 0,
-            "span": 2
-          },
-          "position": 0
-        },
-        {
-          "id": "a4b2791f-a5f2-4915-9e53-ba3dcf5b8a70",
-          "type": "mapSection",
-          "name": "MapSection",
-          "componentName": "mapSection1",
-          "data": {
-            "visible": true,
-            "texts": {
-              "title": "Map Section Title",
-              "subtitle": "This is a sample subtitle for the section."
-            },
-            "colors": {
-              "background": "#FFFFFF",
-              "textColor": "#1F2937"
-            },
-            "settings": {
-              "enabled": true,
-              "layout": "default"
+              "opacity": "0.45",
+              "color": "#000000"
             }
           },
-          "layout": {
-            "row": 1,
-            "col": 0,
-            "span": 2
-          },
-          "position": 1
-        }
-      ],
-      "for-rent": [
-        {
-          "id": "0",
-          "type": "hero",
-          "name": "Hero",
-          "componentName": "hero4",
-          "data": {
-            "ThemeTwo": "ThemeTwo",
-            "visible": true,
-            "title": "عقارات للإيجار",
-            "backgroundImage": "https://dalel-lovat.vercel.app/images/hero.webp",
-            "barType": "propertyFilter",
-            "contact": false,
-            "background": {
-              "ThemeTwo": "ThemeTwo",
-              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-              "alt": "صورة خلفية لغرفة معيشة حديثة",
-              "overlay": {
-                "ThemeTwo": "ThemeTwo",
-                "enabled": true,
-                "opacity": "0.45",
-                "color": "#000000"
-              },
-              "type": "solid",
-              "opacity": "0.8",
-              "blur": true,
-              "colors": {
-                "from": "#ffffff",
-                "to": "#ffffff"
-              }
-            },
-            "content": {
-              "ThemeTwo": "ThemeTwo",
-              "title": "اكتشف عقارك المثالي في أفضل المواقع",
-              "alignment": "center",
-              "maxWidth": "5xl",
-              "font": {
-                "ThemeTwo": "ThemeTwo",
-                "title": {
-                  "ThemeTwo": "ThemeTwo",
-                  "family": "Tajawal",
-                  "size": {
-                    "ThemeTwo": "ThemeTwo",
-                    "desktop": "5xl",
-                    "tablet": "4xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "extrabold",
-                  "color": "#ffffff",
-                  "lineHeight": "1.25"
-                },
-                "subtitle": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "2xl",
-                    "tablet": "2xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "normal",
-                  "color": "rgba(255, 255, 255, 0.85)"
-                }
-              },
-              "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
-              "paddingTop": "200px"
-            },
-            "animations": {
-              "ThemeTwo": "ThemeTwo",
+          "content": {
+            "title": "اكتشف عقارك المثالي في أفضل المواقع",
+            "description": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+            "alignment": "center",
+            "maxWidth": "5xl",
+            "font": {
               "title": {
-                "ThemeTwo": "ThemeTwo",
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
-              },
-              "menuItems": {
-                "enabled": true,
-                "duration": 200,
-                "delay": 50
-              },
-              "mobileMenu": {
-                "enabled": true,
-                "duration": 300,
-                "easing": "ease-in-out"
-              },
-              "subtitle": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
-              },
-              "searchForm": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 600
-              }
-            },
-            "id": "0",
-            "type": "unknown",
-            "variant": "header2",
-            "useStore": true,
-            "position": {
-              "type": "sticky",
-              "top": 0,
-              "zIndex": 50
-            },
-            "height": {
-              "desktop": "90vh",
-              "tablet": "90vh",
-              "mobile": "90vh"
-            },
-            "colors": {
-              "text": "#1f2937",
-              "link": "#374151",
-              "linkHover": "#1f2937",
-              "linkActive": "#059669",
-              "icon": "#374151",
-              "iconHover": "#1f2937",
-              "border": "#e5e7eb",
-              "accent": "#059669"
-            },
-            "logo": {
-              "type": "image+text",
-              "image": "https://dalel-lovat.vercel.app/images/logo.svg",
-              "text": "الشركة العقارية",
-              "font": {
                 "family": "Tajawal",
-                "size": 24,
-                "weight": "600"
-              },
-              "url": "/",
-              "clickAction": "navigate"
-            },
-            "menu": [
-              {
-                "id": "home",
-                "type": "link",
-                "text": "الرئيسية",
-                "url": "/"
-              },
-              {
-                "id": "about",
-                "type": "link",
-                "text": "حول",
-                "url": "/about-us"
-              },
-              {
-                "id": "services",
-                "type": "link",
-                "text": "الخدمات",
-                "url": "/services"
-              },
-              {
-                "id": "contact",
-                "type": "link",
-                "text": "اتصل بنا",
-                "url": "/contact-us"
-              }
-            ],
-            "actions": {
-              "search": {
-                "enabled": false,
-                "placeholder": "بحث..."
-              },
-              "user": {
-                "showProfile": true,
-                "showCart": false,
-                "showWishlist": false,
-                "showNotifications": false
-              },
-              "mobile": {
-                "showLogo": true,
-                "showLanguageToggle": false,
-                "showSearch": false
-              }
-            },
-            "responsive": {
-              "breakpoints": {
-                "mobile": 768,
-                "tablet": 1024,
-                "desktop": 1280
-              },
-              "mobileMenu": {
-                "side": "right",
-                "width": 320,
-                "overlay": true
-              }
-            },
-            "minHeight": {
-              "desktop": "520px",
-              "tablet": "520px",
-              "mobile": "520px"
-            },
-            "searchForm": {
-              "enabled": true,
-              "position": "bottom",
-              "offset": "32",
-              "background": {
+                "size": {
+                  "desktop": "36px",
+                  "tablet": "36px",
+                  "mobile": "36px"
+                },
+                "weight": "bold",
                 "color": "#ffffff",
-                "opacity": "1",
-                "shadow": "2xl",
-                "border": "1px solid rgba(0, 0, 0, 0.05)",
-                "borderRadius": "lg"
-              },
-              "fields": {
-                "purpose": {
-                  "enabled": true,
-                  "options": [
-                    {
-                      "value": "rent",
-                      "label": "إيجار"
-                    },
-                    {
-                      "value": "sell",
-                      "label": "بيع"
-                    }
-                  ],
-                  "default": "rent"
-                },
-                "city": {
-                  "enabled": true,
-                  "placeholder": "أدخل المدينة أو المنطقة",
-                  "icon": "MapPin"
-                },
-                "type": {
-                  "enabled": true,
-                  "placeholder": "نوع العقار",
-                  "icon": "Home",
-                  "options": [
-                    "شقة",
-                    "فيلا",
-                    "دوبلكس",
-                    "أرض",
-                    "شاليه",
-                    "مكتب"
-                  ]
-                },
-                "price": {
-                  "enabled": true,
-                  "placeholder": "السعر",
-                  "icon": "CircleDollarSign",
-                  "options": [
-                    {
-                      "id": "any",
-                      "label": "أي سعر"
-                    },
-                    {
-                      "id": "0-200k",
-                      "label": "0 - 200 ألف"
-                    },
-                    {
-                      "id": "200k-500k",
-                      "label": "200 - 500 ألف"
-                    },
-                    {
-                      "id": "500k-1m",
-                      "label": "500 ألف - 1 مليون"
-                    },
-                    {
-                      "id": "1m+",
-                      "label": "أكثر من 1 مليون"
-                    }
-                  ]
-                },
-                "keywords": {
-                  "enabled": true,
-                  "placeholder": "كلمات مفتاحية..."
-                }
-              },
-              "responsive": {
-                "desktop": "all-in-row",
-                "tablet": "two-rows",
-                "mobile": "stacked"
-              }
-            }
-          },
-          "position": 0,
-          "layout": {
-            "row": 0,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "1",
-          "type": "header",
-          "name": "Header",
-          "componentName": "header1",
-          "data": {
-            "visible": true,
-            "position": {
-              "type": "sticky",
-              "top": 0,
-              "zIndex": 50
-            },
-            "height": {
-              "desktop": 96,
-              "tablet": 80,
-              "mobile": 64
-            },
-            "background": {
-              "type": "solid",
-              "opacity": "0.8",
-              "blur": true,
-              "colors": {
-                "from": "#ffffff",
-                "to": "#ffffff"
-              }
-            },
-            "colors": {
-              "text": "#1f2937",
-              "link": "#374151",
-              "linkHover": "#1f2937",
-              "linkActive": "#059669",
-              "icon": "#374151",
-              "iconHover": "#1f2937",
-              "border": "#e5e7eb",
-              "accent": "#059669"
-            },
-            "logo": {
-              "type": "image+text",
-              "image": "https://dalel-lovat.vercel.app/images/logo.svg",
-              "text": "dsadas",
-              "font": {
-                "family": "Tajawal",
-                "size": 24,
-                "weight": "600"
-              },
-              "url": "/",
-              "clickAction": "navigate"
-            },
-            "menu": [
-              {
-                "id": "home",
-                "type": "link",
-                "text": "الرئيسية",
-                "url": "/"
-              },
-              {
-                "id": "about",
-                "type": "link",
-                "text": "حول",
-                "url": "/about"
-              },
-              {
-                "id": "services",
-                "type": "link",
-                "text": "الخدمات",
-                "url": "/services"
-              },
-              {
-                "id": "contact",
-                "type": "link",
-                "text": "اتصل بنا",
-                "url": "/contact"
-              }
-            ],
-            "actions": {
-              "search": {
-                "enabled": false,
-                "placeholder": "بحث..."
-              },
-              "user": {
-                "showProfile": true,
-                "showCart": false,
-                "showWishlist": false,
-                "showNotifications": false
-              },
-              "mobile": {
-                "showLogo": true,
-                "showLanguageToggle": false,
-                "showSearch": false
-              }
-            },
-            "responsive": {
-              "breakpoints": {
-                "mobile": 768,
-                "tablet": 1024,
-                "desktop": 1280
-              },
-              "mobileMenu": {
-                "side": "right",
-                "width": 320,
-                "overlay": true
-              }
-            },
-            "animations": {
-              "menuItems": {
-                "enabled": true,
-                "duration": 200,
-                "delay": 50
-              },
-              "mobileMenu": {
-                "enabled": true,
-                "duration": 300,
-                "easing": "ease-in-out"
-              }
-            }
-          },
-          "position": 1,
-          "layout": {
-            "row": 1,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "2",
-          "type": "grid",
-          "name": "Grid",
-          "componentName": "grid1",
-          "data": {
-            "visible": true,
-            "texts": {
-              "title": "Property Grid Title",
-              "subtitle": "This is a sample subtitle for the section."
-            },
-            "colors": {
-              "background": "#FFFFFF",
-              "textColor": "#1F2937"
-            },
-            "settings": {
-              "enabled": true,
-              "layout": "default"
-            },
-            "cardSettings": {
-              "theme": "card4"
-            }
-          },
-          "position": 2,
-          "layout": {
-            "row": 2,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "3",
-          "type": "footer",
-          "name": "Footer",
-          "componentName": "footer1",
-          "data": {
-            "visible": true,
-            "background": {
-              "type": "image",
-              "image": "https://dalel-lovat.vercel.app/images/footer/FooterImage.webp",
-              "alt": "خلفية الفوتر",
-              "color": "#1f2937",
-              "gradient": {
-                "enabled": false,
-                "direction": "to-r",
-                "startColor": "#1f2937",
-                "endColor": "#374151",
-                "middleColor": "#4b5563"
-              },
-              "overlay": {
-                "enabled": true,
-                "opacity": "0.7",
-                "color": "#000000",
-                "blendMode": "multiply"
-              }
-            },
-            "layout": {
-              "columns": "3",
-              "spacing": "8",
-              "padding": "16",
-              "maxWidth": "7xl"
-            },
-            "content": {
-              "companyInfo": {
-                "enabled": true,
-                "name": "dsadas",
-                "description": "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
-                "tagline": "للخدمات العقارية",
-                "logo": null
-              },
-              "quickLinks": {
-                "enabled": true,
-                "title": "روابط مهمة",
-                "links": [
-                  {
-                    "text": "الرئيسية",
-                    "url": "/"
-                  },
-                  {
-                    "text": "البيع",
-                    "url": "/sell"
-                  },
-                  {
-                    "text": "الإيجار",
-                    "url": "/rent"
-                  },
-                  {
-                    "text": "من نحن",
-                    "url": "/about"
-                  },
-                  {
-                    "text": "تواصل معنا",
-                    "url": "/contact"
-                  }
-                ]
-              },
-              "contactInfo": {
-                "enabled": true,
-                "title": "معلومات التواصل",
-                "address": "N/A",
-                "phone1": "0000",
-                "phone2": "0000",
-                "email": "test@51.test"
-              },
-              "socialMedia": {
-                "enabled": true,
-                "title": "وسائل التواصل الاجتماعي",
-                "platforms": [
-                  {
-                    "name": "واتساب",
-                    "icon": "FaWhatsapp",
-                    "url": "#",
-                    "color": "#25D366"
-                  },
-                  {
-                    "name": "لينكد إن",
-                    "icon": "Linkedin",
-                    "url": "#",
-                    "color": "#0077B5"
-                  },
-                  {
-                    "name": "إنستغرام",
-                    "icon": "Instagram",
-                    "url": "#",
-                    "color": "#E4405F"
-                  },
-                  {
-                    "name": "تويتر",
-                    "icon": "Twitter",
-                    "url": "#",
-                    "color": "#1DA1F2"
-                  },
-                  {
-                    "name": "فيسبوك",
-                    "icon": "Facebook",
-                    "url": "#",
-                    "color": "#1877F2"
-                  }
-                ]
-              }
-            },
-            "footerBottom": {
-              "enabled": true,
-              "copyright": "© 2024 تعاريف العقارية للخدمات العقارية. جميع الحقوق محفوظة.",
-              "legalLinks": [
-                {
-                  "text": "سياسة الخصوصية",
-                  "url": "/privacy"
-                },
-                {
-                  "text": "الشروط والأحكام",
-                  "url": "/terms"
-                }
-              ]
-            },
-            "styling": {
-              "colors": {
-                "textPrimary": "#ffffff",
-                "textSecondary": "#ffffff",
-                "textMuted": "rgba(255, 255, 255, 0.7)",
-                "accent": "#10b981",
-                "border": "rgba(255, 255, 255, 0.2)"
-              },
-              "typography": {
-                "titleSize": "xl",
-                "titleWeight": "bold",
-                "bodySize": "sm",
-                "bodyWeight": "normal"
-              },
-              "spacing": {
-                "sectionPadding": "16",
-                "columnGap": "8",
-                "itemGap": "3"
-              },
-              "effects": {
-                "hoverTransition": "0.3s",
-                "shadow": "none",
-                "borderRadius": "none"
-              }
-            }
-          },
-          "position": 3,
-          "layout": {
-            "row": 3,
-            "col": 0,
-            "span": 2
-          }
-        }
-      ],
-      "for-sale": [
-        {
-          "id": "0",
-          "type": "hero",
-          "name": "Hero",
-          "componentName": "hero4",
-          "data": {
-            "visible": true,
-            "height": {
-              "desktop": "90vh",
-              "tablet": "90vh",
-              "mobile": "90vh"
-            },
-            "minHeight": {
-              "desktop": "520px",
-              "tablet": "520px",
-              "mobile": "520px"
-            },
-            "background": {
-              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-              "alt": "صورة خلفية لغرفة معيشة حديثة",
-              "overlay": {
-                "enabled": true,
-                "opacity": "0.45",
-                "color": "#000000"
-              }
-            },
-            "content": {
-              "title": "اكتشف عقارك المثالي في أفضل المواقع",
-              "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
-              "font": {
-                "title": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "5xl",
-                    "tablet": "4xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "extrabold",
-                  "color": "#ffffff",
-                  "lineHeight": "1.25"
-                },
-                "subtitle": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "2xl",
-                    "tablet": "2xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "normal",
-                  "color": "rgba(255, 255, 255, 0.85)"
-                }
-              },
-              "alignment": "center",
-              "maxWidth": "5xl",
-              "paddingTop": "200px"
-            },
-            "searchForm": {
-              "enabled": true,
-              "position": "bottom",
-              "offset": "32",
-              "background": {
-                "color": "#ffffff",
-                "opacity": "1",
-                "shadow": "2xl",
-                "border": "1px solid rgba(0, 0, 0, 0.05)",
-                "borderRadius": "lg"
-              },
-              "fields": {
-                "purpose": {
-                  "enabled": true,
-                  "options": [
-                    {
-                      "value": "rent",
-                      "label": "إيجار"
-                    },
-                    {
-                      "value": "sell",
-                      "label": "بيع"
-                    }
-                  ],
-                  "default": "rent"
-                },
-                "city": {
-                  "enabled": true,
-                  "placeholder": "أدخل المدينة أو المنطقة",
-                  "icon": "MapPin"
-                },
-                "type": {
-                  "enabled": true,
-                  "placeholder": "نوع العقار",
-                  "icon": "Home",
-                  "options": [
-                    "شقة",
-                    "فيلا",
-                    "دوبلكس",
-                    "أرض",
-                    "شاليه",
-                    "مكتب"
-                  ]
-                },
-                "price": {
-                  "enabled": true,
-                  "placeholder": "السعر",
-                  "icon": "CircleDollarSign",
-                  "options": [
-                    {
-                      "id": "any",
-                      "label": "أي سعر"
-                    },
-                    {
-                      "id": "0-200k",
-                      "label": "0 - 200 ألف"
-                    },
-                    {
-                      "id": "200k-500k",
-                      "label": "200 - 500 ألف"
-                    },
-                    {
-                      "id": "500k-1m",
-                      "label": "500 ألف - 1 مليون"
-                    },
-                    {
-                      "id": "1m+",
-                      "label": "أكثر من 1 مليون"
-                    }
-                  ]
-                },
-                "keywords": {
-                  "enabled": true,
-                  "placeholder": "كلمات مفتاحية..."
-                }
-              },
-              "responsive": {
-                "desktop": "all-in-row",
-                "tablet": "two-rows",
-                "mobile": "stacked"
-              }
-            },
-            "animations": {
-              "title": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
+                "lineHeight": "1.25"
               },
               "subtitle": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
-              },
-              "searchForm": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 600
-              }
-            },
-            "barType": "propertyFilter",
-            "title": "عقارات للبيع"
-          },
-          "position": 0,
-          "layout": {
-            "row": 0,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "1",
-          "type": "header",
-          "name": "Header",
-          "componentName": "header1",
-          "data": {
-            "visible": true,
-            "position": {
-              "type": "sticky",
-              "top": 0,
-              "zIndex": 50
-            },
-            "height": {
-              "desktop": 96,
-              "tablet": 80,
-              "mobile": 64
-            },
-            "background": {
-              "type": "solid",
-              "opacity": "0.8",
-              "blur": true,
-              "colors": {
-                "from": "#ffffff",
-                "to": "#ffffff"
-              }
-            },
-            "colors": {
-              "text": "#1f2937",
-              "link": "#374151",
-              "linkHover": "#1f2937",
-              "linkActive": "#059669",
-              "icon": "#374151",
-              "iconHover": "#1f2937",
-              "border": "#e5e7eb",
-              "accent": "#059669"
-            },
-            "logo": {
-              "type": "image+text",
-              "image": "https://taearif.com/logos/logo.png",
-              "text": "تعاريف العقارية",
-              "font": {
                 "family": "Tajawal",
-                "size": 24,
-                "weight": "600"
-              },
-              "url": "/",
-              "clickAction": "navigate"
-            },
-            "menu": [
-              {
-                "id": "home",
-                "type": "link",
-                "text": "الرئيسية",
-                "url": "/"
-              },
-              {
-                "id": "about",
-                "type": "link",
-                "text": "حول",
-                "url": "/about"
-              },
-              {
-                "id": "services",
-                "type": "link",
-                "text": "الخدمات",
-                "url": "/services"
-              },
-              {
-                "id": "contact",
-                "type": "link",
-                "text": "اتصل بنا",
-                "url": "/contact"
-              }
-            ],
-            "actions": {
-              "search": {
-                "enabled": false,
-                "placeholder": "بحث..."
-              },
-              "user": {
-                "showProfile": true,
-                "showCart": false,
-                "showWishlist": false,
-                "showNotifications": false
-              },
-              "mobile": {
-                "showLogo": true,
-                "showLanguageToggle": false,
-                "showSearch": false
-              }
-            },
-            "responsive": {
-              "breakpoints": {
-                "mobile": 768,
-                "tablet": 1024,
-                "desktop": 1280
-              },
-              "mobileMenu": {
-                "side": "right",
-                "width": 320,
-                "overlay": true
-              }
-            },
-            "animations": {
-              "menuItems": {
-                "enabled": true,
-                "duration": 200,
-                "delay": 50
-              },
-              "mobileMenu": {
-                "enabled": true,
-                "duration": 300,
-                "easing": "ease-in-out"
-              }
-            }
-          },
-          "position": 1,
-          "layout": {
-            "row": 1,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "2",
-          "type": "grid",
-          "name": "Grid",
-          "componentName": "grid1",
-          "data": {
-            "visible": true,
-            "texts": {
-              "title": "Property Grid Title",
-              "subtitle": "This is a sample subtitle for the section."
-            },
-            "colors": {
-              "background": "#FFFFFF",
-              "textColor": "#1F2937"
-            },
-            "settings": {
-              "enabled": true,
-              "layout": "default"
-            },
-            "id": "f2b3cf94-92c4-4e63-baa3-4f3f71baf4e7",
-            "type": "unknown",
-            "variant": "f2b3cf94-92c4-4e63-baa3-4f3f71baf4e7",
-            "useStore": true,
-            "cardSettings": {
-              "theme": "card4"
-            }
-          },
-          "position": 2,
-          "layout": {
-            "row": 2,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "3",
-          "type": "footer",
-          "name": "Footer",
-          "componentName": "footer1",
-          "data": {
-            "visible": true,
-            "background": {
-              "type": "image",
-              "image": "https://dalel-lovat.vercel.app/images/footer/FooterImage.webp",
-              "alt": "خلفية الفوتر",
-              "color": "#1f2937",
-              "gradient": {
-                "enabled": false,
-                "direction": "to-r",
-                "startColor": "#1f2937",
-                "endColor": "#374151",
-                "middleColor": "#4b5563"
-              },
-              "overlay": {
-                "enabled": true,
-                "opacity": "0.7",
-                "color": "#000000",
-                "blendMode": "multiply"
-              }
-            },
-            "layout": {
-              "columns": "3",
-              "spacing": "8",
-              "padding": "16",
-              "maxWidth": "7xl"
-            },
-            "content": {
-              "companyInfo": {
-                "enabled": true,
-                "name": "تعاريف العقارية",
-                "description": "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
-                "tagline": "للخدمات العقارية",
-                "logo": null
-              },
-              "quickLinks": {
-                "enabled": true,
-                "title": "روابط مهمة",
-                "links": [
-                  {
-                    "text": "الرئيسية",
-                    "url": "/"
-                  },
-                  {
-                    "text": "البيع",
-                    "url": "/sell"
-                  },
-                  {
-                    "text": "الإيجار",
-                    "url": "/rent"
-                  },
-                  {
-                    "text": "من نحن",
-                    "url": "/about"
-                  },
-                  {
-                    "text": "تواصل معنا",
-                    "url": "/contact"
-                  }
-                ]
-              },
-              "contactInfo": {
-                "enabled": true,
-                "title": "معلومات التواصل",
-                "address": "المملكة العربية السعودية",
-                "phone1": "0000",
-                "phone2": "0000",
-                "email": "info@example.com"
-              },
-              "socialMedia": {
-                "enabled": true,
-                "title": "وسائل التواصل الاجتماعي",
-                "platforms": [
-                  {
-                    "name": "واتساب",
-                    "icon": "FaWhatsapp",
-                    "url": "#",
-                    "color": "#25D366"
-                  },
-                  {
-                    "name": "لينكد إن",
-                    "icon": "Linkedin",
-                    "url": "#",
-                    "color": "#0077B5"
-                  },
-                  {
-                    "name": "إنستغرام",
-                    "icon": "Instagram",
-                    "url": "#",
-                    "color": "#E4405F"
-                  },
-                  {
-                    "name": "تويتر",
-                    "icon": "Twitter",
-                    "url": "#",
-                    "color": "#1DA1F2"
-                  },
-                  {
-                    "name": "فيسبوك",
-                    "icon": "Facebook",
-                    "url": "#",
-                    "color": "#1877F2"
-                  }
-                ]
-              }
-            },
-            "footerBottom": {
-              "enabled": true,
-              "copyright": "© 2024 تعاريف العقارية للخدمات العقارية. جميع الحقوق محفوظة.",
-              "legalLinks": [
-                {
-                  "text": "سياسة الخصوصية",
-                  "url": "/privacy"
+                "size": {
+                  "desktop": "15px",
+                  "tablet": "15px",
+                  "mobile": "15px"
                 },
-                {
-                  "text": "الشروط والأحكام",
-                  "url": "/terms"
-                }
-              ]
-            },
-            "styling": {
-              "colors": {
-                "textPrimary": "#ffffff",
-                "textSecondary": "#ffffff",
-                "textMuted": "rgba(255, 255, 255, 0.7)",
-                "accent": "#10b981",
-                "border": "rgba(255, 255, 255, 0.2)"
-              },
-              "typography": {
-                "titleSize": "xl",
-                "titleWeight": "bold",
-                "bodySize": "sm",
-                "bodyWeight": "normal"
-              },
-              "spacing": {
-                "sectionPadding": "16",
-                "columnGap": "8",
-                "itemGap": "3"
-              },
-              "effects": {
-                "hoverTransition": "0.3s",
-                "shadow": "none",
-                "borderRadius": "none"
+                "weight": "normal",
+                "color": "#ffffff"
               }
             }
           },
-          "position": 3,
-          "layout": {
-            "row": 3,
-            "col": 0,
-            "span": 2
+          "animations": {
+            "title": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "description": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            }
           }
+        },
+        "position": 0,
+        "layout": {
+          "row": 0,
+          "col": 0,
+          "span": 2
         }
-      ],
-      "homepage": [
-        {
-          "id": "0",
-          "type": "hero",
-          "name": "Hero",
-          "componentName": "hero3",
-          "data": {
-            "visible": true,
-            "height": {
-              "desktop": "90vh",
-              "tablet": "90vh",
-              "mobile": "90vh"
-            },
-            "minHeight": {
-              "desktop": "520px",
-              "tablet": "520px",
-              "mobile": "520px"
-            },
-            "background": {
-              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-              "alt": "صورة خلفية لغرفة معيشة حديثة",
-              "overlay": {
-                "enabled": true,
-                "opacity": "0.45",
-                "color": "#000000"
-              }
-            },
-            "content": {
-              "title": "اكتشف عقارك المثالي في أفضل المواقع",
-              "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
-              "font": {
-                "title": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "5xl",
-                    "tablet": "4xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "extrabold",
-                  "color": "#ffffff",
-                  "lineHeight": "1.25"
-                },
-                "subtitle": {
-                  "family": "Tajawal",
-                  "size": {
-                    "desktop": "2xl",
-                    "tablet": "2xl",
-                    "mobile": "2xl"
-                  },
-                  "weight": "normal",
-                  "color": "rgba(255, 255, 255, 0.85)"
-                }
-              },
-              "alignment": "center",
-              "maxWidth": "5xl",
-              "paddingTop": "200px"
-            },
-            "searchForm": {
-              "enabled": true,
-              "position": "bottom",
-              "offset": "32",
-              "background": {
-                "color": "#ffffff",
-                "opacity": "1",
-                "shadow": "2xl",
-                "border": "1px solid rgba(0, 0, 0, 0.05)",
-                "borderRadius": "lg"
-              },
-              "fields": {
-                "purpose": {
-                  "enabled": true,
-                  "options": [
-                    {
-                      "value": "rent",
-                      "label": "إيجار"
-                    },
-                    {
-                      "value": "sell",
-                      "label": "بيع"
-                    }
-                  ],
-                  "default": "rent"
-                },
-                "city": {
-                  "enabled": true,
-                  "placeholder": "أدخل المدينة أو المنطقة",
-                  "icon": "MapPin"
-                },
-                "type": {
-                  "enabled": true,
-                  "placeholder": "نوع العقار",
-                  "icon": "Home",
-                  "options": [
-                    "شقة",
-                    "فيلا",
-                    "دوبلكس",
-                    "أرض",
-                    "شاليه",
-                    "مكتب"
-                  ]
-                },
-                "price": {
-                  "enabled": true,
-                  "placeholder": "السعر",
-                  "icon": "CircleDollarSign",
-                  "options": [
-                    {
-                      "id": "any",
-                      "label": "أي سعر"
-                    },
-                    {
-                      "id": "0-200k",
-                      "label": "0 - 200 ألف"
-                    },
-                    {
-                      "id": "200k-500k",
-                      "label": "200 - 500 ألف"
-                    },
-                    {
-                      "id": "500k-1m",
-                      "label": "500 ألف - 1 مليون"
-                    },
-                    {
-                      "id": "1m+",
-                      "label": "أكثر من 1 مليون"
-                    }
-                  ]
-                },
-                "keywords": {
-                  "enabled": true,
-                  "placeholder": "كلمات مفتاحية..."
-                }
-              },
-              "responsive": {
-                "desktop": "all-in-row",
-                "tablet": "two-rows",
-                "mobile": "stacked"
-              }
-            },
-            "animations": {
-              "title": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 200
-              },
-              "subtitle": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 400
-              },
-              "searchForm": {
-                "enabled": true,
-                "type": "fade-up",
-                "duration": 600,
-                "delay": 600
-              }
-            }
-          },
-          "position": 0,
-          "layout": {
-            "row": 0,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "1",
-          "type": "propertiesShowcase",
-          "name": "PropertiesShowcase",
-          "componentName": "propertiesShowcase1",
-          "data": {
-            "visible": true,
-            "texts": {
-              "title": "Properties Showcase Title",
-              "subtitle": "This is a sample subtitle for the section."
-            },
-            "colors": {
-              "background": "#FFFFFF",
-              "textColor": "#1F2937"
-            },
-            "settings": {
-              "enabled": true,
-              "layout": "default"
-            },
-            "ThemeTwo": "propertiesShowcase",
-            "layout": {
-              "ThemeTwo": "layout",
-              "maxWidth": "7xl",
-              "columns": {
-                "ThemeTwo": "columns",
-                "mobile": 1,
-                "tablet": 2,
-                "desktop": 3
-              },
-              "gap": "1.5rem",
-              "padding": {
-                "ThemeTwo": "padding",
-                "top": "3rem",
-                "bottom": "3rem"
-              }
-            },
-            "content": {
-              "ThemeTwo": "content",
-              "title": "عقارات للإيجار",
-              "loadMoreButtonText": "تحميل المزيد",
-              "viewAllButtonText": "عرض الكل",
-              "cardType": "card1"
-            },
-            "dataSource": {
-              "apiUrl": "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
-              "enabled": true
-            },
-            "properties": [
-              {
-                "ThemeTwo": "property",
-                "id": "1",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "مشروع سكني فاخر",
-                "city": "الرياض",
-                "district": "حي النرجس",
-                "status": "للبيع",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 150,
-                  "max": 300
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 3,
-                  "max": 5
-                },
-                "units": 50,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 3,
-                  "max": 5
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 500000,
-                  "max": 1500000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 2,
-                  "max": 4
-                },
-                "featured": false,
-                "url": "#"
-              },
-              {
-                "ThemeTwo": "property",
-                "id": "2",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "مجمع سكني حديث",
-                "city": "جدة",
-                "district": "حي الزهراء",
-                "status": "للإيجار",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 200,
-                  "max": 400
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 4,
-                  "max": 6
-                },
-                "units": 80,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 4,
-                  "max": 6
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 3000,
-                  "max": 8000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 3,
-                  "max": 5
-                },
-                "featured": true,
-                "url": "#"
-              },
-              {
-                "ThemeTwo": "property",
-                "id": "3",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "عمارة سكنية راقية",
-                "city": "الدمام",
-                "district": "حي الفيصلية",
-                "status": "للبيع",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 180,
-                  "max": 350
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 3,
-                  "max": 6
-                },
-                "units": 60,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 4,
-                  "max": 7
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 800000,
-                  "max": 2000000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 2,
-                  "max": 5
-                },
-                "featured": false,
-                "url": "#"
-              }
-            ],
-            "styling": {
-              "ThemeTwo": "styling",
-              "backgroundColor": "#efe5dc",
-              "titleColor": "#1f2937",
-              "dividerColor": "#8b5f46",
-              "viewAllButtonColor": "#8b5f46",
-              "viewAllButtonHoverColor": "#6b4630",
-              "loadMoreButtonColor": "#8b5f46",
-              "loadMoreButtonHoverColor": "#8b5f46",
-              "loadMoreButtonTextColor": "#8b5f46",
-              "loadMoreButtonHoverTextColor": "#ffffff"
-            },
-            "typography": {
-              "ThemeTwo": "typography",
-              "title": {
-                "ThemeTwo": "title",
-                "fontSize": {
-                  "ThemeTwo": "fontSize",
-                  "mobile": "xl",
-                  "tablet": "2xl",
-                  "desktop": "3xl"
-                },
-                "fontWeight": "bold",
-                "fontFamily": "Tajawal"
-              }
-            },
-            "responsive": {
-              "ThemeTwo": "responsive",
-              "mobileBreakpoint": "640px",
-              "tabletBreakpoint": "1024px",
-              "desktopBreakpoint": "1280px"
-            },
-            "id": "3ee57b88-2ace-42e7-8b9e-1e443259c949",
-            "type": "unknown",
-            "variant": "3ee57b88-2ace-42e7-8b9e-1e443259c949",
-            "useStore": true
-          },
-          "position": 1,
-          "layout": {
-            "row": 1,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "2",
-          "type": "propertiesShowcase",
-          "name": "PropertiesShowcase",
-          "componentName": "propertiesShowcase1",
-          "data": {
-            "visible": true,
-            "texts": {
-              "title": "Properties Showcase Title",
-              "subtitle": "This is a sample subtitle for the section."
-            },
-            "colors": {
-              "background": "#FFFFFF",
-              "textColor": "#1F2937"
-            },
-            "settings": {
-              "enabled": true,
-              "layout": "default"
-            },
-            "ThemeTwo": "propertiesShowcase",
-            "layout": {
-              "ThemeTwo": "layout",
-              "maxWidth": "7xl",
-              "columns": {
-                "ThemeTwo": "columns",
-                "mobile": 1,
-                "tablet": 2,
-                "desktop": 3
-              },
-              "gap": "1.5rem",
-              "padding": {
-                "ThemeTwo": "padding",
-                "top": "3rem",
-                "bottom": "3rem"
-              }
-            },
-            "content": {
-              "ThemeTwo": "content",
-              "title": "عقارات للبيع",
-              "loadMoreButtonText": "تحميل المزيد",
-              "viewAllButtonText": "عرض الكل",
-              "cardType": "card1"
-            },
-            "dataSource": {
-              "apiUrl": "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10",
-              "enabled": true
-            },
-            "properties": [
-              {
-                "ThemeTwo": "property",
-                "id": "1",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "مشروع سكني فاخر",
-                "city": "الرياض",
-                "district": "حي النرجس",
-                "status": "للبيع",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 150,
-                  "max": 300
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 3,
-                  "max": 5
-                },
-                "units": 50,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 3,
-                  "max": 5
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 500000,
-                  "max": 1500000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 2,
-                  "max": 4
-                },
-                "featured": false,
-                "url": "#"
-              },
-              {
-                "ThemeTwo": "property",
-                "id": "2",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "مجمع سكني حديث",
-                "city": "جدة",
-                "district": "حي الزهراء",
-                "status": "للإيجار",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 200,
-                  "max": 400
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 4,
-                  "max": 6
-                },
-                "units": 80,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 4,
-                  "max": 6
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 3000,
-                  "max": 8000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 3,
-                  "max": 5
-                },
-                "featured": true,
-                "url": "#"
-              },
-              {
-                "ThemeTwo": "property",
-                "id": "3",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "عمارة سكنية راقية",
-                "city": "الدمام",
-                "district": "حي الفيصلية",
-                "status": "للبيع",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 180,
-                  "max": 350
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 3,
-                  "max": 6
-                },
-                "units": 60,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 4,
-                  "max": 7
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 800000,
-                  "max": 2000000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 2,
-                  "max": 5
-                },
-                "featured": false,
-                "url": "#"
-              }
-            ],
-            "styling": {
-              "ThemeTwo": "styling",
-              "backgroundColor": "#efe5dc",
-              "titleColor": "#1f2937",
-              "dividerColor": "#8b5f46",
-              "viewAllButtonColor": "#8b5f46",
-              "viewAllButtonHoverColor": "#6b4630",
-              "loadMoreButtonColor": "#8b5f46",
-              "loadMoreButtonHoverColor": "#8b5f46",
-              "loadMoreButtonTextColor": "#8b5f46",
-              "loadMoreButtonHoverTextColor": "#ffffff"
-            },
-            "typography": {
-              "ThemeTwo": "typography",
-              "title": {
-                "ThemeTwo": "title",
-                "fontSize": {
-                  "ThemeTwo": "fontSize",
-                  "mobile": "xl",
-                  "tablet": "2xl",
-                  "desktop": "3xl"
-                },
-                "fontWeight": "bold",
-                "fontFamily": "Tajawal"
-              }
-            },
-            "responsive": {
-              "ThemeTwo": "responsive",
-              "mobileBreakpoint": "640px",
-              "tabletBreakpoint": "1024px",
-              "desktopBreakpoint": "1280px"
-            },
-            "id": "31fca95a-3f74-4b73-b6a6-91d965055464",
-            "type": "unknown",
-            "variant": "31fca95a-3f74-4b73-b6a6-91d965055464",
-            "useStore": true
-          },
-          "position": 2,
-          "layout": {
-            "row": 2,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "3",
-          "type": "propertiesShowcase",
-          "name": "PropertiesShowcase",
-          "componentName": "propertiesShowcase1",
-          "data": {
-            "visible": true,
-            "texts": {
-              "title": "Properties Showcase Title",
-              "subtitle": "This is a sample subtitle for the section."
-            },
-            "colors": {
-              "background": "#FFFFFF",
-              "textColor": "#1F2937"
-            },
-            "settings": {
-              "enabled": true,
-              "layout": "default"
-            },
-            "ThemeTwo": "propertiesShowcase",
-            "layout": {
-              "ThemeTwo": "layout",
-              "maxWidth": "7xl",
-              "columns": {
-                "ThemeTwo": "columns",
-                "mobile": 1,
-                "tablet": 2,
-                "desktop": 3
-              },
-              "gap": "1.5rem",
-              "padding": {
-                "ThemeTwo": "padding",
-                "top": "3rem",
-                "bottom": "3rem"
-              }
-            },
-            "content": {
-              "ThemeTwo": "content",
-              "title": "المشاريع",
-              "loadMoreButtonText": "تحميل المزيد",
-              "viewAllButtonText": "عرض الكل",
-              "cardType": "card1"
-            },
-            "dataSource": {
-              "apiUrl": "/v1/tenant-website/{tenantId}/projects?featured=1&limit=10",
-              "enabled": true
-            },
-            "properties": [
-              {
-                "ThemeTwo": "property",
-                "id": "1",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "مشروع سكني فاخر",
-                "city": "الرياض",
-                "district": "حي النرجس",
-                "status": "للبيع",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 150,
-                  "max": 300
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 3,
-                  "max": 5
-                },
-                "units": 50,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 3,
-                  "max": 5
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 500000,
-                  "max": 1500000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 2,
-                  "max": 4
-                },
-                "featured": false,
-                "url": "#"
-              },
-              {
-                "ThemeTwo": "property",
-                "id": "2",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "مجمع سكني حديث",
-                "city": "جدة",
-                "district": "حي الزهراء",
-                "status": "للإيجار",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 200,
-                  "max": 400
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 4,
-                  "max": 6
-                },
-                "units": 80,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 4,
-                  "max": 6
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 3000,
-                  "max": 8000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 3,
-                  "max": 5
-                },
-                "featured": true,
-                "url": "#"
-              },
-              {
-                "ThemeTwo": "property",
-                "id": "3",
-                "image": "https://dalel-lovat.vercel.app/images/hero.webp",
-                "title": "عمارة سكنية راقية",
-                "city": "الدمام",
-                "district": "حي الفيصلية",
-                "status": "للبيع",
-                "area": {
-                  "ThemeTwo": "area",
-                  "min": 180,
-                  "max": 350
-                },
-                "rooms": {
-                  "ThemeTwo": "rooms",
-                  "min": 3,
-                  "max": 6
-                },
-                "units": 60,
-                "floors": {
-                  "ThemeTwo": "floors",
-                  "min": 4,
-                  "max": 7
-                },
-                "price": {
-                  "ThemeTwo": "price",
-                  "min": 800000,
-                  "max": 2000000
-                },
-                "bathrooms": {
-                  "ThemeTwo": "bathrooms",
-                  "min": 2,
-                  "max": 5
-                },
-                "featured": false,
-                "url": "#"
-              }
-            ],
-            "styling": {
-              "ThemeTwo": "styling",
-              "backgroundColor": "#efe5dc",
-              "titleColor": "#1f2937",
-              "dividerColor": "#8b5f46",
-              "viewAllButtonColor": "#8b5f46",
-              "viewAllButtonHoverColor": "#6b4630",
-              "loadMoreButtonColor": "#8b5f46",
-              "loadMoreButtonHoverColor": "#8b5f46",
-              "loadMoreButtonTextColor": "#8b5f46",
-              "loadMoreButtonHoverTextColor": "#ffffff"
-            },
-            "typography": {
-              "ThemeTwo": "typography",
-              "title": {
-                "ThemeTwo": "title",
-                "fontSize": {
-                  "ThemeTwo": "fontSize",
-                  "mobile": "xl",
-                  "tablet": "2xl",
-                  "desktop": "3xl"
-                },
-                "fontWeight": "bold",
-                "fontFamily": "Tajawal"
-              }
-            },
-            "responsive": {
-              "ThemeTwo": "responsive",
-              "mobileBreakpoint": "640px",
-              "tabletBreakpoint": "1024px",
-              "desktopBreakpoint": "1280px"
-            },
-            "id": "d0e7e482-b6b1-412c-abcf-a82f54852420",
-            "type": "unknown",
-            "variant": "d0e7e482-b6b1-412c-abcf-a82f54852420",
-            "useStore": true
-          },
-          "position": 3,
-          "layout": {
-            "row": 3,
-            "col": 0,
-            "span": 2
-          }
-        },
-        {
-          "id": "4",
-          "type": "imageText",
-          "name": "ImageText",
-          "componentName": "imageText1",
-          "data": {
-            "visible": true,
-            "texts": {
-              "title": "Image Text Title",
-              "subtitle": "This is a sample subtitle for the section."
-            },
-            "colors": {
-              "background": "#FFFFFF",
-              "textColor": "#1F2937"
-            },
-            "settings": {
-              "enabled": true,
-              "layout": "default"
-            }
-          },
-          "position": 4,
-          "layout": {
-            "row": 4,
-            "col": 0,
-            "span": 2
-          }
-        }
-      ]
-    },
-    "globalComponentsData": {
-      "header": {
-        "visible": true,
-        "position": {
-          "type": "sticky",
-          "top": 0,
-          "zIndex": 50
-        },
-        "height": {
-          "desktop": 96,
-          "tablet": 80,
-          "mobile": 64
-        },
-        "background": {
-          "type": "solid",
-          "opacity": "0.8",
-          "blur": true,
-          "colors": {
-            "from": "#ffffff",
-            "to": "#ffffff"
-          }
-        },
-        "colors": {
-          "text": "#1f2937",
-          "link": "#374151",
-          "linkHover": "#1f2937",
-          "linkActive": "#059669",
-          "icon": "#374151",
-          "iconHover": "#1f2937",
-          "border": "#e5e7eb",
-          "accent": "#059669"
-        },
-        "logo": {
-          "type": "image+text",
-          "image": "https://dalel-lovat.vercel.app/images/logo.svg",
-          "text": "الشركة العقارية",
-          "font": {
-            "family": "Tajawal",
-            "size": 24,
-            "weight": "600"
-          },
-          "url": "/",
-          "clickAction": "navigate"
-        },
-        "menu": [
-          {
-            "id": "home",
-            "type": "link",
-            "text": "الرئيسية",
-            "url": "/"
-          },
-          {
-            "id": "about",
-            "type": "link",
-            "text": "حول",
-            "url": "/about-us"
-          },
-          {
-            "id": "services",
-            "type": "link",
-            "text": "الخدمات",
-            "url": "/services"
-          },
-          {
-            "id": "contact",
-            "type": "link",
-            "text": "اتصل بنا",
-            "url": "/contact-us"
-          }
-        ],
-        "actions": {
-          "search": {
-            "enabled": false,
-            "placeholder": "بحث..."
-          },
-          "user": {
-            "showProfile": true,
-            "showCart": false,
-            "showWishlist": false,
-            "showNotifications": false
-          },
-          "mobile": {
-            "showLogo": true,
-            "showLanguageToggle": false,
-            "showSearch": false
-          }
-        },
-        "responsive": {
-          "breakpoints": {
-            "mobile": 768,
-            "tablet": 1024,
-            "desktop": 1280
-          },
-          "mobileMenu": {
-            "side": "right",
-            "width": 320,
-            "overlay": true
-          }
-        },
-        "animations": {
-          "menuItems": {
-            "enabled": true,
-            "duration": 200,
-            "delay": 50
-          },
-          "mobileMenu": {
-            "enabled": true,
-            "duration": 300,
-            "easing": "ease-in-out"
-          }
-        },
-        "variant": "header2"
       },
-      "footer": {
-        "visible": true,
-        "ThemeTwo": "ThemeTwo",
-        "background": {
-          "type": "color",
-          "image": null,
-          "alt": null,
-          "color": "#8b5f46",
-          "ThemeTwo": "ThemeTwo",
-          "gradient": {
-            "enabled": false,
-            "direction": "to-r",
-            "startColor": "#1f2937",
-            "endColor": "#374151",
-            "middleColor": "#4b5563",
+      {
+        "id": "1",
+        "type": "halfTextHalfImage",
+        "name": "HalfTextHalfImage",
+        "componentName": "halfTextHalfImage6",
+        "data": {
+          "visible": true,
+          "layout": {
+            "direction": "rtl",
+            "textWidth": 52.8,
+            "imageWidth": 47.2,
+            "gap": "16",
+            "minHeight": "369px",
+            "ThemeTwo": "ThemeTwo",
+            "maxWidth": "1280px"
+          },
+          "spacing": {
+            "padding": {
+              "top": "5rem",
+              "bottom": "3rem",
+              "left": 4,
+              "right": 4,
+              "ThemeTwo": "ThemeTwo"
+            },
+            "margin": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            },
             "ThemeTwo": "ThemeTwo"
           },
-          "overlay": {
-            "enabled": false,
-            "opacity": "0.7",
-            "color": "#000000",
-            "blendMode": "multiply",
+          "content": {
+            "eyebrow": "شريك موثوق",
+            "title": "خبراء في خدمتك – نرافقك نحو استثمار آمن",
+            "description": "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
+            "button": {
+              "text": "تعرف علينا",
+              "enabled": true,
+              "url": "/about-us",
+              "style": {
+                "backgroundColor": "#059669",
+                "textColor": "#ffffff",
+                "hoverBackgroundColor": "#047857",
+                "hoverTextColor": "#ffffff",
+                "width": "119px",
+                "height": "46px",
+                "borderRadius": "10px"
+              }
+            },
+            "ThemeTwo": "ThemeTwo",
+            "titleUnderlined": "خبراء في",
+            "paragraph": "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم."
+          },
+          "typography": {
+            "eyebrow": {
+              "size": "text-xs md:text-base xl:text-lg",
+              "weight": "font-normal",
+              "color": "text-muted-foreground",
+              "lineHeight": "leading-[22.5px]"
+            },
+            "title": {
+              "size": "section-title-large",
+              "weight": "font-normal",
+              "color": "text-foreground",
+              "lineHeight": "lg:leading-[64px]"
+            },
+            "description": {
+              "size": "text-sm md:text-sm xl:text-xl",
+              "weight": "font-normal",
+              "color": "text-muted-foreground",
+              "lineHeight": "leading-[35px]"
+            }
+          },
+          "image": {
+            "src": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",
+            "alt": "صورة",
+            "style": {
+              "aspectRatio": "800/500",
+              "objectFit": "contain",
+              "borderRadius": "0"
+            },
+            "background": {
+              "enabled": true,
+              "color": "#059669",
+              "width": 54,
+              "borderRadius": "5px"
+            },
+            "ThemeTwo": "ThemeTwo",
+            "visible": true
+          },
+          "responsive": {
+            "mobile": {
+              "textOrder": 2,
+              "imageOrder": 1,
+              "textWidth": "w-full",
+              "imageWidth": "w-full",
+              "marginBottom": "mb-10"
+            },
+            "tablet": {
+              "textOrder": 2,
+              "imageOrder": 1,
+              "textWidth": "w-full",
+              "imageWidth": "w-full",
+              "marginBottom": "mb-10"
+            },
+            "desktop": {
+              "textOrder": 1,
+              "imageOrder": 2,
+              "textWidth": "md:w-[52.8%]",
+              "imageWidth": "md:w-[47.2%]",
+              "marginBottom": "md:mb-0"
+            }
+          },
+          "animations": {
+            "text": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "image": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            }
+          },
+          "ThemeTwo": "ThemeTwo",
+          "styling": {
+            "ThemeTwo": "ThemeTwo",
+            "backgroundColor": "#f5f0e8",
+            "titleColor": "#000000",
+            "paragraphColor": "#000000",
+            "dividerColor": "#8b5f46"
+          }
+        },
+        "position": 1,
+        "layout": {
+          "row": 1,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "09df9d73-5c66-432f-84b7-3ae3b3dbc6b9",
+        "type": "halfTextHalfImage",
+        "name": "HalfTextHalfImage",
+        "componentName": "halfTextHalfImage7",
+        "data": {
+          "visible": true,
+          "layout": {
+            "direction": "rtl",
+            "textWidth": 52.8,
+            "imageWidth": 47.2,
+            "gap": "16",
+            "minHeight": "369px",
+            "ThemeTwo": "ThemeTwo",
+            "maxWidth": "1350px"
+          },
+          "spacing": {
+            "padding": {
+              "top": "3rem",
+              "bottom": "4rem",
+              "left": "1rem",
+              "right": "1rem",
+              "ThemeTwo": "ThemeTwo"
+            },
+            "margin": {
+              "top": 0,
+              "bottom": 0,
+              "left": 0,
+              "right": 0
+            },
             "ThemeTwo": "ThemeTwo"
+          },
+          "content": {
+            "eyebrow": "شريك موثوق",
+            "title": "خدمات موثوقة تستحق ثقتك",
+            "description": "نقدم لك أفضل الخدمات العقارية مع ضمان الجودة والموثوقية. فريقنا من الخبراء يساعدك في العثور على العقار المثالي الذي يناسب احتياجاتك وميزانيتك.",
+            "button": {
+              "text": "تعرف علينا",
+              "enabled": true,
+              "url": "/about-us",
+              "style": {
+                "backgroundColor": "#059669",
+                "textColor": "#ffffff",
+                "hoverBackgroundColor": "#047857",
+                "hoverTextColor": "#ffffff",
+                "width": "119px",
+                "height": "46px",
+                "borderRadius": "10px"
+              }
+            },
+            "ThemeTwo": "ThemeTwo",
+            "features": [
+              {
+                "ThemeTwo": "ThemeTwo",
+                "id": "1",
+                "title": "الشفافية",
+                "description": "نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية، دون مفاجآت أو معلومات مخفية.",
+                "icon": "transparency"
+              },
+              {
+                "ThemeTwo": "ThemeTwo",
+                "id": "2",
+                "title": "الالتزام",
+                "description": "نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك، سواء بالشراء أو الاستثمار",
+                "icon": "commitment"
+              },
+              {
+                "ThemeTwo": "ThemeTwo",
+                "id": "3",
+                "title": "الابتكار",
+                "description": "نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة، والراحة.",
+                "icon": "innovation"
+              }
+            ]
+          },
+          "typography": {
+            "eyebrow": {
+              "size": "text-xs md:text-base xl:text-lg",
+              "weight": "font-normal",
+              "color": "text-muted-foreground",
+              "lineHeight": "leading-[22.5px]"
+            },
+            "title": {
+              "size": "section-title-large",
+              "weight": "font-normal",
+              "color": "text-foreground",
+              "lineHeight": "lg:leading-[64px]"
+            },
+            "description": {
+              "size": "text-sm md:text-sm xl:text-xl",
+              "weight": "font-normal",
+              "color": "text-muted-foreground",
+              "lineHeight": "leading-[35px]"
+            }
+          },
+          "image": {
+            "src": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",
+            "alt": "صورة",
+            "style": {
+              "aspectRatio": "800/500",
+              "objectFit": "contain",
+              "borderRadius": "0"
+            },
+            "background": {
+              "enabled": true,
+              "color": "#059669",
+              "width": 54,
+              "borderRadius": "5px"
+            },
+            "ThemeTwo": "ThemeTwo",
+            "visible": true
+          },
+          "responsive": {
+            "mobile": {
+              "textOrder": 2,
+              "imageOrder": 1,
+              "textWidth": "w-full",
+              "imageWidth": "w-full",
+              "marginBottom": "mb-10",
+              "ThemeTwo": "ThemeTwo",
+              "imageHeight": "h-[300px]"
+            },
+            "tablet": {
+              "textOrder": 2,
+              "imageOrder": 1,
+              "textWidth": "w-full",
+              "imageWidth": "w-full",
+              "marginBottom": "mb-10"
+            },
+            "desktop": {
+              "textOrder": 1,
+              "imageOrder": 2,
+              "textWidth": "md:w-[52.8%]",
+              "imageWidth": "md:w-[47.2%]",
+              "marginBottom": "md:mb-0",
+              "ThemeTwo": "ThemeTwo",
+              "imageHeight": "md:min-h-[500px]"
+            },
+            "ThemeTwo": "ThemeTwo"
+          },
+          "animations": {
+            "text": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "image": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            }
+          },
+          "ThemeTwo": "ThemeTwo",
+          "styling": {
+            "ThemeTwo": "ThemeTwo",
+            "backgroundColor": "#f5f0e8",
+            "titleColor": "#000000",
+            "dividerColor": "#8b5f46",
+            "featureTitleColor": "#8b5f46",
+            "featureDescriptionColor": "#8b5f46",
+            "iconBackgroundColor": "#d4a574",
+            "iconColor": "#896042"
           }
         },
         "layout": {
-          "columns": "2",
-          "spacing": "8",
-          "padding": "16",
-          "maxWidth": "6xl",
-          "ThemeTwo": "ThemeTwo"
+          "row": 2,
+          "col": 0,
+          "span": 2
         },
-        "content": {
-          "ThemeTwo": "ThemeTwo",
-          "companyInfo": {
-            "enabled": true,
-            "name": "تعاريفالعقارية",
-            "description": "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
-            "tagline": null,
-            "logo": "/images/main/logo.png",
-            "ThemeTwo": "ThemeTwo"
+        "position": 2
+      }
+    ],
+    "contact-us": [
+      {
+        "id": "2c7b970d-f5ea-418f-915b-0e69109f13bf",
+        "type": "hero",
+        "name": "Hero",
+        "componentName": "hero4",
+        "data": {
+          "visible": true,
+          "height": {
+            "desktop": "90vh",
+            "tablet": "90vh",
+            "mobile": "90vh"
           },
-          "newsletter": {
-            "enabled": true,
-            "title": "اشترك في النشرة البريدية",
-            "description": "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
-            "placeholder": "رقم الواتساب",
-            "buttonText": "اشترك الآن",
-            "ThemeTwo": "ThemeTwo"
+          "minHeight": {
+            "desktop": "520px",
+            "tablet": "520px",
+            "mobile": "520px"
           },
-          "contactInfo": {
-            "enabled": true,
-            "address": "المملكة العربية السعودية - الرياض",
-            "email": "contact@baheya.co",
-            "whatsapp": "0542120011",
-            "whatsappUrl": "https://wa.link/0ysvug",
-            "ThemeTwo": "ThemeTwo"
+          "background": {
+            "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+            "alt": "صورة خلفية لغرفة معيشة حديثة",
+            "overlay": {
+              "enabled": true,
+              "opacity": "0.45",
+              "color": "#000000"
+            }
           },
-          "socialMedia": {
-            "enabled": true,
-            "platforms": [
-              {
-                "name": "Facebook",
-                "url": "https://www.facebook.com/share/1C974jrjRc/",
-                "ThemeTwo": "ThemeTwo"
+          "content": {
+            "title": "اكتشف عقارك المثالي في أفضل المواقع",
+            "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+            "font": {
+              "title": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "5xl",
+                  "tablet": "4xl",
+                  "mobile": "2xl"
+                },
+                "weight": "extrabold",
+                "color": "#ffffff",
+                "lineHeight": "1.25"
               },
-              {
-                "name": "YouTube",
-                "url": "https://youtube.com/channel/UCVru6ldyQvpyuxl1lkd_oUQ?si=v6LprF-hXxagAhrp",
-                "ThemeTwo": "ThemeTwo"
-              },
-              {
-                "name": "Instagram",
-                "url": "https://www.instagram.com/baheyarealestat?igsh=enA3cW1tbjRjbHU4",
-                "ThemeTwo": "ThemeTwo"
-              },
-              {
-                "name": "X (Twitter)",
-                "url": "https://x.com/bahiarealstate?t=U_Fm4pDkJj73HPkY_mHDWQ&s=08",
-                "ThemeTwo": "ThemeTwo"
-              },
-              {
-                "name": "Snapchat",
-                "url": "https://www.snapchat.com/add/baheyarealstate?share_id=CH-Am1w1NlU&locale=ar-AE",
-                "ThemeTwo": "ThemeTwo"
+              "subtitle": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "2xl",
+                  "tablet": "2xl",
+                  "mobile": "2xl"
+                },
+                "weight": "normal",
+                "color": "rgba(255, 255, 255, 0.85)"
               }
-            ],
-            "ThemeTwo": "ThemeTwo"
+            },
+            "alignment": "center",
+            "maxWidth": "5xl",
+            "paddingTop": "200px"
+          },
+          "searchForm": {
+            "enabled": true,
+            "position": "bottom",
+            "offset": "32",
+            "background": {
+              "color": "#ffffff",
+              "opacity": "1",
+              "shadow": "2xl",
+              "border": "1px solid rgba(0, 0, 0, 0.05)",
+              "borderRadius": "lg"
+            },
+            "fields": {
+              "purpose": {
+                "enabled": true,
+                "options": [
+                  {
+                    "value": "rent",
+                    "label": "إيجار"
+                  },
+                  {
+                    "value": "sell",
+                    "label": "بيع"
+                  }
+                ],
+                "default": "rent"
+              },
+              "city": {
+                "enabled": true,
+                "placeholder": "أدخل المدينة أو المنطقة",
+                "icon": "MapPin"
+              },
+              "type": {
+                "enabled": true,
+                "placeholder": "نوع العقار",
+                "icon": "Home",
+                "options": ["شقة", "فيلا", "دوبلكس", "أرض", "شاليه", "مكتب"]
+              },
+              "price": {
+                "enabled": true,
+                "placeholder": "السعر",
+                "icon": "CircleDollarSign",
+                "options": [
+                  {
+                    "id": "any",
+                    "label": "أي سعر"
+                  },
+                  {
+                    "id": "0-200k",
+                    "label": "0 - 200 ألف"
+                  },
+                  {
+                    "id": "200k-500k",
+                    "label": "200 - 500 ألف"
+                  },
+                  {
+                    "id": "500k-1m",
+                    "label": "500 ألف - 1 مليون"
+                  },
+                  {
+                    "id": "1m+",
+                    "label": "أكثر من 1 مليون"
+                  }
+                ]
+              },
+              "keywords": {
+                "enabled": true,
+                "placeholder": "كلمات مفتاحية..."
+              }
+            },
+            "responsive": {
+              "desktop": "all-in-row",
+              "tablet": "two-rows",
+              "mobile": "stacked"
+            }
+          },
+          "animations": {
+            "title": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "subtitle": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            },
+            "searchForm": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 600
+            }
+          },
+          "barType": "contact"
+        },
+        "layout": {
+          "row": 0,
+          "col": 0,
+          "span": 2
+        },
+        "position": 0
+      },
+      {
+        "id": "a4b2791f-a5f2-4915-9e53-ba3dcf5b8a70",
+        "type": "mapSection",
+        "name": "MapSection",
+        "componentName": "mapSection1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Map Section Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
           }
         },
-        "footerBottom": {
-          "enabled": true,
-          "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025©",
-          "companyUrl": "https://baheya.co",
-          "designerUrl": "http://souhailagency.com",
-          "legalLinks": [
+        "layout": {
+          "row": 1,
+          "col": 0,
+          "span": 2
+        },
+        "position": 1
+      }
+    ],
+    "for-rent": [
+      {
+        "id": "0",
+        "type": "hero",
+        "name": "Hero",
+        "componentName": "hero4",
+        "data": {
+          "ThemeTwo": "ThemeTwo",
+          "visible": true,
+          "title": "عقارات للإيجار",
+          "backgroundImage": "https://dalel-lovat.vercel.app/images/hero.webp",
+          "barType": "propertyFilter",
+          "contact": false,
+          "background": {
+            "ThemeTwo": "ThemeTwo",
+            "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+            "alt": "صورة خلفية لغرفة معيشة حديثة",
+            "overlay": {
+              "ThemeTwo": "ThemeTwo",
+              "enabled": true,
+              "opacity": "0.45",
+              "color": "#000000"
+            },
+            "type": "solid",
+            "opacity": "0.8",
+            "blur": true,
+            "colors": {
+              "from": "#ffffff",
+              "to": "#ffffff"
+            }
+          },
+          "content": {
+            "ThemeTwo": "ThemeTwo",
+            "title": "اكتشف عقارك المثالي في أفضل المواقع",
+            "alignment": "center",
+            "maxWidth": "5xl",
+            "font": {
+              "ThemeTwo": "ThemeTwo",
+              "title": {
+                "ThemeTwo": "ThemeTwo",
+                "family": "Tajawal",
+                "size": {
+                  "ThemeTwo": "ThemeTwo",
+                  "desktop": "5xl",
+                  "tablet": "4xl",
+                  "mobile": "2xl"
+                },
+                "weight": "extrabold",
+                "color": "#ffffff",
+                "lineHeight": "1.25"
+              },
+              "subtitle": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "2xl",
+                  "tablet": "2xl",
+                  "mobile": "2xl"
+                },
+                "weight": "normal",
+                "color": "rgba(255, 255, 255, 0.85)"
+              }
+            },
+            "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+            "paddingTop": "200px"
+          },
+          "animations": {
+            "ThemeTwo": "ThemeTwo",
+            "title": {
+              "ThemeTwo": "ThemeTwo",
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "menuItems": {
+              "enabled": true,
+              "duration": 200,
+              "delay": 50
+            },
+            "mobileMenu": {
+              "enabled": true,
+              "duration": 300,
+              "easing": "ease-in-out"
+            },
+            "subtitle": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            },
+            "searchForm": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 600
+            }
+          },
+          "id": "0",
+          "type": "unknown",
+          "variant": "header2",
+          "useStore": true,
+          "position": {
+            "type": "sticky",
+            "top": 0,
+            "zIndex": 50
+          },
+          "height": {
+            "desktop": "90vh",
+            "tablet": "90vh",
+            "mobile": "90vh"
+          },
+          "colors": {
+            "text": "#1f2937",
+            "link": "#374151",
+            "linkHover": "#1f2937",
+            "linkActive": "#059669",
+            "icon": "#374151",
+            "iconHover": "#1f2937",
+            "border": "#e5e7eb",
+            "accent": "#059669"
+          },
+          "logo": {
+            "type": "image+text",
+            "image": "https://dalel-lovat.vercel.app/images/logo.svg",
+            "text": "الشركة العقارية",
+            "font": {
+              "family": "Tajawal",
+              "size": 24,
+              "weight": "600"
+            },
+            "url": "/",
+            "clickAction": "navigate"
+          },
+          "menu": [
             {
-              "text": "سياسة الخصوصية",
-              "url": "/privacy-policy",
+              "id": "home",
+              "type": "link",
+              "text": "الرئيسية",
+              "url": "/"
+            },
+            {
+              "id": "about",
+              "type": "link",
+              "text": "حول",
+              "url": "/about-us"
+            },
+            {
+              "id": "services",
+              "type": "link",
+              "text": "الخدمات",
+              "url": "/services"
+            },
+            {
+              "id": "contact",
+              "type": "link",
+              "text": "اتصل بنا",
+              "url": "/contact-us"
+            }
+          ],
+          "actions": {
+            "search": {
+              "enabled": false,
+              "placeholder": "بحث..."
+            },
+            "user": {
+              "showProfile": true,
+              "showCart": false,
+              "showWishlist": false,
+              "showNotifications": false
+            },
+            "mobile": {
+              "showLogo": true,
+              "showLanguageToggle": false,
+              "showSearch": false
+            }
+          },
+          "responsive": {
+            "breakpoints": {
+              "mobile": 768,
+              "tablet": 1024,
+              "desktop": 1280
+            },
+            "mobileMenu": {
+              "side": "right",
+              "width": 320,
+              "overlay": true
+            }
+          },
+          "minHeight": {
+            "desktop": "520px",
+            "tablet": "520px",
+            "mobile": "520px"
+          },
+          "searchForm": {
+            "enabled": true,
+            "position": "bottom",
+            "offset": "32",
+            "background": {
+              "color": "#ffffff",
+              "opacity": "1",
+              "shadow": "2xl",
+              "border": "1px solid rgba(0, 0, 0, 0.05)",
+              "borderRadius": "lg"
+            },
+            "fields": {
+              "purpose": {
+                "enabled": true,
+                "options": [
+                  {
+                    "value": "rent",
+                    "label": "إيجار"
+                  },
+                  {
+                    "value": "sell",
+                    "label": "بيع"
+                  }
+                ],
+                "default": "rent"
+              },
+              "city": {
+                "enabled": true,
+                "placeholder": "أدخل المدينة أو المنطقة",
+                "icon": "MapPin"
+              },
+              "type": {
+                "enabled": true,
+                "placeholder": "نوع العقار",
+                "icon": "Home",
+                "options": ["شقة", "فيلا", "دوبلكس", "أرض", "شاليه", "مكتب"]
+              },
+              "price": {
+                "enabled": true,
+                "placeholder": "السعر",
+                "icon": "CircleDollarSign",
+                "options": [
+                  {
+                    "id": "any",
+                    "label": "أي سعر"
+                  },
+                  {
+                    "id": "0-200k",
+                    "label": "0 - 200 ألف"
+                  },
+                  {
+                    "id": "200k-500k",
+                    "label": "200 - 500 ألف"
+                  },
+                  {
+                    "id": "500k-1m",
+                    "label": "500 ألف - 1 مليون"
+                  },
+                  {
+                    "id": "1m+",
+                    "label": "أكثر من 1 مليون"
+                  }
+                ]
+              },
+              "keywords": {
+                "enabled": true,
+                "placeholder": "كلمات مفتاحية..."
+              }
+            },
+            "responsive": {
+              "desktop": "all-in-row",
+              "tablet": "two-rows",
+              "mobile": "stacked"
+            }
+          }
+        },
+        "position": 0,
+        "layout": {
+          "row": 0,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "1",
+        "type": "header",
+        "name": "Header",
+        "componentName": "header1",
+        "data": {
+          "visible": true,
+          "position": {
+            "type": "sticky",
+            "top": 0,
+            "zIndex": 50
+          },
+          "height": {
+            "desktop": 96,
+            "tablet": 80,
+            "mobile": 64
+          },
+          "background": {
+            "type": "solid",
+            "opacity": "0.8",
+            "blur": true,
+            "colors": {
+              "from": "#ffffff",
+              "to": "#ffffff"
+            }
+          },
+          "colors": {
+            "text": "#1f2937",
+            "link": "#374151",
+            "linkHover": "#1f2937",
+            "linkActive": "#059669",
+            "icon": "#374151",
+            "iconHover": "#1f2937",
+            "border": "#e5e7eb",
+            "accent": "#059669"
+          },
+          "logo": {
+            "type": "image+text",
+            "image": "https://dalel-lovat.vercel.app/images/logo.svg",
+            "text": "dsadas",
+            "font": {
+              "family": "Tajawal",
+              "size": 24,
+              "weight": "600"
+            },
+            "url": "/",
+            "clickAction": "navigate"
+          },
+          "menu": [
+            {
+              "id": "home",
+              "type": "link",
+              "text": "الرئيسية",
+              "url": "/"
+            },
+            {
+              "id": "about",
+              "type": "link",
+              "text": "حول",
+              "url": "/about"
+            },
+            {
+              "id": "services",
+              "type": "link",
+              "text": "الخدمات",
+              "url": "/services"
+            },
+            {
+              "id": "contact",
+              "type": "link",
+              "text": "اتصل بنا",
+              "url": "/contact"
+            }
+          ],
+          "actions": {
+            "search": {
+              "enabled": false,
+              "placeholder": "بحث..."
+            },
+            "user": {
+              "showProfile": true,
+              "showCart": false,
+              "showWishlist": false,
+              "showNotifications": false
+            },
+            "mobile": {
+              "showLogo": true,
+              "showLanguageToggle": false,
+              "showSearch": false
+            }
+          },
+          "responsive": {
+            "breakpoints": {
+              "mobile": 768,
+              "tablet": 1024,
+              "desktop": 1280
+            },
+            "mobileMenu": {
+              "side": "right",
+              "width": 320,
+              "overlay": true
+            }
+          },
+          "animations": {
+            "menuItems": {
+              "enabled": true,
+              "duration": 200,
+              "delay": 50
+            },
+            "mobileMenu": {
+              "enabled": true,
+              "duration": 300,
+              "easing": "ease-in-out"
+            }
+          }
+        },
+        "position": 1,
+        "layout": {
+          "row": 1,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "2",
+        "type": "grid",
+        "name": "Grid",
+        "componentName": "grid1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Property Grid Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
+          },
+          "cardSettings": {
+            "theme": "card4"
+          }
+        },
+        "position": 2,
+        "layout": {
+          "row": 2,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "3",
+        "type": "footer",
+        "name": "Footer",
+        "componentName": "footer1",
+        "data": {
+          "visible": true,
+          "background": {
+            "type": "image",
+            "image": "https://dalel-lovat.vercel.app/images/footer/FooterImage.webp",
+            "alt": "خلفية الفوتر",
+            "color": "#1f2937",
+            "gradient": {
+              "enabled": false,
+              "direction": "to-r",
+              "startColor": "#1f2937",
+              "endColor": "#374151",
+              "middleColor": "#4b5563"
+            },
+            "overlay": {
+              "enabled": true,
+              "opacity": "0.7",
+              "color": "#000000",
+              "blendMode": "multiply"
+            }
+          },
+          "layout": {
+            "columns": "3",
+            "spacing": "8",
+            "padding": "16",
+            "maxWidth": "7xl"
+          },
+          "content": {
+            "companyInfo": {
+              "enabled": true,
+              "name": "dsadas",
+              "description": "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
+              "tagline": "للخدمات العقارية",
+              "logo": null
+            },
+            "quickLinks": {
+              "enabled": true,
+              "title": "روابط مهمة",
+              "links": [
+                {
+                  "text": "الرئيسية",
+                  "url": "/"
+                },
+                {
+                  "text": "البيع",
+                  "url": "/sell"
+                },
+                {
+                  "text": "الإيجار",
+                  "url": "/rent"
+                },
+                {
+                  "text": "من نحن",
+                  "url": "/about"
+                },
+                {
+                  "text": "تواصل معنا",
+                  "url": "/contact"
+                }
+              ]
+            },
+            "contactInfo": {
+              "enabled": true,
+              "title": "معلومات التواصل",
+              "address": "N/A",
+              "phone1": "0000",
+              "phone2": "0000",
+              "email": "test@51.test"
+            },
+            "socialMedia": {
+              "enabled": true,
+              "title": "وسائل التواصل الاجتماعي",
+              "platforms": [
+                {
+                  "name": "واتساب",
+                  "icon": "FaWhatsapp",
+                  "url": "#",
+                  "color": "#25D366"
+                },
+                {
+                  "name": "لينكد إن",
+                  "icon": "Linkedin",
+                  "url": "#",
+                  "color": "#0077B5"
+                },
+                {
+                  "name": "إنستغرام",
+                  "icon": "Instagram",
+                  "url": "#",
+                  "color": "#E4405F"
+                },
+                {
+                  "name": "تويتر",
+                  "icon": "Twitter",
+                  "url": "#",
+                  "color": "#1DA1F2"
+                },
+                {
+                  "name": "فيسبوك",
+                  "icon": "Facebook",
+                  "url": "#",
+                  "color": "#1877F2"
+                }
+              ]
+            }
+          },
+          "footerBottom": {
+            "enabled": true,
+            "copyright": "© 2024 تعاريف العقارية للخدمات العقارية. جميع الحقوق محفوظة.",
+            "legalLinks": [
+              {
+                "text": "سياسة الخصوصية",
+                "url": "/privacy"
+              },
+              {
+                "text": "الشروط والأحكام",
+                "url": "/terms"
+              }
+            ]
+          },
+          "styling": {
+            "colors": {
+              "textPrimary": "#ffffff",
+              "textSecondary": "#ffffff",
+              "textMuted": "rgba(255, 255, 255, 0.7)",
+              "accent": "#10b981",
+              "border": "rgba(255, 255, 255, 0.2)"
+            },
+            "typography": {
+              "titleSize": "xl",
+              "titleWeight": "bold",
+              "bodySize": "sm",
+              "bodyWeight": "normal"
+            },
+            "spacing": {
+              "sectionPadding": "16",
+              "columnGap": "8",
+              "itemGap": "3"
+            },
+            "effects": {
+              "hoverTransition": "0.3s",
+              "shadow": "none",
+              "borderRadius": "none"
+            }
+          }
+        },
+        "position": 3,
+        "layout": {
+          "row": 3,
+          "col": 0,
+          "span": 2
+        }
+      }
+    ],
+    "for-sale": [
+      {
+        "id": "0",
+        "type": "hero",
+        "name": "Hero",
+        "componentName": "hero4",
+        "data": {
+          "visible": true,
+          "height": {
+            "desktop": "90vh",
+            "tablet": "90vh",
+            "mobile": "90vh"
+          },
+          "minHeight": {
+            "desktop": "520px",
+            "tablet": "520px",
+            "mobile": "520px"
+          },
+          "background": {
+            "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+            "alt": "صورة خلفية لغرفة معيشة حديثة",
+            "overlay": {
+              "enabled": true,
+              "opacity": "0.45",
+              "color": "#000000"
+            }
+          },
+          "content": {
+            "title": "اكتشف عقارك المثالي في أفضل المواقع",
+            "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+            "font": {
+              "title": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "5xl",
+                  "tablet": "4xl",
+                  "mobile": "2xl"
+                },
+                "weight": "extrabold",
+                "color": "#ffffff",
+                "lineHeight": "1.25"
+              },
+              "subtitle": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "2xl",
+                  "tablet": "2xl",
+                  "mobile": "2xl"
+                },
+                "weight": "normal",
+                "color": "rgba(255, 255, 255, 0.85)"
+              }
+            },
+            "alignment": "center",
+            "maxWidth": "5xl",
+            "paddingTop": "200px"
+          },
+          "searchForm": {
+            "enabled": true,
+            "position": "bottom",
+            "offset": "32",
+            "background": {
+              "color": "#ffffff",
+              "opacity": "1",
+              "shadow": "2xl",
+              "border": "1px solid rgba(0, 0, 0, 0.05)",
+              "borderRadius": "lg"
+            },
+            "fields": {
+              "purpose": {
+                "enabled": true,
+                "options": [
+                  {
+                    "value": "rent",
+                    "label": "إيجار"
+                  },
+                  {
+                    "value": "sell",
+                    "label": "بيع"
+                  }
+                ],
+                "default": "rent"
+              },
+              "city": {
+                "enabled": true,
+                "placeholder": "أدخل المدينة أو المنطقة",
+                "icon": "MapPin"
+              },
+              "type": {
+                "enabled": true,
+                "placeholder": "نوع العقار",
+                "icon": "Home",
+                "options": ["شقة", "فيلا", "دوبلكس", "أرض", "شاليه", "مكتب"]
+              },
+              "price": {
+                "enabled": true,
+                "placeholder": "السعر",
+                "icon": "CircleDollarSign",
+                "options": [
+                  {
+                    "id": "any",
+                    "label": "أي سعر"
+                  },
+                  {
+                    "id": "0-200k",
+                    "label": "0 - 200 ألف"
+                  },
+                  {
+                    "id": "200k-500k",
+                    "label": "200 - 500 ألف"
+                  },
+                  {
+                    "id": "500k-1m",
+                    "label": "500 ألف - 1 مليون"
+                  },
+                  {
+                    "id": "1m+",
+                    "label": "أكثر من 1 مليون"
+                  }
+                ]
+              },
+              "keywords": {
+                "enabled": true,
+                "placeholder": "كلمات مفتاحية..."
+              }
+            },
+            "responsive": {
+              "desktop": "all-in-row",
+              "tablet": "two-rows",
+              "mobile": "stacked"
+            }
+          },
+          "animations": {
+            "title": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "subtitle": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            },
+            "searchForm": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 600
+            }
+          },
+          "barType": "propertyFilter",
+          "title": "عقارات للبيع"
+        },
+        "position": 0,
+        "layout": {
+          "row": 0,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "1",
+        "type": "header",
+        "name": "Header",
+        "componentName": "header1",
+        "data": {
+          "visible": true,
+          "position": {
+            "type": "sticky",
+            "top": 0,
+            "zIndex": 50
+          },
+          "height": {
+            "desktop": 96,
+            "tablet": 80,
+            "mobile": 64
+          },
+          "background": {
+            "type": "solid",
+            "opacity": "0.8",
+            "blur": true,
+            "colors": {
+              "from": "#ffffff",
+              "to": "#ffffff"
+            }
+          },
+          "colors": {
+            "text": "#1f2937",
+            "link": "#374151",
+            "linkHover": "#1f2937",
+            "linkActive": "#059669",
+            "icon": "#374151",
+            "iconHover": "#1f2937",
+            "border": "#e5e7eb",
+            "accent": "#059669"
+          },
+          "logo": {
+            "type": "image+text",
+            "image": "https://taearif.com/logos/logo.png",
+            "text": "تعاريف العقارية",
+            "font": {
+              "family": "Tajawal",
+              "size": 24,
+              "weight": "600"
+            },
+            "url": "/",
+            "clickAction": "navigate"
+          },
+          "menu": [
+            {
+              "id": "home",
+              "type": "link",
+              "text": "الرئيسية",
+              "url": "/"
+            },
+            {
+              "id": "about",
+              "type": "link",
+              "text": "حول",
+              "url": "/about"
+            },
+            {
+              "id": "services",
+              "type": "link",
+              "text": "الخدمات",
+              "url": "/services"
+            },
+            {
+              "id": "contact",
+              "type": "link",
+              "text": "اتصل بنا",
+              "url": "/contact"
+            }
+          ],
+          "actions": {
+            "search": {
+              "enabled": false,
+              "placeholder": "بحث..."
+            },
+            "user": {
+              "showProfile": true,
+              "showCart": false,
+              "showWishlist": false,
+              "showNotifications": false
+            },
+            "mobile": {
+              "showLogo": true,
+              "showLanguageToggle": false,
+              "showSearch": false
+            }
+          },
+          "responsive": {
+            "breakpoints": {
+              "mobile": 768,
+              "tablet": 1024,
+              "desktop": 1280
+            },
+            "mobileMenu": {
+              "side": "right",
+              "width": 320,
+              "overlay": true
+            }
+          },
+          "animations": {
+            "menuItems": {
+              "enabled": true,
+              "duration": 200,
+              "delay": 50
+            },
+            "mobileMenu": {
+              "enabled": true,
+              "duration": 300,
+              "easing": "ease-in-out"
+            }
+          }
+        },
+        "position": 1,
+        "layout": {
+          "row": 1,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "2",
+        "type": "grid",
+        "name": "Grid",
+        "componentName": "grid1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Property Grid Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
+          },
+          "id": "f2b3cf94-92c4-4e63-baa3-4f3f71baf4e7",
+          "type": "unknown",
+          "variant": "f2b3cf94-92c4-4e63-baa3-4f3f71baf4e7",
+          "useStore": true,
+          "cardSettings": {
+            "theme": "card4"
+          }
+        },
+        "position": 2,
+        "layout": {
+          "row": 2,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "3",
+        "type": "footer",
+        "name": "Footer",
+        "componentName": "footer1",
+        "data": {
+          "visible": true,
+          "background": {
+            "type": "image",
+            "image": "https://dalel-lovat.vercel.app/images/footer/FooterImage.webp",
+            "alt": "خلفية الفوتر",
+            "color": "#1f2937",
+            "gradient": {
+              "enabled": false,
+              "direction": "to-r",
+              "startColor": "#1f2937",
+              "endColor": "#374151",
+              "middleColor": "#4b5563"
+            },
+            "overlay": {
+              "enabled": true,
+              "opacity": "0.7",
+              "color": "#000000",
+              "blendMode": "multiply"
+            }
+          },
+          "layout": {
+            "columns": "3",
+            "spacing": "8",
+            "padding": "16",
+            "maxWidth": "7xl"
+          },
+          "content": {
+            "companyInfo": {
+              "enabled": true,
+              "name": "تعاريف العقارية",
+              "description": "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
+              "tagline": "للخدمات العقارية",
+              "logo": null
+            },
+            "quickLinks": {
+              "enabled": true,
+              "title": "روابط مهمة",
+              "links": [
+                {
+                  "text": "الرئيسية",
+                  "url": "/"
+                },
+                {
+                  "text": "البيع",
+                  "url": "/sell"
+                },
+                {
+                  "text": "الإيجار",
+                  "url": "/rent"
+                },
+                {
+                  "text": "من نحن",
+                  "url": "/about"
+                },
+                {
+                  "text": "تواصل معنا",
+                  "url": "/contact"
+                }
+              ]
+            },
+            "contactInfo": {
+              "enabled": true,
+              "title": "معلومات التواصل",
+              "address": "المملكة العربية السعودية",
+              "phone1": "0000",
+              "phone2": "0000",
+              "email": "info@example.com"
+            },
+            "socialMedia": {
+              "enabled": true,
+              "title": "وسائل التواصل الاجتماعي",
+              "platforms": [
+                {
+                  "name": "واتساب",
+                  "icon": "FaWhatsapp",
+                  "url": "#",
+                  "color": "#25D366"
+                },
+                {
+                  "name": "لينكد إن",
+                  "icon": "Linkedin",
+                  "url": "#",
+                  "color": "#0077B5"
+                },
+                {
+                  "name": "إنستغرام",
+                  "icon": "Instagram",
+                  "url": "#",
+                  "color": "#E4405F"
+                },
+                {
+                  "name": "تويتر",
+                  "icon": "Twitter",
+                  "url": "#",
+                  "color": "#1DA1F2"
+                },
+                {
+                  "name": "فيسبوك",
+                  "icon": "Facebook",
+                  "url": "#",
+                  "color": "#1877F2"
+                }
+              ]
+            }
+          },
+          "footerBottom": {
+            "enabled": true,
+            "copyright": "© 2024 تعاريف العقارية للخدمات العقارية. جميع الحقوق محفوظة.",
+            "legalLinks": [
+              {
+                "text": "سياسة الخصوصية",
+                "url": "/privacy"
+              },
+              {
+                "text": "الشروط والأحكام",
+                "url": "/terms"
+              }
+            ]
+          },
+          "styling": {
+            "colors": {
+              "textPrimary": "#ffffff",
+              "textSecondary": "#ffffff",
+              "textMuted": "rgba(255, 255, 255, 0.7)",
+              "accent": "#10b981",
+              "border": "rgba(255, 255, 255, 0.2)"
+            },
+            "typography": {
+              "titleSize": "xl",
+              "titleWeight": "bold",
+              "bodySize": "sm",
+              "bodyWeight": "normal"
+            },
+            "spacing": {
+              "sectionPadding": "16",
+              "columnGap": "8",
+              "itemGap": "3"
+            },
+            "effects": {
+              "hoverTransition": "0.3s",
+              "shadow": "none",
+              "borderRadius": "none"
+            }
+          }
+        },
+        "position": 3,
+        "layout": {
+          "row": 3,
+          "col": 0,
+          "span": 2
+        }
+      }
+    ],
+    "homepage": [
+      {
+        "id": "0",
+        "type": "hero",
+        "name": "Hero",
+        "componentName": "hero3",
+        "data": {
+          "visible": true,
+          "height": {
+            "desktop": "90vh",
+            "tablet": "90vh",
+            "mobile": "90vh"
+          },
+          "minHeight": {
+            "desktop": "520px",
+            "tablet": "520px",
+            "mobile": "520px"
+          },
+          "background": {
+            "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+            "alt": "صورة خلفية لغرفة معيشة حديثة",
+            "overlay": {
+              "enabled": true,
+              "opacity": "0.45",
+              "color": "#000000"
+            }
+          },
+          "content": {
+            "title": "اكتشف عقارك المثالي في أفضل المواقع",
+            "subtitle": "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية",
+            "font": {
+              "title": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "5xl",
+                  "tablet": "4xl",
+                  "mobile": "2xl"
+                },
+                "weight": "extrabold",
+                "color": "#ffffff",
+                "lineHeight": "1.25"
+              },
+              "subtitle": {
+                "family": "Tajawal",
+                "size": {
+                  "desktop": "2xl",
+                  "tablet": "2xl",
+                  "mobile": "2xl"
+                },
+                "weight": "normal",
+                "color": "rgba(255, 255, 255, 0.85)"
+              }
+            },
+            "alignment": "center",
+            "maxWidth": "5xl",
+            "paddingTop": "200px"
+          },
+          "searchForm": {
+            "enabled": true,
+            "position": "bottom",
+            "offset": "32",
+            "background": {
+              "color": "#ffffff",
+              "opacity": "1",
+              "shadow": "2xl",
+              "border": "1px solid rgba(0, 0, 0, 0.05)",
+              "borderRadius": "lg"
+            },
+            "fields": {
+              "purpose": {
+                "enabled": true,
+                "options": [
+                  {
+                    "value": "rent",
+                    "label": "إيجار"
+                  },
+                  {
+                    "value": "sell",
+                    "label": "بيع"
+                  }
+                ],
+                "default": "rent"
+              },
+              "city": {
+                "enabled": true,
+                "placeholder": "أدخل المدينة أو المنطقة",
+                "icon": "MapPin"
+              },
+              "type": {
+                "enabled": true,
+                "placeholder": "نوع العقار",
+                "icon": "Home",
+                "options": ["شقة", "فيلا", "دوبلكس", "أرض", "شاليه", "مكتب"]
+              },
+              "price": {
+                "enabled": true,
+                "placeholder": "السعر",
+                "icon": "CircleDollarSign",
+                "options": [
+                  {
+                    "id": "any",
+                    "label": "أي سعر"
+                  },
+                  {
+                    "id": "0-200k",
+                    "label": "0 - 200 ألف"
+                  },
+                  {
+                    "id": "200k-500k",
+                    "label": "200 - 500 ألف"
+                  },
+                  {
+                    "id": "500k-1m",
+                    "label": "500 ألف - 1 مليون"
+                  },
+                  {
+                    "id": "1m+",
+                    "label": "أكثر من 1 مليون"
+                  }
+                ]
+              },
+              "keywords": {
+                "enabled": true,
+                "placeholder": "كلمات مفتاحية..."
+              }
+            },
+            "responsive": {
+              "desktop": "all-in-row",
+              "tablet": "two-rows",
+              "mobile": "stacked"
+            }
+          },
+          "animations": {
+            "title": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 200
+            },
+            "subtitle": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 400
+            },
+            "searchForm": {
+              "enabled": true,
+              "type": "fade-up",
+              "duration": 600,
+              "delay": 600
+            }
+          }
+        },
+        "position": 0,
+        "layout": {
+          "row": 0,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "1",
+        "type": "propertiesShowcase",
+        "name": "PropertiesShowcase",
+        "componentName": "propertiesShowcase1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Properties Showcase Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
+          },
+          "ThemeTwo": "propertiesShowcase",
+          "layout": {
+            "ThemeTwo": "layout",
+            "maxWidth": "7xl",
+            "columns": {
+              "ThemeTwo": "columns",
+              "mobile": 1,
+              "tablet": 2,
+              "desktop": 3
+            },
+            "gap": "1.5rem",
+            "padding": {
+              "ThemeTwo": "padding",
+              "top": "3rem",
+              "bottom": "3rem"
+            }
+          },
+          "content": {
+            "ThemeTwo": "content",
+            "title": "عقارات للإيجار",
+            "loadMoreButtonText": "تحميل المزيد",
+            "viewAllButtonText": "عرض الكل",
+            "cardType": "card1"
+          },
+          "dataSource": {
+            "apiUrl": "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
+            "enabled": true
+          },
+          "properties": [
+            {
+              "ThemeTwo": "property",
+              "id": "1",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "مشروع سكني فاخر",
+              "city": "الرياض",
+              "district": "حي النرجس",
+              "status": "للبيع",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 150,
+                "max": 300
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 3,
+                "max": 5
+              },
+              "units": 50,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 3,
+                "max": 5
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 500000,
+                "max": 1500000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 2,
+                "max": 4
+              },
+              "featured": false,
+              "url": "#"
+            },
+            {
+              "ThemeTwo": "property",
+              "id": "2",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "مجمع سكني حديث",
+              "city": "جدة",
+              "district": "حي الزهراء",
+              "status": "للإيجار",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 200,
+                "max": 400
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 4,
+                "max": 6
+              },
+              "units": 80,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 4,
+                "max": 6
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 3000,
+                "max": 8000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 3,
+                "max": 5
+              },
+              "featured": true,
+              "url": "#"
+            },
+            {
+              "ThemeTwo": "property",
+              "id": "3",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "عمارة سكنية راقية",
+              "city": "الدمام",
+              "district": "حي الفيصلية",
+              "status": "للبيع",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 180,
+                "max": 350
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 3,
+                "max": 6
+              },
+              "units": 60,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 4,
+                "max": 7
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 800000,
+                "max": 2000000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 2,
+                "max": 5
+              },
+              "featured": false,
+              "url": "#"
+            }
+          ],
+          "styling": {
+            "ThemeTwo": "styling",
+            "backgroundColor": "#efe5dc",
+            "titleColor": "#1f2937",
+            "dividerColor": "#8b5f46",
+            "viewAllButtonColor": "#8b5f46",
+            "viewAllButtonHoverColor": "#6b4630",
+            "loadMoreButtonColor": "#8b5f46",
+            "loadMoreButtonHoverColor": "#8b5f46",
+            "loadMoreButtonTextColor": "#8b5f46",
+            "loadMoreButtonHoverTextColor": "#ffffff"
+          },
+          "typography": {
+            "ThemeTwo": "typography",
+            "title": {
+              "ThemeTwo": "title",
+              "fontSize": {
+                "ThemeTwo": "fontSize",
+                "mobile": "xl",
+                "tablet": "2xl",
+                "desktop": "3xl"
+              },
+              "fontWeight": "bold",
+              "fontFamily": "Tajawal"
+            }
+          },
+          "responsive": {
+            "ThemeTwo": "responsive",
+            "mobileBreakpoint": "640px",
+            "tabletBreakpoint": "1024px",
+            "desktopBreakpoint": "1280px"
+          },
+          "id": "3ee57b88-2ace-42e7-8b9e-1e443259c949",
+          "type": "unknown",
+          "variant": "3ee57b88-2ace-42e7-8b9e-1e443259c949",
+          "useStore": true
+        },
+        "position": 1,
+        "layout": {
+          "row": 1,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "2",
+        "type": "propertiesShowcase",
+        "name": "PropertiesShowcase",
+        "componentName": "propertiesShowcase1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Properties Showcase Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
+          },
+          "ThemeTwo": "propertiesShowcase",
+          "layout": {
+            "ThemeTwo": "layout",
+            "maxWidth": "7xl",
+            "columns": {
+              "ThemeTwo": "columns",
+              "mobile": 1,
+              "tablet": 2,
+              "desktop": 3
+            },
+            "gap": "1.5rem",
+            "padding": {
+              "ThemeTwo": "padding",
+              "top": "3rem",
+              "bottom": "3rem"
+            }
+          },
+          "content": {
+            "ThemeTwo": "content",
+            "title": "عقارات للبيع",
+            "loadMoreButtonText": "تحميل المزيد",
+            "viewAllButtonText": "عرض الكل",
+            "cardType": "card1"
+          },
+          "dataSource": {
+            "apiUrl": "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10",
+            "enabled": true
+          },
+          "properties": [
+            {
+              "ThemeTwo": "property",
+              "id": "1",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "مشروع سكني فاخر",
+              "city": "الرياض",
+              "district": "حي النرجس",
+              "status": "للبيع",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 150,
+                "max": 300
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 3,
+                "max": 5
+              },
+              "units": 50,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 3,
+                "max": 5
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 500000,
+                "max": 1500000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 2,
+                "max": 4
+              },
+              "featured": false,
+              "url": "#"
+            },
+            {
+              "ThemeTwo": "property",
+              "id": "2",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "مجمع سكني حديث",
+              "city": "جدة",
+              "district": "حي الزهراء",
+              "status": "للإيجار",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 200,
+                "max": 400
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 4,
+                "max": 6
+              },
+              "units": 80,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 4,
+                "max": 6
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 3000,
+                "max": 8000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 3,
+                "max": 5
+              },
+              "featured": true,
+              "url": "#"
+            },
+            {
+              "ThemeTwo": "property",
+              "id": "3",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "عمارة سكنية راقية",
+              "city": "الدمام",
+              "district": "حي الفيصلية",
+              "status": "للبيع",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 180,
+                "max": 350
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 3,
+                "max": 6
+              },
+              "units": 60,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 4,
+                "max": 7
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 800000,
+                "max": 2000000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 2,
+                "max": 5
+              },
+              "featured": false,
+              "url": "#"
+            }
+          ],
+          "styling": {
+            "ThemeTwo": "styling",
+            "backgroundColor": "#efe5dc",
+            "titleColor": "#1f2937",
+            "dividerColor": "#8b5f46",
+            "viewAllButtonColor": "#8b5f46",
+            "viewAllButtonHoverColor": "#6b4630",
+            "loadMoreButtonColor": "#8b5f46",
+            "loadMoreButtonHoverColor": "#8b5f46",
+            "loadMoreButtonTextColor": "#8b5f46",
+            "loadMoreButtonHoverTextColor": "#ffffff"
+          },
+          "typography": {
+            "ThemeTwo": "typography",
+            "title": {
+              "ThemeTwo": "title",
+              "fontSize": {
+                "ThemeTwo": "fontSize",
+                "mobile": "xl",
+                "tablet": "2xl",
+                "desktop": "3xl"
+              },
+              "fontWeight": "bold",
+              "fontFamily": "Tajawal"
+            }
+          },
+          "responsive": {
+            "ThemeTwo": "responsive",
+            "mobileBreakpoint": "640px",
+            "tabletBreakpoint": "1024px",
+            "desktopBreakpoint": "1280px"
+          },
+          "id": "31fca95a-3f74-4b73-b6a6-91d965055464",
+          "type": "unknown",
+          "variant": "31fca95a-3f74-4b73-b6a6-91d965055464",
+          "useStore": true
+        },
+        "position": 2,
+        "layout": {
+          "row": 2,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "3",
+        "type": "propertiesShowcase",
+        "name": "PropertiesShowcase",
+        "componentName": "propertiesShowcase1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Properties Showcase Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
+          },
+          "ThemeTwo": "propertiesShowcase",
+          "layout": {
+            "ThemeTwo": "layout",
+            "maxWidth": "7xl",
+            "columns": {
+              "ThemeTwo": "columns",
+              "mobile": 1,
+              "tablet": 2,
+              "desktop": 3
+            },
+            "gap": "1.5rem",
+            "padding": {
+              "ThemeTwo": "padding",
+              "top": "3rem",
+              "bottom": "3rem"
+            }
+          },
+          "content": {
+            "ThemeTwo": "content",
+            "title": "المشاريع",
+            "loadMoreButtonText": "تحميل المزيد",
+            "viewAllButtonText": "عرض الكل",
+            "cardType": "card1"
+          },
+          "dataSource": {
+            "apiUrl": "/v1/tenant-website/{tenantId}/projects?featured=1&limit=10",
+            "enabled": true
+          },
+          "properties": [
+            {
+              "ThemeTwo": "property",
+              "id": "1",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "مشروع سكني فاخر",
+              "city": "الرياض",
+              "district": "حي النرجس",
+              "status": "للبيع",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 150,
+                "max": 300
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 3,
+                "max": 5
+              },
+              "units": 50,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 3,
+                "max": 5
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 500000,
+                "max": 1500000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 2,
+                "max": 4
+              },
+              "featured": false,
+              "url": "#"
+            },
+            {
+              "ThemeTwo": "property",
+              "id": "2",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "مجمع سكني حديث",
+              "city": "جدة",
+              "district": "حي الزهراء",
+              "status": "للإيجار",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 200,
+                "max": 400
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 4,
+                "max": 6
+              },
+              "units": 80,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 4,
+                "max": 6
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 3000,
+                "max": 8000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 3,
+                "max": 5
+              },
+              "featured": true,
+              "url": "#"
+            },
+            {
+              "ThemeTwo": "property",
+              "id": "3",
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "title": "عمارة سكنية راقية",
+              "city": "الدمام",
+              "district": "حي الفيصلية",
+              "status": "للبيع",
+              "area": {
+                "ThemeTwo": "area",
+                "min": 180,
+                "max": 350
+              },
+              "rooms": {
+                "ThemeTwo": "rooms",
+                "min": 3,
+                "max": 6
+              },
+              "units": 60,
+              "floors": {
+                "ThemeTwo": "floors",
+                "min": 4,
+                "max": 7
+              },
+              "price": {
+                "ThemeTwo": "price",
+                "min": 800000,
+                "max": 2000000
+              },
+              "bathrooms": {
+                "ThemeTwo": "bathrooms",
+                "min": 2,
+                "max": 5
+              },
+              "featured": false,
+              "url": "#"
+            }
+          ],
+          "styling": {
+            "ThemeTwo": "styling",
+            "backgroundColor": "#efe5dc",
+            "titleColor": "#1f2937",
+            "dividerColor": "#8b5f46",
+            "viewAllButtonColor": "#8b5f46",
+            "viewAllButtonHoverColor": "#6b4630",
+            "loadMoreButtonColor": "#8b5f46",
+            "loadMoreButtonHoverColor": "#8b5f46",
+            "loadMoreButtonTextColor": "#8b5f46",
+            "loadMoreButtonHoverTextColor": "#ffffff"
+          },
+          "typography": {
+            "ThemeTwo": "typography",
+            "title": {
+              "ThemeTwo": "title",
+              "fontSize": {
+                "ThemeTwo": "fontSize",
+                "mobile": "xl",
+                "tablet": "2xl",
+                "desktop": "3xl"
+              },
+              "fontWeight": "bold",
+              "fontFamily": "Tajawal"
+            }
+          },
+          "responsive": {
+            "ThemeTwo": "responsive",
+            "mobileBreakpoint": "640px",
+            "tabletBreakpoint": "1024px",
+            "desktopBreakpoint": "1280px"
+          },
+          "id": "d0e7e482-b6b1-412c-abcf-a82f54852420",
+          "type": "unknown",
+          "variant": "d0e7e482-b6b1-412c-abcf-a82f54852420",
+          "useStore": true
+        },
+        "position": 3,
+        "layout": {
+          "row": 3,
+          "col": 0,
+          "span": 2
+        }
+      },
+      {
+        "id": "4",
+        "type": "imageText",
+        "name": "ImageText",
+        "componentName": "imageText1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Image Text Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
+          }
+        },
+        "position": 4,
+        "layout": {
+          "row": 4,
+          "col": 0,
+          "span": 2
+        }
+      }
+    ]
+  },
+  "globalComponentsData": {
+    "header": {
+      "visible": true,
+      "position": {
+        "type": "sticky",
+        "top": 0,
+        "zIndex": 50
+      },
+      "height": {
+        "desktop": 96,
+        "tablet": 80,
+        "mobile": 64
+      },
+      "background": {
+        "type": "solid",
+        "opacity": "0.8",
+        "blur": true,
+        "colors": {
+          "from": "#ffffff",
+          "to": "#ffffff"
+        }
+      },
+      "colors": {
+        "text": "#1f2937",
+        "link": "#374151",
+        "linkHover": "#1f2937",
+        "linkActive": "#059669",
+        "icon": "#374151",
+        "iconHover": "#1f2937",
+        "border": "#e5e7eb",
+        "accent": "#059669"
+      },
+      "logo": {
+        "type": "image+text",
+        "image": "https://dalel-lovat.vercel.app/images/logo.svg",
+        "text": "الشركة العقارية",
+        "font": {
+          "family": "Tajawal",
+          "size": 24,
+          "weight": "600"
+        },
+        "url": "/",
+        "clickAction": "navigate"
+      },
+      "menu": [
+        {
+          "id": "home",
+          "type": "link",
+          "text": "الرئيسية",
+          "url": "/"
+        },
+        {
+          "id": "about",
+          "type": "link",
+          "text": "حول",
+          "url": "/about-us"
+        },
+        {
+          "id": "services",
+          "type": "link",
+          "text": "الخدمات",
+          "url": "/services"
+        },
+        {
+          "id": "contact",
+          "type": "link",
+          "text": "اتصل بنا",
+          "url": "/contact-us"
+        }
+      ],
+      "actions": {
+        "search": {
+          "enabled": false,
+          "placeholder": "بحث..."
+        },
+        "user": {
+          "showProfile": true,
+          "showCart": false,
+          "showWishlist": false,
+          "showNotifications": false
+        },
+        "mobile": {
+          "showLogo": true,
+          "showLanguageToggle": false,
+          "showSearch": false
+        }
+      },
+      "responsive": {
+        "breakpoints": {
+          "mobile": 768,
+          "tablet": 1024,
+          "desktop": 1280
+        },
+        "mobileMenu": {
+          "side": "right",
+          "width": 320,
+          "overlay": true
+        }
+      },
+      "animations": {
+        "menuItems": {
+          "enabled": true,
+          "duration": 200,
+          "delay": 50
+        },
+        "mobileMenu": {
+          "enabled": true,
+          "duration": 300,
+          "easing": "ease-in-out"
+        }
+      },
+      "variant": "header2"
+    },
+    "footer": {
+      "visible": true,
+      "ThemeTwo": "ThemeTwo",
+      "background": {
+        "type": "color",
+        "image": null,
+        "alt": null,
+        "color": "#8b5f46",
+        "ThemeTwo": "ThemeTwo",
+        "gradient": {
+          "enabled": false,
+          "direction": "to-r",
+          "startColor": "#1f2937",
+          "endColor": "#374151",
+          "middleColor": "#4b5563",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "overlay": {
+          "enabled": false,
+          "opacity": "0.7",
+          "color": "#000000",
+          "blendMode": "multiply",
+          "ThemeTwo": "ThemeTwo"
+        }
+      },
+      "layout": {
+        "columns": "2",
+        "spacing": "8",
+        "padding": "16",
+        "maxWidth": "6xl",
+        "ThemeTwo": "ThemeTwo"
+      },
+      "content": {
+        "ThemeTwo": "ThemeTwo",
+        "companyInfo": {
+          "enabled": true,
+          "name": "تعاريفالعقارية",
+          "description": "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
+          "tagline": null,
+          "logo": "/images/main/logo.png",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "newsletter": {
+          "enabled": true,
+          "title": "اشترك في النشرة البريدية",
+          "description": "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق باهية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
+          "placeholder": "رقم الواتساب",
+          "buttonText": "اشترك الآن",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "contactInfo": {
+          "enabled": true,
+          "address": "المملكة العربية السعودية - الرياض",
+          "email": "contact@baheya.co",
+          "whatsapp": "0542120011",
+          "whatsappUrl": "https://wa.link/0ysvug",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "socialMedia": {
+          "enabled": true,
+          "platforms": [
+            {
+              "name": "Facebook",
+              "url": "https://www.facebook.com/share/1C974jrjRc/",
               "ThemeTwo": "ThemeTwo"
             },
             {
-              "text": "سياسة الاستخدام",
-              "url": "/terms-of-use",
+              "name": "YouTube",
+              "url": "https://youtube.com/channel/UCVru6ldyQvpyuxl1lkd_oUQ?si=v6LprF-hXxagAhrp",
+              "ThemeTwo": "ThemeTwo"
+            },
+            {
+              "name": "Instagram",
+              "url": "https://www.instagram.com/baheyarealestat?igsh=enA3cW1tbjRjbHU4",
+              "ThemeTwo": "ThemeTwo"
+            },
+            {
+              "name": "X (Twitter)",
+              "url": "https://x.com/bahiarealstate?t=U_Fm4pDkJj73HPkY_mHDWQ&s=08",
+              "ThemeTwo": "ThemeTwo"
+            },
+            {
+              "name": "Snapchat",
+              "url": "https://www.snapchat.com/add/baheyarealstate?share_id=CH-Am1w1NlU&locale=ar-AE",
               "ThemeTwo": "ThemeTwo"
             }
           ],
           "ThemeTwo": "ThemeTwo"
-        },
-        "floatingWhatsApp": {
-          "enabled": true,
-          "url": "https://wa.link/0ysvug",
+        }
+      },
+      "footerBottom": {
+        "enabled": true,
+        "copyright": "جميع الحقوق محفوظة لشركة تعاريفالعقارية 2025©",
+        "companyUrl": "https://baheya.co",
+        "designerUrl": "http://souhailagency.com",
+        "legalLinks": [
+          {
+            "text": "سياسة الخصوصية",
+            "url": "/privacy-policy",
+            "ThemeTwo": "ThemeTwo"
+          },
+          {
+            "text": "سياسة الاستخدام",
+            "url": "/terms-of-use",
+            "ThemeTwo": "ThemeTwo"
+          }
+        ],
+        "ThemeTwo": "ThemeTwo"
+      },
+      "floatingWhatsApp": {
+        "enabled": true,
+        "url": "https://wa.link/0ysvug",
+        "ThemeTwo": "ThemeTwo"
+      },
+      "styling": {
+        "ThemeTwo": "ThemeTwo",
+        "colors": {
+          "textPrimary": "#ffffff",
+          "textSecondary": "#ffffff",
+          "textMuted": "rgba(255, 255, 255, 0.9)",
+          "accent": "#a67c5a",
+          "border": "rgba(255, 255, 255, 0.2)",
           "ThemeTwo": "ThemeTwo"
         },
-        "styling": {
-          "ThemeTwo": "ThemeTwo",
-          "colors": {
-            "textPrimary": "#ffffff",
-            "textSecondary": "#ffffff",
-            "textMuted": "rgba(255, 255, 255, 0.9)",
-            "accent": "#a67c5a",
-            "border": "rgba(255, 255, 255, 0.2)",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "typography": {
-            "titleSize": "xl",
-            "titleWeight": "bold",
-            "bodySize": "base",
-            "bodyWeight": "normal",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "spacing": {
-            "sectionPadding": "16",
-            "columnGap": "8",
-            "itemGap": "3",
-            "ThemeTwo": "ThemeTwo"
-          },
-          "effects": {
-            "hoverTransition": "0.3s",
-            "shadow": "none",
-            "borderRadius": "lg",
-            "ThemeTwo": "ThemeTwo"
-          }
+        "typography": {
+          "titleSize": "xl",
+          "titleWeight": "bold",
+          "bodySize": "base",
+          "bodyWeight": "normal",
+          "ThemeTwo": "ThemeTwo"
         },
-        "variant": "footer2"
+        "spacing": {
+          "sectionPadding": "16",
+          "columnGap": "8",
+          "itemGap": "3",
+          "ThemeTwo": "ThemeTwo"
+        },
+        "effects": {
+          "hoverTransition": "0.3s",
+          "shadow": "none",
+          "borderRadius": "lg",
+          "ThemeTwo": "ThemeTwo"
+        }
       },
-      "globalHeaderVariant": "header2",
-      "globalFooterVariant": "footer2"
+      "variant": "footer2"
     },
-    "WebsiteLayout": {
-      "metaTags": {
-        "pages": [
-          {
-            "path": "/",
-            "TitleAr": "الصفحة الرئيسية",
-            "TitleEn": "Homepage",
-            "DescriptionAr": "مرحباً بكم في موقعنا - الصفحة الرئيسية",
-            "DescriptionEn": "Welcome to our website - Homepage",
-            "KeywordsAr": "الرئيسية, الموقع, الصفحة الرئيسية",
-            "KeywordsEn": "homepage, main, website",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "الصفحة الرئيسية",
-            "og:description": "مرحباً بكم في موقعنا",
-            "og:keywords": "الرئيسية, الموقع",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "الصفحة الرئيسية"
-          },
-          {
-            "path": "/create-request",
-            "TitleAr": "إنشاء طلب",
-            "TitleEn": "Create Request",
-            "DescriptionAr": "إنشاء طلب جديد للحصول على الخدمات",
-            "DescriptionEn": "Create a new request to get our services",
-            "KeywordsAr": "إنشاء طلب, خدمات, طلب جديد",
-            "KeywordsEn": "create request, services, new request",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "إنشاء طلب",
-            "og:description": "إنشاء طلب جديد للحصول على الخدمات",
-            "og:keywords": "إنشاء طلب, خدمات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "إنشاء طلب"
-          },
-          {
-            "path": "/for-rent",
-            "TitleAr": "للإيجار",
-            "TitleEn": "For Rent",
-            "DescriptionAr": "عقارات متاحة للإيجار",
-            "DescriptionEn": "Properties available for rent",
-            "KeywordsAr": "للإيجار, عقارات, شقق, منازل",
-            "KeywordsEn": "for rent, properties, apartments, houses",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "للإيجار",
-            "og:description": "عقارات متاحة للإيجار",
-            "og:keywords": "للإيجار, عقارات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "للإيجار"
-          },
-          {
-            "path": "/for-sale",
-            "TitleAr": "للبيع",
-            "TitleEn": "For Sale",
-            "DescriptionAr": "عقارات متاحة للبيع",
-            "DescriptionEn": "Properties available for sale",
-            "KeywordsAr": "للبيع, عقارات, شقق, منازل",
-            "KeywordsEn": "for sale, properties, apartments, houses",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "للبيع",
-            "og:description": "عقارات متاحة للبيع",
-            "og:keywords": "للبيع, عقارات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "للبيع"
-          },
-          {
-            "path": "/projects",
-            "TitleAr": "المشاريع",
-            "TitleEn": "Projects",
-            "DescriptionAr": "مشاريعنا العقارية المتميزة",
-            "DescriptionEn": "Our distinguished real estate projects",
-            "KeywordsAr": "مشاريع, عقارية, تطوير, بناء",
-            "KeywordsEn": "projects, real estate, development, construction",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "المشاريع",
-            "og:description": "مشاريعنا العقارية المتميزة",
-            "og:keywords": "مشاريع, عقارية",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "المشاريع"
-          },
-          {
-            "path": "/contact-us",
-            "TitleAr": "اتصل بنا",
-            "TitleEn": "Contact Us",
-            "DescriptionAr": "تواصل معنا للحصول على المساعدة",
-            "DescriptionEn": "Contact us for assistance",
-            "KeywordsAr": "اتصل بنا, تواصل, مساعدة, خدمة العملاء",
-            "KeywordsEn": "contact us, communication, help, customer service",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "اتصل بنا",
-            "og:description": "تواصل معنا للحصول على المساعدة",
-            "og:keywords": "اتصل بنا, تواصل",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "اتصل بنا"
-          },
-          {
-            "path": "/about-us",
-            "TitleAr": "من نحن",
-            "TitleEn": "About Us",
-            "DescriptionAr": "تعرف على شركتنا وخدماتنا",
-            "DescriptionEn": "Learn about our company and services",
-            "KeywordsAr": "من نحن, شركة, خدمات, معلومات",
-            "KeywordsEn": "about us, company, services, information",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "من نحن",
-            "og:description": "تعرف على شركتنا وخدماتنا",
-            "og:keywords": "من نحن, شركة",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "من نحن"
-          },
-          {
-            "path": "/about",
-            "TitleAr": "حول",
-            "TitleEn": "About",
-            "DescriptionAr": "معلومات حول شركتنا",
-            "DescriptionEn": "Information about our company",
-            "KeywordsAr": "حول, معلومات, شركة",
-            "KeywordsEn": "about, information, company",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "حول",
-            "og:description": "معلومات حول شركتنا",
-            "og:keywords": "حول, معلومات",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "حول"
-          },
-          {
-            "path": "/contact",
-            "TitleAr": "تواصل",
-            "TitleEn": "Contact",
-            "DescriptionAr": "تواصل معنا",
-            "DescriptionEn": "Contact us",
-            "KeywordsAr": "تواصل, اتصال, مساعدة",
-            "KeywordsEn": "contact, communication, help",
-            "Author": "الموقع",
-            "AuthorEn": "Website",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "تواصل",
-            "og:description": "تواصل معنا",
-            "og:keywords": "تواصل, اتصال",
-            "og:author": "الموقع",
-            "og:robots": "index, follow",
-            "og:url": null,
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "الموقع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "تواصل"
-          },
-          {
-            "TitleAr": "للبيع",
-            "TitleEn": "for-sale",
-            "DescriptionAr": "للبيع",
-            "DescriptionEn": "for-sale",
-            "KeywordsAr": "للبيع",
-            "KeywordsEn": "for-sale",
-            "Author": "للبيع",
-            "AuthorEn": "for-sale",
-            "Robots": "index, follow",
-            "RobotsEn": "index, follow",
-            "og:title": "للبيع",
-            "og:description": "للبيع",
-            "og:keywords": "للبيع",
-            "og:author": "للبيع",
-            "og:robots": "index, follow",
-            "og:url": "/for-sale",
-            "og:image": null,
-            "og:type": "website",
-            "og:locale": "ar",
-            "og:locale:alternate": "en",
-            "og:site_name": "للبيع",
-            "og:image:width": null,
-            "og:image:height": null,
-            "og:image:type": null,
-            "og:image:alt": "للبيع",
-            "path": "/for-sale"
-          }
-        ]
-      }
+    "globalHeaderVariant": "header2",
+    "globalFooterVariant": "footer2"
+  },
+  "WebsiteLayout": {
+    "metaTags": {
+      "pages": [
+        {
+          "path": "/",
+          "TitleAr": "الصفحة الرئيسية",
+          "TitleEn": "Homepage",
+          "DescriptionAr": "مرحباً بكم في موقعنا - الصفحة الرئيسية",
+          "DescriptionEn": "Welcome to our website - Homepage",
+          "KeywordsAr": "الرئيسية, الموقع, الصفحة الرئيسية",
+          "KeywordsEn": "homepage, main, website",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "الصفحة الرئيسية",
+          "og:description": "مرحباً بكم في موقعنا",
+          "og:keywords": "الرئيسية, الموقع",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "الصفحة الرئيسية"
+        },
+        {
+          "path": "/create-request",
+          "TitleAr": "إنشاء طلب",
+          "TitleEn": "Create Request",
+          "DescriptionAr": "إنشاء طلب جديد للحصول على الخدمات",
+          "DescriptionEn": "Create a new request to get our services",
+          "KeywordsAr": "إنشاء طلب, خدمات, طلب جديد",
+          "KeywordsEn": "create request, services, new request",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "إنشاء طلب",
+          "og:description": "إنشاء طلب جديد للحصول على الخدمات",
+          "og:keywords": "إنشاء طلب, خدمات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "إنشاء طلب"
+        },
+        {
+          "path": "/for-rent",
+          "TitleAr": "للإيجار",
+          "TitleEn": "For Rent",
+          "DescriptionAr": "عقارات متاحة للإيجار",
+          "DescriptionEn": "Properties available for rent",
+          "KeywordsAr": "للإيجار, عقارات, شقق, منازل",
+          "KeywordsEn": "for rent, properties, apartments, houses",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "للإيجار",
+          "og:description": "عقارات متاحة للإيجار",
+          "og:keywords": "للإيجار, عقارات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "للإيجار"
+        },
+        {
+          "path": "/for-sale",
+          "TitleAr": "للبيع",
+          "TitleEn": "For Sale",
+          "DescriptionAr": "عقارات متاحة للبيع",
+          "DescriptionEn": "Properties available for sale",
+          "KeywordsAr": "للبيع, عقارات, شقق, منازل",
+          "KeywordsEn": "for sale, properties, apartments, houses",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "للبيع",
+          "og:description": "عقارات متاحة للبيع",
+          "og:keywords": "للبيع, عقارات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "للبيع"
+        },
+        {
+          "path": "/projects",
+          "TitleAr": "المشاريع",
+          "TitleEn": "Projects",
+          "DescriptionAr": "مشاريعنا العقارية المتميزة",
+          "DescriptionEn": "Our distinguished real estate projects",
+          "KeywordsAr": "مشاريع, عقارية, تطوير, بناء",
+          "KeywordsEn": "projects, real estate, development, construction",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "المشاريع",
+          "og:description": "مشاريعنا العقارية المتميزة",
+          "og:keywords": "مشاريع, عقارية",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "المشاريع"
+        },
+        {
+          "path": "/contact-us",
+          "TitleAr": "اتصل بنا",
+          "TitleEn": "Contact Us",
+          "DescriptionAr": "تواصل معنا للحصول على المساعدة",
+          "DescriptionEn": "Contact us for assistance",
+          "KeywordsAr": "اتصل بنا, تواصل, مساعدة, خدمة العملاء",
+          "KeywordsEn": "contact us, communication, help, customer service",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "اتصل بنا",
+          "og:description": "تواصل معنا للحصول على المساعدة",
+          "og:keywords": "اتصل بنا, تواصل",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "اتصل بنا"
+        },
+        {
+          "path": "/about-us",
+          "TitleAr": "من نحن",
+          "TitleEn": "About Us",
+          "DescriptionAr": "تعرف على شركتنا وخدماتنا",
+          "DescriptionEn": "Learn about our company and services",
+          "KeywordsAr": "من نحن, شركة, خدمات, معلومات",
+          "KeywordsEn": "about us, company, services, information",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "من نحن",
+          "og:description": "تعرف على شركتنا وخدماتنا",
+          "og:keywords": "من نحن, شركة",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "من نحن"
+        },
+        {
+          "path": "/about",
+          "TitleAr": "حول",
+          "TitleEn": "About",
+          "DescriptionAr": "معلومات حول شركتنا",
+          "DescriptionEn": "Information about our company",
+          "KeywordsAr": "حول, معلومات, شركة",
+          "KeywordsEn": "about, information, company",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "حول",
+          "og:description": "معلومات حول شركتنا",
+          "og:keywords": "حول, معلومات",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "حول"
+        },
+        {
+          "path": "/contact",
+          "TitleAr": "تواصل",
+          "TitleEn": "Contact",
+          "DescriptionAr": "تواصل معنا",
+          "DescriptionEn": "Contact us",
+          "KeywordsAr": "تواصل, اتصال, مساعدة",
+          "KeywordsEn": "contact, communication, help",
+          "Author": "الموقع",
+          "AuthorEn": "Website",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "تواصل",
+          "og:description": "تواصل معنا",
+          "og:keywords": "تواصل, اتصال",
+          "og:author": "الموقع",
+          "og:robots": "index, follow",
+          "og:url": null,
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "الموقع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "تواصل"
+        },
+        {
+          "TitleAr": "للبيع",
+          "TitleEn": "for-sale",
+          "DescriptionAr": "للبيع",
+          "DescriptionEn": "for-sale",
+          "KeywordsAr": "للبيع",
+          "KeywordsEn": "for-sale",
+          "Author": "للبيع",
+          "AuthorEn": "for-sale",
+          "Robots": "index, follow",
+          "RobotsEn": "index, follow",
+          "og:title": "للبيع",
+          "og:description": "للبيع",
+          "og:keywords": "للبيع",
+          "og:author": "للبيع",
+          "og:robots": "index, follow",
+          "og:url": "/for-sale",
+          "og:image": null,
+          "og:type": "website",
+          "og:locale": "ar",
+          "og:locale:alternate": "en",
+          "og:site_name": "للبيع",
+          "og:image:width": null,
+          "og:image:height": null,
+          "og:image:type": null,
+          "og:image:alt": "للبيع",
+          "path": "/for-sale"
+        }
+      ]
     }
   }
+}

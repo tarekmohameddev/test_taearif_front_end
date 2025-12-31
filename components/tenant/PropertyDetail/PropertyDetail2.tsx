@@ -7,12 +7,14 @@ import useTenantStore from "@/context-liveeditor/tenantStore";
 import { getDefaultpropertyDetail2Data } from "@/context-liveeditor/editorStoreFunctions/propertyDetailFunctions";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { MapPinIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ChevronDownIcon } from "lucide-react";
+  MapPinIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+} from "lucide-react";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
 
@@ -179,9 +181,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-  
+
   // Tenant ID hook
-  const { tenantId: tenantIdFromHook, isLoading: tenantLoading } = useTenantId();
+  const { tenantId: tenantIdFromHook, isLoading: tenantLoading } =
+    useTenantId();
   const finalTenantId = tenantId || tenantIdFromHook;
 
   // ─────────────────────────────────────────────────────────
@@ -212,7 +215,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
       for (const [pageSlug, pageComponents] of Object.entries(
         tenantData.componentSettings,
       )) {
-        if (typeof pageComponents === "object" && !Array.isArray(pageComponents)) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
           for (const [componentId, component] of Object.entries(
             pageComponents as any,
           )) {
@@ -248,12 +254,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
 
       ensureComponentVariant("propertyDetail", uniqueId, initialData);
     }
-  }, [
-    uniqueId,
-    props.useStore,
-    ensureComponentVariant,
-    tenantComponentData,
-  ]);
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
@@ -281,9 +282,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   // ─────────────────────────────────────────────────────────
   // 7. PROPERTY DATA FETCHING
   // ─────────────────────────────────────────────────────────
-  
+
   // Check if we're in Live Editor
-  const isLiveEditor = typeof window !== "undefined" && window.location.pathname.includes("/live-editor");
+  const isLiveEditor =
+    typeof window !== "undefined" &&
+    window.location.pathname.includes("/live-editor");
 
   // Mock data for Live Editor
   const mockProperty: Property = {
@@ -310,7 +313,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
     ],
-    description: "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
+    description:
+      "عقار فاخر للبيع في موقع استراتيجي. يتميز بمساحات واسعة وتصميم عصري يوفر جميع وسائل الراحة والرفاهية. العقار مجهز بأحدث التقنيات ويوفر إطلالة رائعة.",
     status: "available",
     location: {
       lat: 24.7136,
@@ -354,12 +358,12 @@ export default function propertyDetail2(props: propertyDetail2Props) {
       },
     ],
   };
-  
+
   // Property data state
   const [property, setProperty] = useState<Property | null>(null);
   const [loadingProperty, setLoadingProperty] = useState(true);
   const [propertyError, setPropertyError] = useState<string | null>(null);
-  
+
   // Image states
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
@@ -484,7 +488,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({
       ...formData,
@@ -617,8 +621,9 @@ export default function propertyDetail2(props: propertyDetail2Props) {
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#8b5f46";
 
-  const primaryColor = mergedData.styling?.primaryColor || primaryColorFromTenant;
-  
+  const primaryColor =
+    mergedData.styling?.primaryColor || primaryColorFromTenant;
+
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
     if (!hex || !hex.startsWith("#")) return "#6b4a3a";
@@ -735,7 +740,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
 
       {/* Overlay Text Top Right */}
       <div className="max-w-[1250px] mx-auto px-4 absolute top-[8rem] md:top-[13rem] left-0 right-0">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0" dir="rtl">
+        <div
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0"
+          dir="rtl"
+        >
           <div className="text-white z-[10] w-full md:w-auto">
             <h1
               className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-md text-right"
@@ -993,7 +1001,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         className="font-bold text-lg"
                         style={{ color: textColor }}
                       >
-                        عمر العقار: {property.building_age === 0 ? "جديد" : `${property.building_age} سنة`}
+                        عمر العقار:{" "}
+                        {property.building_age === 0
+                          ? "جديد"
+                          : `${property.building_age} سنة`}
                       </span>
                     </div>
                   )}
@@ -1285,7 +1296,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                       className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
                       style={{ backgroundColor: primaryColor }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = primaryColorHover;
+                        e.currentTarget.style.backgroundColor =
+                          primaryColorHover;
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = primaryColor;

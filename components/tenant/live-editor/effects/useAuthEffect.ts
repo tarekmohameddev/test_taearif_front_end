@@ -16,4 +16,3 @@ export const useAuthEffect = ({ user, authLoading }: UseAuthEffectProps) => {
     }
   }, [user, authLoading, router]);
 };
-

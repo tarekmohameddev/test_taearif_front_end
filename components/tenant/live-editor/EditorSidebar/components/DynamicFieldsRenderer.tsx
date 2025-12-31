@@ -22,7 +22,10 @@ import { useValueHelpers } from "./DynamicFieldsRenderer/hooks/useValueHelpers";
 import { useIconHelpers } from "./DynamicFieldsRenderer/hooks/useIconHelpers";
 
 // Utils
-import { hasGradientPair, getBackgroundMode } from "./DynamicFieldsRenderer/utils/fieldHelpers";
+import {
+  hasGradientPair,
+  getBackgroundMode,
+} from "./DynamicFieldsRenderer/utils/fieldHelpers";
 
 // Renderers
 import { TextFieldRenderer } from "./DynamicFieldsRenderer/renderers/TextFieldRenderer";
@@ -59,11 +62,10 @@ export function DynamicFieldsRenderer({
 
   // Check for gradient pair
   const hasGradient = hasGradientPair(fields);
-  const backgroundMode: string =
-    getBackgroundMode(
-      getValueByPath("settings.backgroundMode"),
-      hasGradient
-    );
+  const backgroundMode: string = getBackgroundMode(
+    getValueByPath("settings.backgroundMode"),
+    hasGradient,
+  );
 
   const renderField = (def: FieldDefinition, basePath?: string) => {
     if (!def) {

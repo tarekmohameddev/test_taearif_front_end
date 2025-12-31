@@ -170,8 +170,10 @@ export function WhatsAppCenterPage() {
   const [numberToDelete, setNumberToDelete] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [togglingNumberId, setTogglingNumberId] = useState<number | null>(null);
-  const [assignEmployeeDialogOpen, setAssignEmployeeDialogOpen] = useState(false);
-  const [unlinkEmployeeDialogOpen, setUnlinkEmployeeDialogOpen] = useState(false);
+  const [assignEmployeeDialogOpen, setAssignEmployeeDialogOpen] =
+    useState(false);
+  const [unlinkEmployeeDialogOpen, setUnlinkEmployeeDialogOpen] =
+    useState(false);
   const [numberToUnlink, setNumberToUnlink] = useState<number | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
@@ -183,22 +185,24 @@ export function WhatsAppCenterPage() {
   const [paymentUrl, setPaymentUrl] = useState<string>("");
   const [addonId, setAddonId] = useState<number | undefined>(undefined);
   const { userData } = useAuthStore();
-  
+
   // Fetch WhatsApp data function (reusable)
   const fetchWhatsAppData = async () => {
     try {
       setIsLoading(true);
       setError(null);
       // axiosInstance interceptor will automatically add the Authorization header
-      const response = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+      const response = await axiosInstance.get<WhatsAppResponse>(
+        "/api/whatsapp/addons/plans",
+      );
 
       if (response.data.success && response.data.data) {
         const numbers = response.data.data.numbers || [];
         const plansData = response.data.data.plans || [];
-        
+
         setConnectedNumbers(numbers);
         setPlans(plansData);
-        
+
         setQuota(response.data.data.quota || 0);
         setUsage(response.data.data.usage || 0);
       } else {
@@ -225,7 +229,7 @@ export function WhatsAppCenterPage() {
   // Set default selected plan when plans are loaded
   useEffect(() => {
     if (plans.length > 0 && !selectedPlan) {
-      const activePlan = plans.find(plan => plan.is_active) || plans[0];
+      const activePlan = plans.find((plan) => plan.is_active) || plans[0];
       if (activePlan) {
         setSelectedPlan(activePlan.id);
       }
@@ -260,15 +264,15 @@ export function WhatsAppCenterPage() {
   const handleDeleteNumber = async (id: number) => {
     try {
       await axiosInstance.delete(`/whatsapp/${id}`);
-    setConnectedNumbers((prev) => prev.filter((num) => num.id !== id));
+      setConnectedNumbers((prev) => prev.filter((num) => num.id !== id));
       setShowSuccessAlert(true);
       setTimeout(() => setShowSuccessAlert(false), 5000);
     } catch (err: any) {
       console.error("Error deleting number:", err);
       setError(err.response?.data?.message || "حدث خطأ أثناء حذف الرقم");
     } finally {
-    setDeleteDialogOpen(false);
-    setNumberToDelete(null);
+      setDeleteDialogOpen(false);
+      setNumberToDelete(null);
     }
   };
 
@@ -281,12 +285,14 @@ export function WhatsAppCenterPage() {
     try {
       setTogglingNumberId(id);
       setError(null);
-      
+
       const response = await axiosInstance.post(`/whatsapp/${id}/unlink`);
-      
+
       if (response.data.success) {
         // Refresh the numbers list
-        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+        const fetchResponse = await axiosInstance.get<WhatsAppResponse>(
+          "/api/whatsapp/addons/plans",
+        );
         if (fetchResponse.data.success && fetchResponse.data.data) {
           setConnectedNumbers(fetchResponse.data.data.numbers || []);
         }
@@ -297,7 +303,9 @@ export function WhatsAppCenterPage() {
       }
     } catch (err: any) {
       console.error("Error unlinking number:", err);
-      setError(err.response?.data?.message || "حدث خطأ أثناء إلغاء تفعيل الرقم");
+      setError(
+        err.response?.data?.message || "حدث خطأ أثناء إلغاء تفعيل الرقم",
+      );
     } finally {
       setTogglingNumberId(null);
     }
@@ -307,12 +315,12 @@ export function WhatsAppCenterPage() {
     try {
       setTogglingNumberId(id);
       setError(null);
-      
+
       // Count active numbers
       const activeNumbersCount = connectedNumbers.filter(
-        (num) => num.status === "active"
+        (num) => num.status === "active",
       ).length;
-      
+
       // Check if limit is reached
       if (activeNumbersCount >= quota) {
         // Limit reached, need to purchase addon
@@ -321,7 +329,7 @@ export function WhatsAppCenterPage() {
           setTogglingNumberId(null);
           return;
         }
-        
+
         // Call the addon purchase API
         const response = await axiosInstance.post<AddonPurchaseResponse>(
           "/whatsapp/addons",
@@ -332,7 +340,7 @@ export function WhatsAppCenterPage() {
             payment_method: "test",
           },
         );
-        
+
         if (response.data.status === "success" || response.data.success) {
           if (response.data.payment_url) {
             // Open payment popup with iframe
@@ -343,7 +351,9 @@ export function WhatsAppCenterPage() {
             setPaymentPopupOpen(true);
           } else {
             // Refresh the numbers list
-            const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+            const fetchResponse = await axiosInstance.get<WhatsAppResponse>(
+              "/api/whatsapp/addons/plans",
+            );
             if (fetchResponse.data.success && fetchResponse.data.data) {
               setConnectedNumbers(fetchResponse.data.data.numbers || []);
             }
@@ -356,10 +366,12 @@ export function WhatsAppCenterPage() {
       } else {
         // Limit not reached, use normal activation
         const response = await axiosInstance.post(`/whatsapp/${id}/link`);
-        
+
         if (response.data.success) {
           // Refresh the numbers list
-          const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+          const fetchResponse = await axiosInstance.get<WhatsAppResponse>(
+            "/api/whatsapp/addons/plans",
+          );
           if (fetchResponse.data.success && fetchResponse.data.data) {
             setConnectedNumbers(fetchResponse.data.data.numbers || []);
           }
@@ -383,13 +395,16 @@ export function WhatsAppCenterPage() {
       const fetchEmployees = async () => {
         try {
           setLoadingEmployees(true);
-          const response = await axiosInstance.get<EmployeesResponse>("/v1/employees");
+          const response =
+            await axiosInstance.get<EmployeesResponse>("/v1/employees");
           if (response.data && response.data.data) {
             setEmployees(response.data.data);
           }
         } catch (err: any) {
           console.error("Error fetching employees:", err);
-          setError(err.response?.data?.message || "حدث خطأ أثناء تحميل الموظفين");
+          setError(
+            err.response?.data?.message || "حدث خطأ أثناء تحميل الموظفين",
+          );
         } finally {
           setLoadingEmployees(false);
         }
@@ -408,13 +423,19 @@ export function WhatsAppCenterPage() {
       setAssigningEmployee(true);
       setError(null);
 
-      const response = await axiosInstance.patch(`/whatsapp/${selectedNumberId}/employee`, {
-        employeeId: selectedEmployeeId === "none" ? null : Number(selectedEmployeeId),
-      });
+      const response = await axiosInstance.patch(
+        `/whatsapp/${selectedNumberId}/employee`,
+        {
+          employeeId:
+            selectedEmployeeId === "none" ? null : Number(selectedEmployeeId),
+        },
+      );
 
       if (response.data.success) {
         // Refresh the numbers list
-        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+        const fetchResponse = await axiosInstance.get<WhatsAppResponse>(
+          "/api/whatsapp/addons/plans",
+        );
         if (fetchResponse.data.success && fetchResponse.data.data) {
           setConnectedNumbers(fetchResponse.data.data.numbers || []);
         }
@@ -428,7 +449,9 @@ export function WhatsAppCenterPage() {
       }
     } catch (err: any) {
       console.error("Error assigning employee:", err);
-      setError(err.response?.data?.message || "حدث خطأ أثناء ربط الرقم بالموظف");
+      setError(
+        err.response?.data?.message || "حدث خطأ أثناء ربط الرقم بالموظف",
+      );
     } finally {
       setAssigningEmployee(false);
     }
@@ -443,13 +466,18 @@ export function WhatsAppCenterPage() {
       setUnlinkingEmployee(true);
       setError(null);
 
-      const response = await axiosInstance.patch(`/whatsapp/${numberToUnlink}/employee`, {
-        employeeId: null,
-      });
+      const response = await axiosInstance.patch(
+        `/whatsapp/${numberToUnlink}/employee`,
+        {
+          employeeId: null,
+        },
+      );
 
       if (response.data.success) {
         // Refresh the numbers list
-        const fetchResponse = await axiosInstance.get<WhatsAppResponse>("/api/whatsapp/addons/plans");
+        const fetchResponse = await axiosInstance.get<WhatsAppResponse>(
+          "/api/whatsapp/addons/plans",
+        );
         if (fetchResponse.data.success && fetchResponse.data.data) {
           setConnectedNumbers(fetchResponse.data.data.numbers || []);
         }
@@ -462,7 +490,9 @@ export function WhatsAppCenterPage() {
       }
     } catch (err: any) {
       console.error("Error unlinking employee:", err);
-      setError(err.response?.data?.message || "حدث خطأ أثناء فك الربط عن الموظف");
+      setError(
+        err.response?.data?.message || "حدث خطأ أثناء فك الربط عن الموظف",
+      );
     } finally {
       setUnlinkingEmployee(false);
     }
@@ -588,7 +618,9 @@ export function WhatsAppCenterPage() {
                   <div className="text-2xl font-bold text-green-600">
                     {isLoading
                       ? "..."
-                      : connectedNumbers.filter((num) => num.status === "active").length}
+                      : connectedNumbers.filter(
+                          (num) => num.status === "active",
+                        ).length}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     أرقام واتساب نشطة
@@ -826,25 +858,29 @@ export function WhatsAppCenterPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button 
-                                    variant="ghost" 
+                                  <Button
+                                    variant="ghost"
                                     size="icon"
                                     disabled={togglingNumberId === number.id}
                                   >
                                     {togglingNumberId === number.id ? (
                                       <RefreshCw className="h-4 w-4 animate-spin" />
                                     ) : (
-                                <Settings className="h-4 w-4" />
+                                      <Settings className="h-4 w-4" />
                                     )}
-                              </Button>
+                                  </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="rtl">
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="rtl"
+                                >
                                   {number.status === "active" && (
                                     <DropdownMenuItem
-                                      onClick={() => handleUnlinkNumber(number.id)}
+                                      onClick={() =>
+                                        handleUnlinkNumber(number.id)
+                                      }
                                       disabled={togglingNumberId === number.id}
                                       className="cursor-pointer"
                                     >
@@ -877,7 +913,7 @@ export function WhatsAppCenterPage() {
                                   )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                              
+
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -886,37 +922,44 @@ export function WhatsAppCenterPage() {
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
-                              {number.status !== "active" && (() => {
-                                const activeNumbersCount = connectedNumbers.filter(
-                                  (num) => num.status === "active"
-                                ).length;
-                                const needsAddon = activeNumbersCount >= quota;
-                                
-                                return (
-                                  <Button
-                                    onClick={() => handleActivateNumber(number.id)}
-                                    disabled={togglingNumberId === number.id}
-                                    className={
-                                      needsAddon
-                                        ? "bg-green-600 hover:bg-green-700 text-white gap-2"
-                                        : "bg-blue-600 hover:bg-blue-700 text-white gap-2"
-                                    }
-                                    size="default"
-                                  >
-                                    {togglingNumberId === number.id ? (
-                                      <>
-                                        <RefreshCw className="h-4 w-4 animate-spin" />
-                                        {needsAddon ? "جاري التفعيل..." : "جاري الربط..."}
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Power className="h-4 w-4" />
-                                        {needsAddon ? "تفعيل" : "ربط"}
-                                      </>
-                                    )}
-                                  </Button>
-                                );
-                              })()}
+                              {number.status !== "active" &&
+                                (() => {
+                                  const activeNumbersCount =
+                                    connectedNumbers.filter(
+                                      (num) => num.status === "active",
+                                    ).length;
+                                  const needsAddon =
+                                    activeNumbersCount >= quota;
+
+                                  return (
+                                    <Button
+                                      onClick={() =>
+                                        handleActivateNumber(number.id)
+                                      }
+                                      disabled={togglingNumberId === number.id}
+                                      className={
+                                        needsAddon
+                                          ? "bg-green-600 hover:bg-green-700 text-white gap-2"
+                                          : "bg-blue-600 hover:bg-blue-700 text-white gap-2"
+                                      }
+                                      size="default"
+                                    >
+                                      {togglingNumberId === number.id ? (
+                                        <>
+                                          <RefreshCw className="h-4 w-4 animate-spin" />
+                                          {needsAddon
+                                            ? "جاري التفعيل..."
+                                            : "جاري الربط..."}
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Power className="h-4 w-4" />
+                                          {needsAddon ? "تفعيل" : "ربط"}
+                                        </>
+                                      )}
+                                    </Button>
+                                  );
+                                })()}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -996,7 +1039,9 @@ export function WhatsAppCenterPage() {
         maxWidth="max-w-md"
       >
         <CustomDialogContent>
-          <CustomDialogClose onClose={() => setAssignEmployeeDialogOpen(false)} />
+          <CustomDialogClose
+            onClose={() => setAssignEmployeeDialogOpen(false)}
+          />
           <CustomDialogHeader>
             <CustomDialogTitle>ربط الرقم بالموظف</CustomDialogTitle>
           </CustomDialogHeader>
@@ -1016,7 +1061,8 @@ export function WhatsAppCenterPage() {
                     .filter((num) => num.status === "active")
                     .map((number) => (
                       <SelectItem key={number.id} value={String(number.id)}>
-                        {number.phoneNumber} {number.name ? `- ${number.name}` : ""}
+                        {number.phoneNumber}{" "}
+                        {number.name ? `- ${number.name}` : ""}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -1032,19 +1078,20 @@ export function WhatsAppCenterPage() {
                 disabled={loadingEmployees}
               >
                 <SelectTrigger id="employee-select">
-                  <SelectValue 
+                  <SelectValue
                     placeholder={
-                      loadingEmployees 
-                        ? "جاري تحميل الموظفين..." 
+                      loadingEmployees
+                        ? "جاري تحميل الموظفين..."
                         : "اختر الموظف"
-                    } 
+                    }
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">لا يوجد موظف</SelectItem>
                   {employees.map((employee) => (
                     <SelectItem key={employee.id} value={String(employee.id)}>
-                      {employee.first_name} {employee.last_name} ({employee.email})
+                      {employee.first_name} {employee.last_name} (
+                      {employee.email})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1061,9 +1108,9 @@ export function WhatsAppCenterPage() {
             <Button
               onClick={handleAssignEmployee}
               disabled={
-                assigningEmployee || 
-                !selectedNumberId || 
-                !selectedEmployeeId || 
+                assigningEmployee ||
+                !selectedNumberId ||
+                !selectedEmployeeId ||
                 selectedEmployeeId === "none" ||
                 loadingEmployees ||
                 employees.length < 1
@@ -1094,7 +1141,9 @@ export function WhatsAppCenterPage() {
         maxWidth="max-w-md"
       >
         <CustomDialogContent>
-          <CustomDialogClose onClose={() => setUnlinkEmployeeDialogOpen(false)} />
+          <CustomDialogClose
+            onClose={() => setUnlinkEmployeeDialogOpen(false)}
+          />
           <CustomDialogHeader>
             <CustomDialogTitle>تأكيد فك الربط</CustomDialogTitle>
           </CustomDialogHeader>
@@ -1102,7 +1151,7 @@ export function WhatsAppCenterPage() {
             <p className="text-gray-700">
               هل أنت متأكد من رغبتك في فك الربط عن الموظف؟
             </p>
-            
+
             <div className="flex gap-3 justify-end">
               <Button
                 variant="outline"

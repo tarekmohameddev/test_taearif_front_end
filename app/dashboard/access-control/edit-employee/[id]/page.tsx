@@ -171,10 +171,7 @@ export default function EditEmployeePage() {
   };
 
   // Handle group permission change
-  const handleGroupPermissionChange = (
-    groupName: string,
-    checked: boolean,
-  ) => {
+  const handleGroupPermissionChange = (groupName: string, checked: boolean) => {
     if (!permissions || !permissions.grouped[groupName]) return;
 
     const groupPermissions = permissions.grouped[groupName];
@@ -221,9 +218,7 @@ export default function EditEmployeePage() {
       }, 2000);
     } catch (err: any) {
       console.error("Error updating employee:", err);
-      setEditError(
-        err.response?.data?.message || "حدث خطأ في تحديث الموظف",
-      );
+      setEditError(err.response?.data?.message || "حدث خطأ في تحديث الموظف");
     } finally {
       setEditLoading(false);
     }
@@ -232,9 +227,9 @@ export default function EditEmployeePage() {
   if (employeeLoading) {
     return (
       <div className="flex min-h-screen flex-col h-screen bg-gray-50">
-      <DashboardHeader />
-    <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
-    <EnhancedSidebar />
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
+          <EnhancedSidebar />
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="h-8 w-8 animate-spin text-black" />
@@ -250,9 +245,9 @@ export default function EditEmployeePage() {
 
   return (
     <div className="flex min-h-screen flex-col h-screen bg-gray-50">
-        <DashboardHeader />
+      <DashboardHeader />
       <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
-      <EnhancedSidebar />
+        <EnhancedSidebar />
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
@@ -456,11 +451,13 @@ export default function EditEmployeePage() {
                         >
                           الصلاحيات
                         </Label>
-                      <PermissionsDropdown
+                        <PermissionsDropdown
                           permissions={permissions}
                           selectedPermissions={selectedPermissions}
                           handlePermissionChange={handlePermissionChange}
-                          handleGroupPermissionChange={handleGroupPermissionChange}
+                          handleGroupPermissionChange={
+                            handleGroupPermissionChange
+                          }
                           isLoading={permissionsLoading}
                         />
                       </div>
@@ -472,36 +469,40 @@ export default function EditEmployeePage() {
               {/* Footer Actions - Fixed at bottom on mobile */}
               <div className="flex-shrink-0 bg-white sm:pt-[300px] border-t border-gray-200 sm:border-none">
                 <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-3 pt-3 px-4 sm:px-6 pb-3 sm:pb-4">
-                <Button
-                  variant="outline"
-                  onClick={() => router.back()}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto " 
-                >
-                  إلغاء
-                </Button>
-                <Button
-                  onClick={updateEmployee}
-                  disabled={
-                    editLoading ||
-                    !editFormData.first_name ||
-                    !editFormData.last_name ||
-                    !editFormData.email ||
-                    !editFormData.phone
-                  }
-                  className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
-                >
-                  {editLoading ? (
-                    <>
-                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
-                      <span className="text-xs sm:text-sm">جاري التحديث...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                      <span className="text-xs sm:text-sm">حفظ التغييرات</span>
-                    </>
-                  )}
-                </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.back()}
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm sm:text-base w-full sm:w-auto "
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    onClick={updateEmployee}
+                    disabled={
+                      editLoading ||
+                      !editFormData.first_name ||
+                      !editFormData.last_name ||
+                      !editFormData.email ||
+                      !editFormData.phone
+                    }
+                    className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
+                  >
+                    {editLoading ? (
+                      <>
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
+                        <span className="text-xs sm:text-sm">
+                          جاري التحديث...
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                        <span className="text-xs sm:text-sm">
+                          حفظ التغييرات
+                        </span>
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -511,4 +512,3 @@ export default function EditEmployeePage() {
     </div>
   );
 }
-

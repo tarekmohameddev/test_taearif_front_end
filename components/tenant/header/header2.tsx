@@ -155,7 +155,7 @@ export default function Header2(props: Header2Props) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const headerStates = useEditorStore((s) => s.headerStates);
-  
+
   // Subscribe to global header data for force update
   const globalHeaderData = useEditorStore((s) => s.globalHeaderData);
   const [forceUpdate, setForceUpdate] = useState(0);
@@ -311,8 +311,13 @@ export default function Header2(props: Header2Props) {
 
   // Force re-render when globalHeaderData changes (for global headers)
   useEffect(() => {
-    const isGlobalHeader = uniqueId === "global-header" || variantId === "global-header";
-    if (isGlobalHeader && globalHeaderData && Object.keys(globalHeaderData).length > 0) {
+    const isGlobalHeader =
+      uniqueId === "global-header" || variantId === "global-header";
+    if (
+      isGlobalHeader &&
+      globalHeaderData &&
+      Object.keys(globalHeaderData).length > 0
+    ) {
       setForceUpdate((prev) => prev + 1);
     }
   }, [uniqueId, variantId, globalHeaderData]);

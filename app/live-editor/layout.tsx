@@ -1007,7 +1007,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     (state) => state.WebsiteLayout,
   );
   const editorWebsiteLayout = editorStoreWebsiteLayout?.metaTags?.pages || [];
-  const currentTheme = useEditorStore((state) => state.WebsiteLayout?.currentTheme);
+  const currentTheme = useEditorStore(
+    (state) => state.WebsiteLayout?.currentTheme,
+  );
 
   // Theme change handlers
   const handleThemeApply = async (themeNumber: ThemeNumber) => {
@@ -1016,20 +1018,17 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       toast.success(
         locale === "ar"
           ? `تم تطبيق الثيم ${themeNumber} بنجاح`
-          : `Theme ${themeNumber} applied successfully`
+          : `Theme ${themeNumber} applied successfully`,
       );
       // Changes will be reflected automatically via useEffect in LiveEditorEffects
     } catch (error) {
       console.error("Error applying theme:", error);
       toast.error(
-        locale === "ar"
-          ? "حدث خطأ أثناء تطبيق الثيم"
-          : "Error applying theme"
+        locale === "ar" ? "حدث خطأ أثناء تطبيق الثيم" : "Error applying theme",
       );
       throw error;
     }
   };
-
 
   // دالة للحصول على البيانات الافتراضية للصفحة
   const getDefaultSeoData = (pageSlug: string) => {
@@ -1433,8 +1432,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       let projectSeoData = null;
       if (websiteLayout?.metaTags?.pages) {
         projectSeoData = websiteLayout.metaTags.pages.find(
-          (page: any) =>
-            page.path === "/project" || page.path === "project",
+          (page: any) => page.path === "/project" || page.path === "project",
         );
       }
 
@@ -1491,8 +1489,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       let propertySeoData = null;
       if (websiteLayout?.metaTags?.pages) {
         propertySeoData = websiteLayout.metaTags.pages.find(
-          (page: any) =>
-            page.path === "/property" || page.path === "property",
+          (page: any) => page.path === "/property" || page.path === "property",
         );
       }
 
@@ -1776,10 +1773,13 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     if (hasRecentThemeChange) {
       // Theme was recently changed - tenantStore was already updated by themeChangeService
       // Don't overwrite the new theme data in editorStore with potentially old tenantData
-      console.log("[EditorNavBar] Skipping componentSettings load - theme recently changed:", {
-        themeChangeTimestamp,
-        storePages: Object.keys(editorStore.pageComponentsByPage).length,
-      });
+      console.log(
+        "[EditorNavBar] Skipping componentSettings load - theme recently changed:",
+        {
+          themeChangeTimestamp,
+          storePages: Object.keys(editorStore.pageComponentsByPage).length,
+        },
+      );
       return;
     }
 
@@ -1797,15 +1797,19 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           // ⭐ IMPROVED: Check if store already has data for this page
           // If store has data, don't overwrite it with tenantData
           // This prevents loading old data after save
-          const storePageComponents = editorStore.pageComponentsByPage[pageSlug];
+          const storePageComponents =
+            editorStore.pageComponentsByPage[pageSlug];
           if (storePageComponents && storePageComponents.length > 0) {
             // Always prioritize store data if it exists (it has recent changes)
             const tenantComponentCount = Object.keys(pageData).length;
-            console.log("[EditorNavBar] Store has data for page, skipping tenantData load:", {
-              pageSlug,
-              storeCount: storePageComponents.length,
-              tenantCount: tenantComponentCount,
-            });
+            console.log(
+              "[EditorNavBar] Store has data for page, skipping tenantData load:",
+              {
+                pageSlug,
+                storeCount: storePageComponents.length,
+                tenantCount: tenantComponentCount,
+              },
+            );
             return; // Skip this page - store data takes priority
           }
 
@@ -1835,7 +1839,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       Object.entries(PAGE_DEFINITIONS).forEach(
         ([pageSlug, pageData]: [string, any]) => {
           // Check if store already has data for this page
-          const storePageComponents = editorStore.pageComponentsByPage[pageSlug];
+          const storePageComponents =
+            editorStore.pageComponentsByPage[pageSlug];
           if (storePageComponents && storePageComponents.length > 0) {
             // Store already has data - skip loading defaults
             return;
@@ -2316,7 +2321,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                               {currentPath === page.path && (
                                 <svg
                                   className={`w-4 h-4 ml-auto ${
-                                    page.isStatic ? "text-yellow-600" : "text-blue-600"
+                                    page.isStatic
+                                      ? "text-yellow-600"
+                                      : "text-blue-600"
                                   }`}
                                   fill="none"
                                   stroke="currentColor"
@@ -2506,7 +2513,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                   d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
                 />
               </svg>
-              {locale === "ar" ? "تغيير ثيم الموقع بالكامل" : "Change Site Theme"}
+              {locale === "ar"
+                ? "تغيير ثيم الموقع بالكامل"
+                : "Change Site Theme"}
             </button>
 
             <Link
@@ -2658,7 +2667,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                         d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
                       />
                     </svg>
-                    {locale === "ar" ? "تغيير ثيم الموقع بالكامل" : "Change Site Theme"}
+                    {locale === "ar"
+                      ? "تغيير ثيم الموقع بالكامل"
+                      : "Change Site Theme"}
                   </button>
 
                   {/* Divider */}
@@ -2861,7 +2872,9 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                             {currentPath === page.path && (
                               <svg
                                 className={`w-4 h-4 ml-auto ${
-                                  page.isStatic ? "text-yellow-600" : "text-blue-600"
+                                  page.isStatic
+                                    ? "text-yellow-600"
+                                    : "text-blue-600"
                                 }`}
                                 fill="none"
                                 stroke="currentColor"

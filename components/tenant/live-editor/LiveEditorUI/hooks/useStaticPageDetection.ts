@@ -11,13 +11,13 @@ export function useStaticPageDetection(slug: string | undefined): boolean {
   const isStaticPage = useMemo(() => {
     const currentSlug = slug || "";
     if (!currentSlug) return false;
-    
+
     // الصفحات الثابتة المعرفة: "project" هي صفحة ثابتة دائماً
     const staticPageSlugs = ["project", "property"];
     if (staticPageSlugs.includes(currentSlug)) {
       return true;
     }
-    
+
     // التحقق من staticPagesData
     const staticPageData = getStaticPageData(currentSlug);
     return !!staticPageData;
@@ -25,5 +25,3 @@ export function useStaticPageDetection(slug: string | undefined): boolean {
 
   return isStaticPage;
 }
-
-

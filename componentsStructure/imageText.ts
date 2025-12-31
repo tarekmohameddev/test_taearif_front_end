@@ -65,12 +65,3 @@ export const imageTextStructure: ComponentStructure = {
     },
   ],
 };
-
-
-
-
-
-
-
-
-

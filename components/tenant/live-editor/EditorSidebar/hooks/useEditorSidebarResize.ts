@@ -34,4 +34,3 @@ export const useEditorSidebarResize = (setWidth: (width: number) => void) => {
     handleMouseDown,
   };
 };
-

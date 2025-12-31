@@ -1,5 +1,8 @@
 // Helpers to update array fields (slides, gallery) and top-level fields when needed
-export const useArrayHelpers = (tempData: any, setTempData: (data: any) => void) => {
+export const useArrayHelpers = (
+  tempData: any,
+  setTempData: (data: any) => void,
+) => {
   const updateSlides = (newSlides: any[]) => {
     setTempData({ ...tempData, slides: newSlides });
   };
@@ -44,4 +47,3 @@ export const useArrayHelpers = (tempData: any, setTempData: (data: any) => void)
     removeGallery,
   };
 };
-

@@ -15,7 +15,16 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Search, RefreshCw, Loader2, CalendarIcon, User, Phone, Mail, ArrowUpDown } from "lucide-react";
+import {
+  Search,
+  RefreshCw,
+  Loader2,
+  CalendarIcon,
+  User,
+  Phone,
+  Mail,
+  ArrowUpDown,
+} from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
@@ -59,8 +68,18 @@ interface FilterData {
     name: string;
     email: string;
   }>;
-  categories?: Array<{ id: number; name: string; name_ar?: string; name_en?: string }>;
-  properties?: Array<{ id: number; name: string; name_ar?: string; name_en?: string }>;
+  categories?: Array<{
+    id: number;
+    name: string;
+    name_ar?: string;
+    name_en?: string;
+  }>;
+  properties?: Array<{
+    id: number;
+    name: string;
+    name_ar?: string;
+    name_en?: string;
+  }>;
 }
 
 // Translation functions for filter data
@@ -214,10 +233,16 @@ export const FiltersAndSearch = ({
         params.append("phone_number", currentState.filterEmployeePhone.trim());
       }
       if (currentState.dateRange.from) {
-        params.append("created_from", format(currentState.dateRange.from, "yyyy-MM-dd"));
+        params.append(
+          "created_from",
+          format(currentState.dateRange.from, "yyyy-MM-dd"),
+        );
       }
       if (currentState.dateRange.to) {
-        params.append("created_to", format(currentState.dateRange.to, "yyyy-MM-dd"));
+        params.append(
+          "created_to",
+          format(currentState.dateRange.to, "yyyy-MM-dd"),
+        );
       }
       if (currentState.filterProcedure !== "all") {
         params.append("procedure_id", currentState.filterProcedure);
@@ -468,7 +493,10 @@ export const FiltersAndSearch = ({
           <SelectContent>
             <SelectItem value="all">جميع الأنواع</SelectItem>
             {filterData?.types
-              ?.filter((type: any) => type.name !== "Both" && translateType(type.name) !== "كلاهما")
+              ?.filter(
+                (type: any) =>
+                  type.name !== "Both" && translateType(type.name) !== "كلاهما",
+              )
               ?.map((type: any) => (
                 <SelectItem key={type.id} value={type.id.toString()}>
                   {translateType(type.name)}
@@ -685,8 +713,12 @@ export const FiltersAndSearch = ({
                     >
                       <Checkbox
                         id={`category-${category.id}`}
-                        checked={interestedCategoryIds.includes(category.id.toString())}
-                        onCheckedChange={() => handleCategoryToggle(category.id)}
+                        checked={interestedCategoryIds.includes(
+                          category.id.toString(),
+                        )}
+                        onCheckedChange={() =>
+                          handleCategoryToggle(category.id)
+                        }
                       />
                       <Label
                         htmlFor={`category-${category.id}`}
@@ -697,7 +729,9 @@ export const FiltersAndSearch = ({
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">لا توجد فئات متاحة</p>
+                  <p className="text-sm text-muted-foreground">
+                    لا توجد فئات متاحة
+                  </p>
                 )}
               </div>
             </div>
@@ -730,8 +764,12 @@ export const FiltersAndSearch = ({
                     >
                       <Checkbox
                         id={`property-${property.id}`}
-                        checked={interestedPropertyIds.includes(property.id.toString())}
-                        onCheckedChange={() => handlePropertyToggle(property.id)}
+                        checked={interestedPropertyIds.includes(
+                          property.id.toString(),
+                        )}
+                        onCheckedChange={() =>
+                          handlePropertyToggle(property.id)
+                        }
                       />
                       <Label
                         htmlFor={`property-${property.id}`}
@@ -742,7 +780,9 @@ export const FiltersAndSearch = ({
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">لا توجد عقارات متاحة</p>
+                  <p className="text-sm text-muted-foreground">
+                    لا توجد عقارات متاحة
+                  </p>
                 )}
               </div>
             </div>
