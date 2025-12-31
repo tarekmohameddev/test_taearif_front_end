@@ -237,24 +237,6 @@ export default function CustomerDetailsPage() {
                           </div>
                         </div>
                       )}
-
-                      {/* Priority */}
-                      {customerDetails.customer?.priority && (
-                        <div className="flex items-start space-x-3 space-x-reverse">
-                          <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                            <Tag className="h-4 w-4 text-red-600" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              الأولوية
-                            </p>
-                            <p className="text-base font-semibold text-gray-900 dark:text-white">
-                              {customerDetails.customer.priority?.name ||
-                                customerDetails.customer.priority}
-                            </p>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </CardContent>
                 </Card>
