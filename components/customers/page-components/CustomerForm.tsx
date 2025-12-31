@@ -287,7 +287,8 @@ export const CustomerForm = ({
             </p>
           )}
         </div>
-        <div>
+        {/* الأولوية - مخفية حالياً */}
+        {/* <div>
           <Label
             className={hasError("priority_id") ? "text-red-500" : ""}
           >
@@ -334,10 +335,11 @@ export const CustomerForm = ({
               {getErrorMessage("priority_id")}
             </p>
           )}
-        </div>
+        </div> */}
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <div>
+        {/* نوع الإجراء - مخفي حالياً */}
+        {/* <div>
           <Label
             className={hasError("procedure_id") ? "text-red-500" : ""}
           >
@@ -381,7 +383,7 @@ export const CustomerForm = ({
               {getErrorMessage("procedure_id")}
             </p>
           )}
-        </div>
+        </div> */}
         <div>
           <Label htmlFor="stage">المرحلة (اختياري)</Label>
           {fetchingStages ? (

@@ -29,8 +29,10 @@ const customerSchema = z.object({
   district_id: z.union([z.number(), z.string()]).nullable(),
   note: z.string().optional(),
   type_id: z.number().min(1, "نوع العميل مطلوب"),
-  priority_id: z.number().min(1, "الأولوية مطلوبة"),
+  // الأولوية مخفية حالياً - جعلتها اختيارية
+  priority_id: z.number().optional(),
   stage_id: z.union([z.number(), z.null(), z.literal("")]).optional(),
+  // الإجراء مخفي حالياً - جعلته اختيارياً
   procedure_id: z.number().optional(),
 });
 

@@ -127,9 +127,10 @@ export default function EditCustomerPage() {
     if (!formData.type_id) {
       errors.type_id = "نوع العميل مطلوب";
     }
-    if (!formData.priority_id) {
-      errors.priority_id = "الأولوية مطلوبة";
-    }
+    // الأولوية مخفية حالياً - لا حاجة للتحقق منها
+    // if (!formData.priority_id) {
+    //   errors.priority_id = "الأولوية مطلوبة";
+    // }
 
     if (Object.keys(errors).length > 0) {
       setClientErrors(errors);
