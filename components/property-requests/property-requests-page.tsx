@@ -109,7 +109,6 @@ export default function PropertyRequestsPage() {
   const [propertyType, setPropertyType] = useState<string>("");
   const [purchaseGoal, setPurchaseGoal] = useState<string>("");
   const [seriousness, setSeriousness] = useState<string>("");
-  const [isRead, setIsRead] = useState<string>("");
   
   // Filters data
   const [filtersData, setFiltersData] = useState<FiltersResponse["data"] | null>(null);
@@ -209,7 +208,6 @@ export default function PropertyRequestsPage() {
         if (propertyType) params.append("property_type", propertyType);
         if (purchaseGoal) params.append("purchase_goal", purchaseGoal);
         if (seriousness) params.append("seriousness", seriousness);
-        if (isRead !== "") params.append("is_read", isRead);
         if (searchTerm) params.append("q", searchTerm);
         params.append("per_page", perPage.toString());
         params.append("page", currentPage.toString());
@@ -230,7 +228,7 @@ export default function PropertyRequestsPage() {
     };
 
     fetchPropertyRequests();
-  }, [userData?.token, cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, isRead, searchTerm, currentPage, perPage]);
+  }, [userData?.token, cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, searchTerm, currentPage, perPage]);
 
   // Reset district when city changes
   useEffect(() => {
@@ -274,7 +272,7 @@ export default function PropertyRequestsPage() {
       setCurrentPage(1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, isRead, searchTerm]);
+  }, [cityId, districtId, categoryId, propertyType, purchaseGoal, seriousness, searchTerm]);
 
   const handleNewPropertyRequestChange =
     (field: keyof typeof newPropertyRequest) => (value: any) => {
@@ -668,8 +666,6 @@ export default function PropertyRequestsPage() {
                 setPurchaseGoal={setPurchaseGoal}
                 seriousness={seriousness}
                 setSeriousness={setSeriousness}
-                isRead={isRead}
-                setIsRead={setIsRead}
                 filtersData={filtersData}
                 filteredDistricts={filteredDistricts}
                 onResetFilters={() => {
@@ -679,7 +675,6 @@ export default function PropertyRequestsPage() {
                   setPropertyType("");
                   setPurchaseGoal("");
                   setSeriousness("");
-                  setIsRead("");
                   setSearchTerm("");
                   setCurrentPage(1);
                 }}

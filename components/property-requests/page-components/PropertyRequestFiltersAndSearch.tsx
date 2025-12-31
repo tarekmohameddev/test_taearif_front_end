@@ -53,8 +53,6 @@ interface PropertyRequestFiltersAndSearchProps {
   setPurchaseGoal: (value: string) => void;
   seriousness: string;
   setSeriousness: (value: string) => void;
-  isRead: string;
-  setIsRead: (value: string) => void;
   filtersData: FiltersData;
   filteredDistricts: FilterDistrict[];
   onResetFilters: () => void;
@@ -75,8 +73,6 @@ export const PropertyRequestFiltersAndSearch = ({
   setPurchaseGoal,
   seriousness,
   setSeriousness,
-  isRead,
-  setIsRead,
   filtersData,
   filteredDistricts,
   onResetFilters,
@@ -88,7 +84,6 @@ export const PropertyRequestFiltersAndSearch = ({
     propertyType ||
     purchaseGoal ||
     seriousness ||
-    isRead !== "" ||
     searchTerm;
 
   return (
@@ -128,7 +123,6 @@ export const PropertyRequestFiltersAndSearch = ({
                 propertyType,
                 purchaseGoal,
                 seriousness,
-                isRead !== "",
                 searchTerm,
               ].filter(Boolean).length}
             </span>
@@ -229,18 +223,6 @@ export const PropertyRequestFiltersAndSearch = ({
                 {option}
               </SelectItem>
             ))}
-          </SelectContent>
-        </Select>
-
-        {/* Read Status Filter */}
-        <Select value={isRead || "all"} onValueChange={(value) => setIsRead(value === "all" ? "" : value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="حالة القراءة" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">الكل</SelectItem>
-            <SelectItem value="0">غير مقروء</SelectItem>
-            <SelectItem value="1">مقروء</SelectItem>
           </SelectContent>
         </Select>
       </div>
