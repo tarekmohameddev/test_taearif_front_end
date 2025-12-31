@@ -107,7 +107,7 @@ export default function CrmFilters({
       )
     : [];
   const { userData } = useAuthStore();
-  const { setShowAddDealDialog } = useCrmStore();
+  const { setShowAddDealDialog, customers: storeCustomers } = useCrmStore();
   const [isSearching, setIsSearching] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null,
@@ -270,117 +270,116 @@ export default function CrmFilters({
         //   params.append("sort_dir", sortDir);
         // }
 
-        // Use /api/v1/crm/requests endpoint with all filters
-        const endpoint = "/api/v1/crm/requests";
+        // Use /v1/crm/requests endpoint with all filters
+        const endpoint = "/v1/crm/requests";
 
         const response = await axiosInstance.get(endpoint, { params });
         const crmData = response.data;
 
         if (crmData.status === "success") {
-          const { customers, summary, pagination } = crmData.data || {};
+          const { stages, statistics } = crmData.data || {};
 
-          // Transform customers data to match CRM format
-          const transformedCustomers = (customers || []).map(
-            (customer: any) => {
-              // Handle stage_id properly - if null, set pipelineStage to null (not empty string)
-              const stageId = customer.stage?.id || customer.stage_id || null;
-              const pipelineStage = stageId !== null ? String(stageId) : null;
+          // Transform stages data from new API format (same as fetchCrmData)
+          const transformedStages = (stages || []).map((stage: any) => ({
+            id: String(stage.id),
+            name: stage.stage_name,
+            color: stage.color || "#6366f1",
+            icon: stage.icon || "Target",
+            count: stage.requests?.length || 0,
+            value: 0,
+          }));
 
-              // Get priority label from priority object or priority_id
-              // Use priority.name if available, otherwise try to convert priority_id
-              const priorityId =
-                customer.priority?.id || customer.priority_id || null;
-              let urgency = "";
-              if (customer.priority?.name) {
-                // Map English priority names to Arabic
-                const priorityMap: { [key: string]: string } = {
-                  High: "عالية",
-                  Medium: "متوسطة",
-                  Low: "منخفضة",
-                  عالية: "عالية",
-                  متوسطة: "متوسطة",
-                  منخفضة: "منخفضة",
-                };
-                urgency =
-                  priorityMap[customer.priority.name] || customer.priority.name;
-              } else if (priorityId !== null) {
-                urgency = getPriorityLabel(priorityId);
-              }
+          // Transform requests to customers format for compatibility (same as fetchCrmData)
+          const transformedCustomers = (stages || []).flatMap((stage: any) =>
+            (stage.requests || []).map((request: any) => {
+              const customer = request.customer || {};
+              const propertyBasic = request.property_basic || {};
+              const propertySpecs = request.property_specifications || {};
+
+              // Extract property data
+              const basicInfo = propertySpecs.basic_information || {};
+              const facilities = propertySpecs.facilities || {};
+
+              const getPriorityLabelLocal = (priority: number) => {
+                switch (priority) {
+                  case 0:
+                    return "منخفضة";
+                  case 1:
+                    return "متوسطة";
+                  case 2:
+                    return "عالية";
+                  default:
+                    return "متوسطة";
+                }
+              };
 
               return {
-                id: customer.id,
-                request_id: customer.id,
-                customer_id: customer.id,
+                // Request data
+                id: request.id,
+                request_id: request.id,
+                user_id: request.user_id || 0,
+                stage_id: request.stage_id || stage.id,
+                property_id: request.property_id,
+                has_property: request.has_property || false,
+                property_source: request.property_source || null,
+                position: request.position || 0,
+                created_at: request.created_at || "",
+                updated_at: request.updated_at || "",
+
+                // Customer data
+                customer_id: customer.id || request.customer_id,
                 name: customer.name || "",
                 phone_number: customer.phone_number || "",
                 phone: customer.phone_number || "",
-                email: customer.email || null,
-                stage_id: stageId,
-                priority_id: priorityId,
-                type_id: customer.type?.id || customer.type_id || null,
-                procedure_id:
-                  customer.procedure?.id || customer.procedure_id || null,
-                city_id: customer.city?.id || customer.city_id || null,
-                district_id:
-                  customer.district?.id || customer.district_id || null,
-                pipelineStage: pipelineStage,
-                urgency: urgency,
-                created_at: customer.created_at || "",
-                updated_at: customer.updated_at || "",
-                // Additional fields for compatibility
-                city: customer.city?.name_ar || customer.city?.name_en || null,
-                district:
-                  customer.district?.name_ar ||
-                  customer.district?.name_en ||
-                  null,
-                type: customer.type?.name || null,
-                priority: customer.priority?.name || null,
-                procedure: customer.procedure?.name || null,
+                email: null,
+                note: null,
+                customer_type: null,
+                priority: customer.priority_id || 1,
+                priority_id: customer.priority_id || null,
+                type_id: customer.type_id || null,
+                procedure_id: null,
+                city_id: null,
+                district_id: null,
                 responsible_employee: customer.responsible_employee || null,
-                note: customer.note || "",
-                interested_categories: customer.interested_categories || [],
-                interested_properties: customer.interested_properties || [],
+
+                // Backward compatibility fields
+                nameEn: customer.name || "",
+                whatsapp: "",
+                city: propertyBasic.address
+                  ? propertyBasic.address.split(",")[1]?.trim() || ""
+                  : "",
+                district: "",
+                assignedAgent: "",
+                lastContact: "",
+                urgency: customer.priority_id
+                  ? getPriorityLabelLocal(customer.priority_id)
+                  : "",
+                pipelineStage: String(request.stage_id || stage.id),
+                dealValue: propertyBasic.price
+                  ? parseFloat(propertyBasic.price)
+                  : basicInfo.price || 0,
+                probability: 0,
+                avatar: propertyBasic.featured_image || "",
+                reminders: [],
+                interactions: [],
+                appointments: [],
+                notes: "",
+                joinDate: request.created_at || "",
+                nationality: "",
+                familySize: 0,
+                leadSource: "",
+                satisfaction: 0,
+                communicationPreference: "",
+                expectedCloseDate: "",
+
+                // Property data (for compatibility)
+                property_basic: propertyBasic,
+                property_specifications: propertySpecs,
               };
-            },
+            }),
           );
 
-          // Group customers by stage for pipeline view
-          const stagesMap = new Map();
-
-          // Use only stages from pipelineStages (from backend)
-          if (pipelineStages && pipelineStages.length > 0) {
-            pipelineStages.forEach((stage) => {
-              stagesMap.set(String(stage.id), {
-                id: String(stage.id),
-                name: stage.name,
-                color: stage.color || "#6366f1",
-                icon: stage.icon || "Target",
-                count: 0,
-                value: 0,
-              });
-            });
-          }
-
-          // Count customers only for stages that exist in pipelineStages
-          // Ignore customers with stage_id = null (they won't appear in any stage)
-          transformedCustomers.forEach((customer: any) => {
-            const stageId =
-              customer.stage_id !== null ? customer.stage_id.toString() : null;
-            // Only count customers that have a valid stage_id that exists in stagesMap
-            if (stageId !== null && stagesMap.has(stageId)) {
-              const stage = stagesMap.get(stageId);
-              if (stage) {
-                stage.count += 1;
-              }
-            }
-            // Customers with stage_id = null are ignored (not shown in any stage)
-          });
-
-          const transformedStages = Array.from(stagesMap.values()).filter(
-            (stage) => stage.id !== "unassigned" && stage.id !== "غير معين",
-          );
-
-          // Update store - only update customers, keep pipelineStages from backend
+          // Update store - only update customers, keep pipelineStages from backend if they exist
           // Don't update pipelineStages if they come from props (backend)
           if (!pipelineStages || pipelineStages.length === 0) {
             // Only update stages if we don't have them from backend
@@ -577,13 +576,24 @@ export default function CrmFilters({
   }, [searchTimeout]);
 
   // Load all customers on component mount - only once
+  // Only perform initial search if store is empty (fetchCrmData hasn't loaded data yet)
   useEffect(() => {
-    // Only perform search if we haven't done it yet and we have a token
-    if (!hasPerformedInitialSearchRef.current && userData?.token) {
+    // Only perform search if:
+    // 1. We haven't done it yet
+    // 2. We have a token
+    // 3. Store is empty (fetchCrmData hasn't loaded data yet)
+    if (
+      !hasPerformedInitialSearchRef.current &&
+      userData?.token &&
+      (!storeCustomers || storeCustomers.length === 0)
+    ) {
       hasPerformedInitialSearchRef.current = true;
       performSearch("", "all", "all");
+    } else if (storeCustomers && storeCustomers.length > 0) {
+      // If data already exists, mark as performed to prevent overwriting
+      hasPerformedInitialSearchRef.current = true;
     }
-  }, [userData?.token, performSearch]);
+  }, [userData?.token, performSearch, storeCustomers]);
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-2">
