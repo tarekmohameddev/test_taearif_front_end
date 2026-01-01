@@ -5,80 +5,6 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 // DEFAULT DATA - Define your component's data structure
 // ═══════════════════════════════════════════════════════════
 
-export const getDefaultpropertyDetail1Data = (): ComponentData => ({
-  visible: true,
-
-  // Layout configuration
-  layout: {
-    maxWidth: "1600px",
-    padding: {
-      top: "0rem",
-      bottom: "3rem",
-    },
-    gap: "2rem",
-  },
-
-  // Styling
-  styling: {
-    backgroundColor: "#ffffff",
-    primaryColor: "#059669", // emerald-600
-    textColor: "#1f2937",
-    secondaryTextColor: "#6b7280",
-    cardBackgroundColor: "#f9fafb",
-    borderColor: "#e5e7eb",
-    badgeBackgroundColor: "#059669",
-    badgeTextColor: "#ffffff",
-  },
-
-  // Content - نصوص قابلة للتعديل
-  content: {
-    badgeText: "عقار للبيع",
-    similarPropertiesTitle: "عقارات مشابهة",
-    floorplansTitle: "مخططات الأرضية",
-    locationTitle: "موقع العقار",
-    openInGoogleMapsText: "فتح في خرائط جوجل",
-    shareTitle: "مشاركة العقار",
-    shareDescription: "شارك هذا العقار مع أصدقائك",
-  },
-
-  // Display settings - ما الحقول التي تظهر
-  displaySettings: {
-    showAddress: true,
-    showDeveloper: false,
-    showUnits: false,
-    showCompletionDate: false,
-    showCompleteStatus: false,
-    showMinPrice: false,
-    showMaxPrice: false,
-    showVideoUrl: true,
-    showLocation: true,
-    showCreatedAt: false,
-    showUpdatedAt: false,
-    showAmenities: true,
-    showSpecifications: true,
-    showTypes: false,
-    showFeatures: true,
-    showStatus: true,
-    showFloorplans: true,
-    showMap: true,
-    showSimilarProperties: true,
-    showShareButton: true,
-  },
-
-  // Gallery settings
-  gallery: {
-    showThumbnails: true,
-    thumbnailCount: 4,
-    autoplay: false,
-  },
-
-  // Similar properties settings
-  similarProperties: {
-    enabled: true,
-    limit: 6,
-  },
-});
-
 export const getDefaultpropertyDetail2Data = (): ComponentData => ({
   visible: true,
 
@@ -180,11 +106,8 @@ export const propertyDetailFunctions = {
       return {} as any; // Already exists, skip initialization
     }
 
-    // Determine default data based on variant
-    const defaultData =
-      variantId === "propertyDetail2" || variantId?.endsWith("propertyDetail2")
-        ? getDefaultpropertyDetail2Data()
-        : getDefaultpropertyDetail1Data();
+    // Determine default data
+    const defaultData = getDefaultpropertyDetail2Data();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
@@ -205,16 +128,8 @@ export const propertyDetailFunctions = {
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
-  getData: (state: any, variantId: string) => {
-    const existingData = state.propertyDetailStates[variantId];
-    if (existingData && Object.keys(existingData).length > 0) {
-      return existingData;
-    }
-    // Return default based on variant
-    return variantId === "propertyDetail2" || variantId?.endsWith("propertyDetail2")
-      ? getDefaultpropertyDetail2Data()
-      : getDefaultpropertyDetail1Data();
-  },
+  getData: (state: any, variantId: string) =>
+    state.propertyDetailStates[variantId] || getDefaultpropertyDetail2Data(),
 
   /**
    * setData - Set/replace component data completely
@@ -238,14 +153,8 @@ export const propertyDetailFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const existingData = state.propertyDetailStates[variantId];
-    const defaultData =
-      variantId === "propertyDetail2" || variantId?.endsWith("propertyDetail2")
-        ? getDefaultpropertyDetail2Data()
-        : getDefaultpropertyDetail1Data();
-    const source = existingData && Object.keys(existingData).length > 0
-      ? existingData
-      : defaultData;
+    const source =
+      state.propertyDetailStates[variantId] || getDefaultpropertyDetail2Data();
     const newData = updateDataByPath(source, path, value);
 
     return {
