@@ -103,8 +103,11 @@ export default function EditDealPage() {
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // Selected customer data
-  const selectedCustomer = customers.find(
+  // Deal data state
+  const [dealData, setDealData] = useState<any>(null);
+
+  // Selected customer data - use dealData.customer if available, otherwise find in customers list
+  const selectedCustomer = dealData?.customer || customers.find(
     (c) => c.id.toString() === selectedCustomerId,
   );
 
@@ -120,9 +123,10 @@ export default function EditDealPage() {
           `/v1/crm/requests/${dealId}/details`,
         );
         if (response.data.status === "success") {
-          const dealData = response.data.data;
-          setSelectedCustomerId(dealData.customer?.id?.toString() || "");
-          setStageId(dealData.request?.stage_id?.toString() || "");
+          const data = response.data.data;
+          setDealData(data);
+          setSelectedCustomerId(data.customer?.id?.toString() || "");
+          setStageId(data.request?.stage_id?.toString() || "");
         } else {
           setError("فشل في تحميل تفاصيل الصفقة");
         }
@@ -138,6 +142,19 @@ export default function EditDealPage() {
 
     fetchDealDetails();
   }, [dealId, userData?.token]);
+
+  // Update selectedCustomer when customers are loaded and customerId is set
+  useEffect(() => {
+    if (selectedCustomerId && customers.length > 0) {
+      const customer = customers.find(
+        (c) => c.id.toString() === selectedCustomerId,
+      );
+      if (!customer && dealData?.customer) {
+        // If customer not found in list, add it from dealData
+        setCustomers((prev) => [dealData.customer, ...prev]);
+      }
+    }
+  }, [selectedCustomerId, customers, dealData]);
 
   // Fetch customers from /customers endpoint
   useEffect(() => {
