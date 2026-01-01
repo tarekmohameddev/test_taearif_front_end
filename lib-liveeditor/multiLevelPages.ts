@@ -34,3 +34,4 @@ export function isMultiLevelPage(slug: string): boolean {
 export function getSlugPropertyName(slug: string): string {
   return `${slug}Slug`;
 }
+
