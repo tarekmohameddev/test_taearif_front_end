@@ -10,6 +10,9 @@ import {
   MapPin,
   Save,
   ArrowRight,
+  Search,
+  Home,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +33,20 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Badge } from "@/components/ui/badge";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import toast from "react-hot-toast";
@@ -54,12 +71,24 @@ export default function NewDealForm() {
   const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
 
+  // Property selection mode: "existing" or "new"
+  const [propertyMode, setPropertyMode] = useState<"existing" | "new">("new");
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loadingProperties, setLoadingProperties] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const [selectedProperty, setSelectedProperty] = useState<any | null>(null);
+  const [propertySearchOpen, setPropertySearchOpen] = useState(false);
+  const [propertySearchQuery, setPropertySearchQuery] = useState("");
+
   const [formData, setFormData] = useState({
     // Customer info (from cache or manual input)
     customer_id: null as number | null,
     customer_name: "",
     customer_phone: "",
     stage_id: "",
+
+    // Property info
+    property_id: null as number | null,
 
     // Basic Information
     address: "",
@@ -147,6 +176,31 @@ export default function NewDealForm() {
 
     fetchCustomers();
   }, [userData?.token]);
+
+  // Fetch properties from /properties endpoint
+  useEffect(() => {
+    const fetchProperties = async () => {
+      if (!userData?.token) return;
+
+      setLoadingProperties(true);
+      try {
+        const response = await axiosInstance.get("/properties?page=1&per_page=100");
+        if (response.data?.data?.properties) {
+          const propertiesList = response.data.data.properties || [];
+          setProperties(propertiesList);
+        }
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+        toast.error("فشل في جلب العقارات");
+      } finally {
+        setLoadingProperties(false);
+      }
+    };
+
+    if (propertyMode === "existing") {
+      fetchProperties();
+    }
+  }, [userData?.token, propertyMode]);
 
   // Fetch categories, projects, buildings
   useEffect(() => {
@@ -275,6 +329,90 @@ export default function NewDealForm() {
     });
   };
 
+  // Handle property selection
+  const handlePropertySelect = (propertyId: string) => {
+    setSelectedPropertyId(propertyId);
+    const selectedPropertyData = properties.find(
+      (p) => p.id.toString() === propertyId,
+    );
+    
+    if (selectedPropertyData) {
+      setSelectedProperty(selectedPropertyData);
+      setFormData((prev) => ({
+        ...prev,
+        property_id: selectedPropertyData.id,
+        // Auto-fill from property data
+        address: selectedPropertyData.address || prev.address,
+        building: selectedPropertyData.building_id?.toString() || prev.building,
+        price: selectedPropertyData.price?.toString() || prev.price,
+        payment_method: selectedPropertyData.payment_method || prev.payment_method,
+        price_per_sqm: selectedPropertyData.price_per_sqm?.toString() || prev.price_per_sqm,
+        listing_type: selectedPropertyData.transaction_type === "sale" || selectedPropertyData.transaction_type === "1" ? "sale" : "rent",
+        property_category: selectedPropertyData.category_id?.toString() || prev.property_category,
+        project: selectedPropertyData.project_id?.toString() || prev.project,
+        city: selectedPropertyData.city_id || prev.city,
+        district: selectedPropertyData.district_id || prev.district,
+        area: selectedPropertyData.size?.toString() || prev.area,
+        property_type: selectedPropertyData.type || prev.property_type,
+        features: Array.isArray(selectedPropertyData.features) ? selectedPropertyData.features : prev.features,
+        area_sqft: selectedPropertyData.area_sqft?.toString() || prev.area_sqft,
+        year_built: selectedPropertyData.building_age?.toString() || prev.year_built,
+        bedrooms: selectedPropertyData.bedrooms || prev.bedrooms,
+        bathrooms: selectedPropertyData.bathrooms || prev.bathrooms,
+        rooms: selectedPropertyData.rooms || prev.rooms,
+        floors: selectedPropertyData.floors || prev.floors,
+        floor_number: selectedPropertyData.floor_number || prev.floor_number,
+        drivers_room: selectedPropertyData.driver_room || prev.drivers_room,
+        maids_room: selectedPropertyData.maid_room || prev.maids_room,
+        dining_room: selectedPropertyData.dining_room || prev.dining_room,
+        majlis: selectedPropertyData.majlis || prev.majlis,
+        basement: selectedPropertyData.basement || prev.basement,
+        swimming_pool: selectedPropertyData.swimming_pool || prev.swimming_pool,
+        kitchen: selectedPropertyData.kitchen || prev.kitchen,
+        garden: selectedPropertyData.garden || prev.garden,
+        elevator: selectedPropertyData.elevator || prev.elevator,
+        parking_space: selectedPropertyData.private_parking || prev.parking_space,
+      }));
+    }
+    setPropertySearchOpen(false);
+    
+    if (errors.property_id) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.property_id;
+        return newErrors;
+      });
+    }
+  };
+
+  // Handle property mode change
+  const handlePropertyModeChange = (mode: "existing" | "new") => {
+    setPropertyMode(mode);
+    // Reset property data when switching modes
+    setSelectedPropertyId("");
+    setSelectedProperty(null);
+    setFormData((prev) => ({
+      ...prev,
+      property_id: null,
+    }));
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.property_id;
+      return newErrors;
+    });
+  };
+
+  // Filter properties based on search query
+  const filteredProperties = properties.filter((property) => {
+    if (!propertySearchQuery) return true;
+    const query = propertySearchQuery.toLowerCase();
+    return (
+      property.title?.toLowerCase().includes(query) ||
+      property.address?.toLowerCase().includes(query) ||
+      property.id?.toString().includes(query)
+    );
+  });
+
   const handleStringNumberChange = (
     name: string,
     value: string,
@@ -326,6 +464,14 @@ export default function NewDealForm() {
       baseData.customer_phone = formData.customer_phone;
     }
 
+    // If existing property is selected, use property_id
+    if (propertyMode === "existing" && formData.property_id) {
+      baseData.property_id = formData.property_id;
+      // Return minimal data when using existing property
+      return baseData;
+    }
+
+    // If new property, include all property specifications
     return {
       ...baseData,
       property_specifications: {
@@ -398,6 +544,12 @@ export default function NewDealForm() {
       }
       if (!formData.customer_phone.trim()) {
         newErrors.customer_phone = "رقم الهاتف مطلوب";
+      }
+    }
+
+    if (propertyMode === "existing") {
+      if (!formData.property_id) {
+        newErrors.property_id = "يرجى اختيار عقار موجود";
       }
     }
     
@@ -639,7 +791,212 @@ export default function NewDealForm() {
                 </CardContent>
               </Card>
 
-              {/* Basic Information */}
+              {/* Property Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>معلومات العقار</CardTitle>
+                  <CardDescription>
+                    اختر عقار موجود أو أدخل بيانات عقار جديد
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Property Mode Selection */}
+                  <div className="space-y-2">
+                    <Label>نوع العقار *</Label>
+                    <RadioGroup
+                      value={propertyMode}
+                      onValueChange={(value) =>
+                        handlePropertyModeChange(value as "existing" | "new")
+                      }
+                      className="flex flex-row gap-6"
+                    >
+                      <div className="flex items-center space-x-2 space-x-reverse">
+                        <RadioGroupItem value="existing" id="property-existing" />
+                        <Label
+                          htmlFor="property-existing"
+                          className="font-normal cursor-pointer"
+                        >
+                          عقار موجود
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2 space-x-reverse">
+                        <RadioGroupItem value="new" id="property-new" />
+                        <Label
+                          htmlFor="property-new"
+                          className="font-normal cursor-pointer"
+                        >
+                          عقار جديد
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {/* Existing Property Selection */}
+                  {propertyMode === "existing" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="property_id">اختر العقار *</Label>
+                      <Popover open={propertySearchOpen} onOpenChange={setPropertySearchOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={propertySearchOpen}
+                            className="w-full justify-between"
+                            disabled={loadingProperties}
+                          >
+                            {selectedProperty
+                              ? `${selectedProperty.title || `عقار #${selectedProperty.id}`} - ${selectedProperty.address || ""}`
+                              : loadingProperties
+                              ? "جاري تحميل العقارات..."
+                              : "اختر عقار موجود"}
+                            <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <CommandInput
+                              placeholder="ابحث عن عقار..."
+                              value={propertySearchQuery}
+                              onValueChange={setPropertySearchQuery}
+                            />
+                            <CommandList>
+                              <CommandEmpty>
+                                {loadingProperties
+                                  ? "جاري التحميل..."
+                                  : "لا توجد عقارات"}
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {filteredProperties.map((property) => (
+                                  <CommandItem
+                                    key={property.id}
+                                    value={property.id.toString()}
+                                    onSelect={() =>
+                                      handlePropertySelect(property.id.toString())
+                                    }
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center gap-3 w-full">
+                                      {property.featured_image && (
+                                        <img
+                                          src={property.featured_image}
+                                          alt={property.title}
+                                          className="h-12 w-12 rounded object-cover"
+                                        />
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <p className="font-medium truncate">
+                                          {property.title || `عقار #${property.id}`}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground truncate">
+                                          {property.address || "لا يوجد عنوان"}
+                                        </p>
+                                        {property.price && (
+                                          <p className="text-sm font-semibold text-primary mt-1">
+                                            {property.price.toLocaleString()} ريال
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      {errors.property_id && (
+                        <p className="text-sm text-red-500">
+                          {errors.property_id}
+                        </p>
+                      )}
+                      {selectedProperty && (
+                        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+                          <div className="flex items-start gap-4">
+                            {selectedProperty.featured_image && (
+                              <img
+                                src={selectedProperty.featured_image}
+                                alt={selectedProperty.title}
+                                className="h-20 w-20 rounded-lg object-cover"
+                              />
+                            )}
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-lg">
+                                  {selectedProperty.title || `عقار #${selectedProperty.id}`}
+                                </h4>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    router.push(
+                                      `/dashboard/properties/${selectedProperty.id}`,
+                                    )
+                                  }
+                                  className="h-8"
+                                >
+                                  <ExternalLink className="h-4 w-4 ml-2" />
+                                  عرض التفاصيل
+                                </Button>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                {selectedProperty.address && (
+                                  <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-muted-foreground">
+                                      {selectedProperty.address}
+                                    </span>
+                                  </div>
+                                )}
+                                {selectedProperty.price && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold">
+                                      {selectedProperty.price.toLocaleString()} ريال
+                                    </span>
+                                  </div>
+                                )}
+                                {selectedProperty.size && (
+                                  <div className="text-muted-foreground">
+                                    المساحة: {selectedProperty.size} م²
+                                  </div>
+                                )}
+                                {selectedProperty.bedrooms && (
+                                  <div className="text-muted-foreground">
+                                    غرف النوم: {selectedProperty.bedrooms}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                <Badge variant="secondary">
+                                  {selectedProperty.transaction_type === "sale" ||
+                                  selectedProperty.transaction_type === "1"
+                                    ? "للبيع"
+                                    : "للإيجار"}
+                                </Badge>
+                                {selectedProperty.status === 1 && (
+                                  <Badge variant="outline">منشور</Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* New Property Note */}
+                  {propertyMode === "new" && (
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <p className="text-sm text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                        <Home className="h-4 w-4" />
+                        سيتم إنشاء عقار جديد مع الصفقة. يمكنك إدخال بيانات العقار أدناه.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Basic Information - Only show when creating new property */}
+              {propertyMode === "new" && (
               <Card>
                 <CardHeader>
                   <CardTitle>المعلومات الأساسية</CardTitle>
@@ -868,8 +1225,10 @@ export default function NewDealForm() {
                   </div>
                 </CardContent>
               </Card>
+              )}
 
-              {/* Details */}
+              {/* Details - Only show when creating new property */}
+              {propertyMode === "new" && (
               <Card>
                 <CardHeader>
                   <CardTitle>التفاصيل</CardTitle>
@@ -918,8 +1277,10 @@ export default function NewDealForm() {
                   </div>
                 </CardContent>
               </Card>
+              )}
 
-              {/* Attributes */}
+              {/* Attributes - Only show when creating new property */}
+              {propertyMode === "new" && (
               <Card>
                 <CardHeader>
                   <CardTitle>الخصائص</CardTitle>
@@ -959,8 +1320,10 @@ export default function NewDealForm() {
                   </div>
                 </CardContent>
               </Card>
+              )}
 
-              {/* Facilities */}
+              {/* Facilities - Only show when creating new property */}
+              {propertyMode === "new" && (
               <Card>
                 <CardHeader>
                   <CardTitle>المرافق</CardTitle>
@@ -1006,6 +1369,7 @@ export default function NewDealForm() {
                   </div>
                 </CardContent>
               </Card>
+              )}
 
               {/* Submit Button */}
               <div className="flex justify-end gap-4 pb-6">
