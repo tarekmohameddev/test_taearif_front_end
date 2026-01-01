@@ -120,6 +120,8 @@ import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
 import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { getDefaultpropertyDetail1Data } from "@/context-liveeditor/editorStoreFunctions/propertyDetailFunctions";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -139,8 +141,75 @@ import Link from "next/link";
 import Image from "next/image";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 
-interface propertyDetailProps {
+interface PropertyDetail1Props {
+  // Component-specific props (match your default data structure)
+  visible?: boolean;
+  layout?: {
+    maxWidth?: string;
+    padding?: {
+      top?: string;
+      bottom?: string;
+    };
+    gap?: string;
+  };
+  styling?: {
+    backgroundColor?: string;
+    primaryColor?: string;
+    textColor?: string;
+    secondaryTextColor?: string;
+    cardBackgroundColor?: string;
+    borderColor?: string;
+    badgeBackgroundColor?: string;
+    badgeTextColor?: string;
+  };
+  content?: {
+    badgeText?: string;
+    similarPropertiesTitle?: string;
+    floorplansTitle?: string;
+    locationTitle?: string;
+    openInGoogleMapsText?: string;
+    shareTitle?: string;
+    shareDescription?: string;
+  };
+  displaySettings?: {
+    showAddress?: boolean;
+    showDeveloper?: boolean;
+    showUnits?: boolean;
+    showCompletionDate?: boolean;
+    showCompleteStatus?: boolean;
+    showMinPrice?: boolean;
+    showMaxPrice?: boolean;
+    showVideoUrl?: boolean;
+    showLocation?: boolean;
+    showCreatedAt?: boolean;
+    showUpdatedAt?: boolean;
+    showAmenities?: boolean;
+    showSpecifications?: boolean;
+    showTypes?: boolean;
+    showFeatures?: boolean;
+    showStatus?: boolean;
+    showFloorplans?: boolean;
+    showMap?: boolean;
+    showSimilarProperties?: boolean;
+    showShareButton?: boolean;
+  };
+  gallery?: {
+    showThumbnails?: boolean;
+    thumbnailCount?: number;
+    autoplay?: boolean;
+  };
+  similarProperties?: {
+    enabled?: boolean;
+    limit?: number;
+  };
+
+  // Required prop for fetching property data
   propertySlug: string;
+
+  // Editor props (always include these)
+  variant?: string;
+  useStore?: boolean;
+  id?: string;
 }
 
 const getTransactionTypeLabel = (
@@ -164,7 +233,160 @@ const getTransactionTypeLabel = (
   return "للبيع";
 };
 
-export default function propertyDetail({ propertySlug }: propertyDetailProps) {
+export default function PropertyDetail1(props: PropertyDetail1Props) {
+  // ─────────────────────────────────────────────────────────
+  // 1. EXTRACT UNIQUE ID
+  // ─────────────────────────────────────────────────────────
+  const variantId = props.variant || "propertyDetail1";
+  const uniqueId = props.id || variantId;
+
+  // ─────────────────────────────────────────────────────────
+  // 2. CONNECT TO STORES
+  // ─────────────────────────────────────────────────────────
+  const ensureComponentVariant = useEditorStore(
+    (s) => s.ensureComponentVariant,
+  );
+  const getComponentData = useEditorStore((s) => s.getComponentData);
+  const propertyDetailStates = useEditorStore((s) => s.propertyDetailStates);
+
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
+  // ─────────────────────────────────────────────────────────
+  // 3. INITIALIZE IN STORE (on mount)
+  // ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId);
+    }
+  }, [tenantId, fetchTenantData]);
+
+  // Extract component data from tenantData (BEFORE useEffect)
+  const getTenantComponentData = () => {
+    if (!tenantData) return {};
+
+    // Check new structure (tenantData.components)
+    if (tenantData.components && Array.isArray(tenantData.components)) {
+      for (const component of tenantData.components) {
+        if (
+          component.type === "propertyDetail" &&
+          component.componentName === variantId
+        ) {
+          return component.data;
+        }
+      }
+    }
+
+    // Check old structure (tenantData.componentSettings)
+    if (tenantData?.componentSettings) {
+      for (const [pageSlug, pageComponents] of Object.entries(
+        tenantData.componentSettings,
+      )) {
+        if (
+          typeof pageComponents === "object" &&
+          !Array.isArray(pageComponents)
+        ) {
+          for (const [componentId, component] of Object.entries(
+            pageComponents as any,
+          )) {
+            if (
+              (component as any).type === "propertyDetail" &&
+              (component as any).componentName === variantId &&
+              componentId === props.id
+            ) {
+              return (component as any).data;
+            }
+          }
+        }
+      }
+    }
+
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultpropertyDetail1Data(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultpropertyDetail1Data(),
+              ...props,
+            };
+
+      // Initialize in store
+      ensureComponentVariant("propertyDetail", uniqueId, initialData);
+    }
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+
+  // ─────────────────────────────────────────────────────────
+  // 4. RETRIEVE DATA FROM STORE
+  // ─────────────────────────────────────────────────────────
+  const storeData = propertyDetailStates[uniqueId];
+  const currentStoreData = getComponentData("propertyDetail", uniqueId);
+
+  // ─────────────────────────────────────────────────────────
+  // 5. MERGE DATA (PRIORITY ORDER)
+  // ─────────────────────────────────────────────────────────
+  const mergedData = {
+    ...getDefaultpropertyDetail1Data(), // 1. Defaults (lowest priority)
+    ...storeData, // 2. Store state
+    ...currentStoreData, // 3. Current store data
+    ...props, // 4. Props (highest priority)
+  };
+
+  // Get primary color from mergedData or tenantData
+  const primaryColor =
+    mergedData.styling?.primaryColor ||
+    (tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#059669"); // emerald-600 default
+
+  // ─────────────────────────────────────────────────────────
+  // 6. EARLY RETURN IF NOT VISIBLE
+  // ─────────────────────────────────────────────────────────
+  if (!mergedData.visible) {
+    return null;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 7. RENDER
+  // ─────────────────────────────────────────────────────────
+
+  // Helper functions
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    if (!hex || !hex.startsWith("#")) return "#047857";
+    const cleanHex = hex.replace("#", "");
+    if (cleanHex.length !== 6) return "#047857";
+
+    const r = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount),
+    );
+    const g = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount),
+    );
+    const b = Math.max(
+      0,
+      Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount),
+    );
+
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  };
+
+  const primaryColorHover = getDarkerColor(primaryColor, 20);
+
+  // UI state
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("");
   const [bookingForm, setBookingForm] = useState({
@@ -326,7 +548,8 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
   };
 
   // Tenant ID hook
-  const { tenantId, isLoading: tenantLoading } = useTenantId();
+  const { tenantId: hookTenantId, isLoading: tenantLoading } = useTenantId();
+  const finalTenantId = tenantId || hookTenantId;
 
   // Check if we're in Live Editor
   const isLiveEditor =
@@ -413,7 +636,7 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
 
   // Handle create reservation
   const handleCreateReservation = async () => {
-    if (!tenantId) {
+    if (!finalTenantId) {
       setReservationError("لم يتم العثور على معرف المستأجر");
       return;
     }
@@ -480,7 +703,7 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
       }
 
       const response = await axiosInstance.post(
-        `/api/v1/tenant-website/${tenantId}/reservations`,
+        `/api/v1/tenant-website/${finalTenantId}/reservations`,
         payload,
       );
 
@@ -671,13 +894,18 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
       setLoadingProperty(true);
       setPropertyError(null);
 
-      if (!tenantId) {
+      if (!finalTenantId) {
+        setLoadingProperty(false);
+        return;
+      }
+
+      if (!props.propertySlug) {
         setLoadingProperty(false);
         return;
       }
 
       const response = await axiosInstance.get(
-        `/v1/tenant-website/${tenantId}/properties/${propertySlug}`,
+        `/v1/tenant-website/${finalTenantId}/properties/${props.propertySlug}`,
       );
 
       // Handle new API response format
@@ -731,13 +959,13 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
     try {
       setLoadingSimilar(true);
 
-      if (!tenantId) {
+      if (!finalTenantId) {
         setLoadingSimilar(false);
         return;
       }
 
       const response = await axiosInstance.get(
-        `/v1/tenant-website/${tenantId}/properties?purpose=rent&latest=1&limit=10`,
+        `/v1/tenant-website/${finalTenantId}/properties?purpose=rent&latest=1&limit=${mergedData.similarProperties?.limit || 10}`,
       );
 
       // Handle new API response format
@@ -810,15 +1038,19 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
     // ⭐ NEW: In Live Editor, always use mock data
     if (isLiveEditor) {
       fetchProperty();
-      fetchSimilarProperties();
+      if (mergedData.similarProperties?.enabled) {
+        fetchSimilarProperties();
+      }
       return;
     }
 
-    if (tenantId) {
+    if (finalTenantId && props.propertySlug) {
       fetchProperty();
-      fetchSimilarProperties();
+      if (mergedData.similarProperties?.enabled) {
+        fetchSimilarProperties();
+      }
     }
-  }, [tenantId, propertySlug, isLiveEditor]);
+  }, [finalTenantId, props.propertySlug, mergedData.similarProperties?.enabled, isLiveEditor]);
 
   // تحديث الصورة الرئيسية عند تحميل العقار
   useEffect(() => {
@@ -1035,7 +1267,7 @@ export default function propertyDetail({ propertySlug }: propertyDetailProps) {
   }
 
   // Show error if no tenant ID
-  if (!tenantId) {
+  if (!finalTenantId) {
     return (
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
