@@ -35,3 +35,4 @@ export function getSlugPropertyName(slug: string): string {
   return `${slug}Slug`;
 }
 
+

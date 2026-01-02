@@ -672,8 +672,8 @@ export default function CrmFilters({
           />
         </div>
         <div className="flex flex-wrap gap-2">
-          {/* Stage Filter - Commented out */}
-          {/* <Select value={filterStage} onValueChange={handleStageChange}>
+          {/* Stage Filter - Active */}
+          <Select value={filterStage} onValueChange={handleStageChange}>
             <SelectTrigger className="w-full sm:w-[120px] lg:w-[150px]">
               <SelectValue placeholder="المراحل" />
             </SelectTrigger>
@@ -685,10 +685,10 @@ export default function CrmFilters({
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select> */}
+          </Select>
 
-          {/* Urgency Filter - Active */}
-          <Select value={filterUrgency} onValueChange={handleUrgencyChange}>
+          {/* Urgency Filter - Commented out */}
+          {/* <Select value={filterUrgency} onValueChange={handleUrgencyChange}>
             <SelectTrigger className="w-full sm:w-[100px] lg:w-[120px]">
               <SelectValue placeholder="الأولوية" />
             </SelectTrigger>
@@ -698,7 +698,7 @@ export default function CrmFilters({
               <SelectItem value="متوسطة">متوسطة</SelectItem>
               <SelectItem value="منخفضة">منخفضة</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
 
           {/* Date Range Filter - Active */}
           <Popover>
