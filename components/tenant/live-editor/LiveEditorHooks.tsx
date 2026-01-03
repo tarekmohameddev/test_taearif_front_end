@@ -4,11 +4,11 @@ import { useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import useTenantStore from "@/context/tenantStore";
 import { ComponentInstance, ComponentData } from "@/lib-liveeditor/types";
-import { DropIndicator } from "@/services-liveeditor/live-editor";
+import { DropIndicator } from "@/services/live-editor";
 import {
   createInitialComponents,
   PAGE_DEFINITIONS,
-} from "@/services-liveeditor/live-editor";
+} from "@/services/live-editor";
 
 // ============================================================================
 // Hooks والـ State Management للـ LiveEditor

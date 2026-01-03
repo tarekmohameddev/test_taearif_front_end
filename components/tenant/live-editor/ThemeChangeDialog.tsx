@@ -15,7 +15,7 @@ import {
   useEditorLocale,
 } from "@/context/editorI18nStore";
 import { Palette, AlertTriangle, Loader2 } from "lucide-react";
-import { ThemeNumber } from "@/services-liveeditor/live-editor/themeChangeService";
+import { ThemeNumber } from "@/services/live-editor/themeChangeService";
 
 interface ThemeOption {
   id: ThemeNumber;

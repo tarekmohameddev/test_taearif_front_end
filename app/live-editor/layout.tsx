@@ -22,7 +22,7 @@ import { ThemeChangeDialog } from "@/components/tenant/live-editor/ThemeChangeDi
 import {
   applyThemeToAllPages,
   ThemeNumber,
-} from "@/services-liveeditor/live-editor/themeChangeService";
+} from "@/services/live-editor/themeChangeService";
 import {
   Dialog,
   DialogContent,

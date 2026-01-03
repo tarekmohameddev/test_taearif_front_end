@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance } from "@/lib-liveeditor/types";
 import { createDefaultData } from "../EditorSidebar/utils";
-import { getComponentDisplayName } from "@/services-liveeditor/live-editor";
+import { getComponentDisplayName } from "@/services/live-editor";
 import {
   getDefaultComponentForStaticPage,
   isStaticPage,
@@ -229,7 +229,7 @@ export const useDatabaseLoadingEffect = ({
           // استيراد createInitialComponents من الخدمة
           const {
             createInitialComponents,
-          } = require("@/services-liveeditor/live-editor");
+          } = require("@/services/live-editor");
           setPageComponents(createInitialComponents(slug));
         }
       }

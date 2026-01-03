@@ -10,7 +10,7 @@ import {
   positionTracker,
   PositionDebugInfo,
   validateComponentPositions,
-} from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
+} from "@/services/live-editor/dragDrop/enhanced-position-tracker";
 
 interface UseComponentHandlersProps {
   pageComponents: any[];

@@ -6,7 +6,7 @@ import { ComponentData } from "@/lib-liveeditor/types";
 import {
   getDefaultThemeForType,
   applyAutoExpandLogic,
-} from "@/services-liveeditor/live-editor";
+} from "@/services/live-editor";
 import { createDefaultData } from "./EditorSidebar/utils";
 import {
   logComponentAdd,
@@ -496,7 +496,7 @@ export function useLiveEditorHandlers(state: any) {
     const {
       handleDragEnd,
       manageDragState,
-    } = require("@/services-liveeditor/live-editor");
+    } = require("@/services/live-editor");
 
     // Create a custom setPageComponents that also updates the store
     const setPageComponentsWithStore = (

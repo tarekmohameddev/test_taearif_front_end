@@ -1,567 +1,75 @@
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\auth\error\AuthErrorPageWrapper.tsx
-  4,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\auth\signin\SignInPageWrapper.tsx
-  4,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\live-editor\layout.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,35: import { EditorProvider } from "@/context-liveeditor/EditorProvider";
-  9,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  17,11: } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\live-editor\LiveEditorWrapper.tsx
-  4,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\owner\dashboard\page.tsx
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\owner\login\page.tsx
-  17,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\HomePageWrapper.tsx
-  15,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\PrivacyPageWrapper.tsx
-  3,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\app\TenantPageWrapper.tsx
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\live-editor\LiveEditorPage.tsx
-  7,35: import { EditorProvider } from "@/context-liveeditor/EditorProvider";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\providers\I18nProvider.tsx
-  5,36: import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\applicationForm\applicationForm1.tsx
-  14,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  15,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  16,50: import { getDefaultApplicationFormData } from "@/context-liveeditor/editorStoreFunctions/applicationFormFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\blogsSections\blogsSections1.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  8,48: import { getDefaultBlogsSectionsData } from "@/context-liveeditor/editorStoreFunctions/blogsSectionsFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\cards\card1.tsx
-  8,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\cards\card2.tsx
-  8,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\cards\card3.tsx
-  8,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\cards\card4.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  8,40: import { getDefaultCard4Data } from "@/context-liveeditor/editorStoreFunctions/card4Functions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\cards\card5.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,40: import { getDefaultCard5Data } from "@/context-liveeditor/editorStoreFunctions/card5Functions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\contactCards\contactCards1.tsx
-  4,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,47: import { getDefaultContactCardsData } from "@/context-liveeditor/editorStoreFunctions/contactCardsFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\contactFormSection\contactFormSection1.tsx
-  11,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  12,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  13,53: import { getDefaultContactFormSectionData } from "@/context-liveeditor/editorStoreFunctions/contactFormSectionFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\contactMapSection\contactMapSection1.tsx
-  9,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  10,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\contactUsHomePage\contactUsHomePage1.tsx
-  18,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  19,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  20,52: import { getDefaultContactUsHomePageData } from "@/context-liveeditor/editorStoreFunctions/contactUsHomePageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\ctaValuation\ctaValuation1.tsx
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  8,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  9,47: import { getDefaultCtaValuationData } from "@/context-liveeditor/editorStoreFunctions/ctaValuationFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\filterButtons\filterButtons1.tsx
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  8,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\footer\footer1-i18n.tsx
-  4,31: import { useClientT } from "@/context-liveeditor/clientI18nStore";
-  5,36: import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\footer\footer1.tsx
-  16,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  17,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\footer\footer2.tsx
-  9,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  10,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  11,42: import { getDefaultFooter2Data } from "@/context-liveeditor/editorStoreFunctions/footerFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\footer\StaticFooter1.tsx
-  16,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  17,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\global\GlobalLayout.tsx
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  84,22:       } = require("@/context-liveeditor/editorStoreFunctions/headerFunctions");
-  95,22:       } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\grid\grid1.tsx
-  13,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  14,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\halfTextHalfImage\halfTextHalfImage1.tsx
-  8,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  9,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  10,52: import { getDefaultHalfTextHalfImageData } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\halfTextHalfImage\halfTextHalfImage2.tsx
-  10,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  11,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  12,53: import { getDefaultHalfTextHalfImage2Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\halfTextHalfImage\halfTextHalfImage3.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  12,53: import { getDefaultHalfTextHalfImage3Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\halfTextHalfImage\halfTextHalfImage4.tsx
-  7,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  8,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  9,53: import { getDefaultHalfTextHalfImage4Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\halfTextHalfImage\halfTextHalfImage5.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,53: import { getDefaultHalfTextHalfImage5Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\halfTextHalfImage\halfTextHalfImage6.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,53: import { getDefaultHalfTextHalfImage6Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\halfTextHalfImage\halfTextHalfImage7.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-  8,53: import { getDefaultHalfTextHalfImage7Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\header\header1-i18n.tsx
-  4,31: import { useClientT } from "@/context-liveeditor/clientI18nStore";
-  5,36: import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\header\header1.tsx
-  13,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  14,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  15,78: import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\header\header2.tsx
-  11,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  12,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  13,42: import { getDefaultHeader2Data } from "@/context-liveeditor/editorStoreFunctions/header2Functions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\header\StaticHeader1.tsx
-  13,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  14,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  15,78: import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\hero\hero1-i18n.tsx
-  4,31: import { useClientT } from "@/context-liveeditor/clientI18nStore";
-  5,36: import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\hero\hero1.tsx
-  25,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  26,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  27,39: import { getDefaultHeroData } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\hero\hero2.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\hero\hero3.tsx
-  16,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  17,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  18,40: import { getDefaultHero3Data } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\hero\hero4.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  8,40: import { getDefaultHero4Data } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\hero\HeroSearchForm.tsx
-  15,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\imageText\imageText1.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,44: import { getDefaultImageTextData } from "@/context-liveeditor/editorStoreFunctions/imageTextFunctions";
-  8,31: import { useClientT } from "@/context-liveeditor/clientI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\inputs\inputs1.tsx
-  22,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  23,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  24,41: import { getDefaultInputsData } from "@/context-liveeditor/editorStoreFunctions/inputsFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\inputs\inputs2.tsx
-  33,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  34,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  35,49: import { getDefaultInputs2Data } from "../../../context-liveeditor/editorStoreFunctions/inputs2Functions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\DynamicFieldsRenderer\hooks\useValueHelpers.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\DynamicFieldsRenderer\hooks\useVariantInitialization.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\DynamicFieldsRenderer\renderers\ColorFieldRendererWithToggle.tsx
-  3,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\DynamicFieldsRenderer\renderers\SelectFieldRenderer.tsx
-  3,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\DynamicFieldsRenderer\renderers\TextareaFieldRenderer.tsx
-  3,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\DynamicFieldsRenderer\renderers\TextFieldRenderer.tsx
-  4,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\AdvancedSimpleSwitcher.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\BrandingSettings.tsx
-  3,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  4,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\DynamicFieldsRenderer.tsx
-  3,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\components\FieldRenderers.tsx
-  4,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\handlers\useInputHandlers.ts
-  1,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\handlers\useSaveHandler.ts
-  1,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\hooks\useEditorSidebarData.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,41: import { getDefaultHeaderData } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\hooks\useEditorSidebarInitialization.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,41: import { getDefaultHeaderData } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\views\AddSectionView.tsx
-  2,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\views\EditComponentView.tsx
-  3,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-  9,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\views\MainView.tsx
-  2,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\views\SidebarFooter.tsx
-  3,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,41: import { getDefaultHeaderData } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\I18nExample.tsx
-  5,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\index.tsx
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\TranslationExample.tsx
-  5,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\TranslationFields.tsx
-  4,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\TranslationTestComponent.tsx
-  7,11: } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\UnifiedSidebar.tsx
-  5,43: import { useSidebarStateManager } from "@/context-liveeditor/SidebarStateManager";
-  8,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\EditorSidebar\utils.ts
-  8,11: } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-  9,42: import { getDefaultInputs2Data } from "@/context-liveeditor/editorStoreFunctions/inputs2Functions";
-  10,40: import { getDefaultTitleData } from "@/context-liveeditor/editorStoreFunctions/titleFunctions";
-  631,24:         } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
-  637,22:       } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\effects\useCurrentPageEffect.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
+  25,11: } from "@/services-liveeditor/live-editor/themeChangeService";
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\effects\useDatabaseLoadingEffect.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  247,24:         } = require("@/context-liveeditor/editorStoreFunctions/inputs2Functions");
+  5,44: import { getComponentDisplayName } from "@/services-liveeditor/live-editor";
+  232,26:           } = require("@/services-liveeditor/live-editor");
 
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\effects\useSaveFunctionEffect.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
+E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\components\DebugPanel.tsx
+  10,11: } from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
+  11,36: import { positionTracker } from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
 
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\effects\useStaticPagesSubscriptionEffect.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\effects\useStaticPagesSyncEffect.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\effects\useStoreSyncEffect.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\hooks\useBackendDataState.ts
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
+E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\components\LiveEditorIframeContent.tsx
+  7,39: import { LiveEditorDropZone } from "@/services-liveeditor/live-editor/dragDrop";
+  8,49: import { LiveEditorDraggableComponent } from "@/services-liveeditor/live-editor/dragDrop/DraggableComponent";
+  9,36: import { CachedComponent } from "@/services-liveeditor/live-editor";
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\hooks\useComponentHandlers.ts
-  8,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\hooks\useDeviceManagement.ts
-  8,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-  9,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\hooks\useGlobalComponents.ts
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  88,20:     } = require("@/context-liveeditor/editorStoreFunctions/headerFunctions");
-  96,20:     } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\hooks\useStaticPageDetection.ts
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
+  13,11: } from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorUI\index.tsx
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\CardThemeSelector.tsx
-  15,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+  6,54: import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-editor/dragDrop/EnhancedLiveEditorDragDropContext";
+  11,11: } from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\ComponentsSidebar.tsx
-  4,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LanguageDropdown.tsx
-  20,36: import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LanguageSwitcher.tsx
-  11,36: import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorEffects.tsx
-  3,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
+  9,40: import { DraggableDrawerItem } from "@/services-liveeditor/live-editor/dragDrop";
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorHandlers.tsx
-  3,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  4,31: import useTenantStore from "@/context-liveeditor/tenantStore";
+  9,11: } from "@/services-liveeditor/live-editor";
+  499,20:     } = require("@/services-liveeditor/live-editor");
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\LiveEditorHooks.tsx
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\PageThemeSelector.tsx
-  16,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\ResetConfirmDialog.tsx
-  15,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+  7,34: import { DropIndicator } from "@/services-liveeditor/live-editor";
+  11,11: } from "@/services-liveeditor/live-editor";
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\ThemeChangeDialog.tsx
-  16,11: } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\live-editor\ThemeSelector.tsx
-  16,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\logosTicker\logosTicker1.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,46: import { getDefaultLogosTickerData } from "@/context-liveeditor/editorStoreFunctions/logosTickerFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\mapSection\mapSection1.tsx
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,45: import { getDefaultMapSectionData } from "@/context-liveeditor/editorStoreFunctions/mapSectionFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\partners\partners1.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,43: import { getDefaultPartnersData } from "@/context-liveeditor/editorStoreFunctions/partnersFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\partners\partners2.tsx
-  9,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  10,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  11,44: import { getDefaultPartners2Data } from "@/context-liveeditor/editorStoreFunctions/partnersFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\photosGrid\photosGrid1.tsx
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,45: import { getDefaultPhotosGridData } from "@/context-liveeditor/editorStoreFunctions/photosGridFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\photosGrid\photosGrid2.tsx
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,45: import { getDefaultPhotosGridData } from "@/context-liveeditor/editorStoreFunctions/photosGridFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\projectDetails\projectDetails1.tsx
-  40,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  53,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  54,49: import { getDefaultProjectDetailsData } from "@/context-liveeditor/editorStoreFunctions/projectDetailsFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\projectDetails\projectDetails2.tsx
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  8,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  9,50: import { getDefaultProjectDetails2Data } from "@/context-liveeditor/editorStoreFunctions/projectDetailsFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\propertiesShowcase\propertiesShowcase1.tsx
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  8,53: import { getDefaultPropertiesShowcaseData } from "@/context-liveeditor/editorStoreFunctions/propertiesShowcaseFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\propertyDetail\propertyDetail1.tsx
-  122,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\propertyDetail\propertyDetail2.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,50: import { getDefaultpropertyDetail2Data } from "@/context-liveeditor/editorStoreFunctions/propertyDetailFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\propertyFilter\propertyFilter1.tsx
-  9,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  10,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\propertyFilter\propertyFilter2.tsx
-  9,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  10,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\propertySlider\propertySlider1.tsx
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\responsiveImage\responsiveImage1.tsx
-  5,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,50: import { getDefaultResponsiveImageData } from "@/context-liveeditor/editorStoreFunctions/responsiveImageFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\stepsSection\stepsSection1.tsx
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  7,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\testimonials\testimonials1.tsx
-  6,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  7,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\title\title1.tsx
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,40: import { getDefaultTitleData } from "@/context-liveeditor/editorStoreFunctions/titleFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\video\video1.tsx
-  4,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,40: import { getDefaultVideoData } from "@/context-liveeditor/editorStoreFunctions/videoFunctions";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\whyChooseUs\whyChooseUs1.tsx
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-  6,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\LanguageDropdown.tsx
-  20,36: import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\tenant\LanguageSwitcher.tsx
-  11,36: import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\GA4Provider.tsx
-  10,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\project-detail.tsx
-  90,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\components\SaveConfirmationDialog.tsx
-  13,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\hooks\useTenantId.ts
-  5,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\lib\metaTags.ts
-  205,38:     const mod: any = await import("@/context-liveeditor/tenantStore.jsx");
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\lib-liveeditor\ComponentsList.tsx
-  8,34:    import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-  25,31: import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\theme-change\backupService.ts
-  22,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  23,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\theme-change\globalComponentsService.ts
-  22,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\theme-change\pageComponentsService.ts
-  24,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\theme-change\staticPagesService.ts
-  24,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\theme-change\tenantStoreSyncService.ts
-  22,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  23,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\theme-change\themeApplicationService.ts
-  24,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\theme-change\themeRestoreService.ts
-  22,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\services-liveeditor\live-editor\stateService.ts
-  2,35: import { useEditorStore } from "@/context-liveeditor/editorStore";
-  3,31: import useTenantStore from "@/context-liveeditor/tenantStore";
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\.cursorrules
-  151,7: // 1. context-liveeditor/editorStoreFunctions/{component}Functions.ts
-  154,7: // 4. context-liveeditor/editorStore.ts (import, state, 4 switch cases, functions)
-  157,7: // 7. context-liveeditor/editorStoreFunctions/index.ts (export)
-  358,1: context-liveeditor/editorStoreFunctions/
-  370,1: context-liveeditor/
-  384,1: context-liveeditor/editorStoreFunctions/
-  464,1: context-liveeditor/editorStoreFunctions/heroFunctions.ts
-  471,1: context-liveeditor/editorStoreFunctions/contactCardsFunctions.ts  ← Extended functions
+  18,32: import { ThemeNumber } from "@/services-liveeditor/live-editor/themeChangeService";
 
 E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\paths.txt
-  95,4:   'context-liveeditor/clientI18nStore.ts',
-  96,4:   'context-liveeditor/EditorContext.tsx',
-  97,4:   'context-liveeditor/editorI18nStore.ts',
-  98,4:   'context-liveeditor/EditorProvider.tsx',
-  99,4:   'context-liveeditor/editorStore.ts',
-  100,4:   'context-liveeditor/SidebarStateManager.ts',
-  101,4:   'context-liveeditor/tenantStore.jsx',
-  349,4:   'context-liveeditor/editorStoreFunctions/contactCardsFunctions.ts',
-  350,4:   'context-liveeditor/editorStoreFunctions/contactFormSectionFunctions.ts',
-  351,4:   'context-liveeditor/editorStoreFunctions/contactMapSectionFunctions.ts',
-  352,4:   'context-liveeditor/editorStoreFunctions/ctaValuationFunctions.ts',
-  353,4:   'context-liveeditor/editorStoreFunctions/filterButtonsFunctions.ts',
-  354,4:   'context-liveeditor/editorStoreFunctions/footerFunctions.ts',
-  355,4:   'context-liveeditor/editorStoreFunctions/gridFunctions.ts',
-  356,4:   'context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions.ts',
-  357,4:   'context-liveeditor/editorStoreFunctions/headerFunctions.ts',
-  358,4:   'context-liveeditor/editorStoreFunctions/heroFunctions.ts',
-  359,4:   'context-liveeditor/editorStoreFunctions/index.ts',
-  360,4:   'context-liveeditor/editorStoreFunctions/mapSectionFunctions.ts',
-  361,4:   'context-liveeditor/editorStoreFunctions/propertyFilterFunctions.ts',
-  362,4:   'context-liveeditor/editorStoreFunctions/propertySliderFunctions.ts',
-  363,4:   'context-liveeditor/editorStoreFunctions/stepsSectionFunctions.ts',
-  364,4:   'context-liveeditor/editorStoreFunctions/testimonialsFunctions.ts',
-  365,4:   'context-liveeditor/editorStoreFunctions/types.ts',
-  366,4:   'context-liveeditor/editorStoreFunctions/whyChooseUsFunctions.ts',
-
-E:\samy\projeccts\tarek\pagebuildDashboard\website-builder-dashboard\README.md
-  92,5: ├── context-liveeditor/       ← Live Editor context & stores
+  370,4:   'services-liveeditor/live-editor/componentCacheService.ts',
+  371,4:   'services-liveeditor/live-editor/componentCreationService.ts',
+  372,4:   'services-liveeditor/live-editor/componentDisplayService.ts',
+  373,4:   'services-liveeditor/live-editor/componentFallbackService.ts',
+  374,4:   'services-liveeditor/live-editor/componentLoaderService.ts',
+  375,4:   'services-liveeditor/live-editor/componentParserService.ts',
+  376,4:   'services-liveeditor/live-editor/componentPathService.ts',
+  377,4:   'services-liveeditor/live-editor/componentService.ts',
+  378,4:   'services-liveeditor/live-editor/componentThemeService.ts',
+  379,4:   'services-liveeditor/live-editor/dataService.ts',
+  380,4:   'services-liveeditor/live-editor/dialogService.ts',
+  381,4:   'services-liveeditor/live-editor/dragDropService.ts',
+  382,4:   'services-liveeditor/live-editor/eventService.ts',
+  383,4:   'services-liveeditor/live-editor/index.ts',
+  384,4:   'services-liveeditor/live-editor/pageDefinitionService.ts',
+  385,4:   'services-liveeditor/live-editor/stateService.ts',
+  386,4:   'services-liveeditor/live-editor/uiService.tsx',
+  387,4:   'services-liveeditor/live-editor/validationService.ts',
+  589,4:   'services-liveeditor/live-editor/dragDrop/dom-utils.ts',
+  590,4:   'services-liveeditor/live-editor/dragDrop/DraggableComponent.tsx',
+  591,4:   'services-liveeditor/live-editor/dragDrop/DraggableDrawerItem.tsx',
+  592,4:   'services-liveeditor/live-editor/dragDrop/DropZone.tsx',
+  593,4:   'services-liveeditor/live-editor/dragDrop/enhanced-position-tracker.ts',
+  594,4:   'services-liveeditor/live-editor/dragDrop/EnhancedLiveEditorDragDropContext.tsx',
+  595,4:   'services-liveeditor/live-editor/dragDrop/index.ts',
+  596,4:   'services-liveeditor/live-editor/dragDrop/LiveEditorDragDropContext.tsx',
+  597,4:   'services-liveeditor/live-editor/dragDrop/NestedDroppablePlugin.ts',
+  598,4:   'services-liveeditor/live-editor/dragDrop/types.ts',
+  599,4:   'services-liveeditor/live-editor/dragDrop/useSensors.ts',
+  600,4:   'services-liveeditor/live-editor/dragDrop/utils.ts',
+  601,4:   'services-liveeditor/live-editor/dragDrop/zoneContext.tsx',
+  602,4:   'services-liveeditor/live-editor/dragDrop/zoneStore.ts',
+  647,4:   'services-liveeditor/live-editor/dragDrop/collision/dynamic/get-direction.ts',
+  648,4:   'services-liveeditor/live-editor/dragDrop/collision/dynamic/get-midpoint-impact.ts',
+  649,4:   'services-liveeditor/live-editor/dragDrop/collision/dynamic/index.ts',
+  650,4:   'services-liveeditor/live-editor/dragDrop/collision/dynamic/store.ts',
+  651,4:   'services-liveeditor/live-editor/dragDrop/collision/dynamic/track-movement-interval.ts',

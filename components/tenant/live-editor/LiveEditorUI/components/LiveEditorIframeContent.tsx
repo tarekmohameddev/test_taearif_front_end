@@ -4,9 +4,9 @@
 
 import React, { Suspense, useMemo } from "react";
 import { motion } from "framer-motion";
-import { LiveEditorDropZone } from "@/services-liveeditor/live-editor/dragDrop";
-import { LiveEditorDraggableComponent } from "@/services-liveeditor/live-editor/dragDrop/DraggableComponent";
-import { CachedComponent } from "@/services-liveeditor/live-editor";
+import { LiveEditorDropZone } from "@/services/live-editor/dragDrop";
+import { LiveEditorDraggableComponent } from "@/services/live-editor/dragDrop/DraggableComponent";
+import { CachedComponent } from "@/services/live-editor";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { SkeletonLoader } from "@/components/skeleton";

@@ -7,8 +7,8 @@ import {
   PositionDebugInfo,
   PositionValidation,
   generatePositionReport,
-} from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
-import { positionTracker } from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
+} from "@/services/live-editor/dragDrop/enhanced-position-tracker";
+import { positionTracker } from "@/services/live-editor/dragDrop/enhanced-position-tracker";
 import { DebugControls } from "@/components/tenant/live-editor/debug/DebugControls";
 
 interface DebugPanelProps {

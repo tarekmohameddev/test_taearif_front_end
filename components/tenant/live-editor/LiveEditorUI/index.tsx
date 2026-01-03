@@ -3,12 +3,12 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEditorStore } from "@/context/editorStore";
 import { useEditorT } from "@/context/editorI18nStore";
-import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-editor/dragDrop/EnhancedLiveEditorDragDropContext";
+import { EnhancedLiveEditorDragDropContext } from "@/services/live-editor/dragDrop/EnhancedLiveEditorDragDropContext";
 import {
   validateComponentPositions,
   PositionValidation,
   PositionDebugInfo,
-} from "@/services-liveeditor/live-editor/dragDrop/enhanced-position-tracker";
+} from "@/services/live-editor/dragDrop/enhanced-position-tracker";
 import { EditorSidebar } from "@/components/tenant/live-editor/EditorSidebar";
 import { ComponentsSidebar } from "@/components/tenant/live-editor/ComponentsSidebar";
 import { DebugControls } from "@/components/tenant/live-editor/debug/DebugControls";
