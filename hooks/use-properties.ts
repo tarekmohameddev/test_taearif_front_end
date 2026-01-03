@@ -145,3 +145,4 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
     resetFilters,
   };
 };
+

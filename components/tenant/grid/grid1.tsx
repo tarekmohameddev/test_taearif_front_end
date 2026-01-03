@@ -13,7 +13,7 @@ import Pagination from "@/components/ui/pagination";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import axiosInstance from "@/lib/axiosInstance";
-import { useUrlFilters } from "@/hooks-liveeditor/use-url-filters";
+import { useUrlFilters } from "@/hooks/use-url-filters";
 
 interface PropertyGridProps {
   emptyMessage?: string;
