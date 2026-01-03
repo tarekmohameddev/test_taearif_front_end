@@ -1,4 +1,4 @@
-import dbConnect from "@/lib-liveeditor/dbConnect";
+import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 
 // POST /api/tenant/save-pages

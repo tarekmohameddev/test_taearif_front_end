@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { getMetaForSlugServer } from "@/lib/metaTags";
 import { getDefaultSeoData } from "@/lib/defaultSeo";
 import TenantPageWrapper from "../TenantPageWrapper";
-import { isMultiLevelPage } from "@/lib-liveeditor/multiLevelPages";
+import { isMultiLevelPage } from "@/lib/multiLevelPages";
 
 export const dynamic = "force-dynamic";
 

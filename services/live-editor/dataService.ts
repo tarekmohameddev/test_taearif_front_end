@@ -259,6 +259,6 @@ export const updateComponentNames = (
 };
 
 // استيراد المكتبات المطلوبة
-import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
+import { defaultComponents } from "@/lib/defaultComponents";
 import { AVAILABLE_SECTIONS } from "@/components/tenant/live-editor/EditorSidebar";
 import { getDefaultThemeForType } from "./componentService";

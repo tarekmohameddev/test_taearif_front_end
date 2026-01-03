@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import PasswordStrengthMeter from "./PasswordStrengthMeter";
 import useStore from "@/context/Store";
-import type { Tenant } from "@/lib-liveeditor/types";
+import type { Tenant } from "@/lib/types";
 
 interface SignupForm1Props {
   callbackUrl?: string;

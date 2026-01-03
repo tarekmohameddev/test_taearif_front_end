@@ -7,7 +7,7 @@ import {
   getSectionIconTranslated,
 } from "@/components/tenant/live-editor/EditorSidebar/constants";
 import { DraggableDrawerItem } from "@/services/live-editor/dragDrop";
-import { getComponents } from "@/lib-liveeditor/ComponentsList";
+import { getComponents } from "@/lib/ComponentsList";
 
 // Animation variants
 const collapseVariants = {

@@ -1897,7 +1897,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       // ⭐ Only load defaults if store doesn't already have data (from theme change)
       const {
         PAGE_DEFINITIONS,
-      } = require("@/lib-liveeditor/defaultComponents");
+      } = require("@/lib/defaultComponents");
 
       Object.entries(PAGE_DEFINITIONS).forEach(
         ([pageSlug, pageData]: [string, any]) => {

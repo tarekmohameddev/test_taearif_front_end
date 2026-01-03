@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import { AVAILABLE_SECTIONS } from "../EditorSidebar/constants";
-import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
+import { defaultComponents } from "@/lib/defaultComponents";
 
 interface UseComponentNamesEffectProps {
   registeredComponents: Record<string, any>;

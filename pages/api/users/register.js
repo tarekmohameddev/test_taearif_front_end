@@ -1,7 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
+import { defaultComponents } from "@/lib/defaultComponents";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();

@@ -1,7 +1,7 @@
 "use client";
 import { useRef } from "react";
 import { useEditorStore } from "@/context/editorStore";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 
 // Effects
 import { useAuthEffect } from "./effects/useAuthEffect";

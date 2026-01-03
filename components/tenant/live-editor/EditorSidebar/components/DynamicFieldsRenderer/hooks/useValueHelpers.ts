@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import { normalizePath } from "../../../utils";
-import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { COMPONENTS } from "@/lib/ComponentsList";
 
 interface UseValueHelpersProps {
   currentData: any;

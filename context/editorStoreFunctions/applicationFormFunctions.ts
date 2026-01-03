@@ -1,4 +1,4 @@
-import { ComponentData } from "@/lib-liveeditor/types";
+import { ComponentData } from "@/lib/types";
 
 // Default data for Application Form component
 export const getDefaultApplicationFormData = (): ComponentData => ({

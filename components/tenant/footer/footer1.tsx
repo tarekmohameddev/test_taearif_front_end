@@ -15,7 +15,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
-import { logChange } from "@/lib-liveeditor/debugLogger";
+import { logChange } from "@/lib/debugLogger";
 
 // Define footer data type
 type FooterData = {

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { AdvancedSimpleSwitcherProps } from "../types";
 import { DynamicFieldsRenderer } from "./DynamicFieldsRenderer";
-import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { COMPONENTS } from "@/lib/ComponentsList";
 import { useEditorStore } from "@/context/editorStore";
 import { useEditorT } from "@/context/editorI18nStore";
 import { translateComponentStructure } from "@/componentsStructure";

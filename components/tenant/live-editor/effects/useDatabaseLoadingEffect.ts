@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useEditorStore } from "@/context/editorStore";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import { createDefaultData } from "../EditorSidebar/utils";
 import { getComponentDisplayName } from "@/services/live-editor";
 import {

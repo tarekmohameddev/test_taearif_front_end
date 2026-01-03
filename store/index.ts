@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Product, CartItem, Tenant } from "@/lib-liveeditor/types";
+import type { Product, CartItem, Tenant } from "@/lib/types";
 
 interface StoreState {
   tenant: Tenant | null;

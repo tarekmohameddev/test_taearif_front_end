@@ -1,5 +1,5 @@
 import User from "@/models/User";
-import dbConnect from "@/lib-liveeditor/dbConnect";
+import dbConnect from "@/lib/dbConnect";
 
 export default async function handler(req, res) {
   await dbConnect();

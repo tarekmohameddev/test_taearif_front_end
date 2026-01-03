@@ -4,7 +4,7 @@
 
 import { lazy } from "react";
 import dynamic from "next/dynamic";
-import { getComponentSubPath } from "@/lib-liveeditor/ComponentsList";
+import { getComponentSubPath } from "@/lib/ComponentsList";
 
 // Import static components
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";

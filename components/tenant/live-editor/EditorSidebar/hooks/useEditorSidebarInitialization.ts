@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useEditorStore } from "@/context/editorStore";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import { createDefaultData } from "../utils";
 import { getDefaultHeaderData } from "@/context/editorStoreFunctions/headerFunctions";
-import { logSidebar } from "@/lib-liveeditor/debugLogger";
+import { logSidebar } from "@/lib/debugLogger";
 
 interface UseEditorSidebarInitializationProps {
   view: "main" | "add-section" | "edit-component" | "branding-settings";

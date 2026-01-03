@@ -4,7 +4,7 @@ import {
   getComponentsBySectionTranslated,
   COMPONENTS,
   getComponents,
-} from "@/lib-liveeditor/ComponentsList";
+} from "@/lib/ComponentsList";
 
 // تعريفات الأقسام المتاحة للإضافة من القائمة المركزية (للتوافق مع الكود الموجود)
 export const AVAILABLE_SECTIONS: AvailableSection[] = getComponentsBySection(

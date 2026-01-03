@@ -10,7 +10,7 @@ import { FiMail, FiLock, FiAlertCircle } from "react-icons/fi";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import useStore from "@/context/Store";
-import type { Tenant } from "@/lib-liveeditor/types";
+import type { Tenant } from "@/lib/types";
 
 interface LoginForm1Props {
   callbackUrl?: string;

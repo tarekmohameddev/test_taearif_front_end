@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { ComponentInstanceWithPosition } from "@/lib-liveeditor/types";
+import { ComponentInstanceWithPosition } from "@/lib/types";
 import { useSidebarStateManager } from "@/context/SidebarStateManager";
 import { AdvancedSimpleSwitcher } from "./components/AdvancedSimpleSwitcher";
-import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { COMPONENTS } from "@/lib/ComponentsList";
 import { useEditorT } from "@/context/editorI18nStore";
 
 interface UnifiedSidebarProps {

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import { createDefaultData } from "@/components/tenant/live-editor/EditorSidebar/utils";
-import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
+import { PAGE_DEFINITIONS } from "@/lib/defaultComponents";
 import { getPageDefinition } from "./pageDefinitionService";
 
 // دالة إنشاء المكونات الافتراضية بناءً على الصفحة

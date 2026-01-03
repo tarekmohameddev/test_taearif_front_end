@@ -143,7 +143,7 @@ export const isValidComponentType = (type: string): boolean => {
   // استخدام القائمة المركزية للمكونات
   const {
     isValidComponentType: isValidFromComponentsList,
-  } = require("@/lib-liveeditor/ComponentsList");
+  } = require("@/lib/ComponentsList");
   return isValidFromComponentsList(type);
 };
 

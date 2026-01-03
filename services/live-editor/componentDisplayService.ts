@@ -3,7 +3,7 @@
 import {
   getComponentDisplayName as getDisplayNameFromList,
   COMPONENTS,
-} from "@/lib-liveeditor/ComponentsList";
+} from "@/lib/ComponentsList";
 
 // دالة الحصول على اسم عرض المكون
 export const getComponentDisplayName = (type: string): string => {

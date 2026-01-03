@@ -1,4 +1,4 @@
-import { ComponentData } from "@/lib-liveeditor/types";
+import { ComponentData } from "@/lib/types";
 import { createDefaultData } from "./types";
 
 // Default data for contact cards

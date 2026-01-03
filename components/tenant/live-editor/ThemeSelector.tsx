@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Palette, Sparkles } from "lucide-react";
-import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { COMPONENTS } from "@/lib/ComponentsList";
 import { useEditorT } from "@/context/editorI18nStore";
 
 interface ThemeOption {

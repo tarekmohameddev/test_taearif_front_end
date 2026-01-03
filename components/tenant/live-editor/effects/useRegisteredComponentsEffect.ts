@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { defaultComponents } from "@/lib-liveeditor/defaultComponents";
+import { defaultComponents } from "@/lib/defaultComponents";
 
 interface UseRegisteredComponentsEffectProps {
   tenantData: any;

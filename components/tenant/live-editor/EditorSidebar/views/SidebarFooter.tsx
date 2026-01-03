@@ -1,5 +1,5 @@
 import React from "react";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import { useEditorT } from "@/context/editorI18nStore";
 import { useEditorStore } from "@/context/editorStore";
 import { createDefaultData } from "../utils";

@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import {
   getSectionPath,
   getComponentSubPath,
-} from "@/lib-liveeditor/ComponentsList";
+} from "@/lib/ComponentsList";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import Header1 from "@/components/tenant/header/header1";
 import Header2 from "@/components/tenant/header/header2";
@@ -19,7 +19,7 @@ import PropertyDetail1 from "@/components/tenant/propertyDetail/propertyDetail1"
 import PropertyDetail2 from "@/components/tenant/propertyDetail/propertyDetail2";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
-import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
+import { PAGE_DEFINITIONS } from "@/lib/defaultComponents";
 import { SkeletonLoader } from "@/components/skeleton";
 import {
   StaticHeaderSkeleton1,
@@ -43,7 +43,7 @@ import { trackProjectView } from "@/lib/ga4-tracking";
 import {
   isMultiLevelPage,
   getSlugPropertyName,
-} from "@/lib-liveeditor/multiLevelPages";
+} from "@/lib/multiLevelPages";
 import { getDefaultComponentForStaticPage } from "@/components/tenant/live-editor/effects/utils/staticPageHelpers";
 
 // ⭐ Cache للـ header components

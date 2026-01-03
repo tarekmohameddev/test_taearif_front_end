@@ -1,4 +1,4 @@
-import { isMultiLevelPage } from "@/lib-liveeditor/multiLevelPages";
+import { isMultiLevelPage } from "@/lib/multiLevelPages";
 
 /**
  * Returns the default component configuration for a static page

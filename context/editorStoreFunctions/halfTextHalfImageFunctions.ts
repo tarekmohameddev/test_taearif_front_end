@@ -1,6 +1,6 @@
-import { ComponentData } from "@/lib-liveeditor/types";
+import { ComponentData } from "@/lib/types";
 import { ComponentState, createDefaultData, updateDataByPath } from "./types";
-import { logEditorStore } from "@/lib-liveeditor/debugLogger";
+import { logEditorStore } from "@/lib/debugLogger";
 
 // Default halfTextHalfImage data structure
 export const getDefaultHalfTextHalfImageData = (): ComponentData => ({

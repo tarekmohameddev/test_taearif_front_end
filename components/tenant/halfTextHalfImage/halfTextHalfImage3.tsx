@@ -8,7 +8,7 @@ import useTenantStore from "@/context/tenantStore";
 import {
   logComponentRender,
   logTenantStore,
-} from "@/lib-liveeditor/debugLogger";
+} from "@/lib/debugLogger";
 import { getDefaultHalfTextHalfImage3Data } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 
 interface VisionSectionProps {

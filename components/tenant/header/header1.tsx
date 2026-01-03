@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context/editorStoreFunctions/headerFunctions";
-import { logChange } from "@/lib-liveeditor/debugLogger";
+import { logChange } from "@/lib/debugLogger";
 
 // Default header data
 const getDefaultHeaderData = () => ({

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useEditorStore } from "@/context/editorStore";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import {
   isStaticPage,
   getDefaultComponentForStaticPage,

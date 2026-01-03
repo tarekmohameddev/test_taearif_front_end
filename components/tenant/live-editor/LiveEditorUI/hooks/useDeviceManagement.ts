@@ -43,7 +43,7 @@ export function useDeviceManagement({
     setTimeout(() => {
       const {
         componentsToRefresh,
-      } = require("@/lib-liveeditor/refreshComponents.js");
+      } = require("@/lib/refreshComponents.js");
 
       // إعادة تصيير المكونات المحددة
       componentsToRefresh.forEach((componentName: string) => {

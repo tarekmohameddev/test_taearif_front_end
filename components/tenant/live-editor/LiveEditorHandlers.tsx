@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
-import { ComponentData } from "@/lib-liveeditor/types";
+import { ComponentData } from "@/lib/types";
 import {
   getDefaultThemeForType,
   applyAutoExpandLogic,
@@ -12,7 +12,7 @@ import {
   logComponentAdd,
   logComponentChange,
   logUserAction,
-} from "@/lib-liveeditor/debugLogger";
+} from "@/lib/debugLogger";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 

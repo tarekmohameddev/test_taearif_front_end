@@ -9,7 +9,7 @@ import {
   getChangeLogsAsString,
   getAllChangeLogs,
   clearChangeLogs,
-} from "@/lib-liveeditor/debugLogger";
+} from "@/lib/debugLogger";
 
 interface DebugControlsProps {
   onClose?: () => void;

@@ -10,13 +10,13 @@ import {
   useRef,
 } from "react";
 import { useRouter } from "next/navigation";
-import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
+import { PAGE_DEFINITIONS } from "@/lib/defaultComponents";
 import { useAuth } from "@/context/AuthContext";
 import useTenantStore from "@/context/tenantStore";
 import {
   getSectionPath,
   getComponentSubPath,
-} from "@/lib-liveeditor/ComponentsList";
+} from "@/lib/ComponentsList";
 import { SkeletonLoader } from "@/components/skeleton";
 import {
   StaticHeaderSkeleton1,

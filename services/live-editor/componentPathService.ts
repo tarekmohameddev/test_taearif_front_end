@@ -4,7 +4,7 @@ import {
   COMPONENTS,
   getSectionPath as getCentralSectionPath,
   getComponentSubPath as getCentralComponentSubPath,
-} from "@/lib-liveeditor/ComponentsList";
+} from "@/lib/ComponentsList";
 
 // استخدام القائمة المركزية للأقسام والمكونات
 export const SECTION_PATHS: Record<string, string> = Object.fromEntries(

@@ -1,10 +1,10 @@
 import React from "react";
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import { useEditorT } from "@/context/editorI18nStore";
 import { ThemeSelector } from "../../ThemeSelector";
 import { ResetConfirmDialog } from "../../ResetConfirmDialog";
 import { AdvancedSimpleSwitcher } from "../components/AdvancedSimpleSwitcher";
-import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { COMPONENTS } from "@/lib/ComponentsList";
 import { createDefaultData } from "../utils";
 import { useEditorStore } from "@/context/editorStore";
 

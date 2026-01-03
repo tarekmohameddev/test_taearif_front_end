@@ -9,7 +9,7 @@ import { notFound } from "next/navigation";
 import {
   getSectionPath,
   getComponentSubPath,
-} from "@/lib-liveeditor/ComponentsList";
+} from "@/lib/ComponentsList";
 
 // Lazy load Header and Footer components
 const loadComponent = (componentName: string) => {

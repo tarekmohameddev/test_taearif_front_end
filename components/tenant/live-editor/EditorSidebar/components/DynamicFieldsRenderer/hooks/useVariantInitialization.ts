@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useEditorStore } from "@/context/editorStore";
-import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { COMPONENTS } from "@/lib/ComponentsList";
 
 interface UseVariantInitializationProps {
   variantId: string | null;

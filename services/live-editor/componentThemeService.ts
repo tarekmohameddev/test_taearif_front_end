@@ -1,6 +1,6 @@
 // خدمة إدارة ثيمات المكونات
 
-import { getComponentDefaultTheme } from "@/lib-liveeditor/ComponentsList";
+import { getComponentDefaultTheme } from "@/lib/ComponentsList";
 
 // دالة الحصول على الثيم الافتراضي لنوع المكون
 export const getDefaultThemeForType = (type: string): string => {

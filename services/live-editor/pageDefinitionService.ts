@@ -1,6 +1,6 @@
-import { ComponentInstance } from "@/lib-liveeditor/types";
+import { ComponentInstance } from "@/lib/types";
 import { createDefaultData } from "@/components/tenant/live-editor/EditorSidebar/utils";
-import { PAGE_DEFINITIONS } from "@/lib-liveeditor/defaultComponents";
+import { PAGE_DEFINITIONS } from "@/lib/defaultComponents";
 
 // إعادة تصدير PAGE_DEFINITIONS من defaultComponents.js
 export { PAGE_DEFINITIONS };

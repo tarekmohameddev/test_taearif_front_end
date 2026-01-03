@@ -1,8 +1,8 @@
 "use client";
 
 import { create } from "zustand";
-import { ComponentData } from "@/lib-liveeditor/types";
-import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { ComponentData } from "@/lib/types";
+import { COMPONENTS } from "@/lib/ComponentsList";
 import { heroStructure } from "@/componentsStructure/hero";
 import { headerStructure } from "@/componentsStructure/header";
 import { halfTextHalfImageStructure } from "@/componentsStructure/halfTextHalfImage";

@@ -1,6 +1,6 @@
 import { ComponentData } from "@/lib/types";
 import { AVAILABLE_SECTIONS } from "./constants";
-import { getComponentById, COMPONENTS } from "@/lib-liveeditor/ComponentsList";
+import { getComponentById, COMPONENTS } from "@/lib/ComponentsList";
 import {
   getDefaultHalfTextHalfImageData,
   getDefaultHalfTextHalfImage2Data,
@@ -8,7 +8,7 @@ import {
 } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 import { getDefaultInputs2Data } from "@/context/editorStoreFunctions/inputs2Functions";
 import { getDefaultTitleData } from "@/context/editorStoreFunctions/titleFunctions";
-import { logSidebar } from "@/lib-liveeditor/debugLogger";
+import { logSidebar } from "@/lib/debugLogger";
 
 // دالة لإنشاء البيانات الافتراضية لكل نوع مكون
 export const createDefaultData = (

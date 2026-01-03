@@ -1,4 +1,4 @@
-import { ComponentData } from "@/lib-liveeditor/types";
+import { ComponentData } from "@/lib/types";
 import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 
 /**
