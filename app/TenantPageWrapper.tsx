@@ -376,8 +376,10 @@ export default function TenantPageWrapper({
       return true;
     }
 
-    // ⭐ Priority 3: Check componentSettings
-    if (tenantData?.componentSettings && slug in tenantData.componentSettings) {
+    // ⭐ Priority 3: Check componentSettings (skip for static pages)
+    // Static pages should ignore componentSettings and only use StaticPages or default data
+    // If it's a static page (has default component), skip componentSettings check
+    if (!defaultStaticComponent && tenantData?.componentSettings && slug in tenantData.componentSettings) {
       return true;
     }
 
@@ -587,8 +589,11 @@ export default function TenantPageWrapper({
       ];
     }
 
-    // ⭐ Priority 4: Check componentSettings (regular pages)
+    // ⭐ Priority 4: Check componentSettings (regular pages only, skip for static pages)
+    // Static pages should ignore componentSettings and only use StaticPages or default data
+    // If it's a static page (has default component), skip componentSettings check
     if (
+      !defaultStaticComponent &&
       tenantData?.componentSettings &&
       slug &&
       tenantData.componentSettings[slug]
