@@ -82,6 +82,7 @@ import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
 import { getDefaultInputs2Data } from "./editorStoreFunctions/inputs2Functions";
+import defaultData from "@/lib/defaultData.json";
 
 type OpenDialogFn = () => void;
 
@@ -2758,6 +2759,41 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           ...state.staticPagesData,
           ...convertedStaticPages,
         };
+      }
+
+      // ⭐ FALLBACK: Load StaticPages from defaultData.json if not in tenantData
+      // This ensures newly added static pages (like create-request) are always available
+      if (defaultData?.StaticPages && typeof defaultData.StaticPages === "object") {
+        const defaultStaticPages: Record<string, any> = {};
+
+        Object.entries(defaultData.StaticPages).forEach(
+          ([pageSlug, pageData]: [string, any]) => {
+            // Only load if page doesn't already exist in staticPagesData (from tenantData)
+            if (!newState.staticPagesData[pageSlug]) {
+              // Handle both formats: { slug, components } or direct object
+              if (
+                typeof pageData === "object" &&
+                !Array.isArray(pageData) &&
+                pageData.slug &&
+                Array.isArray(pageData.components)
+              ) {
+                // Format: { slug, components }
+                defaultStaticPages[pageSlug] = {
+                  slug: pageData.slug || pageSlug,
+                  components: pageData.components || [],
+                };
+              }
+            }
+          },
+        );
+
+        // Merge default StaticPages into staticPagesData (only if not already present)
+        if (Object.keys(defaultStaticPages).length > 0) {
+          newState.staticPagesData = {
+            ...newState.staticPagesData,
+            ...defaultStaticPages,
+          };
+        }
       }
 
       // Load page components from componentSettings (regular pages only)

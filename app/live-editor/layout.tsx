@@ -1537,6 +1537,65 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       });
     }
 
+    // ⭐ إضافة صفحة إنشاء طلب بشكل إجباري
+    const createRequestPageExists = pages.some(
+      (page) => page.slug === "create-request" || page.path === "/create-request",
+    );
+    if (!createRequestPageExists) {
+      // البحث عن بيانات SEO لصفحة create-request في WebsiteLayout
+      let createRequestSeoData = null;
+      if (websiteLayout?.metaTags?.pages && Array.isArray(websiteLayout.metaTags.pages)) {
+        // metaTags.pages is an array with one object containing all pages as keys
+        const pagesObject = websiteLayout.metaTags.pages[0];
+        if (pagesObject && typeof pagesObject === "object") {
+          createRequestSeoData = pagesObject["create-request"] || null;
+        }
+      }
+
+      const hasCreateRequestSeoData =
+        createRequestSeoData &&
+        (createRequestSeoData.TitleAr ||
+          createRequestSeoData.TitleEn ||
+          createRequestSeoData.DescriptionAr ||
+          createRequestSeoData.DescriptionEn);
+
+      pages.push({
+        slug: "create-request",
+        name: locale === "ar" ? "إنشاء طلب" : "Create Request",
+        path: "/create-request",
+        isStatic: true, // ⭐ علامة للصفحات الثابتة
+        seo: hasCreateRequestSeoData
+          ? {
+              TitleAr: createRequestSeoData.TitleAr,
+              TitleEn: createRequestSeoData.TitleEn,
+              DescriptionAr: createRequestSeoData.DescriptionAr,
+              DescriptionEn: createRequestSeoData.DescriptionEn,
+              KeywordsAr: createRequestSeoData.KeywordsAr,
+              KeywordsEn: createRequestSeoData.KeywordsEn,
+              Author: createRequestSeoData.Author,
+              AuthorEn: createRequestSeoData.AuthorEn,
+              Robots: createRequestSeoData.Robots,
+              RobotsEn: createRequestSeoData.RobotsEn,
+              "og:title": createRequestSeoData["og:title"],
+              "og:description": createRequestSeoData["og:description"],
+              "og:keywords": createRequestSeoData["og:keywords"],
+              "og:author": createRequestSeoData["og:author"],
+              "og:robots": createRequestSeoData["og:robots"],
+              "og:url": createRequestSeoData["og:url"],
+              "og:image": createRequestSeoData["og:image"],
+              "og:type": createRequestSeoData["og:type"],
+              "og:locale": createRequestSeoData["og:locale"],
+              "og:locale:alternate": createRequestSeoData["og:locale:alternate"],
+              "og:site_name": createRequestSeoData["og:site_name"],
+              "og:image:width": createRequestSeoData["og:image:width"],
+              "og:image:height": createRequestSeoData["og:image:height"],
+              "og:image:type": createRequestSeoData["og:image:type"],
+              "og:image:alt": createRequestSeoData["og:image:alt"],
+            }
+          : getDefaultSeoData("create-request"),
+      });
+    }
+
     // Console log لعرض availablePages بعد الـ merge
     console.log("🔍 availablePages after merge:", pages);
 
@@ -1900,34 +1959,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         "og:image:height": null,
         "og:image:type": null,
         "og:image:alt": "الصفحة الرئيسية",
-      },
-      {
-        path: "/create-request",
-        TitleAr: "إنشاء طلب",
-        TitleEn: "Create Request",
-        DescriptionAr: "إنشاء طلب جديد للحصول على الخدمات",
-        DescriptionEn: "Create a new request to get our services",
-        KeywordsAr: "إنشاء طلب, خدمات, طلب جديد",
-        KeywordsEn: "create request, services, new request",
-        Author: "الموقع",
-        AuthorEn: "Website",
-        Robots: "index, follow",
-        RobotsEn: "index, follow",
-        "og:title": "إنشاء طلب",
-        "og:description": "إنشاء طلب جديد للحصول على الخدمات",
-        "og:keywords": "إنشاء طلب, خدمات",
-        "og:author": "الموقع",
-        "og:robots": "index, follow",
-        "og:url": "",
-        "og:image": "",
-        "og:type": "website",
-        "og:locale": "ar",
-        "og:locale:alternate": "en",
-        "og:site_name": "الموقع",
-        "og:image:width": null,
-        "og:image:height": null,
-        "og:image:type": null,
-        "og:image:alt": "إنشاء طلب",
       },
       {
         path: "/for-rent",

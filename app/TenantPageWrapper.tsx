@@ -44,6 +44,7 @@ import {
   isMultiLevelPage,
   getSlugPropertyName,
 } from "@/lib-liveeditor/multiLevelPages";
+import { getDefaultComponentForStaticPage } from "@/components/tenant/live-editor/effects/utils/staticPageHelpers";
 
 // ⭐ Cache للـ header components
 const headerComponentsCache = new Map<string, any>();
@@ -357,7 +358,7 @@ export default function TenantPageWrapper({
       return true;
     }
 
-    // ⭐ Priority 1: Check static pages
+    // ⭐ Priority 1: Check static pages in editorStore
     const staticPageData = getStaticPageData(slug);
     if (staticPageData) {
       return true;
@@ -365,6 +366,13 @@ export default function TenantPageWrapper({
 
     // ⭐ Priority 2: Check tenantData.StaticPages
     if (tenantData?.StaticPages?.[slug]) {
+      return true;
+    }
+
+    // ⭐ Priority 2.5: Check if it's a known static page (has default component)
+    // This ensures static pages are always available even if not in tenantData
+    const defaultStaticComponent = getDefaultComponentForStaticPage(slug);
+    if (defaultStaticComponent) {
       return true;
     }
 
@@ -563,6 +571,20 @@ export default function TenantPageWrapper({
             .sort((a: any, b: any) => a.position - b.position);
         }
       }
+    }
+
+    // ⭐ Priority 3.5: Check if it's a known static page (has default component)
+    // This ensures static pages are always available even if not in tenantData
+    const defaultStaticComponent = getDefaultComponentForStaticPage(slug);
+    if (defaultStaticComponent) {
+      return [
+        {
+          id: defaultStaticComponent.id,
+          componentName: defaultStaticComponent.componentName,
+          data: defaultStaticComponent.data,
+          position: defaultStaticComponent.position || 0,
+        },
+      ];
     }
 
     // ⭐ Priority 4: Check componentSettings (regular pages)

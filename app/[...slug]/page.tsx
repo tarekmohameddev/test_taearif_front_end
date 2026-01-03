@@ -117,11 +117,17 @@ export default async function TenantPage({
     domainType,
   });
 
-  // Handle slug array: ["project", "samy"] -> slug: "project", dynamicSlug: "samy"
-  // Or: ["property", "john"] -> slug: "property", dynamicSlug: "john"
-  // Or single slug: ["about"] -> slug: "about", dynamicSlug: undefined
-  const slug = slugArray?.[0] || "";
-  const isMultiLevel = isMultiLevelPage(slug);
+  // Handle complex paths: ["property-requests", "create"] -> slug: "property-requests/create"
+  // Or single slug: ["about"] -> slug: "about"
+  // Or multi-level: ["project", "samy"] -> slug: "project", dynamicSlug: "samy"
+  const firstSegment = slugArray?.[0] || "";
+  const isMultiLevel = isMultiLevelPage(firstSegment);
+  
+  // For multi-level pages, keep the original behavior
+  // For other paths, join all segments to support complex paths like "property-requests/create"
+  const slug = isMultiLevel
+    ? firstSegment
+    : slugArray?.join("/") || "";
   const dynamicSlug =
     isMultiLevel && slugArray?.length > 1 ? slugArray[1] : undefined;
 
