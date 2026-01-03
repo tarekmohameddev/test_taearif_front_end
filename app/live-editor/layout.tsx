@@ -96,6 +96,12 @@ function AddPageDialog({
 
   // دالة لحساب عنوان الصفحة حسب اللغة
   const getPageTitle = (page: any) => {
+    // ⭐ PRIORITY: Use page.name first if it exists (especially for static pages)
+    // This ensures correctly set names like "صفحة العقار" appear instead of SEO data
+    if (page.name) {
+      return page.name;
+    }
+    // Fallback to SEO data if page.name is not set
     // إذا كانت الصفحة باللغة العربية
     if (locale === "ar" && page.seo?.TitleAr) {
       return page.seo.TitleAr;
@@ -104,11 +110,7 @@ function AddPageDialog({
     if (locale === "en" && page.seo?.TitleEn) {
       return page.seo.TitleEn;
     }
-    // إذا لم تكن هناك بيانات SEO، استخدم page.name
-    if (page.name) {
-      return page.name;
-    }
-    // إذا لم يكن هناك page.name، استخدم page.slug
+    // إذا لم يكن هناك page.name أو بيانات SEO، استخدم page.slug
     return page.slug || "Homepage";
   };
 
@@ -912,6 +914,12 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
   // دالة لحساب عنوان الصفحة حسب اللغة
   const getPageTitle = (page: any) => {
+    // ⭐ PRIORITY: Use page.name first if it exists (especially for static pages)
+    // This ensures correctly set names like "صفحة العقار" appear instead of SEO data
+    if (page.name) {
+      return page.name;
+    }
+    // Fallback to SEO data if page.name is not set
     // إذا كانت الصفحة باللغة العربية
     if (locale === "ar" && page.seo?.TitleAr) {
       return page.seo.TitleAr;
@@ -920,11 +928,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     if (locale === "en" && page.seo?.TitleEn) {
       return page.seo.TitleEn;
     }
-    // إذا لم تكن هناك بيانات SEO، استخدم page.name
-    if (page.name) {
-      return page.name;
-    }
-    // إذا لم يكن هناك page.name، استخدم page.slug
+    // إذا لم يكن هناك page.name أو بيانات SEO، استخدم page.slug
     return page.slug || "Homepage";
   };
   const [formData, setFormData] = useState({
