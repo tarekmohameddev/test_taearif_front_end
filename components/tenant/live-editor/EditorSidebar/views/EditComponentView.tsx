@@ -1,12 +1,12 @@
 import React from "react";
 import { ComponentInstance } from "@/lib-liveeditor/types";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { ThemeSelector } from "../../ThemeSelector";
 import { ResetConfirmDialog } from "../../ResetConfirmDialog";
 import { AdvancedSimpleSwitcher } from "../components/AdvancedSimpleSwitcher";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
 import { createDefaultData } from "../utils";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 
 interface EditComponentViewProps {
   selectedComponent: ComponentInstance;

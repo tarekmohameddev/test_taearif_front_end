@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import {
   useEditorT,
   useEditorLocale,
-} from "@/context-liveeditor/editorI18nStore";
+} from "@/context/editorI18nStore";
 import { Palette, AlertTriangle, Loader2 } from "lucide-react";
 import { ThemeNumber } from "@/services-liveeditor/live-editor/themeChangeService";
 

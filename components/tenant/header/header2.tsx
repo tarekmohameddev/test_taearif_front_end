@@ -8,9 +8,9 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useRouter, usePathname } from "next/navigation";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultHeader2Data } from "@/context-liveeditor/editorStoreFunctions/header2Functions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultHeader2Data } from "@/context/editorStoreFunctions/header2Functions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

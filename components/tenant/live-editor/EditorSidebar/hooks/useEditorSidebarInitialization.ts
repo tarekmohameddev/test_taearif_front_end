@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance } from "@/lib-liveeditor/types";
 import { createDefaultData } from "../utils";
-import { getDefaultHeaderData } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
+import { getDefaultHeaderData } from "@/context/editorStoreFunctions/headerFunctions";
 import { logSidebar } from "@/lib-liveeditor/debugLogger";
 
 interface UseEditorSidebarInitializationProps {

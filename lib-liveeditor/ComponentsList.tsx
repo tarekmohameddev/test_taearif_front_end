@@ -5,7 +5,7 @@
 كيفية استخدام الدوال المترجمة:
 
 1. استيراد دالة الترجمة:
-   import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+   import { useEditorT } from "@/context/editorI18nStore";
    const t = useEditorT();
 
 2. استخدام الدوال المترجمة:
@@ -22,7 +22,7 @@
 */
 
 import { heroStructure } from "@/componentsStructure/hero";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { headerStructure } from "@/componentsStructure/header";
 import { propertiesShowcaseStructure } from "@/componentsStructure/propertiesShowcase";
 import { halfTextHalfImageStructure } from "@/componentsStructure/halfTextHalfImage";

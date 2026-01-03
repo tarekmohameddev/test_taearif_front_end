@@ -10,8 +10,8 @@ import Card5 from "@/components/tenant/cards/card5";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import Pagination from "@/components/ui/pagination";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
 import axiosInstance from "@/lib/axiosInstance";
 import { useUrlFilters } from "@/hooks-liveeditor/use-url-filters";
 

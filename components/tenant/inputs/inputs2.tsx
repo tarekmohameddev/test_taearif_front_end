@@ -30,9 +30,9 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultInputs2Data } from "../../../context-liveeditor/editorStoreFunctions/inputs2Functions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultInputs2Data } from "../../../context/editorStoreFunctions/inputs2Functions";
 import { useTenantId } from "@/hooks/useTenantId";
 import axios from "axios";
 import {

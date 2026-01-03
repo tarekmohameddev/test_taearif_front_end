@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
 import SwiperCarousel from "@/components/ui/swiper-carousel";
 import { PropertyCard } from "@/components/tenant/cards/card1";
 import PropertyCard2 from "@/components/tenant/cards/card2";

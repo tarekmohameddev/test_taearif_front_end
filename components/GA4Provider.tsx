@@ -7,7 +7,7 @@ import {
   trackPageView,
   setTenantContext,
 } from "@/lib/ga4-tracking";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 
 interface GA4ProviderProps {
   tenantId: string | null;

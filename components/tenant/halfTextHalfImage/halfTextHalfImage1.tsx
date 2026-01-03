@@ -5,9 +5,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultHalfTextHalfImageData } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultHalfTextHalfImageData } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 
 // Default half text half image data (local fallback - use getDefaultHalfTextHalfImageData from functions instead)
 const getDefaulthalfTextHalfImageData = () => ({

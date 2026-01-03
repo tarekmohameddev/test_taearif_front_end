@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { FaWhatsapp, FaSnapchat, FaTiktok, FaYoutube } from "react-icons/fa";
 import { useEffect, useMemo, useCallback, useState } from "react";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
 import { StaticFooterSkeleton } from "@/components/skeleton/footer/StaticFooterSkeleton";
 
 // Define footer data type

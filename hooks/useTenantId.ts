@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import useAuthStore from "@/context/AuthContext";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 
 export function useTenantId() {
   const [tenantId, setTenantId] = useState<string | null>(null);

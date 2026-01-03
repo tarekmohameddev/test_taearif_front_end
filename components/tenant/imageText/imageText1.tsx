@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultImageTextData } from "@/context-liveeditor/editorStoreFunctions/imageTextFunctions";
-import { useClientT } from "@/context-liveeditor/clientI18nStore";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultImageTextData } from "@/context/editorStoreFunctions/imageTextFunctions";
+import { useClientT } from "@/context/clientI18nStore";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

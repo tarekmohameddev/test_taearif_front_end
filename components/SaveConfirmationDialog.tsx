@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 
 export default function SaveConfirmationDialog({
   open,

@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import { ComponentInstance, ComponentData } from "@/lib-liveeditor/types";
 import { DropIndicator } from "@/services-liveeditor/live-editor";
 import {

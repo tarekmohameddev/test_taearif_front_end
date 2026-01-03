@@ -3,8 +3,8 @@
 // ============================================================================
 
 import { useMemo } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
 import { getDefaultComponentForStaticPage } from "@/components/tenant/live-editor/effects/utils/staticPageHelpers";
 import { isMultiLevelPage } from "@/lib-liveeditor/multiLevelPages";
 

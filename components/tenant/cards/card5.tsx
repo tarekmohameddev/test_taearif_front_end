@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultCard5Data } from "@/context-liveeditor/editorStoreFunctions/card5Functions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultCard5Data } from "@/context/editorStoreFunctions/card5Functions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

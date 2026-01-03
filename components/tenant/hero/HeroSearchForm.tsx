@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUrlFilters } from "@/hooks-liveeditor/use-url-filters";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 
 interface CityOption {
   id: string | number;

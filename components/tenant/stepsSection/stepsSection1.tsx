@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import type React from "react";
 import { cn } from "@/lib/utils";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";

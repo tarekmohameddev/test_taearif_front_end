@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
+import { useClientLocale } from "@/context/clientI18nStore";
 import { getLocaleFromPathname, isValidLocale } from "@/lib/i18n/config";
 
 interface I18nProviderProps {

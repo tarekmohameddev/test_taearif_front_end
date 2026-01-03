@@ -4,7 +4,7 @@ import React from "react";
 import {
   useEditorT,
   useEditorLocale,
-} from "@/context-liveeditor/editorI18nStore";
+} from "@/context/editorI18nStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Globe, Languages } from "lucide-react";

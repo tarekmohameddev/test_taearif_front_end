@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Palette, Sparkles, Globe } from "lucide-react";
 import SaveConfirmationDialog from "@/components/SaveConfirmationDialog";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 
 interface PageThemeOption {
   id: string;

@@ -1,7 +1,7 @@
 import React from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { ImageFieldRenderer } from "../../FieldRenderers";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 
 interface TextFieldRendererProps {
   def: FieldDefinition;

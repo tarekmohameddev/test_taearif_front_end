@@ -19,9 +19,9 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultInputsData } from "@/context-liveeditor/editorStoreFunctions/inputsFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultInputsData } from "@/context/editorStoreFunctions/inputsFunctions";
 import { useTenantId } from "@/hooks/useTenantId";
 
 // Generate random ID function

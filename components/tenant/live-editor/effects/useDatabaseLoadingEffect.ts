@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance } from "@/lib-liveeditor/types";
 import { createDefaultData } from "../EditorSidebar/utils";
 import { getComponentDisplayName } from "@/services-liveeditor/live-editor";
@@ -244,7 +244,7 @@ export const useDatabaseLoadingEffect = ({
         );
         const {
           getDefaultInputs2Data,
-        } = require("@/context-liveeditor/editorStoreFunctions/inputs2Functions");
+        } = require("@/context/editorStoreFunctions/inputs2Functions");
         const defaultInputs2Data = getDefaultInputs2Data();
 
         editorStore.ensureComponentVariant(

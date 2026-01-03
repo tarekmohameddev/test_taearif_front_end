@@ -202,7 +202,7 @@ export async function getWebsiteLayoutFromTenantStore(): Promise<WebsiteLayout |
   if (typeof window === "undefined") return null;
   try {
     // Dynamic import to avoid marking this file as client-only
-    const mod: any = await import("@/context-liveeditor/tenantStore.jsx");
+    const mod: any = await import("@/context/tenantStore.jsx");
     const useTenantStore = mod.default;
     if (!useTenantStore || typeof useTenantStore.getState !== "function") {
       return null;

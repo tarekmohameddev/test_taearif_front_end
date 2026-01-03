@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultHalfTextHalfImage6Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultHalfTextHalfImage6Data } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

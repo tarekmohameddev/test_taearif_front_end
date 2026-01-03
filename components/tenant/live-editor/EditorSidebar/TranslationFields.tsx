@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { locales, localeNames, localeFlags } from "@/lib/i18n/config";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

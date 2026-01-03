@@ -5,9 +5,9 @@ import {
   getDefaultHalfTextHalfImageData,
   getDefaultHalfTextHalfImage2Data,
   getDefaultHalfTextHalfImage3Data,
-} from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
-import { getDefaultInputs2Data } from "@/context-liveeditor/editorStoreFunctions/inputs2Functions";
-import { getDefaultTitleData } from "@/context-liveeditor/editorStoreFunctions/titleFunctions";
+} from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
+import { getDefaultInputs2Data } from "@/context/editorStoreFunctions/inputs2Functions";
+import { getDefaultTitleData } from "@/context/editorStoreFunctions/titleFunctions";
 import { logSidebar } from "@/lib-liveeditor/debugLogger";
 
 // دالة لإنشاء البيانات الافتراضية لكل نوع مكون
@@ -628,13 +628,13 @@ export const createDefaultData = (
         // Import getDefaultFooter2Data dynamically to avoid circular dependencies
         const {
           getDefaultFooter2Data,
-        } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
+        } = require("@/context/editorStoreFunctions/footerFunctions");
         return getDefaultFooter2Data();
       }
       // Default to footer1/StaticFooter1
       const {
         getDefaultFooterData,
-      } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
+      } = require("@/context/editorStoreFunctions/footerFunctions");
       return getDefaultFooterData();
 
     case "inputs2":

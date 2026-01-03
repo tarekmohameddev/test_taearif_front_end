@@ -37,7 +37,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import {
   Dialog,
   DialogContent,
@@ -50,8 +50,8 @@ import { ar } from "date-fns/locale";
 import Link from "next/link";
 import Image from "next/image";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultProjectDetailsData } from "@/context-liveeditor/editorStoreFunctions/projectDetailsFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultProjectDetailsData } from "@/context/editorStoreFunctions/projectDetailsFunctions";
 
 interface Project {
   id: string;

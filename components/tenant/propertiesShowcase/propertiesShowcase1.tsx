@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultPropertiesShowcaseData } from "@/context-liveeditor/editorStoreFunctions/propertiesShowcaseFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultPropertiesShowcaseData } from "@/context/editorStoreFunctions/propertiesShowcaseFunctions";
 import { cn } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";

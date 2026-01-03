@@ -17,7 +17,7 @@ import {
   getDirectionForLocale,
   getDefaultDirection,
 } from "@/lib/i18n/config";
-import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
+import { useEditorLocale } from "@/context/editorI18nStore";
 
 export function LanguageDropdown() {
   const pathname = usePathname();

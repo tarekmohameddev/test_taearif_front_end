@@ -5,7 +5,7 @@ import { Eye, Bed, Bath, Square, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useTenantId } from "@/hooks/useTenantId";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 
 type Property = {
   id: string;

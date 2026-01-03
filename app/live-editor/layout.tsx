@@ -3,10 +3,10 @@
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { EditorProvider } from "@/context-liveeditor/EditorProvider";
+import { useEditorStore } from "@/context/editorStore";
+import { EditorProvider } from "@/context/EditorProvider";
 import { ReactNode, useEffect, useMemo, useState } from "react";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
@@ -14,7 +14,7 @@ import { LanguageSwitcher } from "@/components/tenant/live-editor/LanguageSwitch
 import {
   useEditorT,
   useEditorLocale,
-} from "@/context-liveeditor/editorI18nStore";
+} from "@/context/editorI18nStore";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/live-editor/LanguageDropdown";
 import { AuthProvider } from "@/context/AuthContext";

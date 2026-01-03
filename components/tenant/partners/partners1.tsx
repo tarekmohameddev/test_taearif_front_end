@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultPartnersData } from "@/context-liveeditor/editorStoreFunctions/partnersFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultPartnersData } from "@/context/editorStoreFunctions/partnersFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

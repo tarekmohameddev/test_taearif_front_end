@@ -3,8 +3,8 @@
 // ============================================================================
 
 import { useMemo } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
 import { loadHeaderComponent, loadFooterComponent } from "../componentLoaders";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
@@ -85,7 +85,7 @@ export function useGlobalComponents() {
   if (!globalHeaderData || Object.keys(globalHeaderData).length === 0) {
     const {
       getDefaultHeaderData,
-    } = require("@/context-liveeditor/editorStoreFunctions/headerFunctions");
+    } = require("@/context/editorStoreFunctions/headerFunctions");
     const defaultHeaderData = getDefaultHeaderData();
     setGlobalHeaderData(defaultHeaderData);
   }
@@ -93,7 +93,7 @@ export function useGlobalComponents() {
   if (!globalFooterData || Object.keys(globalFooterData).length === 0) {
     const {
       getDefaultFooterData,
-    } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
+    } = require("@/context/editorStoreFunctions/footerFunctions");
     const defaultFooterData = getDefaultFooterData();
     setGlobalFooterData(defaultFooterData);
   }

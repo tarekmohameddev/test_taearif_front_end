@@ -1,4 +1,4 @@
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 
 export const useInputHandlers = () => {
   const { updateTempField } = useEditorStore();

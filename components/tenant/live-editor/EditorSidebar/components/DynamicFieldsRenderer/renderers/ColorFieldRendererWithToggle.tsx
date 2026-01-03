@@ -1,8 +1,8 @@
 import React from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { ColorFieldRenderer } from "../../FieldRenderers";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 
 interface ColorFieldRendererWithToggleProps {
   def: FieldDefinition;

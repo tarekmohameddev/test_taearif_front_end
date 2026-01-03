@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { ComponentData, ComponentInstance } from "@/lib-liveeditor/types";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { EditorSidebarProps } from "./types";
 import { BrandingSettings } from "./components/BrandingSettings";
 

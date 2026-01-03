@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultContactCardsData } from "@/context-liveeditor/editorStoreFunctions/contactCardsFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultContactCardsData } from "@/context/editorStoreFunctions/contactCardsFunctions";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";

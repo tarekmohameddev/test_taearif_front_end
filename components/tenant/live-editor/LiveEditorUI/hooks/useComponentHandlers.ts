@@ -5,7 +5,7 @@
 import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { createDefaultData } from "../../EditorSidebar/utils";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import {
   positionTracker,
   PositionDebugInfo,

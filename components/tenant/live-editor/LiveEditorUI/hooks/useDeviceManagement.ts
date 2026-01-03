@@ -5,8 +5,8 @@
 import { useState, useEffect } from "react";
 import type { DeviceType } from "../types";
 import { getDeviceDimensions } from "../constants";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorStore } from "@/context/editorStore";
 
 interface UseDeviceManagementProps {
   pageComponents: any[];

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
-import { EditorProvider } from "@/context-liveeditor/EditorProvider";
+import { EditorProvider } from "@/context/EditorProvider";
 
 export function LiveEditorPage() {
   const [isMounted, setIsMounted] = useState(false);

@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
 import { MapPin } from "lucide-react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultFooter2Data } from "@/context-liveeditor/editorStoreFunctions/footerFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultFooter2Data } from "@/context/editorStoreFunctions/footerFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

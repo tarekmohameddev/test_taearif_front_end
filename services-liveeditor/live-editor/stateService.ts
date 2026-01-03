@@ -1,6 +1,6 @@
 import { ComponentInstance } from "@/lib/types";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
 import { createDefaultData } from "@/components/tenant/live-editor/EditorSidebar/utils";
 
 // دالة مزامنة الحالة مع المحرر

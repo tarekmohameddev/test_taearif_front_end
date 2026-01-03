@@ -2,10 +2,10 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { ComponentInstanceWithPosition } from "@/lib-liveeditor/types";
-import { useSidebarStateManager } from "@/context-liveeditor/SidebarStateManager";
+import { useSidebarStateManager } from "@/context/SidebarStateManager";
 import { AdvancedSimpleSwitcher } from "./components/AdvancedSimpleSwitcher";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 
 interface UnifiedSidebarProps {
   isOpen: boolean;

@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { Mail } from "lucide-react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultHero4Data } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultHero4Data } from "@/context/editorStoreFunctions/heroFunctions";
 import PropertyFilter2 from "@/components/tenant/propertyFilter/propertyFilter2";
 
 interface Hero4Props {

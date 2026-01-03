@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultPhotosGridData } from "@/context-liveeditor/editorStoreFunctions/photosGridFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultPhotosGridData } from "@/context/editorStoreFunctions/photosGridFunctions";
 
 interface PhotosGridProps {
   visible?: boolean;

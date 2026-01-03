@@ -22,9 +22,9 @@ import { cn } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultHeroData } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultHeroData } from "@/context/editorStoreFunctions/heroFunctions";
 import HeroSearchForm from "./HeroSearchForm";
 
 interface HeroProps {

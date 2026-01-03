@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import SignInForm from "@/components/tenant/auth/signin-form";

@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultHalfTextHalfImage4Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultHalfTextHalfImage4Data } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

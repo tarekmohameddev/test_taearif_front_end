@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultCard4Data } from "@/context-liveeditor/editorStoreFunctions/card4Functions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultCard4Data } from "@/context/editorStoreFunctions/card4Functions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

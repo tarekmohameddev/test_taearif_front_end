@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/select";
 import { ChevronDown, Home, MapPin, Search, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultHero3Data } from "@/context-liveeditor/editorStoreFunctions/heroFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultHero3Data } from "@/context/editorStoreFunctions/heroFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-import { getDefaultHalfTextHalfImage7Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorT } from "@/context/editorI18nStore";
+import { getDefaultHalfTextHalfImage7Data } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";

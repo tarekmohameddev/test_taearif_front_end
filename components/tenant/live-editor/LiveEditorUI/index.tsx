@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorStore } from "@/context/editorStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { EnhancedLiveEditorDragDropContext } from "@/services-liveeditor/live-editor/dragDrop/EnhancedLiveEditorDragDropContext";
 import {
   validateComponentPositions,

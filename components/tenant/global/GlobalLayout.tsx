@@ -2,8 +2,8 @@
 
 import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
 import { useParams } from "next/navigation";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
 import { StaticHeaderSkeleton1, HeaderSkeleton1 } from "@/components/skeleton";
 import { notFound } from "next/navigation";
 import {
@@ -81,7 +81,7 @@ export default function GlobalLayout({ children }: GlobalLayoutProps) {
       console.log("🚀 GlobalLayout - Setting default header data");
       const {
         getDefaultHeaderData,
-      } = require("@/context-liveeditor/editorStoreFunctions/headerFunctions");
+      } = require("@/context/editorStoreFunctions/headerFunctions");
       const defaultData = getDefaultHeaderData();
       console.log("🚀 GlobalLayout - Default header data:", defaultData);
       setGlobalHeaderData(defaultData);
@@ -92,7 +92,7 @@ export default function GlobalLayout({ children }: GlobalLayoutProps) {
       console.log("🚀 GlobalLayout - Setting default footer data");
       const {
         getDefaultFooterData,
-      } = require("@/context-liveeditor/editorStoreFunctions/footerFunctions");
+      } = require("@/context/editorStoreFunctions/footerFunctions");
       const defaultData = getDefaultFooterData();
       setGlobalFooterData(defaultData);
     }

@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEditorLocale } from "@/context-liveeditor/editorI18nStore";
+import { useEditorLocale } from "@/context/editorI18nStore";
 import { locales, localeNames, localeFlags } from "@/lib/i18n/config";
 import { Globe } from "lucide-react";
 

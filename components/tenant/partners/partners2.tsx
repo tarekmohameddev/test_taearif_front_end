@@ -6,9 +6,9 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultPartners2Data } from "@/context-liveeditor/editorStoreFunctions/partnersFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultPartners2Data } from "@/context/editorStoreFunctions/partnersFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

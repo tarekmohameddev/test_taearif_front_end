@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
 
 // القائمة الافتراضية لأنواع العقارات (تُستخدم كـ fallback)
 const defaultPropertyTypes = [

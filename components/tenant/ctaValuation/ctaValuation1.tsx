@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultCtaValuationData } from "@/context-liveeditor/editorStoreFunctions/ctaValuationFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultCtaValuationData } from "@/context/editorStoreFunctions/ctaValuationFunctions";
 
 interface CtaValuationSectionProps {
   visible?: boolean;

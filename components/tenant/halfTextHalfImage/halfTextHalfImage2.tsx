@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultHalfTextHalfImage2Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultHalfTextHalfImage2Data } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 
 // Default half text half image data for variant 2 (with stats)
 // ⚠️ DEPRECATED: Use getDefaultHalfTextHalfImage2Data from halfTextHalfImageFunctions.ts instead

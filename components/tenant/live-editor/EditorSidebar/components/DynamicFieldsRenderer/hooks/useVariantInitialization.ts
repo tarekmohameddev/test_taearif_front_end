@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
 
 interface UseVariantInitializationProps {

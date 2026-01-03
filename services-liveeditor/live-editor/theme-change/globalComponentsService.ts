@@ -19,7 +19,7 @@
  * ============================================================================
  */
 
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { createDefaultData } from "@/components/tenant/live-editor/EditorSidebar/utils";
 import type { ThemeData } from "./types";
 

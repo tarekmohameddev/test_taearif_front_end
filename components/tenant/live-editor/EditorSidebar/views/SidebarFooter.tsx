@@ -1,9 +1,9 @@
 import React from "react";
 import { ComponentInstance } from "@/lib-liveeditor/types";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorStore } from "@/context/editorStore";
 import { createDefaultData } from "../utils";
-import { getDefaultHeaderData } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
+import { getDefaultHeaderData } from "@/context/editorStoreFunctions/headerFunctions";
 
 interface SidebarFooterProps {
   view: "main" | "add-section" | "edit-component" | "branding-settings";

@@ -8,9 +8,9 @@ import {
   FaLinkedinIn,
   FaWhatsapp,
 } from "react-icons/fa6";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultContactFormSectionData } from "@/context-liveeditor/editorStoreFunctions/contactFormSectionFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultContactFormSectionData } from "@/context/editorStoreFunctions/contactFormSectionFunctions";
 
 interface SocialLinkProps {
   href: string;

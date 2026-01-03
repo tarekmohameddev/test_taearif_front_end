@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance } from "@/lib-liveeditor/types";
 import { isStaticPage } from "./utils/staticPageHelpers";
 

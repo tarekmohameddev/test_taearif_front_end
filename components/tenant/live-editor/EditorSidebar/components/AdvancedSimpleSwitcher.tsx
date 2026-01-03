@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { AdvancedSimpleSwitcherProps } from "../types";
 import { DynamicFieldsRenderer } from "./DynamicFieldsRenderer";
 import { COMPONENTS } from "@/lib-liveeditor/ComponentsList";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorStore } from "@/context/editorStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { translateComponentStructure } from "@/componentsStructure";
 
 export function AdvancedSimpleSwitcher({

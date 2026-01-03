@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import { useEffect } from "react";
 
 interface LiveEditorWrapperProps {

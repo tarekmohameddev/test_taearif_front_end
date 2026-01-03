@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { DynamicFieldsRendererProps } from "../types";
 import { normalizePath } from "../utils";

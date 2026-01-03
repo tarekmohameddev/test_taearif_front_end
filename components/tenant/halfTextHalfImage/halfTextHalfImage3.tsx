@@ -3,13 +3,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
 import {
   logComponentRender,
   logTenantStore,
 } from "@/lib-liveeditor/debugLogger";
-import { getDefaultHalfTextHalfImage3Data } from "@/context-liveeditor/editorStoreFunctions/halfTextHalfImageFunctions";
+import { getDefaultHalfTextHalfImage3Data } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 
 interface VisionSectionProps {
   visible?: boolean;

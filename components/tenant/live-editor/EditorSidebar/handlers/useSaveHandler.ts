@@ -1,4 +1,4 @@
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance, ComponentData } from "@/lib-liveeditor/types";
 import { logChange } from "@/lib-liveeditor/debugLogger";
 import { deepMerge } from "../utils/deepMerge";

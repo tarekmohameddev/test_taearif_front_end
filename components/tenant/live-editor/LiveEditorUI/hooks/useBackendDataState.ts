@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { useState, useEffect, useRef } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 
 interface UseBackendDataStateProps {
   pageComponents: any[];

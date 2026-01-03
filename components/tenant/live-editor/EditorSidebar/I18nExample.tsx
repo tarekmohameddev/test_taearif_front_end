@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { TranslationFields } from "./TranslationFields";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Languages } from "lucide-react";

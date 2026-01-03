@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultLogosTickerData } from "@/context-liveeditor/editorStoreFunctions/logosTickerFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultLogosTickerData } from "@/context/editorStoreFunctions/logosTickerFunctions";
 import {
   TrustedBrandsScroller,
   TrustedBrandsScrollerReverse,

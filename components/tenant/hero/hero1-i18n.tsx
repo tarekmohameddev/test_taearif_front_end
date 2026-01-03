@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { useClientT } from "@/context-liveeditor/clientI18nStore";
-import { useClientLocale } from "@/context-liveeditor/clientI18nStore";
+import { useClientT } from "@/context/clientI18nStore";
+import { useClientLocale } from "@/context/clientI18nStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

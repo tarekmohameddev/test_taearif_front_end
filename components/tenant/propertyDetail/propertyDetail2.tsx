@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultpropertyDetail2Data } from "@/context-liveeditor/editorStoreFunctions/propertyDetailFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultpropertyDetail2Data } from "@/context/editorStoreFunctions/propertyDetailFunctions";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";

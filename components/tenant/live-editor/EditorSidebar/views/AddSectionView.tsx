@@ -1,5 +1,5 @@
 import React from "react";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { AVAILABLE_SECTIONS, getSectionIcon } from "../constants";
 
 interface AddSectionViewProps {

@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context-liveeditor/editorStoreFunctions/headerFunctions";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context/editorStoreFunctions/headerFunctions";
 import HeaderSkeleton from "@/components/skeleton/header/StaticHeaderSkeleton1";
 // Function to generate random ID
 const generateRandomId = (): string => {

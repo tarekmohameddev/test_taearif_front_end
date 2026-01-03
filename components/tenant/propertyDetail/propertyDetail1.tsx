@@ -119,7 +119,7 @@ interface Property {
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,

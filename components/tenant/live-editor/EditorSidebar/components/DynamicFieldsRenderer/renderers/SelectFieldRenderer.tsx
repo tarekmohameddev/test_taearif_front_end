@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { FieldRendererProps } from "../types";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import axiosInstance from "@/lib/axiosInstance";
 
 // مكون عرض حقل اللون

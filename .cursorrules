@@ -148,13 +148,13 @@ docs/important/
 
 ```typescript
 // When adding/modifying components, UPDATE ALL:
-// 1. context-liveeditor/editorStoreFunctions/{component}Functions.ts
+// 1. context/editorStoreFunctions/{component}Functions.ts
 // 2. componentsStructure/{component}.ts
 // 3. components/tenant/{component}/{component}1.tsx
-// 4. context-liveeditor/editorStore.ts (import, state, 4 switch cases, functions)
+// 4. context/editorStore.ts (import, state, 4 switch cases, functions)
 // 5. lib-liveeditor/ComponentsList.tsx (import, getComponents, COMPONENTS)
 // 6. componentsStructure/index.ts (export)
-// 7. context-liveeditor/editorStoreFunctions/index.ts (export)
+// 7. context/editorStoreFunctions/index.ts (export)
 
 // ✅ Follow checklist in ADD_NEW_COMPONENT.md
 // ❌ Never skip integration steps
@@ -355,7 +355,7 @@ STEP 5: Verify saves/loads correctly
 
 ### **Component Files:**
 ```
-context-liveeditor/editorStoreFunctions/
+context/editorStoreFunctions/
   └── {componentType}Functions.ts         ← 4 functions + default data
 
 componentsStructure/
@@ -367,7 +367,7 @@ components/tenant/{componentType}/
 
 ### **Store Files:**
 ```
-context-liveeditor/
+context/
   ├── editorStore.ts                      ← Main store
   ├── tenantStore.jsx                     ← Tenant data
   └── editorI18nStore.ts                  ← Translations
@@ -381,7 +381,7 @@ lib-liveeditor/
 componentsStructure/
   └── index.ts                            ← Export all structures
 
-context-liveeditor/editorStoreFunctions/
+context/editorStoreFunctions/
   └── index.ts                            ← Export all functions
 ```
 
@@ -461,14 +461,14 @@ When responding to user:
 ### **Good Examples to Study:**
 ```
 components/tenant/hero/hero1.tsx          ← Perfect 7-step pattern
-context-liveeditor/editorStoreFunctions/heroFunctions.ts
+context/editorStoreFunctions/heroFunctions.ts
 componentsStructure/hero.ts
 ```
 
 ### **Complex Examples:**
 ```
 components/tenant/testimonials/testimonials1.tsx  ← Array handling
-context-liveeditor/editorStoreFunctions/contactCardsFunctions.ts  ← Extended functions
+context/editorStoreFunctions/contactCardsFunctions.ts  ← Extended functions
 ```
 
 ---

@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultBlogsSectionsData } from "@/context-liveeditor/editorStoreFunctions/blogsSectionsFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultBlogsSectionsData } from "@/context/editorStoreFunctions/blogsSectionsFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE

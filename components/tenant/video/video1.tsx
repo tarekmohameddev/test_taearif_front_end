@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultVideoData } from "@/context-liveeditor/editorStoreFunctions/videoFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultVideoData } from "@/context/editorStoreFunctions/videoFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // VIDEO SOURCE DETECTION UTILITIES

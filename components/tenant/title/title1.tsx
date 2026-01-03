@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { getDefaultTitleData } from "@/context-liveeditor/editorStoreFunctions/titleFunctions";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { getDefaultTitleData } from "@/context/editorStoreFunctions/titleFunctions";
 
 interface TitleProps {
   visible?: boolean;

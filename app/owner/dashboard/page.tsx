@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import useOwnerAuthStore from "@/context/OwnerAuthContext";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import { Button } from "@/components/ui/button";
 import {
   Card,

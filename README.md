@@ -89,7 +89,7 @@ project/
 ├── components/               ← React components
 │   ├── tenant/              ← Tenant-specific components
 │   └── ui/                  ← UI components
-├── context-liveeditor/       ← Live Editor context & stores
+├── context/                  ← Context & stores (including Live Editor)
 ├── componentsStructure/      ← Component structure definitions
 ├── lib-liveeditor/          ← Live Editor utilities
 ├── docs/                     ← Documentation

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import useTenantStore from "@/context/tenantStore";
 import Navbar from "@/components/landing/homepage/components/Navbar";
 import Footer from "@/components/landing/homepage/components/Footer";
 

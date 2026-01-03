@@ -19,8 +19,8 @@
  * ============================================================================
  */
 
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import useTenantStore from "@/context-liveeditor/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
+import useTenantStore from "@/context/tenantStore";
 import { createBackupKey } from "./themeDataLoader";
 import type { BackupResult } from "./types";
 

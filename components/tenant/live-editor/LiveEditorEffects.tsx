@@ -1,6 +1,6 @@
 "use client";
 import { useRef } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance } from "@/lib-liveeditor/types";
 
 // Effects

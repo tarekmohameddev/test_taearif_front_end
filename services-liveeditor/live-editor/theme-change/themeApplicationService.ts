@@ -21,7 +21,7 @@
  * ============================================================================
  */
 
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import { useEditorStore } from "@/context/editorStore";
 import { loadThemeData } from "./themeDataLoader";
 import {
   backupCurrentComponentSettings,

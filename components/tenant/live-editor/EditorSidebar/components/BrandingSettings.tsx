@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
-import { useEditorT } from "@/context-liveeditor/editorI18nStore";
+import { useEditorStore } from "@/context/editorStore";
+import { useEditorT } from "@/context/editorI18nStore";
 import { ModernColorPicker } from "./ModernColorPicker";
 
 export function BrandingSettings() {

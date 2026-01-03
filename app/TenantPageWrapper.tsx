@@ -2,8 +2,8 @@
 
 import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
-import useTenantStore from "@/context-liveeditor/tenantStore";
-import { useEditorStore } from "@/context-liveeditor/editorStore";
+import useTenantStore from "@/context/tenantStore";
+import { useEditorStore } from "@/context/editorStore";
 import { notFound } from "next/navigation";
 import {
   getSectionPath,
