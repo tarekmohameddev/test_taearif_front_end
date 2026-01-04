@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Move, UserPlus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import axiosInstance from "@/lib/axiosInstance";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { z } from "zod";
 import toast from "react-hot-toast";
@@ -30,10 +30,10 @@ const customerSchema = z.object({
   note: z.string().optional(),
   type_id: z.number().min(1, "نوع العميل مطلوب"),
   // الأولوية مخفية حالياً - جعلتها اختيارية
-  priority_id: z.number().optional(),
+  priority_id: z.number().nullable().optional(),
   stage_id: z.union([z.number(), z.null(), z.literal("")]).optional(),
   // الإجراء مخفي حالياً - جعلته اختيارياً
-  procedure_id: z.number().optional(),
+  procedure_id: z.number().nullable().optional(),
 });
 
 // Error message translation mapping
@@ -80,10 +80,25 @@ export const CustomerPageHeader = ({
   // Get filter data from store
   const { userData } = useAuthStore();
 
+  // تعيين كلمة المرور تلقائياً عند فتح النموذج
+  useEffect(() => {
+    if (showAddCustomerDialog && (!newCustomer.password || newCustomer.password === "")) {
+      setNewCustomer((prev: typeof newCustomer) => ({
+        ...prev,
+        password: "123456",
+      }));
+    }
+  }, [showAddCustomerDialog, newCustomer.password, setNewCustomer]);
+
   // Client-side validation function
   const validateForm = () => {
     try {
-      customerSchema.parse(newCustomer);
+      // استخدام البيانات المحدثة للتحقق - تعيين password تلقائياً
+      const dataToValidate = {
+        ...newCustomer,
+        password: newCustomer.password || "123456",
+      };
+      customerSchema.parse(dataToValidate);
       setFormErrors({});
       return true;
     } catch (error) {
@@ -114,29 +129,78 @@ export const CustomerPageHeader = ({
     setValidationErrors({});
     setClientErrors({});
 
+    // تعيين كلمة المرور الافتراضية قبل التحقق
+    // التأكد من أن password موجود دائماً
+    const passwordToUse = 
+      newCustomer.password && 
+      newCustomer.password.trim() !== "" 
+        ? newCustomer.password 
+        : "123456";
+
+    // تحديث الـ state إذا كان password فارغاً
+    if (!newCustomer.password || newCustomer.password.trim() === "") {
+      setNewCustomer((prev: typeof newCustomer) => ({
+        ...prev,
+        password: "123456",
+      }));
+    }
+
     // Client-side validation
-    if (!validateForm()) {
-      toast.error("يرجى تصحيح الأخطاء في النموذج", {
-        duration: 4000,
-        position: "top-center",
-        style: {
-          background: "#EF4444",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: "16px",
-          padding: "12px 20px",
-          borderRadius: "8px",
-        },
-      });
+    // استخدام البيانات المحدثة مع password الافتراضي
+    // تحويل null إلى undefined للحقول الاختيارية
+    const customerDataForValidation = {
+      ...newCustomer,
+      password: passwordToUse,
+      priority_id: newCustomer.priority_id ?? undefined,
+      procedure_id: newCustomer.procedure_id ?? undefined,
+    };
+
+    try {
+      customerSchema.parse(customerDataForValidation);
+      setFormErrors({});
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            errors[err.path[0] as string] = err.message;
+          }
+        });
+        setFormErrors(errors);
+        
+        // عرض رسالة خطأ مفصلة
+        const firstError = Object.values(errors)[0];
+        const errorMessage = firstError || "يرجى تصحيح الأخطاء في النموذج";
+        
+        toast.error(errorMessage, {
+          duration: 4000,
+          position: "top-center",
+          style: {
+            background: "#EF4444",
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: "16px",
+            padding: "12px 20px",
+            borderRadius: "8px",
+          },
+        });
+        return;
+      }
       return;
     }
 
+    // إذا وصلنا هنا، التحقق نجح - المتابعة لإرسال البيانات
     setIsSubmitting(true);
     try {
       // معالجة stage_id قبل الإرسال
+      // التأكد من أن password موجود (إذا كان فارغاً، استخدم القيمة الافتراضية)
       const customerDataToSend: any = {
         ...newCustomer,
+        password: newCustomer.password || "123456",
         stage_id: newCustomer.stage_id === null ? "" : newCustomer.stage_id,
+        // تحويل null إلى undefined للحقول الاختيارية
+        priority_id: newCustomer.priority_id ?? undefined,
+        procedure_id: newCustomer.procedure_id ?? undefined,
       };
 
       // إزالة stage_id إذا كان فارغاً لتجنب مشاكل الـ API
@@ -265,7 +329,16 @@ export const CustomerPageHeader = ({
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <Button onClick={() => setShowAddCustomerDialog(true)}>
+        <Button
+          onClick={() => {
+            // تعيين كلمة المرور الافتراضية عند فتح النموذج
+            setNewCustomer((prev: typeof newCustomer) => ({
+              ...prev,
+              password: "123456",
+            }));
+            setShowAddCustomerDialog(true);
+          }}
+        >
           <UserPlus className="ml-2 h-4 w-4" />
           إضافة عميل جديد
         </Button>
