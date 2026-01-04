@@ -338,22 +338,12 @@ export default function CreateEmployeePage() {
                     </div>
                   )}
 
-                  {/* Limit Error Message */}
-                  {limitError && (
-                    <div className={`border rounded-lg p-4 flex flex-col gap-3 ${
-                      isOverLimit 
-                        ? "bg-red-50 border-red-200" 
-                        : "bg-orange-50 border-orange-200"
-                    }`}>
+                  {/* Limit Error Message - Only show when over limit */}
+                  {isOverLimit && limitError && (
+                    <div className="border rounded-lg p-4 flex flex-col gap-3 bg-red-50 border-red-200">
                       <div className="flex items-center gap-3">
-                        {isOverLimit ? (
-                          <AlertCircle className="h-5 w-5 text-red-600" />
-                        ) : (
-                          <AlertCircle className="h-5 w-5 text-orange-600" />
-                        )}
-                        <span className={`font-medium ${
-                          isOverLimit ? "text-red-800" : "text-orange-800"
-                        }`}>
+                        <AlertCircle className="h-5 w-5 text-red-600" />
+                        <span className="font-medium text-red-800">
                           {limitError}
                         </span>
                       </div>
@@ -369,9 +359,7 @@ export default function CreateEmployeePage() {
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
-                              className={`h-2 rounded-full ${
-                                isOverLimit ? "bg-red-600" : "bg-orange-600"
-                              }`}
+                              className="h-2 rounded-full bg-red-600"
                               style={{
                                 width: `${Math.min(
                                   ((employeesData.usage || employeesData.total_count || 0) / employeesData.max_employees) * 100,
