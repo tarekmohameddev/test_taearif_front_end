@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -839,17 +840,20 @@ export default function CrmSettingsDialog({
   };
 
   return (
-    <Dialog open={showCrmSettingsDialog} onOpenChange={handleClose}>
-      <DialogContent
-        className="max-w-5xl max-h-[85vh] overflow-hidden"
-        dir="rtl"
-      >
-        <DialogHeader className="pb-4">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Settings className="h-6 w-6" />
-            إعدادات نظام إدارة العملاء
-          </DialogTitle>
-        </DialogHeader>
+    <CustomDialog
+      open={showCrmSettingsDialog}
+      onOpenChange={handleClose}
+      maxWidth="max-w-5xl"
+    >
+      <CustomDialogContent className="max-h-[85vh] overflow-hidden">
+        <div dir="rtl">
+          <CustomDialogClose onClose={handleClose} />
+          <CustomDialogHeader className="pb-4">
+            <CustomDialogTitle className="flex items-center gap-2 text-xl">
+              <Settings className="h-6 w-6" />
+              إعدادات نظام إدارة العملاء
+            </CustomDialogTitle>
+          </CustomDialogHeader>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
@@ -973,12 +977,13 @@ export default function CrmSettingsDialog({
           </Tabs>
         )}
 
-        <div className="flex justify-start pt-4 border-t">
+        <div className="flex justify-end p-4 border-t">
           <Button onClick={handleClose} variant="outline" className="gap-2">
             إغلاق
           </Button>
         </div>
-      </DialogContent>
+        </div>
+      </CustomDialogContent>
 
       {/* Form Dialog */}
       <CrmFormDialog
@@ -992,6 +997,6 @@ export default function CrmSettingsDialog({
         error={formError}
         fieldErrors={fieldErrors}
       />
-    </Dialog>
+    </CustomDialog>
   );
 }
