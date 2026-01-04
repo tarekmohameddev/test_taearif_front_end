@@ -152,7 +152,6 @@ export default function PropertyRequestsPage() {
   >([]);
   const [statistics, setStatistics] = useState<{
     total_requests: number;
-    total_customers: number;
     by_status: { [key: string]: number };
   } | null>(null);
   const [formData, setFormData] = useState<Partial<PropertyRequest> | null>(
