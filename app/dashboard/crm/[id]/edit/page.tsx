@@ -1328,7 +1328,7 @@ export default function EditDealPage() {
                           <Home className="h-5 w-5" />
                           معلومات العقار
                         </CardTitle>
-                        <div className="w-full md:w-80">
+                        <div className="w-full md:w-[500px]">
                           {loadingProperties ? (
                             <div className="flex items-center gap-2">
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -1357,14 +1357,14 @@ export default function EditDealPage() {
                                     <SelectItem
                                       key={property.id}
                                       value={property.id.toString()}
-                                      className="text-sm max-w-[350px]"
+                                      className="text-sm max-w-[350px] sm:max-w-full"
                                     >
                                       <div className="flex flex-col">
                                         <span className={`font-medium ${isLongText ? 'text-[10px]' : 'text-sm'}`}>
                                           {title}
                                         </span>
                                         {property.address && (
-                                          <span className="text-xs text-muted-foreground md:hidden">
+                                          <span className="text-xs text-muted-foreground hidden md:block">
                                             {property.address}
                                           </span>
                                         )}
