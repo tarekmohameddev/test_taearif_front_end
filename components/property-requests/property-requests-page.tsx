@@ -163,7 +163,6 @@ export default function PropertyRequestsPage() {
     full_name: "",
     phone: "",
     contact_on_whatsapp: false,
-    notes: "",
   });
   const { userData } = useAuthStore();
 
@@ -318,9 +317,34 @@ export default function PropertyRequestsPage() {
 
     setIsSubmitting(true);
     try {
+      // بناء الـ request بالشكل المطلوب
+      const requestData = {
+        full_name: newPropertyRequest.full_name,
+        phone: newPropertyRequest.phone,
+        region: "", // يمكن إضافته لاحقاً إذا كان موجوداً في النموذج
+        property_type: newPropertyRequest.property_type,
+        category_id: newPropertyRequest.category ? parseInt(newPropertyRequest.category) : null,
+        city_id: null, // يمكن إضافته لاحقاً إذا كان موجوداً في النموذج
+        districts_id: newPropertyRequest.neighborhoods && newPropertyRequest.neighborhoods.length > 0 
+          ? parseInt(newPropertyRequest.neighborhoods[0]) 
+          : null,
+        area_from: newPropertyRequest.area_from,
+        area_to: newPropertyRequest.area_to,
+        purchase_method: newPropertyRequest.purchase_method,
+        budget_from: newPropertyRequest.budget_from,
+        budget_to: newPropertyRequest.budget_to,
+        seriousness: newPropertyRequest.seriousness,
+        purchase_goal: newPropertyRequest.purchase_goal,
+        wants_similar_offers: newPropertyRequest.wants_similar_offers,
+        contact_on_whatsapp: newPropertyRequest.contact_on_whatsapp,
+        is_read: false,
+        is_active: true,
+        status_id: 2,
+      };
+
       const response = await axiosInstance.post(
         "/v1/property-requests",
-        newPropertyRequest,
+        requestData,
       );
 
       // Add the new property request to the list
@@ -348,7 +372,6 @@ export default function PropertyRequestsPage() {
         full_name: "",
         phone: "",
         contact_on_whatsapp: false,
-        notes: "",
       });
       // Clear any existing errors
       setClientErrors({});
@@ -381,7 +404,6 @@ export default function PropertyRequestsPage() {
       full_name: propertyRequest.full_name || "",
       phone: propertyRequest.phone || "",
       contact_on_whatsapp: propertyRequest.contact_on_whatsapp,
-      notes: propertyRequest.notes || "",
     });
     setOpen(true);
   };

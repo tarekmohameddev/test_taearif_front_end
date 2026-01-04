@@ -2,7 +2,6 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -30,7 +29,6 @@ interface PropertyRequestFormData {
   full_name: string;
   phone: string;
   contact_on_whatsapp: boolean;
-  notes: string;
 }
 
 interface FiltersData {
@@ -348,20 +346,6 @@ export const PropertyRequestForm = ({
         </div>
       )}
 
-      {/* Notes */}
-      <div className="space-y-2">
-        <Label htmlFor="notes">الملاحظات</Label>
-        <Textarea
-          id="notes"
-          value={formData.notes}
-          onChange={(e) => onChange("notes", e.target.value)}
-          rows={4}
-          className={getError("notes") ? "border-red-500" : ""}
-        />
-        {getError("notes") && (
-          <p className="text-sm text-red-500">{getError("notes")}</p>
-        )}
-      </div>
     </div>
   );
 };
