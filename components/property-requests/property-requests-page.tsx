@@ -65,7 +65,6 @@ interface PropertyRequestsResponse {
     };
     statistics: {
       total_requests: number;
-      total_customers: number;
       by_status: {
         [key: string]: number;
       };

@@ -6,13 +6,11 @@ import {
   Eye,
   CheckCircle,
   XCircle,
-  Users,
 } from "lucide-react";
 
 interface PropertyRequestStatisticsCardsProps {
   statistics: {
     total_requests: number;
-    total_customers: number;
     by_status: { [key: string]: number };
   } | null;
   loading?: boolean;
@@ -24,13 +22,12 @@ export const PropertyRequestStatisticsCards = ({
 }: PropertyRequestStatisticsCardsProps) => {
   // استخدام البيانات من API مباشرة
   const totalRequests = statistics?.total_requests || 0;
-  const totalCustomers = statistics?.total_customers || 0;
   const byStatus = statistics?.by_status || {};
 
   // الحصول على جميع الحالات من by_status
   const statusEntries = Object.entries(byStatus);
 
-  // تعريف البطاقات - إجمالي الطلبات والعملاء أولاً
+  // تعريف البطاقات - إجمالي الطلبات أولاً
   const statsCards = [
     {
       title: "إجمالي الطلبات",
@@ -38,13 +35,6 @@ export const PropertyRequestStatisticsCards = ({
       icon: FileText,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-    },
-    {
-      title: "إجمالي العملاء",
-      value: totalCustomers,
-      icon: Users,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
     },
     // إضافة بطاقات للحالات الديناميكية
     ...statusEntries.map(([statusName, count], index) => {
