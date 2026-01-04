@@ -15,10 +15,14 @@ import {
   XCircle,
   Loader2,
   ArrowRight,
+  AlertCircle,
+  TrendingUp,
 } from "lucide-react";
 import { PermissionsDropdown } from "@/components/access-control/PermissionsDropdown";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { useUserStore } from "@/store/userStore";
+import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
 // Types
 interface Permission {
@@ -60,6 +64,9 @@ interface CreateEmployeeRequest {
 export default function CreateEmployeePage() {
   const router = useRouter();
   const { userData } = useAuthStore();
+  const userStoreData = useUserStore((state) => state.userData);
+  const employeesData = userStoreData?.employees;
+  
   const [formData, setFormData] = useState<CreateEmployeeRequest>({
     first_name: "",
     last_name: "",
@@ -80,6 +87,70 @@ export default function CreateEmployeePage() {
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState(false);
+  
+  // Limit detection states
+  const [limitError, setLimitError] = useState<string | null>(null);
+  const [isAtLimit, setIsAtLimit] = useState(false);
+  const [isOverLimit, setIsOverLimit] = useState(false);
+  
+  // Payment popup state
+  const [paymentPopupOpen, setPaymentPopupOpen] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
+  const [isPurchasingAddon, setIsPurchasingAddon] = useState(false);
+
+  // Check limit on mount and when employeesData changes
+  useEffect(() => {
+    // Fetch user data if not already loaded
+    const userStore = useUserStore.getState();
+    if (!userStore.userData || !userStore.userData.employees) {
+      userStore.fetchUserData();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!employeesData) {
+      // No employees data yet, wait for it to load
+      return;
+    }
+
+    // Check if there's a limit set
+    if (!employeesData.max_employees) {
+      // No limit set, can create employee
+      setLimitError(null);
+      setIsAtLimit(false);
+      setIsOverLimit(false);
+      return;
+    }
+
+    const usage = employeesData.usage || employeesData.total_count || 0;
+    const maxEmployees = employeesData.max_employees;
+    const usagePercentage = usage / maxEmployees;
+
+    // Check if over limit
+    if (employeesData.is_over_limit || usage > maxEmployees) {
+      setIsOverLimit(true);
+      setIsAtLimit(false);
+      setLimitError(
+        `لقد تجاوزت الحد المسموح به. الحد الأقصى: ${maxEmployees}، المستخدم: ${usage}`
+      );
+      return;
+    }
+
+    // Check if at limit
+    if (usagePercentage >= 1) {
+      setIsAtLimit(true);
+      setIsOverLimit(false);
+      setLimitError(
+        `لقد وصلت إلى الحد الأقصى المسموح به. الحد الأقصى: ${maxEmployees}، المستخدم: ${usage}`
+      );
+      return;
+    }
+
+    // Within limit
+    setLimitError(null);
+    setIsAtLimit(false);
+    setIsOverLimit(false);
+  }, [employeesData]);
 
   // Fetch permissions
   useEffect(() => {
@@ -125,8 +196,53 @@ export default function CreateEmployeePage() {
     setSelectedPermissions(newSelectedPermissions);
   };
 
+  // Purchase employee addon (increase limit)
+  const handlePurchaseEmployeeAddon = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    
+    setIsPurchasingAddon(true);
+    setCreateError(null);
+
+    try {
+      const response = await axiosInstance.post("/employee/addons", {
+        qty: 1,
+        plan_id: 1,
+      });
+
+      if (response.data.status === "success" && response.data.payment_url) {
+        setPaymentUrl(response.data.payment_url);
+        setPaymentPopupOpen(true);
+      } else {
+        setCreateError("فشل في إنشاء طلب الشراء");
+      }
+    } catch (err: any) {
+      console.error("Error purchasing employee addon:", err);
+      setCreateError(err.response?.data?.message || "حدث خطأ أثناء شراء الحد الإضافي");
+    } finally {
+      setIsPurchasingAddon(false);
+    }
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = async () => {
+    setPaymentPopupOpen(false);
+    setPaymentUrl("");
+    
+    // Refresh user data to get updated employees quota
+    const userStore = useUserStore.getState();
+    await userStore.refreshUserData();
+  };
+
   // Create employee
   const createEmployee = async () => {
+    // Check limit before creating
+    if (isAtLimit || isOverLimit) {
+      setCreateError(limitError || "لا يمكن إضافة موظف جديد. تم الوصول إلى الحد الأقصى.");
+      return;
+    }
+
     setCreateLoading(true);
     setCreateError(null);
 
@@ -158,6 +274,10 @@ export default function CreateEmployeePage() {
         permissions: [],
       });
       setSelectedPermissions({});
+
+      // Refresh user data to update employees count
+      const userStore = useUserStore.getState();
+      await userStore.refreshUserData();
 
       // Redirect after 2 seconds
       setTimeout(() => {
@@ -218,8 +338,55 @@ export default function CreateEmployeePage() {
                     </div>
                   )}
 
+                  {/* Limit Error Message */}
+                  {limitError && (
+                    <div className={`border rounded-lg p-4 flex flex-col gap-3 ${
+                      isOverLimit 
+                        ? "bg-red-50 border-red-200" 
+                        : "bg-orange-50 border-orange-200"
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        {isOverLimit ? (
+                          <AlertCircle className="h-5 w-5 text-red-600" />
+                        ) : (
+                          <AlertCircle className="h-5 w-5 text-orange-600" />
+                        )}
+                        <span className={`font-medium ${
+                          isOverLimit ? "text-red-800" : "text-orange-800"
+                        }`}>
+                          {limitError}
+                        </span>
+                      </div>
+                      {employeesData && employeesData.max_employees && (
+                        <div className="pr-8">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-gray-600">
+                              الحد الأقصى: {employeesData.max_employees}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              المستخدم: {employeesData.usage || employeesData.total_count || 0}
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full ${
+                                isOverLimit ? "bg-red-600" : "bg-orange-600"
+                              }`}
+                              style={{
+                                width: `${Math.min(
+                                  ((employeesData.usage || employeesData.total_count || 0) / employeesData.max_employees) * 100,
+                                  100
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Error Message */}
-                  {createError && (
+                  {createError && !limitError && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
                       <XCircle className="h-5 w-5 text-red-600" />
                       <span className="text-red-800 font-medium">
@@ -407,38 +574,91 @@ export default function CreateEmployeePage() {
                   >
                     إلغاء
                   </Button>
-                  <Button
-                    onClick={createEmployee}
-                    disabled={
-                      createLoading ||
-                      !formData.first_name ||
-                      !formData.last_name ||
-                      !formData.email ||
-                      !formData.phone ||
-                      !formData.password
+                  {(() => {
+                    // If at limit or over limit, show "Increase Limit" button
+                    if (isAtLimit || isOverLimit) {
+                      return (
+                        <Button
+                          type="button"
+                          className="bg-orange-600 hover:bg-orange-700 text-white text-sm sm:text-base w-full sm:w-auto"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (e.nativeEvent) {
+                              e.nativeEvent.stopImmediatePropagation();
+                            }
+                            handlePurchaseEmployeeAddon(e);
+                            return false;
+                          }}
+                          disabled={isPurchasingAddon}
+                        >
+                          {isPurchasingAddon ? (
+                            <>
+                              <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
+                              <span className="text-xs sm:text-sm">
+                                جاري المعالجة...
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                              <span className="text-xs sm:text-sm">
+                                زيادة الحد المسموح
+                              </span>
+                            </>
+                          )}
+                        </Button>
+                      );
                     }
-                    className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
-                  >
-                    {createLoading ? (
-                      <>
-                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
-                        <span className="text-xs sm:text-sm">
-                          جاري الإنشاء...
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                        <span className="text-xs sm:text-sm">إنشاء الموظف</span>
-                      </>
-                    )}
-                  </Button>
+                    
+                    // Otherwise, show "Create Employee" button
+                    return (
+                      <Button
+                        onClick={createEmployee}
+                        disabled={
+                          createLoading ||
+                          !formData.first_name ||
+                          !formData.last_name ||
+                          !formData.email ||
+                          !formData.phone ||
+                          !formData.password
+                        }
+                        className="bg-black hover:bg-gray-800 text-white disabled:bg-gray-400 text-sm sm:text-base w-full sm:w-auto"
+                      >
+                        {createLoading ? (
+                          <>
+                            <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 animate-spin" />
+                            <span className="text-xs sm:text-sm">
+                              جاري الإنشاء...
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                            <span className="text-xs sm:text-sm">إنشاء الموظف</span>
+                          </>
+                        )}
+                      </Button>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Payment Popup */}
+      {paymentPopupOpen && (
+        <PaymentPopup
+          paymentUrl={paymentUrl}
+          onClose={() => {
+            setPaymentPopupOpen(false);
+            setPaymentUrl("");
+          }}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   );
 }
