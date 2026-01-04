@@ -377,6 +377,7 @@ export const PropertyRequestsTable = ({
                 <TableHead className="text-right">نوع العقار</TableHead>
                 <TableHead className="text-right">المنطقة</TableHead>
                 <TableHead className="text-right">الحي</TableHead>
+                <TableHead className="text-right">الحالة</TableHead>
                 <TableHead className="text-right">تاريخ الطلب</TableHead>
                 <TableHead className="w-[100px] text-right">
                   الإجراءات
@@ -411,6 +412,9 @@ export const PropertyRequestsTable = ({
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-20 rounded-full" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-24" />
@@ -528,6 +532,20 @@ export const PropertyRequestsTable = ({
                         </span>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {propertyRequest.status ? (
+                      <Badge
+                        variant="outline"
+                        className="border-gray-500 text-gray-700"
+                      >
+                        {propertyRequest.status.name_ar}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm italic">
+                        غير محدد
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center text-sm">
