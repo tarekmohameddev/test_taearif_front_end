@@ -33,6 +33,7 @@ import {
 } from "@/components/crm/dialogs/crm-activity-card";
 import { AddActivityForm } from "@/components/crm/dialogs/add-activity-form";
 import useCrmStore from "@/context/store/crm";
+import useAuthStore from "@/context/AuthContext";
 
 interface DealDetailsData {
   request: {
@@ -119,6 +120,7 @@ export default function DealDetailsPage() {
   const dealId = (params?.id as string) || "";
   const [activeTab, setActiveTab] = useState("crm");
   const { pipelineStages, getStageById, setPipelineStages } = useCrmStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,6 +136,11 @@ export default function DealDetailsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // انتظار حتى يتم جلب الـ token
+    if (authLoading || !userData?.token) {
+      return;
+    }
+
     const fetchDealDetails = async () => {
       try {
         setLoading(true);
@@ -159,7 +166,7 @@ export default function DealDetailsPage() {
     if (dealId) {
       fetchDealDetails();
     }
-  }, [dealId]);
+  }, [dealId, userData?.token, authLoading]);
 
   // Fetch pipeline stages if not in store
   useEffect(() => {
@@ -443,11 +450,26 @@ export default function DealDetailsPage() {
     property,
   } = data as any;
 
+  // Get stage from request.stage (as per API response structure)
+  const stage = request?.stage || (data as any).stage;
+
   // Debug: Log to check data structure
   console.log("Full Data:", data);
   console.log("Property:", property);
   console.log("Property Basic:", property_basic);
   console.log("Property Specifications:", property_specifications);
+  console.log("Stage:", stage);
+
+  // Get stage name - prioritize stage object from API, fallback to store lookup
+  const getStageName = () => {
+    if (stage?.name) {
+      return stage.name;
+    }
+    if (request?.stage_id) {
+      return getStageById(String(request.stage_id))?.name || `#${request.stage_id}`;
+    }
+    return "غير محدد";
+  };
 
   // Get property data from multiple possible locations (property, property_basic, or request.property_basic)
   const propertyBasicData =
@@ -668,15 +690,14 @@ export default function DealDetailsPage() {
                     </div>
                   ) : null}
 
-                  {request.stage_id ? (
+                  {(request.stage_id || stage) ? (
                     <div className="pt-4 border-t">
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground">
                           المرحلة:
                         </span>
                         <Badge variant="secondary">
-                          {getStageById(String(request.stage_id))?.name ||
-                            `#${request.stage_id}`}
+                          {getStageName()}
                         </Badge>
                       </div>
                     </div>
@@ -703,8 +724,7 @@ export default function DealDetailsPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">المرحلة</p>
                       <Badge variant="secondary">
-                        {getStageById(String(request.stage_id))?.name ||
-                          `#${request.stage_id}`}
+                        {getStageName()}
                       </Badge>
                     </div>
                     <div>
