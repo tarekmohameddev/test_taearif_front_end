@@ -211,32 +211,6 @@ export const CustomerForm = ({
             </p>
           )}
         </div>
-        {!isEditMode && (
-          <div>
-            <Label
-              htmlFor="password"
-              className={hasError("password") ? "text-red-500" : ""}
-            >
-              كلمة المرور <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password || ""}
-              onChange={handleInputChange("password")}
-              className={
-                hasError("password")
-                  ? "border-red-500 focus:border-red-500"
-                  : ""
-              }
-            />
-            {hasError("password") && (
-              <p className="text-red-500 text-sm mt-1">
-                {getErrorMessage("password")}
-              </p>
-            )}
-          </div>
-        )}
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>

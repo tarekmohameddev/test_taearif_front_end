@@ -139,7 +139,7 @@ export default function CustomersPage() {
     name: "",
     email: "",
     phone_number: "",
-    password: "",
+    password: "123456",
     city_id: null,
     district_id: null,
     note: "",
