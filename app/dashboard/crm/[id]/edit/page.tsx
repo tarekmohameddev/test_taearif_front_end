@@ -40,6 +40,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Customer {
@@ -98,6 +105,11 @@ export default function EditDealPage() {
   // Form data
   const [stageId, setStageId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Property selection
+  const [availableProperties, setAvailableProperties] = useState<Property[]>([]);
+  const [loadingProperties, setLoadingProperties] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
 
   // Property form data
   const [propertyData, setPropertyData] = useState<any>(null);
@@ -176,6 +188,8 @@ export default function EditDealPage() {
               data.request?.stage?.id?.toString() ||
               "",
           );
+          // Set selected property ID if exists
+          setSelectedPropertyId(data.request?.property_id?.toString() || "");
 
           // Load property data if exists
           // Property data comes directly from data.property (not nested in property_specifications)
@@ -311,6 +325,28 @@ export default function EditDealPage() {
     fetchStages();
   }, [pipelineStages.length, setPipelineStages]);
 
+  // Fetch available properties for selection
+  useEffect(() => {
+    const fetchAvailableProperties = async () => {
+      if (!userData?.token) return;
+
+      setLoadingProperties(true);
+      try {
+        const response = await axiosInstance.get("/properties?page=1&per_page=100");
+        if (response.data?.status === "success") {
+          const propertiesList = response.data.data?.properties || response.data.data || [];
+          setAvailableProperties(propertiesList);
+        }
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+      } finally {
+        setLoadingProperties(false);
+      }
+    };
+
+    fetchAvailableProperties();
+  }, [userData?.token]);
+
   // Fetch cards, projects and properties
   useEffect(() => {
     const fetchData = async () => {
@@ -407,6 +443,65 @@ export default function EditDealPage() {
     }
   };
 
+  // Handle property selection
+  const handlePropertySelect = (propertyId: string) => {
+    // Handle "none" value to clear selection
+    if (propertyId === "none") {
+      setSelectedPropertyId("");
+      return;
+    }
+
+    setSelectedPropertyId(propertyId);
+    const selectedProperty = availableProperties.find(
+      (p) => p.id.toString() === propertyId,
+    ) as any;
+
+    if (selectedProperty) {
+      // Update property form data with selected property data
+      const safeToString = (value: any): string => {
+        if (value === null || value === undefined) return "";
+        return value.toString();
+      };
+
+      setPropertyFormData({
+        address: selectedProperty.address ?? "",
+        building: safeToString(selectedProperty.building_id),
+        price: safeToString(selectedProperty.price),
+        payment_method: selectedProperty.payment_method ?? "",
+        price_per_sqm: safeToString(selectedProperty.pricePerMeter),
+        listing_type: "",
+        property_category: safeToString(selectedProperty.category_id),
+        project: safeToString(selectedProperty.project_id),
+        city: safeToString(selectedProperty.city_id),
+        district: safeToString(selectedProperty.state_id),
+        area: safeToString(selectedProperty.area ?? selectedProperty.size),
+        property_type: selectedProperty.type ?? "",
+        title: selectedProperty.title ?? "",
+        purpose: selectedProperty.purpose ?? "",
+        description: selectedProperty.description ?? "",
+        bedrooms: safeToString(selectedProperty.beds),
+        bathrooms: safeToString(selectedProperty.bath ?? selectedProperty.bathrooms),
+        rooms: safeToString(selectedProperty.rooms),
+        floors: safeToString(selectedProperty.floors),
+        floor_number: safeToString(selectedProperty.floor_number),
+        drivers_room: safeToString(selectedProperty.driver_room),
+        maids_room: safeToString(selectedProperty.maid_room),
+        dining_room: safeToString(selectedProperty.dining_room),
+        living_room: selectedProperty.living_room ?? false,
+        majlis: safeToString(selectedProperty.majlis),
+        storage_room: selectedProperty.storage_room ?? false,
+        basement: safeToString(selectedProperty.basement),
+        swimming_pool: safeToString(selectedProperty.swimming_pool),
+        kitchen: safeToString(selectedProperty.kitchen),
+        balcony: selectedProperty.balcony ?? false,
+        garden: safeToString(selectedProperty.garden),
+        annex: selectedProperty.annex ?? false,
+        elevator: safeToString(selectedProperty.elevator),
+        parking_space: safeToString(selectedProperty.private_parking),
+      });
+    }
+  };
+
   // Handle property form change
   const handlePropertyChange = (field: string, value: any) => {
     setPropertyFormData((prev) => ({
@@ -429,8 +524,13 @@ export default function EditDealPage() {
         stage_id: parseInt(stageId),
       };
 
+      // Add property_id if a new property is selected
+      if (selectedPropertyId && selectedPropertyId !== dealData?.request?.property_id?.toString()) {
+        payload.property_id = parseInt(selectedPropertyId);
+      }
+
       // Add property data if property exists and form has data
-      if (dealData?.request?.property_id && propertyData) {
+      if ((dealData?.request?.property_id || selectedPropertyId) && propertyData) {
         payload.property = {
           // Basic information
           address: propertyFormData.address || null,
@@ -641,6 +741,59 @@ export default function EditDealPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Property Selection */}
+                <div className="space-y-2">
+                  <Label htmlFor="property">
+                    العقار المرتبط
+                  </Label>
+                  {loadingProperties ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="text-sm text-muted-foreground">
+                        جاري تحميل العقارات...
+                      </span>
+                    </div>
+                  ) : (
+                    <Select
+                      value={selectedPropertyId || "none"}
+                      onValueChange={handlePropertySelect}
+                    >
+                      <SelectTrigger id="property">
+                        <SelectValue placeholder="اختر العقار (اختياري)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">
+                          <span className="text-muted-foreground">
+                            لا يوجد عقار مرتبط
+                          </span>
+                        </SelectItem>
+                        {availableProperties.map((property: any) => (
+                          <SelectItem
+                            key={property.id}
+                            value={property.id.toString()}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-medium">
+                                {property.title || property.address || `عقار #${property.id}`}
+                              </span>
+                              {property.address && (
+                                <span className="text-xs text-muted-foreground">
+                                  {property.address}
+                                </span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {selectedPropertyId && (
+                    <p className="text-xs text-muted-foreground">
+                      سيتم ربط هذا العقار بالصفقة. يمكنك تعديل بياناته أدناه.
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -787,13 +940,16 @@ export default function EditDealPage() {
                 {/* Property Edit Form - Only show if property exists */}
                 {propertyData && dealData?.request?.property_id && (
                   <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Home className="h-5 w-5" />
-                        تعديل بيانات العقار
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
+                    <Accordion type="single" collapsible className="w-full" defaultValue="property-edit">
+                      <AccordionItem value="property-edit" className="border-none">
+                        <AccordionTrigger className="px-6 py-4 hover:no-underline cursor-pointer">
+                          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                            <Home className="h-5 w-5" />
+                            تعديل بيانات العقار
+                          </CardTitle>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="px-6 pb-6 space-y-6">
                       {/* Basic Information */}
                       <div className="space-y-4">
                         <h4 className="font-semibold text-base border-b pb-2">
@@ -1184,7 +1340,10 @@ export default function EditDealPage() {
                           </div>
                         </div>
                       </div>
-                    </CardContent>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </Card>
                 )}
 
