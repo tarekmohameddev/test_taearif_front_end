@@ -4,7 +4,7 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { z } from "zod";
 import toast from "react-hot-toast";
@@ -23,7 +23,7 @@ interface PropertyRequest {
   property_type: string;
   category_id: number;
   city_id: number;
-  districts_id: number;
+  districts_id: number | null;
   category: string | null;
   neighborhoods: string[] | null;
   area_from: number | null;
@@ -39,8 +39,16 @@ interface PropertyRequest {
   contact_on_whatsapp: boolean;
   notes: string;
   is_read: number;
-  is_active: number;
-  status?: string;
+  is_active?: number;
+  status?: {
+    id: number;
+    name_ar: string;
+    name_en: string;
+  } | null;
+  employee?: {
+    id: number;
+    name: string;
+  } | null;
   created_at: string;
   updated_at: string;
 }
@@ -192,46 +200,42 @@ export default function PropertyRequestsPage() {
   }, [userData?.token]);
 
   // Fetch property requests with filters
-  useEffect(() => {
-    const fetchPropertyRequests = async () => {
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        console.log("No token available, skipping fetchPropertyRequests");
-        setLoading(false);
-        return;
-      }
+  const fetchPropertyRequests = useCallback(async () => {
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    if (!userData?.token) {
+      console.log("No token available, skipping fetchPropertyRequests");
+      setLoading(false);
+      return;
+    }
 
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
 
-        // Build query parameters
-        const params = new URLSearchParams();
-        if (cityId) params.append("city_id", cityId);
-        if (districtId) params.append("district_id", districtId);
-        if (categoryId) params.append("category_id", categoryId);
-        if (propertyType) params.append("property_type", propertyType);
-        if (purchaseGoal) params.append("purchase_goal", purchaseGoal);
-        if (seriousness) params.append("seriousness", seriousness);
-        if (searchTerm) params.append("q", searchTerm);
-        params.append("per_page", perPage.toString());
-        params.append("page", currentPage.toString());
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (cityId) params.append("city_id", cityId);
+      if (districtId) params.append("district_id", districtId);
+      if (categoryId) params.append("category_id", categoryId);
+      if (propertyType) params.append("property_type", propertyType);
+      if (purchaseGoal) params.append("purchase_goal", purchaseGoal);
+      if (seriousness) params.append("seriousness", seriousness);
+      if (searchTerm) params.append("q", searchTerm);
+      params.append("per_page", perPage.toString());
+      params.append("page", currentPage.toString());
 
-        const response = await axiosInstance.get<PropertyRequestsResponse>(
-          `/v1/property-requests?${params.toString()}`,
-        );
-        const { property_requests, pagination } = response.data.data;
-        setPropertyRequestsData(property_requests);
-        setTotalPropertyRequests(pagination.total);
-      } catch (err) {
-        console.error("Error fetching property requests:", err);
-        setError("حدث خطأ أثناء تحميل البيانات.");
-        toast.error("حدث خطأ أثناء تحميل البيانات");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPropertyRequests();
+      const response = await axiosInstance.get<PropertyRequestsResponse>(
+        `/v1/property-requests?${params.toString()}`,
+      );
+      const { property_requests, pagination } = response.data.data;
+      setPropertyRequestsData(property_requests);
+      setTotalPropertyRequests(pagination.total);
+    } catch (err) {
+      console.error("Error fetching property requests:", err);
+      setError("حدث خطأ أثناء تحميل البيانات.");
+      toast.error("حدث خطأ أثناء تحميل البيانات");
+    } finally {
+      setLoading(false);
+    }
   }, [
     userData?.token,
     cityId,
@@ -244,6 +248,10 @@ export default function PropertyRequestsPage() {
     currentPage,
     perPage,
   ]);
+
+  useEffect(() => {
+    fetchPropertyRequests();
+  }, [fetchPropertyRequests]);
 
   // Reset district when city changes
   useEffect(() => {
@@ -756,6 +764,21 @@ export default function PropertyRequestsPage() {
               onPageChange={setCurrentPage}
               totalItems={totalPropertyRequests}
               perPage={perPage}
+              onStatusUpdated={(propertyRequestId, newStatus) => {
+                // تحديث الحالة في القائمة
+                setPropertyRequestsData((prev) =>
+                  prev.map((req) =>
+                    req.id === propertyRequestId
+                      ? { ...req, status: newStatus }
+                      : req,
+                  ),
+                );
+              }}
+              onEmployeeAssigned={(propertyRequestId, employeeId) => {
+                // يمكن إضافة منطق تحديث الموظف هنا إذا كان API يعيد البيانات المحدثة
+                // أو يمكن إعادة تحميل البيانات
+                fetchPropertyRequests();
+              }}
             />
 
           </div>

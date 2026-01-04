@@ -28,6 +28,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { PropertyRequestStageAssignmentDialog } from "./PropertyRequestStageAssignmentDialog";
+import { PropertyRequestStatusChangeDialog } from "./PropertyRequestStatusChangeDialog";
+import { PropertyRequestEmployeeAssignmentDialog } from "./PropertyRequestEmployeeAssignmentDialog";
 import {
   MoreHorizontal,
   Mail,
@@ -44,9 +46,12 @@ import {
   CheckSquare,
   X,
   ArrowRight,
+  User,
 } from "lucide-react";
 import { Pagination } from "@/components/customers/page-components/Pagination";
 import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 // Import PropertyRequest interface from parent
 interface PropertyRequest {
@@ -56,7 +61,7 @@ interface PropertyRequest {
   property_type: string;
   category_id: number;
   city_id: number;
-  districts_id: number;
+  districts_id: number | null;
   category: string | null;
   neighborhoods: string[] | null;
   area_from: number | null;
@@ -72,7 +77,16 @@ interface PropertyRequest {
   contact_on_whatsapp: boolean;
   notes: string;
   is_read: number;
-  is_active: number;
+  is_active?: number;
+  status?: {
+    id: number;
+    name_ar: string;
+    name_en: string;
+  } | null;
+  employee?: {
+    id: number;
+    name: string;
+  } | null;
   created_at: string;
   updated_at: string;
 }
@@ -102,6 +116,8 @@ interface PropertyRequestsTableProps {
   onPageChange?: (page: number) => void;
   totalItems?: number;
   perPage?: number;
+  onStatusUpdated?: (propertyRequestId: number, newStatus: string) => void;
+  onEmployeeAssigned?: (propertyRequestId: number, employeeId: number | null) => void;
 }
 
 export const PropertyRequestsTable = ({
@@ -127,8 +143,25 @@ export const PropertyRequestsTable = ({
   onPageChange,
   totalItems = 0,
   perPage = 20,
+  onStatusUpdated,
+  onEmployeeAssigned,
 }: PropertyRequestsTableProps) => {
   const router = useRouter();
+  
+  // Dropdown menu state
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+
+  // Dialogs state
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
+  const [selectedPropertyRequestForAction, setSelectedPropertyRequestForAction] =
+    useState<PropertyRequest | null>(null);
   const openWhatsApp = (raw: string) => {
     const phone = raw.replace(/\D/g, ""); // remove non-digits
     let full = "";
@@ -143,6 +176,98 @@ export const PropertyRequestsTable = ({
 
     window.open(`https://wa.me/${full}`, "_blank");
   };
+
+  // دالة لحساب موقع الزر
+  const calculateDropdownPosition = useCallback((propertyRequestId: string) => {
+    const button = buttonRefs.current[propertyRequestId];
+    if (!button) return;
+
+    const rect = button.getBoundingClientRect();
+    const dropdownWidth = 224; // w-56 = 14rem = 224px
+    const dropdownHeight = 200; // تقريبي
+    const padding = 8;
+
+    // حساب الموقع الأفقي (من اليمين لأننا RTL)
+    let left = rect.left - dropdownWidth + rect.width;
+
+    // إذا خرج من الجهة اليسرى، اجعله يبدأ من اليسار
+    if (left < padding) {
+      left = rect.left;
+    }
+
+    // إذا خرج من الجهة اليمنى، اجعله بالقرب من الحافة اليمنى
+    if (left + dropdownWidth > window.innerWidth - padding) {
+      left = window.innerWidth - dropdownWidth - padding;
+    }
+
+    // حساب الموقع العمودي
+    let top = rect.bottom + padding;
+
+    // التحقق من الحدود السفلية
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+      // اعرضه فوق الزر
+      top = rect.top - dropdownHeight - padding;
+      // إذا كان فوق أيضاً خارج الشاشة، اجعله في أعلى مكان ممكن
+      if (top < padding) {
+        top = padding;
+      }
+    }
+
+    // تأكد من أن القمة لا تخرج من الشاشة
+    if (top < padding) {
+      top = padding;
+    }
+
+    setDropdownPosition({ top, left });
+  }, []);
+
+  // إغلاق الـ dropdown عند الضغط خارجه أو السكرول
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        const isButton = Object.values(buttonRefs.current).some(
+          (button) => button && button.contains(event.target as Node),
+        );
+        if (!isButton) {
+          setOpenDropdownId(null);
+          setDropdownPosition(null);
+        }
+      }
+    };
+
+    const handleScroll = () => {
+      if (openDropdownId) {
+        // إعادة حساب الموقع عند السكرول
+        requestAnimationFrame(() => {
+          calculateDropdownPosition(openDropdownId);
+        });
+      }
+    };
+
+    const handleResize = () => {
+      if (openDropdownId) {
+        setOpenDropdownId(null);
+        setDropdownPosition(null);
+      }
+    };
+
+    if (openDropdownId) {
+      document.addEventListener("mousedown", handleClickOutside);
+      window.addEventListener("scroll", handleScroll, true); // true للـ capture phase
+      window.addEventListener("resize", handleResize);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        window.removeEventListener("scroll", handleScroll, true);
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+  }, [openDropdownId, calculateDropdownPosition]);
 
   return (
     <div className="space-y-4">
@@ -244,6 +369,7 @@ export const PropertyRequestsTable = ({
                   </Button>
                 </TableHead>
                 <TableHead className="text-right">الاتصال</TableHead>
+                <TableHead className="text-right">الموظف</TableHead>
                 <TableHead className="text-right">نوع العقار</TableHead>
                 <TableHead className="text-right">المنطقة</TableHead>
                 <TableHead className="text-right">الحي</TableHead>
@@ -302,6 +428,22 @@ export const PropertyRequestsTable = ({
                     </div>
                   </TableCell>
                   <TableCell>
+                    {propertyRequest.employee ? (
+                      <div className="space-y-1">
+                        <div className="font-medium text-right">
+                          {propertyRequest.employee.name}
+                        </div>
+                        <div className="text-sm text-muted-foreground text-right">
+                          #{propertyRequest.employee.id}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm italic">
+                        غير محدد
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <Badge
                       variant="outline"
                       className={
@@ -354,12 +496,13 @@ export const PropertyRequestsTable = ({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           router.push(
                             `/dashboard/property-requests/${propertyRequest.id}`,
                           );
@@ -368,18 +511,79 @@ export const PropertyRequestsTable = ({
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
+
+                      {/* Custom Dropdown Menu */}
                       <Button
+                        ref={(el) => {
+                          buttonRefs.current[propertyRequest.id] = el;
+                        }}
                         variant="ghost"
                         size="icon"
-                        onClick={() => {
-                          router.push(
-                            `/dashboard/property-requests/${propertyRequest.id}/edit`,
-                          );
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (openDropdownId === propertyRequest.id.toString()) {
+                            setOpenDropdownId(null);
+                            setDropdownPosition(null);
+                          } else {
+                            setOpenDropdownId(propertyRequest.id.toString());
+                            // استخدام requestAnimationFrame للتأكد من حساب الموقع بعد الرسم
+                            requestAnimationFrame(() => {
+                              calculateDropdownPosition(propertyRequest.id.toString());
+                            });
+                          }
                         }}
-                        title="تعديل الطلب"
                       >
-                        <Edit className="h-4 w-4" />
+                        <MoreHorizontal className="h-4 w-4" />
                       </Button>
+
+                      {/* Dropdown Menu using Portal */}
+                      {openDropdownId === propertyRequest.id.toString() &&
+                        dropdownPosition &&
+                        typeof window !== "undefined" &&
+                        createPortal(
+                          <div
+                            ref={dropdownRef}
+                            className="w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 max-h-[calc(100vh-16px)] overflow-y-auto"
+                            style={{
+                              position: "fixed",
+                              top: `${dropdownPosition.top}px`,
+                              left: `${dropdownPosition.left}px`,
+                              zIndex: 9999,
+                              direction: "rtl",
+                            }}
+                          >
+                            {/* تعيين الموظف المسؤول */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                                setSelectedPropertyRequestForAction(propertyRequest);
+                                setShowEmployeeDialog(true);
+                              }}
+                            >
+                              <User className="ml-2 h-4 w-4" />
+                              تعيين موظف
+                            </button>
+
+                            {/* تغيير الحالة */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                                setSelectedPropertyRequestForAction(propertyRequest);
+                                setShowStatusDialog(true);
+                              }}
+                            >
+                              <Tag className="ml-2 h-4 w-4" />
+                              تغيير الحالة
+                            </button>
+                          </div>,
+                          document.body,
+                        )}
                       {/* DropdownMenu - Hidden */}
                       {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -491,6 +695,32 @@ export const PropertyRequestsTable = ({
           />
         </div>
       )}
+
+      {/* Status Change Dialog */}
+      <PropertyRequestStatusChangeDialog
+        open={showStatusDialog}
+        onOpenChange={setShowStatusDialog}
+        propertyRequest={selectedPropertyRequestForAction}
+        onStatusUpdated={(propertyRequestId, newStatus) => {
+          if (onStatusUpdated) {
+            onStatusUpdated(propertyRequestId, newStatus);
+          }
+          setSelectedPropertyRequestForAction(null);
+        }}
+      />
+
+      {/* Employee Assignment Dialog */}
+      <PropertyRequestEmployeeAssignmentDialog
+        open={showEmployeeDialog}
+        onOpenChange={setShowEmployeeDialog}
+        propertyRequest={selectedPropertyRequestForAction}
+        onEmployeeAssigned={(propertyRequestId, employeeId) => {
+          if (onEmployeeAssigned) {
+            onEmployeeAssigned(propertyRequestId, employeeId);
+          }
+          setSelectedPropertyRequestForAction(null);
+        }}
+      />
     </div>
   );
 };
