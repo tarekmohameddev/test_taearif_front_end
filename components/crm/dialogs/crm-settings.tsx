@@ -873,7 +873,7 @@ export default function CrmSettingsDialog({
             onValueChange={setActiveTab}
             className="h-full "
           >
-            <TabsList className="grid w-full grid-cols-4 mb-6 bg-muted/30">
+            <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/30">
               <TabsTrigger
                 value="stages"
                 className="flex items-center gap-2 text-sm font-medium"
@@ -887,13 +887,6 @@ export default function CrmSettingsDialog({
               >
                 <ListCheck className="h-4 w-4 ml-2" />
                 الإجراءات
-              </TabsTrigger>
-              <TabsTrigger
-                value="priorities"
-                className="flex items-center gap-2 text-sm font-medium"
-              >
-                <Flag className="h-4 w-4 ml-2" />
-                الأولويات
               </TabsTrigger>
               <TabsTrigger
                 value="types"
@@ -949,30 +942,6 @@ export default function CrmSettingsDialog({
                   </CardHeader>
                   <CardContent>
                     {renderItemList(procedures, "إجراء", "/crm/procedures")}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="priorities" className="mt-0" dir="rtl">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2">
-                        <Flag className="h-5 w-5 ml-2" />
-                        إدارة الأولويات
-                      </CardTitle>
-                      <Button
-                        size="sm"
-                        className="gap-2"
-                        onClick={() => handleOpenAddForm("priorities")}
-                      >
-                        <Plus className="h-4 w-4 ml-2" />
-                        إضافة أولوية
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {renderItemList(priorities, "أولوية", "/crm/priorities")}
                   </CardContent>
                 </Card>
               </TabsContent>
