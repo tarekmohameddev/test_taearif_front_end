@@ -1342,7 +1342,7 @@ export default function EditDealPage() {
                               onValueChange={handlePropertySelect}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="اختر العقار" />
+                                <span className="text-sm">تغيير العقار</span>
                               </SelectTrigger>
                               <SelectContent className="text-sm">
                                 <SelectItem value="none" className="text-sm">
