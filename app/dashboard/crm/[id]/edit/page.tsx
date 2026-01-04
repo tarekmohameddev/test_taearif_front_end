@@ -46,7 +46,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ChevronDown } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ChevronDown, Edit, MapPin, DollarSign } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface Customer {
@@ -163,9 +168,13 @@ export default function EditDealPage() {
   const [dealData, setDealData] = useState<any>(null);
 
   // Selected customer data - use dealData.customer if available, otherwise find in customers list
-  const selectedCustomer = dealData?.customer || customers.find(
-    (c) => c.id.toString() === selectedCustomerId,
-  );
+  // Update when selectedCustomerId changes (real-time UI update)
+  const selectedCustomer = React.useMemo(() => {
+    if (selectedCustomerId) {
+      return customers.find((c) => c.id.toString() === selectedCustomerId) || dealData?.customer || null;
+    }
+    return dealData?.customer || null;
+  }, [selectedCustomerId, customers, dealData?.customer]);
 
   // Fetch deal details
   useEffect(() => {
@@ -676,127 +685,6 @@ export default function EditDealPage() {
               </div>
             </div>
 
-            {/* Customer Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle>اختيار العميل</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="customer">
-                    العميل <span className="text-red-500">*</span>
-                  </Label>
-                  {loadingCustomers ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-sm text-muted-foreground">
-                        جاري تحميل العملاء...
-                      </span>
-                    </div>
-                  ) : (
-                    <Select
-                      value={selectedCustomerId}
-                      onValueChange={setSelectedCustomerId}
-                    >
-                      <SelectTrigger id="customer">
-                        <SelectValue placeholder="اختر العميل" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customers.map((customer) => (
-                          <SelectItem
-                            key={customer.id}
-                            value={customer.id.toString()}
-                          >
-                            <div className="flex flex-col">
-                              <span className="font-medium">
-                                {customer.name}
-                              </span>
-                              {customer.phone_number && (
-                                <span className="text-xs text-muted-foreground">
-                                  {customer.phone_number}
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="stage">
-                    المرحلة <span className="text-red-500">*</span>
-                  </Label>
-                  <Select value={stageId} onValueChange={setStageId}>
-                    <SelectTrigger id="stage">
-                      <SelectValue placeholder="اختر المرحلة" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {pipelineStages.map((stage) => (
-                        <SelectItem key={stage.id} value={stage.id}>
-                          {stage.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Property Selection */}
-                <div className="space-y-2">
-                  <Label htmlFor="property">
-                    العقار المرتبط
-                  </Label>
-                  {loadingProperties ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="text-sm text-muted-foreground">
-                        جاري تحميل العقارات...
-                      </span>
-                    </div>
-                  ) : (
-                    <Select
-                      value={selectedPropertyId || "none"}
-                      onValueChange={handlePropertySelect}
-                    >
-                      <SelectTrigger id="property">
-                        <SelectValue placeholder="اختر العقار (اختياري)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">
-                          <span className="text-muted-foreground">
-                            لا يوجد عقار مرتبط
-                          </span>
-                        </SelectItem>
-                        {availableProperties.map((property: any) => (
-                          <SelectItem
-                            key={property.id}
-                            value={property.id.toString()}
-                          >
-                            <div className="flex flex-col">
-                              <span className="font-medium">
-                                {property.title || property.address || `عقار #${property.id}`}
-                              </span>
-                              {property.address && (
-                                <span className="text-xs text-muted-foreground">
-                                  {property.address}
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  {selectedPropertyId && (
-                    <p className="text-xs text-muted-foreground">
-                      سيتم ربط هذا العقار بالصفقة. يمكنك تعديل بياناته أدناه.
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Customer Info Card - Same as details page */}
             {selectedCustomer && (
               <>
@@ -809,24 +697,79 @@ export default function EditDealPage() {
                           <User className="h-5 w-5" />
                           معلومات العميل
                         </CardTitle>
-                        {selectedCustomer.id && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              router.push(
-                                `/dashboard/customers/${selectedCustomer.id}`,
-                              )
-                            }
-                            className="gap-2"
-                          >
-                            <ArrowRight className="h-4 w-4" />
-                            <span className="hidden sm:inline">
-                              عرض التفاصيل
-                            </span>
-                            <span className="sm:hidden">التفاصيل</span>
-                          </Button>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" size="sm" className="gap-2">
+                                <Edit className="h-4 w-4" />
+                                <span className="hidden sm:inline">تعديل العميل</span>
+                                <span className="sm:hidden">تعديل</span>
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 h-[500px]" align="end">
+                              <div className="space-y-2">
+                                <Label>اختر العميل</Label>
+                                {loadingCustomers ? (
+                                  <div className="flex items-center gap-2 py-4">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span className="text-sm text-muted-foreground">
+                                      جاري تحميل العملاء...
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <Select
+                                    value={selectedCustomerId}
+                                    onValueChange={(value) => {
+                                      setSelectedCustomerId(value);
+                                      // Real-time UI update - selectedCustomer will update automatically via useMemo
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="اختر العميل" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {customers.map((customer) => (
+                                        <SelectItem
+                                          key={customer.id}
+                                          value={customer.id.toString()}
+                                        >
+                                          <div className="flex flex-col">
+                                            <span className="font-medium">
+                                              {customer.name}
+                                            </span>
+                                            {customer.phone_number && (
+                                              <span className="text-xs text-muted-foreground">
+                                                {customer.phone_number}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                          {selectedCustomer.id && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                router.push(
+                                  `/dashboard/customers/${selectedCustomer.id}`,
+                                )
+                              }
+                              className="gap-2"
+                            >
+                              <ArrowRight className="h-4 w-4" />
+                              <span className="hidden sm:inline">
+                                عرض التفاصيل
+                              </span>
+                              <span className="sm:hidden">التفاصيل</span>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -909,10 +852,38 @@ export default function EditDealPage() {
                   {/* معلومات الصفقة */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Building className="h-5 w-5" />
-                        معلومات الصفقة
-                      </CardTitle>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                          <Building className="h-5 w-5" />
+                          معلومات الصفقة
+                        </CardTitle>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-2">
+                              <Edit className="h-4 w-4" />
+                              <span className="hidden sm:inline">تعديل المرحلة</span>
+                              <span className="sm:hidden">تعديل</span>
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80 h-[300px]" align="end">
+                            <div className="space-y-2">
+                              <Label>اختر المرحلة</Label>
+                              <Select value={stageId} onValueChange={setStageId}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="اختر المرحلة" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {pipelineStages.map((stage) => (
+                                    <SelectItem key={stage.id} value={stage.id}>
+                                      {stage.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
@@ -937,8 +908,8 @@ export default function EditDealPage() {
                   </Card>
                 </div>
 
-                {/* Property Edit Form - Only show if property exists */}
-                {propertyData && dealData?.request?.property_id && (
+                {/* Property Edit Form - COMMENTED OUT - Property edit form is hidden */}
+                {false && propertyData && dealData?.request?.property_id && (
                   <Card>
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="property-edit" className="border-none">
@@ -1344,6 +1315,316 @@ export default function EditDealPage() {
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
+                  </Card>
+                )}
+                {/* END OF COMMENTED PROPERTY EDIT FORM */}
+
+                {/* Property Display Card - Show property information */}
+                {(dealData?.property || dealData?.property_basic || selectedPropertyId) && (
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                          <Home className="h-5 w-5" />
+                          معلومات العقار
+                        </CardTitle>
+                        <div className="w-80">
+                          {loadingProperties ? (
+                            <div className="flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              <span className="text-sm text-muted-foreground">
+                                جاري تحميل العقارات...
+                              </span>
+                            </div>
+                          ) : (
+                            <Select
+                              value={selectedPropertyId || "none"}
+                              onValueChange={handlePropertySelect}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="اختر العقار" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">
+                                  <span className="text-muted-foreground">
+                                    لا يوجد عقار مرتبط
+                                  </span>
+                                </SelectItem>
+                                {availableProperties.map((property: any) => (
+                                  <SelectItem
+                                    key={property.id}
+                                    value={property.id.toString()}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">
+                                        {property.title || property.address || `عقار #${property.id}`}
+                                      </span>
+                                      {property.address && (
+                                        <span className="text-xs text-muted-foreground">
+                                          {property.address}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {(() => {
+                        // Get property data - prioritize selected property, then dealData
+                        const property = selectedPropertyId && availableProperties.find((p: any) => p.id.toString() === selectedPropertyId)
+                          ? availableProperties.find((p: any) => p.id.toString() === selectedPropertyId)
+                          : dealData?.property || dealData?.property_basic || null;
+                        const propertySpecs = dealData?.property_specifications || null;
+                        
+                        if (!property) return null;
+
+                        // Extract data similar to deal-details-page
+                        const basicInfoFromSpecs = propertySpecs?.basic_information || {};
+                        const basicInfoFromBasic = property || {};
+                        
+                        const basicInfo = {
+                          address: basicInfoFromSpecs.address || basicInfoFromBasic.address || null,
+                          building: basicInfoFromSpecs.building || basicInfoFromBasic.building || null,
+                          price: basicInfoFromSpecs.price || (basicInfoFromBasic.price ? parseFloat(basicInfoFromBasic.price) : 0) || 0,
+                          payment_method: basicInfoFromSpecs.payment_method || basicInfoFromBasic.payment_method || null,
+                          price_per_sqm: basicInfoFromSpecs.price_per_sqm || (basicInfoFromBasic.pricePerMeter ? parseFloat(basicInfoFromBasic.pricePerMeter) : 0) || 0,
+                          listing_type: basicInfoFromSpecs.listing_type || null,
+                          property_category: basicInfoFromSpecs.property_category || null,
+                          project: basicInfoFromSpecs.project || null,
+                          city: basicInfoFromSpecs.city || basicInfoFromBasic.city_id || null,
+                          district: basicInfoFromSpecs.district || basicInfoFromBasic.state_id || null,
+                          area: basicInfoFromSpecs.area || (basicInfoFromBasic.area ? parseFloat(basicInfoFromBasic.area) : null) || (basicInfoFromBasic.size ? parseFloat(basicInfoFromBasic.size) : null) || null,
+                          property_type: basicInfoFromSpecs.property_type || basicInfoFromBasic.type || null,
+                          title: basicInfoFromBasic.title || null,
+                          purpose: basicInfoFromBasic.purpose || null,
+                          beds: basicInfoFromBasic.beds || basicInfoFromBasic.rooms || null,
+                          bath: basicInfoFromBasic.bath || basicInfoFromBasic.bathrooms || null,
+                          featured_image: basicInfoFromBasic.featured_image || null,
+                          description: basicInfoFromBasic.description || null,
+                        };
+
+                        const facilitiesFromSpecs = propertySpecs?.facilities || {};
+                        const facilities = {
+                          bedrooms: facilitiesFromSpecs.bedrooms || basicInfoFromBasic.beds || basicInfoFromBasic.rooms || null,
+                          bathrooms: facilitiesFromSpecs.bathrooms || basicInfoFromBasic.bath || basicInfoFromBasic.bathrooms || null,
+                          rooms: facilitiesFromSpecs.rooms || basicInfoFromBasic.rooms || null,
+                          floors: facilitiesFromSpecs.floors || basicInfoFromBasic.floors || null,
+                          floor_number: facilitiesFromSpecs.floor_number || basicInfoFromBasic.floor_number || null,
+                          drivers_room: facilitiesFromSpecs.drivers_room || basicInfoFromBasic.driver_room || null,
+                          maids_room: facilitiesFromSpecs.maids_room || basicInfoFromBasic.maid_room || null,
+                          dining_room: facilitiesFromSpecs.dining_room || basicInfoFromBasic.dining_room || null,
+                          living_room: facilitiesFromSpecs.living_room || basicInfoFromBasic.living_room || null,
+                          majlis: facilitiesFromSpecs.majlis || basicInfoFromBasic.majlis || null,
+                          storage_room: facilitiesFromSpecs.storage_room || basicInfoFromBasic.storage_room || null,
+                          basement: facilitiesFromSpecs.basement || basicInfoFromBasic.basement || null,
+                          swimming_pool: facilitiesFromSpecs.swimming_pool || basicInfoFromBasic.swimming_pool || null,
+                          kitchen: facilitiesFromSpecs.kitchen || basicInfoFromBasic.kitchen || null,
+                          balcony: facilitiesFromSpecs.balcony || basicInfoFromBasic.balcony || null,
+                          garden: facilitiesFromSpecs.garden || basicInfoFromBasic.garden || null,
+                          annex: facilitiesFromSpecs.annex || basicInfoFromBasic.annex || null,
+                          elevator: facilitiesFromSpecs.elevator || basicInfoFromBasic.elevator || null,
+                          parking_space: facilitiesFromSpecs.parking_space || basicInfoFromBasic.private_parking || null,
+                        };
+
+                        const formatCurrency = (amount: number) => {
+                          if (!amount) return "غير محدد";
+                          return new Intl.NumberFormat("ar-SA", {
+                            style: "currency",
+                            currency: "SAR",
+                            minimumFractionDigits: 0,
+                          }).format(amount);
+                        };
+
+                        return (
+                          <div className="grid gap-6 md:grid-cols-2">
+                            {/* المعلومات الأساسية */}
+                            <div className="space-y-4">
+                              <h4 className="font-semibold text-base border-b pb-2">
+                                المعلومات الأساسية
+                              </h4>
+                              <div className="space-y-4">
+                                {/* Featured Image */}
+                                {basicInfo.featured_image && (
+                                  <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                                    <img
+                                      src={basicInfo.featured_image}
+                                      alt={basicInfo.title || "عقار"}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                )}
+                                
+                                {/* Title or Address */}
+                                {(basicInfo.title || basicInfo.address) && (
+                                  <div className="flex items-start gap-3">
+                                    <MapPin className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                                    <div className="flex-1">
+                                      <p className="text-sm text-muted-foreground mb-1">
+                                        {basicInfo.title ? "العنوان" : "العنوان الكامل"}
+                                      </p>
+                                      <p className="font-medium">
+                                        {basicInfo.title || basicInfo.address}
+                                      </p>
+                                      {basicInfo.title && basicInfo.address && basicInfo.title !== basicInfo.address && (
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                          {basicInfo.address}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Description */}
+                                {basicInfo.description && (
+                                  <div className="flex items-start gap-3">
+                                    <MapPin className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                                    <div className="flex-1">
+                                      <p className="text-sm text-muted-foreground mb-1">الوصف</p>
+                                      <p className="font-medium text-sm">{basicInfo.description}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Price */}
+                                {(basicInfo.price && basicInfo.price > 0) && (
+                                  <div className="flex items-start gap-3">
+                                    <DollarSign className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                                    <div className="flex-1">
+                                      <p className="text-sm text-muted-foreground mb-1">السعر</p>
+                                      <p className="font-medium text-lg text-primary">
+                                        {formatCurrency(basicInfo.price)}
+                                      </p>
+                                      {basicInfo.price_per_sqm && basicInfo.price_per_sqm > 0 && (
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          السعر للمتر: {formatCurrency(basicInfo.price_per_sqm)}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Payment Method */}
+                                {basicInfo.payment_method && (
+                                  <div>
+                                    <p className="text-sm text-muted-foreground mb-1">طريقة الدفع</p>
+                                    <Badge variant="outline">{basicInfo.payment_method}</Badge>
+                                  </div>
+                                )}
+
+                                <div className="grid grid-cols-2 gap-4 pt-2">
+                                  {basicInfo.area && (
+                                    <div>
+                                      <p className="text-sm text-muted-foreground mb-1">المساحة</p>
+                                      <p className="font-medium">{basicInfo.area} م²</p>
+                                    </div>
+                                  )}
+                                  {basicInfo.property_type && (
+                                    <div>
+                                      <p className="text-sm text-muted-foreground mb-1">نوع العقار</p>
+                                      <Badge variant="outline">{basicInfo.property_type}</Badge>
+                                    </div>
+                                  )}
+                                  {basicInfo.city && (
+                                    <div>
+                                      <p className="text-sm text-muted-foreground mb-1">المدينة</p>
+                                      <p className="font-medium">{basicInfo.city}</p>
+                                    </div>
+                                  )}
+                                  {basicInfo.district && (
+                                    <div>
+                                      <p className="text-sm text-muted-foreground mb-1">الحي</p>
+                                      <p className="font-medium">{basicInfo.district}</p>
+                                    </div>
+                                  )}
+                                  {basicInfo.beds && (
+                                    <div>
+                                      <p className="text-sm text-muted-foreground mb-1">غرف النوم</p>
+                                      <p className="font-medium">{basicInfo.beds}</p>
+                                    </div>
+                                  )}
+                                  {basicInfo.bath && (
+                                    <div>
+                                      <p className="text-sm text-muted-foreground mb-1">الحمامات</p>
+                                      <p className="font-medium">{basicInfo.bath}</p>
+                                    </div>
+                                  )}
+                                  {basicInfo.purpose && (
+                                    <div>
+                                      <p className="text-sm text-muted-foreground mb-1">الغرض</p>
+                                      <Badge variant="outline">{basicInfo.purpose}</Badge>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* المرافق */}
+                            {Object.keys(facilities).some(
+                              (key) => facilities[key as keyof typeof facilities] !== null && facilities[key as keyof typeof facilities] !== 0
+                            ) && (
+                              <div className="space-y-4">
+                                <h4 className="font-semibold text-base border-b pb-2">المرافق</h4>
+                                <div className="grid grid-cols-2 gap-4">
+                                  {facilities.bedrooms && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">غرف النوم</p>
+                                      <p className="font-semibold text-lg">{facilities.bedrooms}</p>
+                                    </div>
+                                  )}
+                                  {facilities.bathrooms && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">الحمامات</p>
+                                      <p className="font-semibold text-lg">{facilities.bathrooms}</p>
+                                    </div>
+                                  )}
+                                  {facilities.parking_space && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">مواقف السيارات</p>
+                                      <p className="font-semibold text-lg">{facilities.parking_space}</p>
+                                    </div>
+                                  )}
+                                  {facilities.elevator && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">مصعد</p>
+                                      <Badge variant="outline" className="mt-1">متوفر</Badge>
+                                    </div>
+                                  )}
+                                  {facilities.swimming_pool && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">مسبح</p>
+                                      <p className="font-semibold text-lg">{facilities.swimming_pool}</p>
+                                    </div>
+                                  )}
+                                  {facilities.rooms && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">غرف</p>
+                                      <p className="font-semibold text-lg">{facilities.rooms}</p>
+                                    </div>
+                                  )}
+                                  {facilities.kitchen && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">مطبخ</p>
+                                      <Badge variant="outline" className="mt-1">متوفر</Badge>
+                                    </div>
+                                  )}
+                                  {facilities.majlis && (
+                                    <div className="p-3 bg-muted/50 rounded-lg">
+                                      <p className="text-sm text-muted-foreground mb-1">مجلس</p>
+                                      <p className="font-semibold text-lg">{facilities.majlis}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </CardContent>
                   </Card>
                 )}
 
