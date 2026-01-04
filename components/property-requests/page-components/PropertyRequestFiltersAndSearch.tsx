@@ -29,6 +29,19 @@ interface FilterCategory {
   icon: string | null;
 }
 
+interface FilterEmployee {
+  id: number;
+  name: string;
+  email: string;
+  whatsapp_number: string;
+}
+
+interface FilterStatus {
+  id: number;
+  name_ar: string;
+  name_en: string;
+}
+
 interface FiltersData {
   cities: FilterCity[];
   districts: FilterDistrict[];
@@ -36,6 +49,8 @@ interface FiltersData {
   property_types: string[];
   purchase_goals: string[];
   seriousness_options: string[];
+  employees?: FilterEmployee[];
+  status?: FilterStatus[];
 }
 
 interface PropertyRequestFiltersAndSearchProps {
@@ -53,6 +68,12 @@ interface PropertyRequestFiltersAndSearchProps {
   setPurchaseGoal: (value: string) => void;
   seriousness: string;
   setSeriousness: (value: string) => void;
+  employeeId: string;
+  setEmployeeId: (value: string) => void;
+  employeePhone: string;
+  setEmployeePhone: (value: string) => void;
+  statusId: string;
+  setStatusId: (value: string) => void;
   filtersData: FiltersData;
   filteredDistricts: FilterDistrict[];
   onResetFilters: () => void;
@@ -73,6 +94,12 @@ export const PropertyRequestFiltersAndSearch = ({
   setPurchaseGoal,
   seriousness,
   setSeriousness,
+  employeeId,
+  setEmployeeId,
+  employeePhone,
+  setEmployeePhone,
+  statusId,
+  setStatusId,
   filtersData,
   filteredDistricts,
   onResetFilters,
@@ -84,6 +111,9 @@ export const PropertyRequestFiltersAndSearch = ({
     propertyType ||
     purchaseGoal ||
     seriousness ||
+    employeeId ||
+    employeePhone ||
+    statusId ||
     searchTerm;
 
   return (
@@ -128,6 +158,9 @@ export const PropertyRequestFiltersAndSearch = ({
                   propertyType,
                   purchaseGoal,
                   seriousness,
+                  employeeId,
+                  employeePhone,
+                  statusId,
                   searchTerm,
                 ].filter(Boolean).length
               }
@@ -252,6 +285,73 @@ export const PropertyRequestFiltersAndSearch = ({
             ))}
           </SelectContent>
         </Select>
+
+        {/* Employee Filter */}
+        {filtersData.employees && filtersData.employees.length > 0 && (
+          <Select
+            value={employeeId || "all"}
+            onValueChange={(value) =>
+              setEmployeeId(value === "all" ? "" : value)
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="الموظف" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الموظفين</SelectItem>
+              {filtersData.employees.map((employee) => (
+                <SelectItem key={employee.id} value={employee.id.toString()}>
+                  {employee.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {/* Employee Phone Filter */}
+        {filtersData.employees && filtersData.employees.length > 0 && (
+          <Select
+            value={employeePhone || "all"}
+            onValueChange={(value) =>
+              setEmployeePhone(value === "all" ? "" : value)
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="رقم واتساب الموظف" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الأرقام</SelectItem>
+              {filtersData.employees.map((employee) => (
+                <SelectItem
+                  key={employee.id}
+                  value={employee.whatsapp_number || employee.id.toString()}
+                >
+                  {employee.whatsapp_number || employee.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {/* Status Filter */}
+        {filtersData.status && filtersData.status.length > 0 && (
+          <Select
+            value={statusId || "all"}
+            onValueChange={(value) => setStatusId(value === "all" ? "" : value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="الحالة" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الحالات</SelectItem>
+              {filtersData.status.map((status) => (
+                <SelectItem key={status.id} value={status.id.toString()}>
+                  {status.name_ar}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
     </div>
   );

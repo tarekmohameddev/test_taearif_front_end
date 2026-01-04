@@ -52,6 +52,7 @@ import { Pagination } from "@/components/customers/page-components/Pagination";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Import PropertyRequest interface from parent
 interface PropertyRequest {
@@ -119,6 +120,7 @@ interface PropertyRequestsTableProps {
   perPage?: number;
   onStatusUpdated?: (propertyRequestId: number, newStatus: string) => void;
   onEmployeeAssigned?: (propertyRequestId: number, employeeId: number | null) => void;
+  loading?: boolean;
 }
 
 export const PropertyRequestsTable = ({
@@ -146,6 +148,7 @@ export const PropertyRequestsTable = ({
   perPage = 20,
   onStatusUpdated,
   onEmployeeAssigned,
+  loading = false,
 }: PropertyRequestsTableProps) => {
   const router = useRouter();
   
@@ -381,7 +384,47 @@ export const PropertyRequestsTable = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAndSortedPropertyRequests.map((propertyRequest: any) => (
+              {loading ? (
+                // Loading Skeleton Rows
+                [...Array(8)].map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-4" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-32" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="h-8 w-8 rounded" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                filteredAndSortedPropertyRequests.map((propertyRequest: any) => (
                 <TableRow key={propertyRequest.id}>
                   <TableCell>
                     <Checkbox
@@ -674,7 +717,8 @@ export const PropertyRequestsTable = ({
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -691,7 +735,7 @@ export const PropertyRequestsTable = ({
             from={(currentPage - 1) * perPage + 1}
             to={Math.min(currentPage * perPage, totalItems)}
             onPageChange={onPageChange}
-            loading={false}
+            loading={loading}
           />
         </div>
       )}

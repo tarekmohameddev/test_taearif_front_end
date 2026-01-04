@@ -4,7 +4,7 @@ import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { z } from "zod";
 import toast from "react-hot-toast";
@@ -124,6 +124,9 @@ export default function PropertyRequestsPage() {
   const [propertyType, setPropertyType] = useState<string>("");
   const [purchaseGoal, setPurchaseGoal] = useState<string>("");
   const [seriousness, setSeriousness] = useState<string>("");
+  const [employeeId, setEmployeeId] = useState<string>("");
+  const [employeePhone, setEmployeePhone] = useState<string>("");
+  const [statusId, setStatusId] = useState<string>("");
 
   // Filters data
   const [filtersData, setFiltersData] = useState<
@@ -146,7 +149,7 @@ export default function PropertyRequestsPage() {
 
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
   const [totalPropertyRequests, setTotalPropertyRequests] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [propertyRequestsData, setPropertyRequestsData] = useState<
     PropertyRequest[]
@@ -184,6 +187,7 @@ export default function PropertyRequestsPage() {
     contact_on_whatsapp: false,
   });
   const { userData } = useAuthStore();
+  const isInitialLoad = useRef(true);
 
   // Fetch filters data
   useEffect(() => {
@@ -230,6 +234,9 @@ export default function PropertyRequestsPage() {
       if (propertyType) params.append("property_type", propertyType);
       if (purchaseGoal) params.append("purchase_goal", purchaseGoal);
       if (seriousness) params.append("seriousness", seriousness);
+      if (employeeId) params.append("responsible_employee_id", employeeId);
+      if (employeePhone) params.append("employee_phone", employeePhone);
+      if (statusId) params.append("status_id", statusId);
       if (searchTerm) params.append("q", searchTerm);
       params.append("per_page", perPage.toString());
       params.append("page", currentPage.toString());
@@ -256,6 +263,9 @@ export default function PropertyRequestsPage() {
     propertyType,
     purchaseGoal,
     seriousness,
+    employeeId,
+    employeePhone,
+    statusId,
     searchTerm,
     currentPage,
     perPage,
@@ -314,6 +324,9 @@ export default function PropertyRequestsPage() {
     propertyType,
     purchaseGoal,
     seriousness,
+    employeeId,
+    employeePhone,
+    statusId,
     searchTerm,
   ]);
 
@@ -428,7 +441,7 @@ export default function PropertyRequestsPage() {
     setOpen(true);
   };
 
-  if (loading) {
+  if (loading && propertyRequestsData.length === 0) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
         <DashboardHeader />
@@ -706,7 +719,7 @@ export default function PropertyRequestsPage() {
             {/* Statistics Cards */}
             <PropertyRequestStatisticsCards
               statistics={statistics}
-              loading={loading}
+              loading={false}
             />
 
             {/* Customer Type Distribution */}
@@ -735,6 +748,12 @@ export default function PropertyRequestsPage() {
                 setPurchaseGoal={setPurchaseGoal}
                 seriousness={seriousness}
                 setSeriousness={setSeriousness}
+                employeeId={employeeId}
+                setEmployeeId={setEmployeeId}
+                employeePhone={employeePhone}
+                setEmployeePhone={setEmployeePhone}
+                statusId={statusId}
+                setStatusId={setStatusId}
                 filtersData={filtersData}
                 filteredDistricts={filteredDistricts}
                 onResetFilters={() => {
@@ -744,6 +763,9 @@ export default function PropertyRequestsPage() {
                   setPropertyType("");
                   setPurchaseGoal("");
                   setSeriousness("");
+                  setEmployeeId("");
+                  setEmployeePhone("");
+                  setStatusId("");
                   setSearchTerm("");
                   setCurrentPage(1);
                 }}
@@ -776,6 +798,7 @@ export default function PropertyRequestsPage() {
               onPageChange={setCurrentPage}
               totalItems={totalPropertyRequests}
               perPage={perPage}
+              loading={loading}
               onStatusUpdated={(propertyRequestId, newStatus) => {
                 // تحديث الحالة في القائمة - newStatus هو name_ar من الحالة
                 setPropertyRequestsData((prev) =>
