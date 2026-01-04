@@ -62,6 +62,7 @@ interface PropertyRequest {
   category_id: number;
   city_id: number;
   districts_id: number | null;
+  districtName: string | null;
   category: string | null;
   neighborhoods: string[] | null;
   area_from: number | null;
@@ -474,10 +475,9 @@ export const PropertyRequestsTable = ({
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      {propertyRequest.neighborhoods &&
-                      propertyRequest.neighborhoods.length > 0 ? (
+                      {propertyRequest.districtName ? (
                         <div className="font-medium text-right text-sm">
-                          {propertyRequest.neighborhoods.join("، ")}
+                          {propertyRequest.districtName}
                         </div>
                       ) : (
                         <span className="text-muted-foreground text-sm italic">

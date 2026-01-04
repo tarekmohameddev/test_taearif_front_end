@@ -24,6 +24,7 @@ interface PropertyRequest {
   category_id: number;
   city_id: number;
   districts_id: number | null;
+  districtName: string | null;
   category: string | null;
   neighborhoods: string[] | null;
   area_from: number | null;
