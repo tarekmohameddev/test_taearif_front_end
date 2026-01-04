@@ -28,7 +28,7 @@ interface PropertyRequest {
   property_type: string;
   category_id: number;
   city_id: number;
-  districts_id: number;
+  districts_id: number | null;
   category: string | null;
   neighborhoods: string[] | null;
   area_from: number | null;
@@ -44,7 +44,9 @@ interface PropertyRequest {
   contact_on_whatsapp: boolean;
   notes: string;
   is_read: number;
-  is_active: number;
+  is_active?: number;
+  status?: string | null;
+  employee?: any | null;
   created_at: string;
   updated_at: string;
 }
@@ -72,8 +74,10 @@ export default function PropertyRequestDetailsPage() {
     setError(null);
     try {
       const response = await axiosInstance.get(`/v1/property-requests/${id}`);
-      if (response.data.status === "success" || response.data.data) {
-        setPropertyRequest(response.data.data || response.data);
+      // التحقق من وجود البيانات في أي من الأشكال المحتملة
+      const data = response.data?.data || response.data;
+      if (data && (data.id || data.user_id)) {
+        setPropertyRequest(data);
       } else {
         setError("فشل تحميل بيانات طلب العقار");
       }

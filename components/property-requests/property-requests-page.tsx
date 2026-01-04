@@ -40,6 +40,7 @@ interface PropertyRequest {
   notes: string;
   is_read: number;
   is_active: number;
+  status?: string;
   created_at: string;
   updated_at: string;
 }
@@ -661,6 +662,10 @@ export default function PropertyRequestsPage() {
             <PropertyRequestsPageHeader />
 
             {/* Statistics Cards */}
+            <PropertyRequestStatisticsCards
+              propertyRequests={propertyRequestsData}
+              loading={loading}
+            />
 
             {/* Customer Type Distribution */}
             {/* <CustomerTypeDistribution
