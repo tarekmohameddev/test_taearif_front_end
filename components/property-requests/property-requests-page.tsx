@@ -14,7 +14,6 @@ import { PropertyRequestStatisticsCards } from "./page-components/PropertyReques
 import { PropertyRequestTypeDistribution } from "./page-components/PropertyRequestTypeDistribution";
 import { PropertyRequestFiltersAndSearch } from "./page-components/PropertyRequestFiltersAndSearch";
 import { PropertyRequestsTable } from "./page-components/PropertyRequestsTable";
-import { PropertyRequestDetailDialog } from "./page-components/PropertyRequestDetailDialog";
 
 // Property Request interface based on API response
 interface PropertyRequest {
@@ -129,8 +128,6 @@ export default function PropertyRequestsPage() {
     setFilteredAndSortedPropertyRequests,
   ] = useState<PropertyRequest[]>([]);
 
-  const [showPropertyRequestDialog, setShowPropertyRequestDialog] =
-    useState(false);
   const [showBulkActionsDialog, setShowBulkActionsDialog] = useState(false);
   const [totalPropertyRequests, setTotalPropertyRequests] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -717,8 +714,6 @@ export default function PropertyRequestsPage() {
               sortField={sortField}
               sortDirection={sortDirection}
               handleSort={handleSort}
-              setSelectedPropertyRequest={setSelectedPropertyRequest}
-              setShowPropertyRequestDialog={setShowPropertyRequestDialog}
               openEditDialog={openEditDialog}
               handleDelete={handleDelete}
               formData={formData}
@@ -736,12 +731,6 @@ export default function PropertyRequestsPage() {
               perPage={perPage}
             />
 
-            {/* Property Request Detail Dialog */}
-            <PropertyRequestDetailDialog
-              showPropertyRequestDialog={showPropertyRequestDialog}
-              setShowPropertyRequestDialog={setShowPropertyRequestDialog}
-              selectedPropertyRequest={selectedPropertyRequest}
-            />
           </div>
         </main>
       </div>

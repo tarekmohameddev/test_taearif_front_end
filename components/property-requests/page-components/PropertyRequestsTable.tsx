@@ -46,6 +46,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Pagination } from "@/components/customers/page-components/Pagination";
+import { useRouter } from "next/navigation";
 
 // Import PropertyRequest interface from parent
 interface PropertyRequest {
@@ -84,8 +85,6 @@ interface PropertyRequestsTableProps {
   sortField: string;
   sortDirection: string;
   handleSort: (field: keyof PropertyRequest) => void;
-  setSelectedPropertyRequest: (request: PropertyRequest) => void;
-  setShowPropertyRequestDialog: (show: boolean) => void;
   openEditDialog: (request: PropertyRequest) => void;
   handleDelete: (id: number) => void;
   formData: any;
@@ -113,8 +112,6 @@ export const PropertyRequestsTable = ({
   sortField,
   sortDirection,
   handleSort,
-  setSelectedPropertyRequest,
-  setShowPropertyRequestDialog,
   openEditDialog,
   handleDelete,
   formData,
@@ -131,6 +128,7 @@ export const PropertyRequestsTable = ({
   totalItems = 0,
   perPage = 20,
 }: PropertyRequestsTableProps) => {
+  const router = useRouter();
   const openWhatsApp = (raw: string) => {
     const phone = raw.replace(/\D/g, ""); // remove non-digits
     let full = "";
@@ -248,6 +246,7 @@ export const PropertyRequestsTable = ({
                 <TableHead className="text-right">الاتصال</TableHead>
                 <TableHead className="text-right">نوع العقار</TableHead>
                 <TableHead className="text-right">المنطقة</TableHead>
+                <TableHead className="text-right">الحي</TableHead>
                 <TableHead className="text-right">تاريخ الطلب</TableHead>
                 <TableHead className="w-[100px] text-right">
                   الإجراءات
@@ -332,6 +331,20 @@ export const PropertyRequestsTable = ({
                     </div>
                   </TableCell>
                   <TableCell>
+                    <div className="space-y-1">
+                      {propertyRequest.neighborhoods &&
+                      propertyRequest.neighborhoods.length > 0 ? (
+                        <div className="font-medium text-right text-sm">
+                          {propertyRequest.neighborhoods.join("، ")}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm italic">
+                          غير محدد
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
                     <div className="flex items-center text-sm">
                       <Clock className="ml-2 h-3 w-3 text-blue-500" />
                       <span className="font-medium">
@@ -347,11 +360,25 @@ export const PropertyRequestsTable = ({
                         variant="ghost"
                         size="icon"
                         onClick={() => {
-                          setSelectedPropertyRequest(propertyRequest);
-                          setShowPropertyRequestDialog(true);
+                          router.push(
+                            `/dashboard/property-requests/${propertyRequest.id}`,
+                          );
                         }}
+                        title="عرض التفاصيل"
                       >
                         <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          router.push(
+                            `/dashboard/property-requests/${propertyRequest.id}/edit`,
+                          );
+                        }}
+                        title="تعديل الطلب"
+                      >
+                        <Edit className="h-4 w-4" />
                       </Button>
                       {/* DropdownMenu - Hidden */}
                       {/* <DropdownMenu>
