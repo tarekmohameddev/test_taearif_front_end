@@ -63,6 +63,13 @@ interface PropertyRequestsResponse {
       current_page: number;
       last_page: number;
     };
+    statistics: {
+      total_requests: number;
+      total_customers: number;
+      by_status: {
+        [key: string]: number;
+      };
+    };
   };
 }
 
@@ -144,6 +151,11 @@ export default function PropertyRequestsPage() {
   const [propertyRequestsData, setPropertyRequestsData] = useState<
     PropertyRequest[]
   >([]);
+  const [statistics, setStatistics] = useState<{
+    total_requests: number;
+    total_customers: number;
+    by_status: { [key: string]: number };
+  } | null>(null);
   const [formData, setFormData] = useState<Partial<PropertyRequest> | null>(
     null,
   );
@@ -226,9 +238,10 @@ export default function PropertyRequestsPage() {
       const response = await axiosInstance.get<PropertyRequestsResponse>(
         `/v1/property-requests?${params.toString()}`,
       );
-      const { property_requests, pagination } = response.data.data;
+      const { property_requests, pagination, statistics } = response.data.data;
       setPropertyRequestsData(property_requests);
       setTotalPropertyRequests(pagination.total);
+      setStatistics(statistics);
     } catch (err) {
       console.error("Error fetching property requests:", err);
       setError("حدث خطأ أثناء تحميل البيانات.");
@@ -693,7 +706,7 @@ export default function PropertyRequestsPage() {
 
             {/* Statistics Cards */}
             <PropertyRequestStatisticsCards
-              propertyRequests={propertyRequestsData}
+              statistics={statistics}
               loading={loading}
             />
 
@@ -765,14 +778,23 @@ export default function PropertyRequestsPage() {
               totalItems={totalPropertyRequests}
               perPage={perPage}
               onStatusUpdated={(propertyRequestId, newStatus) => {
-                // تحديث الحالة في القائمة
+                // تحديث الحالة في القائمة - newStatus هو name_ar من الحالة
                 setPropertyRequestsData((prev) =>
                   prev.map((req) =>
                     req.id === propertyRequestId
-                      ? { ...req, status: newStatus }
+                      ? {
+                          ...req,
+                          status: {
+                            id: req.status?.id || 0,
+                            name_ar: newStatus,
+                            name_en: req.status?.name_en || newStatus,
+                          },
+                        }
                       : req,
                   ),
                 );
+                // إعادة تحميل البيانات للحصول على statistics محدثة
+                fetchPropertyRequests();
               }}
               onEmployeeAssigned={(propertyRequestId, employeeId) => {
                 // يمكن إضافة منطق تحديث الموظف هنا إذا كان API يعيد البيانات المحدثة

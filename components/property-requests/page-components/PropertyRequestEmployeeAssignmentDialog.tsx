@@ -107,9 +107,18 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
     setSavingEmployee(true);
     try {
       // إرسال طلب التحديث
-      await axiosInstance.put(`/v1/property-requests/${propertyRequest.id}`, {
-        responsible_employee_id: selectedEmployeeId,
-      });
+      // إذا كان selectedEmployeeId هو null أو "none"، نرسل null
+      const employeeIdToSend =
+        selectedEmployeeId === null || selectedEmployeeId === undefined
+          ? null
+          : selectedEmployeeId;
+
+      await axiosInstance.put(
+        `/v1/property-requests/${propertyRequest.id}/employee`,
+        {
+          responsible_employee_id: employeeIdToSend,
+        },
+      );
 
       toast.success("تم تعيين الموظف المسؤول بنجاح!", {
         duration: 4000,
@@ -204,14 +213,16 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
             ) : (
               <div className="space-y-2">
                 <Select
-                  value={
-                    selectedEmployeeId
-                      ? selectedEmployeeId.toString()
-                      : undefined
-                  }
-                  onValueChange={(value) =>
-                    setSelectedEmployeeId(value ? Number(value) : null)
-                  }
+                    value={
+                      selectedEmployeeId
+                        ? selectedEmployeeId.toString()
+                        : "none"
+                    }
+                    onValueChange={(value) =>
+                      setSelectedEmployeeId(
+                        value === "none" ? null : Number(value),
+                      )
+                    }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="اختر الموظف" />

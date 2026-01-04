@@ -23,7 +23,11 @@ import useAuthStore from "@/context/AuthContext";
 interface PropertyRequest {
   id: number;
   full_name: string;
-  status?: string;
+  status?: {
+    id: number;
+    name_ar: string;
+    name_en: string;
+  } | null;
 }
 
 interface PropertyRequestStatusChangeDialogProps {
@@ -55,7 +59,7 @@ export const PropertyRequestStatusChangeDialog = ({
   // Set initial status when dialog opens
   useEffect(() => {
     if (open && propertyRequest) {
-      setSelectedStatus(propertyRequest.status || "جديد");
+      setSelectedStatus(propertyRequest.status?.name_ar || "جديد");
     }
   }, [open, propertyRequest]);
 

@@ -6,41 +6,31 @@ import {
   Eye,
   CheckCircle,
   XCircle,
+  Users,
 } from "lucide-react";
 
-interface PropertyRequest {
-  id: number;
-  status?: string;
-}
-
 interface PropertyRequestStatisticsCardsProps {
-  propertyRequests: PropertyRequest[];
+  statistics: {
+    total_requests: number;
+    total_customers: number;
+    by_status: { [key: string]: number };
+  } | null;
   loading?: boolean;
 }
 
 export const PropertyRequestStatisticsCards = ({
-  propertyRequests,
+  statistics,
   loading = false,
 }: PropertyRequestStatisticsCardsProps) => {
-  // حساب الإحصائيات
-  const totalRequests = propertyRequests.length;
-  const newCount = propertyRequests.filter(
-    (req) => req.status === "جديد",
-  ).length;
-  const searchingCount = propertyRequests.filter(
-    (req) => req.status === "بحث عن عقار",
-  ).length;
-  const inspectionCount = propertyRequests.filter(
-    (req) => req.status === "في المعاينه",
-  ).length;
-  const completedCount = propertyRequests.filter(
-    (req) => req.status === "تم اتمام الصفقه",
-  ).length;
-  const rejectedCount = propertyRequests.filter(
-    (req) => req.status === "رفض الصفقه",
-  ).length;
+  // استخدام البيانات من API مباشرة
+  const totalRequests = statistics?.total_requests || 0;
+  const totalCustomers = statistics?.total_customers || 0;
+  const byStatus = statistics?.by_status || {};
 
-  // تعريف البطاقات
+  // الحصول على جميع الحالات من by_status
+  const statusEntries = Object.entries(byStatus);
+
+  // تعريف البطاقات - إجمالي الطلبات والعملاء أولاً
   const statsCards = [
     {
       title: "إجمالي الطلبات",
@@ -50,40 +40,66 @@ export const PropertyRequestStatisticsCards = ({
       bgColor: "bg-blue-50",
     },
     {
-      title: "جديد",
-      value: newCount,
-      icon: Clock,
-      color: "text-gray-600",
-      bgColor: "bg-gray-50",
+      title: "إجمالي العملاء",
+      value: totalCustomers,
+      icon: Users,
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
     },
-    {
-      title: "بحث عن عقار",
-      value: searchingCount,
-      icon: Search,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-    },
-    {
-      title: "في المعاينه",
-      value: inspectionCount,
-      icon: Eye,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-    {
-      title: "تم اتمام الصفقه",
-      value: completedCount,
-      icon: CheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      title: "رفض الصفقه",
-      value: rejectedCount,
-      icon: XCircle,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-    },
+    // إضافة بطاقات للحالات الديناميكية
+    ...statusEntries.map(([statusName, count], index) => {
+      // تحديد الألوان والأيقونات حسب اسم الحالة
+      let icon = Clock;
+      let color = "text-gray-600";
+      let bgColor = "bg-gray-50";
+
+      // تخصيص الألوان والأيقونات حسب الحالة
+      if (statusName.includes("جديد") || statusName.includes("New")) {
+        icon = Clock;
+        color = "text-gray-600";
+        bgColor = "bg-gray-50";
+      } else if (
+        statusName.includes("متابعة") ||
+        statusName.includes("Progress") ||
+        statusName.includes("بحث")
+      ) {
+        icon = Search;
+        color = "text-yellow-600";
+        bgColor = "bg-yellow-50";
+      } else if (
+        statusName.includes("معاينه") ||
+        statusName.includes("Inspection") ||
+        statusName.includes("معلق")
+      ) {
+        icon = Eye;
+        color = "text-purple-600";
+        bgColor = "bg-purple-50";
+      } else if (
+        statusName.includes("مكتمل") ||
+        statusName.includes("Completed") ||
+        statusName.includes("تمام")
+      ) {
+        icon = CheckCircle;
+        color = "text-green-600";
+        bgColor = "bg-green-50";
+      } else if (
+        statusName.includes("ملغي") ||
+        statusName.includes("Cancelled") ||
+        statusName.includes("رفض")
+      ) {
+        icon = XCircle;
+        color = "text-red-600";
+        bgColor = "bg-red-50";
+      }
+
+      return {
+        title: statusName,
+        value: count,
+        icon,
+        color,
+        bgColor,
+      };
+    }),
   ];
 
   return (
