@@ -1323,12 +1323,12 @@ export default function EditDealPage() {
                 {(dealData?.property || dealData?.property_basic || selectedPropertyId) && (
                   <Card>
                     <CardHeader>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <CardTitle className="flex items-center gap-2">
                           <Home className="h-5 w-5" />
                           معلومات العقار
                         </CardTitle>
-                        <div className="w-80">
+                        <div className="w-full md:w-80">
                           {loadingProperties ? (
                             <div className="flex items-center gap-2">
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -1344,29 +1344,34 @@ export default function EditDealPage() {
                               <SelectTrigger>
                                 <SelectValue placeholder="اختر العقار" />
                               </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">
-                                  <span className="text-muted-foreground">
+                              <SelectContent className="text-sm">
+                                <SelectItem value="none" className="text-sm">
+                                  <span className="text-muted-foreground text-sm">
                                     لا يوجد عقار مرتبط
                                   </span>
                                 </SelectItem>
-                                {availableProperties.map((property: any) => (
-                                  <SelectItem
-                                    key={property.id}
-                                    value={property.id.toString()}
-                                  >
-                                    <div className="flex flex-col">
-                                      <span className="font-medium">
-                                        {property.title || property.address || `عقار #${property.id}`}
-                                      </span>
-                                      {property.address && (
-                                        <span className="text-xs text-muted-foreground">
-                                          {property.address}
+                                {availableProperties.map((property: any) => {
+                                  const title = property.title || property.address || `عقار #${property.id}`;
+                                  const isLongText = title.length > 50;
+                                  return (
+                                    <SelectItem
+                                      key={property.id}
+                                      value={property.id.toString()}
+                                      className="text-sm max-w-[350px]"
+                                    >
+                                      <div className="flex flex-col">
+                                        <span className={`font-medium ${isLongText ? 'text-[10px]' : 'text-sm'}`}>
+                                          {title}
                                         </span>
-                                      )}
-                                    </div>
-                                  </SelectItem>
-                                ))}
+                                        {property.address && (
+                                          <span className="text-xs text-muted-foreground md:hidden">
+                                            {property.address}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })}
                               </SelectContent>
                             </Select>
                           )}

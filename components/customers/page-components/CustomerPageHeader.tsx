@@ -198,8 +198,8 @@ export const CustomerPageHeader = ({
         ...newCustomer,
         password: newCustomer.password || "123456",
         stage_id: newCustomer.stage_id === null ? "" : newCustomer.stage_id,
-        // تحويل null إلى undefined للحقول الاختيارية
-        priority_id: newCustomer.priority_id ?? undefined,
+        // تعيين priority_id إلى null عند الإرسال
+        priority_id: null,
         procedure_id: newCustomer.procedure_id ?? undefined,
       };
 
