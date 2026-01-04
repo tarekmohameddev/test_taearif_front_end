@@ -23,6 +23,10 @@ import useAuthStore from "@/context/AuthContext";
 interface PropertyRequest {
   id: number;
   full_name: string;
+  employee?: {
+    id: number;
+    name: string;
+  } | null;
 }
 
 interface Employee {
@@ -63,11 +67,11 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
 
   // تعيين الموظف الحالي عند فتح dialog
   useEffect(() => {
-    if (propertyRequest && open) {
-      // TODO: إذا كان هناك موظف مسؤول حالياً، قم بتعيينه
-      // setSelectedEmployeeId(propertyRequest.responsible_employee_id);
+    if (propertyRequest && employees.length > 0) {
+      const currentEmployeeId = propertyRequest.employee?.id || null;
+      setSelectedEmployeeId(currentEmployeeId);
     }
-  }, [propertyRequest, open]);
+  }, [propertyRequest, employees]);
 
   const fetchEmployees = async () => {
     if (!userData?.token) {
@@ -77,9 +81,9 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
 
     setLoadingEmployees(true);
     try {
-      const response = await axiosInstance.get("/employees");
-      if (response.data.status === "success") {
-        setEmployees(response.data.data || []);
+      const response = await axiosInstance.get("/v1/employees");
+      if (response.data && response.data.data) {
+        setEmployees(response.data.data);
       }
     } catch (error) {
       console.error("Error fetching employees:", error);
