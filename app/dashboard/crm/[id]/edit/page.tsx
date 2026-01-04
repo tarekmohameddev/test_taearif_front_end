@@ -940,7 +940,7 @@ export default function EditDealPage() {
                 {/* Property Edit Form - Only show if property exists */}
                 {propertyData && dealData?.request?.property_id && (
                   <Card>
-                    <Accordion type="single" collapsible className="w-full" defaultValue="property-edit">
+                    <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="property-edit" className="border-none">
                         <AccordionTrigger className="px-6 py-4 hover:no-underline cursor-pointer">
                           <CardTitle className="flex items-center gap-2 text-base font-semibold">
