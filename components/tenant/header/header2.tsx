@@ -284,6 +284,24 @@ export default function Header2(props: Header2Props) {
       ...(props.overrideData || {}), // 7. OverrideData (highest priority)
     };
 
+    // Apply branding data with highest priority
+    if (tenantData?.branding) {
+      // Logo priority: tenantData.branding.logo (highest) → merged.logo.image → default
+      if (!merged.logo) {
+        merged.logo = {};
+      }
+      if (tenantData.branding.logo) {
+        merged.logo.image = tenantData.branding.logo;
+      }
+      
+      // Alt/Name priority: tenantData.branding.name (highest) → tenantData.websiteName → merged.logo.alt → default
+      if (tenantData.branding.name) {
+        merged.logo.alt = tenantData.branding.name;
+      } else if (tenantData.websiteName) {
+        merged.logo.alt = tenantData.websiteName;
+      }
+    }
+
     // Convert menu (StaticHeader1 format) to links (Header2 format) if needed
     if (
       merged.menu &&
@@ -443,7 +461,7 @@ export default function Header2(props: Header2Props) {
         document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
         document.documentElement.lang = newLang;
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         console.error("Failed to change language:", err);
       });
   }, [lang, pathname, router, i18n]);
@@ -485,8 +503,8 @@ export default function Header2(props: Header2Props) {
             }}
           >
             <Image
-              src={mergedData.logo?.image || "/images/main/logo.png"}
-              alt={mergedData.logo?.alt || "rules"}
+              src={tenantData?.branding?.logo || mergedData.logo?.image || "/images/main/logo.png"}
+              alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.alt || "rules"}
               fill
               style={{ objectFit: "contain" }}
             />

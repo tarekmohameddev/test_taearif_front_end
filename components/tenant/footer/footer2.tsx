@@ -248,7 +248,7 @@ export default function Footer2(props: Footer2Props) {
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   const mergedData = useMemo(() => {
-    return isGlobalFooter
+    const baseData = isGlobalFooter
       ? {
           ...getDefaultFooter2Data(), // 1. Defaults (lowest priority)
           ...globalFooterData, // 2. Global footer data
@@ -262,6 +262,31 @@ export default function Footer2(props: Footer2Props) {
           ...props, // 4. Props
           ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
         };
+
+    // Apply branding data with highest priority
+    if (tenantData?.branding) {
+      // Ensure content.companyInfo exists
+      if (!baseData.content) {
+        baseData.content = {};
+      }
+      if (!baseData.content.companyInfo) {
+        baseData.content.companyInfo = {};
+      }
+
+      // Logo priority: tenantData.branding.logo (highest) → baseData.content.companyInfo.logo → default
+      if (tenantData.branding.logo) {
+        baseData.content.companyInfo.logo = tenantData.branding.logo;
+      }
+      
+      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → baseData.content.companyInfo.name → default
+      if (tenantData.branding.name) {
+        baseData.content.companyInfo.name = tenantData.branding.name;
+      } else if (tenantData.websiteName) {
+        baseData.content.companyInfo.name = tenantData.websiteName;
+      }
+    }
+
+    return baseData;
   }, [
     isGlobalFooter,
     globalFooterData,
@@ -269,6 +294,7 @@ export default function Footer2(props: Footer2Props) {
     storeData,
     currentStoreData,
     forceUpdate,
+    tenantData,
   ]);
 
   // Force re-render when globalFooterData changes (for global footers)
@@ -326,12 +352,14 @@ export default function Footer2(props: Footer2Props) {
             {/* Right Section - Company Info */}
             <div className="w-full lg:w-1/2 xl:w-2/5">
               <div className="flex items-center gap-3 mb-6">
-                {mergedData.content?.companyInfo?.logo ? (
+                {(tenantData?.branding?.logo || mergedData.content?.companyInfo?.logo) ? (
                   <div className="flex">
                     <Image
-                      src={mergedData.content.companyInfo.logo}
+                      src={tenantData?.branding?.logo || mergedData.content?.companyInfo?.logo}
                       alt={replaceBaheya(
-                        mergedData.content?.companyInfo?.name ||
+                        tenantData?.branding?.name ||
+                          tenantData?.websiteName ||
+                          mergedData.content?.companyInfo?.name ||
                           "Baheya Real Estate",
                       )}
                       width={100}
@@ -351,10 +379,15 @@ export default function Footer2(props: Footer2Props) {
                     </div>
                   </Link>
                 )}
-                {mergedData.content?.companyInfo?.name && (
+                {(tenantData?.branding?.name || tenantData?.websiteName || mergedData.content?.companyInfo?.name) && (
                   <div>
                     <h3 className="text-lg font-bold text-white">
-                      {replaceBaheya(mergedData.content.companyInfo.name)}
+                      {replaceBaheya(
+                        tenantData?.branding?.name ||
+                          tenantData?.websiteName ||
+                          mergedData.content?.companyInfo?.name ||
+                          ""
+                      )}
                     </h3>
                     {mergedData.content?.companyInfo?.tagline && (
                       <p className="text-sm text-white/80">

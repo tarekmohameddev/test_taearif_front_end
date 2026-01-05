@@ -1,0 +1,12 @@
+عملت حساب جديد .
+فتحت الlive editor فأتى بالبيانات , وهذا ما اتى docs\ExcessFiles\5-1-2026\getTenantResponseBeforeMakeAnyThing.txt (فعليا انا لم اعمل اي شئ حرفيا)
+ثاني شئ هو انني اختارت الثيم الثاني وضغطت تطبيق , وثم ضغطت على حفظ التغييرات فأرسل api request ل save-page وهذا هو الbody : "docs\ExcessFiles\5-1-2026\save-pagesRequestBodyInSecondStep.txt"
+ثالث شئ هو انني فتحت الهومبيدج كشخص عادي ففتح @app/TenantPageWrapper.tsx  واتي بالبيانات من getTenant : "docs\ExcessFiles\5-1-2026\getTenantResponseInThirdStep.txt"
+الخطوة الرابعة : وضعت مكون blogsSections1 بعد الhero فصفحة ال Homepage .
+الخطوة الخامسة هى انني ضغطت على زر حفظ التغييرات فأرسل save-page api request "docs\ExcessFiles\5-1-2026\save-pagesRequestBodyIn5step.txt"
+سادس شئ هو انني فتحت الهومبيدج كشخص عادي ففتح @app/TenantPageWrapper.tsx  واتي بالبيانات من getTenant : docs\ExcessFiles\5-1-2026\getTenantResponse6step.txt
+الخطوة السابعة اختارت الثيم الاول في الdialog ألخاص بتغيير الثيم وضغطت تطبيق الثيم.
+الخطوة الثامنة هى انني ضغطت على زر حفظ التغييرات فأرسل save-page api request "docs\ExcessFiles\5-1-2026\save-pagesRequestBodyIn8step.txt" 
+تاسع شئ هو انني فتحت الهومبيدج كشخص عادي ففتح @app/TenantPageWrapper.tsx  واتي بالبيانات من getTenant : docs\ExcessFiles\5-1-2026\getTenantResponse9step.txt
+عاشر خطوة هو انني اختارت الثيم الثاني وضغطت تطبيق , وثم ضغطت على حفظ التغييرات فأرسل api request ل save-page وهذا هو الbody : docs\ExcessFiles\5-1-2026\save-pagesRequestBodyIn10step.txt
+الخطوة 11شئ هو انني فتحت الهومبيدج كشخص عادي ففتح @app/TenantPageWrapper.tsx  واتي بالبيانات من getTenant : docs\ExcessFiles\5-1-2026\getTenantResponse11step.txt

@@ -23,10 +23,10 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // تحسين cache
+  // تحسين cache - تقليل استهلاك الذاكرة في التطوير
   onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
+    maxInactiveAge: 15 * 1000, // تقليل الوقت من 25 إلى 15 ثانية
+    pagesBufferLength: 1, // تقليل من 2 إلى 1 لتوفير الذاكرة
   },
   // تحسين البناء للصفحات الثابتة - معالجة مشكلة symlink على Windows
   output: process.platform === "win32" ? undefined : "standalone",
@@ -36,7 +36,17 @@ const nextConfig = {
     if (dev) {
       config.watchOptions = {
         ...config.watchOptions,
-        ignored: /node_modules|\.git|trash|docs/,
+        ignored: /node_modules|\.git|trash|docs|\.next|\.cache/,
+        // تقليل استهلاك الذاكرة في وضع المراقبة
+        aggregateTimeout: 300,
+        poll: false, // تعطيل polling لتوفير الذاكرة
+      };
+      // تقليل استهلاك الذاكرة في webpack
+      config.optimization = {
+        ...config.optimization,
+        removeAvailableModules: true,
+        removeEmptyChunks: true,
+        mergeDuplicateChunks: true,
       };
     }
 
@@ -45,6 +55,7 @@ const nextConfig = {
   // إعدادات Turbopack (Next.js 16)
   // إضافة turbopack: {} لإسكات الخطأ - Turbopack هو الافتراضي في Next.js 16
   // يعمل فقط في وضع التطوير
+  // ملاحظة: حد الذاكرة يتم التحكم فيه من خلال NODE_OPTIONS في package.json
   ...(process.env.NODE_ENV === "development" && { turbopack: {} }),
 };
 

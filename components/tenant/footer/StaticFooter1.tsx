@@ -327,6 +327,29 @@ export default function StaticFooter({
       };
     }
 
+    // Apply branding data as fallback for logo and name
+    if (tenantData?.branding) {
+      // Ensure content.companyInfo exists
+      if (!result.content) {
+        result.content = {};
+      }
+      if (!result.content.companyInfo) {
+        result.content.companyInfo = {};
+      }
+
+      // Logo priority: tenantData.branding.logo (highest) → result.content.companyInfo.logo → default
+      if (tenantData.branding.logo) {
+        result.content.companyInfo.logo = tenantData.branding.logo;
+      }
+      
+      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → result.content.companyInfo.name → default
+      if (tenantData.branding.name) {
+        result.content.companyInfo.name = tenantData.branding.name;
+      } else if (tenantData.websiteName) {
+        result.content.companyInfo.name = tenantData.websiteName;
+      }
+    }
+
     return result;
   }, [
     defaultData,
@@ -471,11 +494,11 @@ export default function StaticFooter({
           {mergedData.content.companyInfo.enabled && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                {mergedData.content.companyInfo.logo ? (
+                {(tenantData?.branding?.logo || mergedData.content.companyInfo.logo) ? (
                   <div className="flex ">
                     <Image
-                      src={mergedData.content.companyInfo.logo}
-                      alt={mergedData.content.companyInfo.name}
+                      src={tenantData?.branding?.logo || mergedData.content.companyInfo.logo}
+                      alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.content.companyInfo.name || ""}
                       width={100}
                       height={100}
                       className="rounded-full object-contain"
@@ -493,7 +516,10 @@ export default function StaticFooter({
                       fontSize: `var(--${mergedData.styling.typography.titleSize})`,
                     }}
                   >
-                    {mergedData.content.companyInfo.name}
+                    {tenantData?.branding?.name ||
+                      tenantData?.websiteName ||
+                      mergedData.content.companyInfo.name ||
+                      ""}
                   </h3>
                   <p className="text-sm text-white/80">
                     {mergedData.content.companyInfo.tagline}

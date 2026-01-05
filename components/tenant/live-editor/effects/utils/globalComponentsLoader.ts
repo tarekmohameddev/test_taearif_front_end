@@ -18,6 +18,18 @@ export function loadGlobalComponentsFromTenantData(
 
   const globalData = tenantData.globalComponentsData;
 
+  // ⭐ NEW: Load ThemesBackup when tenantData contains backups and store is empty
+  if (
+    tenantData.ThemesBackup &&
+    typeof tenantData.ThemesBackup === "object" &&
+    Object.keys(tenantData.ThemesBackup).length > 0
+  ) {
+    const currentBackups = editorStore.ThemesBackup || {};
+    if (Object.keys(currentBackups).length === 0) {
+      editorStore.setThemesBackup(tenantData.ThemesBackup);
+    }
+  }
+
   // Only load if not already loaded (check if variants are default values)
   const currentHeaderVariant = editorStore.globalHeaderVariant;
   const currentFooterVariant = editorStore.globalFooterVariant;
@@ -56,4 +68,5 @@ export function loadGlobalComponentsFromTenantData(
     editorStore.setGlobalFooterData(globalData.footer);
   }
 }
+
 

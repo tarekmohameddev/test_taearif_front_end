@@ -270,6 +270,24 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
       result.colors = defaultData.colors;
     }
 
+    // Apply branding data with highest priority
+    if (tenantData?.branding) {
+      // Logo priority: tenantData.branding.logo (highest) → result.logo.image → default
+      if (!result.logo) {
+        result.logo = {};
+      }
+      if (tenantData.branding.logo) {
+        result.logo.image = tenantData.branding.logo;
+      }
+      
+      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → result.logo.text → default
+      if (tenantData.branding.name) {
+        result.logo.text = tenantData.branding.name;
+      } else if (tenantData.websiteName) {
+        result.logo.text = tenantData.websiteName;
+      }
+    }
+
     return result;
   });
 
@@ -339,6 +357,24 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
 
     if (!result.colors || typeof result.colors !== "object") {
       result.colors = defaultData.colors;
+    }
+
+    // Apply branding data with highest priority
+    if (tenantData?.branding) {
+      // Logo priority: tenantData.branding.logo (highest) → result.logo.image → default
+      if (!result.logo) {
+        result.logo = {};
+      }
+      if (tenantData.branding.logo) {
+        result.logo.image = tenantData.branding.logo;
+      }
+      
+      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → result.logo.text → default
+      if (tenantData.branding.name) {
+        result.logo.text = tenantData.branding.name;
+      } else if (tenantData.websiteName) {
+        result.logo.text = tenantData.websiteName;
+      }
     }
 
     setMergedData(result);
@@ -512,10 +548,10 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                 "#1f2937",
             }}
           >
-            {mergedData.logo?.type !== "text" && mergedData.logo?.image && (
+            {mergedData.logo?.type !== "text" && (tenantData?.branding?.logo || mergedData.logo?.image) && (
               <img
-                src={mergedData.logo.image}
-                alt={mergedData.logo?.text || "Logo"}
+                src={tenantData?.branding?.logo || mergedData.logo?.image}
+                alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.text || "Logo"}
                 className="h-full max-h-16 w-auto object-contain"
                 style={{
                   maxHeight: "4rem", // 64px
@@ -534,8 +570,9 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                     : ""
                 }
               >
-                {mergedData.logo?.text ||
+                {tenantData?.branding?.name ||
                   tenantData?.websiteName ||
+                  mergedData.logo?.text ||
                   "الشركة العقارية"}
               </span>
             )}
@@ -816,10 +853,10 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                 <div className="flex items-center justify-between">
                   {mergedData.actions?.mobile?.showLogo && (
                     <div className="flex items-center gap-2">
-                      {mergedData.logo?.image && (
+                      {(tenantData?.branding?.logo || mergedData.logo?.image) && (
                         <img
-                          src={mergedData.logo.image}
-                          alt={mergedData.logo?.text || "Logo"}
+                          src={tenantData?.branding?.logo || mergedData.logo?.image}
+                          alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.text || "Logo"}
                           className="size-8" // 32x32px مثل الكود الأصلي
                           style={{
                             width: "32px",
@@ -836,8 +873,9 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                             "#1f2937",
                         }}
                       >
-                        {mergedData.logo?.text ||
+                        {tenantData?.branding?.name ||
                           tenantData?.websiteName ||
+                          mergedData.logo?.text ||
                           "الشركة العقارية"}
                       </span>
                     </div>

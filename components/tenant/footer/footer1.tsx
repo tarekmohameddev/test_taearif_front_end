@@ -12,7 +12,7 @@ import {
   Linkedin,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { logChange } from "@/lib/debugLogger";
@@ -298,19 +298,53 @@ export default function Footer(props: FooterProps = {}) {
   // Merge data with priority:
   // For global footer: overrideData > globalFooterData > props > default
   // For regular footer: storeData > tenantComponentData > props > default
-  const mergedData = isGlobalFooter
-    ? {
-        ...getDefaultFooterData(),
-        ...props,
-        ...globalFooterData,
-        ...(props.overrideData || {}), // ⭐ NEW: Highest priority
+  const mergedData = useMemo(() => {
+    const baseData = isGlobalFooter
+      ? {
+          ...getDefaultFooterData(),
+          ...props,
+          ...globalFooterData,
+          ...(props.overrideData || {}), // ⭐ NEW: Highest priority
+        }
+      : {
+          ...getDefaultFooterData(),
+          ...props,
+          ...tenantComponentData,
+          ...storeData,
+        };
+
+    // Apply branding data with highest priority
+    if (tenantData?.branding) {
+      // Ensure content.companyInfo exists
+      if (!baseData.content) {
+        baseData.content = {};
       }
-    : {
-        ...getDefaultFooterData(),
-        ...props,
-        ...tenantComponentData,
-        ...storeData,
-      };
+      if (!baseData.content.companyInfo) {
+        baseData.content.companyInfo = {};
+      }
+
+      // Logo priority: tenantData.branding.logo (highest) → baseData.content.companyInfo.logo → default
+      if (tenantData.branding.logo) {
+        baseData.content.companyInfo.logo = tenantData.branding.logo;
+      }
+      
+      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → baseData.content.companyInfo.name → default
+      if (tenantData.branding.name) {
+        baseData.content.companyInfo.name = tenantData.branding.name;
+      } else if (tenantData.websiteName) {
+        baseData.content.companyInfo.name = tenantData.websiteName;
+      }
+    }
+
+    return baseData;
+  }, [
+    isGlobalFooter,
+    props,
+    globalFooterData,
+    tenantComponentData,
+    storeData,
+    tenantData,
+  ]);
 
   // Debug logging for global footer changes
   useEffect(() => {
@@ -447,7 +481,10 @@ export default function Footer(props: FooterProps = {}) {
                       fontSize: `var(--${mergedData.styling.typography.titleSize})`,
                     }}
                   >
-                    {mergedData.content.companyInfo.name}
+                    {tenantData?.branding?.name ||
+                      tenantData?.websiteName ||
+                      mergedData.content.companyInfo.name ||
+                      ""}
                   </h3>
                   <p className="text-sm text-white/80">
                     {mergedData.content.companyInfo.tagline}

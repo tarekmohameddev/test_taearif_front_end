@@ -272,3 +272,5 @@ export const useDatabaseLoadingEffect = ({
     setInitialized,
   ]);
 };
+
+export default useDatabaseLoadingEffect;
