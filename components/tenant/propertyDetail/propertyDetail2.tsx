@@ -1128,8 +1128,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
               </section>
             )}
 
-            {/* Contact Form */}
-            {mergedData.displaySettings?.showContactForm !== false && (
+            {/* Contact Form - COMMENTED OUT */}
+            {/* {mergedData.displaySettings?.showContactForm !== false && (
               <section
                 className="text-white p-8 rounded-lg h-fit"
                 data-purpose="contact-form"
@@ -1220,7 +1220,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                   </button>
                 </form>
               </section>
-            )}
+            )} */}
           </div>
           {/* END Right Column */}
 
