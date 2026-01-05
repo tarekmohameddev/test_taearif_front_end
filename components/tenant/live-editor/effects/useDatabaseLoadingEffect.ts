@@ -12,6 +12,7 @@ import {
   extractComponentType,
   createComponentFromDbData,
 } from "./utils/componentTypeHelpers";
+import { loadGlobalComponentsFromTenantData } from "./utils/globalComponentsLoader";
 
 interface UseDatabaseLoadingEffectProps {
   initialized: boolean;
@@ -56,6 +57,10 @@ export const useDatabaseLoadingEffect = ({
       const themeChangeTimestamp = editorStore.themeChangeTimestamp;
       const hasRecentThemeChange = themeChangeTimestamp > 0;
 
+      // ⭐ ALWAYS load global components data (header/footer variants)
+      // even if store already has page components
+      loadGlobalComponentsFromTenantData(editorStore, tenantData);
+
       // ⭐ PRIORITY LOGIC: Check store first before loading from tenantData
       // This prevents overwriting recent changes (after save) with old tenantData
       const storePageComponents = editorStore.pageComponentsByPage[slug];
@@ -64,7 +69,7 @@ export const useDatabaseLoadingEffect = ({
         // Store already has data - use it instead of tenantData to avoid overwriting recent changes
         setPageComponents(storePageComponents);
         setInitialized(true);
-        return; // Skip loading from tenantData
+        return; // Skip loading page components from tenantData
       }
 
       // Load data into editorStore (only if store doesn't have data for this page)

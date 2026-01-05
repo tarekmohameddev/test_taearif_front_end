@@ -76,7 +76,10 @@ export {
 // ============================================================================
 // Theme Application Service
 // ============================================================================
-export { applyThemeToAllPages } from "./themeApplicationService";
+export {
+  applyThemeToAllPages,
+  applyDefaultThemeData,
+} from "./themeApplicationService";
 
 // ============================================================================
 // Theme Restore Service

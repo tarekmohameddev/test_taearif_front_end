@@ -21,6 +21,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ThemeChangeDialog } from "@/components/tenant/live-editor/ThemeChangeDialog";
 import {
   applyThemeToAllPages,
+  applyDefaultThemeData,
   ThemeNumber,
 } from "@/services/live-editor/themeChangeService";
 import {
@@ -1029,6 +1030,26 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       console.error("Error applying theme:", error);
       toast.error(
         locale === "ar" ? "حدث خطأ أثناء تطبيق الثيم" : "Error applying theme",
+      );
+      throw error;
+    }
+  };
+
+  const handleThemeReset = async (themeNumber: ThemeNumber) => {
+    try {
+      await applyDefaultThemeData(themeNumber);
+      toast.success(
+        locale === "ar"
+          ? `تم إعادة تعيين الثيم ${themeNumber} للبيانات الافتراضية بنجاح`
+          : `Theme ${themeNumber} reset to default data successfully`,
+      );
+      // Changes will be reflected automatically via useEffect in LiveEditorEffects
+    } catch (error) {
+      console.error("Error resetting theme:", error);
+      toast.error(
+        locale === "ar"
+          ? "حدث خطأ أثناء إعادة تعيين الثيم"
+          : "Error resetting theme",
       );
       throw error;
     }
@@ -3528,6 +3549,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         isOpen={isThemeDialogOpen}
         onClose={() => setIsThemeDialogOpen(false)}
         onThemeApply={handleThemeApply}
+        onThemeReset={handleThemeReset}
         currentTheme={currentTheme || null}
       />
     </nav>

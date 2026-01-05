@@ -286,9 +286,9 @@ function forceUpdateCurrentPageAfterRestore(
 export async function restoreThemeFromBackup(backupKey: string): Promise<void> {
   const store = useEditorStore.getState();
 
-  // قراءة النسخ الاحتياطي من WebsiteLayout بدلاً من themeBackup
-  // Read backup from WebsiteLayout instead of themeBackup
-  const backup = store.WebsiteLayout?.[backupKey];
+  // قراءة النسخ الاحتياطي من ThemesBackup (NEW: separate field)
+  // Read backup from ThemesBackup (NEW: separate field)
+  const backup = store.ThemesBackup?.[backupKey];
 
   // التحقق من وجود النسخ الاحتياطي
   // Check if backup exists

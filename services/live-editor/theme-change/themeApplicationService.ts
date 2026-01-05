@@ -444,7 +444,7 @@ export async function applyThemeToAllPages(
   // If backup exists, restore from backup instead of applying default theme
   // 3. Check if backup exists for the target theme
   const targetBackupKey = `Theme${themeNumber}Backup`;
-  const targetBackup = store.WebsiteLayout?.[targetBackupKey];
+  const targetBackup = store.ThemesBackup?.[targetBackupKey];
 
   // تحميل بيانات الثيم من lib/themes/theme{themeNumber}Data.json
   // (مطلوب للـ variants حتى لو كان هناك نسخ احتياطي)
@@ -469,5 +469,53 @@ export async function applyThemeToAllPages(
 
   // 4. إذا لم يكن هناك نسخ احتياطي، المتابعة مع تطبيق الثيم الافتراضي من مجلد lib
   // 4. If no backup exists, continue with default theme application from lib folder
+  applyDefaultTheme(store, themeData, themeNumber);
+}
+
+/**
+ * تطبيق البيانات الافتراضية للثيم الحالي
+ * Apply default data for current theme
+ *
+ * تقوم هذه الدالة بتطبيق البيانات الافتراضية للثيم الحالي
+ * من مجلد lib/themes دون التحقق من النسخ الاحتياطي.
+ * يتم استخدامها عند الضغط على زر Reset لإعادة تعيين الثيم
+ * إلى حالته الافتراضية الأصلية.
+ *
+ * This function applies default data for current theme
+ * from lib/themes folder without checking for backup.
+ * It is used when clicking the Reset button to reset the theme
+ * to its original default state.
+ *
+ * @param themeNumber - رقم الثيم المطلوب إعادة تعيينه (1 أو 2)
+ *                     Theme number to reset (1 or 2)
+ *
+ * @example
+ * ```typescript
+ * await applyDefaultThemeData(1);
+ * ```
+ */
+export async function applyDefaultThemeData(
+  themeNumber: ThemeNumber,
+): Promise<void> {
+  const store = useEditorStore.getState();
+
+  // 1. حذف النسخة الاحتياطية الموجودة للثيم الحالي من ThemesBackup (إن وجدت)
+  // 1. Delete existing backup for current theme from ThemesBackup if it exists
+  const backupKey = `Theme${themeNumber}Backup`;
+  if (store.ThemesBackup?.[backupKey]) {
+    store.deleteThemeBackup(backupKey);
+  }
+
+  // 2. مسح جميع الحالات قبل تطبيق الثيم الجديد
+  // This ensures complete removal of all components and data from iframe
+  // 2. Clear ALL states before applying new theme
+  store.clearAllStates();
+
+  // 3. تحميل بيانات الثيم الافتراضية من lib/themes/theme{themeNumber}Data.json
+  // 3. Load default theme data from lib/themes/theme{themeNumber}Data.json
+  const themeData = loadThemeData(themeNumber);
+
+  // 4. تطبيق الثيم الافتراضي مباشرة (دون التحقق من backup)
+  // 4. Apply default theme directly (without checking for backup)
   applyDefaultTheme(store, themeData, themeNumber);
 }

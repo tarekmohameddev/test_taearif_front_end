@@ -124,8 +124,8 @@
           },
           "logo": {
             "type": "image+text",
-            "image": "https://dalel-lovat.vercel.app/images/logo.svg",
-            "text": "الشركة العقارية",
+            "image": "",
+            "text": "",
             "font": {
               "family": "Tajawal",
               "size": 24,
@@ -2451,6 +2451,46 @@
         },
         "position": 1
       }
+    ],
+    "projects": [
+      {
+        "id": "0",
+        "type": "grid",
+        "name": "Grid",
+        "componentName": "grid1",
+        "data": {
+          "visible": true,
+          "texts": {
+            "title": "Property Grid Title",
+            "subtitle": "This is a sample subtitle for the section."
+          },
+          "colors": {
+            "background": "#FFFFFF",
+            "textColor": "#1F2937"
+          },
+          "settings": {
+            "enabled": true,
+            "layout": "default"
+          },
+          "id": "component",
+          "type": "unknown",
+          "variant": "e4a27bd8-6911-482d-9e5d-82923f264aca",
+          "useStore": true,
+          "dataSource": {
+            "apiUrl": "/v1/tenant-website/{{tenantID}}/projects",
+            "enabled": true
+          },
+          "cardSettings": {
+            "theme": "card4"
+          }
+        },
+        "position": 0,
+        "layout": {
+          "row": 0,
+          "col": 0,
+          "span": 2
+        }
+      }
     ]
   },
   "globalComponentsData": {
@@ -2487,8 +2527,8 @@
       },
       "logo": {
         "type": "image+text",
-        "image": "https://dalel-lovat.vercel.app/images/logo.svg",
-        "text": "الشركة العقارية",
+        "image": "",
+        "text": "",
         "font": {
           "family": "Tajawal",
           "size": 24,
@@ -3001,7 +3041,7 @@
       ]
     }
   },
-  "staticPages": {
+  "StaticPages": {
     "project": {
       "slug": "project",
       "components": [

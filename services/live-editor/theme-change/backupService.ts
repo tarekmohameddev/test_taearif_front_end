@@ -215,14 +215,15 @@ export function saveBackupInStore(
 ): void {
   const store = useEditorStore.getState();
 
-  // حفظ في themeBackup
-  // Save in themeBackup
+  // حفظ في themeBackup (temporary reference)
+  // Save in themeBackup (temporary reference)
   store.setThemeBackup(backupKey, backup);
 
-  // حفظ أيضاً في WebsiteLayout للاستمرارية
-  // Also save in WebsiteLayout for persistence
-  store.setWebsiteLayout({
-    ...store.WebsiteLayout,
+  // حفظ في ThemesBackup field (NEW: separate field for persistence)
+  // Save in ThemesBackup field (NEW: separate field for persistence)
+  const updatedBackups = {
+    ...store.ThemesBackup,
     [backupKey]: backup,
-  });
+  };
+  store.setThemesBackup(updatedBackups);
 }

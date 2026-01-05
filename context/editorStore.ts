@@ -216,6 +216,11 @@ interface EditorStore {
   themeBackupKey: string | null;
   setThemeBackup: (key: string, backup: Record<string, any>) => void;
 
+  // Theme backups collection - Separate from WebsiteLayout
+  ThemesBackup: Record<string, any>; // { Theme1Backup: {...}, Theme2Backup: {...} }
+  setThemesBackup: (backups: Record<string, any>) => void;
+  deleteThemeBackup: (backupKey: string) => void;
+
   // Theme change timestamp for forcing sync after theme restore
   themeChangeTimestamp: number;
 
@@ -680,6 +685,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   themeBackup: null,
   themeBackupKey: null,
   themeChangeTimestamp: 0,
+
+  // Theme backups collection - Initialize as empty object
+  ThemesBackup: {},
 
   structures: Object.keys(COMPONENTS).reduce(
     (acc, componentType) => {
@@ -2618,27 +2626,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         newState.WebsiteLayout = state.WebsiteLayout;
       }
 
-      // Load theme backups from ThemesBackup object (supports unlimited themes)
+      // Load theme backups from ThemesBackup object (NEW: separate field)
       // Regex pattern /^Theme\d+Backup$/ supports any number (1, 2, 10, 11, 100, etc.)
       if (
         tenantData.ThemesBackup &&
         typeof tenantData.ThemesBackup === "object"
       ) {
-        // Initialize WebsiteLayout if it doesn't exist
-        if (!newState.WebsiteLayout) {
-          newState.WebsiteLayout = {
-            metaTags: { pages: [] },
-          };
-        }
-
-        // Copy all backups from ThemesBackup to WebsiteLayout
-        Object.entries(tenantData.ThemesBackup).forEach(
-          ([backupKey, backupData]) => {
-            if (backupKey.match(/^Theme\d+Backup$/)) {
-              newState.WebsiteLayout[backupKey] = backupData;
-            }
-          },
-        );
+        // Store backups in separate ThemesBackup field
+        newState.ThemesBackup = { ...tenantData.ThemesBackup };
 
         // Auto-detect and set themeBackup and themeBackupKey from loaded backups
         // Find first available backup that is NOT the current theme
@@ -2679,6 +2674,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           newState.themeBackup = foundBackupData;
           newState.themeBackupKey = foundBackupKey;
         }
+      } else {
+        // Initialize empty ThemesBackup if not in database
+        newState.ThemesBackup = {};
       }
 
       // Preserve existing backup state if not in tenantData
@@ -3374,6 +3372,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       themeBackup: backup,
       themeBackupKey: key,
     })),
+
+  setThemesBackup: (backups) =>
+    set(() => ({
+      ThemesBackup: backups,
+    })),
+
+  deleteThemeBackup: (backupKey) =>
+    set((state) => {
+      const updatedBackups = { ...state.ThemesBackup };
+      delete updatedBackups[backupKey];
+      return { ThemesBackup: updatedBackups };
+    }),
 
   // Clear all states (for theme change)
   clearAllStates: () =>

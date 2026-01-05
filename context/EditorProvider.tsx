@@ -41,13 +41,12 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     const headerVariant = state.globalHeaderVariant || "StaticHeader1";
     const footerVariant = state.globalFooterVariant || "StaticFooter1";
 
-    // Get static page slugs to exclude them from pages and componentSettings
+    // Get static page slugs to exclude them from pages
     const staticPageSlugs = new Set(Object.keys(state.staticPagesData || {}));
 
-    // Convert pageComponentsByPage (array format) to componentSettings (object format)
-    // ⚠️ Exclude static pages - they should only be in StaticPages, not in pages/componentSettings
-    const componentSettings: Record<string, any> = {};
-    // Also create pages format (array format) for API
+    // Convert pageComponentsByPage to pages format (array format) for API
+    // ⚠️ Exclude static pages - they should only be in StaticPages, not in pages
+    // Note: API builds componentSettings from pages array, so we don't need to send it
     const pages: Record<string, any[]> = {};
     Object.entries(state.pageComponentsByPage).forEach(
       ([pageSlug, components]) => {
@@ -56,7 +55,6 @@ export function EditorProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        componentSettings[pageSlug] = {};
         // pages format: array of components (API expects this format)
         pages[pageSlug] = components.map((comp: any) => ({
           id: comp.id,
@@ -67,16 +65,6 @@ export function EditorProvider({ children }: { children: ReactNode }) {
           position: comp.position || 0,
           layout: (comp as any).layout || { row: 0, col: 0, span: 2 },
         }));
-        components.forEach((comp: any) => {
-          componentSettings[pageSlug][comp.id] = {
-            type: comp.type,
-            name: comp.name,
-            componentName: comp.componentName,
-            data: comp.data || {},
-            position: comp.position || 0,
-            layout: (comp as any).layout || { row: 0, col: 0, span: 2 },
-          };
-        });
       },
     );
 
@@ -84,8 +72,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       tenantId: username, // API requires tenantId (maps to username in database)
       username: username,
       websiteName: websiteName,
-      pages: pages, // API requires pages in array format
-      componentSettings: componentSettings,
+      pages: pages, // API requires pages in array format (API builds componentSettings from this)
       globalComponentsData: {
         ...state.globalComponentsData,
         header: {
@@ -106,18 +93,18 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       },
     };
 
-    // Collect all theme backups from WebsiteLayout into ThemesBackup object
+    // Collect all theme backups from ThemesBackup field (NEW: separate field)
     // Exclude the current theme (it's already in pages and globalComponentsData)
     const themesBackup: Record<string, any> = {};
     const currentTheme = state.WebsiteLayout?.currentTheme;
 
-    // Iterate through WebsiteLayout keys to find Theme*Backup keys
+    // Get backups from ThemesBackup field directly
     // Regex pattern /^Theme\d+Backup$/ supports any number (1, 2, 10, 11, 100, etc.)
-    if (state.WebsiteLayout) {
-      Object.keys(state.WebsiteLayout).forEach((key) => {
-        if (key.match(/^Theme\d+Backup$/)) {
-          // Extract theme number from backup key (Theme1Backup -> 1, Theme10Backup -> 10, etc.)
-          const themeMatch = key.match(/^Theme(\d+)Backup$/);
+    if (state.ThemesBackup && typeof state.ThemesBackup === "object") {
+      Object.entries(state.ThemesBackup).forEach(([backupKey, backupData]) => {
+        if (backupKey.match(/^Theme\d+Backup$/)) {
+          // Extract theme number from backup key
+          const themeMatch = backupKey.match(/^Theme(\d+)Backup$/);
           const backupThemeNumber = themeMatch
             ? parseInt(themeMatch[1], 10)
             : null;
@@ -127,7 +114,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
             backupThemeNumber !== null &&
             backupThemeNumber !== currentTheme
           ) {
-            themesBackup[key] = (state.WebsiteLayout as any)[key];
+            themesBackup[backupKey] = backupData;
           }
         }
       });

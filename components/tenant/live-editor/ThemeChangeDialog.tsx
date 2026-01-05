@@ -14,7 +14,12 @@ import {
   useEditorT,
   useEditorLocale,
 } from "@/context/editorI18nStore";
-import { Palette, AlertTriangle, Loader2 } from "lucide-react";
+import {
+  Palette,
+  AlertTriangle,
+  Loader2,
+  RotateCcw,
+} from "lucide-react";
 import { ThemeNumber } from "@/services/live-editor/themeChangeService";
 
 interface ThemeOption {
@@ -49,6 +54,7 @@ interface ThemeChangeDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onThemeApply: (themeNumber: ThemeNumber) => Promise<void>;
+  onThemeReset: (themeNumber: ThemeNumber) => Promise<void>;
   currentTheme: number | null;
 }
 
@@ -56,6 +62,7 @@ export function ThemeChangeDialog({
   isOpen,
   onClose,
   onThemeApply,
+  onThemeReset,
   currentTheme,
 }: ThemeChangeDialogProps) {
   const t = useEditorT();
@@ -63,6 +70,8 @@ export function ThemeChangeDialog({
   const [selectedTheme, setSelectedTheme] = useState<ThemeNumber | null>(null);
   const [showWarning, setShowWarning] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [showResetWarning, setShowResetWarning] = useState(false);
 
   const isRTL = locale === "ar";
 
@@ -87,10 +96,26 @@ export function ThemeChangeDialog({
     }
   };
 
+  const handleReset = async () => {
+    if (!currentTheme) return;
+
+    setIsResetting(true);
+    try {
+      await onThemeReset(currentTheme);
+      setShowResetWarning(false);
+      onClose();
+    } catch (error) {
+      console.error("Error resetting theme:", error);
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const handleClose = () => {
-    if (!isApplying) {
+    if (!isApplying && !isResetting) {
       setSelectedTheme(null);
       setShowWarning(false);
+      setShowResetWarning(false);
       onClose();
     }
   };
@@ -114,6 +139,67 @@ export function ThemeChangeDialog({
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Reset Button - Only show if currentTheme exists */}
+          {currentTheme !== null && (
+            <div className="space-y-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowResetWarning(true)}
+                disabled={isApplying || isResetting}
+                className="w-full gap-2 border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400"
+              >
+                <RotateCcw className="w-4 h-4" />
+                {isRTL ? "إعادة تعيين للافتراضي" : "Reset to Default"}
+              </Button>
+
+              {/* Reset Warning Message */}
+              {showResetWarning && (
+                <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-900">
+                      {isRTL ? "⚠️ تحذير: إعادة التعيين" : "⚠️ Warning: Reset"}
+                    </p>
+                    <p className="text-sm text-red-800 mt-1">
+                      {isRTL
+                        ? "سيتم استبدال جميع الكومبوننتات في جميع الصفحات بالبيانات الافتراضية للثيم الحالي. سيتم حفظ الثيم الحالي كنسخة احتياطية قبل إعادة التعيين."
+                        : "All components on all pages will be replaced with the default data of the current theme. The current theme will be saved as a backup before reset."}
+                    </p>
+                    <div className="flex items-center gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={handleReset}
+                        disabled={isResetting}
+                        className="gap-2"
+                      >
+                        {isResetting ? (
+                          <>
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            {isRTL ? "جاري إعادة التعيين..." : "Resetting..."}
+                          </>
+                        ) : (
+                          <>
+                            <RotateCcw className="w-3 h-3" />
+                            {isRTL ? "تأكيد إعادة التعيين" : "Confirm Reset"}
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setShowResetWarning(false)}
+                        disabled={isResetting}
+                      >
+                        {isRTL ? "إلغاء" : "Cancel"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Warning Message */}
           {showWarning && selectedTheme && (
             <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
@@ -206,12 +292,16 @@ export function ThemeChangeDialog({
         </div>
 
         <DialogFooter className="flex items-center justify-end gap-2">
-          <Button variant="outline" onClick={handleClose} disabled={isApplying}>
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={isApplying || isResetting}
+          >
             {isRTL ? "إلغاء" : "Cancel"}
           </Button>
           <Button
             onClick={handleApply}
-            disabled={!selectedTheme || isApplying}
+            disabled={!selectedTheme || isApplying || isResetting}
             className="gap-2 bg-indigo-600 hover:bg-indigo-700"
           >
             {isApplying ? (
