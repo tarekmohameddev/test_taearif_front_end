@@ -23,6 +23,7 @@ import useAuthStore from "@/context/AuthContext";
 interface PropertyRequest {
   id: number;
   full_name: string;
+  customer_id?: number;
   employee?: {
     id: number;
     name: string;
@@ -108,6 +109,24 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
       return;
     }
 
+    // التحقق من وجود customer_id
+    const customerID = propertyRequest.customer_id;
+    if (!customerID) {
+      toast.error("لا يمكن تعيين الموظف: معرف العميل غير متوفر", {
+        duration: 4000,
+        position: "top-center",
+        style: {
+          background: "#EF4444",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          padding: "12px 20px",
+          borderRadius: "8px",
+        },
+      });
+      return;
+    }
+
     setSavingEmployee(true);
     try {
       // إرسال طلب التحديث
@@ -118,7 +137,7 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
           : selectedEmployeeId;
 
       await axiosInstance.put(
-        `/v1/property-requests/${propertyRequest.id}/employee`,
+        `/v1/property-requests/customer/${customerID}/employee`,
         {
           responsible_employee_id: employeeIdToSend,
         },

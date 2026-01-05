@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultHero3Data } from "@/context/editorStoreFunctions/heroFunctions";
+import { useUrlFilters } from "@/hooks/use-url-filters";
+import { useSearchParams } from "next/navigation";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -140,17 +142,140 @@ function SearchForm({
   primaryColor?: string;
   primaryColorHover?: string;
 }) {
-  const [status, setStatus] = useState("");
-  const [city, setCity] = useState("");
+  const { navigateWithFilters } = useUrlFilters();
+  const searchParams = useSearchParams();
+
+  // City options from API
+  interface CityOption {
+    id: string | number;
+    name: string;
+  }
+  const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
+  const [cityLoading, setCityLoading] = useState(false);
+
+  // Form state
+  const [status, setStatus] = useState(() => {
+    const purposeParam = searchParams?.get("purpose");
+    if (purposeParam === "rent") return "للإيجار";
+    if (purposeParam === "sale") return "للبيع";
+    return "";
+  });
+  const [cityId, setCityId] = useState(() => searchParams?.get("city_id") || "");
+  const [cityName, setCityName] = useState("");
   const [type, setType] = useState("");
 
   // Default colors if not provided
   const defaultPrimaryColor = primaryColor || "#8b5f46";
   const defaultPrimaryColorHover = primaryColorHover || "#6b4630";
 
+  // Fetch cities from API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCities = async () => {
+      try {
+        setCityLoading(true);
+        const res = await fetch(
+          "https://nzl-backend.com/api/cities?country_id=1",
+        );
+        if (!res.ok) throw new Error(`Failed to load cities: ${res.status}`);
+        const data = await res.json();
+        const list: CityOption[] = Array.isArray(data?.data)
+          ? data.data.map((c: any) => ({
+              id: c.id,
+              name: c.name_ar || c.name_en || String(c.id),
+            }))
+          : [];
+        if (isMounted) setCityOptions(list);
+      } catch (e: any) {
+        console.error("Error fetching cities:", e);
+        // Fallback to config options if API fails
+        if (isMounted && config.fields?.city?.options) {
+          const fallbackOptions: CityOption[] = config.fields.city.options
+            .filter((opt: string) => opt !== "اختر المدينة")
+            .map((opt: string, index: number) => ({
+              id: index + 1,
+              name: opt,
+            }));
+          setCityOptions(fallbackOptions);
+        }
+      } finally {
+        if (isMounted) setCityLoading(false);
+      }
+    };
+    fetchCities();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Update form fields when URL changes
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const purposeParam = searchParams.get("purpose");
+    const cityIdParam = searchParams.get("city_id");
+
+    if (purposeParam === "rent") setStatus("للإيجار");
+    else if (purposeParam === "sale") setStatus("للبيع");
+    if (cityIdParam) setCityId(cityIdParam);
+  }, [searchParams]);
+
+  // Find city name from cityId for display
+  useEffect(() => {
+    if (cityId && cityOptions.length > 0) {
+      const city = cityOptions.find((c) => c.id.toString() === cityId);
+      if (city) setCityName(city.name);
+    } else {
+      setCityName("");
+    }
+  }, [cityId, cityOptions]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Navigate to results page or trigger search
+
+    // Convert status to transactionType
+    let transactionType: "rent" | "sale" = "rent";
+    if (status === "للبيع") {
+      transactionType = "sale";
+    } else if (status === "للإيجار") {
+      transactionType = "rent";
+    } else {
+      // Default to rent if no status selected
+      transactionType = "rent";
+    }
+
+    // Collect filters
+    const filters: {
+      city_id?: string;
+      state_id?: string;
+      max_price?: string;
+      category_id?: string;
+      type_id?: string;
+      search?: string;
+    } = {};
+
+    // Add city_id if city is selected
+    if (cityId && cityId.trim()) {
+      filters.city_id = cityId.trim();
+    }
+
+    // Add type as search term if provided and not "الكل"
+    if (type && type.trim() && type !== "الكل") {
+      filters.search = type.trim();
+    }
+
+    // Log for debugging
+    console.log("🔍 Hero3 Search Form Submit:", {
+      status,
+      transactionType,
+      cityId,
+      cityName,
+      type,
+      filters,
+    });
+
+    // Navigate to the appropriate listing page with filters
+    navigateWithFilters(transactionType, filters);
   };
 
   if (!config?.enabled) return null;
@@ -165,14 +290,6 @@ function SearchForm({
     "عمائر",
     "تاون هاوس",
     "أبراج",
-  ];
-  const cityOptions = config.fields?.city?.options || [
-    "اختر المدينة",
-    "الرياض",
-    "جدة",
-    "مكة المكرمة",
-    "المدينة المنورة",
-    "الدمام",
   ];
   const statusOptions = config.fields?.status?.options || [
     "بيع / ايجار",
@@ -218,17 +335,40 @@ function SearchForm({
               <MapPin className="size-5" style={{ color: "#896042" }} />
               <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
             </div>
-            <Select value={city} onValueChange={setCity}>
+            <Select
+              value={cityId}
+              onValueChange={(value) => {
+                setCityId(value);
+                const city = cityOptions.find((c) => c.id.toString() === value);
+                if (city) setCityName(city.name);
+              }}
+            >
               <SelectTrigger className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042]">
-                <SelectValue placeholder="اختر المدينة" />
+                <SelectValue
+                  placeholder={
+                    cityLoading
+                      ? "جاري التحميل..."
+                      : cityName || "اختر المدينة"
+                  }
+                />
                 <ChevronDown className="size-4 opacity-60" />
               </SelectTrigger>
               <SelectContent align="end">
-                {cityOptions.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
+                {cityLoading ? (
+                  <SelectItem value="loading" disabled>
+                    جاري التحميل...
                   </SelectItem>
-                ))}
+                ) : cityOptions.length === 0 ? (
+                  <SelectItem value="no-cities" disabled>
+                    لا توجد مدن
+                  </SelectItem>
+                ) : (
+                  cityOptions.map((city) => (
+                    <SelectItem key={city.id} value={city.id.toString()}>
+                      {city.name}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -308,17 +448,40 @@ function SearchForm({
               <MapPin className="size-5" style={{ color: "#896042" }} />
               <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
             </div>
-            <Select value={city} onValueChange={setCity}>
+            <Select
+              value={cityId}
+              onValueChange={(value) => {
+                setCityId(value);
+                const city = cityOptions.find((c) => c.id.toString() === value);
+                if (city) setCityName(city.name);
+              }}
+            >
               <SelectTrigger className="h-12 border border-gray-200 rounded-2xl">
-                <SelectValue placeholder="اختر المدينة" />
+                <SelectValue
+                  placeholder={
+                    cityLoading
+                      ? "جاري التحميل..."
+                      : cityName || "اختر المدينة"
+                  }
+                />
                 <ChevronDown className="size-4 opacity-60" />
               </SelectTrigger>
               <SelectContent align="end">
-                {cityOptions.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
+                {cityLoading ? (
+                  <SelectItem value="loading" disabled>
+                    جاري التحميل...
                   </SelectItem>
-                ))}
+                ) : cityOptions.length === 0 ? (
+                  <SelectItem value="no-cities" disabled>
+                    لا توجد مدن
+                  </SelectItem>
+                ) : (
+                  cityOptions.map((city) => (
+                    <SelectItem key={city.id} value={city.id.toString()}>
+                      {city.name}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>

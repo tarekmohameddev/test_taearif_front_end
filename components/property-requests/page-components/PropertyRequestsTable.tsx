@@ -58,6 +58,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface PropertyRequest {
   id: number;
   user_id: number;
+  customer_id?: number;
   region: string;
   property_type: string;
   category_id: number;
