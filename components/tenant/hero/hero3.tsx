@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -132,8 +133,8 @@ interface HeroProps {
   id?: string;
 }
 
-// Search Form Component
-function SearchForm({
+// Search Form Component - Memoized to prevent unnecessary re-renders
+const SearchForm = React.memo(function SearchForm({
   config,
   primaryColor,
   primaryColorHover,
@@ -280,8 +281,8 @@ function SearchForm({
 
   if (!config?.enabled) return null;
 
-  // Default options based on the HTML code provided
-  const typeOptions = config.fields?.type?.options || [
+  // Default options based on the HTML code provided - Memoized to prevent re-computation
+  const typeOptions = useMemo(() => config.fields?.type?.options || [
     "الكل",
     "شقق",
     "فلل",
@@ -290,12 +291,13 @@ function SearchForm({
     "عمائر",
     "تاون هاوس",
     "أبراج",
-  ];
-  const statusOptions = config.fields?.status?.options || [
+  ], [config.fields?.type?.options]);
+  
+  const statusOptions = useMemo(() => config.fields?.status?.options || [
     "بيع / ايجار",
     "للبيع",
     "للإيجار",
-  ];
+  ], [config.fields?.status?.options]);
 
   return (
     <form
@@ -527,12 +529,12 @@ function SearchForm({
       </div>
     </form>
   );
-}
+});
 
 // ═══════════════════════════════════════════════════════════
-// COMPONENT
+// COMPONENT - Memoized to prevent unnecessary re-renders
 // ═══════════════════════════════════════════════════════════
-export default function Hero3(props: HeroProps) {
+function Hero3(props: HeroProps) {
   // ─────────────────────────────────────────────────────────
   // 1. EXTRACT UNIQUE ID
   // ─────────────────────────────────────────────────────────
@@ -555,14 +557,11 @@ export default function Hero3(props: HeroProps) {
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
+  // ⚠️ REMOVED: fetchTenantData useEffect - causes infinite re-renders
+  // Tenant data should be loaded at a higher level, not in component
 
-  // Extract component data from tenantData (BEFORE useEffect)
-  const getTenantComponentData = () => {
+  // Extract component data from tenantData (memoized to prevent re-computation)
+  const tenantComponentData = useMemo(() => {
     if (!tenantData) return {};
 
     // Check new structure (tenantData.components)
@@ -601,9 +600,7 @@ export default function Hero3(props: HeroProps) {
     }
 
     return {};
-  };
-
-  const tenantComponentData = getTenantComponentData();
+  }, [tenantData, variantId, props.id]);
 
   useEffect(() => {
     if (props.useStore) {
@@ -632,14 +629,14 @@ export default function Hero3(props: HeroProps) {
   const currentStoreData = getComponentData("hero", uniqueId);
 
   // ─────────────────────────────────────────────────────────
-  // 5. MERGE DATA (PRIORITY ORDER)
+  // 5. MERGE DATA (PRIORITY ORDER) - Memoized to prevent re-computation
   // ─────────────────────────────────────────────────────────
-  const mergedData = {
+  const mergedData = useMemo(() => ({
     ...getDefaultHero3Data(), // 1. Defaults (lowest priority)
     ...storeData, // 2. Store state
     ...currentStoreData, // 3. Current store data
     ...props, // 4. Props (highest priority)
-  };
+  }), [storeData, currentStoreData, props]);
 
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
@@ -853,3 +850,24 @@ export default function Hero3(props: HeroProps) {
     </section>
   );
 }
+
+// Export memoized component to prevent unnecessary re-renders
+export default React.memo(Hero3, (prevProps, nextProps) => {
+  // Only re-render if id changes or props actually change
+  if (prevProps.id !== nextProps.id) return false;
+  
+  // Deep comparison for props (excluding functions)
+  const prevKeys = Object.keys(prevProps).filter(k => k !== 'id');
+  const nextKeys = Object.keys(nextProps).filter(k => k !== 'id');
+  
+  if (prevKeys.length !== nextKeys.length) return false;
+  
+  for (const key of prevKeys) {
+    if (JSON.stringify(prevProps[key as keyof HeroProps]) !== 
+        JSON.stringify(nextProps[key as keyof HeroProps])) {
+      return false;
+    }
+  }
+  
+  return true; // Props are equal, skip re-render
+});
