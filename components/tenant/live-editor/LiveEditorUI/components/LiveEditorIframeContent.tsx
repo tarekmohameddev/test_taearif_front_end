@@ -221,7 +221,7 @@ export function LiveEditorIframeContent({
                             ...component.mergedData, // ✅ استخدام البيانات من useState
                             id: component.id,
                             useStore: true,
-                            variant: component.componentName, // ⭐ FIX: Use componentName instead of id for variant
+                            variant: component.id, // ✅ Use id from database (matches the key in heroStates)
                             deviceType: selectedDevice,
                             forceUpdate: component.forceUpdate,
                           } as any

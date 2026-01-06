@@ -206,76 +206,65 @@ export const CachedComponent = React.memo(
       );
     }
 
+    // ✅ Pass through merged component data while enforcing safe core props
+    const buildSafeProps = (rawData: any) => {
+      const safeVariant =
+        rawData?.variant &&
+        typeof rawData.variant === "string" &&
+        rawData.variant.length < 100
+          ? rawData.variant
+          : "default";
+
+      const safeUseStore =
+        typeof rawData?.useStore === "boolean" ? rawData.useStore : true;
+
+      const safeId =
+        typeof (componentId || rawData?.id) === "string" &&
+        (componentId || rawData.id).length < 100
+          ? (componentId || rawData.id)
+          : "component";
+
+      const safeType =
+        rawData?.type &&
+        typeof rawData.type === "string" &&
+        rawData.type.length < 100
+          ? rawData.type
+          : "unknown";
+
+      // استخدم spread للـ mergedData بالكامل، ثم نضمن أن الحقول الأساسية آمنة
+      return {
+        ...(rawData || {}),
+        id: safeId,
+        type: safeType,
+        visible:
+          typeof rawData?.visible === "boolean" ? rawData.visible : true,
+        variant: safeVariant,
+        useStore: safeUseStore,
+      } as ComponentData;
+    };
+
+    const safeData = buildSafeProps(data);
+
     return (
       <Suspense
         fallback={
           <div className="p-8 bg-white border border-red-200 rounded-lg shadow-sm ">
             <div className="animate-pulse flex space-x-4">
-              <div className="rounded-full bg-gray-300 h-10 w-10"></div>
+              <div className="rounded-full bg-gray-300 h-10 w-10" />
               <div className="flex-1 space-y-2 py-1">
-                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-300 rounded w-3/4" />
                 <div className="space-y-2">
-                  <div className="h-4 bg-gray-300 rounded"></div>
-                  <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                  <div className="h-4 bg-gray-300 rounded" />
+                  <div className="h-4 bg-gray-300 rounded w-5/6" />
                 </div>
               </div>
             </div>
           </div>
         }
       >
-        {/* Pass useStore & variant so components read live state from EditorStore */}
+        {/* Pass merged data (from backend/default/store) into the component */}
         <LoadedComponent
-          {...(() => {
-            // Absolute maximum safety: pass only the most basic props
-            const getAbsoluteSafeProps = (data: any) => {
-              // Only return the absolute minimum required props
-              const safeVariant =
-                data?.variant &&
-                typeof data.variant === "string" &&
-                data.variant.length < 100
-                  ? data.variant
-                  : "default";
-              const safeUseStore =
-                typeof data?.useStore === "boolean" ? data.useStore : true;
-
-              return {
-                id:
-                  componentId ||
-                  (data?.id &&
-                    typeof data.id === "string" &&
-                    data.id.length < 100)
-                    ? data.id
-                    : "component",
-                type:
-                  data?.type &&
-                  typeof data.type === "string" &&
-                  data.type.length < 100
-                    ? data.type
-                    : "unknown",
-                visible:
-                  typeof data?.visible === "boolean" ? data.visible : true,
-                variant: safeVariant,
-                useStore: safeUseStore,
-              };
-            };
-
-            try {
-              return getAbsoluteSafeProps(data);
-            } catch (error) {
-              console.warn(
-                "Error creating absolute safe props for component:",
-                error,
-              );
-              // Return only the most basic props
-              return {
-                id: componentId || "component",
-                type: "unknown",
-                visible: true,
-                variant: "default",
-                useStore: true,
-              };
-            }
-          })()}
+          {...safeData}
           key={componentId || data.id || "component"}
         />
       </Suspense>

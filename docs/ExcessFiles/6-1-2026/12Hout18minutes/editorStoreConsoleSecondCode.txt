@@ -1,0 +1,42 @@
+code : ("// ⭐ DEBUG: Get editorStore state
+(() => {
+  // Try to access Zustand store
+  const stores = window.__ZUSTAND_STORES__ || {};
+  
+  // Get editorStore
+  const editorStore = stores['editorStore'] || 
+                      (window.__NEXT_DATA__?.props?.pageProps?.editorStore);
+  
+  if (editorStore) {
+    const state = editorStore.getState();
+    console.log('📊 EditorStore State:', {
+      heroStates: state.heroStates,
+      heroStatesKeys: Object.keys(state.heroStates || {}),
+      pageComponentsByPage: state.pageComponentsByPage,
+      homepageComponents: state.pageComponentsByPage?.homepage || [],
+    });
+    
+    // Log specific hero component
+    if (state.heroStates) {
+      Object.entries(state.heroStates).forEach(([key, value]) => {
+        console.log(`Hero State [${key}]:`, {
+          hasContent: !!value?.content,
+          hasBackground: !!value?.background,
+          visible: value?.visible,
+          dataKeys: value ? Object.keys(value) : [],
+        });
+      });
+    }
+  } else {
+    console.error('❌ EditorStore not found');
+    console.log('Available stores:', Object.keys(stores));
+  }
+})();")
+
+response : 
+installHook.js:1 ❌ EditorStore not found
+overrideMethod @ installHook.js:1
+error @ node_modules_next_dist_7a8122d0._.js:3118
+(anonymous) @ VM6375:31
+(anonymous) @ VM6375:34Understand this error
+node_modules_next_dist_7a8122d0._.js:2288 Available stores: []

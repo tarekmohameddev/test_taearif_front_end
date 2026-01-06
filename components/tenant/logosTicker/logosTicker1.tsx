@@ -85,39 +85,156 @@ export default function LogosTicker1(props: LogosTickerProps) {
   }, [tenantId, fetchTenantData]);
 
   // ─────────────────────────────────────────────────────────
-  // 4. INITIALIZE IN STORE (on mount)
+  // 4. GET TENANT COMPONENT DATA
+  // ─────────────────────────────────────────────────────────
+  // Get tenant data for this specific component variant - memoized
+  const getTenantComponentData = () => {
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
+          if (
+            (component as any).type === "logosTicker" &&
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "logosTicker" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+    }
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
+  // ⭐ DEBUG: Log tenant component data search
+  if (props.useStore && Object.keys(tenantComponentData).length === 0) {
+    console.group("🔍 LogosTicker1 Tenant Data Search Debug");
+    console.log("Searching for component with:");
+    console.log("  - props.id:", props.id);
+    console.log("  - uniqueId:", uniqueId);
+    console.log("  - variantId:", variantId);
+    console.log("  - type: logosTicker");
+    console.log("Tenant Data componentSettings:", tenantData?.componentSettings);
+    if (tenantData?.componentSettings?.homepage) {
+      const homepage = tenantData.componentSettings.homepage;
+      console.log("Homepage components:", Array.isArray(homepage) ? homepage : Object.values(homepage));
+      const logosTickerComponents = Array.isArray(homepage)
+        ? homepage.filter((c: any) => c.type === "logosTicker")
+        : Object.values(homepage).filter((c: any) => (c as any).type === "logosTicker");
+      console.log("LogosTicker components found:", logosTickerComponents);
+    }
+    console.groupEnd();
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 5. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (props.useStore) {
-      // Prepare initial data from props
-      const initialData = {
-        ...getDefaultLogosTickerData(),
-        ...props,
-      };
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultLogosTickerData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultLogosTickerData(),
+              ...props,
+            };
 
       // Initialize in store
       ensureComponentVariant("logosTicker", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore]);
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
 
   // ─────────────────────────────────────────────────────────
-  // 5. RETRIEVE DATA FROM STORE
+  // 6. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = logosTickerStates[uniqueId];
   const currentStoreData = getComponentData("logosTicker", uniqueId);
 
   // ─────────────────────────────────────────────────────────
-  // 6. MERGE DATA (PRIORITY ORDER)
+  // 7. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
+  // Merge data with priority: currentStoreData > tenantComponentData > props > default
+  // This follows the exact same pattern as hero1.tsx
+  // Priority order: Current Store > Backend > Props > Default
+  // However, if currentStoreData contains default data and tenantComponentData exists,
+  // prioritize tenantComponentData (it has the actual database data)
+  const defaultData = getDefaultLogosTickerData();
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // If tenantComponentData exists and currentStoreData is just default data,
+  // prioritize tenantComponentData over currentStoreData
   const mergedData = {
-    ...getDefaultLogosTickerData(), // 1. Defaults (lowest priority)
-    ...storeData, // 2. Store state
-    ...currentStoreData, // 3. Current store data
-    ...props, // 4. Props (highest priority)
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
+  // ⭐ DEBUG: Log data sources
+  if (props.useStore) {
+    console.group("🔍 LogosTicker1 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.log("Final Subtitle:", mergedData.content?.subtitle);
+    console.log("Final Logos Count:", mergedData.logos?.length);
+    console.log("Display Mode:", mergedData.displayMode);
+    console.groupEnd();
+  }
+
   // ─────────────────────────────────────────────────────────
-  // 7. GET BRANDING COLORS
+  // 8. GET BRANDING COLORS
   // ─────────────────────────────────────────────────────────
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
@@ -140,7 +257,7 @@ export default function LogosTicker1(props: LogosTickerProps) {
   };
 
   // ─────────────────────────────────────────────────────────
-  // 8. HELPER FUNCTION TO GET COLOR
+  // 9. HELPER FUNCTION TO GET COLOR
   // ─────────────────────────────────────────────────────────
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
@@ -270,14 +387,14 @@ export default function LogosTicker1(props: LogosTickerProps) {
   };
 
   // ─────────────────────────────────────────────────────────
-  // 9. EARLY RETURN IF NOT VISIBLE
+  // 10. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
 
   // ─────────────────────────────────────────────────────────
-  // 10. RENDER
+  // 11. RENDER
   // ─────────────────────────────────────────────────────────
   const { i18n } = useTranslation();
   const lang = i18n.language;

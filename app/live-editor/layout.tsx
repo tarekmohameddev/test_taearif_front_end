@@ -24,6 +24,7 @@ import {
   applyDefaultThemeData,
   ThemeNumber,
 } from "@/services/live-editor/themeChangeService";
+import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
 import {
   Dialog,
   DialogContent,
@@ -1885,7 +1886,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             editorStore.pageComponentsByPage[pageSlug];
           if (storePageComponents && storePageComponents.length > 0) {
             // Always prioritize store data if it exists (it has recent changes)
-            const tenantComponentCount = Object.keys(pageData).length;
+            const normalized = normalizeComponentSettings(pageData);
+            const tenantComponentCount = Object.keys(normalized).length;
             console.log(
               "[EditorNavBar] Store has data for page, skipping tenantData load:",
               {
@@ -1897,7 +1899,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             return; // Skip this page - store data takes priority
           }
 
-          const components = Object.entries(pageData).map(
+          const normalizedSettings = normalizeComponentSettings(pageData);
+          const components = Object.entries(normalizedSettings).map(
             ([id, component]: [string, any]) => ({
               id,
               type: component.type,

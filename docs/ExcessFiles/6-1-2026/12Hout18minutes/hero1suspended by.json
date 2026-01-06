@@ -1,0 +1,101 @@
+[
+  {
+    "awaited": {
+      "name": "lazy",
+      "description": "",
+      "start": 3247.800000000745,
+      "end": 3431.900000002235,
+      "byteSize": null,
+      "value": "fulfilled Promise {Hero1() {}}",
+      "env": null,
+      "owner": null,
+      "stack": [
+        [
+          "createKnownComponentFallback",
+          "http://localhost:3000/_next/static/chunks/services_live-editor_d064562c._.js",
+          1808,
+          196,
+          1807,
+          38,
+          false
+        ],
+        [
+          "loadComponent",
+          "http://localhost:3000/_next/static/chunks/services_live-editor_d064562c._.js",
+          3223,
+          217,
+          3194,
+          23,
+          false
+        ],
+        [
+          "CachedComponent.useMemo[LoadedComponent]",
+          "http://localhost:3000/_next/static/chunks/services_live-editor_d064562c._.js",
+          4244,
+          230,
+          4244,
+          53,
+          false
+        ],
+        [
+          "mountMemo",
+          "http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
+          5418,
+          25,
+          5415,
+          5,
+          false
+        ],
+        [
+          "Object.useMemo",
+          "http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
+          14993,
+          24,
+          14986,
+          18,
+          false
+        ],
+        [
+          "exports.useMemo",
+          "http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_a0e4c7b4._.js",
+          1742,
+          36,
+          1741,
+          23,
+          false
+        ],
+        [
+          "CachedComponent",
+          "http://localhost:3000/_next/static/chunks/services_live-editor_d064562c._.js",
+          4243,
+          202,
+          4241,
+          227,
+          false
+        ]
+      ]
+    },
+    "env": null,
+    "owner": {
+      "displayName": "Hero1",
+      "id": 646,
+      "key": "0",
+      "env": null,
+      "stack": [
+        [
+          "CachedComponent",
+          "http://localhost:3000/_next/static/chunks/services_live-editor_d064562c._.js",
+          4325,
+          212,
+          4241,
+          227,
+          false
+        ]
+      ],
+      "type": 5,
+      "hocDisplayNames": null,
+      "compiledWithForget": false
+    },
+    "stack": null
+  }
+]

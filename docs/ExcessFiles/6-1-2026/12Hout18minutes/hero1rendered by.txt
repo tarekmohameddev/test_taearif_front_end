@@ -1,0 +1,38 @@
+CachedComponent @ 
+uiService.tsx:227
+
+<CachedComponent>
+children @ 
+LiveEditorIframeContent.tsx:214
+LiveEditorDraggableComponent @ 
+DraggableComponent.tsx:243
+
+<LiveEditorDraggableComponent>
+ @ 
+LiveEditorIframeContent.tsx:189
+Array.map
+LiveEditorIframeContent @ 
+LiveEditorIframeContent.tsx:171
+
+<LiveEditorIframeContent>
+LiveEditorUI.useMemo[iframeContent] @ 
+LiveEditorUI/index.tsx:268
+LiveEditorUI @ 
+LiveEditorUI/index.tsx:266
+
+<LiveEditorUI>
+LiveEditor @ 
+LiveEditor.tsx:24
+
+<LiveEditor>
+LiveEditorWrapper @ 
+LiveEditorWrapper.tsx:23
+
+<LiveEditorWrapper>
+Page @ 
+page.tsx:8
+
+<Page>
+Server
+hydrateRoot()
+react-dom@19.3.0-canary-52684925-20251110

@@ -333,34 +333,10 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const stepsSectionStates = useEditorStore((s) => s.stepsSectionStates);
 
-  useEffect(() => {
-    if (props.useStore) {
-      const initialData = {
-        ...getDefaultStepsSectionData(),
-        ...props,
-      };
-      ensureComponentVariant("stepsSection", uniqueId, initialData);
-    }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
-
-  // Get tenant data
+  // Get tenant data (needed before useEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore
-    ? getComponentData("stepsSection", uniqueId) || {}
-    : {};
-  const currentStoreData = props.useStore
-    ? stepsSectionStates[uniqueId] || {}
-    : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
@@ -381,10 +357,25 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
           pageComponents as any,
         )) {
           // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "stepsSection" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "stepsSection" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
@@ -396,13 +387,67 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
 
   const tenantComponentData = getTenantComponentData();
 
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultStepsSectionData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultStepsSectionData(),
+              ...props,
+            };
+
+      // Initialize in store
+      ensureComponentVariant("stepsSection", uniqueId, initialData);
+    }
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId);
+    }
+  }, [tenantId, fetchTenantData]);
+
+  // Get data from store or tenantData with fallback logic
+  const storeData = props.useStore
+    ? getComponentData("stepsSection", uniqueId) || {}
+    : {};
+  const currentStoreData = props.useStore
+    ? stepsSectionStates[uniqueId] || {}
+    : {};
+
+  // Get default data
+  const defaultData = getDefaultStepsSectionData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like header.title.text)
+  const isStoreDataDefault =
+    currentStoreData?.header?.title?.text === defaultData?.header?.title?.text;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultStepsSectionData(),
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
+    // Also merge storeData if it's not default
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : storeData), // 5. Store data (if not default)
   };
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)

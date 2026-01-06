@@ -1,0 +1,40 @@
+هذا ما ظهر في الconsole عندما فتحت الeditor sidebar ولم اعمل اي تعديل حرفيا وضغطت على زر الحفظ.
+
+🚀 EditorSidebar Save Process
+node_modules_next_dist_7a8122d0._.js:2288 Setting hasChangesMade to true
+node_modules_next_dist_7a8122d0._.js:2288 🔍 Initial Save Debug
+node_modules_next_dist_7a8122d0._.js:2288 Selected Component: {id: 'c4f825e7-4f1d-4c8b-901c-70ead86b9ae7', type: 'logosTicker', name: 'LogosTicker', componentName: 'logosTicker1', data: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Current Page: homepage
+node_modules_next_dist_7a8122d0._.js:2288 Page Components Before: 5
+node_modules_next_dist_7a8122d0._.js:2288 TempData: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 StoreData: {visible: true, layout: {…}, content: {…}, logos: Array(9), displayMode: 'both', …}
+node_modules_next_dist_7a8122d0._.js:2288 🔍 Save Debug - tempData sources
+node_modules_next_dist_7a8122d0._.js:2288 Store TempData: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 TempData Prop: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Latest TempData: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Actual TempData: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Store Data: {visible: true, layout: {…}, content: {…}, logos: Array(9), displayMode: 'both', …}
+node_modules_next_dist_7a8122d0._.js:2288 Existing Component Data: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 🔧 Merge Process Debug
+node_modules_next_dist_7a8122d0._.js:2288 Existing Component Data: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Store Data: {visible: true, layout: {…}, content: {…}, logos: Array(9), displayMode: 'both', …}
+node_modules_next_dist_7a8122d0._.js:2288 Latest TempData: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Actual TempData: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Merged Data: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Styling Data
+node_modules_next_dist_7a8122d0._.js:2288 Styling in TempData: {backgroundColor: 'transparent', titleColor: '#0D2EA1', subtitleColor: '#6b7280', logoOpacity: 0.6, logoHoverOpacity: 1}
+node_modules_next_dist_7a8122d0._.js:2288 Styling in StoreData: {backgroundColor: 'transparent', titleColor: '#0D2EA1', subtitleColor: '#6b7280', logoOpacity: 0.6, logoHoverOpacity: 1}
+node_modules_next_dist_7a8122d0._.js:2288 Styling in MergedData: {backgroundColor: 'transparent', titleColor: '#0D2EA1', subtitleColor: '#6b7280', logoOpacity: 0.6, logoHoverOpacity: 1}
+node_modules_next_dist_7a8122d0._.js:2288 Search Button Data
+node_modules_next_dist_7a8122d0._.js:2288 SearchButton in TempData: undefined
+node_modules_next_dist_7a8122d0._.js:2288 SearchButton in StoreData: undefined
+node_modules_next_dist_7a8122d0._.js:2288 SearchButton in MergedData: undefined
+node_modules_next_dist_7a8122d0._.js:2288 ✅ EditorSidebar Save Complete
+node_modules_next_dist_7a8122d0._.js:2288 Merged Data: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Latest TempData: {visible: true, texts: {…}, colors: {…}, settings: {…}, layout: {…}, …}
+node_modules_next_dist_7a8122d0._.js:2288 Store Data: {visible: true, layout: {…}, content: {…}, logos: Array(9), displayMode: 'both', …}
+node_modules_next_dist_7a8122d0._.js:2288 Updated Page Components: 5
+node_modules_next_dist_7a8122d0._.js:2288 Page Components After: 5
+node_modules_next_dist_7a8122d0._.js:2288 Store After
+node_modules_next_dist_7a8122d0._.js:2288 Contact Cards States: {}
+node_modules_next_dist_7a8122d0._.js:2288 Page Components By Page: 

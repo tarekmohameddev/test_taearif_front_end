@@ -1,0 +1,20 @@
+code : ("// الحصول على editorStore
+const editorStore = window.__NEXT_DATA__?.props?.pageProps?.editorStore || 
+                    (() => {
+                      // Try to get from React DevTools
+                      const reactFiber = document.querySelector('[data-reactroot]')?._reactInternalFiber ||
+                                        document.querySelector('#__next')?._reactInternalFiber;
+                      return reactFiber?.memoizedState?.store;
+                    })();
+
+// أو استخدم هذا الكود البسيط
+console.log('EditorStore State:', {
+  heroStates: window.__ZUSTAND_STORE__?.heroStates || 'Not found',
+  pageComponentsByPage: window.__ZUSTAND_STORE__?.pageComponentsByPage || 'Not found'
+});") 
+
+response : 
+EditorStore State:{
+    "heroStates": "Not found",
+    "pageComponentsByPage": "Not found"
+}

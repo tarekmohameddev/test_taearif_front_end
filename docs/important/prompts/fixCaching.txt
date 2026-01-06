@@ -1,0 +1,163 @@
+# Fix Component Data Caching Issue
+
+## Problem
+The component displays default data instead of database data in the Live Editor iframe, even though the data exists in the database and appears correctly in the editor sidebar when clicked.
+
+## Root Cause
+1. The component doesn't retrieve `tenantComponentData` (database data) from `tenantData.componentSettings`
+2. The data merging priority is incorrect - `currentStoreData` (which may contain default data) overrides `tenantComponentData` (database data)
+3. The `useEffect` initialization doesn't use database data when initializing the component in the store
+
+## Solution
+
+### Step 1: Add `getTenantComponentData()` Function
+Add a function to retrieve component data from `tenantData.componentSettings`:
+
+```typescript
+// Get tenant data for this specific component variant
+const getTenantComponentData = () => {
+  if (!tenantData?.componentSettings) {
+    return {};
+  }
+  // Search through all pages for this component variant
+  for (const [pageSlug, pageComponents] of Object.entries(
+    tenantData.componentSettings,
+  )) {
+    // Check if pageComponents is an object (not array)
+    if (
+      typeof pageComponents === "object" &&
+      !Array.isArray(pageComponents)
+    ) {
+      // Search through all components in this page
+      for (const [componentId, component] of Object.entries(
+        pageComponents as any,
+      )) {
+        // Check if this is the exact component we're looking for by ID
+        // Use componentId === props.id (most reliable identifier)
+        if (
+          (component as any).type === "COMPONENT_TYPE" && // Replace with actual type (e.g., "logosTicker", "hero", etc.)
+          (componentId === props.id ||
+            (component as any).id === props.id ||
+            (component as any).id === uniqueId)
+        ) {
+          return (component as any).data;
+        }
+      }
+    }
+    // Also handle array format
+    if (Array.isArray(pageComponents)) {
+      for (const component of pageComponents) {
+        // Search by id (most reliable identifier)
+        if (
+          (component as any).type === "COMPONENT_TYPE" && // Replace with actual type
+          ((component as any).id === props.id ||
+            (component as any).id === uniqueId)
+        ) {
+          return (component as any).data;
+        }
+      }
+    }
+  }
+  return {};
+};
+
+const tenantComponentData = getTenantComponentData();
+```
+
+**Replace `COMPONENT_TYPE`** with the actual component type (e.g., `"logosTicker"`, `"hero"`, `"testimonials"`, etc.)
+
+### Step 2: Update `useEffect` Initialization
+Modify the `useEffect` that initializes the component in the store to use `tenantComponentData`:
+
+```typescript
+useEffect(() => {
+  if (props.useStore) {
+    // ✅ Use database data if available
+    const initialData =
+      tenantComponentData && Object.keys(tenantComponentData).length > 0
+        ? {
+            ...getDefaultComponentData(), // Replace with actual default data function
+            ...tenantComponentData, // Database data takes priority
+            ...props,
+          }
+        : {
+            ...getDefaultComponentData(),
+            ...props,
+          };
+
+    // Initialize in store
+    ensureComponentVariant("COMPONENT_TYPE", uniqueId, initialData); // Replace COMPONENT_TYPE
+  }
+}, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+```
+
+**Replace:**
+- `getDefaultComponentData()` with the actual default data function (e.g., `getDefaultLogosTickerData()`, `getDefaultHeroData()`, etc.)
+- `COMPONENT_TYPE` with the actual component type
+
+### Step 3: Fix Data Merging Priority
+Update the data merging logic to prioritize `tenantComponentData` over `currentStoreData` when `currentStoreData` contains only default data:
+
+```typescript
+// Get default data
+const defaultData = getDefaultComponentData(); // Replace with actual default data function
+
+// Check if tenantComponentData exists
+const hasTenantData =
+  tenantComponentData &&
+  Object.keys(tenantComponentData).length > 0;
+
+// Check if currentStoreData is just default data (by comparing a key field like content.title)
+const isStoreDataDefault =
+  currentStoreData?.content?.title === defaultData?.content?.title;
+// OR use another field that's unique to default data if content.title doesn't exist
+
+// Merge data with correct priority
+const mergedData = {
+  ...defaultData, // 1. Defaults (lowest priority)
+  ...props, // 2. Props from parent component
+  // If tenantComponentData exists, use it (it's from Database)
+  ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+  // Use currentStoreData only if it's not just default data
+  // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+  ...(hasTenantData && isStoreDataDefault
+    ? {}
+    : currentStoreData), // 4. Current store data (highest priority if not default)
+};
+```
+
+**Replace:**
+- `getDefaultComponentData()` with the actual default data function
+- `content?.title` with the appropriate field to compare (use a field that exists in both default and database data)
+
+### Step 4: Add Debug Logging (Optional)
+Add console logging to debug data sources:
+
+```typescript
+// ⭐ DEBUG: Log data sources
+if (props.useStore) {
+  console.group("🔍 ComponentName Data Sources");
+  console.log("1️⃣ Default Data:", defaultData);
+  console.log("2️⃣ Props:", props);
+  console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+  console.log("4️⃣ Current Store Data:", currentStoreData);
+  console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+  console.log("🔍 Has Tenant Data?", hasTenantData);
+  console.log("🔀 Merged Data:", mergedData);
+  console.log("Final Title:", mergedData.content?.title); // Adjust field name as needed
+  console.groupEnd();
+}
+```
+
+## Checklist
+- [ ] Added `getTenantComponentData()` function with correct component type
+- [ ] Updated `useEffect` initialization to use `tenantComponentData`
+- [ ] Fixed data merging priority to check if `currentStoreData` is default data
+- [ ] Replaced all placeholder values (`COMPONENT_TYPE`, `getDefaultComponentData()`, field names)
+- [ ] Tested that component displays database data correctly in Live Editor iframe
+
+## Expected Result
+- Component displays database data immediately when Live Editor opens
+- Data priority: Default → Props → Database → Store (if store has user updates)
+- Component works correctly in both Live Editor and regular page rendering
+

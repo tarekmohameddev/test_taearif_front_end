@@ -13,6 +13,7 @@ import {
   createComponentFromDbData,
 } from "./utils/componentTypeHelpers";
 import { loadGlobalComponentsFromTenantData } from "./utils/globalComponentsLoader";
+import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
 
 interface UseDatabaseLoadingEffectProps {
   initialized: boolean;
@@ -218,39 +219,40 @@ export const useDatabaseLoadingEffect = ({
       if (hasRecentThemeChange && storePageComponentsAfterLoad !== undefined) {
         // Theme was recently changed - use store data (new theme) instead of tenantData (old theme)
         setPageComponents(storePageComponentsAfterLoad || []);
-      } else if (
-        tenantData?.componentSettings?.[slug] &&
-        Object.keys(tenantData.componentSettings[slug]).length > 0
-      ) {
+      } else if (tenantData?.componentSettings?.[slug]) {
         const pageSettings = tenantData.componentSettings[slug];
-        const dbComponents = Object.entries(pageSettings).map(
-          ([id, comp]: [string, any]) => {
-            // استعادة النوع الصحيح من componentName أو id إذا كان type غير صحيح
-            const correctType = extractComponentType(comp);
+        const normalizedSettings = normalizeComponentSettings(pageSettings);
+        
+        if (Object.keys(normalizedSettings).length > 0) {
+          const dbComponents = Object.entries(normalizedSettings).map(
+            ([id, comp]: [string, any]) => {
+              // استعادة النوع الصحيح من componentName أو id إذا كان type غير صحيح
+              const correctType = extractComponentType(comp);
 
-            return createComponentFromDbData(
-              id,
-              comp,
-              correctType,
-              getComponentDisplayName,
-              createDefaultData,
-            );
-          },
-        );
+              return createComponentFromDbData(
+                id,
+                comp,
+                correctType,
+                getComponentDisplayName,
+                createDefaultData,
+              );
+            },
+          );
 
-        // التحقق من وجود تخطيطات متضاربة وإعادة بنائها إذا لزم الأمر
-        const hasLayoutInfo = dbComponents.every(
-          (c) => c.layout && c.layout.span,
-        );
-        if (!hasLayoutInfo) {
-          // إذا كانت البيانات قديمة ولا تحتوي على تخطيط، قم ببناء تخطيط افتراضي
-          dbComponents.sort((a, b) => a.position - b.position);
-          dbComponents.forEach((comp, index) => {
-            comp.layout = { row: index, col: 0, span: 2 };
-            comp.position = index; // تحديث position أيضاً
-          });
+          // التحقق من وجود تخطيطات متضاربة وإعادة بنائها إذا لزم الأمر
+          const hasLayoutInfo = dbComponents.every(
+            (c) => c.layout && c.layout.span,
+          );
+          if (!hasLayoutInfo) {
+            // إذا كانت البيانات قديمة ولا تحتوي على تخطيط، قم ببناء تخطيط افتراضي
+            dbComponents.sort((a, b) => a.position - b.position);
+            dbComponents.forEach((comp, index) => {
+              comp.layout = { row: index, col: 0, span: 2 };
+              comp.position = index; // تحديث position أيضاً
+            });
+          }
+          setPageComponents(dbComponents as ComponentInstance[]);
         }
-        setPageComponents(dbComponents as ComponentInstance[]);
       } else {
         // ⭐ FALLBACK: If no tenantData and no store data, check store first
         // This handles the case where theme was changed but tenantData wasn't updated yet

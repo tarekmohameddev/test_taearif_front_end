@@ -2,19 +2,20 @@ import { ComponentInstance, ComponentData } from "@/lib/types";
 import { getComponentDisplayName } from "./componentService";
 import { createDefaultData } from "@/components/tenant/live-editor/EditorSidebar/utils";
 import { v4 as uuidv4 } from "uuid";
+import { normalizeComponentSettings } from "./componentSettingsHelper";
 
 // دالة تحميل بيانات المكونات من قاعدة البيانات
 export const loadComponentsFromDatabase = (
   tenantData: any,
   slug: string,
 ): ComponentInstance[] => {
-  if (
-    tenantData?.componentSettings?.[slug] &&
-    Object.keys(tenantData.componentSettings[slug]).length > 0
-  ) {
+  if (tenantData?.componentSettings?.[slug]) {
     const pageSettings = tenantData.componentSettings[slug];
-    const dbComponents = Object.entries(pageSettings).map(
-      ([id, comp]: [string, any]) => {
+    const normalizedSettings = normalizeComponentSettings(pageSettings);
+    
+    if (Object.keys(normalizedSettings).length > 0) {
+      const dbComponents = Object.entries(normalizedSettings).map(
+        ([id, comp]: [string, any]) => {
         // استعادة النوع الصحيح من componentName أو id إذا كان type غير صحيح
         let correctType = comp.type;
         if (comp.type === "unknown" || !comp.type) {
@@ -111,18 +112,19 @@ export const loadComponentsFromDatabase = (
           layout: comp.layout || { row: comp.position || 0, col: 0, span: 2 },
         };
       },
-    );
+      );
 
-    // التحقق من وجود تخطيطات متضاربة وإعادة بنائها إذا لزم الأمر
-    const hasLayoutInfo = dbComponents.every((c) => c.layout && c.layout.span);
-    if (!hasLayoutInfo) {
-      // إذا كانت البيانات قديمة ولا تحتوي على تخطيط، قم ببناء تخطيط افتراضي
-      dbComponents.sort((a, b) => a.position - b.position);
-      dbComponents.forEach((comp, index) => {
-        comp.layout = { row: index, col: 0, span: 2 };
-      });
+      // التحقق من وجود تخطيطات متضاربة وإعادة بنائها إذا لزم الأمر
+      const hasLayoutInfo = dbComponents.every((c) => c.layout && c.layout.span);
+      if (!hasLayoutInfo) {
+        // إذا كانت البيانات قديمة ولا تحتوي على تخطيط، قم ببناء تخطيط افتراضي
+        dbComponents.sort((a, b) => a.position - b.position);
+        dbComponents.forEach((comp, index) => {
+          comp.layout = { row: index, col: 0, span: 2 };
+        });
+      }
+      return dbComponents as ComponentInstance[];
     }
-    return dbComponents as ComponentInstance[];
   }
 
   return [];

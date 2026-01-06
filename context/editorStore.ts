@@ -83,6 +83,7 @@ import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
 import { getDefaultInputs2Data } from "./editorStoreFunctions/inputs2Functions";
 import defaultData from "@/lib/defaultData.json";
+import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
 
 type OpenDialogFn = () => void;
 
@@ -2840,8 +2841,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       // ⚠️ Note: Static pages should NOT be in componentSettings
       Object.entries(tenantData.componentSettings).forEach(
         ([page, pageSettings]: [string, any]) => {
-          if (pageSettings && typeof pageSettings === "object") {
-            const components = Object.entries(pageSettings).map(
+          const normalizedSettings = normalizeComponentSettings(pageSettings);
+          if (Object.keys(normalizedSettings).length > 0) {
+            const components = Object.entries(normalizedSettings).map(
               ([id, comp]: [string, any]) => ({
                 id,
                 ...comp,
@@ -2856,11 +2858,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       // Load component data into respective stores using modular functions
       Object.entries(tenantData.componentSettings).forEach(
         ([page, pageSettings]: [string, any]) => {
-          if (pageSettings && typeof pageSettings === "object") {
-            Object.entries(pageSettings).forEach(
-              ([id, comp]: [string, any]) => {
-                if (comp.data && comp.componentName) {
-                  switch (comp.type) {
+          const normalizedSettings = normalizeComponentSettings(pageSettings);
+          Object.entries(normalizedSettings).forEach(
+            ([id, comp]: [string, any]) => {
+              if (comp.data && comp.componentName) {
+                switch (comp.type) {
                     case "header":
                       newState.headerStates = headerFunctions.setData(
                         newState,
@@ -3119,7 +3121,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
               },
             );
           }
-        },
+        ,
       );
 
       // Initialize default inputs2 data if no inputs2 components exist in database

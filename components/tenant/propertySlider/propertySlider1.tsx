@@ -199,6 +199,61 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
+  // Get tenant data (needed before useEffect)
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+  const router = useRouter();
+
+  // Get tenant data for this specific component variant
+  const getTenantComponentData = () => {
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
+          if (
+            (component as any).type === "propertySlider" &&
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === variantId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "propertySlider" &&
+            ((component as any).id === props.id ||
+              (component as any).id === variantId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+    }
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
   // Fetch properties/projects from API
   const fetchProperties = async (apiUrl?: string) => {
     try {
@@ -272,15 +327,23 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
   useEffect(() => {
     if (props.useStore) {
-      ensureComponentVariant("propertySlider", variantId, props);
-    }
-  }, [variantId, props.useStore, ensureComponentVariant]);
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultPropertySliderData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultPropertySliderData(),
+              ...props,
+            };
 
-  // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const tenantId = useTenantStore((s) => s.tenantId);
-  const router = useRouter();
+      // Initialize in store
+      ensureComponentVariant("propertySlider", variantId, initialData);
+    }
+  }, [variantId, props.useStore, ensureComponentVariant, tenantComponentData]);
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
@@ -316,46 +379,29 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     ? getComponentData("propertySlider", variantId) || {}
     : {};
 
-  // Get tenant data for this specific component variant
-  const getTenantComponentData = () => {
-    if (!tenantData?.componentSettings) {
-      return {};
-    }
-    // Search through all pages for this component variant
-    for (const [pageSlug, pageComponents] of Object.entries(
-      tenantData.componentSettings,
-    )) {
-      // Check if pageComponents is an object (not array)
-      if (
-        typeof pageComponents === "object" &&
-        !Array.isArray(pageComponents)
-      ) {
-        // Search through all components in this page
-        for (const [componentId, component] of Object.entries(
-          pageComponents as any,
-        )) {
-          // Check if this is the exact component we're looking for by ID
-          if (
-            (component as any).type === "propertySlider" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
-          ) {
-            return (component as any).data;
-          }
-        }
-      }
-    }
-    return {};
-  };
+  // Get default data
+  const defaultData = getDefaultPropertySliderData();
 
-  const tenantComponentData = getTenantComponentData();
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
 
-  // Merge data with priority: storeData > tenantComponentData > props > default
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    storeData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultPropertySliderData(),
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : storeData), // 4. Current store data (highest priority if not default)
   };
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)

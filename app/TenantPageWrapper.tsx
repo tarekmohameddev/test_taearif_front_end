@@ -45,6 +45,7 @@ import {
   getSlugPropertyName,
 } from "@/lib/multiLevelPages";
 import { getDefaultComponentForStaticPage } from "@/components/tenant/live-editor/effects/utils/staticPageHelpers";
+import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
 
 // ⭐ Cache للـ header components
 const headerComponentsCache = new Map<string, any>();
@@ -600,9 +601,10 @@ export default function TenantPageWrapper({
       tenantData.componentSettings[slug]
     ) {
       const pageSettings = tenantData.componentSettings[slug];
+      const normalizedSettings = normalizeComponentSettings(pageSettings);
 
       // تحويل componentSettings إلى قائمة مكونات
-      const components = Object.entries(pageSettings)
+      const components = Object.entries(normalizedSettings)
         .map(([id, component]: [string, any]) => ({
           id,
           componentName: component.componentName,

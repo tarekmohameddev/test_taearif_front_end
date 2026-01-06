@@ -8,6 +8,7 @@ export * from "./dragDropService";
 export * from "./dataService";
 export * from "./stateService";
 export * from "./uiService";
+export * from "./componentSettingsHelper";
 
 // الخدمات الجديدة المنفصلة - تصدير انتقائي لتجنب التكرار
 export * from "./componentCacheService";

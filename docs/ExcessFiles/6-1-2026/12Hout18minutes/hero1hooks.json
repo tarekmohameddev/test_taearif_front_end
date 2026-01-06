@@ -1,0 +1,411 @@
+[
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": "ensureComponentVariant() {}",
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": "ensureComponentVariant() {}",
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2385,
+      "columnNumber": 180,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": "getComponentData() {}",
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": "getComponentData() {}",
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2388,
+      "columnNumber": 174,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "Effect",
+    "value": "Hero1.useEffect() {}",
+    "subHooks": [],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2391,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js",
+      "columnNumber": 180
+    }
+  },
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": {
+          "username": "Marsd-qp",
+          "websiteName": "Marsd-qp",
+          "branding": "{logo: \"https://api.taearif.com/templates/a134c9ba-…}",
+          "componentSettings": "{about-us: Array(7), contact-us: Array(5), create-r…}",
+          "globalComponentsData": "{footer: {…}, globalFooterVariant: \"StaticFooter1\",…}",
+          "WebsiteLayout": "{branding: {…}, metaTags: {…}}",
+          "ThemesBackup": null,
+          "StaticPages": null
+        },
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": {
+              "username": "Marsd-qp",
+              "websiteName": "Marsd-qp",
+              "branding": "{logo: \"https://api.taearif.com/templates/a134c9ba-…}",
+              "componentSettings": "{about-us: Array(7), contact-us: Array(5), create-r…}",
+              "globalComponentsData": "{footer: {…}, globalFooterVariant: \"StaticFooter1\",…}",
+              "WebsiteLayout": "{branding: {…}, metaTags: {…}}",
+              "ThemesBackup": null,
+              "StaticPages": null
+            },
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2403,
+      "columnNumber": 162,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": "fetchTenantData() {}",
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": "fetchTenantData() {}",
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2406,
+      "columnNumber": 167,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": null,
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": null,
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2409,
+      "columnNumber": 160,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "Effect",
+    "value": "Hero1.useEffect() {}",
+    "subHooks": [],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2412,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js",
+      "columnNumber": 180
+    }
+  },
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": {
+          "0": "{id: \"0\", type: \"unknown\", useStore: true, variant:…}",
+          "c6f0ea22-35d9-4a33-83f1-e94df41c2d5c": "{id: \"c6f0ea22-35d9-4a33-83f1-e94df41c2d5c\", type: …}"
+        },
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": {
+              "0": "{id: \"0\", type: \"unknown\", useStore: true, variant:…}",
+              "c6f0ea22-35d9-4a33-83f1-e94df41c2d5c": "{id: \"c6f0ea22-35d9-4a33-83f1-e94df41c2d5c\", type: …}"
+            },
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2440,
+      "columnNumber": 168,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "Auth",
+    "subHooks": [
+      {
+        "name": "Context",
+        "value": {
+          "user": "{email: \"Marsd.qp@gmail.com\", first_name: \"User\", l…}",
+          "loading": false,
+          "error": null,
+          "login": "login() {}",
+          "register": "register() {}",
+          "logout": "logout() {}",
+          "toggleImage": "toggleImage() {}",
+          "fetchUser": "AuthProvider.useCallback[fetchUser]() {}"
+        },
+        "subHooks": [],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 1133,
+          "functionName": "useAuth",
+          "fileName": "http://localhost:3000/_next/static/chunks/_05464146._.js",
+          "columnNumber": 197
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2498,
+      "columnNumber": 168,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "Router",
+    "subHooks": [
+      {
+        "name": "AppRouterContext",
+        "value": {
+          "back": "back() {}",
+          "forward": "forward() {}",
+          "prefetch": "prefetch() {}",
+          "replace": "replace() {}",
+          "push": "push() {}",
+          "refresh": "refresh() {}",
+          "hmrRefresh": "hmrRefresh() {}"
+        },
+        "subHooks": [],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 9210,
+          "functionName": "useRouter",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_aaee43fe._.js",
+          "columnNumber": 42
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2499,
+      "columnNumber": 171,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": false,
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": false,
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2500,
+      "columnNumber": 169,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  },
+  {
+    "name": "BoundStore",
+    "subHooks": [
+      {
+        "name": "Store",
+        "value": null,
+        "subHooks": [
+          {
+            "name": "SyncExternalStore",
+            "value": null,
+            "subHooks": [],
+            "debugInfo": null,
+            "hookSource": {
+              "lineNumber": 473,
+              "functionName": "useStore",
+              "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js",
+              "columnNumber": 188
+            }
+          }
+        ],
+        "debugInfo": null,
+        "hookSource": {
+          "lineNumber": 483,
+          "columnNumber": 39,
+          "functionName": "useBoundStore",
+          "fileName": "http://localhost:3000/_next/static/chunks/node_modules_eb235139._.js"
+        }
+      }
+    ],
+    "debugInfo": null,
+    "hookSource": {
+      "lineNumber": 2503,
+      "columnNumber": 157,
+      "functionName": "Hero1",
+      "fileName": "http://localhost:3000/_next/static/chunks/_834a9e73._.js"
+    }
+  }
+]

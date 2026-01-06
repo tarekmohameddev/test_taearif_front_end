@@ -139,16 +139,27 @@ export function useBackendDataState({
         }
 
         // قراءة البيانات من editorStore
-        // For static pages, use finalId (which may have been updated to match componentName)
+        // ✅ Use component.id from database (the key used in loadFromDatabase)
+        // This ensures we find the data that was loaded using comp.id in loadFromDatabase
         const storeData = useEditorStore
           .getState()
-          .getComponentData(component.type, finalId);
+          .getComponentData(component.type, component.id);
 
-        // دمج البيانات: أولوية للبيانات من editorStore
+        // ⭐ NEW: Fallback to pageComponentsByPage data (from Database)
+        // This ensures we use Database data even if storeData is empty
+        const pageComponentsByPage = useEditorStore.getState().pageComponentsByPage[slug];
+        const pageComponentFromStore = pageComponentsByPage?.find(
+          (pc: any) => pc.id === component.id
+        );
+        const databaseData = pageComponentFromStore?.data;
+
+        // دمج البيانات: أولوية للبيانات من editorStore، ثم Database، ثم component.data
         const mergedData =
           storeData && Object.keys(storeData).length > 0
             ? storeData
-            : component.data;
+            : databaseData && Object.keys(databaseData).length > 0
+              ? databaseData
+              : component.data;
 
         return {
           ...component,
