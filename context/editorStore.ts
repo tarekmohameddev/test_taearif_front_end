@@ -2727,36 +2727,78 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }
       }
 
-      // Load StaticPages data (separate from regular pages)
+      // ⭐ PRIORITY 1: Load staticPagesData from tenantData.staticPagesData (if exists)
+      // This is the new format that comes from API after theme changes
+      if (
+        tenantData.staticPagesData &&
+        typeof tenantData.staticPagesData === "object" &&
+        Object.keys(tenantData.staticPagesData).length > 0
+      ) {
+        newState.staticPagesData = {
+          ...state.staticPagesData,
+          ...tenantData.staticPagesData,
+        };
+        console.log(
+          "[loadFromDatabase] Loaded staticPagesData from tenantData.staticPagesData:",
+          Object.keys(tenantData.staticPagesData),
+        );
+      }
+
+      // ⭐ PRIORITY 2: Load StaticPages data (separate from regular pages)
+      // Convert StaticPages format: handle [slug, components, apiEndpoints] and { slug, components, apiEndpoints }
       if (
         tenantData.StaticPages &&
         typeof tenantData.StaticPages === "object"
       ) {
-        // Convert StaticPages format: handle both [slug, components] and { slug, components }
+        // Convert StaticPages format: handle both [slug, components, apiEndpoints] and { slug, components, apiEndpoints }
         const convertedStaticPages: Record<string, any> = {};
 
         Object.entries(tenantData.StaticPages).forEach(
           ([pageSlug, pageData]: [string, any]) => {
-            if (Array.isArray(pageData) && pageData.length === 2) {
-              // Format: [slug, components]
-              convertedStaticPages[pageSlug] = {
-                slug: pageData[0] || pageSlug,
-                components: Array.isArray(pageData[1]) ? pageData[1] : [],
-              };
-            } else if (
-              typeof pageData === "object" &&
-              !Array.isArray(pageData)
-            ) {
-              // Format: { slug, components }
-              convertedStaticPages[pageSlug] = pageData;
+            // Only convert if not already in staticPagesData (Priority 1 takes precedence)
+            if (!newState.staticPagesData[pageSlug]) {
+              // Format: [slug, components, apiEndpoints]
+              if (Array.isArray(pageData) && pageData.length >= 2) {
+                const slug = pageData[0] || pageSlug;
+                const components = Array.isArray(pageData[1])
+                  ? pageData[1]
+                  : [];
+                const apiEndpoints = pageData[2] || {};
+
+                convertedStaticPages[pageSlug] = {
+                  slug,
+                  components,
+                  apiEndpoints,
+                };
+              }
+              // Format: { slug, components, apiEndpoints }
+              else if (
+                typeof pageData === "object" &&
+                !Array.isArray(pageData)
+              ) {
+                convertedStaticPages[pageSlug] = {
+                  slug: pageData.slug || pageSlug,
+                  components: Array.isArray(pageData.components)
+                    ? pageData.components
+                    : [],
+                  apiEndpoints: pageData.apiEndpoints || {},
+                };
+              }
             }
           },
         );
 
-        newState.staticPagesData = {
-          ...state.staticPagesData,
-          ...convertedStaticPages,
-        };
+        // Merge converted StaticPages into staticPagesData (only if not already present)
+        if (Object.keys(convertedStaticPages).length > 0) {
+          newState.staticPagesData = {
+            ...newState.staticPagesData,
+            ...convertedStaticPages,
+          };
+          console.log(
+            "[loadFromDatabase] Converted StaticPages to staticPagesData:",
+            Object.keys(convertedStaticPages),
+          );
+        }
       }
 
       // ⭐ FALLBACK: Load StaticPages from defaultData.json if not in tenantData

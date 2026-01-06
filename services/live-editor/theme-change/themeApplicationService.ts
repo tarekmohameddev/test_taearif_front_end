@@ -157,6 +157,12 @@ function forceUpdateAllStaticPages(
           // Use componentName as id if it exists (for static pages, id should match componentName)
           const finalId = normalizeComponentId(comp);
 
+          // ⭐ CRITICAL: تحديث component state بشكل صحيح
+          // Update component state correctly
+          const variantId = comp.componentName || finalId;
+          store.ensureComponentVariant(comp.type, variantId, comp.data || {});
+          store.setComponentData(comp.type, variantId, comp.data || {});
+
           return {
             id: finalId, // ⭐ FIX: استخدام componentName كـ id لمطابقة variantId في states
             type: comp.type,
@@ -177,6 +183,7 @@ function forceUpdateAllStaticPages(
           components: staticPageComponents.map((c: any) => ({
             id: c.id,
             componentName: c.componentName,
+            type: c.type,
           })),
         },
       );
@@ -187,6 +194,49 @@ function forceUpdateAllStaticPages(
       store.setPageComponentsForPage(pageSlug, staticPageComponents);
     }
   });
+
+  // ⭐ CRITICAL: إضافة forceUpdate إضافي بعد تحديث جميع الصفحات
+  // This ensures all updates are propagated before sync
+  // Add additional forceUpdate after updating all pages
+  setTimeout(() => {
+    const finalStore = useEditorStore.getState();
+    Object.keys(themeData.staticPages || {}).forEach((pageSlug) => {
+      const finalStaticPageData = finalStore.getStaticPageData(pageSlug);
+      if (
+        finalStaticPageData &&
+        finalStaticPageData.components &&
+        finalStaticPageData.components.length > 0
+      ) {
+        const finalStaticPageComponents = finalStaticPageData.components.map(
+          (comp: any) => {
+            const finalId = normalizeComponentId(comp);
+            return {
+              id: finalId,
+              type: comp.type,
+              name: comp.name || comp.type,
+              componentName: comp.componentName,
+              data: comp.data || {},
+              position: comp.position || 0,
+              layout: comp.layout || { row: 0, col: 0, span: 2 },
+            };
+          },
+        );
+
+        // Force update again to ensure sync
+        finalStore.forceUpdatePageComponents(pageSlug, finalStaticPageComponents);
+        finalStore.setPageComponentsForPage(pageSlug, finalStaticPageComponents);
+
+        console.log(
+          `[forceUpdateAllStaticPages] Additional force update for static page: ${pageSlug}`,
+          {
+            componentNames: finalStaticPageComponents.map(
+              (c: any) => c.componentName,
+            ),
+          },
+        );
+      }
+    });
+  }, 50);
 }
 
 /**
@@ -343,11 +393,28 @@ function applyDefaultTheme(
   // Force update all static pages
   forceUpdateAllStaticPages(store, themeData);
 
-  // ⭐ CRITICAL: تحديث tenantStore لمزامنة مع editorStore
-  // This ensures tenantData.componentSettings matches pageComponentsByPage
-  // and tenantData.globalComponentsData matches globalComponentsData
-  // ⭐ CRITICAL: Update tenantStore to sync with editorStore
-  syncTenantStoreWithEditorStore(themeData);
+  // ⭐ CRITICAL: إضافة تأخير صغير قبل syncTenantStoreWithEditorStore
+  // This ensures all store updates (staticPagesData, pageComponentsByPage, componentStates)
+  // are fully propagated before syncing to tenantStore
+  // ⭐ CRITICAL: Add small delay before syncTenantStoreWithEditorStore
+  setTimeout(() => {
+    const finalStore = useEditorStore.getState();
+
+    // ⭐ CRITICAL: تحديث tenantStore لمزامنة مع editorStore
+    // This ensures tenantData.componentSettings matches pageComponentsByPage
+    // and tenantData.globalComponentsData matches globalComponentsData
+    // and tenantData.StaticPages matches staticPagesData
+    // ⭐ CRITICAL: Update tenantStore to sync with editorStore
+    syncTenantStoreWithEditorStore(themeData);
+
+    console.log(
+      `[applyDefaultTheme] Theme ${themeNumber} applied and synced to tenantStore`,
+      {
+        staticPagesCount: Object.keys(finalStore.staticPagesData || {}).length,
+        staticPagesSlugs: Object.keys(finalStore.staticPagesData || {}),
+      },
+    );
+  }, 100);
 }
 
 /**

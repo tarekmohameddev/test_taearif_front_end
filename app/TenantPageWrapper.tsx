@@ -462,11 +462,11 @@ export default function TenantPageWrapper({
       }
 
       // ⭐ Priority 1.2: Try to get from tenantData.StaticPages
-      // Handle both formats: { components: [...] } or [slug, [components...]]
+      // Handle both formats: { slug, components, apiEndpoints } or [slug, components, apiEndpoints]
       if (tenantData?.StaticPages?.[slug]) {
         const staticPage = tenantData.StaticPages[slug];
 
-        // Format 1: Array format [slug, [components...]]
+        // Format 1: Array format [slug, components, apiEndpoints]
         if (Array.isArray(staticPage) && staticPage.length >= 2) {
           const components = staticPage[1];
           if (Array.isArray(components)) {
@@ -481,7 +481,7 @@ export default function TenantPageWrapper({
           }
         }
 
-        // Format 2: Object format { components: [...] }
+        // Format 2: Object format { slug, components, apiEndpoints }
         if (
           staticPage &&
           typeof staticPage === "object" &&
@@ -538,10 +538,11 @@ export default function TenantPageWrapper({
     }
 
     // ⭐ Priority 3: Check tenantData.StaticPages
+    // Support format: [slug, components, apiEndpoints] or { slug, components, apiEndpoints }
     if (tenantData?.StaticPages?.[slug]) {
       const staticPage = tenantData.StaticPages[slug];
 
-      // Format 1: Array format [slug, [components...]]
+      // Format 1: Array format [slug, components, apiEndpoints]
       if (Array.isArray(staticPage) && staticPage.length >= 2) {
         const components = staticPage[1];
         if (Array.isArray(components)) {
@@ -556,7 +557,7 @@ export default function TenantPageWrapper({
         }
       }
 
-      // Format 2: Object format { components: [...] }
+      // Format 2: Object format { slug, components, apiEndpoints }
       if (
         staticPage &&
         typeof staticPage === "object" &&

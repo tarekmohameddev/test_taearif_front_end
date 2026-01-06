@@ -79,11 +79,31 @@ export const useDatabaseLoadingEffect = ({
       const storePageComponentsAfterLoad =
         editorStore.pageComponentsByPage[slug];
 
-      // ⭐ STATIC PAGES: Load with priority from tenantData.StaticPages
+      // ⭐ STATIC PAGES: Load with priority from staticPagesData (store) when theme changed
       if (pageIsStatic) {
-        // ⭐ PRIORITY 0: If theme was recently changed, prioritize staticPagesData from store
+        // ⭐ PRIORITY 0: If theme was recently changed, ALWAYS prioritize staticPagesData from store
         // This ensures we use the new theme data instead of old tenantData.StaticPages
+        // Also check pageComponentsByPage as it may have been updated by forceUpdateAllStaticPages
         if (hasRecentThemeChange) {
+          // First check pageComponentsByPage (may have been updated by forceUpdateAllStaticPages)
+          const storePageComponentsForStatic = editorStore.pageComponentsByPage[slug];
+          if (storePageComponentsForStatic && storePageComponentsForStatic.length > 0) {
+            console.log(
+              `[useDatabaseLoadingEffect] Theme changed - using pageComponentsByPage for static page:`,
+              {
+                slug,
+                componentCount: storePageComponentsForStatic.length,
+                componentNames: storePageComponentsForStatic.map(
+                  (c: any) => c.componentName,
+                ),
+              },
+            );
+            setPageComponents(storePageComponentsForStatic);
+            setInitialized(true);
+            return; // Skip further loading logic
+          }
+
+          // Then check staticPagesData from store
           const staticPageDataFromStore = editorStore.getStaticPageData(slug);
           const staticPageComponentsFromStore =
             staticPageDataFromStore?.components || [];
@@ -94,32 +114,41 @@ export const useDatabaseLoadingEffect = ({
               slug,
             );
 
+            console.log(
+              `[useDatabaseLoadingEffect] Theme changed - using staticPagesData for static page:`,
+              {
+                slug,
+                componentCount: staticComponents.length,
+                componentNames: staticComponents.map((c: any) => c.componentName),
+              },
+            );
+
             setPageComponents(staticComponents);
             setInitialized(true);
             return; // Skip further loading logic
           }
         }
 
-        // ⭐ PRIORITY 1: Check tenantData.StaticPages[slug] first (from getTenant)
+        // ⭐ PRIORITY 1: Check tenantData.StaticPages[slug] (ONLY if theme was NOT recently changed)
         // ⭐ CRITICAL: Skip tenantData.StaticPages if theme was recently changed
         // This ensures we use the new theme data from staticPagesData instead of old database data
         if (!hasRecentThemeChange) {
           const staticPageFromTenant = tenantData?.StaticPages?.[slug];
 
-          // Handle different formats: [slug, components] or { slug, components }
+          // Handle different formats: [slug, components, apiEndpoints] or { slug, components, apiEndpoints }
           let tenantComponents: any[] = [];
 
           if (staticPageFromTenant) {
-            // Format 1: Array format [slug, components]
+            // Format 1: Array format [slug, components, apiEndpoints]
             if (
               Array.isArray(staticPageFromTenant) &&
-              staticPageFromTenant.length === 2
+              staticPageFromTenant.length >= 2
             ) {
               tenantComponents = Array.isArray(staticPageFromTenant[1])
                 ? staticPageFromTenant[1]
                 : [];
             }
-            // Format 2: Object format { slug, components }
+            // Format 2: Object format { slug, components, apiEndpoints }
             else if (
               typeof staticPageFromTenant === "object" &&
               !Array.isArray(staticPageFromTenant)
@@ -146,6 +175,7 @@ export const useDatabaseLoadingEffect = ({
         }
 
         // ⭐ PRIORITY 2: Check editorStore.staticPagesData[slug] (after loadFromDatabase)
+        // This is fallback if Priority 0 and 1 didn't find data
         let staticPageData = editorStore.getStaticPageData(slug);
         let staticPageComponents = staticPageData?.components || [];
 

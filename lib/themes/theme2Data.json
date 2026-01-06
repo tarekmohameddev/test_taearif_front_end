@@ -3041,7 +3041,7 @@
       ]
     }
   },
-  "StaticPages": {
+  "staticPages": {
     "project": {
       "slug": "project",
       "components": [

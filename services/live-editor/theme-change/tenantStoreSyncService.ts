@@ -197,6 +197,21 @@ export function syncTenantStoreWithEditorStore(themeData?: ThemeData): void {
   // Update staticPagesData in Tenant Store
   const updatedStaticPagesData = store.staticPagesData || {};
 
+  // ⭐ CRITICAL: تحديث StaticPages في Tenant Store من staticPagesData
+  // Convert staticPagesData format to StaticPages format [slug, components, apiEndpoints]
+  // Update StaticPages in Tenant Store from staticPagesData
+  const updatedStaticPages: Record<string, any> = {};
+  Object.entries(updatedStaticPagesData).forEach(([slug, pageData]: [string, any]) => {
+    if (pageData && typeof pageData === "object") {
+      // Convert to Array format: [slug, components, apiEndpoints]
+      updatedStaticPages[slug] = [
+        pageData.slug || slug,
+        Array.isArray(pageData.components) ? pageData.components : [],
+        pageData.apiEndpoints || {},
+      ];
+    }
+  });
+
   // تحديث Tenant Store بالبيانات الجديدة
   // Update Tenant Store with new data
   useTenantStore.setState({
@@ -205,6 +220,7 @@ export function syncTenantStoreWithEditorStore(themeData?: ThemeData): void {
       componentSettings: updatedComponentSettings,
       globalComponentsData: updatedGlobalComponentsData,
       staticPagesData: updatedStaticPagesData,
+      StaticPages: updatedStaticPages, // ⭐ CRITICAL: Update StaticPages format
       WebsiteLayout: store.WebsiteLayout,
     },
   });
@@ -213,6 +229,8 @@ export function syncTenantStoreWithEditorStore(themeData?: ThemeData): void {
     componentSettingsPages: Object.keys(updatedComponentSettings).length,
     hasGlobalComponentsData: !!updatedGlobalComponentsData,
     hasStaticPagesData: Object.keys(updatedStaticPagesData).length > 0,
+    hasStaticPages: Object.keys(updatedStaticPages).length > 0,
+    staticPagesSlugs: Object.keys(updatedStaticPages),
   });
 }
 
@@ -298,6 +316,21 @@ export function syncTenantStoreFromBackup(backup: Record<string, any>): void {
   // Update staticPagesData in Tenant Store from restored backup
   const updatedStaticPagesData = store.staticPagesData || {};
 
+  // ⭐ CRITICAL: تحديث StaticPages في Tenant Store من staticPagesData
+  // Convert staticPagesData format to StaticPages format [slug, components, apiEndpoints]
+  // Update StaticPages in Tenant Store from staticPagesData
+  const updatedStaticPages: Record<string, any> = {};
+  Object.entries(updatedStaticPagesData).forEach(([slug, pageData]: [string, any]) => {
+    if (pageData && typeof pageData === "object") {
+      // Convert to Array format: [slug, components, apiEndpoints]
+      updatedStaticPages[slug] = [
+        pageData.slug || slug,
+        Array.isArray(pageData.components) ? pageData.components : [],
+        pageData.apiEndpoints || {},
+      ];
+    }
+  });
+
   // تحديث Tenant Store بالبيانات المستعادة
   // Update Tenant Store with restored data
   useTenantStore.setState({
@@ -306,6 +339,7 @@ export function syncTenantStoreFromBackup(backup: Record<string, any>): void {
       componentSettings: updatedComponentSettings,
       globalComponentsData: updatedGlobalComponentsData,
       staticPagesData: updatedStaticPagesData,
+      StaticPages: updatedStaticPages, // ⭐ CRITICAL: Update StaticPages format
       WebsiteLayout: store.WebsiteLayout,
     },
   });
@@ -314,5 +348,7 @@ export function syncTenantStoreFromBackup(backup: Record<string, any>): void {
     componentSettingsPages: Object.keys(updatedComponentSettings).length,
     hasGlobalComponentsData: !!updatedGlobalComponentsData,
     hasStaticPagesData: Object.keys(updatedStaticPagesData).length > 0,
+    hasStaticPages: Object.keys(updatedStaticPages).length > 0,
+    staticPagesSlugs: Object.keys(updatedStaticPages),
   });
 }

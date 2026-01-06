@@ -363,6 +363,52 @@ const useTenantStore = create((set) => ({
         editorStore.setWebsiteLayout(data.WebsiteLayout);
       }
 
+      // ⭐ CRITICAL: Load StaticPages data into editor store
+      // Convert StaticPages format [slug, components, apiEndpoints] to staticPagesData format
+      if (data.StaticPages && typeof data.StaticPages === "object") {
+        const convertedStaticPages = {};
+
+        Object.entries(data.StaticPages).forEach(
+          ([pageSlug, pageData]) => {
+            // Handle Array format: [slug, components, apiEndpoints]
+            if (Array.isArray(pageData) && pageData.length >= 2) {
+              const slug = pageData[0] || pageSlug;
+              const components = Array.isArray(pageData[1]) ? pageData[1] : [];
+              const apiEndpoints = pageData[2] || {};
+
+              convertedStaticPages[pageSlug] = {
+                slug,
+                components,
+                apiEndpoints,
+              };
+            }
+            // Handle Object format: { slug, components, apiEndpoints }
+            else if (
+              typeof pageData === "object" &&
+              !Array.isArray(pageData)
+            ) {
+              convertedStaticPages[pageSlug] = {
+                slug: pageData.slug || pageSlug,
+                components: Array.isArray(pageData.components)
+                  ? pageData.components
+                  : [],
+                apiEndpoints: pageData.apiEndpoints || {},
+              };
+            }
+          },
+        );
+
+        // Load each static page into editorStore
+        Object.entries(convertedStaticPages).forEach(([slug, pageData]) => {
+          editorStore.setStaticPageData(slug, pageData);
+        });
+
+        console.log(
+          "[fetchTenantData] Loaded StaticPages into editorStore:",
+          Object.keys(convertedStaticPages),
+        );
+      }
+
       set({
         tenantData: data,
         loadingTenantData: false,

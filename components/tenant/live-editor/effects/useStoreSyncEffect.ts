@@ -58,6 +58,9 @@ export const useStoreSyncEffect = ({
   // ⭐ CRITICAL: Use ref to track if we're currently updating to prevent loops
   const isUpdatingRef = useRef(false);
 
+  // ⭐ CRITICAL: Track previous themeChangeTimestamp to detect changes
+  const prevThemeChangeTimestampRef = useRef(0);
+
   useEffect(() => {
     // Only sync if already initialized to avoid conflicts with initial load
     if (!initialized) return;
@@ -74,6 +77,11 @@ export const useStoreSyncEffect = ({
     const currentThemeChangeTimestamp = editorStore.themeChangeTimestamp;
     const hasRecentThemeChange = currentThemeChangeTimestamp > 0;
 
+    // ⭐ CRITICAL: Detect if themeChangeTimestamp changed
+    const themeChangeTimestampChanged =
+      themeChangeTimestamp !== prevThemeChangeTimestampRef.current &&
+      themeChangeTimestamp > 0;
+
     if (pageIsStatic) {
       const staticPageData = editorStore.getStaticPageData(slug);
       const staticPageComponents = staticPageData?.components || [];
@@ -86,15 +94,32 @@ export const useStoreSyncEffect = ({
 
         const staticSignature = createSignature(staticComponents);
 
-        // ⭐ CRITICAL: Force update if theme was recently changed, even if signature matches
-        // This ensures static pages are updated immediately after theme change
+        // ⭐ CRITICAL: Force update if:
+        // 1. Theme was recently changed (hasRecentThemeChange)
+        // 2. ThemeChangeTimestamp changed (themeChangeTimestampChanged)
+        // 3. Signature doesn't match
+        // This ensures static pages are updated immediately after theme change/reset
         const shouldUpdate =
-          hasRecentThemeChange || lastSyncedRef.current !== staticSignature;
+          hasRecentThemeChange ||
+          themeChangeTimestampChanged ||
+          lastSyncedRef.current !== staticSignature;
 
         if (shouldUpdate) {
+          console.log(
+            `[useStoreSyncEffect] Force updating static page after theme change:`,
+            {
+              slug,
+              hasRecentThemeChange,
+              themeChangeTimestampChanged,
+              signatureChanged: lastSyncedRef.current !== staticSignature,
+              componentNames: staticComponents.map((c: any) => c.componentName),
+            },
+          );
+
           isUpdatingRef.current = true;
           setPageComponents(staticComponents);
           lastSyncedRef.current = staticSignature;
+          prevThemeChangeTimestampRef.current = themeChangeTimestamp;
           // Reset flag after a short delay to allow state update to complete
           setTimeout(() => {
             isUpdatingRef.current = false;
@@ -130,10 +155,28 @@ export const useStoreSyncEffect = ({
           );
 
           const staticSignature = createSignature(staticComponents);
-          if (lastSyncedRef.current !== staticSignature) {
+
+          // ⭐ CRITICAL: Force update if themeChangeTimestamp changed, even if signature matches
+          // This ensures componentName changes (e.g., propertyDetail1 -> propertyDetail2) are detected
+          const shouldUpdate =
+            themeChangeTimestampChanged ||
+            lastSyncedRef.current !== staticSignature;
+
+          if (shouldUpdate) {
+            console.log(
+              `[useStoreSyncEffect] Force updating static page from staticPagesData:`,
+              {
+                slug,
+                themeChangeTimestampChanged,
+                signatureChanged: lastSyncedRef.current !== staticSignature,
+                componentNames: staticComponents.map((c: any) => c.componentName),
+              },
+            );
+
             isUpdatingRef.current = true;
             setPageComponents(staticComponents);
             lastSyncedRef.current = staticSignature;
+            prevThemeChangeTimestampRef.current = themeChangeTimestamp;
             setTimeout(() => {
               isUpdatingRef.current = false;
             }, 0);
@@ -144,10 +187,28 @@ export const useStoreSyncEffect = ({
 
       if (freshStorePageComponents !== undefined) {
         const storeSignature = createSignature(freshStorePageComponents);
-        if (lastSyncedRef.current !== storeSignature) {
+
+        // ⭐ CRITICAL: Force update if themeChangeTimestamp changed, even if signature matches
+        // This ensures componentName changes are detected
+        const shouldUpdate =
+          themeChangeTimestampChanged ||
+          lastSyncedRef.current !== storeSignature;
+
+        if (shouldUpdate) {
+          console.log(
+            `[useStoreSyncEffect] Force updating pageComponents from pageComponentsByPage:`,
+            {
+              slug,
+              themeChangeTimestampChanged,
+              signatureChanged: lastSyncedRef.current !== storeSignature,
+              componentCount: freshStorePageComponents.length,
+            },
+          );
+
           isUpdatingRef.current = true;
           setPageComponents(freshStorePageComponents || []);
           lastSyncedRef.current = storeSignature;
+          prevThemeChangeTimestampRef.current = themeChangeTimestamp;
           setTimeout(() => {
             isUpdatingRef.current = false;
           }, 0);
