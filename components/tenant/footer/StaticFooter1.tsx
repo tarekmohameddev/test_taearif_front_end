@@ -557,7 +557,7 @@ export default function StaticFooter({
                 {mergedData.content.quickLinks.title}
               </h4>
               <nav className="space-y-3">
-                {mergedData.content.quickLinks.links.map(
+                {mergedData.content.quickLinks.links.filter((link: any) => link.url).map(
                   (link: any, index: number) => (
                     <Link
                       key={index}

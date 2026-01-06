@@ -598,7 +598,7 @@ export default function Footer2(props: Footer2Props) {
                 })()}
               </p>
               <div className="flex items-center gap-6">
-                {mergedData.footerBottom?.legalLinks?.map(
+                {mergedData.footerBottom?.legalLinks?.filter((link: any) => link.url).map(
                   (link: any, index: number) => (
                     <Link
                       key={index}

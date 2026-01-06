@@ -519,7 +519,7 @@ export default function Footer(props: FooterProps = {}) {
                 {mergedData.content.quickLinks.title}
               </h4>
               <nav className="space-y-3">
-                {mergedData.content.quickLinks.links.map(
+                {mergedData.content.quickLinks.links.filter((link: any) => link.url).map(
                   (link: any, index: number) => (
                     <Link
                       key={index}
@@ -636,7 +636,7 @@ export default function Footer(props: FooterProps = {}) {
                 {mergedData.footerBottom.copyright}
               </p>
               <div className="flex gap-6">
-                {mergedData.footerBottom.legalLinks.map(
+                {mergedData.footerBottom.legalLinks.filter((link: any) => link.url).map(
                   (link: any, index: number) => (
                     <Link
                       key={index}
