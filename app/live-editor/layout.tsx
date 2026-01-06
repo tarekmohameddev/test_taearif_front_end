@@ -2224,19 +2224,19 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
   return (
     <nav
       className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[51]"
-      dir="ltr"
+      dir={locale === "ar" ? "rtl" : "ltr"}
     >
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-1">
         {/* Desktop Layout - Single Row */}
-        <div className="hidden md:flex justify-between h-16">
-          <div className="flex">
+        <div className="hidden md:flex items-center justify-between h-16">
+          <div className="flex items-center">
             {/* Back to Dashboard Button */}
             <Link
               href="/dashboard"
-              className="flex-shrink-0 flex items-center px-3 py-2 mr-4 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
+              className="flex-shrink-0 flex items-center px-3 py-2 ltr:mr-4 rtl:ml-4 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
             >
               <svg
-                className="w-5 h-5 group-hover:transform group-hover:-translate-x-1 transition-transform duration-200"
+                className="w-5 h-5 group-hover:transform rtl:-scale-x-100 ltr:group-hover:-translate-x-1 rtl:group-hover:translate-x-1 transition-transform duration-200"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -2257,11 +2257,11 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               <h1 className="text-xl font-bold text-gray-900">
                 {t("editor.title")}
               </h1>
-              <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
+              <span className="ltr:ml-2 rtl:mr-2 text-sm text-gray-500">({tenantId})</span>
             </div>
             {/* Desktop Pages Navigation - Show as links if less than 5 pages, otherwise show dropdown */}
             {availablePages.length < 5 ? (
-              <div className="hidden xl:ml-6 xl:flex xl:space-x-8">
+              <div className="hidden xl:ml-6 xl:flex xl:space-x-8 rtl:space-x-reverse">
                 {availablePages.map((page) => (
                   <Link
                     key={page.slug || "homepage"}
@@ -2286,7 +2286,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     aria-haspopup="true"
                   >
                     <svg
-                      className="w-4 h-4 mr-2"
+                      className="w-4 h-4 ltr:mr-2 rtl:ml-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -2300,7 +2300,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     </svg>
                     {t("editor.pages")}
                     <svg
-                      className="w-4 h-4 ml-2"
+                      className="w-4 h-4 ltr:ml-2 rtl:mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -2404,7 +2404,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             )}
 
             {/* Mobile Pages Dropdown - Visible on screens < 1100px */}
-            <div className="xl:hidden flex items-center mx-2">
+            <div className="xl:hidden flex items-center ltr:mx-2 rtl:mx-2">
               <div className="relative pages-dropdown-container">
                 <button
                   onClick={() => setIsPagesDropdownOpen(!isPagesDropdownOpen)}
@@ -2461,7 +2461,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                             }`}
                           >
                             <svg
-                              className="w-4 h-4 mr-3 flex-shrink-0"
+                              className="w-4 h-4 ltr:mr-3 rtl:ml-3 flex-shrink-0"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -2478,7 +2478,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                             </span>
                             {currentPath === page.path && (
                               <svg
-                                className="w-4 h-4 ml-auto text-blue-600"
+                                className="w-4 h-4 ltr:ml-auto rtl:mr-auto text-blue-600"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -2501,8 +2501,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             </div>
           </div>
 
-          {/* Desktop Actions - Hidden on screens <= 1400px */}
-          <div className="hidden xl:flex items-center space-x-4">
+          {/* Right Side: Actions */}
+          <div className="flex items-center">
+            {/* Desktop Actions - Hidden on screens <= 1400px */}
+            <div className="hidden xl:flex items-center space-x-4 rtl:space-x-reverse">
             {/* Save Button - Always visible */}
             <div className="relative">
               <button
@@ -2536,7 +2538,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
               <svg
-                className="w-4 h-4 mr-2"
+                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -2557,7 +2559,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               className="inline-flex items-center px-4 py-2 border border-purple-300 text-sm font-medium rounded-md text-purple-700 bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 hover:border-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
               <svg
-                className="w-4 h-4 mr-2"
+                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -2581,7 +2583,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
               <svg
-                className="w-4 h-4 mr-2"
+                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -2602,7 +2604,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
               <svg
-                className="w-4 h-4 mr-2"
+                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -2621,8 +2623,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             <LanguageDropdown />
           </div>
 
-          {/* Mobile/Tablet Actions Dropdown - Visible on screens <= 1400px */}
-          <div className="xl:hidden flex items-center space-x-2">
+            {/* Mobile/Tablet Actions Dropdown - Visible on screens <= 1400px */}
+            <div className="xl:hidden flex items-center space-x-2 rtl:space-x-reverse">
             {/* Save Button - Outside dropdown */}
             <div className="relative">
               <button
@@ -2687,7 +2689,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
                     <svg
-                      className="w-4 h-4 mr-3"
+                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -2711,7 +2713,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     className="w-full flex items-center px-4 py-3 text-sm text-purple-700 hover:bg-purple-50 transition-colors duration-200"
                   >
                     <svg
-                      className="w-4 h-4 mr-3"
+                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -2740,7 +2742,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
                     <svg
-                      className="w-4 h-4 mr-3"
+                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -2764,7 +2766,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
                     <svg
-                      className="w-4 h-4 mr-3"
+                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -2783,6 +2785,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             </div>
           </div>
         </div>
+      </div>
 
         {/* Mobile Layout - Two Rows for screens < 820px */}
         <div className="md:hidden">
@@ -2904,7 +2907,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                               </svg>
                             ) : (
                               <svg
-                                className="w-4 h-4 mr-3 flex-shrink-0"
+                                className="w-4 h-4 ltr:mr-3 rtl:ml-3 flex-shrink-0"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
