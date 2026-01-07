@@ -61,6 +61,7 @@ import {
   UserCheck,
   AlertCircle,
   TrendingUp,
+  Activity,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { useUserStore } from "@/store/userStore";
@@ -1821,6 +1822,19 @@ export default function AccessControlPage() {
                                     >
                                       <Eye className="h-4 w-4" />
                                       عرض التفاصيل
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        router.push(
+                                          `/dashboard/access-control/employee-activity/${employee.id}`,
+                                        )
+                                      }
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Activity className="h-4 w-4" />
+                                      سجل الموظف
                                     </Button>
                                   </div>
                                 </TableCell>
