@@ -60,7 +60,7 @@ import { PropertyCounter } from "@/components/property/propertyCOMP/property-cou
 export default function NewDealForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const { pipelineStages, newDealData, clearNewDealData } = useCrmStore();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -77,6 +77,7 @@ export default function NewDealForm() {
   const [isLoadingCustomerFromUrl, setIsLoadingCustomerFromUrl] = useState(
     !!customerIdFromUrl
   );
+  const [customerNotFound, setCustomerNotFound] = useState(false);
 
   // Property selection mode: "existing" or "new"
   const [propertyMode, setPropertyMode] = useState<"existing" | "new">("existing");
@@ -165,9 +166,12 @@ export default function NewDealForm() {
 
   // Fetch customers from /customers endpoint
   useEffect(() => {
-    const fetchCustomers = async () => {
-      if (!userData?.token) return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return;
+    }
 
+    const fetchCustomers = async () => {
       setLoadingCustomers(true);
       try {
         const response = await axiosInstance.get("/customers");
@@ -176,13 +180,17 @@ export default function NewDealForm() {
         }
       } catch (err) {
         console.error("Error fetching customers:", err);
+        // Stop loading customer from URL if fetch fails
+        if (isLoadingCustomerFromUrl) {
+          setIsLoadingCustomerFromUrl(false);
+        }
       } finally {
         setLoadingCustomers(false);
       }
     };
 
     fetchCustomers();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading, isLoadingCustomerFromUrl]);
 
   // Fetch properties from /properties endpoint
   useEffect(() => {
@@ -304,6 +312,8 @@ export default function NewDealForm() {
         customer_name: selectedCustomer.name || "",
         customer_phone: selectedCustomer.phone_number || "",
       }));
+      // Clear customer not found error when customer is selected
+      setCustomerNotFound(false);
     }
     if (errors.customer_id || errors.customer_name || errors.customer_phone) {
       setErrors((prev) => {
@@ -320,6 +330,12 @@ export default function NewDealForm() {
   useEffect(() => {
     const customerIdFromUrl = searchParams?.get("customer_id");
     if (customerIdFromUrl) {
+      // If customers are still loading, wait
+      if (loadingCustomers) {
+        return;
+      }
+
+      // If customers are loaded
       if (customers.length > 0) {
         // Verify customer exists in the list
         const customerExists = customers.find(
@@ -335,21 +351,30 @@ export default function NewDealForm() {
             customer_phone: customerExists.phone_number || "",
           }));
           setIsLoadingCustomerFromUrl(false);
+          setCustomerNotFound(false);
+        } else {
+          // Customer not found in the list - stop loading and allow manual selection
+          setIsLoadingCustomerFromUrl(false);
+          setCustomerNotFound(true);
         }
-        // If customer not found but customers are loaded, keep loading until customer is selected
+      } else {
+        // Customers list is empty after loading - stop loading
+        setIsLoadingCustomerFromUrl(false);
+        setCustomerNotFound(true);
       }
-      // If customers are still loading, keep isLoadingCustomerFromUrl true
     } else {
       // No customer_id in URL, stop loading
       setIsLoadingCustomerFromUrl(false);
+      setCustomerNotFound(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, customers, selectedCustomerId]);
+  }, [searchParams, customers, selectedCustomerId, loadingCustomers]);
 
   // Stop loading when customer is manually selected
   useEffect(() => {
     if (selectedCustomerId && isLoadingCustomerFromUrl) {
       setIsLoadingCustomerFromUrl(false);
+      setCustomerNotFound(false);
     }
   }, [selectedCustomerId, isLoadingCustomerFromUrl]);
 
@@ -752,6 +777,11 @@ export default function NewDealForm() {
                           )}
                         </SelectContent>
                       </Select>
+                      {customerNotFound && (
+                        <p className="text-sm text-red-500">
+                          لم يتم العثور على العميل المطلوب
+                        </p>
+                      )}
                       {errors.customer_id && (
                         <p className="text-sm text-red-500">
                           {errors.customer_id}

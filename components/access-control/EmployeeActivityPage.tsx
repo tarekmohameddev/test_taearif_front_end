@@ -139,11 +139,185 @@ export default function EmployeeActivityPage() {
     }
   };
 
+  // Mock data for testing (temporary)
+  const getMockLogs = (): EmployeeLog[] => {
+    const mockLogs: EmployeeLog[] = [
+      {
+        id: 1,
+        action: "activity.create.customer",
+        action_label: "إنشاء عميل",
+        actor_type: "employee",
+        actor_id: Number(employeeId),
+        target_type: "api_customers",
+        target_id: 101,
+        old_values: null,
+        new_values: {
+          body: {
+            name: "محمد أحمد",
+            email: "mohamed@example.com",
+            phone: "+201234567890"
+          },
+          response_status: 201
+        },
+        ip: "192.168.1.100",
+        user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        actor: {
+          id: Number(employeeId),
+          name: employeeInfo ? `${employeeInfo.first_name || ""} ${employeeInfo.last_name || ""}`.trim() : "موظف",
+          email: employeeInfo?.email || "",
+          account_type: "employee"
+        }
+      },
+      {
+        id: 2,
+        action: "activity.update.property",
+        action_label: "تحديث عقار",
+        actor_type: "employee",
+        actor_id: Number(employeeId),
+        target_type: "api_properties",
+        target_id: 205,
+        old_values: {
+          price: 500000,
+          status: "available"
+        },
+        new_values: {
+          price: 550000,
+          status: "sold"
+        },
+        ip: "192.168.1.100",
+        user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        actor: {
+          id: Number(employeeId),
+          name: employeeInfo ? `${employeeInfo.first_name || ""} ${employeeInfo.last_name || ""}`.trim() : "موظف",
+          email: employeeInfo?.email || "",
+          account_type: "employee"
+        }
+      },
+      {
+        id: 3,
+        action: "activity.delete.project",
+        action_label: "حذف مشروع",
+        actor_type: "employee",
+        actor_id: Number(employeeId),
+        target_type: "api_projects",
+        target_id: 303,
+        old_values: {
+          name: "مشروع سكني جديد",
+          status: "active"
+        },
+        new_values: null,
+        ip: "192.168.1.100",
+        user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        actor: {
+          id: Number(employeeId),
+          name: employeeInfo ? `${employeeInfo.first_name || ""} ${employeeInfo.last_name || ""}`.trim() : "موظف",
+          email: employeeInfo?.email || "",
+          account_type: "employee"
+        }
+      },
+      {
+        id: 4,
+        action: "activity.create.property",
+        action_label: "إنشاء عقار",
+        actor_type: "employee",
+        actor_id: Number(employeeId),
+        target_type: "api_properties",
+        target_id: 404,
+        old_values: null,
+        new_values: {
+          body: {
+            title: "شقة للبيع - القاهرة الجديدة",
+            price: 1200000,
+            area: 150
+          },
+          response_status: 201
+        },
+        ip: "192.168.1.100",
+        user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        created_at: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+        actor: {
+          id: Number(employeeId),
+          name: employeeInfo ? `${employeeInfo.first_name || ""} ${employeeInfo.last_name || ""}`.trim() : "موظف",
+          email: employeeInfo?.email || "",
+          account_type: "employee"
+        }
+      },
+      {
+        id: 5,
+        action: "activity.update.customer",
+        action_label: "تحديث عميل",
+        actor_type: "employee",
+        actor_id: Number(employeeId),
+        target_type: "api_customers",
+        target_id: 501,
+        old_values: {
+          phone: "+201111111111"
+        },
+        new_values: {
+          phone: "+201222222222"
+        },
+        ip: "192.168.1.100",
+        user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        created_at: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+        actor: {
+          id: Number(employeeId),
+          name: employeeInfo ? `${employeeInfo.first_name || ""} ${employeeInfo.last_name || ""}`.trim() : "موظف",
+          email: employeeInfo?.email || "",
+          account_type: "employee"
+        }
+      }
+    ];
+
+    // Apply filters to mock data
+    let filtered = mockLogs;
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(log =>
+        log.action_label.toLowerCase().includes(query) ||
+        log.action.toLowerCase().includes(query) ||
+        log.target_type.toLowerCase().includes(query)
+      );
+    }
+
+    if (actionFilter !== "all") {
+      filtered = filtered.filter(log => {
+        if (actionFilter === "create") return log.action.includes("create");
+        if (actionFilter === "update") return log.action.includes("update");
+        if (actionFilter === "delete") return log.action.includes("delete");
+        return true;
+      });
+    }
+
+    return filtered;
+  };
+
   // Fetch employee logs
   const fetchEmployeeLogs = async () => {
     if (!employeeId || !userData?.token) return;
     setLoading(true);
     setError(null);
+    
+    // TODO: Remove this mock data when API is ready
+    // TEMPORARY: Using mock data
+    setTimeout(() => {
+      try {
+        const mockLogs = getMockLogs();
+        setEmployeeLogs(mockLogs);
+        setTotalPages(1);
+        setTotalLogs(mockLogs.length);
+      } catch (err: any) {
+        console.error("Error with mock data:", err);
+        setError("حدث خطأ في عرض البيانات الوهمية");
+      } finally {
+        setLoading(false);
+      }
+    }, 500); // Simulate API delay
+
+    /* TODO: Uncomment when API is ready
     try {
       const params: any = {
         actor_id: employeeId,
@@ -183,6 +357,7 @@ export default function EmployeeActivityPage() {
     } finally {
       setLoading(false);
     }
+    */
   };
 
   // Get user initials
@@ -201,6 +376,94 @@ export default function EmployeeActivityPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  // Translate action names to Arabic
+  const translateAction = (action: string, actionLabel?: string): string => {
+    // If action_label is provided, use it
+    if (actionLabel) {
+      return actionLabel;
+    }
+
+    // Action type translations
+    const actionTypes: { [key: string]: string } = {
+      create: "إنشاء",
+      update: "تحديث",
+      delete: "حذف",
+      view: "عرض",
+      manage: "إدارة",
+    };
+
+    // Entity type translations
+    const entityTypes: { [key: string]: string } = {
+      customer: "عميل",
+      customers: "عميل",
+      property: "عقار",
+      properties: "عقار",
+      project: "مشروع",
+      projects: "مشروع",
+      crm: "سجل إدارة العملاء",
+      content: "محتوى",
+      settings: "إعدادات",
+      dashboard: "لوحة التحكم",
+      live_editor: "المحرر المباشر",
+      apps: "تطبيق",
+      affiliate: "التسويق بالعمولة",
+      rental: "إيجار",
+      rentals: "إيجار",
+      role: "دور",
+      roles: "دور",
+      permission: "صلاحية",
+      permissions: "صلاحية",
+      employee: "موظف",
+      employees: "موظف",
+    };
+
+    // Extract action type and entity from action string
+    const parts = action.toLowerCase().split(".");
+    let actionType = "";
+    let entity = "";
+
+    // Find action type
+    for (const [key, value] of Object.entries(actionTypes)) {
+      if (action.includes(key)) {
+        actionType = value;
+        break;
+      }
+    }
+
+    // Find entity type
+    for (const [key, value] of Object.entries(entityTypes)) {
+      if (action.includes(key)) {
+        entity = value;
+        break;
+      }
+    }
+
+    // If we found both, combine them
+    if (actionType && entity) {
+      return `${actionType} ${entity}`;
+    }
+
+    // Fallback: translate common patterns
+    if (action.includes("activity.create.customer")) return "إنشاء عميل";
+    if (action.includes("activity.update.customer")) return "تحديث عميل";
+    if (action.includes("activity.delete.customer")) return "حذف عميل";
+    if (action.includes("activity.create.property")) return "إنشاء عقار";
+    if (action.includes("activity.update.property")) return "تحديث عقار";
+    if (action.includes("activity.delete.property")) return "حذف عقار";
+    if (action.includes("activity.create.project")) return "إنشاء مشروع";
+    if (action.includes("activity.update.project")) return "تحديث مشروع";
+    if (action.includes("activity.delete.project")) return "حذف مشروع";
+    if (action.includes("activity.create.crm")) return "إنشاء سجل إدارة العملاء";
+    if (action.includes("activity.update.crm")) return "تحديث سجل إدارة العملاء";
+    if (action.includes("activity.delete.crm")) return "حذف سجل إدارة العملاء";
+    if (action.includes("activity.create.content")) return "إنشاء محتوى";
+    if (action.includes("activity.update.content")) return "تحديث محتوى";
+    if (action.includes("activity.delete.content")) return "حذف محتوى";
+
+    // Return action as is if no translation found
+    return action;
   };
 
   // Get action icon
@@ -534,13 +797,13 @@ export default function EmployeeActivityPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
                               <h4 className="font-medium text-gray-900">
-                                {log.action_label || log.action}
+                                {translateAction(log.action, log.action_label)}
                               </h4>
                               <Badge
                                 variant={getActionBadgeVariant(log.action)}
                                 className="text-xs"
                               >
-                                {log.action}
+                                {translateAction(log.action, log.action_label)}
                               </Badge>
                             </div>
 
@@ -548,7 +811,13 @@ export default function EmployeeActivityPage() {
                               {log.target_type && (
                                 <div className="flex items-center gap-1">
                                   <Globe className="h-3 w-3" />
-                                  {log.target_type}
+                                  {log.target_type
+                                    .replace("api_", "")
+                                    .replace("customers", "عميل")
+                                    .replace("properties", "عقار")
+                                    .replace("projects", "مشروع")
+                                    .replace("crm", "سجل إدارة العملاء")
+                                    .replace("content", "محتوى")}
                                   {log.target_id && ` #${log.target_id}`}
                                 </div>
                               )}
