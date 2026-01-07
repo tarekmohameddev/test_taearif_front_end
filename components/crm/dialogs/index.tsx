@@ -1,5 +1,6 @@
 export { default as CustomerDetailDialog } from "./customer-detail";
 export { default as AddNoteDialog } from "./add-note";
+export { default as RequiredNoteDialog } from "./required-note-dialog";
 export { default as AddReminderDialog } from "./add-reminder";
 export { default as EditReminderDialog } from "./edit-reminder";
 export { default as AddAppointmentDialog } from "./add-appointment";

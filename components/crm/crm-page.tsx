@@ -39,6 +39,7 @@ import {
   Utilities,
   CustomerDetailDialog,
   AddNoteDialog,
+  RequiredNoteDialog,
   AddReminderDialog,
   EditReminderDialog,
   AddAppointmentDialog,
@@ -377,6 +378,17 @@ export default function CrmPage() {
   const [focusedCustomer, setFocusedCustomer] = useState<Customer | null>(null);
   const [focusedStage, setFocusedStage] = useState<PipelineStage | null>(null);
 
+  // Required note dialog states for employees
+  const [showRequiredNoteDialog, setShowRequiredNoteDialog] = useState(false);
+  const [pendingStageChange, setPendingStageChange] = useState<{
+    customerId: string;
+    stageId: string;
+    originalStage: string;
+    customerName: string;
+  } | null>(null);
+  const [customerCards, setCustomerCards] = useState<any[]>([]);
+  const [loadingCustomerCards, setLoadingCustomerCards] = useState(false);
+
   // Helper function for updateCustomerStage API call
   const updateCustomerStageAPI = async (
     customerId: string,
@@ -474,20 +486,34 @@ export default function CrmPage() {
       if (dragPreview && dragPreview.pipelineStage !== stageId) {
         const originalStage = dragPreview.pipelineStage;
         const customerName = dragPreview.name;
+        const customerId = dragPreview.id.toString();
 
-        updateCustomerStage(dragPreview.id.toString(), stageId);
+        // Check if user is employee - only employees need to write note
+        if (userData?.account_type === "employee") {
+          // Employee must write note before stage change
+          setPendingStageChange({
+            customerId,
+            stageId,
+            originalStage: originalStage || "",
+            customerName,
+          });
+          setSelectedCustomer(dragPreview);
+          setShowRequiredNoteDialog(true);
+          // Don't proceed with stage change until note is added
+          return;
+        }
+
+        // If not employee, proceed with normal stage change
+        updateCustomerStage(customerId, stageId);
 
         utilities.showSuccessAnimation(stageId);
         utilities.announceToScreenReader(`تم نقل العميل ${customerName} بنجاح`);
 
-        updateCustomerStageAPI(dragPreview.id.toString(), stageId)
+        updateCustomerStageAPI(customerId, stageId)
           .then((success) => {
             if (!success) {
               // Revert if API fails
-              updateCustomerStage(
-                dragPreview.id.toString(),
-                originalStage || "",
-              );
+              updateCustomerStage(customerId, originalStage || "");
               utilities.announceToScreenReader(
                 `فشل في نقل العميل ${customerName}`,
               );
@@ -495,7 +521,7 @@ export default function CrmPage() {
           })
           .catch((error) => {
             // Revert if API fails
-            updateCustomerStage(dragPreview.id.toString(), originalStage || "");
+            updateCustomerStage(customerId, originalStage || "");
             utilities.announceToScreenReader(
               `فشل في نقل العميل ${customerName}`,
             );
@@ -669,6 +695,69 @@ export default function CrmPage() {
   const completedAppointments = allAppointments.filter(
     (app: Appointment) => app.status === "مكتمل",
   ).length;
+
+  // Check if customer has note
+  const checkCustomerHasNote = async (customerId: string): Promise<boolean> => {
+    try {
+      setLoadingCustomerCards(true);
+      // customerId might be request_id, so try both
+      // First try with request_id (most common case)
+      try {
+        const response = await axiosInstance.get(
+          `/v1/crm/cards?card_request_id=${customerId}`
+        );
+        const cards = response.data?.data?.cards || response.data?.data || [];
+        const hasNote = cards.some((card: any) => card.card_procedure === "note");
+        setCustomerCards(cards);
+        if (hasNote || cards.length > 0) {
+          return hasNote;
+        }
+      } catch (err) {
+        // If request_id fails, try customer_id
+      }
+      
+      // Try with customer_id
+      const response = await axiosInstance.get(
+        `/v1/crm/cards?card_customer_id=${customerId}`
+      );
+      const cards = response.data?.data?.cards || response.data?.data || [];
+      const hasNote = cards.some((card: any) => card.card_procedure === "note");
+      setCustomerCards(cards);
+      return hasNote;
+    } catch (error) {
+      console.error("Error checking customer notes:", error);
+      return false;
+    } finally {
+      setLoadingCustomerCards(false);
+    }
+  };
+
+  // Apply pending stage change after note is added
+  const applyPendingStageChange = async () => {
+    if (!pendingStageChange) return;
+    
+    const { customerId, stageId, originalStage, customerName } = pendingStageChange;
+    
+    // Apply the stage change
+    updateCustomerStage(customerId, stageId);
+    
+    utilities.showSuccessAnimation(stageId);
+    utilities.announceToScreenReader(`تم نقل العميل ${customerName} بنجاح`);
+    
+    // Call API
+    const success = await updateCustomerStageAPI(customerId, stageId);
+    if (!success) {
+      // Revert if API fails
+      updateCustomerStage(customerId, originalStage);
+      utilities.announceToScreenReader(
+        `فشل في نقل العميل ${customerName}`,
+      );
+    }
+    
+    // Clear pending change
+    setPendingStageChange(null);
+    setShowRequiredNoteDialog(false);
+  };
 
   // Event handlers
   const handleRefresh = () => {
@@ -961,6 +1050,18 @@ export default function CrmPage() {
             {/* Dialogs - Conditional Rendering */}
             {showCustomerDialog && <CustomerDetailDialog />}
             {showAddNoteDialog && <AddNoteDialog />}
+            {showRequiredNoteDialog && pendingStageChange && (
+              <RequiredNoteDialog
+                open={showRequiredNoteDialog}
+                onClose={() => {
+                  setShowRequiredNoteDialog(false);
+                  setPendingStageChange(null);
+                }}
+                onNoteAdded={applyPendingStageChange}
+                customerId={pendingStageChange.customerId}
+                customerName={pendingStageChange.customerName}
+              />
+            )}
             {showAddReminderDialog && (
               <AddReminderDialog onReminderAdded={updateRemindersList} />
             )}
