@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bell, Calendar, Clock, AlertTriangle } from "lucide-react";
+import { Bell, Calendar, Clock, AlertTriangle, Loader2 } from "lucide-react";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
 import axiosInstance from "@/lib/axiosInstance";
@@ -25,6 +26,19 @@ import axiosInstance from "@/lib/axiosInstance";
 interface AddReminderDialogProps {
   onReminderAdded?: (reminder: any) => void;
 }
+
+// دالة ترجمة أنواع التذكيرات من الإنجليزية إلى العربية
+const translateReminderType = (type: string): string => {
+  const translations: { [key: string]: string } = {
+    "Send Final Proposal": "إرسال العرض النهائي",
+    "Follow up call": "مكالمة متابعة",
+    "Meeting with Client": "اجتماع مع العميل",
+    "Review contract": "مراجعة العقد",
+    "Send proposal": "إرسال عرض",
+  };
+
+  return translations[type] || type;
+};
 
 export default function AddReminderDialog({
   onReminderAdded,
@@ -35,27 +49,57 @@ export default function AddReminderDialog({
     setShowAddReminderDialog,
     customers,
   } = useCrmStore();
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   const [reminderData, setReminderData] = useState({
     customer_id: "",
-    title: "",
-    priority: "2", // 1=low, 2=medium, 3=high
     date: "",
     time: "",
   });
+  const [reminderTypes, setReminderTypes] = useState<string[]>([]);
+  const [selectedReminderType, setSelectedReminderType] = useState<string>("");
+  const [loadingReminderTypes, setLoadingReminderTypes] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch reminder types from filter-options API
+  useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return;
+    }
+
+    const fetchReminderTypes = async () => {
+      try {
+        setLoadingReminderTypes(true);
+        const response = await axiosInstance.get(
+          "/crm/customer-reminders/filter-options"
+        );
+
+        if (response.data.status === "success" && response.data.data?.titles) {
+          setReminderTypes(response.data.data.titles);
+        }
+      } catch (err: any) {
+        console.error("Error fetching reminder types:", err);
+        // Don't show error to user, just log it
+      } finally {
+        setLoadingReminderTypes(false);
+      }
+    };
+
+    if (showAddReminderDialog) {
+      fetchReminderTypes();
+    }
+  }, [userData?.token, authLoading, showAddReminderDialog]);
 
   const handleClose = () => {
     setShowAddReminderDialog(false);
     setReminderData({
       customer_id: "",
-      title: "",
-      priority: "2",
       date: "",
       time: "",
     });
+    setSelectedReminderType("");
     setError(null);
   };
 
@@ -71,7 +115,7 @@ export default function AddReminderDialog({
     e.preventDefault();
 
     // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
+    if (authLoading || !userData?.token) {
       alert("Authentication required. Please login.");
       return;
     }
@@ -80,12 +124,7 @@ export default function AddReminderDialog({
     const customerId = selectedCustomer
       ? selectedCustomer.customer_id
       : reminderData.customer_id;
-    if (
-      !customerId ||
-      !reminderData.title.trim() ||
-      !reminderData.date ||
-      !reminderData.time
-    ) {
+    if (!customerId || !reminderData.date || !reminderData.time || !selectedReminderType) {
       setError("جميع الحقول مطلوبة");
       return;
     }
@@ -97,29 +136,26 @@ export default function AddReminderDialog({
       // Combine date and time for API
       const datetime = `${reminderData.date} ${reminderData.time}:00`;
 
-      const response = await axiosInstance.post("/crm/customer-reminders", {
+      // Build payload with selected reminder type
+      const payload: any = {
         customer_id: parseInt(customerId),
-        title: reminderData.title.trim(),
-        priority: parseInt(reminderData.priority),
         datetime: datetime,
-      });
+        title: selectedReminderType || "",
+      };
+
+      const response = await axiosInstance.post("/crm/customer-reminders", payload);
 
       if (response.data.status === "success") {
         // Add the new reminder to the store
         const newReminder = {
           id: response.data.data?.id || Date.now(),
-          title: reminderData.title.trim(),
-          priority: parseInt(reminderData.priority),
-          priority_label:
-            reminderData.priority === "3"
-              ? "High"
-              : reminderData.priority === "2"
-                ? "Medium"
-                : "Low",
+          title: response.data.data?.title || selectedReminderType || "",
+          priority: response.data.data?.priority || null,
+          priority_label: response.data.data?.priority_label || "Not Set",
           datetime: datetime,
           customer: selectedCustomer
             ? {
-                id: parseInt(selectedCustomer.customer_id),
+                id: parseInt(String(selectedCustomer.customer_id || "")),
                 name: selectedCustomer.name,
               }
             : customers.find((c) => c.customer_id === reminderData.customer_id)
@@ -150,14 +186,21 @@ export default function AddReminderDialog({
   };
 
   return (
-    <Dialog open={showAddReminderDialog} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+    <CustomDialog
+      open={showAddReminderDialog}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+      maxWidth="max-w-md"
+    >
+      <CustomDialogContent className="p-3">
+        <CustomDialogClose onClose={handleClose} />
+        <CustomDialogHeader>
+          <CustomDialogTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
             إضافة تذكير جديد
-          </DialogTitle>
-        </DialogHeader>
+          </CustomDialogTitle>
+        </CustomDialogHeader>
 
         {selectedCustomer && (
           <div className="mb-4 p-3 bg-muted rounded-lg">
@@ -188,7 +231,7 @@ export default function AddReminderDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.customer_id}>
+                    <SelectItem key={customer.id} value={String(customer.customer_id || "")}>
                       {customer.name}
                     </SelectItem>
                   ))}
@@ -196,32 +239,43 @@ export default function AddReminderDialog({
               </Select>
             </div>
           )}
-          <div className="space-y-2">
-            <Label htmlFor="reminder-title">عنوان التذكير</Label>
-            <Input
-              id="reminder-title"
-              placeholder="مثال: متابعة العميل"
-              value={reminderData.title}
-              onChange={(e) => handleInputChange("title", e.target.value)}
-              required
-            />
-          </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reminder-priority">الأولوية</Label>
-            <Select
-              value={reminderData.priority}
-              onValueChange={(value) => handleInputChange("priority", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر الأولوية" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">منخفضة</SelectItem>
-                <SelectItem value="2">متوسطة</SelectItem>
-                <SelectItem value="3">عالية</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="reminder-type">نوع التذكير</Label>
+            {loadingReminderTypes ? (
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                <span className="mr-2 text-sm text-muted-foreground">
+                  جاري تحميل أنواع التذكيرات...
+                </span>
+              </div>
+            ) : (
+              <Select
+                value={selectedReminderType}
+                onValueChange={(value) => {
+                  setSelectedReminderType(value);
+                  setError(null);
+                }}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر نوع التذكير" />
+                </SelectTrigger>
+                <SelectContent>
+                  {reminderTypes.length > 0 ? (
+                    reminderTypes.map((type, index) => (
+                      <SelectItem key={index} value={type}>
+                        {translateReminderType(type)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>
+                      لا توجد أنواع متاحة
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -273,16 +327,16 @@ export default function AddReminderDialog({
               type="submit"
               disabled={
                 isSubmitting ||
-                !reminderData.title.trim() ||
                 !reminderData.date ||
-                !reminderData.time
+                !reminderData.time ||
+                !selectedReminderType
               }
             >
               {isSubmitting ? "جاري الحفظ..." : "حفظ التذكير"}
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

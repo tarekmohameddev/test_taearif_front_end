@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Settings,
@@ -25,6 +27,7 @@ import {
   Flag,
   Tag,
   Loader2,
+  Bell,
 } from "lucide-react";
 import useCrmStore from "@/context/store/crm";
 import axiosInstance from "@/lib/axiosInstance";
@@ -55,9 +58,13 @@ export default function CrmSettingsDialog({
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isMoving, setIsMoving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reminders, setReminders] = useState<any[]>([]);
+  const [loadingReminders, setLoadingReminders] = useState(false);
 
   // Form dialog states
   const [showFormDialog, setShowFormDialog] = useState(false);
+  const [showReminderTypeForm, setShowReminderTypeForm] = useState(false);
+  const [reminderTypeFormData, setReminderTypeFormData] = useState({ title: "" });
   const [formMode, setFormMode] = useState<"add" | "edit">("add");
   const [formType, setFormType] = useState<
     "stages" | "procedures" | "priorities" | "types"
@@ -115,9 +122,53 @@ export default function CrmSettingsDialog({
     }
   }, [showCrmSettingsDialog]);
 
+  // Load reminders when reminders tab is active
+  useEffect(() => {
+    if (showCrmSettingsDialog && activeTab === "reminders") {
+      const loadReminders = async () => {
+        setLoadingReminders(true);
+        setError(null);
+
+        try {
+          const response = await axiosInstance.get("/crm/customer-reminders");
+          if (response.data.status === "success") {
+            // Get unique reminder types (titles) with is_default flag
+            const remindersMap = new Map();
+            response.data.data.forEach((reminder: any) => {
+              if (!remindersMap.has(reminder.title)) {
+                remindersMap.set(reminder.title, {
+                  title: reminder.title,
+                  is_default: reminder.is_default || false,
+                  id: reminder.id, // Keep first ID for reference
+                });
+              } else {
+                // If already exists, update is_default if this one is default
+                const existing = remindersMap.get(reminder.title);
+                if (reminder.is_default) {
+                  existing.is_default = true;
+                }
+              }
+            });
+            setReminders(Array.from(remindersMap.values()));
+          }
+        } catch (err: any) {
+          console.error("Error loading reminders:", err);
+          setError("فشل في تحميل أنواع التذكيرات");
+        } finally {
+          setLoadingReminders(false);
+        }
+      };
+
+      loadReminders();
+    }
+  }, [showCrmSettingsDialog, activeTab]);
+
   const handleClose = () => {
     setShowCrmSettingsDialog(false);
     setError(null);
+    setReminders([]);
+    setShowReminderTypeForm(false);
+    setReminderTypeFormData({ title: "" });
   };
 
   // Form dialog handlers
@@ -437,6 +488,114 @@ export default function CrmSettingsDialog({
     }
   };
 
+  // Handle add reminder type
+  const handleAddReminderType = async () => {
+    if (!reminderTypeFormData.title.trim()) {
+      setFormError("يجب إدخال نوع التذكير");
+      return;
+    }
+
+    setIsLoading(true);
+    setFormError(null);
+
+    try {
+      // Create a reminder without customer_id to use as a type
+      const response = await axiosInstance.post("/crm/customer-reminders", {
+        title: reminderTypeFormData.title.trim(),
+        datetime: new Date().toISOString().slice(0, 19).replace("T", " "),
+        customer_id: null,
+      });
+
+      if (response.data.status === "success") {
+        // Reload reminders to get updated list
+        const remindersResponse = await axiosInstance.get("/crm/customer-reminders");
+        if (remindersResponse.data.status === "success") {
+          const remindersMap = new Map();
+          remindersResponse.data.data.forEach((reminder: any) => {
+            if (!remindersMap.has(reminder.title)) {
+              remindersMap.set(reminder.title, {
+                title: reminder.title,
+                is_default: reminder.is_default || false,
+                id: reminder.id,
+              });
+            } else {
+              const existing = remindersMap.get(reminder.title);
+              if (reminder.is_default) {
+                existing.is_default = true;
+              }
+            }
+          });
+          setReminders(Array.from(remindersMap.values()));
+        }
+        setShowReminderTypeForm(false);
+        setReminderTypeFormData({ title: "" });
+      }
+    } catch (err: any) {
+      console.error("Error adding reminder type:", err);
+      setFormError(err.response?.data?.message || "فشل في إضافة نوع التذكير");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle delete reminder type (only non-default)
+  const handleDeleteReminderType = async (reminderType: any) => {
+    if (reminderType.is_default) {
+      setError("لا يمكن حذف أنواع التذكيرات الافتراضية");
+      return;
+    }
+
+    if (!confirm(`هل أنت متأكد من حذف نوع التذكير "${reminderType.title}"؟`)) {
+      return;
+    }
+
+    setIsDeleting(reminderType.id.toString());
+    setError(null);
+
+    try {
+      // Find all reminders with this title and delete them
+      const remindersResponse = await axiosInstance.get("/crm/customer-reminders");
+      if (remindersResponse.data.status === "success") {
+        const remindersToDelete = remindersResponse.data.data.filter(
+          (r: any) => r.title === reminderType.title && !r.is_default
+        );
+
+        // Delete all reminders with this title
+        await Promise.all(
+          remindersToDelete.map((r: any) =>
+            axiosInstance.delete(`/crm/customer-reminders/${r.id}`)
+          )
+        );
+
+        // Reload reminders
+        const updatedResponse = await axiosInstance.get("/crm/customer-reminders");
+        if (updatedResponse.data.status === "success") {
+          const remindersMap = new Map();
+          updatedResponse.data.data.forEach((reminder: any) => {
+            if (!remindersMap.has(reminder.title)) {
+              remindersMap.set(reminder.title, {
+                title: reminder.title,
+                is_default: reminder.is_default || false,
+                id: reminder.id,
+              });
+            } else {
+              const existing = remindersMap.get(reminder.title);
+              if (reminder.is_default) {
+                existing.is_default = true;
+              }
+            }
+          });
+          setReminders(Array.from(remindersMap.values()));
+        }
+      }
+    } catch (err: any) {
+      console.error("Error deleting reminder type:", err);
+      setError(err.response?.data?.message || "فشل في حذف نوع التذكير");
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
   const handleDeleteItem = async (
     endpoint: string,
     itemId: string,
@@ -593,6 +752,96 @@ export default function CrmSettingsDialog({
     } finally {
       setIsMoving(null);
     }
+  };
+
+  // Render reminders list
+  const renderRemindersList = () => {
+    if (loadingReminders) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      );
+    }
+
+    if (!reminders || reminders.length === 0) {
+      return (
+        <p className="text-center text-muted-foreground py-12 text-right">
+          لا توجد أنواع تذكيرات مُعرّفة بعد.
+        </p>
+      );
+    }
+
+    // Separate default and custom reminders
+    const defaultReminders = reminders.filter((r) => r.is_default);
+    const customReminders = reminders.filter((r) => !r.is_default);
+
+    return (
+      <div className="space-y-6">
+        {/* Default Reminders Section */}
+        {defaultReminders.length > 0 && (
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3 text-right">
+              أنواع التذكيرات الافتراضية
+            </h3>
+            <div className="space-y-2">
+              {defaultReminders.map((reminder) => (
+                <div
+                  key={reminder.id}
+                  className="flex items-center justify-between p-3 border rounded-lg bg-muted/30"
+                >
+                  <div className="flex items-center gap-3">
+                    <Bell className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{reminder.title}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      افتراضي
+                    </Badge>
+                  </div>
+                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                    غير قابل للإزالة
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Custom Reminders Section */}
+        {customReminders.length > 0 && (
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3 text-right">
+              أنواع التذكيرات المخصصة
+            </h3>
+            <div className="space-y-2">
+              {customReminders.map((reminder) => (
+                <div
+                  key={reminder.id}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <Bell className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{reminder.title}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteReminderType(reminder)}
+                    disabled={isDeleting === reminder.id.toString()}
+                    className="text-red-600 hover:text-red-700 h-8 w-8"
+                  >
+                    {isDeleting === reminder.id.toString() ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   // Render item component for reusability
@@ -877,7 +1126,7 @@ export default function CrmSettingsDialog({
             onValueChange={setActiveTab}
             className="h-full "
           >
-            <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/30">
+            <TabsList className="grid w-full grid-cols-4 mb-6 bg-muted/30">
               <TabsTrigger
                 value="stages"
                 className="flex items-center gap-2 text-sm font-medium"
@@ -898,6 +1147,13 @@ export default function CrmSettingsDialog({
               >
                 <Tag className="h-4 w-4 ml-2" />
                 الأنواع
+              </TabsTrigger>
+              <TabsTrigger
+                value="reminders"
+                className="flex items-center gap-2 text-sm font-medium"
+              >
+                <Bell className="h-4 w-4 ml-2" />
+                التذكيرات
               </TabsTrigger>
             </TabsList>
 
@@ -970,6 +1226,76 @@ export default function CrmSettingsDialog({
                   </CardHeader>
                   <CardContent>
                     {renderItemList(types, "نوع", "/crm/types")}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="reminders" className="mt-0" dir="rtl">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Bell className="h-5 w-5 ml-2" />
+                        إدارة أنواع التذكيرات
+                      </CardTitle>
+                      <Button
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => setShowReminderTypeForm(true)}
+                      >
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة نوع تذكير
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="max-h-[400px] overflow-y-auto pr-2">
+                    {showReminderTypeForm && (
+                      <div className="mb-4 p-4 border rounded-lg bg-muted/30">
+                        <div className="space-y-3">
+                          <div className="space-y-2">
+                            <Label htmlFor="reminder-type-title">نوع التذكير</Label>
+                            <Input
+                              id="reminder-type-title"
+                              placeholder="مثال: متابعة العميل"
+                              value={reminderTypeFormData.title}
+                              onChange={(e) =>
+                                setReminderTypeFormData({
+                                  ...reminderTypeFormData,
+                                  title: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                          {formError && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-md text-sm">
+                              {formError}
+                            </div>
+                          )}
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setShowReminderTypeForm(false);
+                                setReminderTypeFormData({ title: "" });
+                                setFormError(null);
+                              }}
+                              disabled={isLoading}
+                            >
+                              إلغاء
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={handleAddReminderType}
+                              disabled={isLoading || !reminderTypeFormData.title.trim()}
+                            >
+                              {isLoading ? "جاري الحفظ..." : "حفظ"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {renderRemindersList()}
                   </CardContent>
                 </Card>
               </TabsContent>
