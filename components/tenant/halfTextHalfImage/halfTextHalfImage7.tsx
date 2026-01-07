@@ -108,7 +108,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
+  // 3. FETCH TENANT DATA
   // ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (tenantId) {
@@ -116,54 +116,70 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     }
   }, [tenantId, fetchTenantData]);
 
+  // ─────────────────────────────────────────────────────────
+  // 4. RETRIEVE DATA FROM STORE
+  // ─────────────────────────────────────────────────────────
+  const storeData = props.useStore
+    ? halfTextHalfImageStates[uniqueId] || {}
+    : {};
+  const currentStoreData = props.useStore
+    ? getComponentData("halfTextHalfImage", uniqueId) || {}
+    : {};
+
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData) return {};
-
-    // Check new structure (tenantData.components)
-    if (tenantData.components && Array.isArray(tenantData.components)) {
-      for (const component of tenantData.components) {
-        if (
-          component.type === "halfTextHalfImage" &&
-          component.componentName === variantId
-        ) {
-          return component.data;
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
+          if (
+            (component as any).type === "halfTextHalfImage" &&
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
         }
       }
-    }
-
-    // Check old structure (tenantData.componentSettings)
-    if (tenantData?.componentSettings) {
-      for (const [pageSlug, pageComponents] of Object.entries(
-        tenantData.componentSettings,
-      )) {
-        if (
-          typeof pageComponents === "object" &&
-          !Array.isArray(pageComponents)
-        ) {
-          for (const [componentId, component] of Object.entries(
-            pageComponents as any,
-          )) {
-            if (
-              (component as any).type === "halfTextHalfImage" &&
-              (component as any).componentName === variantId &&
-              componentId === props.id
-            ) {
-              return (component as any).data;
-            }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "halfTextHalfImage" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-
     return {};
   };
 
+  const tenantComponentData = getTenantComponentData();
+
+  // ─────────────────────────────────────────────────────────
+  // 5. INITIALIZE IN STORE (on mount)
+  // ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (props.useStore) {
-      // Get tenant component data inside useEffect to avoid infinite loops
-      const tenantComponentData = getTenantComponentData();
-
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
@@ -184,38 +200,65 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     uniqueId,
     props.useStore,
     ensureComponentVariant,
-    variantId,
-    props.id,
-    tenantData,
+    tenantComponentData,
+    props,
   ]);
 
   // ─────────────────────────────────────────────────────────
-  // 4. RETRIEVE DATA FROM STORE
+  // 6. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
-  const storeData = halfTextHalfImageStates[uniqueId];
-  const currentStoreData = getComponentData("halfTextHalfImage", uniqueId);
-  const tenantComponentData = getTenantComponentData();
+  // Get default data
+  const defaultData = getDefaultHalfTextHalfImage7Data();
 
-  // ─────────────────────────────────────────────────────────
-  // 5. MERGE DATA (PRIORITY ORDER)
-  // ─────────────────────────────────────────────────────────
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultHalfTextHalfImage7Data(), // 1. Defaults (lowest priority)
-    ...tenantComponentData, // 2. Tenant data from database
-    ...storeData, // 3. Store state
-    ...currentStoreData, // 4. Current store data
-    ...props, // 5. Props (highest priority)
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    props.useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 HalfTextHalfImage7 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
+
   // ─────────────────────────────────────────────────────────
-  // 6. EARLY RETURN IF NOT VISIBLE
+  // 7. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
 
   // ─────────────────────────────────────────────────────────
-  // 7. RENDER
+  // 8. RENDER
   // ─────────────────────────────────────────────────────────
   // Function to get icon component based on type or name
   const getFeatureIcon = (

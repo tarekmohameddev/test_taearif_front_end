@@ -248,14 +248,6 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
-  useEffect(() => {
-    if (props.useStore) {
-      // Use component.id as unique identifier instead of variantId
-      const uniqueId = props.id || variantId;
-      ensureComponentVariant("halfTextHalfImage", uniqueId, props);
-    }
-  }, [variantId, props.useStore, props.id, ensureComponentVariant]);
-
   const { user, loading } = useAuth();
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
@@ -263,6 +255,12 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
+
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId);
+    }
+  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
   const uniqueId = props.id || variantId;
@@ -280,8 +278,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData?.componentSettings) return {};
-
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
     // Search through all pages for this component variant
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings,
@@ -295,10 +294,26 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
         for (const [componentId, component] of Object.entries(
           pageComponents as any,
         )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "halfTextHalfImage" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "halfTextHalfImage" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
@@ -310,28 +325,74 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   const tenantComponentData = getTenantComponentData();
 
-  // ⭐ IMPORTANT: Use getDefaultHalfTextHalfImage2Data from halfTextHalfImageFunctions.ts
-  // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
-  // So we only use getDefaultHalfTextHalfImage2Data() as fallback if no store data exists
-  const defaultData =
-    variantId === "halfTextHalfImage2" &&
-    (!currentStoreData || Object.keys(currentStoreData).length === 0)
-      ? getDefaultHalfTextHalfImage2Data()
-      : {};
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultHalfTextHalfImage2Data(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultHalfTextHalfImage2Data(),
+              ...props,
+            };
 
-  // Merge data with priority: currentStoreData > tenantComponentData > props > default
+      // Initialize in store
+      ensureComponentVariant("halfTextHalfImage", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
+
+  // Get default data
+  const defaultData = getDefaultHalfTextHalfImage2Data();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...currentStoreData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    props.useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 HalfTextHalfImage2 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669

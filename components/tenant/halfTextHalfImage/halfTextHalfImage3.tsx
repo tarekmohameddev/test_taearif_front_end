@@ -133,25 +133,6 @@ export default function VisionSection(props: VisionSectionProps = {}) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
-  useEffect(() => {
-    if (useStore) {
-      // Use component.id as unique identifier instead of variantId
-      const uniqueId = props.id || variantId;
-
-      // Log component initialization
-      logComponentRender(uniqueId, variantId, "halfTextHalfImage", {
-        action: "INITIALIZE_COMPONENT",
-        uniqueId,
-        variantId,
-        useStore,
-        props: props,
-        reason: "Component mounted or props changed",
-      });
-
-      ensureComponentVariant("halfTextHalfImage", uniqueId, props);
-    }
-  }, [variantId, useStore, props.id, ensureComponentVariant]);
-
   // Get tenant data
   const tenantData = useTenantStore((s: any) => s.tenantData);
   const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData);
@@ -195,6 +176,7 @@ export default function VisionSection(props: VisionSectionProps = {}) {
         type: "halfTextHalfImage",
         componentName: variantId,
         componentId: props.id,
+        uniqueId: uniqueId,
       },
     });
 
@@ -212,14 +194,36 @@ export default function VisionSection(props: VisionSectionProps = {}) {
           pageComponents as any,
         )) {
           // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "halfTextHalfImage" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
           ) {
             logTenantStore("FOUND_TENANT_DATA", uniqueId, variantId, {
               pageSlug,
               componentId,
+              component: component,
+              foundData: (component as any).data,
+            });
+
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "halfTextHalfImage" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            logTenantStore("FOUND_TENANT_DATA", uniqueId, variantId, {
+              pageSlug,
+              componentId: (component as any).id,
               component: component,
               foundData: (component as any).data,
             });
@@ -240,46 +244,111 @@ export default function VisionSection(props: VisionSectionProps = {}) {
 
   const tenantComponentData = getTenantComponentData();
 
-  // ⭐ IMPORTANT: Use getDefaultHalfTextHalfImage3Data from halfTextHalfImageFunctions.ts
-  // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
-  // So we only use getDefaultHalfTextHalfImage3Data() as fallback if no store data exists
-  const defaultData =
-    variantId === "halfTextHalfImage3" &&
-    (!currentStoreData || Object.keys(currentStoreData).length === 0)
-      ? getDefaultHalfTextHalfImage3Data()
-      : {};
+  useEffect(() => {
+    if (useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultHalfTextHalfImage3Data(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultHalfTextHalfImage3Data(),
+              ...props,
+            };
 
-  // Check if currentStoreData contains old halfTextHalfImage1 data
-  const hasOldData =
-    currentStoreData.content?.title === "نحن شريكك الموثوق في عالم العقارات";
+      // Log component initialization
+      logComponentRender(uniqueId, variantId, "halfTextHalfImage", {
+        action: "INITIALIZE_COMPONENT",
+        uniqueId,
+        variantId,
+        useStore,
+        props: props,
+        tenantComponentData: tenantComponentData,
+        initialData: initialData,
+        reason: "Component mounted or props changed",
+      });
+
+      // Initialize in store
+      ensureComponentVariant("halfTextHalfImage", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+    variantId,
+  ]);
+
+  // Get default data
+  const defaultData = getDefaultHalfTextHalfImage3Data();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
 
   // Log data analysis
   logComponentRender(uniqueId, variantId, "halfTextHalfImage", {
     action: "DATA_ANALYSIS",
     uniqueId,
     variantId,
-    hasOldData,
+    hasTenantData,
+    isStoreDataDefault,
     currentStoreDataContent: currentStoreData.content,
     defaultDataContent: defaultData.content,
-    reason: hasOldData
-      ? "Detected old halfTextHalfImage1 data, will override"
+    tenantComponentDataContent: tenantComponentData.content,
+    reason: hasTenantData && isStoreDataDefault
+      ? "Detected default store data, will use tenant data"
       : "Using current store data",
   });
 
+  // Merge data with correct priority
   const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    // Only use currentStoreData if it doesn't contain old data
-    ...(hasOldData ? {} : currentStoreData),
-    // Force override content with correct data
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
+    // Force override content with correct priority
     content: {
       ...defaultData.content,
-      ...(hasOldData ? {} : currentStoreData.content),
-      ...tenantComponentData.content,
-      ...props.content,
+      ...(props.content || {}),
+      ...(hasTenantData ? tenantComponentData.content || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData.content || {}),
     },
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 HalfTextHalfImage3 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
 
   // Log final data merge
   logComponentRender(uniqueId, variantId, "halfTextHalfImage", {
