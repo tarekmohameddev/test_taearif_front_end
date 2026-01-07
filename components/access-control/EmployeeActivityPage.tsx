@@ -492,6 +492,96 @@ export default function EmployeeActivityPage() {
     }
   };
 
+  // Format values for display (user-friendly format)
+  const formatValuesForDisplay = (values: any, title: string): React.ReactNode => {
+    if (!values) return null;
+
+    // Handle response_status case (for create actions)
+    if (values.response_status) {
+      return (
+        <div className="space-y-2">
+          <div className="text-sm text-gray-600">
+            <span className="font-medium">حالة الاستجابة:</span>{" "}
+            <span className={values.response_status === 201 ? "text-green-600" : "text-gray-900"}>
+              {values.response_status === 201 ? "تم الإنشاء بنجاح" : values.response_status}
+            </span>
+          </div>
+          {values.body && formatValuesForDisplay(values.body, "البيانات")}
+        </div>
+      );
+    }
+
+    // Handle regular object values
+    if (typeof values === "object" && values !== null) {
+      const entries = Object.entries(values);
+      
+      if (entries.length === 0) {
+        return <p className="text-sm text-gray-500">لا توجد بيانات</p>;
+      }
+
+      return (
+        <div className="space-y-2">
+          {entries.map(([key, value]) => {
+            // Translate field names
+            const fieldTranslations: { [key: string]: string } = {
+              name: "الاسم",
+              title: "العنوان",
+              email: "البريد الإلكتروني",
+              phone: "رقم الهاتف",
+              price: "السعر",
+              area: "المساحة",
+              status: "الحالة",
+              body: "البيانات",
+              response_status: "حالة الاستجابة",
+              description: "الوصف",
+              address: "العنوان",
+              city: "المدينة",
+              country: "الدولة",
+            };
+
+            const translatedKey = fieldTranslations[key] || key;
+            let displayValue: React.ReactNode;
+
+            if (value === null || value === undefined) {
+              displayValue = <span className="text-gray-400">غير محدد</span>;
+            } else if (typeof value === "object") {
+              displayValue = (
+                <div className="mr-4 mt-1 p-2 bg-gray-100 rounded border border-gray-200">
+                  {formatValuesForDisplay(value, "")}
+                </div>
+              );
+            } else if (typeof value === "boolean") {
+              displayValue = (
+                <span className={value ? "text-green-600" : "text-red-600"}>
+                  {value ? "نعم" : "لا"}
+                </span>
+              );
+            } else if (typeof value === "number") {
+              // Format numbers with commas
+              displayValue = typeof value === "number" && value > 1000
+                ? value.toLocaleString("ar-EG")
+                : value;
+            } else {
+              displayValue = String(value);
+            }
+
+            return (
+              <div key={key} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 py-1 border-b border-gray-200 last:border-b-0">
+                <span className="font-medium text-gray-700 min-w-[120px]">
+                  {translatedKey}:
+                </span>
+                <span className="text-gray-900 flex-1">{displayValue}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // Handle primitive values
+    return <span className="text-gray-900">{String(values)}</span>;
+  };
+
   // Calculate statistics
   const createdCount = employeeLogs.filter((log) =>
     log.action.includes("create"),
@@ -561,7 +651,13 @@ export default function EmployeeActivityPage() {
           <div className="mx-auto">
             {/* Header */}
             <div className="mb-8">
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <Activity className="h-6 w-6 text-gray-600" />
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    سجل الموظف
+                  </h1>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -571,12 +667,6 @@ export default function EmployeeActivityPage() {
                   <ArrowLeft className="h-4 w-4" />
                   العودة
                 </Button>
-                <div className="flex items-center gap-2">
-                  <Activity className="h-6 w-6 text-gray-600" />
-                  <h1 className="text-3xl font-bold text-gray-900">
-                    سجل الموظف
-                  </h1>
-                </div>
               </div>
               <p className="text-gray-600">
                 مراقبة وتتبع جميع الأنشطة والتفاعلات التي قام بها الموظف
@@ -834,29 +924,36 @@ export default function EmployeeActivityPage() {
                             </div>
 
                             {(log.old_values || log.new_values) && (
-                              <details className="mt-2">
-                                <summary className="text-sm text-gray-600 cursor-pointer hover:text-gray-900">
+                              <details className="mt-3">
+                                <summary className="text-sm font-medium text-blue-600 cursor-pointer hover:text-blue-800 flex items-center gap-2">
+                                  <Eye className="h-4 w-4" />
                                   عرض التفاصيل
                                 </summary>
-                                <div className="mt-2 p-3 bg-gray-50 rounded-md text-xs">
+                                <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
                                   {log.old_values && (
-                                    <div className="mb-2">
-                                      <p className="font-medium text-red-600 mb-1">
-                                        القيم السابقة:
-                                      </p>
-                                      <pre className="overflow-auto">
-                                        {JSON.stringify(log.old_values, null, 2)}
-                                      </pre>
+                                    <div>
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <div className="h-1 w-1 bg-red-500 rounded-full"></div>
+                                        <p className="font-semibold text-red-700 text-sm">
+                                          القيم السابقة
+                                        </p>
+                                      </div>
+                                      <div className="bg-white p-3 rounded-md border border-red-200">
+                                        {formatValuesForDisplay(log.old_values, "القيم السابقة")}
+                                      </div>
                                     </div>
                                   )}
                                   {log.new_values && (
                                     <div>
-                                      <p className="font-medium text-green-600 mb-1">
-                                        القيم الجديدة:
-                                      </p>
-                                      <pre className="overflow-auto">
-                                        {JSON.stringify(log.new_values, null, 2)}
-                                      </pre>
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <div className="h-1 w-1 bg-green-500 rounded-full"></div>
+                                        <p className="font-semibold text-green-700 text-sm">
+                                          القيم الجديدة
+                                        </p>
+                                      </div>
+                                      <div className="bg-white p-3 rounded-md border border-green-200">
+                                        {formatValuesForDisplay(log.new_values, "القيم الجديدة")}
+                                      </div>
                                     </div>
                                   )}
                                 </div>
