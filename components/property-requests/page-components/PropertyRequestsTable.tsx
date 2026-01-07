@@ -47,12 +47,15 @@ import {
   X,
   ArrowRight,
   User,
+  Building,
 } from "lucide-react";
 import { Pagination } from "@/components/customers/page-components/Pagination";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import axiosInstance from "@/lib/axiosInstance";
+import toast from "react-hot-toast";
 
 // Import PropertyRequest interface from parent
 interface PropertyRequest {
@@ -180,6 +183,76 @@ export const PropertyRequestsTable = ({
     else full = "966" + phone;
 
     window.open(`https://wa.me/${full}`, "_blank");
+  };
+
+  // Extract customer from property request (find customer by phone number)
+  const findCustomerByPhone = async (phone: string): Promise<number | null> => {
+    try {
+      const response = await axiosInstance.get("/customers");
+      if (response.data?.status === "success") {
+        const customers = response.data.data?.customers || [];
+        const customer = customers.find(
+          (c: any) => c.phone_number === phone || c.phone_number?.replace(/\D/g, "") === phone.replace(/\D/g, "")
+        );
+        return customer?.id || null;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error finding customer by phone:", error);
+      return null;
+    }
+  };
+
+  // Check if customer has existing deal
+  const checkExistingDeal = async (customerId: number): Promise<boolean> => {
+    try {
+      const response = await axiosInstance.get(`/v1/crm/requests?customer_id=${customerId}`);
+      const requests = response.data?.data?.requests || response.data?.data || [];
+      return Array.isArray(requests) && requests.length > 0;
+    } catch (error) {
+      console.error("Error checking existing deal:", error);
+      return false;
+    }
+  };
+
+  // Handle convert to CRM from property request
+  const handleConvertToCrm = async (propertyRequest: PropertyRequest) => {
+    try {
+      // First, try to get customer_id from property request
+      let customerId: number | null = propertyRequest.customer_id || null;
+
+      // If no customer_id, try to find customer by phone number
+      if (!customerId && propertyRequest.phone) {
+        customerId = await findCustomerByPhone(propertyRequest.phone);
+      }
+
+      if (!customerId) {
+        toast.error("لم يتم العثور على عميل مرتبط بهذا الطلب", {
+          duration: 4000,
+          position: "top-center",
+        });
+        return;
+      }
+
+      // Check if customer has existing deal
+      const hasDeal = await checkExistingDeal(customerId);
+      if (hasDeal) {
+        toast.error("يوجد صفقة فعلياً مع هذا العميل", {
+          duration: 4000,
+          position: "top-center",
+        });
+        return;
+      }
+
+      // Redirect to create deal page with customer_id
+      router.push(`/dashboard/crm/new-deal?customer_id=${customerId}`);
+    } catch (error) {
+      console.error("Error converting to CRM:", error);
+      toast.error("حدث خطأ أثناء التحويل إلى CRM", {
+        duration: 4000,
+        position: "top-center",
+      });
+    }
   };
 
   // دالة لحساب موقع الزر
@@ -642,6 +715,21 @@ export const PropertyRequestsTable = ({
                             >
                               <Tag className="ml-2 h-4 w-4" />
                               تغيير الحالة
+                            </button>
+
+                            {/* تحويل الى الcrm */}
+                            <button
+                              className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setOpenDropdownId(null);
+                                setDropdownPosition(null);
+                                handleConvertToCrm(propertyRequest);
+                              }}
+                            >
+                              <Building className="ml-2 h-4 w-4" />
+                              تحويل الى الcrm
                             </button>
                           </div>,
                           document.body,

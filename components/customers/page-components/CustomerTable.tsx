@@ -46,6 +46,7 @@ import {
   X,
   ArrowRight,
   User,
+  Building,
 } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -334,6 +335,39 @@ export const CustomerTable = ({
         channel.is_connected === true &&
         channel.customers_page_integration_enabled === true,
     );
+  };
+
+  // Check if customer has existing deal
+  const checkExistingDeal = async (customerId: number): Promise<boolean> => {
+    try {
+      const response = await axiosInstance.get(`/v1/crm/requests?customer_id=${customerId}`);
+      const requests = response.data?.data?.requests || response.data?.data || [];
+      return Array.isArray(requests) && requests.length > 0;
+    } catch (error) {
+      console.error("Error checking existing deal:", error);
+      return false;
+    }
+  };
+
+  // Handle convert to CRM
+  const handleConvertToCrm = async (customerId: number) => {
+    try {
+      const hasDeal = await checkExistingDeal(customerId);
+      if (hasDeal) {
+        toast.error("يوجد صفقة فعلياً مع هذا العميل", {
+          duration: 4000,
+          position: "top-center",
+        });
+        return;
+      }
+      router.push(`/dashboard/crm/new-deal?customer_id=${customerId}`);
+    } catch (error) {
+      console.error("Error converting to CRM:", error);
+      toast.error("حدث خطأ أثناء التحويل إلى CRM", {
+        duration: 4000,
+        position: "top-center",
+      });
+    }
   };
   return (
     <div className="space-y-4">
@@ -692,7 +726,8 @@ export const CustomerTable = ({
                                   تعديل العميل
                                 </button>
 
-                                {/* تعيين المرحلة */}
+                                {/* تعيين المرحلة - HIDDEN */}
+                                {/* 
                                 <button
                                   className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
                                   onClick={(e) => {
@@ -705,6 +740,22 @@ export const CustomerTable = ({
                                 >
                                   <ArrowRight className="ml-2 h-4 w-4" />
                                   تعيين المرحلة
+                                </button>
+                                */}
+
+                                {/* تحويل الى الcrm */}
+                                <button
+                                  className="w-full text-right px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center transition-colors"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setOpenDropdownId(null);
+                                    setDropdownPosition(null);
+                                    handleConvertToCrm(customer.id);
+                                  }}
+                                >
+                                  <Building className="ml-2 h-4 w-4" />
+                                  تحويل الى الcrm
                                 </button>
 
                                 {/* تعيين الموظف المسؤول */}

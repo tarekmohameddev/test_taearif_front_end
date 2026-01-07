@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Upload,
   X,
@@ -59,6 +59,7 @@ import { PropertyCounter } from "@/components/property/propertyCOMP/property-cou
 
 export default function NewDealForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { userData } = useAuthStore();
   const { pipelineStages, newDealData, clearNewDealData } = useCrmStore();
 
@@ -66,13 +67,19 @@ export default function NewDealForm() {
   const [activeTab, setActiveTab] = useState("crm");
 
   // Customer selection mode: "existing" or "new"
-  const [customerMode, setCustomerMode] = useState<"existing" | "new">("new");
+  const customerIdFromUrl = searchParams?.get("customer_id");
+  const [customerMode, setCustomerMode] = useState<"existing" | "new">(
+    customerIdFromUrl ? "existing" : "new"
+  );
   const [customers, setCustomers] = useState<any[]>([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+  const [isLoadingCustomerFromUrl, setIsLoadingCustomerFromUrl] = useState(
+    !!customerIdFromUrl
+  );
 
   // Property selection mode: "existing" or "new"
-  const [propertyMode, setPropertyMode] = useState<"existing" | "new">("new");
+  const [propertyMode, setPropertyMode] = useState<"existing" | "new">("existing");
   const [properties, setProperties] = useState<any[]>([]);
   const [loadingProperties, setLoadingProperties] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
@@ -308,6 +315,43 @@ export default function NewDealForm() {
       });
     }
   };
+
+  // Auto-select customer from URL query parameter
+  useEffect(() => {
+    const customerIdFromUrl = searchParams?.get("customer_id");
+    if (customerIdFromUrl) {
+      if (customers.length > 0) {
+        // Verify customer exists in the list
+        const customerExists = customers.find(
+          (c) => c.id.toString() === customerIdFromUrl
+        );
+        if (customerExists) {
+          setCustomerMode("existing");
+          setSelectedCustomerId(customerIdFromUrl);
+          setFormData((prev) => ({
+            ...prev,
+            customer_id: customerExists.id,
+            customer_name: customerExists.name || "",
+            customer_phone: customerExists.phone_number || "",
+          }));
+          setIsLoadingCustomerFromUrl(false);
+        }
+        // If customer not found but customers are loaded, keep loading until customer is selected
+      }
+      // If customers are still loading, keep isLoadingCustomerFromUrl true
+    } else {
+      // No customer_id in URL, stop loading
+      setIsLoadingCustomerFromUrl(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, customers, selectedCustomerId]);
+
+  // Stop loading when customer is manually selected
+  useEffect(() => {
+    if (selectedCustomerId && isLoadingCustomerFromUrl) {
+      setIsLoadingCustomerFromUrl(false);
+    }
+  }, [selectedCustomerId, isLoadingCustomerFromUrl]);
 
   // Handle customer mode change
   const handleCustomerModeChange = (mode: "existing" | "new") => {
@@ -623,36 +667,47 @@ export default function NewDealForm() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Customer Mode Selection */}
-                  <div className="space-y-2">
-                    <Label>نوع العميل *</Label>
-                    <RadioGroup
-                      value={customerMode}
-                      onValueChange={(value) =>
-                        handleCustomerModeChange(value as "existing" | "new")
-                      }
-                      className="flex flex-row gap-6"
-                    >
-                      <div className="flex items-center space-x-2 space-x-reverse">
-                        <RadioGroupItem value="existing" id="existing" />
-                        <Label
-                          htmlFor="existing"
-                          className="font-normal cursor-pointer"
-                        >
-                          عميل موجود
-                        </Label>
+                  {isLoadingCustomerFromUrl ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-sm text-muted-foreground">
+                          جاري تحميل بيانات العميل...
+                        </p>
                       </div>
-                      <div className="flex items-center space-x-2 space-x-reverse">
-                        <RadioGroupItem value="new" id="new" />
-                        <Label
-                          htmlFor="new"
-                          className="font-normal cursor-pointer"
+                    </div>
+                  ) : (
+                    <>
+                      {/* Customer Mode Selection */}
+                      <div className="space-y-2">
+                        <Label>نوع العميل *</Label>
+                        <RadioGroup
+                          value={customerMode}
+                          onValueChange={(value) =>
+                            handleCustomerModeChange(value as "existing" | "new")
+                          }
+                          className="flex flex-row gap-6"
                         >
-                          عميل جديد
-                        </Label>
+                          <div className="flex items-center space-x-2 space-x-reverse">
+                            <RadioGroupItem value="existing" id="existing" />
+                            <Label
+                              htmlFor="existing"
+                              className="font-normal cursor-pointer"
+                            >
+                              عميل موجود
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-2 space-x-reverse">
+                            <RadioGroupItem value="new" id="new" />
+                            <Label
+                              htmlFor="new"
+                              className="font-normal cursor-pointer"
+                            >
+                              عميل جديد
+                            </Label>
+                          </div>
+                        </RadioGroup>
                       </div>
-                    </RadioGroup>
-                  </div>
 
                   {/* Existing Customer Selection */}
                   {customerMode === "existing" && (
@@ -759,6 +814,8 @@ export default function NewDealForm() {
                         )}
                       </div>
                     </div>
+                  )}
+                    </>
                   )}
 
                   {/* Stage Selection */}

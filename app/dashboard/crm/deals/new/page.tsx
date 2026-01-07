@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -82,6 +82,7 @@ interface Customer {
 
 export default function CreateDealPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { userData } = useAuthStore();
   const { pipelineStages, getStageById, setPipelineStages } = useCrmStore();
   const [activeTab, setActiveTab] = useState("crm");
@@ -128,6 +129,20 @@ export default function CreateDealPage() {
 
     fetchCustomers();
   }, [userData?.token]);
+
+  // Auto-select customer from URL query parameter
+  useEffect(() => {
+    const customerIdFromUrl = searchParams?.get("customer_id");
+    if (customerIdFromUrl && customers.length > 0) {
+      // Verify customer exists in the list
+      const customerExists = customers.find(
+        (c) => c.id.toString() === customerIdFromUrl
+      );
+      if (customerExists) {
+        setSelectedCustomerId(customerIdFromUrl);
+      }
+    }
+  }, [searchParams, customers]);
 
   // Fetch pipeline stages
   useEffect(() => {
