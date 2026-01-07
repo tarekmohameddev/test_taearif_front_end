@@ -343,12 +343,6 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
-  useEffect(() => {
-    if (props.useStore) {
-      ensureComponentVariant("contactMapSection", variantId, props);
-    }
-  }, [variantId, props.useStore, ensureComponentVariant]);
-
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -362,6 +356,9 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
+    ? getComponentData("contactMapSection", variantId) || {}
+    : {};
+  const currentStoreData = props.useStore
     ? getComponentData("contactMapSection", variantId) || {}
     : {};
 
@@ -384,10 +381,25 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
           pageComponents as any,
         )) {
           // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "contactMapSection" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === variantId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "contactMapSection" &&
+            ((component as any).id === props.id ||
+              (component as any).id === variantId)
           ) {
             return (component as any).data;
           }
@@ -398,6 +410,30 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
   };
 
   const tenantComponentData = getTenantComponentData();
+
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultcontactMapSectionData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultcontactMapSectionData(),
+              ...props,
+            };
+      ensureComponentVariant("contactMapSection", variantId, initialData);
+    }
+  }, [
+    variantId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
@@ -442,13 +478,48 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
     return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
 
-  // Merge data with priority: storeData > tenantComponentData > props > default
+  // Get default data
+  const defaultData = getDefaultcontactMapSectionData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like title)
+  const isStoreDataDefault =
+    currentStoreData?.title === defaultData?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultcontactMapSectionData(),
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    props.useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 ContactMapSection1 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.title);
+    console.groupEnd();
+  }
 
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (

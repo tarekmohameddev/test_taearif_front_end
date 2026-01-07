@@ -120,12 +120,6 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const contactCardsStates = useEditorStore((s) => s.contactCardsStates);
 
-  useEffect(() => {
-    if (useStore) {
-      ensureComponentVariant("contactCards", uniqueId, props);
-    }
-  }, [uniqueId, useStore, ensureComponentVariant]);
-
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -163,10 +157,25 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
           pageComponents as any,
         )) {
           // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "contactCards" &&
-            (component as any).componentName === variantId &&
-            componentId === id
+            (componentId === id ||
+              (component as any).id === id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "contactCards" &&
+            ((component as any).id === id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
@@ -177,6 +186,25 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   };
 
   const tenantComponentData = getTenantComponentData();
+
+  useEffect(() => {
+    if (useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultContactCardsData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultContactCardsData(),
+              ...props,
+            };
+
+      ensureComponentVariant("contactCards", uniqueId, initialData);
+    }
+  }, [uniqueId, useStore, ensureComponentVariant, tenantComponentData, props]);
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
@@ -201,15 +229,44 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
   // Get default data as base (99% of the data)
   const defaultData = getDefaultContactCardsData();
 
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
-  // Use same pattern as stepsSection1.tsx
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like cards)
+  const isStoreDataDefault =
+    JSON.stringify(currentStoreData?.cards) === JSON.stringify(defaultData?.cards);
+
+  // Merge data with correct priority
   const mergedData = {
-    ...defaultData, // 99% - Default data as base
-    ...props, // Props from parent component
-    ...tenantComponentData, // Backend data (tenant data)
-    ...storeData, // Store data
-    ...currentStoreData, // Current store data (highest priority)
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 ContactCards1 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.groupEnd();
+  }
 
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (

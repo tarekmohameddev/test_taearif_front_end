@@ -91,15 +91,16 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     (s) => s.contactFormSectionStates,
   );
 
+  // Get tenant data
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
   useEffect(() => {
-    if (props.useStore) {
-      const initialData = {
-        ...getDefaultContactFormSectionData(),
-        ...props,
-      };
-      ensureComponentVariant("contactFormSection", uniqueId, initialData);
+    if (tenantId) {
+      fetchTenantData(tenantId);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
+  }, [tenantId, fetchTenantData]);
 
   // Add effect to listen for store updates
   useEffect(() => {
@@ -117,17 +118,6 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     }
   }, [props.useStore, uniqueId]);
 
-  // Get tenant data
-  const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
     ? getComponentData("contactFormSection", uniqueId) || {}
@@ -141,7 +131,6 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     if (!tenantData?.componentSettings) {
       return {};
     }
-
     // Search through all pages for this component variant
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings,
@@ -155,10 +144,26 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
         for (const [componentId, component] of Object.entries(
           pageComponents as any,
         )) {
-          // Check if this is the exact component we're looking for by type and componentName
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "contactFormSection" &&
-            (component as any).componentName === variantId
+            (componentId === id ||
+              (component as any).id === id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "contactFormSection" &&
+            ((component as any).id === id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
@@ -169,6 +174,30 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
   };
 
   const tenantComponentData = getTenantComponentData();
+
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultContactFormSectionData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultContactFormSectionData(),
+              ...props,
+            };
+      ensureComponentVariant("contactFormSection", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
@@ -290,52 +319,81 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     return brandingColor;
   };
 
-  // Check if we have any data from API/stores first
-  const hasApiData =
-    tenantComponentData && Object.keys(tenantComponentData).length > 0;
-  const hasStoreData =
-    (storeData && Object.keys(storeData).length > 0) ||
-    (currentStoreData && Object.keys(currentStoreData).length > 0);
-  const hasPropsData = props.content || props.form;
-
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  // Get default data
   const defaultData = getDefaultContactFormSectionData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
     // Ensure nested objects are properly merged
     content: {
       ...defaultData.content,
       ...(props.content || {}),
-      ...(tenantComponentData?.content || {}),
-      ...(storeData?.content || {}),
-      ...(currentStoreData?.content || {}),
+      ...(hasTenantData ? tenantComponentData?.content || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData?.content || {}),
     },
     form: {
       ...defaultData.form,
       ...(props.form || {}),
-      ...(tenantComponentData?.form || {}),
-      ...(storeData?.form || {}),
-      ...(currentStoreData?.form || {}),
+      ...(hasTenantData ? tenantComponentData?.form || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData?.form || {}),
     },
     layout: {
       ...defaultData.layout,
       ...(props.layout || {}),
-      ...(tenantComponentData?.layout || {}),
-      ...(storeData?.layout || {}),
-      ...(currentStoreData?.layout || {}),
+      ...(hasTenantData ? tenantComponentData?.layout || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData?.layout || {}),
     },
     styling: {
       ...defaultData.styling,
       ...(props.styling || {}),
-      ...(tenantComponentData?.styling || {}),
-      ...(storeData?.styling || {}),
-      ...(currentStoreData?.styling || {}),
+      ...(hasTenantData ? tenantComponentData?.styling || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData?.styling || {}),
     },
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    props.useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 ContactFormSection1 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
 
   // Don't render if not visible
   if (!mergedData.visible) {

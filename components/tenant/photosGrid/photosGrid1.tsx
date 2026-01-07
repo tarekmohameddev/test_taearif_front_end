@@ -78,35 +78,48 @@ export default function PhotosGrid1(props: PhotosGridProps) {
   }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = () => {
-    if (!tenantData) return {};
-
-    if (tenantData.components && Array.isArray(tenantData.components)) {
-      for (const component of tenantData.components) {
-        if (
-          component.type === "photosGrid" &&
-          component.componentName === variantId
-        ) {
-          return component.data;
-        }
-      }
+    if (!tenantData?.componentSettings) {
+      return {};
     }
-
-    if (tenantData?.componentSettings) {
-      for (const pageSettings of Object.values(
-        tenantData.componentSettings,
-      ) as any[]) {
-        if (!pageSettings || typeof pageSettings !== "object") continue;
-        for (const [componentId, component] of Object.entries(pageSettings)) {
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "photosGrid" &&
-            (component as any).componentName === variantId
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "photosGrid" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
         }
       }
     }
-
     return {};
   };
 
@@ -142,15 +155,37 @@ export default function PhotosGrid1(props: PhotosGridProps) {
   ]);
 
   // 4. RETRIEVE DATA FROM STORE
-  const storeData = photosGridStates[uniqueId];
-  const currentStoreData = getComponentData("photosGrid", uniqueId);
+  const storeData = props.useStore
+    ? photosGridStates[uniqueId] || {}
+    : {};
+  const currentStoreData = props.useStore
+    ? getComponentData("photosGrid", uniqueId) || {}
+    : {};
 
   // 5. MERGE DATA
+  // Get default data
+  const defaultData = getDefaultPhotosGridData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultPhotosGridData(),
-    ...storeData,
-    ...currentStoreData,
-    ...props,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
   // 6. EARLY RETURN IF NOT VISIBLE

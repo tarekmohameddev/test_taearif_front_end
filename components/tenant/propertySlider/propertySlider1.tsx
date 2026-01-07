@@ -343,7 +343,13 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
       // Initialize in store
       ensureComponentVariant("propertySlider", variantId, initialData);
     }
-  }, [variantId, props.useStore, ensureComponentVariant, tenantComponentData]);
+  }, [
+    variantId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {

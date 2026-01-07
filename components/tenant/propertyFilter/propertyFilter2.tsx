@@ -8,6 +8,7 @@ import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
+import { getDefaultPropertyFilterData } from "@/context/editorStoreFunctions/propertyFilterFunctions";
 
 // القائمة الافتراضية لأنواع العقارات (تُستخدم كـ fallback)
 const defaultPropertyTypes = [
@@ -85,12 +86,6 @@ export default function PropertyFilter2({
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const propertyFilterStates = useEditorStore((s) => s.propertyFilterStates);
 
-  useEffect(() => {
-    if (useStore) {
-      ensureComponentVariant("propertyFilter", uniqueId, props);
-    }
-  }, [uniqueId, useStore, ensureComponentVariant]);
-
   // Store state
   const {
     search,
@@ -112,7 +107,16 @@ export default function PropertyFilter2({
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
 
   // Get tenant data from store
-  const { tenantData } = useTenantStore();
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantIdFromStore = useTenantStore((s) => s.tenantId);
+
+  useEffect(() => {
+    const finalTenantId = tenantIdFromStore || currentTenantId;
+    if (finalTenantId) {
+      fetchTenantData(finalTenantId);
+    }
+  }, [tenantIdFromStore, currentTenantId, fetchTenantData]);
 
   // Get data from store or content prop with fallback logic
   const storeData = useStore
@@ -120,11 +124,106 @@ export default function PropertyFilter2({
     : {};
   const currentStoreData = useStore ? propertyFilterStates[uniqueId] || {} : {};
 
-  // Merge content prop with store data (store data takes priority)
-  const mergedContent =
-    useStore && storeData && Object.keys(storeData).length > 0
-      ? { ...content, ...storeData }
-      : content;
+  // Get tenant data for this specific component variant
+  const getTenantComponentData = () => {
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === id (most reliable identifier)
+          if (
+            (component as any).type === "propertyFilter" &&
+            (componentId === id ||
+              (component as any).id === id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "propertyFilter" &&
+            ((component as any).id === id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+    }
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
+  useEffect(() => {
+    if (useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultPropertyFilterData(),
+              ...tenantComponentData, // Database data takes priority
+              ...content,
+              ...props,
+            }
+          : {
+              ...getDefaultPropertyFilterData(),
+              ...content,
+              ...props,
+            };
+      ensureComponentVariant("propertyFilter", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    content,
+    props,
+  ]);
+
+  // Get default data
+  const defaultData = getDefaultPropertyFilterData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data
+  const isStoreDataDefault =
+    JSON.stringify(currentStoreData) === JSON.stringify(defaultData);
+
+  // Merge content prop with correct priority
+  const mergedContent = {
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...content, // 2. Content props from parent component
+    ...props, // 3. Other props
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 4. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 5. Current store data (highest priority if not default)
+  };
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669

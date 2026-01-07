@@ -198,43 +198,48 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
 
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
-    if (!tenantData) return {};
-
-    // Check new structure (tenantData.components)
-    if (tenantData.components && Array.isArray(tenantData.components)) {
-      for (const component of tenantData.components) {
-        if (
-          component.type === "projectDetails" &&
-          component.componentName === variantId
-        ) {
-          return component.data;
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
+          if (
+            (component as any).type === "projectDetails" &&
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
         }
       }
-    }
-
-    // Check old structure (tenantData.componentSettings)
-    if (tenantData?.componentSettings) {
-      for (const [pageSlug, pageComponents] of Object.entries(
-        tenantData.componentSettings,
-      )) {
-        if (
-          typeof pageComponents === "object" &&
-          !Array.isArray(pageComponents)
-        ) {
-          for (const [componentId, component] of Object.entries(
-            pageComponents as any,
-          )) {
-            if (
-              (component as any).type === "projectDetails" &&
-              (component as any).componentName === variantId
-            ) {
-              return (component as any).data;
-            }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "projectDetails" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-
     return {};
   };
 
@@ -258,22 +263,50 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
       // Initialize in store
       ensureComponentVariant("projectDetails", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
-  const storeData = projectDetailsStates[uniqueId];
-  const currentStoreData = getComponentData("projectDetails", uniqueId);
+  const storeData = props.useStore
+    ? projectDetailsStates[uniqueId] || {}
+    : {};
+  const currentStoreData = props.useStore
+    ? getComponentData("projectDetails", uniqueId) || {}
+    : {};
 
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
+  // Get default data
+  const defaultData = getDefaultProjectDetailsData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultProjectDetailsData(), // 1. Defaults (lowest priority)
-    ...storeData, // 2. Store state
-    ...currentStoreData, // 3. Current store data
-    ...props, // 4. Props (highest priority)
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
   // Get primary color from mergedData or tenantData

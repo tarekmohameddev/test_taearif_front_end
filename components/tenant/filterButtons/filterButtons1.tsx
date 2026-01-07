@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
+import { getDefaultFilterButtonsData } from "@/context/editorStoreFunctions/filterButtonsFunctions";
 
 type FilterType = "all" | "available" | "sold" | "rented";
 
@@ -35,18 +36,20 @@ export default function FilterButtons({
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const filterButtonsStates = useEditorStore((s) => s.filterButtonsStates);
 
-  useEffect(() => {
-    if (useStore) {
-      ensureComponentVariant("filterButtons", uniqueId, {});
-    }
-  }, [uniqueId, useStore, ensureComponentVariant]);
-
   // Store state
   const { transactionType, activeFilter, setActiveFilter } =
     usePropertiesStore();
 
   // Get tenant data from store
-  const { tenantData } = useTenantStore();
+  const tenantData = useTenantStore((s) => s.tenantData);
+  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
+
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId);
+    }
+  }, [tenantId, fetchTenantData]);
 
   // Get data from store or content prop with fallback logic
   const storeData = useStore
@@ -54,11 +57,119 @@ export default function FilterButtons({
     : {};
   const currentStoreData = useStore ? filterButtonsStates[uniqueId] || {} : {};
 
-  // Merge content prop with store data (store data takes priority)
-  const mergedContent =
-    useStore && storeData && Object.keys(storeData).length > 0
-      ? { ...content, ...storeData }
-      : content;
+  // Get tenant data for this specific component variant
+  const getTenantComponentData = () => {
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === id (most reliable identifier)
+          if (
+            (component as any).type === "filterButtons" &&
+            (componentId === id ||
+              (component as any).id === id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "filterButtons" &&
+            ((component as any).id === id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+    }
+    return {};
+  };
+
+  const tenantComponentData = getTenantComponentData();
+
+  useEffect(() => {
+    if (useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultFilterButtonsData(),
+              ...tenantComponentData, // Database data takes priority
+              ...content,
+            }
+          : {
+              ...getDefaultFilterButtonsData(),
+              ...content,
+            };
+      ensureComponentVariant("filterButtons", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    content,
+  ]);
+
+  // Get default data
+  const defaultData = getDefaultFilterButtonsData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data
+  const isStoreDataDefault =
+    JSON.stringify(currentStoreData) === JSON.stringify(defaultData);
+
+  // Merge content prop with correct priority
+  const mergedContent = {
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...content, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
+  };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 FilterButtons1 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Content Props:", content);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Content:", mergedContent);
+    console.groupEnd();
+  }
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669

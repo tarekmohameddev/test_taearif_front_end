@@ -381,16 +381,6 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const whyChooseUsStates = useEditorStore((s) => s.whyChooseUsStates);
 
-  useEffect(() => {
-    if (props.useStore) {
-      const initialData = {
-        ...getDefaultWhyChooseUsData(),
-        ...props,
-      };
-      ensureComponentVariant("whyChooseUs", uniqueId, initialData);
-    }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
-
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -412,86 +402,76 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData) {
+    if (!tenantData?.componentSettings) {
       return {};
     }
-
-    // First, check if data comes directly from API response (new structure)
-    if (tenantData.components && Array.isArray(tenantData.components)) {
-      for (const component of tenantData.components) {
-        if (
-          component.type === "whyChooseUs" &&
-          component.componentName === variantId
-        ) {
-          const componentData = component.data;
-
-          // Transform the API data structure to match component expectations
-          return {
-            visible: componentData.visible,
-            header: {
-              title: componentData.texts?.title || componentData.header?.title,
-              description:
-                componentData.texts?.subtitle ||
-                componentData.header?.description,
-              typography: {
-                title: {
-                  className: componentData.texts?.title
-                    ? "section-title text-right"
-                    : undefined,
-                },
-                description: {
-                  className: componentData.texts?.subtitle
-                    ? "section-subtitle-xl"
-                    : undefined,
-                },
-              },
-            },
-            colors: {
-              background: componentData.colors?.background,
-              textColor: componentData.colors?.textColor,
-              titleColor: componentData.colors?.titleColor,
-              descriptionColor: componentData.colors?.descriptionColor,
-            },
-            layout: {
-              direction: componentData.layout?.direction || "rtl",
-              maxWidth: componentData.layout?.maxWidth || "1600px",
-            },
-          };
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
+          if (
+            (component as any).type === "whyChooseUs" &&
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
         }
       }
-    }
-
-    // Fallback: check componentSettings (old structure)
-    if (tenantData?.componentSettings) {
-      // Search through all pages for this component variant
-      for (const [pageSlug, pageComponents] of Object.entries(
-        tenantData.componentSettings,
-      )) {
-        // Check if pageComponents is an object (not array)
-        if (
-          typeof pageComponents === "object" &&
-          !Array.isArray(pageComponents)
-        ) {
-          // Search through all components in this page
-          for (const [componentId, component] of Object.entries(
-            pageComponents as any,
-          )) {
-            // Check if this is the exact component we're looking for by type and componentName
-            if (
-              (component as any).type === "whyChooseUs" &&
-              (component as any).componentName === variantId
-            ) {
-              return (component as any).data;
-            }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "whyChooseUs" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-
     return {};
   };
 
   const tenantComponentData = getTenantComponentData();
+
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultWhyChooseUsData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultWhyChooseUsData(),
+              ...props,
+            };
+      ensureComponentVariant("whyChooseUs", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
@@ -696,14 +676,29 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   };
 
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  // Get default data
   const defaultData = getDefaultWhyChooseUsData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like header.title)
+  const isStoreDataDefault =
+    currentStoreData?.header?.title === defaultData?.header?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
     // Ensure nested objects are properly merged
     header: {
       ...defaultData.header,

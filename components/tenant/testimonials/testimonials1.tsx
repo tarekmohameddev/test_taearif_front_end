@@ -291,12 +291,6 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
-  useEffect(() => {
-    if (props.useStore) {
-      ensureComponentVariant("testimonials", variantId, props);
-    }
-  }, [variantId, props.useStore, ensureComponentVariant]);
-
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -312,11 +306,15 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
   const storeData = props.useStore
     ? getComponentData("testimonials", variantId) || {}
     : {};
+  const currentStoreData = props.useStore
+    ? getComponentData("testimonials", variantId) || {}
+    : {};
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData?.componentSettings) return {};
-
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
     // Search through all pages for this component variant
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings,
@@ -330,10 +328,26 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
         for (const [componentId, component] of Object.entries(
           pageComponents as any,
         )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "testimonials" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === variantId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "testimonials" &&
+            ((component as any).id === props.id ||
+              (component as any).id === variantId)
           ) {
             return (component as any).data;
           }
@@ -344,12 +358,54 @@ export default function TestimonialsSection(props: TestimonialsProps = {}) {
   };
 
   const tenantComponentData = getTenantComponentData();
-  // Merge data with priority: storeData > tenantComponentData > props > default
+
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultTestimonialsData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultTestimonialsData(),
+              ...props,
+            };
+      ensureComponentVariant("testimonials", variantId, initialData);
+    }
+  }, [
+    variantId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
+
+  // Get default data
+  const defaultData = getDefaultTestimonialsData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like title)
+  const isStoreDataDefault =
+    currentStoreData?.title === defaultData?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultTestimonialsData(),
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)

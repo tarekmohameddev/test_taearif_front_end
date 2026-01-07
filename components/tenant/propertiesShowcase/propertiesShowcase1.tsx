@@ -689,43 +689,48 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
 
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {
-    if (!tenantData) return {};
-
-    // Check new structure (tenantData.components)
-    if (tenantData.components && Array.isArray(tenantData.components)) {
-      for (const component of tenantData.components) {
-        if (
-          component.type === "propertiesShowcase" &&
-          component.componentName === variantId
-        ) {
-          return component.data;
+    if (!tenantData?.componentSettings) {
+      return {};
+    }
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
+          if (
+            (component as any).type === "propertiesShowcase" &&
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
         }
       }
-    }
-
-    // Check old structure (tenantData.componentSettings)
-    if (tenantData?.componentSettings) {
-      for (const [pageSlug, pageComponents] of Object.entries(
-        tenantData.componentSettings,
-      )) {
-        if (
-          typeof pageComponents === "object" &&
-          !Array.isArray(pageComponents)
-        ) {
-          for (const [componentId, component] of Object.entries(
-            pageComponents as any,
-          )) {
-            if (
-              (component as any).type === "propertiesShowcase" &&
-              (component as any).componentName === variantId
-            ) {
-              return (component as any).data;
-            }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "propertiesShowcase" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-
     return {};
   };
 
@@ -749,23 +754,50 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
       // Initialize in store
       ensureComponentVariant("propertiesShowcase", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // ─────────────────────────────────────────────────────────
   // 4. RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
-  const storeData = propertiesShowcaseStates[uniqueId];
-  const currentStoreData = getComponentData("propertiesShowcase", uniqueId);
+  const storeData = props.useStore
+    ? propertiesShowcaseStates[uniqueId] || {}
+    : {};
+  const currentStoreData = props.useStore
+    ? getComponentData("propertiesShowcase", uniqueId) || {}
+    : {};
 
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
+  // Get default data
+  const defaultData = getDefaultPropertiesShowcaseData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...getDefaultPropertiesShowcaseData(), // 1. Defaults (lowest priority)
-    ...storeData, // 2. Store state
-    ...currentStoreData, // 3. Current store data
-    ...tenantComponentData, // 4. Tenant component data
-    ...props, // 5. Props (highest priority)
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
   // ─────────────────────────────────────────────────────────

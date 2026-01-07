@@ -47,12 +47,6 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const ctaValuationStates = useEditorStore((s) => s.ctaValuationStates);
 
-  useEffect(() => {
-    if (props.useStore) {
-      ensureComponentVariant("ctaValuation", uniqueId, props);
-    }
-  }, [uniqueId, props.useStore, ensureComponentVariant]);
-
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -93,10 +87,25 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
           pageComponents as any,
         )) {
           // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "ctaValuation" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "ctaValuation" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
@@ -108,26 +117,81 @@ const CtaValuationSection = (props: CtaValuationSectionProps = {}) => {
 
   const tenantComponentData = getTenantComponentData();
 
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultCtaValuationData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultCtaValuationData(),
+              ...props,
+            };
+      ensureComponentVariant("ctaValuation", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
+
   // Get default data as base (99% of the data)
   const defaultData = getDefaultCtaValuationData();
 
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
-  // Use same pattern as stepsSection1.tsx
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...defaultData, // 99% - Default data as base
-    ...props, // Props from parent component
-    ...tenantComponentData, // Backend data (tenant data)
-    ...storeData, // Store data
-    ...currentStoreData, // Current store data (highest priority)
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
     // Ensure content is properly merged (important for text display)
     content: {
       ...defaultData.content,
       ...(props.content || {}),
-      ...(tenantComponentData?.content || {}),
-      ...(storeData?.content || {}),
-      ...(currentStoreData?.content || {}),
+      ...(hasTenantData ? tenantComponentData?.content || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData?.content || {}),
     },
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    props.useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 CtaValuation1 Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669
