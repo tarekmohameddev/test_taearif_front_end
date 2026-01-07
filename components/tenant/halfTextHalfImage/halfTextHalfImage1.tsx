@@ -279,14 +279,6 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
     (s) => s.updatehalfTextHalfImageByPath,
   );
 
-  useEffect(() => {
-    if (props.useStore) {
-      // Use component.id as unique identifier instead of variantId
-      const uniqueId = props.id || variantId;
-      ensureComponentVariant("halfTextHalfImage", uniqueId, props);
-    }
-  }, [variantId, props.useStore, props.id, ensureComponentVariant]);
-
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
@@ -332,10 +324,25 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
           pageComponents as any,
         )) {
           // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "halfTextHalfImage" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
+        }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "halfTextHalfImage" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
@@ -347,22 +354,70 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   const tenantComponentData = getTenantComponentData();
 
-  // ⭐ IMPORTANT: Only use default data from halfTextHalfImage1 if variantId is "halfTextHalfImage1"
-  // If currentStoreData exists, it already has the correct default data for the current theme from ensureVariant
-  // So we only use getDefaultHalfTextHalfImageData() as fallback if no store data exists
-  const defaultData =
-    variantId === "halfTextHalfImage1" &&
-    (!currentStoreData || Object.keys(currentStoreData).length === 0)
-      ? getDefaultHalfTextHalfImageData()
-      : {};
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultHalfTextHalfImageData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultHalfTextHalfImageData(),
+              ...props,
+            };
 
-  // Merge data with priority: currentStoreData > tenantComponentData > props > default
+      // Initialize in store
+      ensureComponentVariant("halfTextHalfImage", uniqueId, initialData);
+    }
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
+
+  // Get default data
+  const defaultData = getDefaultHalfTextHalfImageData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...currentStoreData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (props.useStore && typeof window !== "undefined" && (window as any).__DEBUG_COMPONENT_DATA__) {
+    console.group("🔍 HalfTextHalfImage Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669

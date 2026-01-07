@@ -14,6 +14,7 @@ import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import axiosInstance from "@/lib/axiosInstance";
 import { useUrlFilters } from "@/hooks/use-url-filters";
+import { getDefaultGridData } from "@/context/editorStoreFunctions/gridFunctions";
 
 interface PropertyGridProps {
   emptyMessage?: string;
@@ -38,6 +39,8 @@ interface PropertyGridProps {
 export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "grid1";
+  // Use props.id as unique identifier (most reliable)
+  const uniqueId = props.id || variantId;
 
   // Get current pathname
   const pathname = usePathname();
@@ -143,33 +146,6 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const primaryColorLight = getLighterColor(primaryColor, 0.15); // 15% opacity for badge backgrounds
   const primaryColorDark = getDarkerColor(primaryColor, 40); // Darker for text on light backgrounds
 
-  useEffect(() => {
-    if (props.useStore) {
-      ensureComponentVariant("grid", variantId, props);
-    }
-  }, [variantId, props.useStore, ensureComponentVariant]);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Set tenantId in properties store when it changes
-  useEffect(() => {
-    if (currentTenantId) {
-      setTenantId(currentTenantId);
-    }
-  }, [currentTenantId, setTenantId]);
-
-  // Note: URL parameters are automatically applied by useUrlFilters hook
-  // The hook uses useEffect internally to watch searchParams changes
-
-  // Get data from store or tenantData with fallback logic
-  const storeData = props.useStore
-    ? getComponentData("grid", variantId) || {}
-    : {};
-
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
@@ -189,25 +165,27 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
           pageComponents as any,
         )) {
           // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
           if (
             (component as any).type === "grid" &&
-            (component as any).componentName === variantId &&
-            componentId === props.id
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
           ) {
             return (component as any).data;
           }
         }
-        // Fallback: if no explicit id, return first matching grid component with this variant
-        if (!props.id) {
-          for (const [_componentId, component] of Object.entries(
-            pageComponents as any,
-          )) {
-            if (
-              (component as any).type === "grid" &&
-              (component as any).componentName === variantId
-            ) {
-              return (component as any).data;
-            }
+      }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "grid" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
           }
         }
       }
@@ -215,14 +193,88 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     return {};
   };
 
+  // Get tenant component data (must be called before useEffect that uses it)
   const tenantComponentData = getTenantComponentData();
 
-  // Merge data with priority: storeData > tenantComponentData > props > default
+  // Get data from store or tenantData with fallback logic
+  const currentStoreData = props.useStore
+    ? getComponentData("grid", uniqueId) || {}
+    : {};
+
+  useEffect(() => {
+    if (props.useStore) {
+      // ✅ Use database data if available
+      const initialData =
+        tenantComponentData && Object.keys(tenantComponentData).length > 0
+          ? {
+              ...getDefaultGridData(),
+              ...tenantComponentData, // Database data takes priority
+              ...props,
+            }
+          : {
+              ...getDefaultGridData(),
+              ...props,
+            };
+
+      // Initialize in store
+      ensureComponentVariant("grid", uniqueId, initialData);
+    }
+  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+
+  useEffect(() => {
+    if (tenantId) {
+      fetchTenantData(tenantId);
+    }
+  }, [tenantId, fetchTenantData]);
+
+  // Set tenantId in properties store when it changes
+  useEffect(() => {
+    if (currentTenantId) {
+      setTenantId(currentTenantId);
+    }
+  }, [currentTenantId, setTenantId]);
+
+  // Note: URL parameters are automatically applied by useUrlFilters hook
+  // The hook uses useEffect internally to watch searchParams changes
+
+  // Get default data
+  const defaultData = getDefaultGridData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
   const mergedData = {
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (props.useStore && process.env.NODE_ENV === "development") {
+    console.group("🔍 Grid Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
 
   // Resolve default API URL based on current page
   const resolveDefaultUrl = () => {

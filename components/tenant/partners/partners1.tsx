@@ -87,49 +87,48 @@ export default function Partners1(props: PartnersProps = {}) {
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
-    if (!tenantData) {
+    if (!tenantData?.componentSettings) {
       return {};
     }
-
-    // First, check if data comes directly from API response (new structure)
-    if (tenantData.components && Array.isArray(tenantData.components)) {
-      for (const component of tenantData.components) {
-        if (
-          component.type === "partners" &&
-          component.componentName === variantId
-        ) {
-          return component.data;
+    // Search through all pages for this component variant
+    for (const [pageSlug, pageComponents] of Object.entries(
+      tenantData.componentSettings,
+    )) {
+      // Check if pageComponents is an object (not array)
+      if (
+        typeof pageComponents === "object" &&
+        !Array.isArray(pageComponents)
+      ) {
+        // Search through all components in this page
+        for (const [componentId, component] of Object.entries(
+          pageComponents as any,
+        )) {
+          // Check if this is the exact component we're looking for by ID
+          // Use componentId === props.id (most reliable identifier)
+          if (
+            (component as any).type === "partners" &&
+            (componentId === props.id ||
+              (component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
+          }
         }
       }
-    }
-
-    // Fallback: check componentSettings (old structure)
-    if (tenantData?.componentSettings) {
-      // Search through all pages for this component variant
-      for (const [pageSlug, pageComponents] of Object.entries(
-        tenantData.componentSettings,
-      )) {
-        // Check if pageComponents is an object (not array)
-        if (
-          typeof pageComponents === "object" &&
-          !Array.isArray(pageComponents)
-        ) {
-          // Search through all components in this page
-          for (const [componentId, component] of Object.entries(
-            pageComponents as any,
-          )) {
-            // Check if this is the exact component we're looking for by type and componentName
-            if (
-              (component as any).type === "partners" &&
-              (component as any).componentName === variantId
-            ) {
-              return (component as any).data;
-            }
+      // Also handle array format
+      if (Array.isArray(pageComponents)) {
+        for (const component of pageComponents) {
+          // Search by id (most reliable identifier)
+          if (
+            (component as any).type === "partners" &&
+            ((component as any).id === props.id ||
+              (component as any).id === uniqueId)
+          ) {
+            return (component as any).data;
           }
         }
       }
     }
-
     return {};
   };
 
@@ -137,21 +136,29 @@ export default function Partners1(props: PartnersProps = {}) {
 
   useEffect(() => {
     if (props.useStore) {
-      // If we have tenant data, use it; otherwise use props or defaults
+      // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
           ? {
               ...getDefaultPartnersData(),
-              ...tenantComponentData,
+              ...tenantComponentData, // Database data takes priority
               ...props,
             }
           : {
               ...getDefaultPartnersData(),
               ...props,
             };
+
+      // Initialize in store
       ensureComponentVariant("partners", uniqueId, initialData);
     }
-  }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
+  }, [
+    uniqueId,
+    props.useStore,
+    ensureComponentVariant,
+    tenantComponentData,
+    props,
+  ]);
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
@@ -179,100 +186,161 @@ export default function Partners1(props: PartnersProps = {}) {
         : "#059669", // fallback to primary
   };
 
-  // Merge data with priority: currentStoreData > storeData > tenantComponentData > props > default
+  // Get default data
   const defaultData = getDefaultPartnersData();
+
+  // Check if tenantComponentData exists
+  const hasTenantData =
+    tenantComponentData &&
+    Object.keys(tenantComponentData).length > 0;
+
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
+  const isStoreDataDefault =
+    currentStoreData?.content?.title === defaultData?.content?.title;
+
+  // Merge data with correct priority
+  const baseMergedData = {
+    ...defaultData, // 1. Defaults (lowest priority)
+    ...props, // 2. Props from parent component
+    // If tenantComponentData exists, use it (it's from Database)
+    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+    // Use currentStoreData only if it's not just default data
+    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+    ...(hasTenantData && isStoreDataDefault
+      ? {}
+      : currentStoreData), // 4. Current store data (highest priority if not default)
+  };
+
+  // Ensure nested objects are properly merged with correct priority
   const mergedData = {
-    ...defaultData,
-    ...props,
-    ...tenantComponentData,
-    ...storeData,
-    ...currentStoreData,
-    // Ensure nested objects are properly merged
+    ...baseMergedData,
     content: {
       ...defaultData.content,
       ...(props.content || {}),
-      ...(tenantComponentData.content || {}),
-      ...(storeData.content || {}),
-      ...(currentStoreData.content || {}),
+      ...(hasTenantData ? tenantComponentData.content || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData.content || {}),
     },
     layout: {
       ...defaultData.layout,
       ...(props.layout || {}),
-      ...(tenantComponentData.layout || {}),
-      ...(storeData.layout || {}),
-      ...(currentStoreData.layout || {}),
+      ...(hasTenantData ? tenantComponentData.layout || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData.layout || {}),
       padding: {
         ...defaultData.layout?.padding,
         ...(props.layout?.padding || {}),
-        ...(tenantComponentData.layout?.padding || {}),
-        ...(storeData.layout?.padding || {}),
-        ...(currentStoreData.layout?.padding || {}),
+        ...(hasTenantData ? tenantComponentData.layout?.padding || {} : {}),
+        ...(hasTenantData && isStoreDataDefault
+          ? {}
+          : currentStoreData.layout?.padding || {}),
       },
     },
     grid: {
       ...defaultData.grid,
       ...(props.grid || {}),
-      ...(tenantComponentData.grid || {}),
-      ...(storeData.grid || {}),
-      ...(currentStoreData.grid || {}),
+      ...(hasTenantData ? tenantComponentData.grid || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData.grid || {}),
       columns: {
         ...defaultData.grid?.columns,
         ...(props.grid?.columns || {}),
-        ...(tenantComponentData.grid?.columns || {}),
-        ...(storeData.grid?.columns || {}),
-        ...(currentStoreData.grid?.columns || {}),
+        ...(hasTenantData ? tenantComponentData.grid?.columns || {} : {}),
+        ...(hasTenantData && isStoreDataDefault
+          ? {}
+          : currentStoreData.grid?.columns || {}),
       },
     },
     styling: {
       ...defaultData.styling,
       ...(props.styling || {}),
-      ...(tenantComponentData.styling || {}),
-      ...(storeData.styling || {}),
-      ...(currentStoreData.styling || {}),
+      ...(hasTenantData ? tenantComponentData.styling || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData.styling || {}),
     },
     typography: {
       ...defaultData.typography,
       ...(props.typography || {}),
-      ...(tenantComponentData.typography || {}),
-      ...(storeData.typography || {}),
-      ...(currentStoreData.typography || {}),
+      ...(hasTenantData ? tenantComponentData.typography || {} : {}),
+      ...(hasTenantData && isStoreDataDefault
+        ? {}
+        : currentStoreData.typography || {}),
       title: {
         ...defaultData.typography?.title,
         ...(props.typography?.title || {}),
-        ...(tenantComponentData.typography?.title || {}),
-        ...(storeData.typography?.title || {}),
-        ...(currentStoreData.typography?.title || {}),
+        ...(hasTenantData ? tenantComponentData.typography?.title || {} : {}),
+        ...(hasTenantData && isStoreDataDefault
+          ? {}
+          : currentStoreData.typography?.title || {}),
         fontSize: {
           ...defaultData.typography?.title?.fontSize,
           ...(props.typography?.title?.fontSize || {}),
-          ...(tenantComponentData.typography?.title?.fontSize || {}),
-          ...(storeData.typography?.title?.fontSize || {}),
-          ...(currentStoreData.typography?.title?.fontSize || {}),
+          ...(hasTenantData
+            ? tenantComponentData.typography?.title?.fontSize || {}
+            : {}),
+          ...(hasTenantData && isStoreDataDefault
+            ? {}
+            : currentStoreData.typography?.title?.fontSize || {}),
         },
       },
       description: {
         ...defaultData.typography?.description,
         ...(props.typography?.description || {}),
-        ...(tenantComponentData.typography?.description || {}),
-        ...(storeData.typography?.description || {}),
-        ...(currentStoreData.typography?.description || {}),
+        ...(hasTenantData
+          ? tenantComponentData.typography?.description || {}
+          : {}),
+        ...(hasTenantData && isStoreDataDefault
+          ? {}
+          : currentStoreData.typography?.description || {}),
         fontSize: {
           ...defaultData.typography?.description?.fontSize,
           ...(props.typography?.description?.fontSize || {}),
-          ...(tenantComponentData.typography?.description?.fontSize || {}),
-          ...(storeData.typography?.description?.fontSize || {}),
-          ...(currentStoreData.typography?.description?.fontSize || {}),
+          ...(hasTenantData
+            ? tenantComponentData.typography?.description?.fontSize || {}
+            : {}),
+          ...(hasTenantData && isStoreDataDefault
+            ? {}
+            : currentStoreData.typography?.description?.fontSize || {}),
         },
       },
     },
     // Partners array - use the one with highest priority
     partners:
-      props?.partners ||
-      tenantComponentData?.partners ||
-      storeData?.partners ||
-      currentStoreData?.partners ||
-      defaultData.partners,
+      hasTenantData && !isStoreDataDefault
+        ? currentStoreData?.partners ||
+          tenantComponentData?.partners ||
+          props?.partners ||
+          defaultData.partners
+        : hasTenantData
+          ? tenantComponentData?.partners ||
+            props?.partners ||
+            defaultData.partners
+          : currentStoreData?.partners ||
+            props?.partners ||
+            defaultData.partners,
   };
+
+  // ⭐ DEBUG: Log data sources (optional - remove in production)
+  if (
+    props.useStore &&
+    typeof window !== "undefined" &&
+    (window as any).__DEBUG_COMPONENT_DATA__
+  ) {
+    console.group("🔍 Partners Data Sources");
+    console.log("1️⃣ Default Data:", defaultData);
+    console.log("2️⃣ Props:", props);
+    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
+    console.log("4️⃣ Current Store Data:", currentStoreData);
+    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
+    console.log("🔍 Has Tenant Data?", hasTenantData);
+    console.log("🔀 Merged Data:", mergedData);
+    console.log("Final Title:", mergedData.content?.title);
+    console.groupEnd();
+  }
 
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (
