@@ -986,7 +986,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
             )}
 
             {/* Contact Form */}
-            {mergedData.displaySettings?.showContactForm && (
+            {/* {mergedData.displaySettings?.showContactForm && (
               <section
                 className="text-white p-8 rounded-lg h-fit"
                 data-purpose="contact-form"
@@ -1018,7 +1018,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 </p>
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 gap-4">
-                    {/* Name */}
                     <div>
                       <input
                         className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
@@ -1034,7 +1033,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         onChange={handleChange}
                       />
                     </div>
-                    {/* Phone */}
                     <div>
                       <input
                         className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
@@ -1050,7 +1048,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         onChange={handleChange}
                       />
                     </div>
-                    {/* Email */}
                     <div>
                       <input
                         className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
@@ -1067,7 +1064,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                       />
                     </div>
                   </div>
-                  {/* Message */}
                   <div>
                     <textarea
                       className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 outline-none"
@@ -1083,7 +1079,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                       onChange={handleChange}
                     ></textarea>
                   </div>
-                  {/* Submit Button */}
                   <button
                     className="w-full font-bold py-3 rounded transition-colors shadow-md text-lg"
                     style={{
@@ -1105,7 +1100,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   </button>
                 </form>
               </section>
-            )}
+            )} */}
           </div>
           {/* END Right Column */}
           {/* Left Column: Video & Map */}

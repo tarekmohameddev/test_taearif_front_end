@@ -99,6 +99,7 @@ interface PropertyRequest {
   employee?: {
     id: number;
     name: string;
+    whatsapp_number?: string | null;
   } | null;
   created_at: string;
   updated_at: string;
@@ -574,9 +575,16 @@ export const PropertyRequestsTable = ({
                         <div className="font-medium text-right">
                           {propertyRequest.employee.name}
                         </div>
-                        <div className="text-sm text-muted-foreground text-right">
-                          #{propertyRequest.employee.id}
-                        </div>
+                        {propertyRequest.employee.whatsapp_number ? (
+                          <div className="text-sm text-muted-foreground text-right flex items-center">
+                            <MessageSquare className="ml-1 h-3 w-3 text-green-500" />
+                            {propertyRequest.employee.whatsapp_number}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-muted-foreground text-right italic">
+                            لا يوجد رقم واتساب
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <span className="text-muted-foreground text-sm italic">
