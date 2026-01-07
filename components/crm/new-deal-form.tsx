@@ -499,9 +499,12 @@ export default function NewDealForm() {
       stage_id: parseInt(formData.stage_id),
     };
 
-    // If existing customer is selected, use customer_id
+    // If existing customer is selected, use customer_id and also send customer_name and customer_phone
     if (customerMode === "existing" && formData.customer_id) {
       baseData.customer_id = formData.customer_id;
+      // API requires customer_name and customer_phone even when customer_id is provided
+      baseData.customer_name = formData.customer_name;
+      baseData.customer_phone = formData.customer_phone;
     } else {
       // If new customer, use customer_name and customer_phone
       baseData.customer_name = formData.customer_name;

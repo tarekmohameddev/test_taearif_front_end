@@ -94,6 +94,7 @@ export const CustomerTable = ({
   const [selectedCustomerForWhatsApp, setSelectedCustomerForWhatsApp] =
     useState<any>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [showDealExistsDialog, setShowDealExistsDialog] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<{
     top: number;
     left: number;
@@ -340,9 +341,23 @@ export const CustomerTable = ({
   // Check if customer has existing deal
   const checkExistingDeal = async (customerId: number): Promise<boolean> => {
     try {
-      const response = await axiosInstance.get(`/v1/crm/requests?customer_id=${customerId}`);
-      const requests = response.data?.data?.requests || response.data?.data || [];
-      return Array.isArray(requests) && requests.length > 0;
+      const response = await axiosInstance.get(
+        `/v1/crm/requests?customer_id=${customerId}`,
+      );
+
+      const data = response.data?.data;
+
+      // API format used across CRM pages: stages[].requests[]
+      const stages = Array.isArray(data?.stages) ? data.stages : [];
+      const allRequests = stages.flatMap((stage: any) =>
+        Array.isArray(stage?.requests) ? stage.requests : [],
+      );
+
+      return allRequests.some((req: any) => {
+        const reqCustomerId =
+          req?.customer?.id ?? req?.customer_id ?? req?.customerId;
+        return String(reqCustomerId) === String(customerId);
+      });
     } catch (error) {
       console.error("Error checking existing deal:", error);
       return false;
@@ -354,10 +369,7 @@ export const CustomerTable = ({
     try {
       const hasDeal = await checkExistingDeal(customerId);
       if (hasDeal) {
-        toast.error("يوجد صفقة فعلياً مع هذا العميل", {
-          duration: 4000,
-          position: "top-center",
-        });
+        setShowDealExistsDialog(true);
         return;
       }
       router.push(`/dashboard/crm/new-deal?customer_id=${customerId}`);
@@ -1054,6 +1066,30 @@ export const CustomerTable = ({
                   تطبيق
                 </>
               )}
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
+
+      {/* Deal Exists Dialog */}
+      <CustomDialog
+        open={showDealExistsDialog}
+        onOpenChange={setShowDealExistsDialog}
+        maxWidth="max-w-md"
+      >
+        <CustomDialogContent className="p-5">
+          <CustomDialogHeader>
+            <CustomDialogTitle>تعذر التحويل إلى CRM</CustomDialogTitle>
+            <CustomDialogClose onClose={() => setShowDealExistsDialog(false)} />
+          </CustomDialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              يوجد صفقة فعلياً مع هذا العميل وممنوع عمل صفقة جديدة.
+            </p>
+          </div>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setShowDealExistsDialog(false)}>
+              موافق
             </Button>
           </div>
         </CustomDialogContent>
