@@ -78,6 +78,7 @@ export default function NewDealForm() {
     !!customerIdFromUrl
   );
   const [customerNotFound, setCustomerNotFound] = useState(false);
+  const [customersLoaded, setCustomersLoaded] = useState(false);
 
   // Property selection mode: "existing" or "new"
   const [propertyMode, setPropertyMode] = useState<"existing" | "new">("existing");
@@ -173,13 +174,16 @@ export default function NewDealForm() {
 
     const fetchCustomers = async () => {
       setLoadingCustomers(true);
+      setCustomersLoaded(false);
       try {
         const response = await axiosInstance.get("/customers");
         if (response.data.status === "success") {
           setCustomers(response.data.data.customers || []);
+          setCustomersLoaded(true);
         }
       } catch (err) {
         console.error("Error fetching customers:", err);
+        setCustomersLoaded(false);
         // Stop loading customer from URL if fetch fails
         if (isLoadingCustomerFromUrl) {
           setIsLoadingCustomerFromUrl(false);
@@ -335,8 +339,8 @@ export default function NewDealForm() {
         return;
       }
 
-      // If customers are loaded
-      if (customers.length > 0) {
+      // Only check if customers were successfully loaded
+      if (customersLoaded && customers.length > 0) {
         // Verify customer exists in the list
         const customerExists = customers.find(
           (c) => c.id.toString() === customerIdFromUrl
@@ -353,14 +357,18 @@ export default function NewDealForm() {
           setIsLoadingCustomerFromUrl(false);
           setCustomerNotFound(false);
         } else {
-          // Customer not found in the list - stop loading and allow manual selection
+          // Customer not found in the list - stop loading and show error message
           setIsLoadingCustomerFromUrl(false);
           setCustomerNotFound(true);
         }
-      } else {
-        // Customers list is empty after loading - stop loading
+      } else if (customersLoaded && customers.length === 0) {
+        // Customers loaded successfully but list is empty - stop loading without error
         setIsLoadingCustomerFromUrl(false);
-        setCustomerNotFound(true);
+        setCustomerNotFound(false);
+      } else if (!customersLoaded && !loadingCustomers) {
+        // Loading finished but failed - stop loading without error
+        setIsLoadingCustomerFromUrl(false);
+        setCustomerNotFound(false);
       }
     } else {
       // No customer_id in URL, stop loading
@@ -368,7 +376,7 @@ export default function NewDealForm() {
       setCustomerNotFound(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, customers, selectedCustomerId, loadingCustomers]);
+  }, [searchParams, customers, selectedCustomerId, loadingCustomers, customersLoaded]);
 
   // Stop loading when customer is manually selected
   useEffect(() => {
