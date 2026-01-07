@@ -589,7 +589,8 @@ export const halfTextHalfImageFunctions = {
       }
     }
 
-    // ⭐ STEP 4: Use initial data if provided, otherwise use default (like footerFunctions does)
+    // ⭐ STEP 4: Always use defaultData for currentTheme, ignore initial/tempData
+    // This ensures each theme uses its own default data structure
     if (
       state.halfTextHalfImageStates[variantId] &&
       Object.keys(state.halfTextHalfImageStates[variantId]).length > 0
@@ -597,7 +598,9 @@ export const halfTextHalfImageFunctions = {
       return {} as any;
     }
 
-    const data: ComponentData = initial || state.tempData || defaultData;
+    // ⭐ FIX: Always use defaultData based on currentTheme
+    // Ignore initial/tempData to prevent using data from different theme
+    const data: ComponentData = defaultData;
 
     const result = {
       halfTextHalfImageStates: {

@@ -5,6 +5,10 @@ import {
   getDefaultHalfTextHalfImageData,
   getDefaultHalfTextHalfImage2Data,
   getDefaultHalfTextHalfImage3Data,
+  getDefaultHalfTextHalfImage4Data,
+  getDefaultHalfTextHalfImage5Data,
+  getDefaultHalfTextHalfImage6Data,
+  getDefaultHalfTextHalfImage7Data,
 } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 import { getDefaultInputs2Data } from "@/context/editorStoreFunctions/inputs2Functions";
 import { getDefaultTitleData } from "@/context/editorStoreFunctions/titleFunctions";
@@ -282,9 +286,20 @@ export const createDefaultData = (
         },
       );
 
-      if (componentName === "halfTextHalfImage2") {
+      if (componentName === "halfTextHalfImage1") {
+        const data = getDefaultHalfTextHalfImageData();
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage1",
+          {
+            data: data,
+            reason: "halfTextHalfImage1 default data",
+          },
+        );
+        return data;
+      } else if (componentName === "halfTextHalfImage2") {
         const data = getDefaultHalfTextHalfImage2Data();
-
         logSidebar(
           "CREATE_DEFAULT_DATA_RESULT",
           "unknown",
@@ -294,11 +309,9 @@ export const createDefaultData = (
             reason: "halfTextHalfImage2 default data",
           },
         );
-
         return data;
       } else if (componentName === "halfTextHalfImage3") {
         const data = getDefaultHalfTextHalfImage3Data();
-
         logSidebar(
           "CREATE_DEFAULT_DATA_RESULT",
           "unknown",
@@ -308,21 +321,67 @@ export const createDefaultData = (
             reason: "halfTextHalfImage3 default data",
           },
         );
-
+        return data;
+      } else if (componentName === "halfTextHalfImage4") {
+        const data = getDefaultHalfTextHalfImage4Data();
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage4",
+          {
+            data: data,
+            reason: "halfTextHalfImage4 default data",
+          },
+        );
+        return data;
+      } else if (componentName === "halfTextHalfImage5") {
+        const data = getDefaultHalfTextHalfImage5Data();
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage5",
+          {
+            data: data,
+            reason: "halfTextHalfImage5 default data",
+          },
+        );
+        return data;
+      } else if (componentName === "halfTextHalfImage6") {
+        const data = getDefaultHalfTextHalfImage6Data();
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage6",
+          {
+            data: data,
+            reason: "halfTextHalfImage6 default data",
+          },
+        );
+        return data;
+      } else if (componentName === "halfTextHalfImage7") {
+        const data = getDefaultHalfTextHalfImage7Data();
+        logSidebar(
+          "CREATE_DEFAULT_DATA_RESULT",
+          "unknown",
+          "halfTextHalfImage7",
+          {
+            data: data,
+            reason: "halfTextHalfImage7 default data",
+          },
+        );
         return data;
       } else {
+        // Fallback للثيم 1 فقط إذا كان componentName غير معروف
         const data = getDefaultHalfTextHalfImageData();
-
         logSidebar(
           "CREATE_DEFAULT_DATA_RESULT",
           "unknown",
           "halfTextHalfImage1",
           {
             data: data,
-            reason: `Fallback for componentName: "${componentName}"`,
+            reason: `Fallback for unknown componentName: "${componentName}"`,
           },
         );
-
         return data;
       }
 
