@@ -605,7 +605,20 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       price: parsePrice(property.price),
       bathrooms: parseBathrooms(property.bathrooms),
       featured: property.featured || false,
-      url: property.slug ? `/${property.slug}` : property.url || "",
+      // Determine if this is a project and build correct URL
+      url: (() => {
+        if (!property.slug) return property.url || "";
+        
+        const isProject = 
+          property.transactionType === "project" || 
+          property.type === "مشروع" ||
+          pathname?.includes("/projects") ||
+          mergedData.dataSource?.apiUrl?.includes("/projects");
+        
+        return isProject 
+          ? `/project/${property.slug}` 
+          : `/property/${property.slug}`;
+      })(),
       units: property.units || 0, // For card4
     };
   };
