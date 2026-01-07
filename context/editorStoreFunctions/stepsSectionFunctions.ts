@@ -19,7 +19,7 @@ export const getDefaultStepsSectionData = (): ComponentData => ({
       className: "section-title",
     },
     description: {
-      text: "نتبع خطوات احترافية لضمان تسويق عقارك بdsadأعلى dsadمستوى من اdsdلكفاءة والنجاح",
+      text: "نتبع خطوات احترافية لضمان تسويق عقارك بأعلى مستوى من الكفاءة والنجاح",
       className: "section-subtitle-xl text-gray-600",
     },
   },
