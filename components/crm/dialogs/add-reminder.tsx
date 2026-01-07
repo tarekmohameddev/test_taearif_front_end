@@ -53,6 +53,7 @@ export default function AddReminderDialog({
 
   const [reminderData, setReminderData] = useState({
     customer_id: "",
+    title: "",
     date: "",
     time: "",
   });
@@ -96,6 +97,7 @@ export default function AddReminderDialog({
     setShowAddReminderDialog(false);
     setReminderData({
       customer_id: "",
+      title: "",
       date: "",
       time: "",
     });
@@ -124,8 +126,19 @@ export default function AddReminderDialog({
     const customerId = selectedCustomer
       ? selectedCustomer.customer_id
       : reminderData.customer_id;
-    if (!customerId || !reminderData.date || !reminderData.time || !selectedReminderType) {
+    if (!customerId || !reminderData.date || !reminderData.time) {
       setError("جميع الحقول مطلوبة");
+      return;
+    }
+
+    // Both title and reminder type are required
+    if (!reminderData.title.trim()) {
+      setError("يجب إدخال عنوان التذكير");
+      return;
+    }
+
+    if (!selectedReminderType) {
+      setError("يجب اختيار نوع التذكير");
       return;
     }
 
@@ -136,12 +149,39 @@ export default function AddReminderDialog({
       // Combine date and time for API
       const datetime = `${reminderData.date} ${reminderData.time}:00`;
 
-      // Build payload with selected reminder type
+      // Find reminder_id from selected reminder type (title)
+      let reminderId: number | null = null;
+      if (selectedReminderType) {
+        try {
+          // Fetch reminders to find one with matching title
+          const remindersResponse = await axiosInstance.get(
+            `/crm/customer-reminders?filter_title=${encodeURIComponent(selectedReminderType)}`
+          );
+          if (
+            remindersResponse.data.status === "success" &&
+            remindersResponse.data.data &&
+            remindersResponse.data.data.length > 0
+          ) {
+            // Use the first reminder's ID for cloning
+            reminderId = remindersResponse.data.data[0].id;
+          }
+        } catch (err) {
+          console.error("Error finding reminder ID:", err);
+          // Continue without reminder_id if not found
+        }
+      }
+
+      // Build payload: title is custom title, reminder_id is for cloning the type
       const payload: any = {
         customer_id: parseInt(customerId),
         datetime: datetime,
-        title: selectedReminderType || "",
+        title: reminderData.title.trim(), // Custom title, independent from reminder type
       };
+
+      // Add reminder_id only if found (for cloning reminder type properties)
+      if (reminderId) {
+        payload.reminder_id = reminderId;
+      }
 
       const response = await axiosInstance.post("/crm/customer-reminders", payload);
 
@@ -149,7 +189,7 @@ export default function AddReminderDialog({
         // Add the new reminder to the store
         const newReminder = {
           id: response.data.data?.id || Date.now(),
-          title: response.data.data?.title || selectedReminderType || "",
+          title: response.data.data?.title || reminderData.title.trim(),
           priority: response.data.data?.priority || null,
           priority_label: response.data.data?.priority_label || "Not Set",
           datetime: datetime,
@@ -241,6 +281,17 @@ export default function AddReminderDialog({
           )}
 
           <div className="space-y-2">
+            <Label htmlFor="reminder-title">عنوان التذكير</Label>
+            <Input
+              id="reminder-title"
+              placeholder="مثال: متابعة العميل"
+              value={reminderData.title}
+              onChange={(e) => handleInputChange("title", e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="reminder-type">نوع التذكير</Label>
             {loadingReminderTypes ? (
               <div className="flex items-center justify-center p-4">
@@ -329,6 +380,7 @@ export default function AddReminderDialog({
                 isSubmitting ||
                 !reminderData.date ||
                 !reminderData.time ||
+                !reminderData.title.trim() ||
                 !selectedReminderType
               }
             >

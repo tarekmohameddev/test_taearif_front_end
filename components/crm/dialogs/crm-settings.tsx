@@ -37,6 +37,19 @@ interface CrmSettingsDialogProps {
   onStageDeleted?: (stageId: string) => void;
 }
 
+// دالة ترجمة أنواع التذكيرات من الإنجليزية إلى العربية
+const translateReminderType = (type: string): string => {
+  const translations: { [key: string]: string } = {
+    "Send Final Proposal": "إرسال العرض النهائي",
+    "Follow up call": "مكالمة متابعة",
+    "Meeting with Client": "اجتماع مع العميل",
+    "Review contract": "مراجعة العقد",
+    "Send proposal": "إرسال عرض",
+  };
+
+  return translations[type] || type;
+};
+
 export default function CrmSettingsDialog({
   onStageDeleted,
 }: CrmSettingsDialogProps) {
@@ -792,7 +805,7 @@ export default function CrmSettingsDialog({
                 >
                   <div className="flex items-center gap-3">
                     <Bell className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{reminder.title}</span>
+                    <span className="font-medium">{translateReminderType(reminder.title)}</span>
                     <Badge variant="secondary" className="text-xs">
                       افتراضي
                     </Badge>
@@ -820,7 +833,7 @@ export default function CrmSettingsDialog({
                 >
                   <div className="flex items-center gap-3">
                     <Bell className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{reminder.title}</span>
+                    <span className="font-medium">{translateReminderType(reminder.title)}</span>
                   </div>
                   <Button
                     variant="ghost"

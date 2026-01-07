@@ -599,15 +599,21 @@ export default function CrmFilters({
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex flex-wrap items-center gap-2">
-        {/* <Button
-          variant={activeView === "pipeline" ? "default" : "outline"}
-          onClick={() => setActiveView("pipeline")}
-          className="flex items-center gap-2"
-        >
-          <Move className="h-4 w-4" />
-          <span className="hidden sm:inline">مراحل العملاء</span>
-          <span className="sm:hidden">المراحل</span>
-        </Button> */}
+        {process.env.NODE_ENV === "development" && (
+          <Button
+            variant="outline"
+            onClick={() => setActiveView("pipeline")}
+            className={`flex items-center gap-2 ${
+              activeView === "pipeline"
+                ? "bg-red-600 hover:bg-red-700 text-white border-red-600"
+                : "bg-red-500 hover:bg-red-600 text-white border-red-500"
+            }`}
+          >
+            <Move className="h-4 w-4" />
+            <span className="hidden sm:inline">مراحل العملاء</span>
+            <span className="sm:hidden">المراحل</span>
+          </Button>
+        )}
         <Button
           variant="default"
           className="flex items-center gap-2"
@@ -625,17 +631,23 @@ export default function CrmFilters({
           <Calendar className="h-4 w-4" />
           <span className="hidden sm:inline">المواعيد</span>
           <span className="sm:hidden">المواعيد</span>
-        </Button>
-        <Button
-          variant={activeView === "reminders" ? "default" : "outline"}
-          onClick={() => setActiveView("reminders")}
-          className="flex items-center gap-2"
-        >
-          <Bell className="h-4 w-4" />
-          <span className="hidden sm:inline">التذكيرات</span>
-          <span className="sm:hidden">التذكيرات</span>
-        </Button>
-        <Button
+        </Button> */}
+        {process.env.NODE_ENV === "development" && (
+          <Button
+            variant="outline"
+            onClick={() => setActiveView("reminders")}
+            className={`flex items-center gap-2 ${
+              activeView === "reminders"
+                ? "bg-red-600 hover:bg-red-700 text-white border-red-600"
+                : "bg-red-500 hover:bg-red-600 text-white border-red-500"
+            }`}
+          >
+            <Bell className="h-4 w-4" />
+            <span className="hidden sm:inline">التذكيرات</span>
+            <span className="sm:hidden">التذكيرات</span>
+          </Button>
+        )}
+        {/* <Button
           variant={activeView === "inquiry" ? "default" : "outline"}
           onClick={() => setActiveView("inquiry")}
           className="flex items-center gap-2"
