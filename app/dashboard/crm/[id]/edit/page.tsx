@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -110,6 +110,11 @@ export default function EditDealPage() {
   // Form data
   const [stageId, setStageId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Stage change validation for employees
+  const [cachedStageId, setCachedStageId] = useState<string>("");
+  const [stageChangeError, setStageChangeError] = useState<string>("");
+  const notesSectionRef = useRef<HTMLDivElement>(null);
 
   // Property selection
   const [availableProperties, setAvailableProperties] = useState<Property[]>([]);
@@ -421,6 +426,18 @@ export default function EditDealPage() {
     }
   }, [dealId, userData?.token]);
 
+  // Auto-apply cached stage when note is added
+  useEffect(() => {
+    if (cachedStageId && stageChangeError && userData?.account_type === "employee") {
+      const hasNote = cards.some(card => card.card_procedure === "note");
+      if (hasNote) {
+        setStageId(cachedStageId);
+        setStageChangeError("");
+        setCachedStageId("");
+      }
+    }
+  }, [cards, cachedStageId, stageChangeError, userData?.account_type]);
+
   // Handle add card
   const handleAddCard = async (cardData: any) => {
     if (!dealId) return;
@@ -441,6 +458,13 @@ export default function EditDealPage() {
         setCards((prev) => [newCard, ...prev]);
         setShowAddForm(false);
         toast.success("تم إضافة النشاط بنجاح");
+        
+        // If a note was added and there's a cached stage, apply it
+        if (cardData.card_procedure === "note" && cachedStageId && stageChangeError) {
+          setStageId(cachedStageId);
+          setStageChangeError("");
+          setCachedStageId("");
+        }
       } else {
         toast.error(response.data.message || "فشل في إضافة النشاط");
       }
@@ -517,6 +541,42 @@ export default function EditDealPage() {
       ...prev,
       [field]: value,
     }));
+  };
+
+  // Handle stage change with validation for employees
+  const handleStageChange = (newStageId: string) => {
+    // Check if user is employee
+    if (userData?.account_type === "employee") {
+      // Save to cache
+      setCachedStageId(newStageId);
+      
+      // Check if there's a note in cards
+      const hasNote = cards.some(card => card.card_procedure === "note");
+      
+      if (!hasNote) {
+        // No note found - show error and scroll to notes section
+        setStageChangeError("يجب إضافة ملاحظة قبل تغيير المرحلة");
+        
+        // Scroll to notes section
+        setTimeout(() => {
+          notesSectionRef.current?.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "start" 
+          });
+        }, 100);
+        
+        // Don't update the actual stageId
+        return;
+      } else {
+        // Note exists - allow stage change
+        setStageId(newStageId);
+        setStageChangeError("");
+      }
+    } else {
+      // Not an employee - update directly
+      setStageId(newStageId);
+      setStageChangeError("");
+    }
   };
 
   // Handle submit - update deal
@@ -868,7 +928,7 @@ export default function EditDealPage() {
                           <PopoverContent className="w-80 h-[300px]" align="end">
                             <div className="space-y-2">
                               <Label>اختر المرحلة</Label>
-                              <Select value={stageId} onValueChange={setStageId}>
+                              <Select value={stageId} onValueChange={handleStageChange}>
                                 <SelectTrigger>
                                   <SelectValue placeholder="اختر المرحلة" />
                                 </SelectTrigger>
@@ -1634,7 +1694,7 @@ export default function EditDealPage() {
                 )}
 
                 {/* الأنشطة والبطاقات - Same as details page */}
-                <Card>
+                <Card ref={notesSectionRef}>
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <CardTitle className="flex items-center gap-2">
@@ -1667,6 +1727,12 @@ export default function EditDealPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
+                      {stageChangeError && (
+                        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                          <AlertCircle className="h-4 w-4 text-red-600" />
+                          <p className="text-sm text-red-600">{stageChangeError}</p>
+                        </div>
+                      )}
                       {!showAddForm ? (
                         <Button
                           variant="outline"
@@ -1711,6 +1777,13 @@ export default function EditDealPage() {
                                     c.id === updatedCard.id ? updatedCard : c,
                                   ),
                                 );
+                                
+                                // If a note was updated and there's a cached stage, apply it
+                                if (updatedCard.card_procedure === "note" && cachedStageId && stageChangeError) {
+                                  setStageId(cachedStageId);
+                                  setStageChangeError("");
+                                  setCachedStageId("");
+                                }
                               }}
                             />
                           ))}
@@ -1737,7 +1810,7 @@ export default function EditDealPage() {
                   </Button>
                   <Button
                     onClick={handleSubmit}
-                    disabled={isSubmitting || !selectedCustomerId || !stageId}
+                    disabled={isSubmitting || !selectedCustomerId || !stageId || !!stageChangeError}
                     className="gap-2"
                   >
                     {isSubmitting ? (
