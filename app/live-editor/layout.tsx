@@ -2229,14 +2229,14 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       className="bg-white border-b-[1.5px] border-red-300 sticky top-0 z-[51]"
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
-      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-1">
+      <div className="max-w-full mx-auto px-4 sm:px-2 py-1">
         {/* Desktop Layout - Single Row */}
         <div className="hidden md:flex items-center justify-between h-16">
           <div className="flex items-center">
             {/* Back to Dashboard Button */}
             <Link
               href="/dashboard"
-              className="flex-shrink-0 flex items-center px-3 py-2 ltr:mr-4 rtl:ml-4 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
+              className="flex-shrink-0 flex items-center px-1 py-2 ltr:mr-1 rtl:ml-1 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
             >
               <svg
                 className="w-5 h-5 group-hover:transform rtl:-scale-x-100 ltr:group-hover:-translate-x-1 rtl:group-hover:translate-x-1 transition-transform duration-200"
@@ -2257,7 +2257,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             </Link>
 
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">
+              <h1 className="text-base font-bold text-gray-900">
                 {t("editor.title")}
               </h1>
               <span className="ltr:ml-2 rtl:mr-2 text-sm text-gray-500">({tenantId})</span>
@@ -2507,30 +2507,17 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           {/* Right Side: Actions */}
           <div className="flex items-center">
             {/* Desktop Actions - Hidden on screens <= 1400px */}
-            <div className="hidden xl:flex items-center space-x-4 rtl:space-x-reverse">
+            <div className="hidden xl:flex items-center space-x-2 rtl:space-x-reverse">
             {/* Save Button - Always visible */}
             <div className="relative">
               <button
                 onClick={requestSave}
-                className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
+                className={`inline-flex items-center whitespace-nowrap px-1.5 py-1 xl:px-3 xl:py-1.5 border border-transparent text-sm xl:text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
                   showArrowTooltip
                     ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                  />
-                </svg>
                 {t("editor.save_changes")}
               </button>
             </div>
@@ -2538,42 +2525,16 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             {/* Add Page Button for Desktop */}
             <button
               onClick={() => setIsAddPageDialogOpen(true)}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
+              className="inline-flex items-center whitespace-nowrap px-1.5 py-1 xl:px-3 xl:py-1.5 border border-gray-300 text-sm xl:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
-              <svg
-                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
               {t("editor.add_page")}
             </button>
 
             {/* Change Theme Button for Desktop */}
             <button
               onClick={() => setIsThemeDialogOpen(true)}
-              className="inline-flex items-center px-4 py-2 border border-purple-300 text-sm font-medium rounded-md text-purple-700 bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 hover:border-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
+              className="inline-flex items-center whitespace-nowrap px-1.5 py-1 xl:px-3 xl:py-1.5 border border-purple-300 text-sm xl:text-sm font-medium rounded-md text-purple-700 bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 hover:border-purple-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
-              <svg
-                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                />
-              </svg>
               {locale === "ar"
                 ? "تغيير ثيم الموقع بالكامل"
                 : "Change Site Theme"}
@@ -2583,42 +2544,16 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               href={getTenantUrl(currentPath)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
+              className="inline-flex items-center whitespace-nowrap px-1.5 py-1 xl:px-3 xl:py-1.5 border border-gray-300 text-sm xl:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
-              <svg
-                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
               {t("editor.preview")}
             </Link>
             <Link
               href={getTenantUrl("/")}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
+              className="inline-flex items-center whitespace-nowrap px-1.5 py-1 xl:px-3 xl:py-1.5 border border-gray-300 text-sm xl:text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-2000 hover:scale-[calc(1.02)]"
             >
-              <svg
-                className="w-4 h-4 ltr:mr-2 rtl:ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
               {t("editor.live_preview")}
             </Link>
 
@@ -2627,30 +2562,17 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
           </div>
 
             {/* Mobile/Tablet Actions Dropdown - Visible on screens <= 1400px */}
-            <div className="xl:hidden flex items-center space-x-2 rtl:space-x-reverse">
+            <div className="xl:hidden flex items-center space-x-1 rtl:space-x-reverse">
             {/* Save Button - Outside dropdown */}
             <div className="relative">
               <button
                 onClick={requestSave}
-                className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
+                className={`inline-flex items-center whitespace-nowrap px-1.5 py-1 md:px-2 md:py-1.5 border border-transparent text-sm md:text-xs font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-2000 focus:ring-blue-500 ${
                   showArrowTooltip
                     ? "bg-red-500 hover:bg-red-900 animate-pulse shadow-lg shadow-red-500/50"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                  />
-                </svg>
                 {t("editor.save_changes")}
               </button>
             </div>
@@ -2689,21 +2611,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                       setIsAddPageDialogOpen(true);
                       setIsDropdownOpen(false);
                     }}
-                    className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                    className="w-full flex items-center whitespace-nowrap px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
-                    <svg
-                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
                     {t("editor.add_page")}
                   </button>
 
@@ -2713,21 +2622,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                       setIsThemeDialogOpen(true);
                       setIsDropdownOpen(false);
                     }}
-                    className="w-full flex items-center px-4 py-3 text-sm text-purple-700 hover:bg-purple-50 transition-colors duration-200"
+                    className="w-full flex items-center whitespace-nowrap px-3 py-2 text-sm text-purple-700 hover:bg-purple-50 transition-colors duration-200"
                   >
-                    <svg
-                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                      />
-                    </svg>
                     {locale === "ar"
                       ? "تغيير ثيم الموقع بالكامل"
                       : "Change Site Theme"}
@@ -2742,21 +2638,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                    className="w-full flex items-center whitespace-nowrap px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
-                    <svg
-                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
                     {t("editor.preview")}
                   </Link>
 
@@ -2766,21 +2649,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                    className="w-full flex items-center whitespace-nowrap px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   >
-                    <svg
-                      className="w-4 h-4 ltr:mr-3 rtl:ml-3"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
                     {t("editor.live_preview")}
                   </Link>
                 </div>
@@ -2819,7 +2689,7 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
 
             {/* Title - Centered */}
             <div className="flex-1 flex justify-center items-center pb-2 relative">
-              <h1 className="text-lg font-bold text-gray-900">
+              <h1 className="text-sm font-bold text-gray-900">
                 {t("editor.title")}
               </h1>
               <span className="ml-2 text-sm text-gray-500">({tenantId})</span>
@@ -2960,30 +2830,17 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
               {/* Save Button */}
               <div className="relative">
                 <button
                   onClick={requestSave}
-                  className={`inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-1000 focus:ring-blue-500 ${
+                  className={`inline-flex items-center whitespace-nowrap px-1.5 py-0.5 border border-transparent text-sm font-medium rounded-md text-white hover:scale-[calc(1.05)] focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-1000 focus:ring-blue-500 ${
                     showArrowTooltip
                       ? "bg-red-700 hover:bg-red-700 animate-pulse shadow-lg shadow-red-500/50"
                       : "bg-blue-600 hover:bg-blue-700"
                   }`}
                 >
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                    />
-                  </svg>
                   <span className="inline">{t("editor.save_changes")}</span>
                 </button>
               </div>
@@ -3049,21 +2906,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setIsDropdownOpen(false)}
-                      className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                      className="w-full flex items-center whitespace-nowrap px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <svg
-                        className="w-4 h-4 mr-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
                       {t("editor.preview")}
                     </Link>
 
@@ -3073,21 +2917,8 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setIsDropdownOpen(false)}
-                      className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                      className="w-full flex items-center whitespace-nowrap px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <svg
-                        className="w-4 h-4 mr-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
                       {t("editor.live_preview")}
                     </Link>
                   </div>
