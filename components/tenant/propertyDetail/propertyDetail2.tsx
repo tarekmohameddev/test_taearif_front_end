@@ -906,7 +906,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                   {mergedData.content?.specsTitle || "مواصفات العقار"}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">
-                  {property.bedrooms > 0 && (
+                  {property.bedrooms > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -932,8 +932,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرف النوم: {property.bedrooms}
                       </span>
                     </div>
-                  )}
-                  {property.bathrooms && property.bathrooms > 0 && (
+                  ) : null}
+                  {property.bathrooms && property.bathrooms > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -959,8 +959,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الحمامات: {property.bathrooms}
                       </span>
                     </div>
-                  )}
-                  {property.area && parseFloat(property.area) > 0 && (
+                  ) : null}
+                  {property.area && parseFloat(property.area) > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -986,8 +986,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         المساحة: {property.area} م²
                       </span>
                     </div>
-                  )}
-                  {property.private_parking && property.private_parking > 0 && (
+                  ) : null}
+                  {property.private_parking && property.private_parking > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1013,8 +1013,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         موقف سيارات: {property.private_parking}
                       </span>
                     </div>
-                  )}
-                  {property.building_age && (
+                  ) : null}
+                  {property.building_age ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1043,8 +1043,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           : `${property.building_age} سنة`}
                       </span>
                     </div>
-                  )}
-                  {property.swimming_pool && property.swimming_pool > 0 && (
+                  ) : null}
+                  {property.swimming_pool && property.swimming_pool > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1070,8 +1070,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         مسبح خاص
                       </span>
                     </div>
-                  )}
-                  {property.maid_room && property.maid_room > 0 && (
+                  ) : null}
+                  {property.maid_room && property.maid_room > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1097,7 +1097,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرفة خادمة
                       </span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </section>
             )}
