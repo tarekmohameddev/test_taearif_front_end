@@ -1,0 +1,112 @@
+# Replace && Conditional Rendering with Ternary Operator
+
+## Task
+Replace all instances of conditional rendering using the logical AND operator (`&&`) with the ternary operator (`condition ? element : null`) throughout the entire file.
+
+## Pattern to Find
+```jsx
+{condition && (
+  <element>...</element>
+)}
+```
+
+or
+
+```jsx
+{condition && element}
+```
+
+## Pattern to Replace With
+```jsx
+{condition ? (
+  <element>...</element>
+) : null}
+```
+
+or
+
+```jsx
+{condition ? element : null}
+```
+
+## Rules
+1. **Find ALL instances** of `{condition && (...)` or `{condition && element}` in JSX/TSX code
+2. Replace them with `{condition ? (...) : null}` or `{condition ? element : null}` respectively
+3. **Preserve all whitespace and formatting** exactly as it appears
+4. **Preserve all conditions** - do not simplify or modify the condition logic
+5. **Preserve all JSX elements** - do not modify any element structure, props, or content
+6. Replace ALL occurrences in the file, not just the first one
+7. Handle both single-line and multi-line cases
+8. Handle nested conditions carefully - only replace the outermost pattern
+9. Do NOT replace `&&` operators that are part of the condition itself (e.g., `{a && b && c > 0 ? ...}` should become `{a && b && c > 0 ? ... : null}`)
+10. For conditions with multiple `&&` checks, convert the entire condition: `{a && b && c && (...)}` becomes `{a && b && c ? (...) : null}`
+
+## Examples
+
+### Example 1: Simple condition
+**Before:**
+```jsx
+{property.bedrooms > 0 && (
+  <div>Bedrooms: {property.bedrooms}</div>
+)}
+```
+
+**After:**
+```jsx
+{property.bedrooms > 0 ? (
+  <div>Bedrooms: {property.bedrooms}</div>
+) : null}
+```
+
+### Example 2: Multiple AND conditions
+**Before:**
+```jsx
+{property.bathrooms && property.bathrooms > 0 && (
+  <div>Bathrooms: {property.bathrooms}</div>
+)}
+```
+
+**After:**
+```jsx
+{property.bathrooms && property.bathrooms > 0 ? (
+  <div>Bathrooms: {property.bathrooms}</div>
+) : null}
+```
+
+### Example 3: Single-line rendering
+**Before:**
+```jsx
+{user && <span>{user.name}</span>}
+```
+
+**After:**
+```jsx
+{user ? <span>{user.name}</span> : null}
+```
+
+### Example 4: Inline element
+**Before:**
+```jsx
+<div>{isVisible && <span>Visible</span>}</div>
+```
+
+**After:**
+```jsx
+<div>{isVisible ? <span>Visible</span> : null}</div>
+```
+
+## Important Notes
+- This change is important for React/JSX best practices as it explicitly handles the false case
+- The `&&` operator can sometimes render `0` or empty strings when the condition is falsy, which ternary with `null` avoids
+- Always use `null` (not `undefined` or empty string `""`) in the false branch of the ternary
+- Maintain proper indentation and code formatting
+- Do not modify any other code patterns or logic
+
+## Execution
+When processing a file:
+1. Search for all patterns matching `{.* && \(` or `{.* && <` or `{.* && [A-Z]`
+2. Identify the full condition and element
+3. Replace with ternary operator format
+4. Verify no syntax errors are introduced
+5. Ensure all instances are replaced consistently
+
