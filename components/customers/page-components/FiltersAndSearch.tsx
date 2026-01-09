@@ -214,7 +214,7 @@ export const FiltersAndSearch = ({
       if (currentState.filterEmployee !== "all") {
         params.append("responsible_employee_id", currentState.filterEmployee);
       }
-      if (currentState.filterEmployeePhone.trim()) {
+      if (currentState.filterEmployeePhone.trim() && currentState.filterEmployeePhone.trim() !== "all") {
         params.append("phone_number", currentState.filterEmployeePhone.trim());
       }
       if (currentState.dateRange.from) {
