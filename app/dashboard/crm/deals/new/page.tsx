@@ -83,7 +83,7 @@ interface Customer {
 export default function CreateDealPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const { pipelineStages, getStageById, setPipelineStages } = useCrmStore();
   const [activeTab, setActiveTab] = useState("crm");
 
@@ -110,9 +110,12 @@ export default function CreateDealPage() {
 
   // Fetch customers from /customers endpoint
   useEffect(() => {
-    const fetchCustomers = async () => {
-      if (!userData?.token) return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
+    const fetchCustomers = async () => {
       setLoadingCustomers(true);
       try {
         const response = await axiosInstance.get("/customers");
@@ -128,7 +131,7 @@ export default function CreateDealPage() {
     };
 
     fetchCustomers();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   // Auto-select customer from URL query parameter
   useEffect(() => {
@@ -146,6 +149,11 @@ export default function CreateDealPage() {
 
   // Fetch pipeline stages
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const fetchStages = async () => {
       if (pipelineStages.length === 0) {
         try {
@@ -168,13 +176,16 @@ export default function CreateDealPage() {
       }
     };
     fetchStages();
-  }, [pipelineStages.length, setPipelineStages]);
+  }, [pipelineStages.length, setPipelineStages, userData?.token, authLoading]);
 
   // Fetch projects and properties for cards
   useEffect(() => {
-    const fetchData = async () => {
-      if (!userData?.token) return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
+    const fetchData = async () => {
       try {
         const [projectsRes, propertiesRes] = await Promise.all([
           axiosInstance.get("/projects"),
@@ -199,7 +210,7 @@ export default function CreateDealPage() {
     };
 
     fetchData();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "غير محدد";
@@ -251,6 +262,12 @@ export default function CreateDealPage() {
   const handleSubmit = async () => {
     if (!selectedCustomerId || !stageId) {
       toast.error("يرجى اختيار العميل والمرحلة");
+      return;
+    }
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
       return;
     }
 

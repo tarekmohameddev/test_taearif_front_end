@@ -116,7 +116,7 @@ export default function EditPropertyRequestPage() {
   const params = useParams();
   const router = useRouter();
   const propertyRequestId = params?.id as string;
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   const [propertyRequest, setPropertyRequest] = useState<PropertyRequest | null>(
     null,
@@ -139,9 +139,9 @@ export default function EditPropertyRequestPage() {
 
   // دالة لجلب تفاصيل طلب العقار
   const fetchPropertyRequestDetails = async (id: string) => {
-    if (!userData?.token) {
-      setError("يجب تسجيل الدخول أولاً");
-      return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
     }
 
     setLoadingDetails(true);
@@ -188,16 +188,24 @@ export default function EditPropertyRequestPage() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     if (propertyRequestId) {
       fetchPropertyRequestDetails(propertyRequestId);
     }
-  }, [propertyRequestId, userData?.token]);
+  }, [propertyRequestId, userData?.token, authLoading]);
 
   // Fetch available properties for selection
   useEffect(() => {
-    const fetchAvailableProperties = async () => {
-      if (!userData?.token) return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
+    const fetchAvailableProperties = async () => {
       setLoadingProperties(true);
       try {
         const response = await axiosInstance.get("/properties?page=1&per_page=100");
@@ -214,7 +222,7 @@ export default function EditPropertyRequestPage() {
     };
 
     fetchAvailableProperties();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   // دالة معالجة التغييرات في النموذج
   const handleChange = (field: keyof PropertyRequestFormData, value: any) => {
@@ -287,6 +295,12 @@ export default function EditPropertyRequestPage() {
         duration: 4000,
         position: "top-center",
       });
+      return;
+    }
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
       return;
     }
 

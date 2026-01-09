@@ -55,7 +55,7 @@ export default function PropertyRequestDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const propertyRequestId = params?.id as string;
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   const [propertyRequest, setPropertyRequest] = useState<PropertyRequest | null>(
     null,
@@ -65,9 +65,9 @@ export default function PropertyRequestDetailsPage() {
 
   // دالة لجلب تفاصيل طلب العقار
   const fetchPropertyRequestDetails = async (id: string) => {
-    if (!userData?.token) {
-      setError("يجب تسجيل الدخول أولاً");
-      return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
     }
 
     setLoadingDetails(true);
@@ -93,10 +93,15 @@ export default function PropertyRequestDetailsPage() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     if (propertyRequestId) {
       fetchPropertyRequestDetails(propertyRequestId);
     }
-  }, [propertyRequestId, userData?.token]);
+  }, [propertyRequestId, userData?.token, authLoading]);
 
   const openWhatsApp = (raw: string) => {
     const phone = raw.replace(/\D/g, ""); // remove non-digits

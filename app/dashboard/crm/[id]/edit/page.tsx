@@ -94,7 +94,7 @@ export default function EditDealPage() {
   const params = useParams();
   const router = useRouter();
   const dealId = params?.id as string;
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const { pipelineStages, getStageById, setPipelineStages } = useCrmStore();
   const [activeTab, setActiveTab] = useState("crm");
 
@@ -183,8 +183,13 @@ export default function EditDealPage() {
 
   // Fetch deal details
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const fetchDealDetails = async () => {
-      if (!dealId || !userData?.token) return;
+      if (!dealId) return;
 
       setLoadingDeal(true);
       setError(null);
@@ -276,7 +281,7 @@ export default function EditDealPage() {
     };
 
     fetchDealDetails();
-  }, [dealId, userData?.token]);
+  }, [dealId, userData?.token, authLoading]);
 
   // Update selectedCustomer when customers are loaded and customerId is set
   useEffect(() => {
@@ -293,9 +298,12 @@ export default function EditDealPage() {
 
   // Fetch customers from /customers endpoint
   useEffect(() => {
-    const fetchCustomers = async () => {
-      if (!userData?.token) return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
+    const fetchCustomers = async () => {
       setLoadingCustomers(true);
       try {
         const response = await axiosInstance.get("/customers");
@@ -311,10 +319,15 @@ export default function EditDealPage() {
     };
 
     fetchCustomers();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   // Fetch pipeline stages
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const fetchStages = async () => {
       if (pipelineStages.length === 0) {
         try {
@@ -337,7 +350,7 @@ export default function EditDealPage() {
       }
     };
     fetchStages();
-  }, [pipelineStages.length, setPipelineStages]);
+  }, [pipelineStages.length, setPipelineStages, userData?.token, authLoading]);
 
   // Fetch available properties for selection
   useEffect(() => {
@@ -359,7 +372,7 @@ export default function EditDealPage() {
     };
 
     fetchAvailableProperties();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   // Fetch cards, projects and properties
   useEffect(() => {
@@ -424,7 +437,7 @@ export default function EditDealPage() {
     if (dealId) {
       fetchData();
     }
-  }, [dealId, userData?.token]);
+  }, [dealId, userData?.token, authLoading]);
 
   // Auto-apply cached stage when note is added
   useEffect(() => {
@@ -441,6 +454,12 @@ export default function EditDealPage() {
   // Handle add card
   const handleAddCard = async (cardData: any) => {
     if (!dealId) return;
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
+      return;
+    }
 
     setIsLoadingCards(true);
     try {
@@ -583,6 +602,12 @@ export default function EditDealPage() {
   const handleSubmit = async () => {
     if (!selectedCustomerId || !stageId) {
       toast.error("يرجى اختيار العميل والمرحلة");
+      return;
+    }
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
       return;
     }
 

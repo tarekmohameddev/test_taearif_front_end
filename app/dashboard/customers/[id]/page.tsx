@@ -19,11 +19,13 @@ import axiosInstance from "@/lib/axiosInstance";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import useAuthStore from "@/context/AuthContext";
 
 export default function CustomerDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const customerId = params?.id as string;
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   const [customerDetails, setCustomerDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -31,6 +33,11 @@ export default function CustomerDetailsPage() {
 
   // دالة لجلب تفاصيل العميل مع الاستفسارات
   const fetchCustomerDetails = async (customerId: string) => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setLoadingDetails(true);
     setError(null);
     try {
@@ -53,10 +60,15 @@ export default function CustomerDetailsPage() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     if (customerId) {
       fetchCustomerDetails(customerId);
     }
-  }, [customerId]);
+  }, [customerId, userData?.token, authLoading]);
 
   return (
     <div className="flex h-screen overflow-hidden">

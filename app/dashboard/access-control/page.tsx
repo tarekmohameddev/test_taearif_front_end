@@ -65,6 +65,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { useUserStore } from "@/store/userStore";
+import useAuthStore from "@/context/AuthContext";
 import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
 // Types
@@ -266,6 +267,7 @@ interface UpdateEmployeeRequest {
 export default function AccessControlPage() {
   const router = useRouter();
   const userData = useUserStore((state) => state.userData);
+  const { userData: authUserData, IsLoading: authLoading } = useAuthStore();
   const employeesData = userData?.employees;
   
   const [activeTab, setActiveTab] = useState("employees");
@@ -505,6 +507,11 @@ export default function AccessControlPage() {
 
   // Fetch employees data
   const fetchEmployees = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -521,6 +528,11 @@ export default function AccessControlPage() {
 
   // Fetch employee details
   const fetchEmployeeDetails = async (employeeId: number) => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setDetailsLoading(true);
     try {
       const response = await axiosInstance.get<EmployeeDetailsResponse>(
@@ -537,6 +549,11 @@ export default function AccessControlPage() {
 
   // Fetch available permissions for translation
   const fetchAvailablePermissions = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     try {
       const response = await axiosInstance.get(
         "/v1/employees/available-permissions",
@@ -581,10 +598,13 @@ export default function AccessControlPage() {
             console.log(
               "⚠️ Data is array of strings, fetching full permissions...",
             );
-            const fullResponse = await axiosInstance.get("/v1/permissions");
-            if (fullResponse.data.status && fullResponse.data.data) {
-              setAvailablePermissions(fullResponse.data.data);
-              console.log("✅ Full Permissions Set:", fullResponse.data.data);
+            // Wait until token is fetched before making nested request
+            if (!authLoading && authUserData?.token) {
+              const fullResponse = await axiosInstance.get("/v1/permissions");
+              if (fullResponse.data.status && fullResponse.data.data) {
+                setAvailablePermissions(fullResponse.data.data);
+                console.log("✅ Full Permissions Set:", fullResponse.data.data);
+              }
             }
           }
         }
@@ -596,6 +616,11 @@ export default function AccessControlPage() {
 
   // Fetch roles data
   const fetchRoles = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     console.log("🔍 Fetching roles from /v1/employees/available-roles");
     setRolesLoading(true);
     try {
@@ -633,6 +658,11 @@ export default function AccessControlPage() {
 
   // Fetch permissions for permissions tab
   const fetchPermissionsForTab = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setPermissionsTabLoading(true);
     setPermissionsTabError(null);
     try {
@@ -649,6 +679,11 @@ export default function AccessControlPage() {
 
   // Fetch roles for roles tab
   const fetchRolesForTab = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setRolesTabLoading(true);
     setRolesTabError(null);
     try {
@@ -664,6 +699,11 @@ export default function AccessControlPage() {
 
   // Fetch role details
   const fetchRoleDetails = async (roleId: number) => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setRoleDetailsLoading(true);
     setRoleDetailsError(null);
     try {
@@ -682,6 +722,11 @@ export default function AccessControlPage() {
 
   // Fetch available permissions for role creation
   const fetchAvailablePermissionsForRole = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setPermissionsForRoleLoading(true);
     try {
       const response = await axiosInstance.get("/v1/permissions");
@@ -699,6 +744,11 @@ export default function AccessControlPage() {
 
   // Create new employee
   const createEmployee = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setCreateLoading(true);
     setCreateError(null);
 
@@ -754,6 +804,11 @@ export default function AccessControlPage() {
   // Update employee
   const updateEmployee = async () => {
     if (!editingEmployee) return;
+
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
 
     setEditLoading(true);
     setEditError(null);
@@ -851,6 +906,11 @@ export default function AccessControlPage() {
 
   // Handle edit role
   const handleEditRole = async (role: Role) => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setEditingRole(role);
     setEditRoleFormData({
       name: role.name,
@@ -923,6 +983,11 @@ export default function AccessControlPage() {
 
   // Create new role
   const createRole = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setCreateRoleLoading(true);
     setCreateRoleError(null);
 
@@ -1053,6 +1118,11 @@ export default function AccessControlPage() {
   const updateRole = async () => {
     if (!editingRole) return;
 
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setEditRoleLoading(true);
     setEditRoleError(null);
 
@@ -1097,6 +1167,11 @@ export default function AccessControlPage() {
   const deleteRole = async () => {
     if (!roleToDelete) return;
 
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setDeleteRoleLoading(true);
     setDeleteRoleError(null);
 
@@ -1125,6 +1200,11 @@ export default function AccessControlPage() {
   // Delete permission
   const deletePermission = async () => {
     if (!permissionToDelete) return;
+
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
 
     setDeletePermissionLoading(true);
     setDeletePermissionError(null);
@@ -1156,6 +1236,11 @@ export default function AccessControlPage() {
   // Delete employee
   const deleteEmployee = async () => {
     if (!employeeToDelete) return;
+
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
 
     setDeleteEmployeeLoading(true);
     setDeleteEmployeeError(null);
@@ -1189,6 +1274,11 @@ export default function AccessControlPage() {
     e.preventDefault();
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
+    
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
     
     setIsPurchasingAddon(true);
     setError(null);
@@ -1354,6 +1444,11 @@ export default function AccessControlPage() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     fetchEmployees();
     fetchAvailablePermissions();
     // Fetch user data if not already loaded
@@ -1361,7 +1456,7 @@ export default function AccessControlPage() {
     if (!userStore.userData || !userStore.userData.employees) {
       userStore.fetchUserData();
     }
-  }, []);
+  }, [authUserData?.token, authLoading]);
 
   // Monitor availablePermissions changes
   useEffect(() => {
@@ -1385,6 +1480,11 @@ export default function AccessControlPage() {
 
   // Fetch permissions for create dialog
   const fetchPermissions = async () => {
+    // Wait until token is fetched
+    if (authLoading || !authUserData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setPermissionsLoading(true);
     try {
       const response =
