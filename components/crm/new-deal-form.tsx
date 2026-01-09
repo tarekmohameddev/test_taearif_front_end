@@ -198,9 +198,12 @@ export default function NewDealForm() {
 
   // Fetch properties from /properties endpoint
   useEffect(() => {
-    const fetchProperties = async () => {
-      if (!userData?.token) return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
+    const fetchProperties = async () => {
       setLoadingProperties(true);
       try {
         const response = await axiosInstance.get("/properties?page=1&per_page=100");
@@ -219,15 +222,16 @@ export default function NewDealForm() {
     if (propertyMode === "existing") {
       fetchProperties();
     }
-  }, [userData?.token, propertyMode]);
+  }, [userData?.token, authLoading, propertyMode]);
 
   // Fetch categories, projects, buildings
   useEffect(() => {
-    const fetchData = async () => {
-      if (!userData?.token) {
-        return;
-      }
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
+    const fetchData = async () => {
       // Fetch categories
       try {
         const categoriesRes = await axiosInstance.get("/properties/categories");
@@ -278,7 +282,7 @@ export default function NewDealForm() {
     };
 
     fetchData();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -606,8 +610,9 @@ export default function NewDealForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!userData?.token) {
-      toast.error("يجب تسجيل الدخول أولاً");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
       return;
     }
 
