@@ -50,7 +50,7 @@ import SetupProgressCard from "@/components/homepage/SetupProgressCard";
 import useAuthStore from "@/context/AuthContext";
 
 export function WelcomeDashboard() {
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const {
     homepage: {
       dashboardDevice,
@@ -68,7 +68,11 @@ export function WelcomeDashboard() {
 
   // جلب البيانات إذا لم تكن قد تم جلبها بعد
   useEffect(() => {
-    if (!userData?.token) return;
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     if (!isDashboardDeviceUpdated) {
       fetchDashboardDevice();
     }
@@ -80,6 +84,7 @@ export function WelcomeDashboard() {
     }
   }, [
     userData?.token,
+    authLoading,
     isDashboardDeviceUpdated,
     isDashboardSummaryUpdated,
     isTrafficSourcesUpdated,

@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 export default (set) => ({
   dashboardDevice: [],
@@ -13,6 +14,12 @@ export default (set) => ({
     })),
 
   fetchDashboardDevice: async () => {
+    // Wait until token is fetched
+    const { userData, IsLoading: authLoading } = useAuthStore.getState();
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     set({ loading: true });
     try {
       const response = await axiosInstance.get(

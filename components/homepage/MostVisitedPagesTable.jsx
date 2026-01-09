@@ -23,15 +23,14 @@ export function MostVisitedPagesTable() {
   const [pagesData, setPagesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   // دالة جلب البيانات من API
   const fetchMostVisitedPages = async () => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchMostVisitedPages");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
       setLoading(false);
-      return;
+      return; // Exit early if token is not ready
     }
 
     try {
@@ -50,19 +49,20 @@ export function MostVisitedPagesTable() {
   };
 
   useEffect(() => {
-    // إعادة المحاولة عند تغيير التوكن
-    if (userData?.token) {
-      fetchMostVisitedPages();
-    } else {
-      // إعادة تعيين البيانات عند فقدان التوكن
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      // إعادة تعيين البيانات عند عدم وجود token
       setPagesData([]);
       setError(null);
       setLoading(false);
+      return; // Exit early if token is not ready
     }
-  }, [userData?.token]);
 
-  // إذا لم يكن هناك token، لا نعرض المحتوى
-  if (!userData?.token) {
+    fetchMostVisitedPages();
+  }, [userData?.token, authLoading]);
+
+  // إذا لم يكن هناك token أو كان التحميل جارياً، لا نعرض المحتوى
+  if (authLoading || !userData?.token) {
     return (
       <Card className="w-full">
         <CardHeader className="px-3 sm:px-4 md:px-6">

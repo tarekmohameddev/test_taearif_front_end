@@ -35,17 +35,21 @@ export function RecentActivity() {
     fetchRecentActivityData,
     loading,
   } = useStore();
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (userData?.token && !isRecentActivityUpdated) {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
+    if (!isRecentActivityUpdated) {
       fetchRecentActivityData();
     }
-  }, [userData?.token, isRecentActivityUpdated, fetchRecentActivityData]);
+  }, [userData?.token, authLoading, isRecentActivityUpdated, fetchRecentActivityData]);
 
-  // إذا لم يكن هناك token، لا نعرض المحتوى
-  if (!userData?.token) {
+  // إذا لم يكن هناك token أو كان التحميل جارياً، لا نعرض المحتوى
+  if (authLoading || !userData?.token) {
     return (
       <Card>
         <CardHeader>

@@ -24,17 +24,21 @@ export function SetupProgressCard() {
     },
     loading,
   } = useStore();
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (userData?.token && !isSetupProgressDataUpdated) {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
+    if (!isSetupProgressDataUpdated) {
       fetchSetupProgressData();
     }
-  }, [userData?.token, isSetupProgressDataUpdated, fetchSetupProgressData]);
+  }, [userData?.token, authLoading, isSetupProgressDataUpdated, fetchSetupProgressData]);
 
-  // إذا لم يكن هناك token، لا نعرض المحتوى
-  if (!userData?.token) {
+  // إذا لم يكن هناك token أو كان التحميل جارياً، لا نعرض المحتوى
+  if (authLoading || !userData?.token) {
     return (
       <Card className="col-span-3">
         <CardHeader>

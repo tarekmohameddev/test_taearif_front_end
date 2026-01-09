@@ -24,29 +24,31 @@ function VisitorChart() {
     },
     loading,
   } = useStore();
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (userData?.token) {
-      const dataForSelectedRange = visitorData[selectedTimeRange];
-      if (!dataForSelectedRange || !dataForSelectedRange.fetched) {
-        fetchVisitorData(selectedTimeRange);
-      }
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
     }
-  }, [userData?.token, selectedTimeRange, visitorData, fetchVisitorData]);
+
+    const dataForSelectedRange = visitorData[selectedTimeRange];
+    if (!dataForSelectedRange || !dataForSelectedRange.fetched) {
+      fetchVisitorData(selectedTimeRange);
+    }
+  }, [userData?.token, authLoading, selectedTimeRange, visitorData, fetchVisitorData]);
 
   const chartData = visitorData[selectedTimeRange]?.data || [];
   const totalVisits = visitorData[selectedTimeRange]?.totalVisits || 0;
   const totalUniqueVisitors =
     visitorData[selectedTimeRange]?.totalUniqueVisitors || 0;
 
-  // إذا لم يكن هناك token، لا نعرض المحتوى
-  if (!userData?.token) {
+  // إذا لم يكن هناك token أو كان التحميل جارياً، لا نعرض المحتوى
+  if (authLoading || !userData?.token) {
     return (
       <div className="w-full">
         <div className="text-center text-gray-500 py-8">
-          يرجى تسجيل الدخول لعرض البيانات
+          {authLoading ? "جاري التحميل..." : "يرجى تسجيل الدخول لعرض البيانات"}
         </div>
       </div>
     );

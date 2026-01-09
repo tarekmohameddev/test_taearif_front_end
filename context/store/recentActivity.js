@@ -9,10 +9,10 @@ export default (set) => ({
     set({ recentActivityData: data, isRecentActivityUpdated: true }),
 
   fetchRecentActivityData: async () => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    const token = useAuthStore.getState().userData?.token;
-    if (!token) {
-      return;
+    // Wait until token is fetched
+    const { userData, IsLoading: authLoading } = useAuthStore.getState();
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
     }
 
     set({ loading: true });
