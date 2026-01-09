@@ -54,14 +54,17 @@ export function EnhancedSidebar({
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, loading, error } = sidebarData;
 
-  const { userData } = useAuthStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (userData?.token) {
-      fetchSideMenus();
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
     }
-  }, [fetchSideMenus, userData?.token]);
+
+    // التحقق من وجود التوكن قبل إجراء الطلب
+    fetchSideMenus();
+  }, [fetchSideMenus, userData?.token, authLoading]);
 
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
