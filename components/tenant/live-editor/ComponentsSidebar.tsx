@@ -8,6 +8,7 @@ import {
 } from "@/components/tenant/live-editor/EditorSidebar/constants";
 import { DraggableDrawerItem } from "@/services/live-editor/dragDrop";
 import { getComponents } from "@/lib/ComponentsList";
+import themesComponentsList from "@/lib/themes/themesComponentsList.json";
 
 // Animation variants
 const collapseVariants = {
@@ -53,11 +54,20 @@ const listItem = {
   show: { y: 0, opacity: 1, transition: { duration: 0.18 } },
 };
 
+type ThemeTab = "theme1" | "theme2";
+
+// دالة لاستخراج baseName من componentName
+const getBaseComponentName = (componentName: string): string => {
+  // إزالة الأرقام من النهاية
+  return componentName.replace(/\d+$/, "");
+};
+
 export const ComponentsSidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] =
     useState(true);
+  const [activeTab, setActiveTab] = useState<ThemeTab>("theme1");
   const t = useEditorT();
 
   // الحصول على الأقسام المترجمة
@@ -76,31 +86,42 @@ export const ComponentsSidebar = () => {
     [availableSections, searchTerm],
   );
 
-  // تصفية المكونات للعرض فقط (إزالة header و footer و inputs2 والمكونات الاساسية)
-  const displaySections = useMemo(
-    () =>
-      filteredSections.filter(
-        (section) =>
-          section.type !== "header" &&
-          section.type !== "footer" &&
-          section.type !== "inputs2" &&
-          section.type !== "responsiveImage" &&
-          section.type !== "title" &&
-          section.type !== "video" &&
-          section.type !== "photosGrid" &&
-          section.section !== "header" &&
-          section.section !== "footer" &&
-          section.section !== "inputs2" &&
-          !section.component?.toLowerCase().includes("header") &&
-          !section.component?.toLowerCase().includes("footer") &&
-          !section.component?.toLowerCase().includes("inputs2") &&
-          !section.component?.toLowerCase().includes("responsiveimage") &&
-          !section.component?.toLowerCase().includes("title") &&
-          !section.component?.toLowerCase().includes("video") &&
-          !section.component?.toLowerCase().includes("photosgrid"),
-      ),
-    [filteredSections],
-  );
+  // تصفية المكونات حسب theme المختار
+  const displaySections = useMemo(() => {
+    // الحصول على قائمة componentNames من theme المختار
+    const themeComponentNames =
+      (themesComponentsList[activeTab] as string[]) || [];
+    const themeBaseNames = new Set(
+      themeComponentNames.map(getBaseComponentName),
+    );
+
+    return filteredSections.filter((section) => {
+      // التصفية الحالية (إزالة header و footer و inputs2 والمكونات الاساسية)
+      const passesCurrentFilter =
+        section.type !== "header" &&
+        section.type !== "footer" &&
+        section.type !== "inputs2" &&
+        section.type !== "responsiveImage" &&
+        section.type !== "title" &&
+        section.type !== "video" &&
+        section.type !== "photosGrid" &&
+        section.section !== "header" &&
+        section.section !== "footer" &&
+        section.section !== "inputs2" &&
+        !section.component?.toLowerCase().includes("header") &&
+        !section.component?.toLowerCase().includes("footer") &&
+        !section.component?.toLowerCase().includes("inputs2") &&
+        !section.component?.toLowerCase().includes("responsiveimage") &&
+        !section.component?.toLowerCase().includes("title") &&
+        !section.component?.toLowerCase().includes("video") &&
+        !section.component?.toLowerCase().includes("photosgrid");
+
+      // التصفية حسب theme
+      const isInTheme = themeBaseNames.has(section.component);
+
+      return passesCurrentFilter && isInTheme;
+    });
+  }, [activeTab, filteredSections]);
 
   // الحصول على معلومات المكونات الاساسية
   const basicComponentsInfo = useMemo(() => {
@@ -185,6 +206,44 @@ export const ComponentsSidebar = () => {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Theme Tabs */}
+        <AnimatePresence initial={false}>
+          {isExpanded && (
+            <motion.div
+              key="tabs"
+              variants={collapseVariants}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              className="mt-3"
+              layout
+            >
+              <div className="flex border-b border-gray-200">
+                <button
+                  onClick={() => setActiveTab("theme1")}
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                    activeTab === "theme1"
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  الثيم 1
+                </button>
+                <button
+                  onClick={() => setActiveTab("theme2")}
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                    activeTab === "theme2"
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  الثيم 2
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
