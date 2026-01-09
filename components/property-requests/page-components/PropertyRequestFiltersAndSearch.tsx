@@ -7,7 +7,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, RefreshCw, X, FilterX, RotateCcw } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Search, RefreshCw, X, FilterX, RotateCcw, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
+import type { DateRange } from "react-day-picker";
 
 interface FilterCity {
   id: number;
@@ -42,6 +51,14 @@ interface FilterStatus {
   name_en: string;
 }
 
+interface FilterType {
+  id: number;
+  name: string;
+  value: string;
+  icon: string;
+  color: string;
+}
+
 interface FiltersData {
   cities: FilterCity[];
   districts: FilterDistrict[];
@@ -51,6 +68,7 @@ interface FiltersData {
   seriousness_options: string[];
   employees?: FilterEmployee[];
   status?: FilterStatus[];
+  types?: FilterType[];
 }
 
 interface PropertyRequestFiltersAndSearchProps {
@@ -74,10 +92,26 @@ interface PropertyRequestFiltersAndSearchProps {
   setEmployeePhone: (value: string) => void;
   statusId: string;
   setStatusId: (value: string) => void;
+  dateRange: DateRange | undefined;
+  setDateRange: (range: DateRange | undefined) => void;
+  typeId: string;
+  setTypeId: (value: string) => void;
   filtersData: FiltersData;
   filteredDistricts: FilterDistrict[];
   onResetFilters: () => void;
 }
+
+// Translation function for property types
+const translateType = (name: string): string => {
+  const translations: { [key: string]: string } = {
+    Rent: "إيجار",
+    Sale: "بيع",
+    Rented: "مؤجر",
+    Sold: "مباع",
+    Both: "كلاهما",
+  };
+  return translations[name] || name;
+};
 
 export const PropertyRequestFiltersAndSearch = ({
   searchTerm,
@@ -100,6 +134,10 @@ export const PropertyRequestFiltersAndSearch = ({
   setEmployeePhone,
   statusId,
   setStatusId,
+  dateRange,
+  setDateRange,
+  typeId,
+  setTypeId,
   filtersData,
   filteredDistricts,
   onResetFilters,
@@ -114,7 +152,9 @@ export const PropertyRequestFiltersAndSearch = ({
     employeeId ||
     employeePhone ||
     statusId ||
-    searchTerm;
+    searchTerm ||
+    dateRange?.from ||
+    typeId;
 
   return (
     <div className="space-y-4">
@@ -162,6 +202,8 @@ export const PropertyRequestFiltersAndSearch = ({
                   employeePhone,
                   statusId,
                   searchTerm,
+                  dateRange?.from,
+                  typeId,
                 ].filter(Boolean).length
               }
             </span>
@@ -349,6 +391,69 @@ export const PropertyRequestFiltersAndSearch = ({
                   {status.name_ar}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {/* Date Range Filter */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-[180px] justify-start text-right font-normal"
+            >
+              <CalendarIcon className="ml-2 h-4 w-4" />
+              {dateRange?.from ? (
+                dateRange.to ? (
+                  <>
+                    {format(dateRange.from, "yyyy-MM-dd", { locale: ar })} -{" "}
+                    {format(dateRange.to, "yyyy-MM-dd", { locale: ar })}
+                  </>
+                ) : (
+                  format(dateRange.from, "yyyy-MM-dd", { locale: ar })
+                )
+              ) : (
+                <span>نطاق التاريخ</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={dateRange?.from}
+              selected={dateRange}
+              onSelect={setDateRange}
+              numberOfMonths={2}
+              locale={ar}
+              toDate={new Date()}
+            />
+          </PopoverContent>
+        </Popover>
+
+        {/* Property Type Filter (Sale/Rent) */}
+        {filtersData.types && filtersData.types.length > 0 && (
+          <Select
+            value={typeId || "all"}
+            onValueChange={(value) => setTypeId(value === "all" ? "" : value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="نوع المعاملة" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع الأنواع</SelectItem>
+              {filtersData.types
+                .filter(
+                  (type) =>
+                    type.value === "Sale" ||
+                    type.value === "Rent" ||
+                    type.value === "بيع"
+                )
+                .map((type) => (
+                  <SelectItem key={type.id} value={type.id.toString()}>
+                    {translateType(type.name)}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         )}

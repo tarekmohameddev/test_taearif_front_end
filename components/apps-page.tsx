@@ -12,6 +12,7 @@ import {
   Edit,
   Plus,
   AlertTriangle,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,9 +58,11 @@ import { Switch } from "@/components/ui/switch";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
 import useStore from "@/context/Store";
+import useAuthStore from "@/context/AuthContext";
 
 interface Pixel {
   id: number;
@@ -83,9 +86,11 @@ interface App {
   featured: boolean;
   installed: boolean;
   isPixelApp?: boolean;
+  path?: string;
 }
 
 export function AppsPage() {
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("apps");
@@ -263,10 +268,20 @@ export function AppsPage() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const fetchApps = async () => {
       try {
+        setLoading(true);
         const res = await axiosInstance.get("/apps");
-        const fetchedApps = res.data.data.apps;
+        const fetchedApps = res.data.data.apps.map((app: any) => ({
+          ...app,
+          icon: app.img || app.icon || "/placeholder.svg",
+          path: app.path || undefined,
+        }));
         const appsWithPixels = addPixelsApp(fetchedApps);
         setApps(appsWithPixels);
 
@@ -284,13 +299,14 @@ export function AppsPage() {
       }
     };
     fetchApps();
-  }, []);
-
-  useEffect(() => {
-    fetchPixels();
-  }, []);
+  }, [userData?.token, authLoading]);
 
   const fetchPixels = async () => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setPixelsLoading(true);
     try {
       const res = await axiosInstance.get("/pixels");
@@ -302,10 +318,24 @@ export function AppsPage() {
     }
   };
 
+  useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+    fetchPixels();
+  }, [userData?.token, authLoading]);
+
   const handleInstall = async (appId: string | number) => {
     // Special handling for pixels app
     if (appId === "pixels-app") {
       setIsPixelDialogOpen(true);
+      return;
+    }
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
       return;
     }
 
@@ -340,6 +370,12 @@ export function AppsPage() {
   };
 
   const handleUninstall = async (appId: string | number) => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
+      return;
+    }
+
     const loadingToast = toast.loading("جاري إزالة التطبيق...");
     try {
       await axiosInstance.post(`/apps/uninstall/${appId}`);
@@ -370,6 +406,12 @@ export function AppsPage() {
 
   // Pixel management functions
   const handleAddPixel = async () => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
+      return;
+    }
+
     if (!validatePixelForm(pixelFormData)) {
       toast.error("يوجد أخطاء في إدخال البيانات. يرجى التأكد من صحة البيانات.");
       return;
@@ -389,6 +431,12 @@ export function AppsPage() {
 
   const handleEditPixel = async () => {
     if (!selectedPixel) return;
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
+      return;
+    }
 
     if (!validatePixelForm(pixelFormData)) {
       toast.error("يوجد أخطاء في إدخال البيانات. يرجى التأكد من صحة البيانات.");
@@ -410,6 +458,12 @@ export function AppsPage() {
 
   const handleDeletePixel = async () => {
     if (!selectedPixel) return;
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
+      return;
+    }
 
     try {
       await axiosInstance.delete(`/pixels/${selectedPixel.id}`);
@@ -1068,6 +1122,7 @@ interface AppProps {
 }
 
 function AppCard({ app, onInstall, onUninstall }: AppProps) {
+  const router = useRouter();
   const isInstalled = app.installed || false;
   const isPixelApp = app.isPixelApp;
 
@@ -1117,9 +1172,21 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
       <CardFooter className="p-4 pt-0 flex gap-2">
         {isInstalled ? (
           <>
-            <Button variant="outline" size="sm" className="w-full">
-              تكوين
-            </Button>
+            {app.path ? (
+              <Button
+                variant="default"
+                size="sm"
+                className="flex-1 gap-1"
+                onClick={() => router.push(app.path!)}
+              >
+                <ExternalLink className="h-4 w-4" />
+                فتح
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" className="flex-1">
+                تكوين
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -1154,6 +1221,7 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
 }
 
 function AppListItem({ app, onInstall, onUninstall }: AppProps) {
+  const router = useRouter();
   const isInstalled = app.installed || false;
   const isPixelApp = app.isPixelApp;
 
@@ -1205,9 +1273,21 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
             <div className="flex gap-2 mt-4 sm:mt-0">
               {isInstalled ? (
                 <>
-                  <Button variant="outline" size="sm">
-                    تكوين
-                  </Button>
+                  {app.path ? (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="gap-1"
+                      onClick={() => router.push(app.path!)}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      فتح
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm">
+                      تكوين
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"

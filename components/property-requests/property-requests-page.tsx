@@ -8,6 +8,9 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { z } from "zod";
 import toast from "react-hot-toast";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
+import type { DateRange } from "react-day-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PropertyRequestsPageHeader } from "./page-components/PropertyRequestsPageHeader";
 import { PropertyRequestStatisticsCards } from "./page-components/PropertyRequestStatisticsCards";
@@ -94,6 +97,14 @@ interface FilterCategory {
   icon: string | null;
 }
 
+interface FilterType {
+  id: number;
+  name: string;
+  value: string;
+  icon: string;
+  color: string;
+}
+
 interface FiltersResponse {
   status: string;
   data: {
@@ -103,6 +114,7 @@ interface FiltersResponse {
     property_types: string[];
     purchase_goals: string[];
     seriousness_options: string[];
+    types?: FilterType[];
   };
 }
 
@@ -127,6 +139,8 @@ export default function PropertyRequestsPage() {
   const [employeeId, setEmployeeId] = useState<string>("");
   const [employeePhone, setEmployeePhone] = useState<string>("");
   const [statusId, setStatusId] = useState<string>("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [typeId, setTypeId] = useState<string>("");
 
   // Filters data
   const [filtersData, setFiltersData] = useState<
@@ -238,6 +252,15 @@ export default function PropertyRequestsPage() {
       if (employeePhone) params.append("employee_phone", employeePhone);
       if (statusId) params.append("status_id", statusId);
       if (searchTerm) params.append("q", searchTerm);
+      if (dateRange?.from) {
+        params.append("created_from", format(dateRange.from, "yyyy-MM-dd"));
+      }
+      if (dateRange?.to) {
+        params.append("created_to", format(dateRange.to, "yyyy-MM-dd"));
+      }
+      if (typeId) {
+        params.append("type_id", typeId);
+      }
       params.append("per_page", perPage.toString());
       params.append("page", currentPage.toString());
 
@@ -267,6 +290,8 @@ export default function PropertyRequestsPage() {
     employeePhone,
     statusId,
     searchTerm,
+    dateRange,
+    typeId,
     currentPage,
     perPage,
   ]);
@@ -328,6 +353,8 @@ export default function PropertyRequestsPage() {
     employeePhone,
     statusId,
     searchTerm,
+    dateRange,
+    typeId,
   ]);
 
   const handleNewPropertyRequestChange =
@@ -756,6 +783,10 @@ export default function PropertyRequestsPage() {
                 setStatusId={setStatusId}
                 filtersData={filtersData}
                 filteredDistricts={filteredDistricts}
+                dateRange={dateRange}
+                setDateRange={setDateRange}
+                typeId={typeId}
+                setTypeId={setTypeId}
                 onResetFilters={() => {
                   setCityId("");
                   setDistrictId("");
@@ -767,6 +798,8 @@ export default function PropertyRequestsPage() {
                   setEmployeePhone("");
                   setStatusId("");
                   setSearchTerm("");
+                  setDateRange(undefined);
+                  setTypeId("");
                   setCurrentPage(1);
                 }}
               />
