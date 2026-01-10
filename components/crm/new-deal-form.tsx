@@ -61,7 +61,7 @@ export default function NewDealForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userData, IsLoading: authLoading } = useAuthStore();
-  const { pipelineStages, newDealData, clearNewDealData, resetCache } = useCrmStore();
+  const { pipelineStages, newDealData, clearNewDealData, resetCache, setPipelineStages } = useCrmStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("crm");
@@ -147,6 +147,7 @@ export default function NewDealForm() {
   const [categories, setCategories] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [buildings, setBuildings] = useState<any[]>([]);
+  const [loadingStages, setLoadingStages] = useState(false);
 
   // Load cached data from store on mount (optional - can be written manually)
   useEffect(() => {
@@ -165,7 +166,7 @@ export default function NewDealForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newDealData]); // Run only on mount
 
-  // Fetch customers from /customers endpoint
+  // Fetch customers from /api/customers/all endpoint
   useEffect(() => {
     // Wait until token is fetched
     if (authLoading || !userData?.token) {
@@ -176,7 +177,7 @@ export default function NewDealForm() {
       setLoadingCustomers(true);
       setCustomersLoaded(false);
       try {
-        const response = await axiosInstance.get("/customers");
+        const response = await axiosInstance.get("/api/customers/all");
         if (response.data.status === "success") {
           setCustomers(response.data.data.customers || []);
           setCustomersLoaded(true);
@@ -283,6 +284,43 @@ export default function NewDealForm() {
 
     fetchData();
   }, [userData?.token, authLoading]);
+
+  // Fetch pipeline stages if not already loaded
+  useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
+    const fetchStages = async () => {
+      // Only fetch if pipelineStages is empty
+      if (pipelineStages.length === 0) {
+        setLoadingStages(true);
+        try {
+          const response = await axiosInstance.get("/v1/crm/requests");
+          if (response.data.status === "success") {
+            const { stages } = response.data.data || {};
+            const transformedStages = (stages || []).map((stage: any) => ({
+              id: String(stage.id),
+              name: stage.stage_name,
+              color: stage.color || "#6366f1",
+              icon: stage.icon || "Target",
+              count: stage.requests?.length || 0,
+              value: 0,
+            }));
+            setPipelineStages(transformedStages);
+          }
+        } catch (err) {
+          console.error("Error fetching pipeline stages:", err);
+          toast.error("فشل في تحميل المراحل");
+        } finally {
+          setLoadingStages(false);
+        }
+      }
+    };
+
+    fetchStages();
+  }, [userData?.token, authLoading, pipelineStages.length, setPipelineStages]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -868,26 +906,49 @@ export default function NewDealForm() {
                   {/* Stage Selection */}
                   <div className="space-y-2">
                     <Label htmlFor="stage_id">المرحلة *</Label>
-                    <Select
-                      value={formData.stage_id}
-                      onValueChange={(value) =>
-                        handleSelectChange("stage_id", value)
-                      }
-                    >
-                      <SelectTrigger
-                        id="stage_id"
-                        className={errors.stage_id ? "border-red-500" : ""}
+                    {loadingStages ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="text-sm text-muted-foreground">
+                          جاري تحميل المراحل...
+                        </span>
+                      </div>
+                    ) : (
+                      <Select
+                        value={formData.stage_id}
+                        onValueChange={(value) =>
+                          handleSelectChange("stage_id", value)
+                        }
+                        disabled={loadingStages || pipelineStages.length === 0}
                       >
-                        <SelectValue placeholder="اختر المرحلة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {pipelineStages.map((stage) => (
-                          <SelectItem key={stage.id} value={stage.id}>
-                            {stage.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                        <SelectTrigger
+                          id="stage_id"
+                          className={errors.stage_id ? "border-red-500" : ""}
+                          disabled={loadingStages || pipelineStages.length === 0}
+                        >
+                          <SelectValue 
+                            placeholder={
+                              pipelineStages.length === 0 
+                                ? "لا توجد مراحل متاحة" 
+                                : "اختر المرحلة"
+                            } 
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {pipelineStages.length === 0 ? (
+                            <SelectItem value="no-stages" disabled>
+                              لا توجد مراحل متاحة
+                            </SelectItem>
+                          ) : (
+                            pipelineStages.map((stage) => (
+                              <SelectItem key={stage.id} value={stage.id}>
+                                {stage.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                    )}
                     {errors.stage_id && (
                       <p className="text-sm text-red-500">{errors.stage_id}</p>
                     )}

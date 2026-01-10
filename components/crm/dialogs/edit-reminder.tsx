@@ -105,28 +105,38 @@ export default function EditReminderDialog({
       // Combine date and time for API
       const datetime = `${reminderData.date} ${reminderData.time}:00`;
 
+      // Map priority: 1=Low (0), 2=Medium (1), 3=High (2) to new system 0,1,2
+      const priorityMap: { [key: string]: number } = {
+        "1": 0, // Low
+        "2": 1, // Medium
+        "3": 2, // High
+      };
+      const mappedPriority = priorityMap[reminderData.priority] ?? 1;
+
       const response = await axiosInstance.put(
-        `/crm/customer-reminders/${selectedReminder.id}`,
+        `/crm/reminders/${selectedReminder.id}`,
         {
           title: reminderData.title.trim(),
-          priority: parseInt(reminderData.priority),
+          priority: mappedPriority,
           datetime: datetime,
         },
       );
 
       if (response.data.status === "success") {
-        // Update the reminder in the store
+        // Response includes full reminder with reminder_type and customer objects
+        const reminderResponse = response.data.data;
         const updatedReminder = {
           ...selectedReminder,
-          title: reminderData.title.trim(),
-          priority: parseInt(reminderData.priority),
-          priority_label:
-            reminderData.priority === "3"
-              ? "High"
-              : reminderData.priority === "2"
-                ? "Medium"
-                : "Low",
-          datetime: datetime,
+          title: reminderResponse?.title || reminderData.title.trim(),
+          priority: reminderResponse?.priority ?? mappedPriority,
+          priority_label: reminderResponse?.priority_label || (mappedPriority === 2 ? "High" : mappedPriority === 1 ? "Medium" : "Low"),
+          priority_label_ar: reminderResponse?.priority_label_ar || (mappedPriority === 2 ? "عالية" : mappedPriority === 1 ? "متوسطة" : "منخفضة"),
+          datetime: reminderResponse?.datetime || datetime,
+          status: reminderResponse?.status || selectedReminder.status || "pending",
+          status_label: reminderResponse?.status_label,
+          status_label_ar: reminderResponse?.status_label_ar,
+          customer: reminderResponse?.customer || selectedReminder.customer,
+          reminder_type: reminderResponse?.reminder_type,
         };
 
         // Update the reminders list in the parent component
@@ -136,11 +146,20 @@ export default function EditReminderDialog({
 
         handleClose();
       } else {
-        setError("فشل في تحديث التذكير");
+        setError(response.data.message_ar || "فشل في تحديث التذكير");
       }
     } catch (error: any) {
       console.error("خطأ في تحديث التذكير:", error);
-      setError(error.response?.data?.message || "حدث خطأ أثناء تحديث التذكير");
+      const errorMessage = error.response?.data?.message_ar || error.response?.data?.message || "حدث خطأ أثناء تحديث التذكير";
+      setError(errorMessage);
+      
+      // Handle validation errors
+      if (error.response?.data?.errors) {
+        const firstError = Object.values(error.response.data.errors)[0];
+        if (Array.isArray(firstError) && firstError.length > 0) {
+          setError(firstError[0]);
+        }
+      }
     } finally {
       setIsSubmitting(false);
     }

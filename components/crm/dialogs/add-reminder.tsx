@@ -27,18 +27,13 @@ interface AddReminderDialogProps {
   onReminderAdded?: (reminder: any) => void;
 }
 
-// دالة ترجمة أنواع التذكيرات من الإنجليزية إلى العربية
-const translateReminderType = (type: string): string => {
-  const translations: { [key: string]: string } = {
-    "Send Final Proposal": "إرسال العرض النهائي",
-    "Follow up call": "مكالمة متابعة",
-    "Meeting with Client": "اجتماع مع العميل",
-    "Review contract": "مراجعة العقد",
-    "Send proposal": "إرسال عرض",
-  };
-
-  return translations[type] || type;
-};
+interface ReminderType {
+  id: number;
+  name: string;
+  name_ar?: string;
+  color: string;
+  icon: string;
+}
 
 export default function AddReminderDialog({
   onReminderAdded,
@@ -57,13 +52,13 @@ export default function AddReminderDialog({
     date: "",
     time: "",
   });
-  const [reminderTypes, setReminderTypes] = useState<string[]>([]);
-  const [selectedReminderType, setSelectedReminderType] = useState<string>("");
+  const [reminderTypes, setReminderTypes] = useState<ReminderType[]>([]);
+  const [selectedReminderTypeId, setSelectedReminderTypeId] = useState<string>("");
   const [loadingReminderTypes, setLoadingReminderTypes] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch reminder types from filter-options API
+  // Fetch reminder types from new API
   useEffect(() => {
     // Wait until token is fetched
     if (authLoading || !userData?.token) {
@@ -74,15 +69,15 @@ export default function AddReminderDialog({
       try {
         setLoadingReminderTypes(true);
         const response = await axiosInstance.get(
-          "/crm/customer-reminders/filter-options"
+          "/crm/reminder-types?per_page=100&is_active=true"
         );
 
-        if (response.data.status === "success" && response.data.data?.titles) {
-          setReminderTypes(response.data.data.titles);
+        if (response.data.status === "success" && response.data.data?.reminder_types) {
+          setReminderTypes(response.data.data.reminder_types);
         }
       } catch (err: any) {
         console.error("Error fetching reminder types:", err);
-        // Don't show error to user, just log it
+        setError(err.response?.data?.message_ar || "فشل في تحميل أنواع التذكيرات");
       } finally {
         setLoadingReminderTypes(false);
       }
@@ -101,7 +96,7 @@ export default function AddReminderDialog({
       date: "",
       time: "",
     });
-    setSelectedReminderType("");
+    setSelectedReminderTypeId("");
     setError(null);
   };
 
@@ -137,7 +132,7 @@ export default function AddReminderDialog({
       return;
     }
 
-    if (!selectedReminderType) {
+    if (!selectedReminderTypeId) {
       setError("يجب اختيار نوع التذكير");
       return;
     }
@@ -149,63 +144,49 @@ export default function AddReminderDialog({
       // Combine date and time for API
       const datetime = `${reminderData.date} ${reminderData.time}:00`;
 
-      // Find reminder_id from selected reminder type (title)
-      let reminderId: number | null = null;
-      if (selectedReminderType) {
-        try {
-          // Fetch reminders to find one with matching title
-          const remindersResponse = await axiosInstance.get(
-            `/crm/customer-reminders?filter_title=${encodeURIComponent(selectedReminderType)}`
-          );
-          if (
-            remindersResponse.data.status === "success" &&
-            remindersResponse.data.data &&
-            remindersResponse.data.data.length > 0
-          ) {
-            // Use the first reminder's ID for cloning
-            reminderId = remindersResponse.data.data[0].id;
-          }
-        } catch (err) {
-          console.error("Error finding reminder ID:", err);
-          // Continue without reminder_id if not found
-        }
-      }
-
-      // Build payload: title is custom title, reminder_id is for cloning the type
-      const payload: any = {
+      // Build payload with new structure
+      const payload = {
         customer_id: parseInt(customerId),
+        reminder_type_id: parseInt(selectedReminderTypeId),
+        title: reminderData.title.trim(),
         datetime: datetime,
-        title: reminderData.title.trim(), // Custom title, independent from reminder type
+        priority: 1, // Default to medium priority
       };
 
-      // Add reminder_id only if found (for cloning reminder type properties)
-      if (reminderId) {
-        payload.reminder_id = reminderId;
-      }
-
-      const response = await axiosInstance.post("/crm/customer-reminders", payload);
+      const response = await axiosInstance.post("/crm/reminders", payload);
 
       if (response.data.status === "success") {
-        // Add the new reminder to the store
+        // Response includes full reminder with reminder_type and customer objects
+        const reminderResponse = response.data.data;
         const newReminder = {
-          id: response.data.data?.id || Date.now(),
-          title: response.data.data?.title || reminderData.title.trim(),
-          priority: response.data.data?.priority || null,
-          priority_label: response.data.data?.priority_label || "Not Set",
-          datetime: datetime,
-          customer: selectedCustomer
+          id: reminderResponse?.id || Date.now(),
+          title: reminderResponse?.title || reminderData.title.trim(),
+          priority: reminderResponse?.priority ?? 1,
+          priority_label: reminderResponse?.priority_label || "Medium",
+          priority_label_ar: reminderResponse?.priority_label_ar || "متوسطة",
+          datetime: reminderResponse?.datetime || datetime,
+          status: reminderResponse?.status || "pending",
+          status_label: reminderResponse?.status_label || "Pending",
+          status_label_ar: reminderResponse?.status_label_ar || "قيد الانتظار",
+          customer: reminderResponse?.customer || (selectedCustomer
             ? {
                 id: parseInt(String(selectedCustomer.customer_id || "")),
                 name: selectedCustomer.name,
               }
-            : customers.find((c) => c.customer_id === reminderData.customer_id)
-              ? {
-                  id: parseInt(reminderData.customer_id),
-                  name: customers.find(
-                    (c) => c.customer_id === reminderData.customer_id,
-                  )!.name,
-                }
-              : undefined,
+            : (() => {
+                const customerIdNum = parseInt(customerId);
+                const foundCustomer = customers.find((c) => {
+                  const cid = typeof c.customer_id === 'string' ? parseInt(c.customer_id) : c.customer_id;
+                  return cid === customerIdNum;
+                });
+                return foundCustomer
+                  ? {
+                      id: customerIdNum,
+                      name: foundCustomer.name,
+                    }
+                  : undefined;
+              })()),
+          reminder_type: reminderResponse?.reminder_type,
         };
 
         // Update the reminders list in the parent component
@@ -215,11 +196,20 @@ export default function AddReminderDialog({
 
         handleClose();
       } else {
-        setError("فشل في إضافة التذكير");
+        setError(response.data.message_ar || "فشل في إضافة التذكير");
       }
     } catch (error: any) {
       console.error("خطأ في إضافة التذكير:", error);
-      setError(error.response?.data?.message || "حدث خطأ أثناء إضافة التذكير");
+      const errorMessage = error.response?.data?.message_ar || error.response?.data?.message || "حدث خطأ أثناء إضافة التذكير";
+      setError(errorMessage);
+      
+      // Handle validation errors
+      if (error.response?.data?.errors) {
+        const firstError = Object.values(error.response.data.errors)[0];
+        if (Array.isArray(firstError) && firstError.length > 0) {
+          setError(firstError[0]);
+        }
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -302,9 +292,9 @@ export default function AddReminderDialog({
               </div>
             ) : (
               <Select
-                value={selectedReminderType}
+                value={selectedReminderTypeId}
                 onValueChange={(value) => {
-                  setSelectedReminderType(value);
+                  setSelectedReminderTypeId(value);
                   setError(null);
                 }}
                 required
@@ -314,9 +304,9 @@ export default function AddReminderDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {reminderTypes.length > 0 ? (
-                    reminderTypes.map((type, index) => (
-                      <SelectItem key={index} value={type}>
-                        {translateReminderType(type)}
+                    reminderTypes.map((type) => (
+                      <SelectItem key={type.id} value={String(type.id)}>
+                        {type.name_ar || type.name}
                       </SelectItem>
                     ))
                   ) : (
@@ -381,7 +371,7 @@ export default function AddReminderDialog({
                 !reminderData.date ||
                 !reminderData.time ||
                 !reminderData.title.trim() ||
-                !selectedReminderType
+                !selectedReminderTypeId
               }
             >
               {isSubmitting ? "جاري الحفظ..." : "حفظ التذكير"}

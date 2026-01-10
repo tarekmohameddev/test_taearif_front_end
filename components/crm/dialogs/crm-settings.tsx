@@ -37,18 +37,6 @@ interface CrmSettingsDialogProps {
   onStageDeleted?: (stageId: string) => void;
 }
 
-// دالة ترجمة أنواع التذكيرات من الإنجليزية إلى العربية
-const translateReminderType = (type: string): string => {
-  const translations: { [key: string]: string } = {
-    "Send Final Proposal": "إرسال العرض النهائي",
-    "Follow up call": "مكالمة متابعة",
-    "Meeting with Client": "اجتماع مع العميل",
-    "Review contract": "مراجعة العقد",
-    "Send proposal": "إرسال عرض",
-  };
-
-  return translations[type] || type;
-};
 
 export default function CrmSettingsDialog({
   onStageDeleted,
@@ -71,7 +59,17 @@ export default function CrmSettingsDialog({
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isMoving, setIsMoving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [reminders, setReminders] = useState<any[]>([]);
+  const [reminderTypes, setReminderTypes] = useState<Array<{
+    id: number;
+    name: string;
+    name_ar?: string;
+    description?: string;
+    color: string;
+    icon: string;
+    order: number;
+    is_active: boolean | number;
+    reminders_count?: number;
+  }>>([]);
   const [loadingReminders, setLoadingReminders] = useState(false);
 
   // Form dialog states
@@ -135,51 +133,35 @@ export default function CrmSettingsDialog({
     }
   }, [showCrmSettingsDialog]);
 
-  // Load reminders when reminders tab is active
+  // Load reminder types when reminders tab is active
   useEffect(() => {
     if (showCrmSettingsDialog && activeTab === "reminders") {
-      const loadReminders = async () => {
+      const loadReminderTypes = async () => {
         setLoadingReminders(true);
         setError(null);
 
         try {
-          const response = await axiosInstance.get("/crm/customer-reminders");
-          if (response.data.status === "success") {
-            // Get unique reminder types (titles) with is_default flag
-            const remindersMap = new Map();
-            response.data.data.forEach((reminder: any) => {
-              if (!remindersMap.has(reminder.title)) {
-                remindersMap.set(reminder.title, {
-                  title: reminder.title,
-                  is_default: reminder.is_default || false,
-                  id: reminder.id, // Keep first ID for reference
-                });
-              } else {
-                // If already exists, update is_default if this one is default
-                const existing = remindersMap.get(reminder.title);
-                if (reminder.is_default) {
-                  existing.is_default = true;
-                }
-              }
-            });
-            setReminders(Array.from(remindersMap.values()));
+          const response = await axiosInstance.get("/crm/reminder-types?per_page=100");
+          if (response.data.status === "success" && response.data.data?.reminder_types) {
+            // API returns reminder types directly
+            setReminderTypes(response.data.data.reminder_types);
           }
         } catch (err: any) {
-          console.error("Error loading reminders:", err);
-          setError("فشل في تحميل أنواع التذكيرات");
+          console.error("Error loading reminder types:", err);
+          setError(err.response?.data?.message_ar || "فشل في تحميل أنواع التذكيرات");
         } finally {
           setLoadingReminders(false);
         }
       };
 
-      loadReminders();
+      loadReminderTypes();
     }
   }, [showCrmSettingsDialog, activeTab]);
 
   const handleClose = () => {
     setShowCrmSettingsDialog(false);
     setError(null);
-    setReminders([]);
+    setReminderTypes([]);
     setShowReminderTypeForm(false);
     setReminderTypeFormData({ title: "" });
   };
@@ -510,55 +492,40 @@ export default function CrmSettingsDialog({
 
     setIsLoading(true);
     setFormError(null);
+    setFieldErrors({});
 
     try {
-      // Create a reminder without customer_id to use as a type
-      const response = await axiosInstance.post("/crm/customer-reminders", {
-        title: reminderTypeFormData.title.trim(),
-        datetime: new Date().toISOString().slice(0, 19).replace("T", " "),
-        customer_id: null,
+      // Create reminder type using new endpoint
+      const response = await axiosInstance.post("/crm/reminder-types", {
+        name: reminderTypeFormData.title.trim(),
       });
 
       if (response.data.status === "success") {
-        // Reload reminders to get updated list
-        const remindersResponse = await axiosInstance.get("/crm/customer-reminders");
-        if (remindersResponse.data.status === "success") {
-          const remindersMap = new Map();
-          remindersResponse.data.data.forEach((reminder: any) => {
-            if (!remindersMap.has(reminder.title)) {
-              remindersMap.set(reminder.title, {
-                title: reminder.title,
-                is_default: reminder.is_default || false,
-                id: reminder.id,
-              });
-            } else {
-              const existing = remindersMap.get(reminder.title);
-              if (reminder.is_default) {
-                existing.is_default = true;
-              }
-            }
-          });
-          setReminders(Array.from(remindersMap.values()));
-        }
+        // Add new type to list
+        const newType = response.data.data;
+        setReminderTypes([...reminderTypes, newType]);
         setShowReminderTypeForm(false);
         setReminderTypeFormData({ title: "" });
       }
     } catch (err: any) {
       console.error("Error adding reminder type:", err);
-      setFormError(err.response?.data?.message || "فشل في إضافة نوع التذكير");
+      if (err.response?.data?.status === "error") {
+        if (err.response.data.errors) {
+          setFieldErrors(err.response.data.errors);
+        } else {
+          setFormError(err.response.data.message_ar || err.response.data.message || "فشل في إضافة نوع التذكير");
+        }
+      } else {
+        setFormError("فشل في إضافة نوع التذكير");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle delete reminder type (only non-default)
+  // Handle delete reminder type
   const handleDeleteReminderType = async (reminderType: any) => {
-    if (reminderType.is_default) {
-      setError("لا يمكن حذف أنواع التذكيرات الافتراضية");
-      return;
-    }
-
-    if (!confirm(`هل أنت متأكد من حذف نوع التذكير "${reminderType.title}"؟`)) {
+    if (!confirm(`هل أنت متأكد من حذف نوع التذكير "${reminderType.name_ar || reminderType.name}"؟`)) {
       return;
     }
 
@@ -566,44 +533,22 @@ export default function CrmSettingsDialog({
     setError(null);
 
     try {
-      // Find all reminders with this title and delete them
-      const remindersResponse = await axiosInstance.get("/crm/customer-reminders");
-      if (remindersResponse.data.status === "success") {
-        const remindersToDelete = remindersResponse.data.data.filter(
-          (r: any) => r.title === reminderType.title && !r.is_default
-        );
+      // Delete reminder type using new endpoint
+      const response = await axiosInstance.delete(`/crm/reminder-types/${reminderType.id}`);
 
-        // Delete all reminders with this title
-        await Promise.all(
-          remindersToDelete.map((r: any) =>
-            axiosInstance.delete(`/crm/customer-reminders/${r.id}`)
-          )
-        );
-
-        // Reload reminders
-        const updatedResponse = await axiosInstance.get("/crm/customer-reminders");
-        if (updatedResponse.data.status === "success") {
-          const remindersMap = new Map();
-          updatedResponse.data.data.forEach((reminder: any) => {
-            if (!remindersMap.has(reminder.title)) {
-              remindersMap.set(reminder.title, {
-                title: reminder.title,
-                is_default: reminder.is_default || false,
-                id: reminder.id,
-              });
-            } else {
-              const existing = remindersMap.get(reminder.title);
-              if (reminder.is_default) {
-                existing.is_default = true;
-              }
-            }
-          });
-          setReminders(Array.from(remindersMap.values()));
-        }
+      if (response.data.status === "success") {
+        // Remove from list
+        setReminderTypes(reminderTypes.filter((type) => type.id !== reminderType.id));
       }
     } catch (err: any) {
       console.error("Error deleting reminder type:", err);
-      setError(err.response?.data?.message || "فشل في حذف نوع التذكير");
+      const errorMessage = err.response?.data?.message_ar || err.response?.data?.message || "فشل في حذف نوع التذكير";
+      setError(errorMessage);
+      
+      // Handle REMINDER_TYPE_IN_USE error
+      if (err.response?.data?.error_code === "REMINDER_TYPE_IN_USE") {
+        // Error message is already set, just ensure it's displayed
+      }
     } finally {
       setIsDeleting(null);
     }
@@ -767,7 +712,7 @@ export default function CrmSettingsDialog({
     }
   };
 
-  // Render reminders list
+  // Render reminder types list
   const renderRemindersList = () => {
     if (loadingReminders) {
       return (
@@ -777,82 +722,78 @@ export default function CrmSettingsDialog({
       );
     }
 
-    if (!reminders || reminders.length === 0) {
+    if (!reminderTypes || reminderTypes.length === 0) {
       return (
-        <p className="text-center text-muted-foreground py-12 text-right">
+        <p className="text-center text-muted-foreground py-12">
           لا توجد أنواع تذكيرات مُعرّفة بعد.
         </p>
       );
     }
 
-    // Separate default and custom reminders
-    const defaultReminders = reminders.filter((r) => r.is_default);
-    const customReminders = reminders.filter((r) => !r.is_default);
-
     return (
-      <div className="space-y-6">
-        {/* Default Reminders Section */}
-        {defaultReminders.length > 0 && (
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3 text-right">
-              أنواع التذكيرات الافتراضية
-            </h3>
-            <div className="space-y-2">
-              {defaultReminders.map((reminder) => (
+      <div className="space-y-3">
+        {reminderTypes.map((reminderType) => {
+          const isActive = reminderType.is_active === true || reminderType.is_active === 1;
+          return (
+            <div
+              key={reminderType.id}
+              className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
                 <div
-                  key={reminder.id}
-                  className="flex items-center justify-between p-3 border rounded-lg bg-muted/30"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{translateReminderType(reminder.title)}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      افتراضي
-                    </Badge>
-                  </div>
-                  <Badge variant="outline" className="text-xs text-muted-foreground">
-                    غير قابل للإزالة
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: reminderType.color }}
+                />
+                <Bell className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <span className="font-medium">
+                    {reminderType.name_ar || reminderType.name}
+                  </span>
+                  {reminderType.name_ar && reminderType.name_ar !== reminderType.name && (
+                    <span className="text-sm text-muted-foreground mr-2">
+                      ({reminderType.name})
+                    </span>
+                  )}
+                  {reminderType.description && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {reminderType.description}
+                    </p>
+                  )}
+                </div>
+                {reminderType.reminders_count !== undefined && (
+                  <Badge variant="secondary" className="text-xs">
+                    {reminderType.reminders_count} تذكير
                   </Badge>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Custom Reminders Section */}
-        {customReminders.length > 0 && (
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3 text-right">
-              أنواع التذكيرات المخصصة
-            </h3>
-            <div className="space-y-2">
-              {customReminders.map((reminder) => (
-                <div
-                  key={reminder.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                )}
+                {!isActive && (
+                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                    غير نشط
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {isActive && (
+                  <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
+                    نشط
+                  </Badge>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDeleteReminderType(reminderType)}
+                  disabled={isDeleting === reminderType.id.toString()}
+                  className="text-red-600 hover:text-red-700 h-8 w-8"
                 >
-                  <div className="flex items-center gap-3">
-                    <Bell className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{translateReminderType(reminder.title)}</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteReminderType(reminder)}
-                    disabled={isDeleting === reminder.id.toString()}
-                    className="text-red-600 hover:text-red-700 h-8 w-8"
-                  >
-                    {isDeleting === reminder.id.toString() ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              ))}
+                  {isDeleting === reminderType.id.toString() ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })}
       </div>
     );
   };

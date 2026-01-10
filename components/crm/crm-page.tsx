@@ -836,20 +836,24 @@ export default function CrmPage() {
 
     try {
       const response = await axiosInstance.put(
-        `/crm/customer-reminders/${reminder.id}`,
+        `/crm/reminders/${reminder.id}`,
         {
           status: "completed",
         },
       );
       if (response.data.status === "success") {
+        const reminderResponse = response.data.data;
         const updatedReminder = {
           ...reminder,
-          status: "completed",
+          status: reminderResponse?.status || "completed",
+          status_label: reminderResponse?.status_label || "Completed",
+          status_label_ar: reminderResponse?.status_label_ar || "مكتمل",
         };
         updateReminderInList(updatedReminder);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error completing reminder:", err);
+      alert(err.response?.data?.message_ar || err.response?.data?.message || "فشل في تحديث التذكير");
     }
   };
 

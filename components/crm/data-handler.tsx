@@ -158,16 +158,18 @@ export default function DataHandler({
 
   const fetchAppointmentsData = async () => {
     try {
-      const appointmentsResponse = await axiosInstance.get(
-        "/crm/customer-reminders",
+      const remindersResponse = await axiosInstance.get(
+        "/crm/reminders",
       );
-      const appointmentsData = appointmentsResponse.data;
+      const remindersData = remindersResponse.data;
 
-      if (appointmentsData.status === "success") {
-        onSetAppointmentsData(appointmentsData.data || []);
+      if (remindersData.status === "success") {
+        // API returns { status: "success", data: { reminders: [...], pagination: {...} } }
+        const reminders = remindersData.data?.reminders || remindersData.data || [];
+        onSetAppointmentsData(reminders);
       }
     } catch (err) {
-      console.error("Error fetching appointments data:", err);
+      console.error("Error fetching reminders data:", err);
     }
   };
 

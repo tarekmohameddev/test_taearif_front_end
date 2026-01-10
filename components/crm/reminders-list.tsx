@@ -23,13 +23,26 @@ import {
 interface ApiReminder {
   id: number;
   title: string;
-  priority: number;
-  priority_label: string;
+  priority: number; // 0, 1, or 2
+  priority_label: string; // "Low", "Medium", "High"
+  priority_label_ar: string; // "منخفضة", "متوسطة", "عالية"
   datetime: string;
+  status: "pending" | "completed" | "overdue" | "cancelled";
+  status_label: string;
+  status_label_ar: string;
+  reminder_type?: {
+    id: number;
+    name: string;
+    name_ar?: string;
+    color: string;
+    icon: string;
+  };
   customer: {
     id: number;
     name: string;
   };
+  is_overdue?: boolean;
+  days_until_due?: number;
 }
 
 interface RemindersListProps {
@@ -53,7 +66,12 @@ export default function RemindersList({
   onAddReminder,
   onCompleteReminder,
 }: RemindersListProps) {
-  const getStatusColor = (status: string = "pending") => {
+  const getStatusColor = (reminder: ApiReminder) => {
+    // Check if overdue based on calculated field first
+    if (reminder.is_overdue) {
+      return "bg-red-500";
+    }
+    const status: "pending" | "completed" | "overdue" | "cancelled" = reminder.status || "pending";
     switch (status) {
       case "pending":
         return "bg-yellow-500";
@@ -61,18 +79,27 @@ export default function RemindersList({
         return "bg-green-500";
       case "overdue":
         return "bg-red-500";
+      case "cancelled":
+        return "bg-gray-500";
       default:
         return "bg-yellow-500";
     }
   };
 
-  const getStatusIcon = (status: string = "pending") => {
+  const getStatusIcon = (reminder: ApiReminder) => {
+    // Check if overdue based on calculated field first
+    if (reminder.is_overdue) {
+      return <XCircle className="h-4 w-4" />;
+    }
+    const status: "pending" | "completed" | "overdue" | "cancelled" = reminder.status || "pending";
     switch (status) {
       case "pending":
         return <Clock className="h-4 w-4" />;
       case "completed":
         return <CheckCircle className="h-4 w-4" />;
       case "overdue":
+        return <XCircle className="h-4 w-4" />;
+      case "cancelled":
         return <XCircle className="h-4 w-4" />;
       default:
         return <Clock className="h-4 w-4" />;
@@ -92,22 +119,12 @@ export default function RemindersList({
     }
   };
 
-  const getTypeLabel = (type: string = "") => {
-    switch (type) {
-      case "call":
-        return "اتصال";
-      case "meeting":
-        return "اجتماع";
-      case "follow_up":
-        return "متابعة";
-      case "other":
-        return "أخرى";
-      default:
-        return "عام";
+  const getStatusLabel = (reminder: ApiReminder) => {
+    // Use Arabic label from API if available
+    if (reminder.status_label_ar) {
+      return reminder.status_label_ar;
     }
-  };
-
-  const getStatusLabel = (status: string = "pending") => {
+    const status = reminder.status || "pending";
     switch (status) {
       case "pending":
         return "في الانتظار";
@@ -115,13 +132,20 @@ export default function RemindersList({
         return "مكتمل";
       case "overdue":
         return "متأخر";
+      case "cancelled":
+        return "ملغي";
       default:
         return "في الانتظار";
     }
   };
 
-  const getPriorityLabel = (priorityLabel: string) => {
-    switch (priorityLabel) {
+  const getPriorityLabel = (reminder: ApiReminder) => {
+    // Use Arabic label from API if available
+    if (reminder.priority_label_ar) {
+      return reminder.priority_label_ar;
+    }
+    // Fallback to hardcoded translations
+    switch (reminder.priority_label) {
       case "High":
         return "عالية";
       case "Medium":
@@ -144,7 +168,7 @@ export default function RemindersList({
     // But we can filter by priority
     const matchesUrgency =
       filterUrgency === "all" ||
-      getPriorityLabel(reminder.priority_label) === filterUrgency;
+      getPriorityLabel(reminder) === filterUrgency;
 
     return matchesSearch && matchesUrgency;
   });
@@ -219,7 +243,7 @@ export default function RemindersList({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-1 h-16 rounded-full ${getStatusColor()}`}
+                        className={`w-1 h-16 rounded-full ${getStatusColor(reminder)}`}
                       />
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
@@ -235,6 +259,18 @@ export default function RemindersList({
                         <div>
                           <h3 className="font-semibold">{reminder.title}</h3>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            {reminder.reminder_type && (
+                              <span 
+                                className="flex items-center gap-1 px-2 py-1 rounded text-xs"
+                                style={{ 
+                                  backgroundColor: `${reminder.reminder_type.color}20`,
+                                  color: reminder.reminder_type.color 
+                                }}
+                              >
+                                <Bell className="h-3 w-3" />
+                                {reminder.reminder_type.name_ar || reminder.reminder_type.name}
+                              </span>
+                            )}
                             <span className="flex items-center gap-1">
                               <Users className="h-3 w-3" />
                               {reminder.customer?.name || "عميل غير محدد"}
@@ -247,6 +283,12 @@ export default function RemindersList({
                               <Clock className="h-3 w-3" />
                               {formattedTime}
                             </span>
+                            {reminder.is_overdue && (
+                              <span className="flex items-center gap-1 text-red-600 font-semibold">
+                                <AlertCircle className="h-3 w-3" />
+                                متأخر
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -256,14 +298,14 @@ export default function RemindersList({
                         variant="outline"
                         className={getPriorityColor(reminder.priority_label)}
                       >
-                        {getPriorityLabel(reminder.priority_label)}
+                        {getPriorityLabel(reminder)}
                       </Badge>
                       <Badge
                         variant="outline"
                         className="flex items-center gap-1"
                       >
-                        {getStatusIcon()}
-                        {getStatusLabel()}
+                        {getStatusIcon(reminder)}
+                        {getStatusLabel(reminder)}
                       </Badge>
                       <div className="flex items-center gap-1">
                         <Button

@@ -764,21 +764,30 @@ const useCrmStore = create<CrmStore>()(
 
         const { setReminders } = get();
         try {
-          const response = await axiosInstance.get("/crm/customer-reminders");
+          const response = await axiosInstance.get("/crm/reminders");
           const remindersResponse = response.data;
 
           if (remindersResponse.status === "success") {
             // Transform API data to match component interface
-            const transformedReminders = (remindersResponse.data || []).map(
-              (reminder: any) => ({
-                id: reminder.id,
-                title: reminder.title,
-                priority: reminder.priority,
-                priority_label: reminder.priority_label,
-                datetime: reminder.datetime,
-                customer: reminder.customer,
-              }),
-            );
+            // API returns { status: "success", data: { reminders: [...], pagination: {...} } }
+            const reminders = remindersResponse.data?.reminders || remindersResponse.data || [];
+            const transformedReminders = reminders.map((reminder: any) => ({
+              id: reminder.id,
+              title: reminder.title,
+              priority: reminder.priority,
+              priority_label: reminder.priority_label,
+              priority_label_ar: reminder.priority_label_ar,
+              datetime: reminder.datetime,
+              status: reminder.status,
+              status_label: reminder.status_label,
+              status_label_ar: reminder.status_label_ar,
+              customer: reminder.customer,
+              reminder_type: reminder.reminder_type,
+              is_overdue: reminder.is_overdue,
+              days_until_due: reminder.days_until_due,
+              description: reminder.description,
+              notes: reminder.notes,
+            }));
             setReminders(transformedReminders);
           }
         } catch (err) {
