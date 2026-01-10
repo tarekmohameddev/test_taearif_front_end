@@ -792,20 +792,22 @@ export default function CrmSettingsDialog({
                     نشط
                   </Badge>
                 )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteReminderType(reminderType)}
-                  disabled={isDeleting === reminderType.id.toString() || isDefault}
-                  className="text-red-600 hover:text-red-700 h-8 w-8 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title={isDefault ? "لا يمكن حذف أنواع التذكير الافتراضية" : "حذف"}
-                >
-                  {isDeleting === reminderType.id.toString() ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                </Button>
+                {!isDefault && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteReminderType(reminderType)}
+                    disabled={isDeleting === reminderType.id.toString()}
+                    className="text-red-600 hover:text-red-700 h-8 w-8"
+                    title="حذف"
+                  >
+                    {isDeleting === reminderType.id.toString() ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           );
