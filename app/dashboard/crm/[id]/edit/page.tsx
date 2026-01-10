@@ -95,7 +95,7 @@ export default function EditDealPage() {
   const router = useRouter();
   const dealId = params?.id as string;
   const { userData, IsLoading: authLoading } = useAuthStore();
-  const { pipelineStages, getStageById, setPipelineStages } = useCrmStore();
+  const { pipelineStages, getStageById, setPipelineStages, resetCache } = useCrmStore();
   const [activeTab, setActiveTab] = useState("crm");
 
   // Loading states
@@ -672,6 +672,7 @@ export default function EditDealPage() {
 
       if (response.data.status === "success" || response.data.status === true) {
         toast.success("تم تحديث الصفقة بنجاح!");
+        resetCache(); // Clear cache to force fresh data fetch on redirect
         router.push(`/dashboard/crm/${dealId}`);
       } else {
         toast.error(response.data.message || "فشل في تحديث الصفقة");

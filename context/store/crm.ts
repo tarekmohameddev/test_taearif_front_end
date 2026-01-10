@@ -140,6 +140,7 @@ interface CrmStore {
   getStageById: (stageId: string) => PipelineStage | undefined;
   getRemindersByCustomer: (customerId: string) => Reminder[];
   clearCache: () => void;
+  resetCache: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
@@ -438,6 +439,26 @@ const useCrmStore = create<CrmStore>()(
       // Clear cache
       clearCache: () => {
         set({
+          customersCache: new Map(),
+          stagesCache: new Map(),
+        });
+      },
+
+      // Reset cache - clears all data and resets initialization state
+      resetCache: () => {
+        set({
+          customers: [],
+          pipelineStages: [],
+          appointments: [],
+          reminders: [],
+          procedures: [],
+          priorities: [],
+          types: [],
+          crmData: null,
+          inquiriesData: [],
+          totalCustomers: 0,
+          lastFetched: null,
+          isInitialized: false,
           customersCache: new Map(),
           stagesCache: new Map(),
         });

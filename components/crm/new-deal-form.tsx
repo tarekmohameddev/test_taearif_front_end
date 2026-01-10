@@ -61,7 +61,7 @@ export default function NewDealForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userData, IsLoading: authLoading } = useAuthStore();
-  const { pipelineStages, newDealData, clearNewDealData } = useCrmStore();
+  const { pipelineStages, newDealData, clearNewDealData, resetCache } = useCrmStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("crm");
@@ -660,6 +660,7 @@ export default function NewDealForm() {
 
       if (response.data.status === "success" || response.data.status === true) {
         toast.success("تم إنشاء الصفقة بنجاح");
+        resetCache(); // Clear cache to force fresh data fetch on redirect
         router.push("/dashboard/crm");
       } else {
         toast.error(response.data.message || "فشل في إنشاء الصفقة");

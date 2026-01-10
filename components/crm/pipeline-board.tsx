@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Target } from "lucide-react";
 import type { Customer, PipelineStage as PipelineStageType } from "@/types/crm";
 import PipelineStage from "./pipeline-stage";
 import MobileCustomersView from "./mobile-customers-view";
@@ -134,47 +132,6 @@ export default function PipelineBoard({
           ))}
         </div>
       </div>
-
-      {/* Keyboard Navigation Instructions */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 text-blue-800">
-            <Target className="h-4 w-4" />
-            <span className="font-medium">إرشادات التنقل بلوحة المفاتيح:</span>
-          </div>
-          <div className="mt-2 text-sm text-blue-700 space-y-1">
-            <div>
-              • اضغط{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">
-                Enter
-              </kbd>{" "}
-              أو{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">
-                Space
-              </kbd>{" "}
-              لتحديد عميل
-            </div>
-            <div>
-              • استخدم{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">←</kbd> و{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">→</kbd>{" "}
-              للتنقل بين المراحل
-            </div>
-            <div>
-              • اضغط{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">
-                Enter
-              </kbd>{" "}
-              لنقل العميل إلى المرحلة المحددة
-            </div>
-            <div>
-              • اضغط{" "}
-              <kbd className="px-1 py-0.5 bg-blue-200 rounded text-xs">Esc</kbd>{" "}
-              لإلغاء التحديد
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
