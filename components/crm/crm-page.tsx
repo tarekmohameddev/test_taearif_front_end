@@ -242,47 +242,59 @@ const CrmStatisticsCards = ({
     return null;
   }
 
+  const statsCards = [
+    {
+      title: "إجمالي الطلبات",
+      value: statistics.total_requests || 0,
+      icon: FileText,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+    },
+    {
+      title: "مع عقار",
+      value: statistics.with_property || 0,
+      icon: Home,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+    },
+    {
+      title: "بدون عقار",
+      value: statistics.without_property || 0,
+      icon: FileQuestion,
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50",
+    },
+  ];
+
   return (
-    <div className="grid gap-4 mb-8 grid-cols-1 sm:grid-cols-3">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center">
-            <FileText className="ml-2 h-4 w-4" />
-            إجمالي الطلبات
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl sm:text-3xl font-bold">
-            {statistics.total_requests || 0}
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center">
-            <Home className="ml-2 h-4 w-4" />
-            مع عقار
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl sm:text-3xl font-bold">
-            {statistics.with_property || 0}
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center">
-            <FileQuestion className="ml-2 h-4 w-4" />
-            بدون عقار
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl sm:text-3xl font-bold">
-            {statistics.without_property || 0}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
+      {statsCards.map((stat, index) => {
+        const Icon = stat.icon;
+        return (
+          <Card
+            key={index}
+            className="hover:shadow-lg transition-all duration-300"
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {stat.title}
+                  </p>
+                  <p className={`text-2xl font-bold ${stat.color}`}>
+                    {stat.value}
+                  </p>
+                </div>
+                <div
+                  className={`h-12 w-12 ${stat.bgColor} rounded-lg flex items-center justify-center`}
+                >
+                  <Icon className={`h-6 w-6 ${stat.color}`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };
