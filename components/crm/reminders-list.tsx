@@ -18,6 +18,8 @@ import {
   CheckCircle,
   AlertCircle,
   XCircle,
+  Building,
+  MapPin,
 } from "lucide-react";
 
 interface ApiReminder {
@@ -157,6 +159,23 @@ export default function RemindersList({
     }
   };
 
+  // Get icon component for reminder type
+  const getReminderTypeIcon = (iconName?: string) => {
+    if (!iconName) return Bell;
+    
+    const iconMap: { [key: string]: React.ComponentType<any> } = {
+      Phone: Phone,
+      Building: Building,
+      MapPin: MapPin,
+      Bell: Bell,
+      Calendar: Calendar,
+      Clock: Clock,
+      Users: Users,
+    };
+
+    return iconMap[iconName] || Bell;
+  };
+
   // Filter reminders based on search and filters
   const filteredReminders = remindersData.filter((reminder) => {
     const matchesSearch =
@@ -258,19 +277,26 @@ export default function RemindersList({
                         </Avatar>
                         <div>
                           <h3 className="font-semibold">{reminder.title}</h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            {reminder.reminder_type && (
-                              <span 
-                                className="flex items-center gap-1 px-2 py-1 rounded text-xs"
-                                style={{ 
-                                  backgroundColor: `${reminder.reminder_type.color}20`,
-                                  color: reminder.reminder_type.color 
-                                }}
-                              >
-                                <Bell className="h-3 w-3" />
-                                {reminder.reminder_type.name_ar || reminder.reminder_type.name}
-                              </span>
-                            )}
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                            {reminder.reminder_type && (() => {
+                              const ReminderTypeIcon = getReminderTypeIcon(reminder.reminder_type.icon);
+                              return (
+                                <Badge
+                                  variant="outline"
+                                  className="flex items-center gap-1.5 px-2.5 py-1 border-2"
+                                  style={{ 
+                                    borderColor: reminder.reminder_type.color,
+                                    backgroundColor: `${reminder.reminder_type.color}15`,
+                                    color: reminder.reminder_type.color 
+                                  }}
+                                >
+                                  <ReminderTypeIcon className="h-3.5 w-3.5" />
+                                  <span className="font-medium">
+                                    {reminder.reminder_type.name_ar || reminder.reminder_type.name}
+                                  </span>
+                                </Badge>
+                              );
+                            })()}
                             <span className="flex items-center gap-1">
                               <Users className="h-3 w-3" />
                               {reminder.customer?.name || "عميل غير محدد"}

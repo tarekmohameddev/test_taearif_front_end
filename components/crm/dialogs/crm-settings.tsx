@@ -68,6 +68,7 @@ export default function CrmSettingsDialog({
     icon: string;
     order: number;
     is_active: boolean | number;
+    is_default?: boolean;
     reminders_count?: number;
   }>>([]);
   const [loadingReminders, setLoadingReminders] = useState(false);
@@ -141,7 +142,7 @@ export default function CrmSettingsDialog({
         setError(null);
 
         try {
-          const response = await axiosInstance.get("/crm/reminder-types?per_page=100");
+          const response = await axiosInstance.get("/api/crm/reminder-types?per_page=100");
           if (response.data.status === "success" && response.data.data?.reminder_types) {
             // API returns reminder types directly
             setReminderTypes(response.data.data.reminder_types);
@@ -496,7 +497,7 @@ export default function CrmSettingsDialog({
 
     try {
       // Create reminder type using new endpoint
-      const response = await axiosInstance.post("/crm/reminder-types", {
+      const response = await axiosInstance.post("/api/crm/reminder-types", {
         name: reminderTypeFormData.title.trim(),
       });
 
@@ -525,6 +526,12 @@ export default function CrmSettingsDialog({
 
   // Handle delete reminder type
   const handleDeleteReminderType = async (reminderType: any) => {
+    // Prevent deletion of default types
+    if (!!reminderType.is_default) {
+      setError("لا يمكن حذف أنواع التذكير الافتراضية");
+      return;
+    }
+
     if (!confirm(`هل أنت متأكد من حذف نوع التذكير "${reminderType.name_ar || reminderType.name}"؟`)) {
       return;
     }
@@ -534,7 +541,7 @@ export default function CrmSettingsDialog({
 
     try {
       // Delete reminder type using new endpoint
-      const response = await axiosInstance.delete(`/crm/reminder-types/${reminderType.id}`);
+      const response = await axiosInstance.delete(`/api/crm/reminder-types/${reminderType.id}`);
 
       if (response.data.status === "success") {
         // Remove from list
@@ -734,6 +741,7 @@ export default function CrmSettingsDialog({
       <div className="space-y-3">
         {reminderTypes.map((reminderType) => {
           const isActive = reminderType.is_active === true || reminderType.is_active === 1;
+          const isDefault = !!reminderType.is_default;
           return (
             <div
               key={reminderType.id}
@@ -746,9 +754,16 @@ export default function CrmSettingsDialog({
                 />
                 <Bell className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <span className="font-medium">
-                    {reminderType.name_ar || reminderType.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">
+                      {reminderType.name_ar || reminderType.name}
+                    </span>
+                    {isDefault && (
+                      <Badge variant="default" className="bg-blue-100 text-blue-800 text-xs">
+                        افتراضي
+                      </Badge>
+                    )}
+                  </div>
                   {reminderType.name_ar && reminderType.name_ar !== reminderType.name && (
                     <span className="text-sm text-muted-foreground mr-2">
                       ({reminderType.name})
@@ -781,8 +796,9 @@ export default function CrmSettingsDialog({
                   variant="ghost"
                   size="icon"
                   onClick={() => handleDeleteReminderType(reminderType)}
-                  disabled={isDeleting === reminderType.id.toString()}
-                  className="text-red-600 hover:text-red-700 h-8 w-8"
+                  disabled={isDeleting === reminderType.id.toString() || isDefault}
+                  className="text-red-600 hover:text-red-700 h-8 w-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={isDefault ? "لا يمكن حذف أنواع التذكير الافتراضية" : "حذف"}
                 >
                   {isDeleting === reminderType.id.toString() ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -803,7 +819,7 @@ export default function CrmSettingsDialog({
     console.log("items", items);
     if (!items || items.length === 0) {
       return (
-        <p className="text-center text-muted-foreground py-12 text-right">
+        <p className="text-center text-muted-foreground py-12" dir="rtl">
           لا توجد عناصر مُعرّفة بعد. قم بإضافة العنصر الأول.
         </p>
       );

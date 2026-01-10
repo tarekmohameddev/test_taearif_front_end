@@ -123,11 +123,25 @@ export interface Reminder {
   datetime: string;
   priority: number | string;
   priority_label?: string;
-  status?: "pending" | "completed" | "overdue";
+  priority_label_ar?: string;
+  status?: "pending" | "completed" | "overdue" | "cancelled";
+  status_label?: string;
+  status_label_ar?: string;
   customer?: {
     id: number;
     name: string;
   };
+  reminder_type?: {
+    id: number;
+    name: string;
+    name_ar?: string;
+    color: string;
+    icon: string;
+  };
+  is_overdue?: boolean;
+  days_until_due?: number;
+  description?: string;
+  notes?: string;
 }
 
 export interface Interaction {

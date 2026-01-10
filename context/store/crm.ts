@@ -1,25 +1,7 @@
 import { create } from "zustand";
-import { Customer, PipelineStage, Appointment } from "@/types/crm";
+import { Customer, PipelineStage, Appointment, Reminder } from "@/types/crm";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
-
-interface Reminder {
-  id: string | number;
-  customer_id?: string;
-  title: string;
-  description?: string;
-  datetime: string;
-  status?: "pending" | "completed" | "overdue";
-  priority: number | string;
-  priority_label?: string;
-  type?: "call" | "meeting" | "follow_up" | "other";
-  customer?: {
-    id: number;
-    name: string;
-  };
-  created_at?: string;
-  updated_at?: string;
-}
 
 interface CrmProcedure {
   id: number;

@@ -1006,7 +1006,7 @@ export default function CrmPage() {
             {/* التذكيرات */}
             {activeView === "reminders" && (
               <RemindersList
-                remindersData={remindersData.map((reminder) => ({
+                remindersData={remindersData.map((reminder: any) => ({
                   id:
                     typeof reminder.id === "string"
                       ? parseInt(reminder.id)
@@ -1017,8 +1017,15 @@ export default function CrmPage() {
                       ? parseInt(reminder.priority)
                       : reminder.priority,
                   priority_label: reminder.priority_label || "",
+                  priority_label_ar: reminder.priority_label_ar || "",
                   datetime: reminder.datetime,
+                  status: reminder.status || "pending",
+                  status_label: reminder.status_label || "",
+                  status_label_ar: reminder.status_label_ar || "",
                   customer: reminder.customer || { id: 0, name: "" },
+                  reminder_type: reminder.reminder_type || undefined,
+                  is_overdue: reminder.is_overdue,
+                  days_until_due: reminder.days_until_due,
                 }))}
                 searchTerm={searchTerm}
                 filterStage={filterStage}
