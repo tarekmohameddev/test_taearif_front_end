@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { Customer, PipelineStage, Appointment } from "@/types/crm";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
@@ -209,8 +208,7 @@ interface CrmStore {
 }
 
 const useCrmStore = create<CrmStore>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       // CRM Data
       customers: [],
       pipelineStages: [],
@@ -804,25 +802,6 @@ const useCrmStore = create<CrmStore>()(
         ]);
       },
     }),
-    {
-      name: "crm-store",
-      partialize: (state) => ({
-        customers: state.customers,
-        pipelineStages: state.pipelineStages,
-        appointments: state.appointments,
-        reminders: state.reminders,
-        procedures: state.procedures,
-        priorities: state.priorities,
-        types: state.types,
-        crmData: state.crmData,
-        inquiriesData: state.inquiriesData,
-        totalCustomers: state.totalCustomers,
-        lastFetched: state.lastFetched,
-        isInitialized: state.isInitialized,
-        newDealData: state.newDealData, // Include newDealData for persistence
-      }),
-    },
-  ),
 );
 
 export default useCrmStore;
