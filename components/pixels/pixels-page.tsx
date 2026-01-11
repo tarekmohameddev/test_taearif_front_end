@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Link, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { PixelList } from "./pixel-list";
@@ -18,6 +20,7 @@ import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
 
 export function PixelsPage() {
+  const router = useRouter();
   const { userData, IsLoading: authLoading } = useAuthStore();
   const [pixels, setPixels] = useState<Pixel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -151,6 +154,14 @@ export function PixelsPage() {
                   ربط وإدارة pixels منصات التواصل الاجتماعي مع موقعك لتتبع الزوار والتحويلات
                 </p>
               </div>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard/apps")}
+                className="gap-2"
+              >
+                <ArrowRight className="h-4 w-4" />
+                العودة للتطبيقات
+              </Button>
             </div>
 
             <PixelList
