@@ -77,7 +77,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAuthStore from "@/context/AuthContext";
 import PaymentPopup from "@/components/popup/Popup";
-import { THEME_OPTIONS, ThemeOption } from "@/components/tenant/live-editor/ThemeChangeDialog";
+import { ThemeSection } from "@/components/settings/themes/ThemeSection";
 
 const domainsHelp = {
   title: "إدارة النطاقات",
@@ -104,11 +104,8 @@ export function SettingsPage() {
   const [verifyingDomains, setVerifyingDomains] = useState<any>({});
   const [deleteDomainId, setDeleteDomainId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [themes, setThemes] = useState<ThemeOption[]>(THEME_OPTIONS);
-  const [activeThemeId, setActiveThemeId] = useState<number | null>(null);
   const [hasFormatError, setHasFormatError] = useState(false);
   const [isLoadingDomains, setIsLoadingDomains] = useState(true);
-  const [isLoadingThemes, setIsLoadingThemes] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [subscriptionPlans, setSubscriptionPlans] = useState<any>({});
@@ -232,11 +229,6 @@ export function SettingsPage() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    // استخدام THEME_OPTIONS مباشرة بدلاً من API
-    // البيانات الآن تأتي من ThemeChangeDialog
-    setThemes(THEME_OPTIONS);
-  }, [activeTab]);
 
   const handleAddDomain = async () => {
     if (
@@ -356,18 +348,6 @@ export function SettingsPage() {
     }
   };
 
-  const handleActivateTheme = async (themeId: number) => {
-    try {
-      await axiosInstance.post("/settings/theme/set-active", {
-        theme_id: themeId,
-      });
-      setActiveThemeId(themeId);
-      toast.success("تم تنشيط الثيم بنجاح");
-    } catch (error: any) {
-      console.error("Error activating theme:", error);
-      toast.error("حدث خطأ أثناء تنشيط الثيم");
-    }
-  };
 
   const filteredDomains = (domains || []).filter((domain: any) => {
     if (statusFilter !== "all") {
@@ -1063,102 +1043,7 @@ export function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="themes" className="space-y-4 pt-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-start gap-4 mb-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-right">
-                      ثيمات الموقع
-                    </h2>
-                    <p className="text-muted-foreground  text-right">
-                      اختر وتخصيص ثيم موقعك
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {isLoadingThemes ? (
-                    [1, 2, 3, 4].map((i) => (
-                      <Card key={i} className="overflow-hidden">
-                        <Skeleton className="aspect-video w-full rounded-none" />
-                        <CardHeader className="pb-2">
-                          <div className="space-y-2">
-                            <Skeleton className="h-6 w-3/4" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-1/2" />
-                          </div>
-                        </CardHeader>
-                        <CardContent className="pb-2">
-                          <Skeleton className="h-6 w-24" />
-                        </CardContent>
-                        <CardFooter>
-                          <Skeleton className="h-9 w-full" />
-                        </CardFooter>
-                      </Card>
-                    ))
-                  ) : !themes || themes.length === 0 ? (
-                    <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center">
-                      <div className="rounded-full bg-muted p-3 mb-4">
-                        <Palette className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                      <h3 className="text-lg font-medium mb-1">
-                        لا توجد ثيمات متاحة
-                      </h3>
-                      <p className="text-muted-foreground mb-4">
-                        لم يتم العثور على الثيمات أو حدث خطأ في التحميل
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={() => window.location.reload()}
-                      >
-                        <RefreshCw className="h-4 w-4 ml-1" />
-                        إعادة المحاولة
-                      </Button>
-                    </div>
-                  ) : (
-                    themes.map((theme: any) => (
-                      <Card
-                        key={theme.id}
-                        className={`overflow-hidden ${activeThemeId === theme.id ? "border-primary border-2" : ""}`}
-                      >
-                        <div className="aspect-video w-full overflow-hidden">
-                          <img
-                            src={theme.image || "/placeholder.svg"}
-                            alt={theme.nameAr}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">
-                              {theme.nameAr}
-                            </CardTitle>
-                          </div>
-                          <CardDescription>{theme.descriptionAr}</CardDescription>
-                        </CardHeader>
-                        <CardFooter>
-                          {activeThemeId === theme.id ? (
-                            <Button
-                              variant="outline"
-                              className="w-full"
-                              disabled
-                            >
-                              <Check className="h-4 w-4 ml-1" />
-                              الثيم النشطة
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="default"
-                              className="w-full"
-                              onClick={() => handleActivateTheme(theme.id)}
-                            >
-                              <Sparkles className="h-4 w-4 ml-1" />
-                              تنشيط الثيم
-                            </Button>
-                          )}
-                        </CardFooter>
-                      </Card>
-                    ))
-                  )}
-                </div>
+                <ThemeSection />
               </TabsContent>
             </Tabs>
           </div>
