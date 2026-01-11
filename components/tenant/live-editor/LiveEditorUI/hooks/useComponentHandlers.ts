@@ -158,9 +158,12 @@ export function useComponentHandlers({
 
       // ✅ Initialize component in store with ensureComponentVariant
       try {
+        // For halfTextHalfImage components, pass componentName as variantId to ensure correct theme data
+        const variantId = normalizedComponentType === "halfTextHalfImage" ? componentName : newComponent.id;
+        
         store.ensureComponentVariant(
           newComponent.type,
-          newComponent.id, // ✅ Use component.id as variantId
+          variantId, // ✅ Use componentName for halfTextHalfImage, component.id for others
           {
             ...defaultData,
             ...newComponent.data,

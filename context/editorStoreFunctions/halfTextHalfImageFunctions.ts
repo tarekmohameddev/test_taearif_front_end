@@ -514,6 +514,18 @@ export const halfTextHalfImageFunctions = {
       }
     }
 
+    // ⭐ STEP 1.5: If no componentName found, check if variantId itself is a valid theme name
+    // This handles the case where the component was just created and componentName is not yet set
+    if (!currentTheme) {
+      const validThemes = [
+        "halfTextHalfImage1", "halfTextHalfImage2", "halfTextHalfImage3",
+        "halfTextHalfImage4", "halfTextHalfImage5", "halfTextHalfImage6", "halfTextHalfImage7"
+      ];
+      if (validThemes.includes(variantId)) {
+        currentTheme = variantId;
+      }
+    }
+
     // ⭐ STEP 2: Determine default data based on currentTheme (like footerFunctions does)
     // If we found currentTheme, use it to determine default data
     let defaultData: ComponentData;

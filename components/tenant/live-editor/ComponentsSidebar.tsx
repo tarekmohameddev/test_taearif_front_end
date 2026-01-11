@@ -463,34 +463,104 @@ export const ComponentsSidebar = () => {
                 className="grid grid-cols-2 gap-1.5"
               >
                 {displaySections.length > 0 ? (
-                  displaySections.map((section) => (
-                    <motion.div
-                      key={section.type}
-                      variants={listItem}
-                      className="group relative"
-                    >
-                      <DraggableDrawerItem
-                        componentType={section.component}
-                        section={section.section}
-                        data={{
-                          label: section.name,
-                          description: section.description,
-                          icon: section.type,
-                        }}
-                      >
-                        <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
-                          <div className="flex flex-col items-center justify-center text-center space-y-1">
-                            <div className="text-xl">
-                              {getSectionIconTranslated(section.type, t)}
+                  displaySections.map((section) => {
+                    const themeComponentNames =
+                      (themesComponentsList[activeTab] as string[]) || [];
+                    const variantsForSection = themeComponentNames.filter(
+                      (name) => getBaseComponentName(name) === section.component,
+                    );
+
+                    if (variantsForSection.length <= 1) {
+                      const variantName =
+                        variantsForSection.length === 1
+                          ? variantsForSection[0]
+                          : undefined;
+
+                      const variantSuffix =
+                        variantName &&
+                        variantName.startsWith(section.component)
+                          ? variantName.slice(section.component.length)
+                          : "";
+                      const displayLabel =
+                        variantSuffix && variantSuffix.length > 0
+                          ? `${section.name} ${variantSuffix}`
+                          : section.name;
+
+                      return (
+                        <motion.div
+                          key={`${section.type}-${variantName || "default"}`}
+                          variants={listItem}
+                          className="group relative"
+                        >
+                          <DraggableDrawerItem
+                            componentType={section.component}
+                            section={section.section}
+                            data={{
+                              label: displayLabel,
+                              description: section.description,
+                              icon: section.type,
+                              ...(variantName
+                                ? { variant: variantName }
+                                : {}),
+                            }}
+                          >
+                            <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                <div className="text-xl">
+                                  {getSectionIconTranslated(section.type, t)}
+                                </div>
+                                <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
+                                  {displayLabel}
+                                </h3>
+                              </div>
                             </div>
-                            <h3 className="font-medium text-gray-900 text-xs leading-tight">
-                              {section.name}
-                            </h3>
-                          </div>
-                        </div>
-                      </DraggableDrawerItem>
-                    </motion.div>
-                  ))
+                          </DraggableDrawerItem>
+                        </motion.div>
+                      );
+                    }
+
+                    return variantsForSection.map((variantName) => {
+                      const variantSuffix = variantName.startsWith(
+                        section.component,
+                      )
+                        ? variantName.slice(section.component.length)
+                        : "";
+                      const displayLabel =
+                        variantSuffix && variantSuffix.length > 0
+                          ? `${section.name} ${variantSuffix}`
+                          : section.name;
+
+                      return (
+                        <motion.div
+                          key={`${section.type}-${variantName}`}
+                          variants={listItem}
+                          className="group relative"
+                        >
+                          <DraggableDrawerItem
+                            componentType={section.component}
+                            section={section.section}
+                            data={{
+                              label: displayLabel,
+                              description: section.description,
+                              icon: section.type,
+                              variant: variantName,
+                            }}
+                          >
+                            <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                              <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                <div className="text-xl">
+                                  {getSectionIconTranslated(section.type, t)}
+                                </div>
+                                <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
+                                  {displayLabel}
+                                </h3>
+                              </div>
+                            </div>
+                          </DraggableDrawerItem>
+                        </motion.div>
+                      );
+                    });
+                  })
                 ) : (
                   <motion.div
                     variants={listItem}
