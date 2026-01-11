@@ -11,6 +11,13 @@ import {
   PositionDebugInfo,
   validateComponentPositions,
 } from "@/services/live-editor/dragDrop/enhanced-position-tracker";
+import {
+  logBefore,
+  logAfter,
+  logBeforeAfter,
+  logDuring,
+  logError,
+} from "@/lib/fileLogger";
 
 interface UseComponentHandlersProps {
   pageComponents: any[];
@@ -41,7 +48,7 @@ export function useComponentHandlers({
     [],
   );
 
-  // دالة إضافة مكون جديد - محسنة لتعمل مع النظام الجديد
+  // دالة إضافة مكون جديد - محسنة لتعمل مع النظام الجديد مع logging شامل
   const handleAddComponent = useCallback(
     (componentData: {
       type: string;
@@ -51,6 +58,20 @@ export function useComponentHandlers({
       variant?: string;
       sourceData?: any;
     }) => {
+      // ========== LOG BEFORE ==========
+      logBefore(
+        "COMPONENT_ADD",
+        "ADD_COMPONENT_START",
+        {
+          componentData,
+          currentPageComponentsCount: pageComponents.length,
+          targetIndex: componentData.index,
+        },
+        {
+          componentType: componentData.type,
+        }
+      );
+
       // تحويل componentType إلى camelCase
       const normalizedComponentType = componentData.type
         .replace(/\s+/g, "")
@@ -61,6 +82,18 @@ export function useComponentHandlers({
         componentData.variant ||
         getComponentNameWithOne(normalizedComponentType);
 
+      // ========== LOG DURING: Creating component ==========
+      logDuring(
+        "COMPONENT_ADD",
+        "CREATING_COMPONENT",
+        {
+          normalizedComponentType,
+          componentName,
+        }
+      );
+
+      const defaultData = createDefaultData(normalizedComponentType, componentName);
+
       const newComponent = {
         id: uuidv4(),
         type: normalizedComponentType,
@@ -68,13 +101,35 @@ export function useComponentHandlers({
           componentData.type.charAt(0).toUpperCase() +
           componentData.type.slice(1),
         componentName,
-        data: createDefaultData(normalizedComponentType),
+        data: defaultData,
         layout: {
           row: pageComponents.length,
           col: 0,
           span: 2,
         },
       };
+
+      // ========== LOG BEFORE: Store state ==========
+      const store = useEditorStore.getState();
+      const currentPage = store.currentPage || "homepage";
+      
+      logBefore(
+        "COMPONENT_ADD",
+        "STORE_STATE_BEFORE",
+        {
+          currentPage,
+          pageComponentsByPageCount: store.pageComponentsByPage[currentPage]?.length || 0,
+          existingComponentStates: Object.keys(store).filter(k => k.includes("States") && typeof (store as any)[k] === "object").reduce((acc: any, k) => {
+            acc[k] = Object.keys((store as any)[k] || {}).length;
+            return acc;
+          }, {}),
+        },
+        {
+          componentId: newComponent.id,
+          componentName: newComponent.componentName,
+          componentType: newComponent.type,
+        }
+      );
 
       // إضافة المكون في الموضع المحدد مع تحديث محسن
       const updatedComponents = [...pageComponents];
@@ -84,8 +139,168 @@ export function useComponentHandlers({
       );
       updatedComponents.splice(targetIndex, 0, newComponent);
 
-      // تحديث الحالة مع تنشيط الحدث
+      // ========== CRITICAL: Initialize component in store ==========
+      logDuring(
+        "COMPONENT_ADD",
+        "INITIALIZING_IN_STORE",
+        {
+          componentId: newComponent.id,
+          componentType: newComponent.type,
+          componentName: newComponent.componentName,
+          defaultDataKeys: Object.keys(defaultData),
+        },
+        {
+          componentId: newComponent.id,
+          componentName: newComponent.componentName,
+          componentType: newComponent.type,
+        }
+      );
+
+      // ✅ Initialize component in store with ensureComponentVariant
+      try {
+        store.ensureComponentVariant(
+          newComponent.type,
+          newComponent.id, // ✅ Use component.id as variantId
+          {
+            ...defaultData,
+            ...newComponent.data,
+          }
+        );
+
+        logAfter(
+          "COMPONENT_ADD",
+          "STORE_INITIALIZED",
+          {
+            componentId: newComponent.id,
+            storeData: store.getComponentData(newComponent.type, newComponent.id),
+          },
+          {
+            componentId: newComponent.id,
+            componentName: newComponent.componentName,
+            componentType: newComponent.type,
+          }
+        );
+      } catch (error) {
+        logError(
+          "COMPONENT_ADD",
+          "STORE_INITIALIZATION_FAILED",
+          error,
+          {
+            componentId: newComponent.id,
+            componentName: newComponent.componentName,
+            componentType: newComponent.type,
+          }
+        );
+      }
+
+      // تحديث الحالة المحلية
+      logDuring(
+        "COMPONENT_ADD",
+        "UPDATING_LOCAL_STATE",
+        {
+          updatedComponentsCount: updatedComponents.length,
+          targetIndex,
+        },
+        {
+          componentId: newComponent.id,
+          componentName: newComponent.componentName,
+          componentType: newComponent.type,
+        }
+      );
+
       state.setPageComponents(updatedComponents);
+
+      // ========== CRITICAL: Update pageComponentsByPage in store ==========
+      setTimeout(() => {
+        try {
+          const store = useEditorStore.getState();
+          const currentPage = store.currentPage || "homepage";
+          const currentPageComponents = store.pageComponentsByPage[currentPage] || [];
+
+          logBefore(
+            "COMPONENT_ADD",
+            "UPDATING_PAGE_COMPONENTS_BY_PAGE",
+            {
+              currentPage,
+              beforeCount: currentPageComponents.length,
+              newComponent,
+            },
+            {
+              componentId: newComponent.id,
+              componentName: newComponent.componentName,
+              componentType: newComponent.type,
+            }
+          );
+
+          const updatedPageComponents = [...currentPageComponents];
+          const storeTargetIndex = Math.min(
+            componentData.index,
+            updatedPageComponents.length,
+          );
+          updatedPageComponents.splice(storeTargetIndex, 0, newComponent);
+
+          store.forceUpdatePageComponents(currentPage, updatedPageComponents);
+
+          logAfter(
+            "COMPONENT_ADD",
+            "PAGE_COMPONENTS_BY_PAGE_UPDATED",
+            {
+              currentPage,
+              afterCount: updatedPageComponents.length,
+              pageComponentsByPage: store.pageComponentsByPage[currentPage],
+            },
+            {
+              componentId: newComponent.id,
+              componentName: newComponent.componentName,
+              componentType: newComponent.type,
+            }
+          );
+
+          // Verify component is in store
+          const storeData = store.getComponentData(newComponent.type, newComponent.id);
+          if (!storeData || Object.keys(storeData).length === 0) {
+            logError(
+              "COMPONENT_ADD",
+              "COMPONENT_NOT_FOUND_IN_STORE",
+              {
+                componentId: newComponent.id,
+                componentType: newComponent.type,
+                storeData,
+              },
+              {
+                componentId: newComponent.id,
+                componentName: newComponent.componentName,
+                componentType: newComponent.type,
+              }
+            );
+          } else {
+            logAfter(
+              "COMPONENT_ADD",
+              "STORE_VERIFICATION_SUCCESS",
+              {
+                componentId: newComponent.id,
+                storeDataKeys: Object.keys(storeData),
+              },
+              {
+                componentId: newComponent.id,
+                componentName: newComponent.componentName,
+                componentType: newComponent.type,
+              }
+            );
+          }
+        } catch (error) {
+          logError(
+            "COMPONENT_ADD",
+            "STORE_UPDATE_FAILED",
+            error,
+            {
+              componentId: newComponent.id,
+              componentName: newComponent.componentName,
+              componentType: newComponent.type,
+            }
+          );
+        }
+      }, 0);
 
       // تحديد المكون الجديد تلقائياً
       setTimeout(() => {
@@ -94,6 +309,44 @@ export function useComponentHandlers({
 
       // إعادة تعيين علامة الإغلاق اليدوي عند إضافة مكون جديد
       setWasComponentsSidebarManuallyClosed(false);
+
+      // ========== LOG AFTER ==========
+      logAfter(
+        "COMPONENT_ADD",
+        "ADD_COMPONENT_COMPLETE",
+        {
+          newComponent: {
+            id: newComponent.id,
+            type: newComponent.type,
+            componentName: newComponent.componentName,
+            layout: newComponent.layout,
+          },
+          updatedComponentsCount: updatedComponents.length,
+          targetIndex,
+        },
+        {
+          componentId: newComponent.id,
+          componentName: newComponent.componentName,
+          componentType: newComponent.type,
+        }
+      );
+
+      // ========== LOG BEFORE/AFTER ==========
+      logBeforeAfter(
+        "ADD_COMPONENT",
+        {
+          pageComponentsBefore: pageComponents.map(c => ({ id: c.id, type: c.type, componentName: c.componentName })),
+          pageComponentsByPageBefore: store.pageComponentsByPage[currentPage]?.map((c: any) => ({ id: c.id, type: c.type, componentName: c.componentName })) || [],
+        },
+        {
+          pageComponentsAfter: updatedComponents.map(c => ({ id: c.id, type: c.type, componentName: c.componentName })),
+        },
+        {
+          componentId: newComponent.id,
+          componentName: newComponent.componentName,
+          componentType: newComponent.type,
+        }
+      );
     },
     [
       pageComponents,

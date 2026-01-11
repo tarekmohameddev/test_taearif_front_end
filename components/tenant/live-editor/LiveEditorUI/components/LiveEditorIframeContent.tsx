@@ -2,7 +2,7 @@
 // LiveEditor Iframe Content Component
 // ============================================================================
 
-import React, { Suspense, useMemo } from "react";
+import React, { Suspense, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LiveEditorDropZone } from "@/services/live-editor/dragDrop";
 import { LiveEditorDraggableComponent } from "@/services/live-editor/dragDrop/DraggableComponent";
@@ -11,6 +11,7 @@ import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import { SkeletonLoader } from "@/components/skeleton";
 import type { DeviceType } from "../types";
+import { logBefore, logAfter, logDuring } from "@/lib/fileLogger";
 
 interface LiveEditorIframeContentProps {
   backendDataState: {
@@ -48,6 +49,25 @@ export function LiveEditorIframeContent({
   handleEditClick,
   handleDeleteClick,
 }: LiveEditorIframeContentProps) {
+  // ========== LOG COMPONENTS RENDERING ==========
+  useEffect(() => {
+    logBefore(
+      "IFRAME_CONTENT",
+      "RENDER_COMPONENTS",
+      {
+        componentsCount: backendDataState.componentsWithMergedData.length,
+        components: backendDataState.componentsWithMergedData.map((c: any) => ({
+          id: c.id,
+          type: c.type,
+          componentName: c.componentName,
+          hasMergedData: !!(c.mergedData && Object.keys(c.mergedData).length > 0),
+          mergedDataKeys: c.mergedData ? Object.keys(c.mergedData) : [],
+        })),
+        selectedDevice,
+        pageSlug: state.slug,
+      }
+    );
+  }, [backendDataState.componentsWithMergedData.length, selectedDevice, state.slug]);
   // ⭐ CRITICAL: Memoize header data and key to prevent infinite loops
   // Only recalculate when actual data changes, not on every render
   const { headerDataWithoutVariant, headerKey } = useMemo(() => {
@@ -211,22 +231,45 @@ export function LiveEditorIframeContent({
                             : "text-base"
                       }`}
                     >
-                      <CachedComponent
-                        key={`${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`}
-                        componentName={component.componentName}
-                        section={state.slug}
-                        componentId={component.id}
-                        data={
+                      {(() => {
+                        // ========== LOG COMPONENT RENDER ==========
+                        logDuring(
+                          "IFRAME_CONTENT",
+                          "RENDERING_COMPONENT",
                           {
-                            ...component.mergedData, // ✅ استخدام البيانات من useState
-                            id: component.id,
-                            useStore: true,
-                            variant: component.id, // ✅ Use id from database (matches the key in heroStates)
-                            deviceType: selectedDevice,
-                            forceUpdate: component.forceUpdate,
-                          } as any
-                        }
-                      />
+                            componentId: component.id,
+                            componentName: component.componentName,
+                            componentType: component.type,
+                            hasMergedData: !!(component.mergedData && Object.keys(component.mergedData).length > 0),
+                            mergedDataKeys: component.mergedData ? Object.keys(component.mergedData) : [],
+                            key: `${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`,
+                          },
+                          {
+                            componentId: component.id,
+                            componentName: component.componentName,
+                            componentType: component.type,
+                          }
+                        );
+
+                        return (
+                          <CachedComponent
+                            key={`${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`}
+                            componentName={component.componentName}
+                            section={state.slug}
+                            componentId={component.id}
+                            data={
+                              {
+                                ...component.mergedData, // ✅ استخدام البيانات من useState
+                                id: component.id,
+                                useStore: true,
+                                variant: component.id, // ✅ Use id from database (matches the key in heroStates)
+                                deviceType: selectedDevice,
+                                forceUpdate: component.forceUpdate,
+                              } as any
+                            }
+                          />
+                        );
+                      })()}
                     </div>
                   )}
                 </LiveEditorDraggableComponent>

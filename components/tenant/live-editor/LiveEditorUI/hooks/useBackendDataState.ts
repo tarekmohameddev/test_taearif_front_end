@@ -4,10 +4,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useEditorStore } from "@/context/editorStore";
+import { logEditorStore } from "@/lib/debugLogger";
 
 interface UseBackendDataStateProps {
   pageComponents: any[];
-  slug: string | undefined;
+  slug: string;
   globalHeaderData: any;
   globalFooterData: any;
   globalFooterVariant: string;
@@ -168,6 +169,26 @@ export function useBackendDataState({
           mergedData,
         };
       });
+
+    // Log backend data state for debugging live editor flow
+    logEditorStore(
+      "BACKEND_DATA_STATE_UPDATE",
+      slug || "unknown-slug",
+      "backend-data",
+      {
+        slug,
+        themeChangeTimestamp,
+        componentCount: componentsWithMergedData.length,
+        components: componentsWithMergedData.map((c: any) => ({
+          id: c.id,
+          type: c.type,
+          componentName: c.componentName,
+          hasMergedData:
+            !!c.mergedData &&
+            Object.keys((c.mergedData as any) || {}).length > 0,
+        })),
+      },
+    );
 
     // 2. تحديث state
     setBackendDataState({

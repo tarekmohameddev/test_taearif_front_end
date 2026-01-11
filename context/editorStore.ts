@@ -84,6 +84,13 @@ import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
 import { getDefaultInputs2Data } from "./editorStoreFunctions/inputs2Functions";
 import defaultData from "@/lib/defaultData.json";
 import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
+import {
+  logBefore,
+  logAfter,
+  logBeforeAfter,
+  logDuring,
+  logError,
+} from "@/lib/fileLogger";
 
 type OpenDialogFn = () => void;
 
@@ -1141,6 +1148,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   // Generic functions for all components
   ensureComponentVariant: (componentType, variantId, initial) => {
+    // ========== LOG BEFORE ==========
+    logBefore(
+      "EDITOR_STORE",
+      "ENSURE_COMPONENT_VARIANT",
+      {
+        componentType,
+        variantId,
+        hasInitial: !!initial,
+        initialKeys: initial ? Object.keys(initial) : [],
+      },
+      {
+        componentId: variantId,
+        componentType,
+      }
+    );
+
     // ⭐ CRITICAL: Check if variant already exists BEFORE calling set()
     // This prevents unnecessary store updates that can cause infinite loops
     const currentState = get();
@@ -1213,11 +1236,40 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       }
     })();
 
+    // ========== LOG DURING: Check existing data ==========
+    logDuring(
+      "EDITOR_STORE",
+      "CHECKING_EXISTING_DATA",
+      {
+        componentType,
+        variantId,
+        hasExistingData: !!(existingData && Object.keys(existingData).length > 0),
+        existingDataKeys: existingData ? Object.keys(existingData) : [],
+      },
+      {
+        componentId: variantId,
+        componentType,
+      }
+    );
+
     // ⭐ CRITICAL: Check if we actually need to update
     // If variant already exists and has data, be very conservative about updates
     if (existingData && Object.keys(existingData).length > 0) {
       // If no initial data provided, skip update (variant already exists)
       if (!initial) {
+        logDuring(
+          "EDITOR_STORE",
+          "SKIPPING_UPDATE_NO_INITIAL",
+          {
+            componentType,
+            variantId,
+            reason: "Variant already exists and no initial data provided",
+          },
+          {
+            componentId: variantId,
+            componentType,
+          }
+        );
         return; // Don't call set() at all - prevents any store update
       }
 
@@ -1239,6 +1291,19 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       // If it's props-like and data exists, skip update to prevent loops
       // Components should initialize once, then use setComponentData for updates
       if (isPropsLike) {
+        logDuring(
+          "EDITOR_STORE",
+          "SKIPPING_UPDATE_PROPS_LIKE",
+          {
+            componentType,
+            variantId,
+            reason: "Initial data is props-like, skipping to prevent loops",
+          },
+          {
+            componentId: variantId,
+            componentType,
+          }
+        );
         return; // Skip update - props change on every render
       }
 
@@ -1248,15 +1313,58 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         const initialDataStr = JSON.stringify(initial);
 
         if (existingDataStr === initialDataStr) {
+          logDuring(
+            "EDITOR_STORE",
+            "SKIPPING_UPDATE_SAME_DATA",
+            {
+              componentType,
+              variantId,
+              reason: "Data is the same, skipping update",
+            },
+            {
+              componentId: variantId,
+              componentType,
+            }
+          );
           // Data is the same - skip update to prevent unnecessary re-renders
           return;
         }
       } catch (e) {
+        logDuring(
+          "EDITOR_STORE",
+          "SKIPPING_UPDATE_JSON_ERROR",
+          {
+            componentType,
+            variantId,
+            reason: "JSON.stringify failed, skipping to prevent loops",
+            error: String(e),
+          },
+          {
+            componentId: variantId,
+            componentType,
+          }
+        );
         // If JSON.stringify fails (circular refs, etc), skip update to be safe
         // This prevents infinite loops when we can't compare
         return;
       }
     }
+
+    // ========== LOG BEFORE: Updating store ==========
+    logBefore(
+      "EDITOR_STORE",
+      "UPDATING_STORE",
+      {
+        componentType,
+        variantId,
+        hasInitial: !!initial,
+        willCreate: !existingData || Object.keys(existingData || {}).length === 0,
+      },
+      {
+        componentId: variantId,
+        componentType,
+      }
+    );
 
     // Only call set() if we actually need to create/update the variant
     set((state) => {
@@ -1422,8 +1530,83 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         !result ||
         (typeof result === "object" && Object.keys(result).length === 0)
       ) {
+        logDuring(
+          "EDITOR_STORE",
+          "ENSURE_VARIANT_NO_CHANGES",
+          {
+            componentType,
+            variantId,
+            reason: "Result is empty, no changes needed",
+          },
+          {
+            componentId: variantId,
+            componentType,
+          }
+        );
         return state;
       }
+
+      // ========== LOG AFTER: Store updated ==========
+      // Log after set() completes
+      setTimeout(() => {
+        const newState = get();
+        let updatedData: any;
+        
+        switch (componentType) {
+          case "hero":
+            updatedData = newState.heroStates[variantId];
+            break;
+          case "header":
+            updatedData = newState.headerStates[variantId];
+            break;
+          case "footer":
+            updatedData = newState.footerStates[variantId];
+            break;
+          case "halfTextHalfImage":
+            updatedData = newState.halfTextHalfImageStates[variantId];
+            break;
+          case "propertySlider":
+            updatedData = newState.propertySliderStates[variantId];
+            break;
+          case "testimonials":
+            updatedData = newState.testimonialsStates[variantId];
+            break;
+          case "whyChooseUs":
+            updatedData = newState.whyChooseUsStates[variantId];
+            break;
+          default:
+            updatedData = newState.componentStates[componentType]?.[variantId];
+        }
+
+        logAfter(
+          "EDITOR_STORE",
+          "ENSURE_COMPONENT_VARIANT_COMPLETE",
+          {
+            componentType,
+            variantId,
+            hasUpdatedData: !!(updatedData && Object.keys(updatedData).length > 0),
+            updatedDataKeys: updatedData ? Object.keys(updatedData) : [],
+            resultKeys: result ? Object.keys(result) : [],
+          },
+          {
+            componentId: variantId,
+            componentType,
+          }
+        );
+
+        // Log before/after if we had existing data
+        if (existingData && Object.keys(existingData).length > 0) {
+          logBeforeAfter(
+            "ENSURE_COMPONENT_VARIANT",
+            { before: existingData },
+            { after: updatedData || {} },
+            {
+              componentId: variantId,
+              componentType,
+            }
+          );
+        }
+      }, 0);
 
       return result;
     });
@@ -3375,15 +3558,82 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       return { pageComponentsByPage: newPageComponentsByPage } as any;
     }),
 
-  forceUpdatePageComponents: (slug, components) =>
+  forceUpdatePageComponents: (slug, components) => {
+    // ========== LOG BEFORE ==========
+    const stateBefore = get();
+    const beforeComponents = stateBefore.pageComponentsByPage[slug] || [];
+    
+    logBefore(
+      "EDITOR_STORE",
+      "FORCE_UPDATE_PAGE_COMPONENTS",
+      {
+        slug,
+        beforeCount: beforeComponents.length,
+        afterCount: components.length,
+        beforeComponents: beforeComponents.map((c: any) => ({
+          id: c.id,
+          type: c.type,
+          componentName: c.componentName,
+        })),
+        afterComponents: components.map((c: any) => ({
+          id: c.id,
+          type: c.type,
+          componentName: c.componentName,
+        })),
+      }
+    );
+
     set((state) => {
-      return {
+      const newState = {
         pageComponentsByPage: {
           ...state.pageComponentsByPage,
           [slug]: components,
         },
       };
-    }),
+
+      // ========== LOG AFTER ==========
+      setTimeout(() => {
+        const stateAfter = get();
+        const afterComponents = stateAfter.pageComponentsByPage[slug] || [];
+        
+        logAfter(
+          "EDITOR_STORE",
+          "FORCE_UPDATE_PAGE_COMPONENTS_COMPLETE",
+          {
+            slug,
+            beforeCount: beforeComponents.length,
+            afterCount: afterComponents.length,
+            updatedComponents: afterComponents.map((c: any) => ({
+              id: c.id,
+              type: c.type,
+              componentName: c.componentName,
+            })),
+          }
+        );
+
+        // Log before/after comparison
+        logBeforeAfter(
+          "FORCE_UPDATE_PAGE_COMPONENTS",
+          {
+            before: beforeComponents.map((c: any) => ({
+              id: c.id,
+              type: c.type,
+              componentName: c.componentName,
+            })),
+          },
+          {
+            after: afterComponents.map((c: any) => ({
+              id: c.id,
+              type: c.type,
+              componentName: c.componentName,
+            })),
+          }
+        );
+      }, 0);
+
+      return newState;
+    });
+  },
 
   // WebsiteLayout functions
   setWebsiteLayout: (data) =>

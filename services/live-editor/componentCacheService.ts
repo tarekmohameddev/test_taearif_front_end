@@ -1,4 +1,5 @@
 import React, { lazy } from "react";
+import { debugLogger } from "@/lib/debugLogger";
 
 // Cache للمكونات المحملة - خارج المكون لتجنب إعادة الإنشاء
 const componentCache = new Map<string, React.LazyExoticComponent<any>>();
@@ -7,7 +8,14 @@ const componentCache = new Map<string, React.LazyExoticComponent<any>>();
 export const getCachedComponent = (
   cacheKey: string,
 ): React.LazyExoticComponent<any> | undefined => {
-  return componentCache.get(cacheKey);
+  const component = componentCache.get(cacheKey);
+
+  debugLogger.log("COMPONENT_CACHE", "GET", {
+    cacheKey,
+    hit: !!component,
+  });
+
+  return component;
 };
 
 // دالة حفظ المكون في الـ cache
@@ -16,6 +24,10 @@ export const setCachedComponent = (
   component: React.LazyExoticComponent<any>,
 ): void => {
   componentCache.set(cacheKey, component);
+
+  debugLogger.log("COMPONENT_CACHE", "SET", {
+    cacheKey,
+  });
 };
 
 // دالة إنشاء مفتاح cache للمكون
@@ -33,6 +45,11 @@ export const clearComponentCache = (cacheKey?: string): void => {
   } else {
     componentCache.clear();
   }
+
+  debugLogger.log("COMPONENT_CACHE", "CLEAR", {
+    cacheKey: cacheKey || "ALL",
+    size: componentCache.size,
+  });
 };
 
 // دالة الحصول على حجم cache
