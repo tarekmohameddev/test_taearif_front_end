@@ -588,23 +588,23 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
             </Button>
           </>
         ) : (
-          <Button
-            size="sm"
-            className="w-full gap-1"
-            onClick={() => onInstall(app.id)}
-          >
-            {isPixelApp ? (
-              <>
-                <Link className="h-4 w-4" />
-                ربط
-              </>
-            ) : (
-              <>
-                <Download className="h-4 w-4" />
-                تثبيت
-              </>
-            )}
-          </Button>
+                <Button
+                  size="sm"
+                  className="w-full gap-1"
+                  onClick={() => onInstall(app.id)}
+                >
+                  {isPixelApp ? (
+                    <>
+                      <ExternalLink className="h-4 w-4" />
+                      فتح
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4" />
+                      تثبيت
+                    </>
+                  )}
+                </Button>
         )}
       </CardFooter>
     </Card>
@@ -702,8 +702,8 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
                 >
                   {isPixelApp ? (
                     <>
-                      <Link className="h-4 w-4" />
-                      ربط
+                      <ExternalLink className="h-4 w-4" />
+                      فتح
                     </>
                   ) : (
                     <>
