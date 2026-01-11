@@ -25,26 +25,44 @@ export function PixelList({
 }: PixelListProps) {
   if (loading) {
     return (
-      <div className="space-y-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-between p-4 border rounded-lg"
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold">Pixels المربوطة</h3>
+          <Button
+            onClick={onAddClick}
+            className="gap-2"
+            disabled={!canAdd}
+            title={
+              !canAdd ? "تم ربط جميع ال Pixels المتاحة" : undefined
+            }
           >
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-10 w-10 rounded" />
+            <Plus className="h-4 w-4" />
+            إضافة Pixel جديد
+          </Button>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-4 border rounded-lg space-y-4"
+            >
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              </div>
               <div className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-6 w-16" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 flex-1" />
+                  <Skeleton className="h-8 flex-1" />
+                </div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Skeleton className="h-8 w-16" />
-              <Skeleton className="h-8 w-16" />
-              <Skeleton className="h-8 w-16" />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }
@@ -71,7 +89,7 @@ export function PixelList({
           <p className="text-muted-foreground">لا توجد pixels مربوطة</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {pixels.map((pixel) => (
             <PixelCard
               key={pixel.id}
