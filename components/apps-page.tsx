@@ -9,9 +9,6 @@ import {
   Star,
   Trash2,
   Link,
-  Edit,
-  Plus,
-  AlertTriangle,
   ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,25 +33,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { useState, useEffect } from "react";
@@ -63,15 +41,6 @@ import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
-
-interface Pixel {
-  id: number;
-  platform: string;
-  pixel_id: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 interface App {
   id: string | number;
@@ -96,25 +65,9 @@ export function AppsPage() {
   const [activeTab, setActiveTab] = useState("apps");
   const [apps, setApps] = useState<App[]>([]);
   const [loading, setLoading] = useState(true);
-  const [pixels, setPixels] = useState<Pixel[]>([]);
-  const [pixelsLoading, setPixelsLoading] = useState(false);
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, error } = sidebarData;
-
-  // Pixel management states
-  const [isPixelDialogOpen, setIsPixelDialogOpen] = useState(false);
-  const [isAddPixelDialogOpen, setIsAddPixelDialogOpen] = useState(false);
-  const [isEditPixelDialogOpen, setIsEditPixelDialogOpen] = useState(false);
-  const [isDeletePixelDialogOpen, setIsDeletePixelDialogOpen] = useState(false);
-  const [selectedPixel, setSelectedPixel] = useState<Pixel | null>(null);
-  const [pixelFormData, setPixelFormData] = useState({
-    platform: "facebook",
-    pixel_id: "",
-    is_active: true,
-  });
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({});
+  const router = useRouter();
 
   const categories = [
     "الكل",
@@ -130,121 +83,6 @@ export function AppsPage() {
   ];
 
   const [installedApps, setInstalledApps] = useState<App[]>([]);
-
-  // Helper functions for platform management
-  const getPlatformDisplayName = (platform: string) => {
-    switch (platform) {
-      case "facebook":
-        return "Facebook";
-      case "snapchat":
-        return "Snapchat";
-      case "tiktok":
-        return "TikTok";
-      default:
-        return platform;
-    }
-  };
-
-  const getPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case "facebook":
-        return "F";
-      case "snapchat":
-        return "S";
-      case "tiktok":
-        return "T";
-      default:
-        return platform.charAt(0).toUpperCase();
-    }
-  };
-
-  const getPlatformExamples = (platform: string) => {
-    switch (platform) {
-      case "facebook":
-        return "123456789012345";
-      case "snapchat":
-        return "SC-4455667788";
-      case "tiktok":
-        return "ABC123DEF456GHI789JKL";
-      default:
-        return "";
-    }
-  };
-
-  const getPlatformDescription = (platform: string) => {
-    switch (platform) {
-      case "facebook":
-        return "Facebook Pixel: معرف مكون من 15 رقم بالضبط. يمكنك العثور عليه في Facebook Events Manager.";
-      case "snapchat":
-        return "Snapchat Pixel: معرف مخصص من Snapchat. انسخه من إعدادات Snapchat Ads Manager.";
-      case "tiktok":
-        return "TikTok Pixel: معرف مكون من 20-25 حرف وأرقام كبيرة. يمكنك العثور عليه في TikTok Events Manager.";
-      default:
-        return "";
-    }
-  };
-
-  // Validation function
-  const validatePixelForm = (data: any): boolean => {
-    try {
-      // Simple validation based on platform
-      if (!data.platform || !data.pixel_id) {
-        setValidationErrors({ pixel_id: "جميع الحقول مطلوبة" });
-        return false;
-      }
-
-      if (data.platform === "facebook") {
-        if (!/^[0-9]{15}$/.test(data.pixel_id)) {
-          setValidationErrors({
-            pixel_id:
-              "Facebook Pixel يجب أن يكون 15 رقم بالضبط (مثال: 123456789012345)",
-          });
-          return false;
-        }
-      } else if (data.platform === "tiktok") {
-        if (!/^[A-Z0-9]{20,25}$/.test(data.pixel_id)) {
-          setValidationErrors({
-            pixel_id:
-              "TikTok Pixel يجب أن يكون 20-25 حرف وأرقام كبيرة (مثال: ABC123DEF456GHI789JKL)",
-          });
-          return false;
-        }
-      } else if (data.platform === "snapchat") {
-        if (data.pixel_id.trim().length < 3) {
-          setValidationErrors({
-            pixel_id: "Snapchat Pixel يجب أن يكون 3 أحرف على الأقل",
-          });
-          return false;
-        }
-      }
-
-      setValidationErrors({});
-      return true;
-    } catch (error) {
-      setValidationErrors({ pixel_id: "خطأ في التحقق من صحة البيانات" });
-      return false;
-    }
-  };
-
-  const resetPixelForm = () => {
-    setPixelFormData({ platform: "facebook", pixel_id: "", is_active: true });
-    setValidationErrors({});
-  };
-
-  // Helper function to get available platforms (excluding already added ones)
-  const getAvailablePlatforms = (includePlatform?: string) => {
-    const allPlatforms = [
-      { value: "facebook", label: "Facebook" },
-      { value: "tiktok", label: "TikTok" },
-      { value: "snapchat", label: "Snapchat" },
-    ];
-
-    const usedPlatforms = new Set(pixels.map((pixel) => pixel.platform));
-    if (includePlatform) usedPlatforms.delete(includePlatform);
-    return allPlatforms.filter(
-      (platform) => !usedPlatforms.has(platform.value),
-    );
-  };
 
   // Add pixels app to the apps array
   const addPixelsApp = (fetchedApps: App[]) => {
@@ -301,35 +139,10 @@ export function AppsPage() {
     fetchApps();
   }, [userData?.token, authLoading]);
 
-  const fetchPixels = async () => {
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
-      return; // Exit early if token is not ready
-    }
-
-    setPixelsLoading(true);
-    try {
-      const res = await axiosInstance.get("/pixels");
-      setPixels(res.data.data);
-    } catch (err) {
-      console.error("Failed to load pixels:", err);
-    } finally {
-      setPixelsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
-      return; // Exit early if token is not ready
-    }
-    fetchPixels();
-  }, [userData?.token, authLoading]);
-
   const handleInstall = async (appId: string | number) => {
     // Special handling for pixels app
     if (appId === "pixels-app") {
-      setIsPixelDialogOpen(true);
+      router.push("/dashboard/apps/pixels");
       return;
     }
 
@@ -402,94 +215,6 @@ export function AppsPage() {
       toast.error("فشل في إزالة التطبيق");
       console.error("فشل في إزالة تثبيت التطبيق:", error);
     }
-  };
-
-  // Pixel management functions
-  const handleAddPixel = async () => {
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
-      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
-      return;
-    }
-
-    if (!validatePixelForm(pixelFormData)) {
-      toast.error("يوجد أخطاء في إدخال البيانات. يرجى التأكد من صحة البيانات.");
-      return;
-    }
-
-    try {
-      await axiosInstance.post("/pixels", pixelFormData);
-      toast.success("تم إضافة Pixel بنجاح");
-      setIsAddPixelDialogOpen(false);
-      resetPixelForm();
-      fetchPixels();
-    } catch (error) {
-      toast.error("فشل في إضافة Pixel");
-      console.error("Failed to add pixel:", error);
-    }
-  };
-
-  const handleEditPixel = async () => {
-    if (!selectedPixel) return;
-
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
-      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
-      return;
-    }
-
-    if (!validatePixelForm(pixelFormData)) {
-      toast.error("يوجد أخطاء في إدخال البيانات. يرجى التأكد من صحة البيانات.");
-      return;
-    }
-
-    try {
-      await axiosInstance.put(`/pixels/${selectedPixel.id}`, pixelFormData);
-      toast.success("تم تعديل Pixel بنجاح");
-      setIsEditPixelDialogOpen(false);
-      setSelectedPixel(null);
-      resetPixelForm();
-      fetchPixels();
-    } catch (error) {
-      toast.error("فشل في تعديل Pixel");
-      console.error("Failed to edit pixel:", error);
-    }
-  };
-
-  const handleDeletePixel = async () => {
-    if (!selectedPixel) return;
-
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
-      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
-      return;
-    }
-
-    try {
-      await axiosInstance.delete(`/pixels/${selectedPixel.id}`);
-      toast.success("تم حذف Pixel بنجاح");
-      setIsDeletePixelDialogOpen(false);
-      setSelectedPixel(null);
-      fetchPixels();
-    } catch (error) {
-      toast.error("فشل في حذف Pixel");
-      console.error("Failed to delete pixel:", error);
-    }
-  };
-
-  const openEditDialog = (pixel: Pixel) => {
-    setSelectedPixel(pixel);
-    setPixelFormData({
-      platform: pixel.platform,
-      pixel_id: pixel.pixel_id,
-      is_active: pixel.is_active,
-    });
-    setIsEditPixelDialogOpen(true);
-  };
-
-  const openDeleteDialog = (pixel: Pixel) => {
-    setSelectedPixel(pixel);
-    setIsDeletePixelDialogOpen(true);
   };
 
   const filteredApps = apps.filter(
@@ -763,354 +488,6 @@ export function AppsPage() {
           </div>
         </main>
       </div>
-
-      {/* Pixels Management Dialog */}
-      <Dialog open={isPixelDialogOpen} onOpenChange={setIsPixelDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Link className="h-5 w-5" />
-              إدارة Pixels
-            </DialogTitle>
-            <DialogDescription>
-              ربط وإدارة pixels منصات التواصل الاجتماعي مع موقعك
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Pixels المربوطة</h3>
-              <Button
-                onClick={() => setIsAddPixelDialogOpen(true)}
-                className="gap-2"
-                disabled={getAvailablePlatforms().length === 0}
-                title={
-                  getAvailablePlatforms().length === 0
-                    ? "تم ربط جميع ال Pixels المتاحة"
-                    : undefined
-                }
-              >
-                <Plus className="h-4 w-4" />
-                إضافة Pixel جديد
-              </Button>
-            </div>
-
-            {pixelsLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Skeleton className="h-10 w-10 rounded" />
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-3 w-32" />
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Skeleton className="h-8 w-16" />
-                      <Skeleton className="h-8 w-16" />
-                      <Skeleton className="h-8 w-16" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : pixels.length === 0 ? (
-              <div className="text-center py-8 border border-dashed rounded-lg">
-                <p className="text-muted-foreground">لا توجد pixels مربوطة</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {pixels.map((pixel) => (
-                  <div
-                    key={pixel.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary font-semibold text-sm">
-                          {pixel.platform.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium capitalize">
-                          {pixel.platform}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {pixel.pixel_id}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={pixel.is_active ? "default" : "secondary"}
-                      >
-                        {pixel.is_active ? "نشط" : "غير نشط"}
-                      </Badge>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditDialog(pixel)}
-                        className="gap-1"
-                      >
-                        <Edit className="h-3 w-3" />
-                        تعديل
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => openDeleteDialog(pixel)}
-                        className="gap-1"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        حذف
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add Pixel Dialog */}
-      <Dialog
-        open={isAddPixelDialogOpen}
-        onOpenChange={setIsAddPixelDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>إضافة Pixel جديد</DialogTitle>
-            <DialogDescription>
-              أدخل معلومات Pixel الجديد لربطه مع موقعك
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="platform">المنصة</Label>
-              <Select
-                value={pixelFormData.platform}
-                onValueChange={(value) =>
-                  setPixelFormData({ ...pixelFormData, platform: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر المنصة" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getAvailablePlatforms().map((platform) => (
-                    <SelectItem key={platform.value} value={platform.value}>
-                      {platform.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {getAvailablePlatforms().length === 0 && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  جميع المنصات تم ربطها بالفعل
-                </p>
-              )}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="pixel_id">معرف Pixel</Label>
-              <Input
-                id="pixel_id"
-                value={pixelFormData.pixel_id}
-                onChange={(e) =>
-                  setPixelFormData({
-                    ...pixelFormData,
-                    pixel_id: e.target.value,
-                  })
-                }
-                placeholder="أدخل معرف Pixel"
-              />
-              {validationErrors.pixel_id && (
-                <p className="text-sm text-destructive mt-1">
-                  {validationErrors.pixel_id}
-                </p>
-              )}
-              <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-                <div className="font-medium mb-2">
-                  📋 متطلبات {getPlatformDisplayName(pixelFormData.platform)}:
-                </div>
-                <p className="mb-2">
-                  {getPlatformDescription(pixelFormData.platform)}
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">مثال:</span>
-                  <code className="bg-background px-2 py-1 rounded text-xs font-mono">
-                    {getPlatformExamples(pixelFormData.platform)}
-                  </code>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Switch
-                id="is_active"
-                checked={pixelFormData.is_active}
-                onCheckedChange={(checked) =>
-                  setPixelFormData({ ...pixelFormData, is_active: checked })
-                }
-              />
-              <Label htmlFor="is_active">تفعيل Pixel</Label>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsAddPixelDialogOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button
-              onClick={handleAddPixel}
-              disabled={getAvailablePlatforms().length === 0}
-            >
-              إضافة Pixel
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Pixel Dialog */}
-      <Dialog
-        open={isEditPixelDialogOpen}
-        onOpenChange={setIsEditPixelDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>تعديل Pixel</DialogTitle>
-            <DialogDescription>تعديل معلومات Pixel المحدد</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="edit-platform">المنصة</Label>
-              <Select
-                value={pixelFormData.platform}
-                onValueChange={(value) =>
-                  setPixelFormData({ ...pixelFormData, platform: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر المنصة" />
-                </SelectTrigger>
-                <SelectContent>
-                  {getAvailablePlatforms(selectedPixel?.platform).map(
-                    (platform) => (
-                      <SelectItem key={platform.value} value={platform.value}>
-                        {platform.label}
-                      </SelectItem>
-                    ),
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-pixel_id">معرف Pixel</Label>
-              <Input
-                id="edit-pixel_id"
-                value={pixelFormData.pixel_id}
-                onChange={(e) =>
-                  setPixelFormData({
-                    ...pixelFormData,
-                    pixel_id: e.target.value,
-                  })
-                }
-                placeholder={`مثال: ${getPlatformExamples(pixelFormData.platform)}`}
-                className={
-                  validationErrors.pixel_id ? "border-destructive" : ""
-                }
-              />
-              {validationErrors.pixel_id && (
-                <p className="text-sm text-destructive mt-1">
-                  {validationErrors.pixel_id}
-                </p>
-              )}
-              <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-                <div className="font-medium mb-2">
-                  📋 متطلبات {getPlatformDisplayName(pixelFormData.platform)}:
-                </div>
-                <p className="mb-2">
-                  {getPlatformDescription(pixelFormData.platform)}
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">مثال:</span>
-                  <code className="bg-background px-2 py-1 rounded text-xs font-mono">
-                    {getPlatformExamples(pixelFormData.platform)}
-                  </code>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Switch
-                id="edit-is_active"
-                checked={pixelFormData.is_active}
-                onCheckedChange={(checked) =>
-                  setPixelFormData({ ...pixelFormData, is_active: checked })
-                }
-              />
-              <Label htmlFor="edit-is_active">تفعيل Pixel</Label>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditPixelDialogOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button onClick={handleEditPixel}>حفظ التعديلات</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Pixel Confirmation Dialog */}
-      <AlertDialog
-        open={isDeletePixelDialogOpen}
-        onOpenChange={setIsDeletePixelDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
-              تأكيد الحذف
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-right">
-              <div className="space-y-3">
-                <p className="font-semibold text-lg">
-                  هل أنت متأكد من حذف هذا Pixel؟
-                </p>
-                <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20">
-                  <p className="text-sm">
-                    <span className="font-medium">المنصة:</span>{" "}
-                    {selectedPixel?.platform}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">معرف Pixel:</span>{" "}
-                    {selectedPixel?.pixel_id}
-                  </p>
-                </div>
-                <p className="text-destructive font-medium">
-                  ⚠️ هذا الإجراء لا يمكن التراجع عنه. سيتم حذف Pixel نهائياً من
-                  النظام.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeletePixel}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              نعم، احذف Pixel
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
@@ -1172,12 +549,18 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
       <CardFooter className="p-4 pt-0 flex gap-2">
         {isInstalled ? (
           <>
-            {app.path ? (
+            {app.path || isPixelApp ? (
               <Button
                 variant="default"
                 size="sm"
                 className="flex-1 gap-1"
-                onClick={() => router.push(app.path!)}
+                onClick={() => {
+                  if (isPixelApp) {
+                    router.push("/dashboard/apps/pixels");
+                  } else if (app.path) {
+                    router.push(app.path);
+                  }
+                }}
               >
                 <ExternalLink className="h-4 w-4" />
                 فتح
@@ -1273,12 +656,18 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
             <div className="flex gap-2 mt-4 sm:mt-0">
               {isInstalled ? (
                 <>
-                  {app.path ? (
+                  {app.path || isPixelApp ? (
                     <Button
                       variant="default"
                       size="sm"
                       className="gap-1"
-                      onClick={() => router.push(app.path!)}
+                      onClick={() => {
+                        if (isPixelApp) {
+                          router.push("/dashboard/apps/pixels");
+                        } else if (app.path) {
+                          router.push(app.path);
+                        }
+                      }}
                     >
                       <ExternalLink className="h-4 w-4" />
                       فتح
