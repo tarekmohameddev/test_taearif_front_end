@@ -321,7 +321,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           className="flex-1 flex flex-col"
           animate={{
             marginRight: sidebarOpen ? sidebarWidth : 0,
-            marginLeft: isComponentsSidebarOpen ? 256 : 0,
+            marginLeft: isComponentsSidebarOpen ? 280 : 0,
           }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >

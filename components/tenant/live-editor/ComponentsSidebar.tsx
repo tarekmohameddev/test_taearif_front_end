@@ -141,7 +141,7 @@ export const ComponentsSidebar = () => {
       initial="hidden"
       animate="show"
       exit="exit"
-      className="fixed left-0 top-15 h-full w-64 bg-white border-r border-gray-200 flex flex-col z-30 pb-20"
+      className="fixed left-0 top-15 h-full w-[280px] bg-white border-r border-gray-200 flex flex-col z-30 pb-20"
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
