@@ -77,6 +77,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAuthStore from "@/context/AuthContext";
 import PaymentPopup from "@/components/popup/Popup";
+import { THEME_OPTIONS, ThemeOption } from "@/components/tenant/live-editor/ThemeChangeDialog";
 
 const domainsHelp = {
   title: "إدارة النطاقات",
@@ -103,10 +104,11 @@ export function SettingsPage() {
   const [verifyingDomains, setVerifyingDomains] = useState<any>({});
   const [deleteDomainId, setDeleteDomainId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [themes, setThemes] = useState<any[]>([]);
+  const [themes, setThemes] = useState<ThemeOption[]>(THEME_OPTIONS);
+  const [activeThemeId, setActiveThemeId] = useState<number | null>(null);
   const [hasFormatError, setHasFormatError] = useState(false);
   const [isLoadingDomains, setIsLoadingDomains] = useState(true);
-  const [isLoadingThemes, setIsLoadingThemes] = useState(true);
+  const [isLoadingThemes, setIsLoadingThemes] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [subscriptionPlans, setSubscriptionPlans] = useState<any>({});
@@ -231,22 +233,9 @@ export function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchThemes = async () => {
-      try {
-        setIsLoadingThemes(true);
-        const response = await axiosInstance.get("/settings/theme");
-        setThemes(response.data.themes);
-      } catch (error: any) {
-        console.error("Error fetching themes:", error);
-        toast.error("فشل في تحميل الثيمات");
-      } finally {
-        setIsLoadingThemes(false);
-      }
-    };
-
-    if (activeTab === "themes") {
-      fetchThemes();
-    }
+    // استخدام THEME_OPTIONS مباشرة بدلاً من API
+    // البيانات الآن تأتي من ThemeChangeDialog
+    setThemes(THEME_OPTIONS);
   }, [activeTab]);
 
   const handleAddDomain = async () => {
@@ -367,17 +356,12 @@ export function SettingsPage() {
     }
   };
 
-  const handleActivateTheme = async (themeId: any) => {
+  const handleActivateTheme = async (themeId: number) => {
     try {
       await axiosInstance.post("/settings/theme/set-active", {
         theme_id: themeId,
       });
-      setThemes(
-        themes.map((theme: any) => ({
-          ...theme,
-          active: theme.id === themeId,
-        })) as any[],
-      );
+      setActiveThemeId(themeId);
       toast.success("تم تنشيط الثيم بنجاح");
     } catch (error: any) {
       console.error("Error activating theme:", error);
@@ -452,7 +436,7 @@ export function SettingsPage() {
               value={activeTab}
               onValueChange={setActiveTab}
             >
-              <TabsList className="grid grid-cols-2 w-full">
+              <TabsList className="grid grid-cols-3 w-full">
                 <TabsTrigger
                   value="domains"
                   className="flex gap-1 items-center"
@@ -467,10 +451,10 @@ export function SettingsPage() {
                   <CreditCardIcon className="h-4 w-4" />
                   <span>الاشتراك</span>
                 </TabsTrigger>
-                {/* <TabsTrigger value="themes" className="flex gap-1 items-center">
+                <TabsTrigger value="themes" className="flex gap-1 items-center">
                   <Palette className="h-4 w-4" />
                   <span>الثيمات</span>
-                </TabsTrigger> */}
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="domains" className="space-y-4 pt-4">
@@ -1078,8 +1062,8 @@ export function SettingsPage() {
                 </div>
               </TabsContent>
 
-              {/* <TabsContent value="themes" className="space-y-4 pt-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-4">
+              <TabsContent value="themes" className="space-y-4 pt-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-start gap-4 mb-4">
                   <div>
                     <h2 className="text-xl font-semibold text-right">
                       ثيمات الموقع
@@ -1133,46 +1117,25 @@ export function SettingsPage() {
                     themes.map((theme: any) => (
                       <Card
                         key={theme.id}
-                        className={`overflow-hidden ${theme.active ? "border-primary border-2" : ""}`}
+                        className={`overflow-hidden ${activeThemeId === theme.id ? "border-primary border-2" : ""}`}
                       >
                         <div className="aspect-video w-full overflow-hidden">
                           <img
-                            src={theme.thumbnail || "/placeholder.svg"}
-                            alt={theme.name}
+                            src={theme.image || "/placeholder.svg"}
+                            alt={theme.nameAr}
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-lg">
-                              {theme.name}
+                              {theme.nameAr}
                             </CardTitle>
-                            {theme.popular && (
-                              <Badge
-                                variant="secondary"
-                                className="bg-gray-100 text-gray-800"
-                              >
-                                <Star className="h-3 w-3 ml-1" />
-                                شائع
-                              </Badge>
-                            )}
                           </div>
-                          <CardDescription>{theme.description}</CardDescription>
+                          <CardDescription>{theme.descriptionAr}</CardDescription>
                         </CardHeader>
-                        <CardContent className="pb-2">
-                          <Badge
-                            variant="outline"
-                            className="bg-gray-100 text-gray-700 border-gray-300"
-                          >
-                            {theme.category === "business" && "أعمال"}
-                            {theme.category === "portfolio" && "معرض أعمال"}
-                            {theme.category === "restaurant" && "مطاعم"}
-                            {theme.category === "ecommerce" &&
-                              "متاجر إلكترونية"}
-                          </Badge>
-                        </CardContent>
                         <CardFooter>
-                          {theme.active ? (
+                          {activeThemeId === theme.id ? (
                             <Button
                               variant="outline"
                               className="w-full"
@@ -1196,7 +1159,7 @@ export function SettingsPage() {
                     ))
                   )}
                 </div>
-              </TabsContent> */}
+              </TabsContent>
             </Tabs>
           </div>
         </main>

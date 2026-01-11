@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { ThemeNumber } from "@/services/live-editor/themeChangeService";
 
-interface ThemeOption {
+export interface ThemeOption {
   id: ThemeNumber;
   name: string;
   nameAr: string;
@@ -31,7 +31,7 @@ interface ThemeOption {
   image: string;
 }
 
-const THEME_OPTIONS: ThemeOption[] = [
+export const THEME_OPTIONS: ThemeOption[] = [
   {
     id: 1,
     name: "Theme 1",
