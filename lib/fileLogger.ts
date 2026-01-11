@@ -38,14 +38,17 @@ class FileLogger {
   private beforeAfterLogs: BeforeAfterLog[] = [];
   private maxLogs = 5000; // Maximum logs in memory
   private flushInterval: NodeJS.Timeout | null = null;
-  private isEnabled: boolean;
+  private isEnabled: boolean; // Only true in development mode
+  private manualEnabled: boolean = false; // Manual toggle - false by default
   private sessionId: string;
 
   constructor() {
-    this.isEnabled = process.env.NODE_ENV === "development" || typeof window !== "undefined";
+    this.isEnabled = process.env.NODE_ENV === "development";
+    this.manualEnabled = false; // Default: disabled
     this.sessionId = this.generateSessionId();
     
-    if (this.isEnabled && typeof window !== "undefined") {
+    // Setup auto-flush interval only if logging is active
+    if (this.isLoggingActive() && typeof window !== "undefined") {
       // Auto-flush logs every 5 seconds
       this.flushInterval = setInterval(() => {
         this.flushToFile();
@@ -56,6 +59,13 @@ class FileLogger {
         this.flushToFile();
       });
     }
+  }
+
+  /**
+   * Check if logging is active (both development mode AND manually enabled)
+   */
+  private isLoggingActive(): boolean {
+    return this.isEnabled && this.manualEnabled;
   }
 
   private generateSessionId(): string {
@@ -152,7 +162,7 @@ class FileLogger {
   }
 
   private addLog(entry: LogEntry) {
-    if (!this.isEnabled) return;
+    if (!this.isLoggingActive()) return;
     
     this.logs.push(entry);
     
@@ -264,7 +274,7 @@ class FileLogger {
       componentType?: string;
     }
   ) {
-    if (!this.isEnabled) return;
+    if (!this.isLoggingActive()) return;
     
     const log: BeforeAfterLog = {
       timestamp: this.formatTimestamp(),
@@ -315,7 +325,7 @@ class FileLogger {
    * Get all logs as formatted string
    */
   getLogsAsString(): string {
-    if (!this.isEnabled || this.logs.length === 0) {
+    if (!this.isLoggingActive() || this.logs.length === 0) {
       return `=== NO LOGS ===\nSession ID: ${this.sessionId}\n\n`;
     }
     
@@ -345,7 +355,7 @@ class FileLogger {
    * Flush logs to file (download)
    */
   flushToFile() {
-    if (!this.isEnabled || typeof window === "undefined") return;
+    if (!this.isLoggingActive() || typeof window === "undefined") return;
     
     if (this.logs.length === 0 && this.beforeAfterLogs.length === 0) {
       return; // No logs to flush
@@ -381,7 +391,7 @@ class FileLogger {
    * Download logs as file
    */
   downloadLogs() {
-    if (!this.isEnabled || typeof window === "undefined") return;
+    if (!this.isLoggingActive() || typeof window === "undefined") return;
     
     const logsString = this.getLogsAsString();
     const blob = new Blob([logsString], { type: "text/plain;charset=utf-8" });
@@ -403,7 +413,7 @@ class FileLogger {
    * Clear all logs
    */
   clearLogs() {
-    if (this.isEnabled) {
+    if (this.isLoggingActive()) {
       this.logs = [];
       this.beforeAfterLogs = [];
       console.log("🧹 Logs cleared");
@@ -422,6 +432,77 @@ class FileLogger {
    */
   getBeforeAfterLogsCount(): number {
     return this.beforeAfterLogs.length;
+  }
+
+  /**
+   * Enable logging manually (only works in development mode)
+   */
+  enableLogging() {
+    if (!this.isEnabled) {
+      console.warn("⚠️ Logging can only be enabled in development mode");
+      return;
+    }
+
+    if (!this.manualEnabled) {
+      this.manualEnabled = true;
+      
+      // Setup auto-flush interval if not already set
+      if (!this.flushInterval && typeof window !== "undefined") {
+        this.flushInterval = setInterval(() => {
+          this.flushToFile();
+        }, 5000);
+
+        // Flush on page unload
+        window.addEventListener("beforeunload", () => {
+          this.flushToFile();
+        });
+      }
+      
+      console.log("✅ Logging enabled");
+    }
+  }
+
+  /**
+   * Disable logging manually
+   */
+  disableLogging() {
+    if (this.manualEnabled) {
+      this.manualEnabled = false;
+      
+      // Clear flush interval
+      if (this.flushInterval) {
+        clearInterval(this.flushInterval);
+        this.flushInterval = null;
+      }
+      
+      console.log("⭕ Logging disabled");
+    }
+  }
+
+  /**
+   * Toggle logging on/off
+   */
+  toggleLogging(): boolean {
+    if (this.manualEnabled) {
+      this.disableLogging();
+    } else {
+      this.enableLogging();
+    }
+    return this.manualEnabled;
+  }
+
+  /**
+   * Get logging status (whether logging is currently active)
+   */
+  getLoggingStatus(): boolean {
+    return this.isLoggingActive();
+  }
+
+  /**
+   * Get development mode status
+   */
+  isDevelopmentMode(): boolean {
+    return this.isEnabled;
   }
 }
 
@@ -508,4 +589,25 @@ export const getLogsAsString = () => {
 
 export const getLogsCount = () => {
   return fileLogger.getLogsCount();
+};
+
+// Export control functions
+export const enableLogging = () => {
+  fileLogger.enableLogging();
+};
+
+export const disableLogging = () => {
+  fileLogger.disableLogging();
+};
+
+export const toggleLogging = (): boolean => {
+  return fileLogger.toggleLogging();
+};
+
+export const getLoggingStatus = (): boolean => {
+  return fileLogger.getLoggingStatus();
+};
+
+export const isDevelopmentMode = (): boolean => {
+  return fileLogger.isDevelopmentMode();
 };

@@ -2,6 +2,7 @@
 // Debug Panel Component
 // ============================================================================
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   PositionDebugInfo,
@@ -10,6 +11,13 @@ import {
 } from "@/services/live-editor/dragDrop/enhanced-position-tracker";
 import { positionTracker } from "@/services/live-editor/dragDrop/enhanced-position-tracker";
 import { DebugControls } from "@/components/tenant/live-editor/debug/DebugControls";
+import {
+  toggleLogging,
+  getLoggingStatus,
+  getLogsCount,
+  downloadLogs as downloadFileLogs,
+  isDevelopmentMode,
+} from "@/lib/fileLogger";
 
 interface DebugPanelProps {
   show: boolean;
@@ -36,9 +44,39 @@ export function DebugPanel({
   onShowDebugControls,
   t,
 }: DebugPanelProps) {
+  const [isLoggingEnabled, setIsLoggingEnabled] = useState(false);
+  const [logsCount, setLogsCount] = useState(0);
+
+  // Check logging status on mount and when it changes
+  useEffect(() => {
+    setIsLoggingEnabled(getLoggingStatus());
+    setLogsCount(getLogsCount());
+
+    // Update logs count periodically
+    const interval = setInterval(() => {
+      if (isLoggingEnabled) {
+        setLogsCount(getLogsCount());
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isLoggingEnabled]);
+
   if (!show || process.env.NODE_ENV !== "development") {
     return null;
   }
+
+  const handleToggleLogging = () => {
+    const newStatus = toggleLogging();
+    setIsLoggingEnabled(newStatus);
+    setLogsCount(getLogsCount());
+  };
+
+  const handleDownloadLogs = () => {
+    if (isLoggingEnabled) {
+      downloadFileLogs();
+    }
+  };
 
   return (
     <motion.div
@@ -122,6 +160,32 @@ export function DebugPanel({
             )}
           </div>
         )}
+
+        {/* Logging Status */}
+        <div className="mb-4">
+          <div className="text-xs font-medium text-gray-700 mb-2">
+            Logging Status
+          </div>
+          <div
+            className={`text-xs p-2 rounded border ${
+              isLoggingEnabled
+                ? "bg-green-50 border-green-200 text-green-800"
+                : "bg-gray-50 border-gray-200 text-gray-600"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <span className="mr-2">{isLoggingEnabled ? "✅" : "⭕"}</span>
+                <span className="font-mono">
+                  {isLoggingEnabled ? "Logging Enabled" : "Logging Disabled"}
+                </span>
+              </div>
+              {isLoggingEnabled && (
+                <span className="text-gray-500">({logsCount} logs)</span>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Changes Made Status */}
         <div className="mb-4">
@@ -219,6 +283,29 @@ export function DebugPanel({
 
         {/* Quick Actions */}
         <div className="space-y-2">
+          {/* Toggle Logging Button */}
+          <button
+            onClick={handleToggleLogging}
+            className={`w-full text-xs px-3 py-2 text-white rounded transition-colors ${
+              isLoggingEnabled
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-gray-400 hover:bg-gray-500"
+            }`}
+          >
+            {isLoggingEnabled ? "✅ Logging Enabled" : "⭕ Logging Disabled"}
+          </button>
+
+          {/* Download Logs Button (only when logging is enabled) */}
+          {isLoggingEnabled && (
+            <button
+              onClick={handleDownloadLogs}
+              className="w-full text-xs px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              disabled={logsCount === 0}
+            >
+              📥 Download Logs ({logsCount})
+            </button>
+          )}
+
           <button
             onClick={() => {
               const report = generatePositionReport();
