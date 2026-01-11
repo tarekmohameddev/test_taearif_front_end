@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
@@ -68,6 +68,7 @@ export function AppsPage() {
   const { sidebarData, fetchSideMenus } = useStore();
   const { mainNavItems, error } = sidebarData;
   const router = useRouter();
+  const hasFetchedRef = useRef(false);
 
   const categories = [
     "الكل",
@@ -111,7 +112,13 @@ export function AppsPage() {
       return; // Exit early if token is not ready
     }
 
+    // Prevent multiple fetches
+    if (hasFetchedRef.current) {
+      return;
+    }
+
     const fetchApps = async () => {
+      hasFetchedRef.current = true;
       try {
         setLoading(true);
         const res = await axiosInstance.get("/apps");
@@ -132,6 +139,7 @@ export function AppsPage() {
       } catch (err) {
         toast.error("فشل في تحميل التطبيقات");
         console.error("Failed to load apps:", err);
+        hasFetchedRef.current = false; // Reset on error to allow retry
       } finally {
         setLoading(false);
       }
