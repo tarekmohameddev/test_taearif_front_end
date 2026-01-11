@@ -227,9 +227,9 @@ export function AppsPage() {
 
   const filteredApps = apps.filter(
     (app) =>
-      app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.category.toLowerCase().includes(searchQuery.toLowerCase()),
+      app.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.category?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
