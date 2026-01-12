@@ -1424,8 +1424,8 @@ function PropertyCard({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="-mr-2">
-                <MoreHorizontal className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="-mr-2 bg-muted hover:bg-muted/80">
+                <MoreHorizontal className="h-1 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -1770,8 +1770,8 @@ function PropertyListItem({
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreHorizontal className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="bg-muted hover:bg-muted/80">
+                  <MoreHorizontal className="h-1 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
