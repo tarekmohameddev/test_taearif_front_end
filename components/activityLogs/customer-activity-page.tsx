@@ -31,6 +31,7 @@ import {
   Building,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 // Types
 interface CustomerLog {
@@ -75,6 +76,7 @@ interface CustomerLogsResponse {
 }
 
 export default function CustomerActivityLogPage() {
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const params = useParams();
   const customerId = params?.slug as string;
 
@@ -193,8 +195,13 @@ export default function CustomerActivityLogPage() {
 
   // Effects
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     fetchCustomerLogs();
-  }, [customerId, currentPage, searchQuery, actionFilter]);
+  }, [customerId, currentPage, searchQuery, actionFilter, userData?.token, authLoading]);
 
   return (
     <div className="flex min-h-screen flex-col">

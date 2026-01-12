@@ -1,6 +1,6 @@
 import AddPropertyPage from "@/components/property/add-property-page";
 export const metadata = {
-  title: "إضافة عقار جديد",
+  title: "إضافة وحدة جديدة",
 };
 export default function Page() {
   return <AddPropertyPage />;

@@ -110,7 +110,7 @@ export function MapSection({ onLocationUpdate }) {
       position: { lat, lng },
       map: mapInstance,
       draggable: true,
-      title: "موقع العقار",
+      title: "موقع الوحدة",
       animation: window.google.maps.Animation.DROP,
     });
 
@@ -172,7 +172,7 @@ export function MapSection({ onLocationUpdate }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>اختر موقع العقار</CardTitle>
+        <CardTitle>اختر موقع الوحدة</CardTitle>
         <CardDescription>
           ابحث عن عنوان أو انقر على الخريطة لتحديد الموقع بدقة
         </CardDescription>
@@ -218,7 +218,7 @@ export function MapSection({ onLocationUpdate }) {
         </div>
 
         <div className="text-xs text-muted-foreground dark:text-muted-foreground-dark">
-          <p>• انقر في أي مكان على الخريطة لتحديد موقع العقار</p>
+          <p>• انقر في أي مكان على الخريطة لتحديد موقع الوحدة</p>
           <p>• استخدم مربع البحث للعثور على عنوان محدد</p>
           <p>• اسحب العلامة لضبط الموقع بدقة</p>
         </div>

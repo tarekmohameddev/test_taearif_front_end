@@ -114,7 +114,7 @@ export default function PropertyForm({ mode }) {
     fetchProperties,
   } = useStore();
   const [submitError, setSubmitError] = useState(null);
-  const { userData, fetchUserData } = useAuthStore();
+  const { userData, fetchUserData, IsLoading: authLoading } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { id } = useParams();
@@ -414,9 +414,8 @@ export default function PropertyForm({ mode }) {
     });
   };
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchSuggestedFaqs");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
       return;
     }
 
@@ -427,13 +426,12 @@ export default function PropertyForm({ mode }) {
       } catch (error) {}
     };
     fetchSuggestedFaqs();
-  }, [userData?.token]);
-  // تحديث useEffect لجلب بيانات العقار للتعديل
+  }, [userData?.token, authLoading]);
+  // تحديث useEffect لجلب بيانات الوحدة للتعديل
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchProperty");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
       return;
     }
 
@@ -576,13 +574,13 @@ export default function PropertyForm({ mode }) {
           });
         } catch (error) {
           toast.error(
-            "حدث خطأ أثناء جلب بيانات العقار. يرجى المحاولة مرة أخرى.",
+            "حدث خطأ أثناء جلب بيانات الوحدة. يرجى المحاولة مرة أخرى.",
           );
         }
       };
       fetchProperty();
     }
-  }, [mode, id]);
+  }, [mode, id, userData?.token, authLoading]);
 
   const handleAddFaq = () => {
     if (newQuestion.trim() === "" || newAnswer.trim() === "") {
@@ -627,9 +625,8 @@ export default function PropertyForm({ mode }) {
   }, [fetchProperties, isInitialized, loading, properties, mode]);
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchCategories");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
       return;
     }
 
@@ -639,16 +636,15 @@ export default function PropertyForm({ mode }) {
         setCategories(response.data.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
-        toast.error("حدث خطأ أثناء جلب أنواع العقارات.");
+        toast.error("حدث خطأ أثناء جلب أنواع الوحدات.");
       }
     };
     fetchCategories();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchFacades");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
       return;
     }
 
@@ -660,12 +656,11 @@ export default function PropertyForm({ mode }) {
       .catch((error) => {
         console.error("خطأ في جلب الواجهات:", error);
       });
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchProjects");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
       return;
     }
 
@@ -680,12 +675,11 @@ export default function PropertyForm({ mode }) {
     if (mode === "add") {
       fetchProjects();
     }
-  }, [userData?.token, mode]);
+  }, [userData?.token, authLoading, mode]);
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchBuildings");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
       return;
     }
 
@@ -699,9 +693,9 @@ export default function PropertyForm({ mode }) {
       }
     };
     fetchBuildings();
-  }, [userData?.token]);
+  }, [userData?.token, authLoading]);
 
-  // فحص الحد الأقصى للعقارات (للإضافة فقط)
+  // فحص الحد الأقصى للوحدات (للإضافة فقط)
   React.useEffect(() => {
     if (
       mode === "add" &&
@@ -709,7 +703,7 @@ export default function PropertyForm({ mode }) {
         useAuthStore.getState().userData?.real_estate_limit_number
     ) {
       toast.error(
-        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} عقارات`,
+        `لا يمكنك إضافة أكثر من ${useAuthStore.getState().userData?.real_estate_limit_number} وحدات`,
       );
       hasReachedLimit =
         properties.length >=
@@ -912,7 +906,7 @@ export default function PropertyForm({ mode }) {
     setVideoPreview(null);
   };
 
-  // دالة رفع صورة السند العقاري
+  // دالة رفع صورة السند
   const uploadDeedImage = async (file) => {
     const formData = new FormData();
     formData.append("deed_image", file);
@@ -954,25 +948,25 @@ export default function PropertyForm({ mode }) {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.title) newErrors.title = "اسم العقار مطلوب";
-    if (!formData.address) newErrors.address = "عنوان العقار مطلوب";
+    if (!formData.title) newErrors.title = "اسم الوحدة مطلوب";
+    if (!formData.address) newErrors.address = "عنوان الوحدة مطلوب";
     if (!formData.purpose) newErrors.purpose = "نوع القائمة مطلوب";
-    if (!formData.category) newErrors.category = "فئة العقار مطلوبة";
+    if (!formData.category) newErrors.category = "فئة الوحدة مطلوبة";
     if (mode === "add" && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
     if (mode === "edit" && !previews.thumbnail && !images.thumbnail)
       newErrors.thumbnail = "صورة رئيسية واحدة على الأقل مطلوبة";
     if (!formData.description)
-      newErrors.description = "من فضلك اكتب وصف للعقار";
+      newErrors.description = "من فضلك اكتب وصف للوحدة";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (publish) => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (!userData?.token) {
-      console.log("No token available, skipping handleSubmit");
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      console.log("No token available or auth loading, skipping handleSubmit");
       alert("Authentication required. Please login.");
       return;
     }
@@ -1047,7 +1041,7 @@ export default function PropertyForm({ mode }) {
           }
         }
 
-        // رفع صورة السند العقاري
+        // رفع صورة السند
         let deedImagePath = "";
         if (images.deedImage) {
           try {
@@ -1056,7 +1050,7 @@ export default function PropertyForm({ mode }) {
           } catch (error) {
             console.error("Failed to upload deed image:", error);
             toast.error(
-              "فشل في رفع صورة السند العقاري. يرجى المحاولة مرة أخرى.",
+              "فشل في رفع صورة السند. يرجى المحاولة مرة أخرى.",
             );
             throw error;
           }
@@ -1127,7 +1121,7 @@ export default function PropertyForm({ mode }) {
         let response;
         if (mode === "add") {
           response = await axiosInstance.post("/properties", propertyData);
-          toast.success("تم نشر العقار بنجاح");
+          toast.success("تم نشر الوحدة بنجاح");
           const currentState = useStore.getState();
           const createdProperty = response.data.user_property;
           createdProperty.status =
@@ -1148,7 +1142,7 @@ export default function PropertyForm({ mode }) {
             propertyData,
           );
           toast.success(
-            publish ? "تم تحديث ونشر العقار بنجاح" : "تم حفظ التغييرات كمسودة",
+            publish ? "تم تحديث ونشر الوحدة بنجاح" : "تم حفظ التغييرات كمسودة",
           );
           const currentState = useStore.getState();
           const updatedProperty = response.data.property;
@@ -1163,8 +1157,8 @@ export default function PropertyForm({ mode }) {
 
         router.push("/dashboard/properties");
       } catch (error) {
-        toast.error("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
-        setSubmitError("حدث خطأ أثناء حفظ العقار. يرجى المحاولة مرة أخرى.");
+        toast.error("حدث خطأ أثناء حفظ الوحدة. يرجى المحاولة مرة أخرى.");
+        setSubmitError("حدث خطأ أثناء حفظ الوحدة. يرجى المحاولة مرة أخرى.");
       } finally {
         setUploading(false);
         setIsLoading(false);
@@ -1179,8 +1173,8 @@ export default function PropertyForm({ mode }) {
     setFormData((prev) => ({ ...prev, city_id: cityId, district_id: null }));
   };
 
-  const pageTitle = mode === "add" ? "إضافة عقار جديد" : "تعديل العقار";
-  const submitButtonText = mode === "add" ? "نشر العقار" : "حفظ ونشر التغييرات";
+  const pageTitle = mode === "add" ? "إضافة وحدة جديدة" : "تعديل الوحدة";
+  const submitButtonText = mode === "add" ? "نشر الوحدة" : "حفظ ونشر التغييرات";
   const draftButtonText =
     mode === "add" ? "حفظ كمسودة" : "حفظ التغييرات كمسودة";
 
@@ -1220,8 +1214,8 @@ export default function PropertyForm({ mode }) {
                 <strong className="font-bold">تنبيه!</strong>
                 <span className="block sm:inline">
                   {" "}
-                  لقد وصلت إلى الحد الأقصى لعدد العقارات المسموح به (10 عقارات).
-                  لا يمكنك إضافة المزيد من العقارات.
+                  لقد وصلت إلى الحد الأقصى لعدد الوحدات المسموح به (10 وحدات).
+                  لا يمكنك إضافة المزيد من الوحدات.
                 </span>
               </div>
             )}
@@ -1268,15 +1262,15 @@ export default function PropertyForm({ mode }) {
             <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>معلومات العقار الأساسية</CardTitle>
+                  <CardTitle>معلومات الوحدة الأساسية</CardTitle>
                   <CardDescription>
-                    أدخل المعلومات الأساسية للعقار
+                    أدخل المعلومات الأساسية للوحدة
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="title">
-                      اسم العقار <span className="text-red-500">*</span>
+                      اسم الوحدة <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="title"
@@ -1293,7 +1287,7 @@ export default function PropertyForm({ mode }) {
 
                   <div className="space-y-2">
                     <Label htmlFor="description">
-                      وصف العقار <span className="text-red-500">*</span>
+                      وصف الوحدة <span className="text-red-500">*</span>
                     </Label>
                     <Textarea
                       id="description"
@@ -1466,7 +1460,7 @@ export default function PropertyForm({ mode }) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="category">
-                        فئة العقار <span className="text-red-500">*</span>
+                        فئة الوحدة <span className="text-red-500">*</span>
                       </Label>
                       <Select
                         name="category"
@@ -1572,7 +1566,7 @@ export default function PropertyForm({ mode }) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="PropertyType">نوع العقار</Label>
+                    <Label htmlFor="PropertyType">نوع الوحدة</Label>
                     <Select
                       name="PropertyType"
                       value={formData.PropertyType}
@@ -1604,8 +1598,8 @@ export default function PropertyForm({ mode }) {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>تفاصيل العقار</CardTitle>
-                  <CardDescription>أدخل مواصفات وميزات العقار</CardDescription>
+                  <CardTitle>تفاصيل الوحدة</CardTitle>
+                  <CardDescription>أدخل مواصفات وميزات الوحدة</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -1723,7 +1717,7 @@ export default function PropertyForm({ mode }) {
                       }
                     />
                     <Label htmlFor="featured" className="mr-2">
-                      عرض هذا العقار في الصفحة الرئيسية
+                      عرض هذه الوحدة في الصفحة الرئيسية
                     </Label>
                   </div>
 
@@ -2061,10 +2055,10 @@ export default function PropertyForm({ mode }) {
                       </div>
                     </div>
                   </div>
-                  {/* مرافق العقار - Property Features */}
+                  {/* مرافق الوحدة - Property Features */}
                   <div className="space-y-4 whitespace-nowraps">
                     <h3 className="text-lg font-semibold text-right">
-                      مرافق العقار
+                      مرافق الوحدة
                     </h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -2208,10 +2202,10 @@ export default function PropertyForm({ mode }) {
                     </div>
                   </div>
 
-                  {/* صورة السند العقاري */}
+                  {/* صورة السند */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-right">
-                      صورة السند العقاري (الصك)
+                      صورة السند (الصك)
                     </h3>
                     <div className="flex flex-col md:flex-row items-center gap-6">
                       <div className="border rounded-md p-2 flex-1 w-full">
@@ -2279,9 +2273,9 @@ export default function PropertyForm({ mode }) {
                 className={errors.thumbnail ? "border-red-500 border-2" : ""}
               >
                 <CardHeader>
-                  <CardTitle>صورة العقار الرئيسية</CardTitle>
+                  <CardTitle>صورة الوحدة الرئيسية</CardTitle>
                   <CardDescription>
-                    قم بتحميل صورة رئيسية تمثل العقار{" "}
+                    قم بتحميل صورة رئيسية تمثل الوحدة{" "}
                     <span className="text-red-500">*</span>
                   </CardDescription>
                 </CardHeader>
@@ -2349,9 +2343,9 @@ export default function PropertyForm({ mode }) {
 
               <Card className="xl:col-span-2">
                 <CardHeader>
-                  <CardTitle>معرض صور العقار</CardTitle>
+                  <CardTitle>معرض صور الوحدة</CardTitle>
                   <CardDescription>
-                    قم بتحميل صور متعددة لعرض تفاصيل العقار
+                    قم بتحميل صور متعددة لعرض تفاصيل الوحدة
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -2419,9 +2413,9 @@ export default function PropertyForm({ mode }) {
 
               <Card className="xl:col-span-2">
                 <CardHeader>
-                  <CardTitle>فيديو العقار</CardTitle>
+                  <CardTitle>فيديو الوحدة</CardTitle>
                   <CardDescription>
-                    قم بتحميل فيديو واحد لعرض تفاصيل العقار
+                    قم بتحميل فيديو واحد لعرض تفاصيل الوحدة
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -2503,7 +2497,7 @@ export default function PropertyForm({ mode }) {
                 <CardHeader>
                   <CardTitle>مخططات الطوابق</CardTitle>
                   <CardDescription>
-                    قم بتحميل مخططات الطوابق والتصاميم الهندسية للعقار
+                    قم بتحميل مخططات الطوابق والتصاميم الهندسية للوحدة
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -2570,7 +2564,7 @@ export default function PropertyForm({ mode }) {
                 <CardHeader>
                   <CardTitle> الجولات الافتراضية</CardTitle>
                   <CardDescription>
-                    أضف رابط الجولة الافتراضية للعقار
+                    أضف رابط الجولة الافتراضية للوحدة
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -2655,9 +2649,9 @@ export default function PropertyForm({ mode }) {
               </div>
               <Card className="xl:col-span-2">
                 <CardHeader>
-                  <CardTitle>الأسئلة الشائعة الخاصة بالعقار</CardTitle>
+                  <CardTitle>الأسئلة الشائعة الخاصة بالوحدة</CardTitle>
                   <CardDescription>
-                    أضف أسئلة وأجوبة شائعة حول هذا العقار لمساعدة المشترين
+                    أضف أسئلة وأجوبة شائعة حول هذه الوحدة لمساعدة المشترين
                     المحتملين.
                   </CardDescription>
                 </CardHeader>
@@ -2738,8 +2732,8 @@ export default function PropertyForm({ mode }) {
                                   onClick={() => handleToggleFaqDisplay(faq.id)}
                                   title={
                                     faq.displayOnPage
-                                      ? "إخفاء من صفحة العقار"
-                                      : "عرض في صفحة العقار"
+                                      ? "إخفاء من صفحة الوحدة"
+                                      : "عرض في صفحة الوحدة"
                                   }
                                 >
                                   {faq.displayOnPage ? (

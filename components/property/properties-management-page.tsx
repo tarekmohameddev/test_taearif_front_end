@@ -112,7 +112,7 @@ function ShareDialog({
     whatsapp: `https://wa.me/?text=${encodeURIComponent(`${property?.title || ""} ${propertyUrl}`)}`,
     telegram: `https://t.me/share/url?url=${encodeURIComponent(propertyUrl)}&text=${encodeURIComponent(property?.title || "")}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(propertyUrl)}`,
-    email: `mailto:?subject=${encodeURIComponent(property?.title || "عقار مميز")}&body=${encodeURIComponent(`شاهد هذا العقار: ${propertyUrl}`)}`,
+    email: `mailto:?subject=${encodeURIComponent(property?.title || "وحدة مميزة")}&body=${encodeURIComponent(`شاهد هذه الوحدة: ${propertyUrl}`)}`,
   };
 
   if (!isOpen) return null;
@@ -128,7 +128,7 @@ function ShareDialog({
           <X className="h-5 w-5" />
         </button>
 
-        <h3 className="text-xl font-semibold mb-4 text-center">شارك العقار</h3>
+        <h3 className="text-xl font-semibold mb-4 text-center">شارك الوحدة</h3>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
           <a
@@ -314,7 +314,7 @@ function Pagination({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
       <div className="text-sm text-muted-foreground">
-        عرض {from} إلى {to} من {totalItems} عقار
+        عرض {from} إلى {to} من {totalItems} وحدة
       </div>
 
       <div className="flex items-center gap-2">
@@ -501,17 +501,17 @@ export function PropertiesManagementPage() {
         },
       });
 
-      toast.success("تم استيراد العقارات بنجاح");
+      toast.success("تم استيراد الوحدات بنجاح");
       setImportDialogOpen(false);
       setImportFile(null);
 
-      // إعادة تحميل قائمة العقارات
+      // إعادة تحميل قائمة الوحدات
       fetchProperties(currentPage, appliedFilters);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
-        "حدث خطأ أثناء استيراد العقارات";
+        "حدث خطأ أثناء استيراد الوحدات";
       toast.error(errorMessage);
       if (error instanceof Error) {
         logError(error, "handleImport");
@@ -656,7 +656,7 @@ export function PropertiesManagementPage() {
       const errorInfo = logError(error, "fetchProperties");
 
       setPropertiesManagement({
-        error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات العقارات"),
+        error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات الوحدات"),
         loading: false,
         isInitialized: true,
       });
@@ -693,16 +693,16 @@ export function PropertiesManagementPage() {
       return;
     }
 
-    const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا العقار؟");
+    const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذه الوحدة؟");
     if (confirmDelete) {
       try {
         await axiosInstance.delete(`properties/${id}`);
-        toast.success("تم حذف العقار بنجاح");
+        toast.success("تم حذف الوحدة بنجاح");
 
         // إعادة تحميل الصفحة الحالية بعد الحذف
         fetchProperties(currentPage);
       } catch (error) {
-        toast.error("فشل في حذف العقار");
+        toast.error("فشل في حذف الوحدة");
         console.error("Error deleting property:", error);
       }
     }
@@ -727,12 +727,12 @@ export function PropertiesManagementPage() {
         `/properties/${property.id}/duplicate`,
         duplicateData,
       );
-      toast.success("تم مضاعفة العقار بنجاح");
+      toast.success("تم مضاعفة الوحدة بنجاح");
 
-      // إعادة تحميل العقارات لعرض العقار المضاعف
+      // إعادة تحميل الوحدات لعرض الوحدة المضاعفة
       fetchProperties(currentPage);
     } catch (error) {
-      toast.error("فشل في مضاعفة العقار");
+      toast.error("فشل في مضاعفة الوحدة");
       console.error("Error duplicating property:", error);
     }
   };
@@ -754,7 +754,7 @@ export function PropertiesManagementPage() {
         `تم ${property.status === "منشور" ? "إلغاء النشر" : "النشر"} بنجاح`,
       );
 
-      // تحديث حالة العقار في القائمة المحلية
+      // تحديث حالة الوحدة في القائمة المحلية
       setPropertiesManagement({
         properties: properties.map((p: any) =>
           p.id === property.id ? { ...p, status: newStatus } : p,
@@ -821,7 +821,7 @@ export function PropertiesManagementPage() {
   }, [fetchProperties, isInitialized, loading]);
 
   const renderSkeletons = () => (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: 6 }).map((_, idx) => (
         <SkeletonPropertyCard key={idx} />
       ))}
@@ -864,10 +864,10 @@ export function PropertiesManagementPage() {
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  إدارة العقارات
+                  إدارة الوحدات
                 </h1>
                 <p className="text-muted-foreground">
-                  أضف وأدرج قوائم العقارات لموقعك على الويب
+                  أضف وأدرج قوائم الوحدات لموقعك على الويب
                 </p>
               </div>
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:flex-wrap">
@@ -894,7 +894,7 @@ export function PropertiesManagementPage() {
                   onClick={() => setImportDialogOpen(true)}
                 >
                   <Upload className="h-4 w-4" />
-                  استيراد عقارات
+                  استيراد وحدات
                 </Button>
                 <div className="flex gap-2 w-full md:w-auto">
                   <Button
@@ -936,14 +936,14 @@ export function PropertiesManagementPage() {
                 <Dialog>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                      <DialogTitle>فلتر العقارات</DialogTitle>
+                      <DialogTitle>فلتر الوحدات</DialogTitle>
                       <DialogDescription>
                         قم بتحسين البحث الخاص بك بمعايير محددة
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
-                        <Label>نوع العقار</Label>
+                        <Label>نوع الوحدة</Label>
                         <div className="flex flex-wrap gap-2">
                           {[
                             "House",
@@ -1070,7 +1070,7 @@ export function PropertiesManagementPage() {
                   }}
                 >
                   <Plus className="h-4 w-4" />
-                  إضافة عقار
+                  إضافة وحدة
                 </Button>
               </div>
             </div>
@@ -1083,7 +1083,7 @@ export function PropertiesManagementPage() {
                     لقد وصلت للحد الأقصى للإضافة
                   </DialogTitle>
                   <DialogDescription className="text-center">
-                    برجاء ترقية الباقة لإضافة المزيد من العقارات.
+                    برجاء ترقية الباقة لإضافة المزيد من الوحدات.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="gap-3">
@@ -1098,11 +1098,11 @@ export function PropertiesManagementPage() {
               </DialogContent>
             </Dialog>
 
-            {/* نافذة منبثقة لاستيراد العقارات */}
+            {/* نافذة منبثقة لاستيراد الوحدات */}
             <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle>استيراد عقارات</DialogTitle>
+                  <DialogTitle>استيراد وحدات</DialogTitle>
                   <DialogDescription>
                     قم بتحميل القالب واملأه بالبيانات المطلوبة ثم قم برفعه
                   </DialogDescription>
@@ -1172,20 +1172,20 @@ export function PropertiesManagementPage() {
               <ErrorDisplay
                 error={error}
                 onRetry={() => fetchProperties(currentPage)}
-                title="خطأ في تحميل العقارات"
+                title="خطأ في تحميل الوحدات"
               />
             ) : (
               <Tabs defaultValue="all">
                 {/* <TabsList>
-                  <TabsTrigger value="all">جميع العقارات</TabsTrigger>
+                  <TabsTrigger value="all">جميع الوحدات</TabsTrigger>
                 </TabsList> */}
                 <TabsContent value="all" className="mt-4">
                   {normalizedProperties.length === 0 ? (
-                    <EmptyState type="عقارات" />
+                    <EmptyState type="وحدات" />
                   ) : (
                     <>
                       {viewMode === "grid" ? (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-4  ">
                           {normalizedProperties.map((property: any) => (
                             <PropertyCard
                               key={property.id}
@@ -1264,8 +1264,8 @@ export function PropertiesManagementPage() {
               <div className="relative z-10 bg-white dark:bg-background rounded-lg shadow-xl p-6 w-full max-w-2xl">
                 <h2 className="font-bold mb-4 text-lg text-center">
                   {reorderPopup.type === "featured"
-                    ? "ترتيب العقارات المميزة"
-                    : "ترتيب العقارات في الوحدات"}
+                    ? "ترتيب الوحدات المميزة"
+                    : "ترتيب الوحدات"}
                 </h2>
                 <div className="space-y-4 max-h-[60vh] overflow-y-auto">
                   {reorderList.map((property: any, idx: number) => (
@@ -1429,27 +1429,27 @@ function PropertyCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {/* ترتيب العقار في الرئيسية */}
+              {/* ترتيب الوحدة في الرئيسية */}
               {property.featured && (
                 <DropdownMenuItem
                   onClick={() => {
-                    /* TODO: ترتيب العقار في الرئيسية */
+                    /* TODO: ترتيب الوحدة في الرئيسية */
                     setReorderPopup({ open: true, type: "featured" });
                   }}
                 >
                   <Grid3X3 className="ml-2 h-4 w-4" />
-                  ترتيب العقار في الرئيسية
+                  ترتيب الوحدة في الرئيسية
                 </DropdownMenuItem>
               )}
-              {/* ترتيب العقار في الوحدات */}
+              {/* ترتيب الوحدة */}
               <DropdownMenuItem
                 onClick={() => {
-                  /* TODO: ترتيب العقار في الوحدات */
+                  /* TODO: ترتيب الوحدة */
                   setReorderPopup({ open: true, type: "normal" });
                 }}
               >
                 <List className="ml-2 h-4 w-4" />
-                ترتيب العقار في الوحدات
+                ترتيب الوحدة
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
@@ -1504,7 +1504,7 @@ function PropertyCard({
                 onClick={() => onDelete(property.id)}
               >
                 <Trash2 className="ml-2 h-4 w-4" />
-                حذف العقار
+                حذف الوحدة
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -1775,7 +1775,7 @@ function PropertyListItem({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {/* ترتيب العقار في الرئيسية */}
+                {/* ترتيب الوحدة في الرئيسية */}
                 {property.featured && (
                   <DropdownMenuItem
                     onClick={() => {
@@ -1783,18 +1783,18 @@ function PropertyListItem({
                     }}
                   >
                     <Grid3X3 className="mr-2 h-4 w-4" />
-                    ترتيب العقار في الرئيسية
+                    ترتيب الوحدة في الرئيسية
                   </DropdownMenuItem>
                 )}
-                {/* ترتيب العقار في الوحدات */}
+                {/* ترتيب الوحدة */}
                 <DropdownMenuItem
                   onClick={() => {
-                    /* TODO: ترتيب العقار في الوحدات */
+                    /* TODO: ترتيب الوحدة */
                     setReorderPopup({ open: true, type: "normal" });
                   }}
                 >
                   <List className="mr-2 h-4 w-4" />
-                  ترتيب العقار في الوحدات
+                  ترتيب الوحدة
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onDuplicate(property)}>
                   <Copy className="mr-2 h-4 w-4" />
@@ -1820,7 +1820,7 @@ function PropertyListItem({
                   onClick={() => onDelete(property.id)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  حذف العقار
+                  حذف الوحدة
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

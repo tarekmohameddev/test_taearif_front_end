@@ -75,8 +75,8 @@ export default function PropertyDetailsPage() {
   const propertyId = params?.id as string;
   const [activeTab, setActiveTab] = useState("properties");
 
-  // جلب token من store للمراقبة
-  const token = useAuthStore((state) => state.userData?.token);
+  // جلب token و authLoading من store للمراقبة
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   const [property, setProperty] = useState<PropertyData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,10 +86,9 @@ export default function PropertyDetailsPage() {
     const fetchPropertyDetails = async () => {
       if (!propertyId) return;
 
-      // الانتظار حتى يأتي token
-      if (!token) {
-        // إذا لم يكن هناك token، ننتظر ولا نعرض خطأ
-        return;
+      // Wait until token is fetched
+      if (authLoading || !userData?.token) {
+        return; // Exit early if token is not ready
       }
 
       setLoading(true);
@@ -99,12 +98,12 @@ export default function PropertyDetailsPage() {
         if (response.data.status === "success") {
           setProperty(response.data.data.property);
         } else {
-          setError("فشل تحميل بيانات العقار");
+          setError("فشل تحميل بيانات الوحدة");
         }
       } catch (err: any) {
         console.error("Error fetching property details:", err);
         setError(
-          err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات العقار",
+          err.response?.data?.message || "حدث خطأ أثناء تحميل بيانات الوحدة",
         );
       } finally {
         setLoading(false);
@@ -112,7 +111,7 @@ export default function PropertyDetailsPage() {
     };
 
     fetchPropertyDetails();
-  }, [propertyId, token]);
+  }, [propertyId, userData?.token, authLoading]);
 
   const formatCurrency = (amount: string | number) => {
     if (!amount) return "غير محدد";
@@ -154,8 +153,8 @@ export default function PropertyDetailsPage() {
     return types[type] || type;
   };
 
-  // إذا لم يكن هناك token، نعرض loading حتى يأتي token
-  if (!token || loading) {
+  // إذا لم يكن هناك token أو كان التحميل جارياً، نعرض loading
+  if (authLoading || !userData?.token || loading) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
         <DashboardHeader />
@@ -184,11 +183,11 @@ export default function PropertyDetailsPage() {
                   <AlertCircle className="h-12 w-12 text-destructive mb-4" />
                   <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
                   <p className="text-muted-foreground mb-4">
-                    {error || "لم يتم العثور على تفاصيل العقار"}
+                    {error || "لم يتم العثور على تفاصيل الوحدة"}
                   </p>
                   <Button onClick={() => router.push("/dashboard/properties")}>
                     <ArrowRight className="ml-2 h-4 w-4" />
-                    العودة إلى العقارات
+                    العودة إلى الوحدات
                   </Button>
                 </div>
               </CardContent>
@@ -218,10 +217,10 @@ export default function PropertyDetailsPage() {
                 </Button>
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold">
-                    {property.title || `عقار #${property.id}`}
+                    {property.title || `وحدة #${property.id}`}
                   </h1>
                   <p className="text-sm text-muted-foreground mt-1">
-                    رقم العقار: {property.id}
+                    رقم الوحدة: {property.id}
                   </p>
                 </div>
               </div>
@@ -234,7 +233,7 @@ export default function PropertyDetailsPage() {
                   className="gap-2"
                 >
                   <Edit className="h-4 w-4" />
-                  تعديل العقار
+                  تعديل الوحدة
                 </Button>
                 <Button
                   variant="ghost"
@@ -331,7 +330,7 @@ export default function PropertyDetailsPage() {
                   {property.type && (
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">
-                        نوع العقار
+                        نوع الوحدة
                       </p>
                       <Badge variant="outline">
                         {getTypeText(property.type)}

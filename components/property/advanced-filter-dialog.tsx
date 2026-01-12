@@ -255,7 +255,7 @@ export function AdvancedFilterDialog({
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold text-black flex items-center gap-3">
               <SlidersHorizontal className="h-6 w-6" />
-              فلترة العقارات
+              فلترة الوحدات
             </DialogTitle>
             <div className="flex items-center gap-2">
               {getActiveFiltersCount() > 0 && (
@@ -280,7 +280,7 @@ export function AdvancedFilterDialog({
           {/* الهدف من العقار */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
-              الهدف من العقار
+              الهدف من الوحدة
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {filterData.purposes_filter.map((purpose) => (
@@ -309,7 +309,7 @@ export function AdvancedFilterDialog({
           {/* نوع العقار */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
-              نوع العقار
+              نوع الوحدة
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {filterData.specifics_filters.type.map((type) => (

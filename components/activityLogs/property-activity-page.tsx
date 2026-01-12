@@ -31,6 +31,7 @@ import {
   Building,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 // Types
 interface PropertyLog {
@@ -66,6 +67,7 @@ interface PropertyLogsResponse {
 }
 
 export default function PropertyActivityLogPage() {
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const params = useParams();
   const propertyId = params.slug as string;
 
@@ -178,8 +180,13 @@ export default function PropertyActivityLogPage() {
 
   // Effects
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     fetchPropertyLogs();
-  }, [propertyId, currentPage, searchQuery, actionFilter]);
+  }, [propertyId, currentPage, searchQuery, actionFilter, userData?.token, authLoading]);
 
   return (
     <div className="flex min-h-screen flex-col">
