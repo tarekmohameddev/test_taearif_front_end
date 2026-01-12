@@ -7,18 +7,20 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Phone,
-  Mail,
   Edit,
   MessageSquare,
   MapPin,
-  Target,
   ArrowRight,
-  X,
+  User,
+  Building,
+  Loader2,
+  AlertCircle,
+  Home,
+  DollarSign,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useAuthStore from "@/context/AuthContext";
 
 interface PropertyRequest {
@@ -57,6 +59,7 @@ export default function PropertyRequestDetailsPage() {
   const propertyRequestId = params?.id as string;
   const { userData, IsLoading: authLoading } = useAuthStore();
 
+  const [activeTab, setActiveTab] = useState("property-requests");
   const [propertyRequest, setPropertyRequest] = useState<PropertyRequest | null>(
     null,
   );
@@ -103,346 +106,446 @@ export default function PropertyRequestDetailsPage() {
     }
   }, [propertyRequestId, userData?.token, authLoading]);
 
-  const openWhatsApp = (raw: string) => {
-    const phone = raw.replace(/\D/g, ""); // remove non-digits
-    let full = "";
-
-    // Saudi numbers
-    if (phone.startsWith("05")) full = "966" + phone.slice(1);
-    else if (phone.startsWith("5")) full = "966" + phone;
-    // Egyptian numbers
-    else if (phone.startsWith("1")) full = "20" + phone;
-    // fallback: assume KSA
-    else full = "966" + phone;
-
-    window.open(`https://wa.me/${full}`, "_blank");
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "غير محدد";
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat("ar-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(date);
+    } catch {
+      return dateString;
+    }
   };
 
-  return (
-    <div className="flex h-screen overflow-hidden" dir="rtl">
-      <EnhancedSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
+  const formatCurrency = (amount: number) => {
+    if (!amount) return "غير محدد";
+    return new Intl.NumberFormat("ar-SA", {
+      style: "currency",
+      currency: "SAR",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const handleCall = () => {
+    if (propertyRequest?.phone) {
+      window.open(`tel:${propertyRequest.phone}`, "_blank");
+    }
+  };
+
+  const handleWhatsApp = () => {
+    if (propertyRequest?.phone) {
+      const phone = propertyRequest.phone.replace(/\D/g, "");
+      let full = "";
+
+      // Saudi numbers
+      if (phone.startsWith("05")) full = "966" + phone.slice(1);
+      else if (phone.startsWith("5")) full = "966" + phone;
+      // Egyptian numbers
+      else if (phone.startsWith("1")) full = "20" + phone;
+      // fallback: assume KSA
+      else full = "966" + phone;
+
+      const message = `مرحباً ${propertyRequest.full_name}، أتمنى أن تكون بخير.`;
+      const whatsappUrl = `https://wa.me/${full}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, "_blank");
+    }
+  };
+
+  if (loadingDetails) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
         <DashboardHeader />
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-          <div className="container mx-auto px-4 py-6 max-w-6xl">
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !propertyRequest) {
+    return (
+      <div className="flex min-h-screen flex-col" dir="rtl">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row">
+          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <main className="flex-1 p-4 md:p-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {error || "لم يتم العثور على تفاصيل طلب العقار"}
+                  </p>
+                  <Button onClick={() => router.push("/dashboard/property-requests")}>
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                    العودة إلى طلبات العقارات
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col" dir="rtl">
+      <DashboardHeader />
+      <div className="flex flex-1 flex-col md:flex-row">
+        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <main className="flex-1 p-4 md:p-6">
+          <div className="space-y-6 max-w-6xl mx-auto">
             {/* Header */}
-            <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => router.back()}
-                  className="h-10 w-10"
+                  onClick={() => router.push("/dashboard/property-requests")}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Button>
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src="/placeholder.svg" />
-                    <AvatarFallback>
-                      {propertyRequest?.full_name
-                        .split(" ")
-                        .slice(0, 2)
-                        .map((n) => n[0])
-                        .join("") || "PR"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {propertyRequest?.full_name || "تفاصيل طلب العقار"}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                      طلب عقار • منذ{" "}
-                      {propertyRequest?.created_at
-                        ? new Date(
-                            propertyRequest.created_at,
-                          ).toLocaleDateString("ar-US")
-                        : ""}
-                    </p>
-                  </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold">
+                    تفاصيل طلب العقار #{propertyRequest.id}
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    تم الإنشاء في {formatDate(propertyRequest.created_at)}
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/property-requests/${propertyRequestId}/edit`,
-                    )
-                  }
-                >
-                  <Edit className="ml-2 h-4 w-4" />
-                  تعديل الطلب
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/dashboard/property-requests")}
-                >
-                  <X className="ml-2 h-4 w-4" />
-                  إغلاق
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  router.push(
+                    `/dashboard/property-requests/${propertyRequestId}/edit`,
+                  )
+                }
+                className="gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                <span className="hidden sm:inline">تعديل الطلب</span>
+                <span className="sm:hidden">تعديل</span>
+              </Button>
             </div>
 
-            {/* Content */}
-            {loadingDetails ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              </div>
-            ) : error ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* معلومات العميل */}
               <Card>
-                <CardContent className="p-6">
-                  <div className="text-center py-12">
-                    <p className="text-red-500 dark:text-red-400 mb-4">
-                      {error}
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    معلومات العميل
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg">
+                      {propertyRequest.full_name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      طلب عقار #{propertyRequest.id}
                     </p>
-                    <Button
-                      onClick={() => fetchPropertyRequestDetails(propertyRequestId)}
-                    >
-                      إعادة المحاولة
-                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ) : propertyRequest ? (
-              <div className="space-y-6">
-                {/* Badges */}
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className={
-                      propertyRequest.property_type === "سكني"
-                        ? "border-blue-500 text-blue-700"
-                        : propertyRequest.property_type === "تجاري"
-                          ? "border-green-500 text-green-700"
-                          : propertyRequest.property_type === "صناعي"
-                            ? "border-purple-500 text-purple-700"
-                            : propertyRequest.property_type === "أرض"
-                              ? "border-orange-500 text-orange-700"
-                              : "border-red-500 text-red-700"
-                    }
-                  >
-                    {propertyRequest.property_type}
-                  </Badge>
-                  <Badge
-                    variant={
-                      propertyRequest.is_active === 1 ? "default" : "secondary"
-                    }
-                  >
-                    {propertyRequest.is_active === 1 ? "نشط" : "غير نشط"}
-                  </Badge>
-                </div>
 
-                {/* Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Contact Information */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <Phone className="ml-2 h-5 w-5" />
-                        معلومات الاتصال
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span>الهاتف:</span>
-                        {propertyRequest.phone ? (
-                          <span className="font-medium flex items-center">
-                            <Phone className="ml-1 h-3 w-3 text-green-600" />
-                            {propertyRequest.phone}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground italic text-sm">
-                            غير متوفر
-                          </span>
-                        )}
+                  <div className="space-y-3 pt-4 border-t">
+                    {propertyRequest.phone ? (
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <a
+                          href={`tel:${propertyRequest.phone}`}
+                          className="text-sm hover:text-primary"
+                        >
+                          {propertyRequest.phone}
+                        </a>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>واتساب:</span>
-                        {propertyRequest.contact_on_whatsapp ? (
-                          <span className="font-medium flex items-center">
-                            <MessageSquare className="ml-1 h-3 w-3 text-green-500" />
-                            متاح
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground italic text-sm">
-                            غير متوفر
-                          </span>
-                        )}
+                    ) : null}
+                    {propertyRequest.contact_on_whatsapp ? (
+                      <div className="flex items-center gap-3">
+                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">واتساب متاح</span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>الاسم الكامل:</span>
-                        <span className="font-medium">
-                          {propertyRequest.full_name}
-                        </span>
-                      </div>
-                      {propertyRequest.phone && (
-                        <div className="flex gap-2 pt-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                            onClick={() => openWhatsApp(propertyRequest.phone)}
-                          >
-                            <MessageSquare className="ml-2 h-4 w-4" />
-                            واتساب
-                          </Button>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                    ) : null}
+                  </div>
 
-                  {/* Property Details */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <MapPin className="ml-2 h-5 w-5" />
-                        تفاصيل العقار
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span>نوع العقار:</span>
-                        <span className="font-medium flex items-center">
-                          <MapPin className="ml-1 h-3 w-3 text-blue-500" />
-                          {propertyRequest.property_type}
+                  {propertyRequest.employee ? (
+                    <div className="pt-4 border-t space-y-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <User className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-semibold text-muted-foreground">
+                          الموظف المسؤول:
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>المنطقة:</span>
-                        <span className="font-medium">
-                          {propertyRequest.region || "غير محددة"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>طريقة الشراء:</span>
-                        <span className="font-medium">
-                          {propertyRequest.purchase_method}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>الميزانية:</span>
-                        <span className="font-medium flex items-center">
-                          <Target className="ml-1 h-3 w-3 text-purple-500" />
-                          {propertyRequest.budget_from.toLocaleString()} -{" "}
-                          {propertyRequest.budget_to.toLocaleString()} ريال
-                        </span>
-                      </div>
-                      {propertyRequest.area_from && propertyRequest.area_to && (
-                        <div className="flex items-center justify-between">
-                          <span>المساحة:</span>
-                          <span className="font-medium">
-                            {propertyRequest.area_from} -{" "}
-                            {propertyRequest.area_to} م²
+                      <div className="space-y-2 pr-6">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">
+                            {propertyRequest.employee.name || "غير محدد"}
                           </span>
                         </div>
-                      )}
-                      {propertyRequest.neighborhoods &&
-                        propertyRequest.neighborhoods.length > 0 && (
-                          <div className="flex items-start justify-between">
-                            <span>الأحياء:</span>
-                            <span className="font-medium text-right text-sm">
-                              {propertyRequest.neighborhoods.join("، ")}
+                        {propertyRequest.employee.phone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">
+                              {propertyRequest.employee.phone}
                             </span>
                           </div>
                         )}
-                    </CardContent>
-                  </Card>
+                      </div>
+                    </div>
+                  ) : null}
 
-                  {/* Additional Details */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <Target className="ml-2 h-5 w-5" />
-                        تفاصيل إضافية
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span>الجدية:</span>
-                        <span className="font-medium">
-                          {propertyRequest.seriousness}
-                        </span>
+                  {propertyRequest.phone && (
+                    <div className="pt-4 border-t">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={handleCall}
+                        >
+                          <Phone className="h-4 w-4" />
+                          <span className="hidden sm:inline">اتصل</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={handleWhatsApp}
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                          <span className="hidden sm:inline">واتساب</span>
+                        </Button>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>هدف الشراء:</span>
-                        <span className="font-medium">
-                          {propertyRequest.purchase_goal}
-                        </span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* معلومات الطلب */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    معلومات الطلب
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">رقم الطلب</p>
+                      <p className="font-semibold">#{propertyRequest.id}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">الحالة</p>
+                      <Badge
+                        variant={
+                          propertyRequest.is_active === 1
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {propertyRequest.is_active === 1 ? "نشط" : "غير نشط"}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">تاريخ الإنشاء</p>
+                      <p className="font-semibold text-sm">
+                        {formatDate(propertyRequest.created_at)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">آخر تحديث</p>
+                      <p className="font-semibold text-sm">
+                        {formatDate(propertyRequest.updated_at)}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* معلومات العقار المطلوب */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Home className="h-5 w-5" />
+                  معلومات العقار المطلوب
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* المعلومات الأساسية */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-base border-b pb-2">
+                      المعلومات الأساسية
+                    </h4>
+                    <div className="space-y-4">
+                      {/* نوع العقار */}
+                      {propertyRequest.property_type ? (
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-sm text-muted-foreground mb-1">
+                              نوع العقار
+                            </p>
+                            <Badge variant="outline">
+                              {propertyRequest.property_type}
+                            </Badge>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {/* المنطقة */}
+                      {propertyRequest.region ? (
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-sm text-muted-foreground mb-1">
+                              المنطقة
+                            </p>
+                            <p className="font-medium">{propertyRequest.region}</p>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {/* الميزانية */}
+                      {(propertyRequest.budget_from || propertyRequest.budget_to) ? (
+                        <div className="flex items-start gap-3">
+                          <DollarSign className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-sm text-muted-foreground mb-1">
+                              الميزانية
+                            </p>
+                            <p className="font-medium text-lg text-primary">
+                              {propertyRequest.budget_from
+                                ? formatCurrency(propertyRequest.budget_from)
+                                : ""}{" "}
+                              -{" "}
+                              {propertyRequest.budget_to
+                                ? formatCurrency(propertyRequest.budget_to)
+                                : ""}
+                            </p>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {/* طريقة الشراء */}
+                      {propertyRequest.purchase_method ? (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            طريقة الشراء
+                          </p>
+                          <Badge variant="outline">
+                            {propertyRequest.purchase_method}
+                          </Badge>
+                        </div>
+                      ) : null}
+
+                      <div className="grid grid-cols-2 gap-4 pt-2">
+                        {/* المساحة */}
+                        {propertyRequest.area_from && propertyRequest.area_to ? (
+                          <div>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              المساحة
+                            </p>
+                            <p className="font-medium">
+                              {propertyRequest.area_from} -{" "}
+                              {propertyRequest.area_to} م²
+                            </p>
+                          </div>
+                        ) : null}
+
+                        {/* الأحياء */}
+                        {propertyRequest.neighborhoods &&
+                        propertyRequest.neighborhoods.length > 0 ? (
+                          <div>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              الأحياء
+                            </p>
+                            <p className="font-medium text-sm">
+                              {propertyRequest.neighborhoods.join("، ")}
+                            </p>
+                          </div>
+                        ) : null}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>عروض مشابهة:</span>
+                    </div>
+                  </div>
+
+                  {/* التفاصيل الإضافية */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-base border-b pb-2">
+                      التفاصيل الإضافية
+                    </h4>
+                    <div className="space-y-4">
+                      {/* الجدية */}
+                      {propertyRequest.seriousness ? (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            الجدية
+                          </p>
+                          <Badge variant="outline">
+                            {propertyRequest.seriousness}
+                          </Badge>
+                        </div>
+                      ) : null}
+
+                      {/* هدف الشراء */}
+                      {propertyRequest.purchase_goal ? (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            هدف الشراء
+                          </p>
+                          <p className="font-medium">
+                            {propertyRequest.purchase_goal}
+                          </p>
+                        </div>
+                      ) : null}
+
+                      {/* عروض مشابهة */}
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          عروض مشابهة
+                        </p>
                         {propertyRequest.wants_similar_offers ? (
                           <Badge variant="default">نعم</Badge>
                         ) : (
                           <Badge variant="secondary">لا</Badge>
                         )}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>الحالة:</span>
-                        <Badge
-                          variant={
-                            propertyRequest.is_active === 1
-                              ? "default"
-                              : "secondary"
-                          }
-                        >
-                          {propertyRequest.is_active === 1 ? "نشط" : "غير نشط"}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>تاريخ الإنشاء:</span>
-                        <span className="font-medium text-sm">
-                          {new Date(
-                            propertyRequest.created_at,
-                          ).toLocaleDateString("ar-US")}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>آخر تحديث:</span>
-                        <span className="font-medium text-sm">
-                          {new Date(
-                            propertyRequest.updated_at,
-                          ).toLocaleDateString("ar-US")}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Notes Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">الملاحظات</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {propertyRequest.notes ? (
-                      <p className="text-sm whitespace-pre-line leading-relaxed">
-                        {propertyRequest.notes}
-                      </p>
-                    ) : (
-                      <div className="text-center py-4">
-                        <p className="text-muted-foreground italic text-sm">
-                          لا توجد ملاحظات مضافة لهذا الطلب
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="p-6">
-                  <div className="text-center py-12">
-                    <p className="text-gray-500 dark:text-gray-400">
-                      لا توجد بيانات متاحة
-                    </p>
+                    </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* الملاحظات */}
+            {propertyRequest.notes ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    الملاحظات
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm whitespace-pre-line leading-relaxed">
+                    {propertyRequest.notes}
+                  </p>
                 </CardContent>
               </Card>
-            )}
+            ) : null}
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
