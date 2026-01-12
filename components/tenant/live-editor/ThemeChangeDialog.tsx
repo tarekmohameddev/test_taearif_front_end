@@ -319,7 +319,7 @@ export function ThemeChangeDialog({
                       </div>
 
                       {/* Theme Info */}
-                      <div className="p-4">
+                      <div className="p-4 pb-6">
                         <div className="flex items-start justify-between mb-2">
                           <h4 className="font-semibold text-gray-900">
                             {theme.name}
@@ -347,23 +347,28 @@ export function ThemeChangeDialog({
                             {theme.description}
                           </p>
                         )}
-                        <div className="mt-2 flex items-center justify-between">
+                        <div className="mt-2 flex items-center gap-2">
                           {theme.is_free ? (
-                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                            <span className="text-xs bg-green-100 text-green-700 px-3 py-2 rounded font-medium absolute bottom-4 left-4" >
                               {isRTL ? "مجاني" : "Free"}
                             </span>
-                          ) : (
-                            <span className="text-xs text-gray-600">
-                              {theme.price} {theme.currency || "SAR"}
-                            </span>
-                          )}
+                          ) : null}
                           {theme.has_access && !theme.is_free && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                            <span className="text-xs bg-blue-100 text-blue-700 px-3 py-2 rounded font-medium absolute bottom-4 left-4">
                               {isRTL ? "مملوك" : "Owned"}
                             </span>
                           )}
                         </div>
                       </div>
+
+                      {/* Price Badge - Bottom Left */}
+                      {!theme.is_free && (
+                        <div className={`absolute bottom-4 left-4 z-10`}>
+                          <span className="text-xs bg-orange-100 text-orange-700 px-3 py-2 rounded font-medium">
+                            {theme.price} {theme.currency || "SAR"}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
