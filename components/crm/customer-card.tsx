@@ -25,6 +25,8 @@ import {
   GripVertical,
   MapPin,
   User,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { Customer, PipelineStage, Reminder } from "@/types/crm";
 import useStore from "@/context/Store";
@@ -322,6 +324,73 @@ export default function CustomerCard({
           </div>
         )}
 
+        {/* Reminders Section */}
+        {(() => {
+          const customerId = (customer as any).customer_id || customer.id;
+          const customerReminders = getCustomerReminders(Number(customerId));
+          const activeReminders = customerReminders.filter(
+            (r) => r.status === "pending" || r.status === "overdue"
+          );
+
+          if (activeReminders.length > 0) {
+            return (
+              <div className="space-y-2 text-xs border-t pt-2">
+                <div className="flex items-center gap-1 font-semibold text-muted-foreground">
+                  <Bell className="h-3 w-3 flex-shrink-0" />
+                  <span>التذكيرات ({activeReminders.length})</span>
+                </div>
+                <div className="space-y-0">
+                  {activeReminders.map((reminder, index) => (
+                    <div key={reminder.id}>
+                      <div className="p-1.5 rounded bg-white">
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 text-xs">
+                            <span className="font-medium truncate">
+                              {reminder.title}
+                            </span>
+                            {reminder.reminder_type && (
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap flex-shrink-0">
+                                {reminder.reminder_type.name_ar || reminder.reminder_type.name}
+                              </span>
+                            )}
+                          </div>
+                          {reminder.datetime && (
+                            <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5">
+                              <Clock className="h-2.5 w-2.5 flex-shrink-0" />
+                              <span>
+                                {new Date(reminder.datetime).toLocaleDateString(
+                                  "ar-SA",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {reminder.status === "overdue" && (
+                          <AlertCircle className="h-3 w-3 text-red-500 flex-shrink-0" />
+                        )}
+                      </div>
+                      </div>
+                      {index < activeReminders.length - 1 && (
+                        <div className="flex justify-center">
+                          <div className="w-1/2 border-b border-gray-200"></div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         <div className="flex items-center justify-between flex-wrap gap-2">
           {getPropertyTypeLabel(customer) !== "غير محدد" && (
             <Badge
@@ -331,23 +400,10 @@ export default function CustomerCard({
               {getPropertyTypeLabel(customer)}
             </Badge>
           )}
-          <div className="flex flex-col gap-1 flex-1 text-left">
-            <div className="text-xs text-muted-foreground truncate">
-              {customer.note && customer.note.length > 0
-                ? "لديه ملاحظات"
-                : "لا توجد ملاحظات"}
-            </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground truncate">
-              <Bell className="h-3 w-3 flex-shrink-0" />
-              {(() => {
-                // Use customer_id (actual customer ID) instead of id (request ID)
-                const customerId = (customer as any).customer_id || customer.id;
-                const remindersCount = getActiveRemindersCount(Number(customerId));
-                return remindersCount > 0
-                  ? `لديه ${remindersCount} تذكير${remindersCount > 1 ? "ات" : ""}`
-                  : "لا توجد تذكيرات";
-              })()}
-            </div>
+          <div className="text-xs text-muted-foreground truncate flex-1 text-left">
+            {customer.note && customer.note.length > 0
+              ? "لديه ملاحظات"
+              : "لا توجد ملاحظات"}
           </div>
         </div>
       </div>
@@ -504,6 +560,66 @@ export default function CustomerCard({
           </div>
         )}
 
+        {/* Reminders Section */}
+        {(() => {
+          const customerId = (customer as any).customer_id || customer.id;
+          const customerReminders = getCustomerReminders(Number(customerId));
+          const activeReminders = customerReminders.filter(
+            (r) => r.status === "pending" || r.status === "overdue"
+          );
+
+          if (activeReminders.length > 0) {
+            return (
+              <div className="space-y-1.5 text-xs border-t pt-2">
+                <div className="flex items-center gap-1 font-semibold text-muted-foreground">
+                  <Bell className="h-3 w-3 flex-shrink-0" />
+                  <span>التذكيرات ({activeReminders.length})</span>
+                </div>
+                <div className="space-y-0">
+                  {activeReminders.map((reminder, index) => (
+                    <div key={reminder.id}>
+                      <div className="p-1 rounded bg-white">
+                        <div className="flex items-center justify-between gap-2 text-xs">
+                          <span className="font-medium truncate">
+                            {reminder.title}
+                          </span>
+                          {reminder.reminder_type && (
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap flex-shrink-0">
+                              {reminder.reminder_type.name_ar || reminder.reminder_type.name}
+                            </span>
+                          )}
+                        </div>
+                        {reminder.datetime && (
+                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5">
+                            <Clock className="h-2.5 w-2.5 flex-shrink-0" />
+                            <span>
+                              {new Date(reminder.datetime).toLocaleDateString(
+                                "ar-SA",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      {index < activeReminders.length - 1 && (
+                        <div className="flex justify-center">
+                          <div className="w-1/2 border-b border-gray-200"></div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         <div className="flex items-center justify-between">
           {getPropertyTypeLabel(customer) !== "غير محدد" && (
             <Badge
@@ -513,21 +629,8 @@ export default function CustomerCard({
               {getPropertyTypeLabel(customer)}
             </Badge>
           )}
-          <div className="flex flex-col gap-1 text-xs text-muted-foreground truncate max-w-[100px]">
-            <div className="truncate">
-              {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
-            </div>
-            <div className="flex items-center gap-1 truncate">
-              <Bell className="h-3 w-3 flex-shrink-0" />
-              {(() => {
-                // Use customer_id (actual customer ID) instead of id (request ID)
-                const customerId = (customer as any).customer_id || customer.id;
-                const remindersCount = getActiveRemindersCount(Number(customerId));
-                return remindersCount > 0
-                  ? `${remindersCount} تذكير${remindersCount > 1 ? "ات" : ""}`
-                  : "لا توجد تذكيرات";
-              })()}
-            </div>
+          <div className="text-xs text-muted-foreground truncate max-w-[100px]">
+            {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
           </div>
         </div>
       </div>
@@ -693,6 +796,66 @@ export default function CustomerCard({
           </div>
         )}
 
+        {/* Reminders Section */}
+        {(() => {
+          const customerId = (customer as any).customer_id || customer.id;
+          const customerReminders = getCustomerReminders(Number(customerId));
+          const activeReminders = customerReminders.filter(
+            (r) => r.status === "pending" || r.status === "overdue"
+          );
+
+          if (activeReminders.length > 0) {
+            return (
+              <div className="space-y-1.5 text-xs border-t pt-2">
+                <div className="flex items-center gap-1 font-semibold text-muted-foreground">
+                  <Bell className="h-3 w-3 flex-shrink-0" />
+                  <span>التذكيرات ({activeReminders.length})</span>
+                </div>
+                <div className="space-y-0">
+                  {activeReminders.map((reminder, index) => (
+                    <div key={reminder.id}>
+                      <div className="p-1 rounded bg-white">
+                        <div className="flex items-center justify-between gap-2 text-xs">
+                          <span className="font-medium truncate">
+                            {reminder.title}
+                          </span>
+                          {reminder.reminder_type && (
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap flex-shrink-0">
+                              {reminder.reminder_type.name_ar || reminder.reminder_type.name}
+                            </span>
+                          )}
+                        </div>
+                        {reminder.datetime && (
+                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5">
+                            <Clock className="h-2.5 w-2.5 flex-shrink-0" />
+                            <span>
+                              {new Date(reminder.datetime).toLocaleDateString(
+                                "ar-SA",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      {index < activeReminders.length - 1 && (
+                        <div className="flex justify-center">
+                          <div className="w-1/2 border-b border-gray-200 my-1"></div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         <div className="flex items-center justify-between">
           {getPropertyTypeLabel(customer) !== "غير محدد" && (
             <Badge
@@ -702,21 +865,8 @@ export default function CustomerCard({
               {getPropertyTypeLabel(customer)}
             </Badge>
           )}
-          <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-            <div>
-              {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
-            </div>
-            <div className="flex items-center gap-1">
-              <Bell className="h-3 w-3 flex-shrink-0" />
-              {(() => {
-                // Use customer_id (actual customer ID) instead of id (request ID)
-                const customerId = (customer as any).customer_id || customer.id;
-                const remindersCount = getActiveRemindersCount(Number(customerId));
-                return remindersCount > 0
-                  ? `لديه ${remindersCount} تذكير${remindersCount > 1 ? "ات" : ""}`
-                  : "لا توجد تذكيرات";
-              })()}
-            </div>
+          <div className="text-xs text-muted-foreground">
+            {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
           </div>
         </div>
       </div>
