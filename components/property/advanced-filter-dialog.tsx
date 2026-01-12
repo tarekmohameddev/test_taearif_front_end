@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { X, SlidersHorizontal, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +13,14 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface FilterData {
   purposes_filter: string[];
@@ -38,6 +45,7 @@ interface FilterDialogProps {
   onClose: () => void;
   filterData: FilterData | null;
   onApplyFilters: (filters: any) => void;
+  appliedFilters?: Record<string, any>;
 }
 
 export function AdvancedFilterDialog({
@@ -45,9 +53,8 @@ export function AdvancedFilterDialog({
   onClose,
   filterData,
   onApplyFilters,
+  appliedFilters = {},
 }: FilterDialogProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
   // State for filters
   const [selectedPurposes, setSelectedPurposes] = useState<string[]>([]);
@@ -57,37 +64,107 @@ export function AdvancedFilterDialog({
   const [areaRange, setAreaRange] = useState<[number, number]>([0, 0]);
   const [selectedBeds, setSelectedBeds] = useState<number[]>([]);
   const [selectedBaths, setSelectedBaths] = useState<number[]>([]);
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
+  const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
+  
+  // Cities and Districts data
+  const [cities, setCities] = useState<Array<{ id: number; name_ar: string; name_en: string }>>([]);
+  const [districts, setDistricts] = useState<Array<{ id: number; city_id: number; name_ar: string; name_en: string }>>([]);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
 
-  // Initialize filters from URL params
+  // Fetch cities on mount
   useEffect(() => {
-    if (searchParams) {
-      const purposes = searchParams.get("purposes_filter")?.split(",") || [];
-      const types = searchParams.get("type")?.split(",") || [];
-      const features = searchParams.get("features")?.split(",") || [];
-      const priceFrom = searchParams.get("price_from")
-        ? parseInt(searchParams.get("price_from")!)
-        : 0;
-      const priceTo = searchParams.get("price_to")
-        ? parseInt(searchParams.get("price_to")!)
-        : 0;
-      const areaFrom = searchParams.get("area_from")
-        ? parseInt(searchParams.get("area_from")!)
-        : 0;
-      const areaTo = searchParams.get("area_to")
-        ? parseInt(searchParams.get("area_to")!)
-        : 0;
-      const beds = searchParams.get("beds")?.split(",").map(Number) || [];
-      const baths = searchParams.get("baths")?.split(",").map(Number) || [];
+    const fetchCities = async () => {
+      try {
+        setLoadingCities(true);
+        const response = await axiosInstance.get("https://nzl-backend.com/api/cities?country_id=1");
+        setCities(response.data?.data || []);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+    fetchCities();
+  }, []);
 
-      setSelectedPurposes(purposes);
-      setSelectedTypes(types);
-      setSelectedFeatures(features);
-      setPriceRange([priceFrom, priceTo]);
-      setAreaRange([areaFrom, areaTo]);
-      setSelectedBeds(beds);
-      setSelectedBaths(baths);
+  // Fetch districts when city is selected
+  useEffect(() => {
+    if (selectedCityId) {
+      const fetchDistricts = async () => {
+        try {
+          setLoadingDistricts(true);
+          const response = await axiosInstance.get(`https://nzl-backend.com/api/districts?city_id=${selectedCityId}`);
+          setDistricts(response.data?.data || []);
+        } catch (error) {
+          console.error("Error fetching districts:", error);
+        } finally {
+          setLoadingDistricts(false);
+        }
+      };
+      fetchDistricts();
+    } else {
+      setDistricts([]);
+      setSelectedDistrictId(null);
     }
-  }, [searchParams]);
+  }, [selectedCityId]);
+
+  // Initialize filters from appliedFilters when dialog opens
+  useEffect(() => {
+    if (isOpen && filterData) {
+      // Initialize from appliedFilters if available, otherwise use defaults
+      const minPrice = parseInt(filterData.specifics_filters.price_range.min);
+      const maxPrice = parseInt(filterData.specifics_filters.price_range.max);
+      const minArea = parseInt(filterData.specifics_filters.area_range.min);
+
+      setSelectedPurposes(
+        Array.isArray(appliedFilters.purposes_filter)
+          ? appliedFilters.purposes_filter
+          : appliedFilters.purposes_filter
+            ? [appliedFilters.purposes_filter]
+            : []
+      );
+      setSelectedTypes(
+        Array.isArray(appliedFilters.type)
+          ? appliedFilters.type
+          : appliedFilters.type
+            ? [appliedFilters.type]
+            : []
+      );
+      setSelectedFeatures(
+        Array.isArray(appliedFilters.features)
+          ? appliedFilters.features
+          : appliedFilters.features
+            ? [appliedFilters.features]
+            : []
+      );
+      setSelectedBeds(
+        Array.isArray(appliedFilters.beds)
+          ? appliedFilters.beds
+          : appliedFilters.beds
+            ? [appliedFilters.beds]
+            : []
+      );
+      setSelectedBaths(
+        Array.isArray(appliedFilters.baths)
+          ? appliedFilters.baths
+          : appliedFilters.baths
+            ? [appliedFilters.baths]
+            : []
+      );
+      setPriceRange([
+        appliedFilters.price_from || minPrice,
+        appliedFilters.price_to || maxPrice,
+      ]);
+      setAreaRange([
+        appliedFilters.area_from || minArea,
+        appliedFilters.area_to || maxPrice,
+      ]);
+      setSelectedCityId(appliedFilters.city_id || null);
+      setSelectedDistrictId(appliedFilters.district_id || null);
+    }
+  }, [isOpen, filterData, appliedFilters]);
 
   // Initialize ranges from filter data
   useEffect(() => {
@@ -153,6 +230,8 @@ export function AdvancedFilterDialog({
     setSelectedFeatures([]);
     setSelectedBeds([]);
     setSelectedBaths([]);
+    setSelectedCityId(null);
+    setSelectedDistrictId(null);
     if (filterData) {
       const minPrice = parseInt(filterData.specifics_filters.price_range.min);
       const maxPrice = parseInt(filterData.specifics_filters.price_range.max);
@@ -163,55 +242,52 @@ export function AdvancedFilterDialog({
   };
 
   const applyFilters = () => {
-    const filters = {
-      purposes_filter: selectedPurposes,
-      type: selectedTypes,
-      features: selectedFeatures,
-      price_from: priceRange[0],
-      price_to: priceRange[1],
-      area_from: areaRange[0],
-      area_to: areaRange[1],
-      beds: selectedBeds,
-      baths: selectedBaths,
-    };
+    if (!filterData) return;
 
-    // Build URL params
-    const params = new URLSearchParams();
+    const minPrice = parseInt(filterData.specifics_filters.price_range.min);
+    const maxPrice = parseInt(filterData.specifics_filters.price_range.max);
+    const minArea = parseInt(filterData.specifics_filters.area_range.min);
 
+    const filters: any = {};
+
+    // Only include filters that are different from defaults or have values
     if (selectedPurposes.length > 0) {
-      params.set("purposes_filter", selectedPurposes.join(","));
+      filters.purposes_filter = selectedPurposes;
     }
     if (selectedTypes.length > 0) {
-      params.set("type", selectedTypes.join(","));
+      filters.type = selectedTypes;
     }
     if (selectedFeatures.length > 0) {
-      params.set("features", selectedFeatures.join(","));
-    }
-    if (priceRange[0] > 0) {
-      params.set("price_from", priceRange[0].toString());
-    }
-    if (priceRange[1] > 0) {
-      params.set("price_to", priceRange[1].toString());
-    }
-    if (areaRange[0] > 0) {
-      params.set("area_from", areaRange[0].toString());
-    }
-    if (areaRange[1] > 0) {
-      params.set("area_to", areaRange[1].toString());
+      filters.features = selectedFeatures;
     }
     if (selectedBeds.length > 0) {
-      params.set("beds", selectedBeds.join(","));
+      filters.beds = selectedBeds;
     }
     if (selectedBaths.length > 0) {
-      params.set("baths", selectedBaths.join(","));
+      filters.baths = selectedBaths;
+    }
+    if (selectedCityId) {
+      filters.city_id = selectedCityId;
+    }
+    if (selectedDistrictId) {
+      filters.district_id = selectedDistrictId;
+    }
+    // Only include price filters if they differ from defaults
+    if (priceRange[0] !== minPrice) {
+      filters.price_from = priceRange[0];
+    }
+    if (priceRange[1] !== maxPrice) {
+      filters.price_to = priceRange[1];
+    }
+    // Only include area filters if they differ from defaults
+    if (areaRange[0] !== minArea) {
+      filters.area_from = areaRange[0];
+    }
+    if (areaRange[1] !== maxPrice) {
+      filters.area_to = areaRange[1];
     }
 
-    // Update URL
-    const newUrl = params.toString()
-      ? `/properties?${params.toString()}`
-      : "/properties";
-    router.push(newUrl);
-
+    // Apply filters through callback (don't navigate - we're in dashboard)
     onApplyFilters(filters);
     onClose();
   };
@@ -223,6 +299,8 @@ export function AdvancedFilterDialog({
     if (selectedFeatures.length > 0) count++;
     if (selectedBeds.length > 0) count++;
     if (selectedBaths.length > 0) count++;
+    if (selectedCityId) count++;
+    if (selectedDistrictId) count++;
     if (
       priceRange[0] >
       parseInt(filterData?.specifics_filters.price_range.min || "0")
@@ -277,6 +355,71 @@ export function AdvancedFilterDialog({
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
+          {/* المدينة */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
+              المدينة
+            </h3>
+            <Select
+              value={selectedCityId?.toString() || "all"}
+              onValueChange={(value) => {
+                if (value === "all") {
+                  setSelectedCityId(null);
+                  setSelectedDistrictId(null);
+                } else {
+                  setSelectedCityId(parseInt(value));
+                  setSelectedDistrictId(null); // Reset district when city changes
+                }
+              }}
+            >
+              <SelectTrigger className="w-full border-black">
+                <SelectValue placeholder="اختر المدينة" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع المدن</SelectItem>
+                {loadingCities ? (
+                  <SelectItem value="loading" disabled>جاري التحميل...</SelectItem>
+                ) : (
+                  cities.map((city) => (
+                    <SelectItem key={city.id} value={city.id.toString()}>
+                      {city.name_ar || city.name_en}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* الحي */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
+              الحي
+            </h3>
+            <Select
+              value={selectedDistrictId?.toString() || "all"}
+              onValueChange={(value) => {
+                if (value === "all") {
+                  setSelectedDistrictId(null);
+                } else {
+                  setSelectedDistrictId(parseInt(value));
+                }
+              }}
+              disabled={!selectedCityId || loadingDistricts}
+            >
+              <SelectTrigger className="w-full border-black" disabled={!selectedCityId || loadingDistricts}>
+                <SelectValue placeholder={loadingDistricts ? "جاري التحميل..." : selectedCityId ? "اختر الحي" : "اختر المدينة أولاً"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع الأحياء</SelectItem>
+                {districts.map((district) => (
+                  <SelectItem key={district.id} value={district.id.toString()}>
+                    {district.name_ar || district.name_en}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* الهدف من العقار */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">

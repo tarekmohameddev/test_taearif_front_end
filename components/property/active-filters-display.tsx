@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface ActiveFiltersDisplayProps {
   filters: any;
@@ -15,7 +17,48 @@ export function ActiveFiltersDisplay({
   onRemoveFilter,
   onClearAll,
 }: ActiveFiltersDisplayProps) {
-  const getFilterDisplayName = (key: string, value: any) => {
+  const [cities, setCities] = useState<Array<{ id: number; name_ar: string; name_en: string }>>([]);
+  const [districts, setDistricts] = useState<Array<{ id: number; city_id: number; name_ar: string; name_en: string }>>([]);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
+
+  // Fetch cities on mount
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        setLoadingCities(true);
+        const response = await axiosInstance.get("https://nzl-backend.com/api/cities?country_id=1");
+        setCities(response.data?.data || []);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+    fetchCities();
+  }, []);
+
+  // Fetch districts when city_id filter is present
+  useEffect(() => {
+    if (filters.city_id) {
+      const fetchDistricts = async () => {
+        try {
+          setLoadingDistricts(true);
+          const response = await axiosInstance.get(`https://nzl-backend.com/api/districts?city_id=${filters.city_id}`);
+          setDistricts(response.data?.data || []);
+        } catch (error) {
+          console.error("Error fetching districts:", error);
+        } finally {
+          setLoadingDistricts(false);
+        }
+      };
+      fetchDistricts();
+    } else {
+      setDistricts([]);
+    }
+  }, [filters.city_id]);
+
+  const getFilterDisplayName = (key: string, value: any, filters: any) => {
     switch (key) {
       case "purposes_filter":
         return value === "rent"
@@ -47,6 +90,14 @@ export function ActiveFiltersDisplay({
         return `${value}+ حمامات`;
       case "features":
         return value;
+      case "city_id": {
+        const city = cities.find((c) => c.id === parseInt(value));
+        return city ? `المدينة: ${city.name_ar || city.name_en}` : `المدينة: ${value}`;
+      }
+      case "district_id": {
+        const district = districts.find((d) => d.id === parseInt(value));
+        return district ? `الحي: ${district.name_ar || district.name_en}` : `الحي: ${value}`;
+      }
       default:
         return value;
     }
@@ -63,17 +114,17 @@ export function ActiveFiltersDisplay({
       if (value && value !== "" && value !== 0) {
         if (Array.isArray(value) && value.length > 0) {
           value.forEach((item: any) => {
-            activeFilters.push({
-              key,
-              value: item,
-              displayName: getFilterDisplayName(key, item),
-            });
+          activeFilters.push({
+            key,
+            value: item,
+            displayName: getFilterDisplayName(key, item, filters),
+          });
           });
         } else if (!Array.isArray(value)) {
           activeFilters.push({
             key,
             value,
-            displayName: getFilterDisplayName(key, value),
+            displayName: getFilterDisplayName(key, value, filters),
           });
         }
       }

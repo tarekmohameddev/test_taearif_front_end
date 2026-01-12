@@ -607,9 +607,11 @@ export function PropertiesManagementPage() {
       params.set("page", page.toString());
 
       Object.entries(filters).forEach(([key, value]) => {
-        if (value && value.length > 0) {
+        if (value !== null && value !== undefined && value !== "") {
           if (Array.isArray(value)) {
-            params.set(key, value.join(","));
+            if (value.length > 0) {
+              params.set(key, value.join(","));
+            }
           } else {
             params.set(key, value.toString());
           }
@@ -1251,6 +1253,7 @@ export function PropertiesManagementPage() {
             onClose={() => setFilterDialogOpen(false)}
             filterData={propertiesAllData}
             onApplyFilters={handleApplyFilters}
+            appliedFilters={appliedFilters}
           />
 
           {reorderPopup.open && (
