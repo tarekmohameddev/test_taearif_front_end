@@ -40,6 +40,7 @@ interface ThemeChangeDialogProps {
 export function ThemeChangeDialog({
   isOpen,
   onClose,
+  onThemeApply,
   onThemeReset,
   currentTheme,
 }: ThemeChangeDialogProps) {
@@ -50,7 +51,6 @@ export function ThemeChangeDialog({
   
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [showWarning, setShowWarning] = useState(false);
-  const [isApplying, setIsApplying] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [showResetWarning, setShowResetWarning] = useState(false);
 
@@ -74,22 +74,40 @@ export function ThemeChangeDialog({
     return theme.is_free || theme.has_access;
   };
 
-  const handleApply = async () => {
+  // Convert theme ID to ThemeNumber (1 or 2) based on index
+  // This maps the first theme to 1, second to 2, etc.
+  const convertThemeIdToThemeNumber = (themeId: string): ThemeNumber | null => {
+    const themeIndex = themes.findIndex((t) => t.id === themeId);
+    if (themeIndex === -1) return null;
+    // Map first theme to 1, second to 2 (only support 1 or 2 for now)
+    if (themeIndex === 0) return 1;
+    if (themeIndex === 1) return 2;
+    return null; // Only support themes 1 and 2
+  };
+
+  const handleApply = () => {
     if (!selectedTheme) return;
 
-    setIsApplying(true);
-    try {
-      // استخدام API مباشرة للتفعيل
-      await setActiveTheme(selectedTheme.id);
-      setSelectedTheme(null);
-      setShowWarning(false);
-      // إعادة تحميل الصفحة لتطبيق التغييرات
-      window.location.reload();
-    } catch (error) {
-      console.error("Error applying theme:", error);
-    } finally {
-      setIsApplying(false);
+    const themeNumber = convertThemeIdToThemeNumber(selectedTheme.id);
+    if (!themeNumber) {
+      console.error("Cannot convert theme ID to ThemeNumber:", selectedTheme.id);
+      return;
     }
+
+    // إرسال request للـ API في الخلفية تماماً (fire-and-forget)
+    setActiveTheme(selectedTheme.id).catch((error) => {
+      console.error("Error setting active theme in background:", error);
+    });
+
+    // استخدام onThemeApply callback في الخلفية أيضاً
+    onThemeApply(themeNumber).catch((error) => {
+      console.error("Error applying theme in background:", error);
+    });
+
+    // إغلاق الـ popup فوراً (بدون انتظار أي شيء)
+    setSelectedTheme(null);
+    setShowWarning(false);
+    onClose();
   };
 
   const handlePurchase = () => {
@@ -103,9 +121,16 @@ export function ThemeChangeDialog({
   const handleReset = async () => {
     if (!currentTheme) return;
 
+    // Convert currentTheme to ThemeNumber
+    const themeNumber = currentTheme as ThemeNumber;
+    if (themeNumber !== 1 && themeNumber !== 2) {
+      console.error("Invalid currentTheme value:", currentTheme);
+      return;
+    }
+
     setIsResetting(true);
     try {
-      await onThemeReset(currentTheme);
+      await onThemeReset(themeNumber);
       setShowResetWarning(false);
       onClose();
     } catch (error) {
@@ -116,7 +141,7 @@ export function ThemeChangeDialog({
   };
 
   const handleClose = () => {
-    if (!isApplying && !isResetting) {
+    if (!isResetting) {
       setSelectedTheme(null);
       setShowWarning(false);
       setShowResetWarning(false);
@@ -151,7 +176,7 @@ export function ThemeChangeDialog({
               <Button
                 variant="outline"
                 onClick={() => setShowResetWarning(true)}
-                disabled={isApplying || isResetting}
+                disabled={isResetting}
                 className="w-full gap-2 border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -350,26 +375,21 @@ export function ThemeChangeDialog({
           <Button
             variant="outline"
             onClick={handleClose}
-            disabled={isApplying || isResetting}
+            disabled={isResetting}
           >
             {isRTL ? "إلغاء" : "Cancel"}
           </Button>
           {selectedTheme && (
             <Button
               onClick={selectedThemeCanUse ? handleApply : handlePurchase}
-              disabled={isApplying || isResetting}
+              disabled={isResetting}
               className={`gap-2 ${
                 selectedThemeCanUse
                   ? "bg-indigo-600 hover:bg-indigo-700"
                   : "bg-orange-600 hover:bg-orange-700"
               }`}
             >
-              {isApplying ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {isRTL ? "جاري التطبيق..." : "Applying..."}
-                </>
-              ) : selectedThemeCanUse ? (
+              {selectedThemeCanUse ? (
                 <>
                   <Palette className="w-4 h-4" />
                   {isRTL ? "تطبيق الثيم" : "Apply Theme"}
