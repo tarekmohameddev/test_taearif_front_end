@@ -21,6 +21,8 @@ import {
   MessageSquare,
   PlusCircle,
   Edit,
+  Bell,
+  CheckCircle,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
@@ -66,6 +68,33 @@ interface DealDetailsData {
     card_procedure: string;
     card_date: string;
     created_at: string;
+  }>;
+  reminders?: Array<{
+    id: number;
+    user_id: number;
+    customer_id: number;
+    reminder_type_id: number;
+    reminder_type?: {
+      id: number;
+      name: string;
+      name_ar?: string;
+      color: string;
+      icon: string;
+    };
+    title: string;
+    description?: string | null;
+    datetime: string;
+    priority: number;
+    priority_label?: string;
+    priority_label_ar?: string;
+    status: string;
+    status_label?: string;
+    status_label_ar?: string;
+    notes?: string | null;
+    is_overdue?: boolean;
+    days_until_due?: number;
+    created_at: string;
+    updated_at: string;
   }>;
   property_source: string;
   property_specifications: {
@@ -356,6 +385,69 @@ export default function DealDetailsPage() {
     }).format(amount);
   };
 
+  // Format date and time for reminders
+  const formatSaudiDateTime = (dateString: string) => {
+    if (!dateString) return { formattedDate: "غير محدد", formattedTime: "" };
+    try {
+      const date = new Date(dateString);
+      const formattedDate = new Intl.DateTimeFormat("ar-SA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(date);
+      const formattedTime = new Intl.DateTimeFormat("ar-SA", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(date);
+      return { formattedDate, formattedTime };
+    } catch {
+      return { formattedDate: dateString, formattedTime: "" };
+    }
+  };
+
+  // Get reminder type icon
+  const getReminderTypeIcon = (iconName: string) => {
+    const iconMap: { [key: string]: any } = {
+      MapPin: MapPin,
+      Building: Building,
+      Calendar: Calendar,
+      Phone: Phone,
+      MessageSquare: MessageSquare,
+      Bell: Bell,
+      Clock: Clock,
+      User: User,
+    };
+    return iconMap[iconName] || Bell;
+  };
+
+  // Get priority badge color
+  const getPriorityColor = (priority: number) => {
+    if (priority === 2) return "border-red-500 text-red-600 bg-red-50";
+    if (priority === 1) return "border-yellow-500 text-yellow-600 bg-yellow-50";
+    return "border-gray-500 text-gray-600 bg-gray-50";
+  };
+
+  // Get priority label
+  const getPriorityLabel = (reminder: any) => {
+    return reminder.priority_label_ar || reminder.priority_label || "عادية";
+  };
+
+  // Get status label
+  const getStatusLabel = (reminder: any) => {
+    return reminder.status_label_ar || reminder.status_label || reminder.status || "قيد الانتظار";
+  };
+
+  // Get status icon
+  const getStatusIcon = (reminder: any) => {
+    if (reminder.status === "completed") {
+      return <CheckCircle className="h-3 w-3" />;
+    }
+    if (reminder.is_overdue || reminder.status === "overdue") {
+      return <AlertCircle className="h-3 w-3" />;
+    }
+    return <Clock className="h-3 w-3" />;
+  };
+
   // Handle add card (from popup)
   const handleAddCard = async (cardData: any) => {
     if (!data?.request?.id) return;
@@ -445,6 +537,7 @@ export default function DealDetailsPage() {
     request,
     customer,
     cards: cardsFromApi,
+    reminders,
     property_specifications,
     property_basic,
     property,
@@ -1116,6 +1209,115 @@ export default function DealDetailsPage() {
                 </CardContent>
               </Card>
             ) : null}
+
+            {/* التذكيرات */}
+            {reminders && reminders.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5" />
+                    التذكيرات ({reminders.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {reminders.map((reminder) => {
+                      const { formattedDate, formattedTime } = formatSaudiDateTime(
+                        reminder.datetime,
+                      );
+                      const ReminderTypeIcon = reminder.reminder_type
+                        ? getReminderTypeIcon(reminder.reminder_type.icon)
+                        : Bell;
+
+                      return (
+                        <div
+                          key={reminder.id}
+                          className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-start gap-3 flex-1">
+                              <div
+                                className={`w-1 h-16 rounded-full ${
+                                  reminder.is_overdue || reminder.status === "overdue"
+                                    ? "bg-red-500"
+                                    : reminder.status === "completed"
+                                      ? "bg-green-500"
+                                      : "bg-blue-500"
+                                }`}
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h3 className="font-semibold">{reminder.title}</h3>
+                                  {reminder.reminder_type && (
+                                    <Badge
+                                      variant="outline"
+                                      className="flex items-center gap-1.5 px-2.5 py-1 border-2"
+                                      style={{
+                                        borderColor: reminder.reminder_type.color,
+                                        backgroundColor: `${reminder.reminder_type.color}15`,
+                                        color: reminder.reminder_type.color,
+                                      }}
+                                    >
+                                      <ReminderTypeIcon className="h-3.5 w-3.5" />
+                                      <span className="font-medium text-xs">
+                                        {reminder.reminder_type.name_ar ||
+                                          reminder.reminder_type.name}
+                                      </span>
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    {formattedDate}
+                                  </span>
+                                  {formattedTime && (
+                                    <span className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      {formattedTime}
+                                    </span>
+                                  )}
+                                  {reminder.is_overdue && (
+                                    <span className="flex items-center gap-1 text-red-600 font-semibold">
+                                      <AlertCircle className="h-3 w-3" />
+                                      متأخر
+                                    </span>
+                                  )}
+                                  {reminder.days_until_due !== undefined &&
+                                    reminder.days_until_due >= 0 &&
+                                    !reminder.is_overdue && (
+                                      <span className="text-xs text-muted-foreground">
+                                        متبقي {reminder.days_until_due} يوم
+                                      </span>
+                                    )}
+                                </div>
+                                {reminder.description && (
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    {reminder.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <Badge
+                                variant="outline"
+                                className={getPriorityColor(reminder.priority)}
+                              >
+                                {getPriorityLabel(reminder)}
+                              </Badge>
+                              <Badge variant="outline" className="flex items-center gap-1">
+                                {getStatusIcon(reminder)}
+                                {getStatusLabel(reminder)}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* الأنشطة والبطاقات - من popup */}
             <Card>
