@@ -265,61 +265,69 @@ export function AppsPage() {
       app.status !== "installed" &&
       !app.installed;
 
-    if (needsPayment) {
-      // Initiate payment
-      const loadingToast = toast.loading("جاري إعداد عملية الدفع...");
-      try {
-        const response = await axiosInstance.post(
-          `/api/apps/${appId}/payment/initiate`
-        );
-
-        if (response.data.status === "success" && response.data.payment_url) {
-          setPaymentUrl(response.data.payment_url);
-          setCurrentAppId(Number(appId));
-          setCurrentInstallationId(response.data.installation_id || null);
-          setShowPaymentPopup(true);
-          toast.dismiss(loadingToast);
-        } else {
-          toast.dismiss(loadingToast);
-          toast.error("فشل في إعداد عملية الدفع");
-        }
-      } catch (error: any) {
-        toast.dismiss(loadingToast);
-        toast.error(
-          error.response?.data?.message || "فشل في إعداد عملية الدفع"
-        );
-        console.error("Error initiating payment:", error);
-      }
-      return;
-    }
-
-    // Free app or already paid - proceed with normal installation
-    const loadingToast = toast.loading("جاري تثبيت التطبيق...");
+    // Always call /apps/install - it will return payment_url if payment is needed
+    const loadingToast = toast.loading(
+      needsPayment ? "جاري إعداد عملية الدفع..." : "جاري تثبيت التطبيق..."
+    );
     try {
-      await axiosInstance.post("/apps/install", {
+      const response = await axiosInstance.post("/apps/install", {
         app_id: Number(appId),
       });
 
-      const updatedApps: App[] = apps.map((app) => {
-        if (app.id === appId) {
-          return { ...app, installed: true, status: "installed" as const };
-        }
-        return app;
-      });
+      // Check if payment is required (response contains payment_url)
+      if (response.data.status === "success" && response.data.data?.payment_url) {
+        // Payment required - open payment popup
+        setPaymentUrl(response.data.data.payment_url);
+        setCurrentAppId(Number(appId));
+        setCurrentInstallationId(response.data.data.installation?.id || null);
+        setShowPaymentPopup(true);
+        toast.dismiss(loadingToast);
 
-      setApps(updatedApps);
+        // Update app status to pending_payment
+        const updatedApps: App[] = apps.map((app) => {
+          if (app.id === appId) {
+            return {
+              ...app,
+              status: "pending_payment" as const,
+              installation_id: response.data.data.installation?.id || null,
+            };
+          }
+          return app;
+        });
+        setApps(updatedApps);
+      } else if (response.data.status === "success") {
+        // Free app or already paid - installation completed
+        const updatedApps: App[] = apps.map((app) => {
+          if (app.id === appId) {
+            return {
+              ...app,
+              installed: true,
+              status: "installed" as const,
+              installation_id: response.data.data?.installation?.id || null,
+            };
+          }
+          return app;
+        });
 
-      const updatedInstalledApps = updatedApps.filter(
-        (app) => app.installed === true || app.status === "installed",
+        setApps(updatedApps);
+
+        const updatedInstalledApps = updatedApps.filter(
+          (app) => app.installed === true || app.status === "installed",
+        );
+        setInstalledApps(updatedInstalledApps);
+
+        fetchSideMenus("apps");
+        toast.dismiss(loadingToast);
+        toast.success("تم تثبيت التطبيق بنجاح");
+      } else {
+        toast.dismiss(loadingToast);
+        toast.error(response.data.message || "فشل في تثبيت التطبيق");
+      }
+    } catch (error: any) {
+      toast.dismiss(loadingToast);
+      toast.error(
+        error.response?.data?.message || "فشل في تثبيت التطبيق"
       );
-      setInstalledApps(updatedInstalledApps);
-
-      fetchSideMenus("apps");
-      toast.dismiss(loadingToast);
-      toast.success("تم تثبيت التطبيق بنجاح");
-    } catch (error) {
-      toast.dismiss(loadingToast);
-      toast.error("فشل في تثبيت التطبيق");
       console.error("فشل في تثبيت التطبيق:", error);
     }
   };
