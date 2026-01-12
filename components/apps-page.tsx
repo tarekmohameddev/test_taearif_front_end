@@ -41,6 +41,8 @@ import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import PaymentPopup from "@/components/popup/PopupForPayment";
+import { ShoppingCart } from "lucide-react";
 
 interface App {
   id: string | number;
@@ -56,6 +58,9 @@ interface App {
   installed: boolean;
   isPixelApp?: boolean;
   path?: string;
+  billing_type?: "free" | "paid" | "subscription";
+  status?: "installed" | "pending_payment" | "uninstalled";
+  installation_id?: number | null;
 }
 
 export function AppsPage() {
@@ -84,9 +89,13 @@ export function AppsPage() {
   ];
 
   const [installedApps, setInstalledApps] = useState<App[]>([]);
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  const [currentAppId, setCurrentAppId] = useState<number | null>(null);
+  const [currentInstallationId, setCurrentInstallationId] = useState<number | null>(null);
 
   // Add pixels app to the apps array
-  const addPixelsApp = (fetchedApps: App[]) => {
+  const addPixelsApp = (fetchedApps: App[]): App[] => {
     const pixelsApp: App = {
       id: "pixels-app",
       name: "ربط Pixels",
@@ -101,6 +110,9 @@ export function AppsPage() {
       featured: true,
       installed: false,
       isPixelApp: true,
+      billing_type: "free",
+      status: "uninstalled",
+      installation_id: null,
     };
 
     return [pixelsApp, ...fetchedApps];
@@ -122,10 +134,13 @@ export function AppsPage() {
       try {
         setLoading(true);
         const res = await axiosInstance.get("/apps");
-        const fetchedApps = res.data.data.apps.map((app: any) => ({
+        const fetchedApps: App[] = res.data.data.apps.map((app: any) => ({
           ...app,
           icon: app.img || app.icon || "/placeholder.svg",
           path: app.path || undefined,
+          billing_type: (app.billing_type || "free") as "free" | "paid" | "subscription",
+          status: (app.status || (app.installed ? "installed" : "uninstalled")) as "installed" | "pending_payment" | "uninstalled",
+          installation_id: app.installation_id || null,
         }));
         const appsWithPixels = addPixelsApp(fetchedApps);
         setApps(appsWithPixels);
@@ -147,6 +162,83 @@ export function AppsPage() {
     fetchApps();
   }, [userData?.token, authLoading]);
 
+  const verifyPaymentStatus = async (installationId: number): Promise<boolean> => {
+    const maxAttempts = 30;
+    const interval = 2000; // 2 seconds
+
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        const response = await axiosInstance.get(
+          `/api/installations/${installationId}/payment/status`
+        );
+
+        if (response.data.status === "completed") {
+          return true;
+        }
+
+        if (response.data.status === "failed") {
+          return false;
+        }
+
+        // Wait before next attempt
+        await new Promise((resolve) => setTimeout(resolve, interval));
+      } catch (err: any) {
+        console.error("Error checking payment status:", err);
+        // Continue polling on error
+        await new Promise((resolve) => setTimeout(resolve, interval));
+      }
+    }
+
+    return false; // Timeout
+  };
+
+  const handlePaymentSuccess = async () => {
+    setShowPaymentPopup(false);
+    setPaymentUrl("");
+
+    if (currentInstallationId) {
+      const loadingToast = toast.loading("جاري التحقق من الدفع...");
+      try {
+        const verified = await verifyPaymentStatus(currentInstallationId);
+
+        if (verified) {
+          // Refresh apps list
+          hasFetchedRef.current = false;
+          const res = await axiosInstance.get("/apps");
+          const fetchedApps: App[] = res.data.data.apps.map((app: any) => ({
+            ...app,
+            icon: app.img || app.icon || "/placeholder.svg",
+            path: app.path || undefined,
+            billing_type: (app.billing_type || "free") as "free" | "paid" | "subscription",
+            status: (app.status || (app.installed ? "installed" : "uninstalled")) as "installed" | "pending_payment" | "uninstalled",
+            installation_id: app.installation_id || null,
+          }));
+          const appsWithPixels = addPixelsApp(fetchedApps);
+          setApps(appsWithPixels);
+
+          const installed = appsWithPixels.filter(
+            (app) => app.installed === true || app.status === "installed",
+          );
+          setInstalledApps(installed);
+
+          fetchSideMenus("apps");
+          toast.dismiss(loadingToast);
+          toast.success("تم تأكيد الدفع وتثبيت التطبيق بنجاح");
+        } else {
+          toast.dismiss(loadingToast);
+          toast.error("فشل في التحقق من الدفع. يرجى المحاولة مرة أخرى");
+        }
+      } catch (error) {
+        toast.dismiss(loadingToast);
+        toast.error("حدث خطأ أثناء التحقق من الدفع");
+        console.error("Error verifying payment:", error);
+      }
+    }
+
+    setCurrentAppId(null);
+    setCurrentInstallationId(null);
+  };
+
   const handleInstall = async (appId: string | number) => {
     // Special handling for pixels app
     if (appId === "pixels-app") {
@@ -160,15 +252,57 @@ export function AppsPage() {
       return;
     }
 
+    const app = apps.find((a) => a.id === appId);
+    if (!app) {
+      toast.error("التطبيق غير موجود");
+      return;
+    }
+
+    // Check if payment is needed
+    const needsPayment =
+      parseFloat(app.price) > 0 &&
+      app.billing_type !== "free" &&
+      app.status !== "installed" &&
+      !app.installed;
+
+    if (needsPayment) {
+      // Initiate payment
+      const loadingToast = toast.loading("جاري إعداد عملية الدفع...");
+      try {
+        const response = await axiosInstance.post(
+          `/api/apps/${appId}/payment/initiate`
+        );
+
+        if (response.data.status === "success" && response.data.payment_url) {
+          setPaymentUrl(response.data.payment_url);
+          setCurrentAppId(Number(appId));
+          setCurrentInstallationId(response.data.installation_id || null);
+          setShowPaymentPopup(true);
+          toast.dismiss(loadingToast);
+        } else {
+          toast.dismiss(loadingToast);
+          toast.error("فشل في إعداد عملية الدفع");
+        }
+      } catch (error: any) {
+        toast.dismiss(loadingToast);
+        toast.error(
+          error.response?.data?.message || "فشل في إعداد عملية الدفع"
+        );
+        console.error("Error initiating payment:", error);
+      }
+      return;
+    }
+
+    // Free app or already paid - proceed with normal installation
     const loadingToast = toast.loading("جاري تثبيت التطبيق...");
     try {
       await axiosInstance.post("/apps/install", {
         app_id: Number(appId),
       });
 
-      const updatedApps = apps.map((app) => {
+      const updatedApps: App[] = apps.map((app) => {
         if (app.id === appId) {
-          return { ...app, installed: true };
+          return { ...app, installed: true, status: "installed" as const };
         }
         return app;
       });
@@ -176,7 +310,7 @@ export function AppsPage() {
       setApps(updatedApps);
 
       const updatedInstalledApps = updatedApps.filter(
-        (app) => app.installed === true,
+        (app) => app.installed === true || app.status === "installed",
       );
       setInstalledApps(updatedInstalledApps);
 
@@ -496,6 +630,18 @@ export function AppsPage() {
           </div>
         </main>
       </div>
+      {showPaymentPopup && paymentUrl && (
+        <PaymentPopup
+          paymentUrl={paymentUrl}
+          onClose={() => {
+            setShowPaymentPopup(false);
+            setPaymentUrl("");
+            setCurrentAppId(null);
+            setCurrentInstallationId(null);
+          }}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   );
 }
@@ -508,8 +654,21 @@ interface AppProps {
 
 function AppCard({ app, onInstall, onUninstall }: AppProps) {
   const router = useRouter();
-  const isInstalled = app.installed || false;
+  const isInstalled = app.installed || false || app.status === "installed";
   const isPixelApp = app.isPixelApp;
+  const needsPayment =
+    parseFloat(app.price) > 0 &&
+    app.billing_type !== "free" &&
+    app.status !== "installed" &&
+    !app.installed;
+  const isPendingPayment = app.status === "pending_payment";
+
+  const formatPrice = (price: string) => {
+    if (price === "مجاني" || price === "0.00" || parseFloat(price) === 0) {
+      return "مجاني";
+    }
+    return `${parseFloat(price).toFixed(2)} ريال`;
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -549,10 +708,15 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
               ({app.reviews})
             </span>
           </div>
-          <Badge variant={app.price === "مجاني" ? "outline" : "secondary"}>
-            {app.price}
+          <Badge variant={formatPrice(app.price) === "مجاني" ? "outline" : "secondary"}>
+            {formatPrice(app.price)}
           </Badge>
         </div>
+        {isPendingPayment && (
+          <Badge variant="outline" className="mt-2 text-orange-600 border-orange-600">
+            في انتظار الدفع
+          </Badge>
+        )}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex gap-2">
         {isInstalled ? (
@@ -588,23 +752,33 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
             </Button>
           </>
         ) : (
-                <Button
-                  size="sm"
-                  className="w-full gap-1"
-                  onClick={() => onInstall(app.id)}
-                >
-                  {isPixelApp ? (
-                    <>
-                      <ExternalLink className="h-4 w-4" />
-                      فتح
-                    </>
-                  ) : (
-                    <>
-                      <Download className="h-4 w-4" />
-                      تثبيت
-                    </>
-                  )}
-                </Button>
+          <Button
+            size="sm"
+            className="w-full gap-1"
+            onClick={() => onInstall(app.id)}
+          >
+            {isPixelApp ? (
+              <>
+                <ExternalLink className="h-4 w-4" />
+                فتح
+              </>
+            ) : isPendingPayment ? (
+              <>
+                <ShoppingCart className="h-4 w-4" />
+                إتمام الدفع
+              </>
+            ) : needsPayment ? (
+              <>
+                <ShoppingCart className="h-4 w-4" />
+                شراء
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                تثبيت
+              </>
+            )}
+          </Button>
         )}
       </CardFooter>
     </Card>
@@ -613,8 +787,21 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
 
 function AppListItem({ app, onInstall, onUninstall }: AppProps) {
   const router = useRouter();
-  const isInstalled = app.installed || false;
+  const isInstalled = app.installed || false || app.status === "installed";
   const isPixelApp = app.isPixelApp;
+  const needsPayment =
+    parseFloat(app.price) > 0 &&
+    app.billing_type !== "free" &&
+    app.status !== "installed" &&
+    !app.installed;
+  const isPendingPayment = app.status === "pending_payment";
+
+  const formatPrice = (price: string) => {
+    if (price === "مجاني" || price === "0.00" || parseFloat(price) === 0) {
+      return "مجاني";
+    }
+    return `${parseFloat(price).toFixed(2)} ريال`;
+  };
 
   return (
     <Card>
@@ -647,10 +834,15 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
                   </span>
                 </div>
                 <Badge
-                  variant={app.price === "مجاني" ? "outline" : "secondary"}
+                  variant={formatPrice(app.price) === "مجاني" ? "outline" : "secondary"}
                 >
-                  {app.price}
+                  {formatPrice(app.price)}
                 </Badge>
+                {isPendingPayment && (
+                  <Badge variant="outline" className="text-orange-600 border-orange-600">
+                    في انتظار الدفع
+                  </Badge>
+                )}
                 {app.featured && (
                   <Badge variant="secondary" className="text-xs">
                     مميز
@@ -704,6 +896,16 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
                     <>
                       <ExternalLink className="h-4 w-4" />
                       فتح
+                    </>
+                  ) : isPendingPayment ? (
+                    <>
+                      <ShoppingCart className="h-4 w-4" />
+                      إتمام الدفع
+                    </>
+                  ) : needsPayment ? (
+                    <>
+                      <ShoppingCart className="h-4 w-4" />
+                      شراء
                     </>
                   ) : (
                     <>
