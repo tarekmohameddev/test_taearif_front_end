@@ -2,6 +2,7 @@
 
 import { DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   ExternalLink,
