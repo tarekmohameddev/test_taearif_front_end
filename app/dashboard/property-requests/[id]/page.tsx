@@ -258,24 +258,34 @@ export default function PropertyRequestDetailsPage() {
                     </p>
                   </div>
 
-                  <div className="space-y-3 pt-4 border-t">
+                  {/* معلومات الاتصال */}
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="font-semibold text-sm mb-3">معلومات الاتصال</h4>
                     {propertyRequest.phone ? (
-                      <div className="flex items-center gap-3">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">الهاتف:</span>
                         <a
                           href={`tel:${propertyRequest.phone}`}
-                          className="text-sm hover:text-primary"
+                          className="text-sm font-medium hover:text-primary"
                         >
                           {propertyRequest.phone}
                         </a>
                       </div>
                     ) : null}
-                    {propertyRequest.contact_on_whatsapp ? (
-                      <div className="flex items-center gap-3">
-                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">واتساب متاح</span>
-                      </div>
-                    ) : null}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">واتساب:</span>
+                      {propertyRequest.contact_on_whatsapp ? (
+                        <span className="text-sm font-medium">متاح</span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">غير متاح</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">الاسم الكامل:</span>
+                      <span className="text-sm font-medium">
+                        {propertyRequest.full_name}
+                      </span>
+                    </div>
                   </div>
 
                   {propertyRequest.employee ? (
@@ -368,6 +378,88 @@ export default function PropertyRequestDetailsPage() {
                       <p className="font-semibold text-sm">
                         {formatDate(propertyRequest.updated_at)}
                       </p>
+                    </div>
+                  </div>
+
+                  {/* تفاصيل العقار */}
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="font-semibold text-sm mb-3">تفاصيل العقار</h4>
+                    {propertyRequest.property_type ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">نوع العقار:</span>
+                        <span className="font-medium text-sm">
+                          {propertyRequest.property_type}
+                        </span>
+                      </div>
+                    ) : null}
+                    {propertyRequest.region ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">المنطقة:</span>
+                        <span className="font-medium text-sm">
+                          {propertyRequest.region}
+                        </span>
+                      </div>
+                    ) : null}
+                    {propertyRequest.purchase_method ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">طريقة الشراء:</span>
+                        <span className="font-medium text-sm">
+                          {propertyRequest.purchase_method}
+                        </span>
+                      </div>
+                    ) : null}
+                    {(propertyRequest.budget_from || propertyRequest.budget_to) ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">الميزانية:</span>
+                        <span className="font-medium text-sm">
+                          {propertyRequest.budget_from
+                            ? propertyRequest.budget_from.toLocaleString()
+                            : ""}{" "}
+                          -{" "}
+                          {propertyRequest.budget_to
+                            ? propertyRequest.budget_to.toLocaleString()
+                            : ""}{" "}
+                          ريال
+                        </span>
+                      </div>
+                    ) : null}
+                    {propertyRequest.area_from && propertyRequest.area_to ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">المساحة:</span>
+                        <span className="font-medium text-sm">
+                          {propertyRequest.area_from} -{" "}
+                          {propertyRequest.area_to} م²
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* تفاصيل إضافية */}
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="font-semibold text-sm mb-3">تفاصيل إضافية</h4>
+                    {propertyRequest.seriousness ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">الجدية:</span>
+                        <span className="font-medium text-sm">
+                          {propertyRequest.seriousness}
+                        </span>
+                      </div>
+                    ) : null}
+                    {propertyRequest.purchase_goal ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">هدف الشراء:</span>
+                        <span className="font-medium text-sm">
+                          {propertyRequest.purchase_goal}
+                        </span>
+                      </div>
+                    ) : null}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">عروض مشابهة:</span>
+                      {propertyRequest.wants_similar_offers ? (
+                        <Badge variant="default">نعم</Badge>
+                      ) : (
+                        <Badge variant="secondary">لا</Badge>
+                      )}
                     </div>
                   </div>
                 </CardContent>
