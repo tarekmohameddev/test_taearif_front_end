@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useThemes } from "@/hooks/useThemes";
 import { ThemeCard } from "./ThemeCard";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,13 @@ import { RefreshCw, Palette, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import PaymentPopup from "@/components/popup/PopupForPayment";
 
-export function ThemeSection() {
+interface ThemeSectionProps {
+  initialThemeId?: string;
+}
+
+export function ThemeSection({ initialThemeId }: ThemeSectionProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     themes,
     activeThemeId,
@@ -24,6 +31,44 @@ export function ThemeSection() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [switchingThemeId, setSwitchingThemeId] = useState<string | null>(null);
+
+  // Auto-open purchase popup if themeId is in URL
+  useEffect(() => {
+    const themeIdFromUrl = initialThemeId || searchParams.get("themeId");
+    
+    if (themeIdFromUrl && themes.length > 0 && !isPopupOpen && !loading) {
+      const theme = themes.find((t) => t.id === themeIdFromUrl);
+      if (theme) {
+        // Only open popup if theme is locked (needs purchase)
+        const canSwitch = theme.is_free || theme.has_access;
+        if (!canSwitch) {
+          // Call purchase flow directly in useEffect
+          (async () => {
+            setSwitchingThemeId(themeIdFromUrl);
+            try {
+              const result = await purchaseAndSwitch(themeIdFromUrl);
+              if (result.success && result.paymentUrl) {
+                setPaymentUrl(result.paymentUrl);
+                setIsPopupOpen(true);
+                
+                // Clean URL parameters after opening popup
+                const newParams = new URLSearchParams(searchParams.toString());
+                newParams.delete("themeId");
+                newParams.delete("tab");
+                const newUrl = newParams.toString() ? `?${newParams.toString()}` : "";
+                router.replace(`/dashboard/settings${newUrl}`, { scroll: false });
+              }
+            } catch (err: any) {
+              console.error("Error opening purchase popup:", err);
+            } finally {
+              setSwitchingThemeId(null);
+            }
+          })();
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themes, initialThemeId, isPopupOpen, loading]);
 
   const handleSwitch = async (themeId: string) => {
     setSwitchingThemeId(themeId);
@@ -61,6 +106,13 @@ export function ThemeSection() {
       if (result.success && result.paymentUrl) {
         setPaymentUrl(result.paymentUrl);
         setIsPopupOpen(true);
+        
+        // Clean URL parameters after opening popup
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete("themeId");
+        newParams.delete("tab");
+        const newUrl = newParams.toString() ? `?${newParams.toString()}` : "";
+        router.replace(`/dashboard/settings${newUrl}`, { scroll: false });
       } else {
         toast.error(result.error || "فشل في بدء عملية الشراء");
       }
@@ -83,8 +135,8 @@ export function ThemeSection() {
     const theme = themes.find((t) => t.id === themeId);
     if (!theme) return;
 
-    const isFree = themes.indexOf(theme) === 0; // First theme is always free
-    const canSwitch = isFree || theme.has_access;
+    // الاعتماد على بيانات الباك إند فقط
+    const canSwitch = theme.is_free || theme.has_access;
 
     if (canSwitch) {
       await handleSwitch(themeId);
@@ -191,8 +243,9 @@ export function ThemeSection() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {themes.map((theme, index) => {
-            const isFree = index === 0; // First theme is always free
+          {themes.map((theme) => {
+            // الاعتماد على بيانات الباك إند فقط
+            const isFree = theme.is_free;
             const isActive = theme.id === activeThemeId;
 
             return (

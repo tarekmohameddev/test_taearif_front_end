@@ -91,11 +91,18 @@ const domainsHelp = {
 
 export function SettingsPage() {
   const { clickedOnSubButton, userData } = useAuthStore();
+  const searchParams = useSearchParams();
+  
+  // Initialize activeTab from URL params or clickedOnSubButton
+  const tabFromUrl = searchParams.get("tab");
+  const initialTab = tabFromUrl || `${clickedOnSubButton}`;
+  const themeIdFromUrl = searchParams.get("themeId");
+  
   const [isAddDomainOpen, setIsAddDomainOpen] = useState(false);
   const [newDomain, setNewDomain] = useState("");
   const [isVerifyingDomain, setIsVerifyingDomain] = useState(false);
   const [setupProgress, setSetupProgress] = useState(40);
-  const [activeTab, setActiveTab] = useState(`${clickedOnSubButton}`);
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -1043,7 +1050,7 @@ export function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="themes" className="space-y-4 pt-4">
-                <ThemeSection />
+                <ThemeSection initialThemeId={themeIdFromUrl || undefined} />
               </TabsContent>
             </Tabs>
           </div>

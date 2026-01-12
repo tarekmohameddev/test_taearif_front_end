@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -19,36 +20,14 @@ import {
   AlertTriangle,
   Loader2,
   RotateCcw,
+  Lock,
+  ShoppingCart,
 } from "lucide-react";
 import { ThemeNumber } from "@/services/live-editor/themeChangeService";
-
-export interface ThemeOption {
-  id: ThemeNumber;
-  name: string;
-  nameAr: string;
-  description: string;
-  descriptionAr: string;
-  image: string;
-}
-
-export const THEME_OPTIONS: ThemeOption[] = [
-  {
-    id: 1,
-    name: "Theme 1",
-    nameAr: "الثيم الأول",
-    description: "Modern and clean design with contemporary aesthetics",
-    descriptionAr: "تصميم عصري ونظيف مع جماليات معاصرة",
-    image: "/images/placeholders/themes/theme1.jpeg",
-  },
-  {
-    id: 2,
-    name: "Theme 2",
-    nameAr: "الثيم الثاني",
-    description: "Classic and elegant design with timeless appeal",
-    descriptionAr: "تصميم كلاسيكي وأنيق مع جاذبية خالدة",
-    image: "/images/placeholders/themes/theme2.jpeg",
-  },
-];
+import { useThemes } from "@/hooks/useThemes";
+import { setActiveTheme } from "@/services/theme/themeService";
+import type { Theme } from "@/components/settings/themes/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ThemeChangeDialogProps {
   isOpen: boolean;
@@ -61,13 +40,15 @@ interface ThemeChangeDialogProps {
 export function ThemeChangeDialog({
   isOpen,
   onClose,
-  onThemeApply,
   onThemeReset,
   currentTheme,
 }: ThemeChangeDialogProps) {
   const t = useEditorT();
   const { locale } = useEditorLocale();
-  const [selectedTheme, setSelectedTheme] = useState<ThemeNumber | null>(null);
+  const router = useRouter();
+  const { themes, activeThemeId, loading, error } = useThemes();
+  
+  const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
   const [showWarning, setShowWarning] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -75,9 +56,22 @@ export function ThemeChangeDialog({
 
   const isRTL = locale === "ar";
 
-  const handleThemeSelect = (themeId: ThemeNumber) => {
-    setSelectedTheme(themeId);
+  // Reset selected theme when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedTheme(null);
+      setShowWarning(false);
+    }
+  }, [isOpen]);
+
+  const handleThemeSelect = (theme: Theme) => {
+    setSelectedTheme(theme);
     setShowWarning(true);
+  };
+
+  const canUseTheme = (theme: Theme): boolean => {
+    // الاعتماد على بيانات الباك إند فقط
+    return theme.is_free || theme.has_access;
   };
 
   const handleApply = async () => {
@@ -85,15 +79,25 @@ export function ThemeChangeDialog({
 
     setIsApplying(true);
     try {
-      await onThemeApply(selectedTheme);
+      // استخدام API مباشرة للتفعيل
+      await setActiveTheme(selectedTheme.id);
       setSelectedTheme(null);
       setShowWarning(false);
-      onClose();
+      // إعادة تحميل الصفحة لتطبيق التغييرات
+      window.location.reload();
     } catch (error) {
       console.error("Error applying theme:", error);
     } finally {
       setIsApplying(false);
     }
+  };
+
+  const handlePurchase = () => {
+    if (!selectedTheme) return;
+    
+    // الانتقال إلى settings page مع themeId
+    router.push(`/dashboard/settings?tab=themes&themeId=${selectedTheme.id}`);
+    onClose();
   };
 
   const handleReset = async () => {
@@ -119,6 +123,8 @@ export function ThemeChangeDialog({
       onClose();
     }
   };
+
+  const selectedThemeCanUse = selectedTheme ? canUseTheme(selectedTheme) : false;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -200,8 +206,8 @@ export function ThemeChangeDialog({
             </div>
           )}
 
-          {/* Warning Message */}
-          {showWarning && selectedTheme && (
+          {/* Warning Message - Only show for themes that can be used */}
+          {showWarning && selectedTheme && selectedThemeCanUse && (
             <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
@@ -217,78 +223,127 @@ export function ThemeChangeDialog({
             </div>
           )}
 
-          {/* Theme Grid */}
-          <div>
-            <h3 className="font-medium text-gray-900 mb-4">
-              {isRTL ? "الثيمات المتاحة" : "Available Themes"}
-            </h3>
+          {/* Loading State */}
+          {loading && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {THEME_OPTIONS.map((theme) => {
-                const isSelected = selectedTheme === theme.id;
-                const isCurrent = currentTheme === theme.id;
-
-                return (
-                  <div
-                    key={theme.id}
-                    className={`relative group cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-lg ${
-                      isSelected
-                        ? "border-indigo-500 bg-indigo-50 shadow-md"
-                        : "border-gray-200 hover:border-indigo-300 bg-white"
-                    }`}
-                    onClick={() => handleThemeSelect(theme.id)}
-                  >
-                    {/* Current Theme Badge */}
-                    {isCurrent && (
-                      <div className="absolute top-2 right-2 z-10">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                          {isRTL ? "مطبق حالياً" : "Current"}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Theme Image */}
-                    <div className="relative overflow-hidden rounded-t-lg">
-                      <img
-                        src={theme.image}
-                        alt={theme.name}
-                        className="w-full h-fit object-cover transition-transform duration-200 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                    </div>
-
-                    {/* Theme Info */}
-                    <div className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900">
-                          {isRTL ? theme.nameAr : theme.name}
-                        </h4>
-                        {isSelected && (
-                          <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
-                            <svg
-                              className="w-3 h-3 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {isRTL ? theme.descriptionAr : theme.description}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+              {[1, 2].map((i) => (
+                <div key={i} className="border rounded-lg p-4">
+                  <Skeleton className="aspect-video w-full rounded" />
+                  <Skeleton className="h-6 w-3/4 mt-4" />
+                  <Skeleton className="h-4 w-full mt-2" />
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
+
+          {/* Theme Grid */}
+          {!loading && !error && (
+            <div>
+              <h3 className="font-medium text-gray-900 mb-4">
+                {isRTL ? "الثيمات المتاحة" : "Available Themes"}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {themes.map((theme) => {
+                  const isSelected = selectedTheme?.id === theme.id;
+                  const isCurrent = activeThemeId === theme.id;
+                  const canUse = canUseTheme(theme);
+
+                  return (
+                    <div
+                      key={theme.id}
+                      className={`relative group cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-lg ${
+                        isSelected
+                          ? "border-indigo-500 bg-indigo-50 shadow-md"
+                          : "border-gray-200 hover:border-indigo-300 bg-white"
+                      } ${!canUse ? "opacity-75" : ""}`}
+                      onClick={() => handleThemeSelect(theme)}
+                    >
+                      {/* Current Theme Badge */}
+                      {isCurrent && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                            {isRTL ? "مطبق حالياً" : "Current"}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Lock Overlay */}
+                      {!canUse && (
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10 rounded-lg">
+                          <Lock className="h-12 w-12 text-white" />
+                        </div>
+                      )}
+
+                      {/* Theme Image */}
+                      <div className="relative overflow-hidden rounded-t-lg">
+                        <img
+                          src={theme.thumbnail || "/placeholder.svg"}
+                          alt={theme.name}
+                          className="w-full h-fit object-cover transition-transform duration-200 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      </div>
+
+                      {/* Theme Info */}
+                      <div className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold text-gray-900">
+                            {theme.name}
+                          </h4>
+                          {isSelected && (
+                            <div className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        {theme.description && (
+                          <p className="text-sm text-gray-600">
+                            {theme.description}
+                          </p>
+                        )}
+                        <div className="mt-2 flex items-center justify-between">
+                          {theme.is_free ? (
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                              {isRTL ? "مجاني" : "Free"}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-600">
+                              {theme.price} {theme.currency || "SAR"}
+                            </span>
+                          )}
+                          {theme.has_access && !theme.is_free && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                              {isRTL ? "مملوك" : "Owned"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex items-center justify-end gap-2">
@@ -299,23 +354,34 @@ export function ThemeChangeDialog({
           >
             {isRTL ? "إلغاء" : "Cancel"}
           </Button>
-          <Button
-            onClick={handleApply}
-            disabled={!selectedTheme || isApplying || isResetting}
-            className="gap-2 bg-indigo-600 hover:bg-indigo-700"
-          >
-            {isApplying ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {isRTL ? "جاري التطبيق..." : "Applying..."}
-              </>
-            ) : (
-              <>
-                <Palette className="w-4 h-4" />
-                {isRTL ? "تطبيق الثيم" : "Apply Theme"}
-              </>
-            )}
-          </Button>
+          {selectedTheme && (
+            <Button
+              onClick={selectedThemeCanUse ? handleApply : handlePurchase}
+              disabled={isApplying || isResetting}
+              className={`gap-2 ${
+                selectedThemeCanUse
+                  ? "bg-indigo-600 hover:bg-indigo-700"
+                  : "bg-orange-600 hover:bg-orange-700"
+              }`}
+            >
+              {isApplying ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {isRTL ? "جاري التطبيق..." : "Applying..."}
+                </>
+              ) : selectedThemeCanUse ? (
+                <>
+                  <Palette className="w-4 h-4" />
+                  {isRTL ? "تطبيق الثيم" : "Apply Theme"}
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="w-4 h-4" />
+                  {isRTL ? "شراء الثيم" : "Purchase Theme"}
+                </>
+              )}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
