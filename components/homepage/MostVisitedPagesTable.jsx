@@ -152,22 +152,22 @@ export function MostVisitedPagesTable() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm">
+                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm text-right">
                     الصفحة
                   </TableHead>
-                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm">
+                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm text-right">
                     المشاهدات
                   </TableHead>
-                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm hidden sm:table-cell">
+                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm hidden sm:table-cell text-right">
                     الزوار الفريدون
                   </TableHead>
-                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm hidden md:table-cell">
+                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm hidden md:table-cell text-right">
                     معدل الارتداد
                   </TableHead>
-                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm hidden lg:table-cell">
+                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm hidden lg:table-cell text-right">
                     متوسط وقت التصفح
                   </TableHead>
-                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm">
+                  <TableHead className="px-2 sm:px-4 whitespace-nowrap text-xs sm:text-sm text-right">
                     نسبة المشاهدات
                   </TableHead>
                 </TableRow>
