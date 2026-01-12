@@ -11,9 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Palette, Sparkles } from "lucide-react";
+import { Palette, Sparkles, Lock } from "lucide-react";
 import { COMPONENTS } from "@/lib/ComponentsList";
 import { useEditorT } from "@/context/editorI18nStore";
+import { useThemes } from "@/hooks/useThemes";
+import { findThemeForComponent } from "@/lib/themes/themeComponentLookup";
+import { PremiumDialog } from "./PremiumDialog";
+import type { Theme } from "@/components/settings/themes/types";
 
 interface ThemeOption {
   id: string;
@@ -39,6 +43,18 @@ export function ThemeSelector({
   const t = useEditorT();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
+
+  // Premium Dialog State
+  const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
+  const [selectedPremiumTheme, setSelectedPremiumTheme] = useState<{
+    themeName: string;
+    themePrice: string;
+    currency: string;
+    themeId: string;
+  } | null>(null);
+
+  // Fetch themes data
+  const { themes, loading: themesLoading } = useThemes();
 
   // Update selectedTheme when currentTheme changes
   useEffect(() => {
@@ -78,6 +94,26 @@ export function ThemeSelector({
   };
 
   const handleConfirm = () => {
+    // التحقق من الثيم قبل التطبيق
+    const themeId = findThemeForComponent(selectedTheme);
+    if (themeId && themes.length > 0) {
+      const theme = themes.find((t: Theme) => t.id === themeId);
+      if (theme && !theme.has_access) {
+        // إغلاق ThemeSelector dialog أولاً
+        setIsOpen(false);
+        // منع التطبيق وإظهار PremiumDialog
+        setSelectedPremiumTheme({
+          themeName: theme.name,
+          themePrice: String(theme.price || "0"),
+          currency: theme.currency || "SAR",
+          themeId: theme.id,
+        });
+        setPremiumDialogOpen(true);
+        return; // منع تطبيق الثيم
+      }
+    }
+
+    // المتابعة مع التطبيق العادي
     onThemeChange(selectedTheme);
     setIsOpen(false);
   };
@@ -159,16 +195,28 @@ export function ThemeSelector({
               {t("theme_selector.available_themes")}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {currentThemes.map((theme) => (
-                <div
-                  key={theme.id}
-                  className={`relative group cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-lg ${
-                    selectedTheme === theme.id
-                      ? "border-purple-500 bg-purple-50 shadow-md"
-                      : "border-gray-200 hover:border-purple-300 bg-white"
-                  }`}
-                  onClick={() => handleThemeSelect(theme.id)}
-                >
+              {currentThemes.map((theme) => {
+                const themeId = findThemeForComponent(theme.id);
+                const themeData = themeId ? themes.find((t: Theme) => t.id === themeId) : null;
+                const isLocked = themeData && !themeData.has_access;
+
+                return (
+                  <div
+                    key={theme.id}
+                    className={`relative group cursor-pointer rounded-lg border-2 transition-all duration-200 hover:shadow-lg ${
+                      selectedTheme === theme.id
+                        ? "border-purple-500 bg-purple-50 shadow-md"
+                        : "border-gray-200 hover:border-purple-300 bg-white"
+                    } ${isLocked ? "opacity-60" : ""}`}
+                    onClick={() => handleThemeSelect(theme.id)}
+                  >
+                  {/* Lock Overlay */}
+                  {isLocked && (
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-10 rounded-lg">
+                      <Lock className="h-8 w-8 text-white" />
+                    </div>
+                  )}
+
                   {/* Theme Image */}
                   <div className="relative overflow-hidden rounded-t-lg">
                     <img
@@ -222,7 +270,8 @@ export function ThemeSelector({
                     </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -241,6 +290,21 @@ export function ThemeSelector({
           </div>
         </div>
       </DialogContent>
+
+      {/* Premium Dialog */}
+      {selectedPremiumTheme && (
+        <PremiumDialog
+          open={premiumDialogOpen}
+          onClose={() => {
+            setPremiumDialogOpen(false);
+            setSelectedPremiumTheme(null);
+          }}
+          themeName={selectedPremiumTheme.themeName}
+          themePrice={selectedPremiumTheme.themePrice}
+          currency={selectedPremiumTheme.currency}
+          themeId={selectedPremiumTheme.themeId}
+        />
+      )}
     </Dialog>
   );
 }
