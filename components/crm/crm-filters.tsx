@@ -115,6 +115,7 @@ export default function CrmFilters({
     null,
   );
   const hasPerformedInitialSearchRef = useRef(false);
+  const filterReminderTypeRef = useRef<string>("all");
   const { setCustomers, setPipelineStages } = useCrmStore();
 
   // Get additional filters from store
@@ -128,6 +129,7 @@ export default function CrmFilters({
     filterEmail,
     filterEmployee,
     filterEmployeePhone,
+    filterReminderType,
     interestedCategoryIds,
     interestedPropertyIds,
     sortBy,
@@ -144,6 +146,7 @@ export default function CrmFilters({
     setFilterEmail,
     setFilterEmployee,
     setFilterEmployeePhone,
+    setFilterReminderType,
     setInterestedCategoryIds,
     setInterestedPropertyIds,
     setSortBy,
@@ -240,6 +243,13 @@ export default function CrmFilters({
           filterEmployeePhone.trim()
         ) {
           params.append("employee_whatsapp_number", filterEmployeePhone);
+        }
+
+        // Reminder Type filter - Active
+        // Use ref value to get the latest value even if closure hasn't updated
+        const currentReminderType = filterReminderTypeRef.current;
+        if (currentReminderType !== "all") {
+          params.append("reminder_type_id", currentReminderType);
         }
 
         // Commented out filters - can be enabled later
@@ -408,6 +418,7 @@ export default function CrmFilters({
       filterDistrict,
       filterEmployee,
       filterEmployeePhone,
+      filterReminderType,
       pipelineStages,
       // Commented out dependencies - can be enabled later
       // filterType,
@@ -460,15 +471,27 @@ export default function CrmFilters({
       case "city":
         setFilterCity(value);
         setFilterDistrict("all");
+        // Use setTimeout to ensure state is updated before search
+        setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       case "district":
         setFilterDistrict(value);
+        setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       case "employee":
         setFilterEmployee(value);
+        setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       case "employeePhone":
         setFilterEmployeePhone(value);
+        setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
+        break;
+      case "reminderType":
+        setFilterReminderType(value);
+        // Update ref immediately so performSearch can use the new value
+        filterReminderTypeRef.current = value;
+        // Perform search immediately with the new value
+        setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       // Commented out cases - can be enabled later
       // case "type":
@@ -487,7 +510,6 @@ export default function CrmFilters({
       //   setSortDir(value);
       //   break;
     }
-    setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
   };
 
   // Commented out handlers - can be enabled later
@@ -576,6 +598,11 @@ export default function CrmFilters({
       }
     };
   }, [searchTimeout]);
+
+  // Sync ref with state value
+  useEffect(() => {
+    filterReminderTypeRef.current = filterReminderType;
+  }, [filterReminderType]);
 
   // Load all customers on component mount - only once
   // Only perform initial search if store is empty (fetchCrmData hasn't loaded data yet)
@@ -802,6 +829,24 @@ export default function CrmFilters({
                     </SelectItem>
                   );
                 })}
+            </SelectContent>
+          </Select>
+
+          {/* Reminder Type Filter - Active */}
+          <Select
+            value={filterReminderType}
+            onValueChange={(value) => handleFilterChange("reminderType", value)}
+          >
+            <SelectTrigger className="w-full sm:w-[140px] lg:w-[150px]">
+              <SelectValue placeholder="نوع التذكير" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع أنواع التذكيرات</SelectItem>
+              {filterData?.reminder_types?.map((reminderType: any) => (
+                <SelectItem key={reminderType.id} value={reminderType.id.toString()}>
+                  {reminderType.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 

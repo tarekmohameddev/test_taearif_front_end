@@ -9,6 +9,7 @@ const useCustomersFiltersStore = create((set, get) => ({
   filterPriority: "all",
   filterEmployee: "all",
   filterEmployeePhone: "all",
+  filterReminderType: "all",
   dateRange: { from: undefined, to: undefined },
   filterProcedure: "all",
   filterStage: "all",
@@ -30,6 +31,7 @@ const useCustomersFiltersStore = create((set, get) => ({
     employees: [],
     categories: [],
     properties: [],
+    reminder_types: [],
   },
   loadingFilters: true,
 
@@ -41,6 +43,7 @@ const useCustomersFiltersStore = create((set, get) => ({
   setFilterPriority: (priority) => set({ filterPriority: priority }),
   setFilterEmployee: (employee) => set({ filterEmployee: employee }),
   setFilterEmployeePhone: (phone) => set({ filterEmployeePhone: phone }),
+  setFilterReminderType: (reminderType) => set({ filterReminderType: reminderType }),
   setDateRange: (range) => set({ dateRange: range }),
   setFilterProcedure: (procedure) => set({ filterProcedure: procedure }),
   setFilterStage: (stage) => set({ filterStage: stage }),
@@ -64,6 +67,7 @@ const useCustomersFiltersStore = create((set, get) => ({
         employees: data?.employees || [],
         categories: data?.categories || [],
         properties: data?.properties || [],
+        reminder_types: data?.reminder_types || [],
       },
       loadingFilters: false,
     }),
@@ -79,6 +83,7 @@ const useCustomersFiltersStore = create((set, get) => ({
       filterPriority: "all",
       filterEmployee: "all",
       filterEmployeePhone: "all",
+      filterReminderType: "all",
       dateRange: { from: undefined, to: undefined },
       filterProcedure: "all",
       filterStage: "all",
@@ -101,6 +106,7 @@ const useCustomersFiltersStore = create((set, get) => ({
       state.filterPriority !== "all" ||
       state.filterEmployee !== "all" ||
       state.filterEmployeePhone.trim() ||
+      state.filterReminderType !== "all" ||
       state.dateRange.from ||
       state.dateRange.to ||
       state.filterProcedure !== "all" ||
@@ -125,6 +131,7 @@ const useCustomersFiltersStore = create((set, get) => ({
       filterPriority: state.filterPriority,
       filterEmployee: state.filterEmployee,
       filterEmployeePhone: state.filterEmployeePhone,
+      filterReminderType: state.filterReminderType,
       dateRange: state.dateRange,
       filterProcedure: state.filterProcedure,
       filterStage: state.filterStage,
