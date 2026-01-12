@@ -14,7 +14,7 @@ export interface Customer {
   created_at: string;
   updated_at: string;
   // Optional fields for backward compatibility
-  customer_id?: string;
+  customer_id?: number | string; // Can be number (from API) or string (for backward compatibility)
   nameEn?: string;
   phone?: string;
   whatsapp?: string;
@@ -131,6 +131,7 @@ export interface Reminder {
     id: number;
     name: string;
   };
+  customer_id?: number; // Direct customer_id from API for easier filtering
   reminder_type?: {
     id: number;
     name: string;

@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { Customer, PipelineStage, Reminder } from "@/types/crm";
 import useStore from "@/context/Store";
+import useCrmStore from "@/context/store/crm";
 import { WhatsAppSendDialog } from "@/components/marketing/whatsapp-send-dialog";
 
 interface CustomerCardProps {
@@ -66,6 +67,7 @@ export default function CustomerCard({
   const [tabletMenuOpen, setTabletMenuOpen] = useState(false);
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
   const { marketingChannels, fetchMarketingChannels } = useStore();
+  const { reminders } = useCrmStore();
 
   // جلب قنوات التسويق عند تحميل المكون
   useEffect(() => {
@@ -143,6 +145,30 @@ export default function CustomerCard({
     }
     // Return default if no property type found
     return "غير محدد";
+  };
+
+  // Get reminders for this customer
+  const getCustomerReminders = (customerId: number): Reminder[] => {
+    if (!reminders || reminders.length === 0) return [];
+    return reminders.filter((reminder) => {
+      // Check customer_id directly first (from API), then fallback to customer.id
+      const reminderCustomerId = reminder.customer_id || reminder.customer?.id;
+      
+      if (reminderCustomerId !== undefined && reminderCustomerId !== null) {
+        // Compare as numbers to handle type mismatches (string vs number)
+        return Number(reminderCustomerId) === Number(customerId);
+      }
+      return false;
+    });
+  };
+
+  // Get active reminders count (pending or overdue)
+  const getActiveRemindersCount = (customerId: number): number => {
+    const customerReminders = getCustomerReminders(customerId);
+    return customerReminders.filter(
+      (reminder) =>
+        reminder.status === "pending" || reminder.status === "overdue",
+    ).length;
   };
 
   const renderMobileView = () => (
@@ -305,10 +331,23 @@ export default function CustomerCard({
               {getPropertyTypeLabel(customer)}
             </Badge>
           )}
-          <div className="text-xs text-muted-foreground truncate flex-1 text-left">
-            {customer.note && customer.note.length > 0
-              ? "لديه ملاحظات"
-              : "لا توجد ملاحظات"}
+          <div className="flex flex-col gap-1 flex-1 text-left">
+            <div className="text-xs text-muted-foreground truncate">
+              {customer.note && customer.note.length > 0
+                ? "لديه ملاحظات"
+                : "لا توجد ملاحظات"}
+            </div>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground truncate">
+              <Bell className="h-3 w-3 flex-shrink-0" />
+              {(() => {
+                // Use customer_id (actual customer ID) instead of id (request ID)
+                const customerId = (customer as any).customer_id || customer.id;
+                const remindersCount = getActiveRemindersCount(Number(customerId));
+                return remindersCount > 0
+                  ? `لديه ${remindersCount} تذكير${remindersCount > 1 ? "ات" : ""}`
+                  : "لا توجد تذكيرات";
+              })()}
+            </div>
           </div>
         </div>
       </div>
@@ -474,8 +513,21 @@ export default function CustomerCard({
               {getPropertyTypeLabel(customer)}
             </Badge>
           )}
-          <div className="text-xs text-muted-foreground truncate max-w-[80px]">
-            {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
+          <div className="flex flex-col gap-1 text-xs text-muted-foreground truncate max-w-[100px]">
+            <div className="truncate">
+              {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
+            </div>
+            <div className="flex items-center gap-1 truncate">
+              <Bell className="h-3 w-3 flex-shrink-0" />
+              {(() => {
+                // Use customer_id (actual customer ID) instead of id (request ID)
+                const customerId = (customer as any).customer_id || customer.id;
+                const remindersCount = getActiveRemindersCount(Number(customerId));
+                return remindersCount > 0
+                  ? `${remindersCount} تذكير${remindersCount > 1 ? "ات" : ""}`
+                  : "لا توجد تذكيرات";
+              })()}
+            </div>
           </div>
         </div>
       </div>
@@ -650,8 +702,21 @@ export default function CustomerCard({
               {getPropertyTypeLabel(customer)}
             </Badge>
           )}
-          <div className="text-xs text-muted-foreground">
-            {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
+          <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <div>
+              {customer.note ? "لديه ملاحظات" : "لا توجد ملاحظات"}
+            </div>
+            <div className="flex items-center gap-1">
+              <Bell className="h-3 w-3 flex-shrink-0" />
+              {(() => {
+                // Use customer_id (actual customer ID) instead of id (request ID)
+                const customerId = (customer as any).customer_id || customer.id;
+                const remindersCount = getActiveRemindersCount(Number(customerId));
+                return remindersCount > 0
+                  ? `لديه ${remindersCount} تذكير${remindersCount > 1 ? "ات" : ""}`
+                  : "لا توجد تذكيرات";
+              })()}
+            </div>
           </div>
         </div>
       </div>

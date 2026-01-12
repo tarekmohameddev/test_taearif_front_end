@@ -764,6 +764,7 @@ const useCrmStore = create<CrmStore>()(
               status_label: reminder.status_label,
               status_label_ar: reminder.status_label_ar,
               customer: reminder.customer,
+              customer_id: reminder.customer_id, // Add customer_id directly for easier filtering
               reminder_type: reminder.reminder_type,
               is_overdue: reminder.is_overdue,
               days_until_due: reminder.days_until_due,
