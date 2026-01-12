@@ -116,6 +116,10 @@ export default function CrmFilters({
   );
   const hasPerformedInitialSearchRef = useRef(false);
   const filterReminderTypeRef = useRef<string>("all");
+  const filterCityRef = useRef<string>("all");
+  const filterDistrictRef = useRef<string>("all");
+  const filterEmployeeRef = useRef<string>("all");
+  const filterEmployeePhoneRef = useRef<string>("all");
   const { setCustomers, setPipelineStages } = useCrmStore();
 
   // Get additional filters from store
@@ -224,25 +228,29 @@ export default function CrmFilters({
         }
 
         // City and District filters - Active
-        if (filterCity !== "all") {
-          params.append("city_id", filterCity);
+        const currentCity = filterCityRef.current;
+        const currentDistrict = filterDistrictRef.current;
+        if (currentCity !== "all") {
+          params.append("city_id", currentCity);
         }
-        if (filterDistrict !== "all") {
-          params.append("district_id", filterDistrict);
+        if (currentDistrict !== "all") {
+          params.append("district_id", currentDistrict);
         }
 
         // Employee filters - Active
         // Filter by employee ID (responsible employee)
-        if (filterEmployee !== "all") {
-          params.append("responsible_employee_id", filterEmployee);
+        const currentEmployee = filterEmployeeRef.current;
+        if (currentEmployee !== "all") {
+          params.append("responsible_employee_id", currentEmployee);
         }
         // Filter by employee WhatsApp number (NOT customer WhatsApp)
+        const currentEmployeePhone = filterEmployeePhoneRef.current;
         if (
-          filterEmployeePhone &&
-          filterEmployeePhone !== "all" &&
-          filterEmployeePhone.trim()
+          currentEmployeePhone &&
+          currentEmployeePhone !== "all" &&
+          currentEmployeePhone.trim()
         ) {
-          params.append("employee_whatsapp_number", filterEmployeePhone);
+          params.append("employee_whatsapp_number", currentEmployeePhone);
         }
 
         // Reminder Type filter - Active
@@ -471,19 +479,24 @@ export default function CrmFilters({
       case "city":
         setFilterCity(value);
         setFilterDistrict("all");
+        filterCityRef.current = value;
+        filterDistrictRef.current = "all";
         // Use setTimeout to ensure state is updated before search
         setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       case "district":
         setFilterDistrict(value);
+        filterDistrictRef.current = value;
         setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       case "employee":
         setFilterEmployee(value);
+        filterEmployeeRef.current = value;
         setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       case "employeePhone":
         setFilterEmployeePhone(value);
+        filterEmployeePhoneRef.current = value;
         setTimeout(() => performSearch(searchTerm, filterStage, filterUrgency), 0);
         break;
       case "reminderType":
@@ -599,10 +612,26 @@ export default function CrmFilters({
     };
   }, [searchTimeout]);
 
-  // Sync ref with state value
+  // Sync refs with state values
   useEffect(() => {
     filterReminderTypeRef.current = filterReminderType;
   }, [filterReminderType]);
+
+  useEffect(() => {
+    filterCityRef.current = filterCity;
+  }, [filterCity]);
+
+  useEffect(() => {
+    filterDistrictRef.current = filterDistrict;
+  }, [filterDistrict]);
+
+  useEffect(() => {
+    filterEmployeeRef.current = filterEmployee;
+  }, [filterEmployee]);
+
+  useEffect(() => {
+    filterEmployeePhoneRef.current = filterEmployeePhone;
+  }, [filterEmployeePhone]);
 
   // Load all customers on component mount - only once
   // Only perform initial search if store is empty (fetchCrmData hasn't loaded data yet)
