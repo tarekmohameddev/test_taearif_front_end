@@ -91,7 +91,7 @@ const domainsHelp = {
 };
 
 export function SettingsPage() {
-  const { clickedOnSubButton, userData } = useAuthStore();
+  const { clickedOnSubButton, userData, IsLoading: authLoading } = useAuthStore();
   const searchParams = useSearchParams();
   
   // Initialize activeTab from URL params or clickedOnSubButton
@@ -128,6 +128,11 @@ export function SettingsPage() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const fetchSubscriptionPlans = async () => {
       try {
         const response = await axiosInstance.get("/settings/payment");
@@ -155,7 +160,7 @@ export function SettingsPage() {
       }
     };
     fetchSubscriptionPlans();
-  }, []);
+  }, [userData?.token, authLoading]);
 
   const handleUpgradeClick = (plan: any) => {
     setSelectedPlan(plan);
@@ -166,6 +171,11 @@ export function SettingsPage() {
 
   const handleConfirmUpgrade = async () => {
     if (!selectedPlan) return;
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
     setIsProcessingPayment(true);
     try {
@@ -222,6 +232,11 @@ export function SettingsPage() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const fetchData = async () => {
       try {
         setIsLoadingDomains(true);
@@ -235,7 +250,7 @@ export function SettingsPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [userData?.token, authLoading]);
 
 
   const handleAddDomain = async () => {
@@ -265,6 +280,11 @@ export function SettingsPage() {
       return;
     }
 
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const loadingToast = toast.loading("جاري إضافة النطاق...");
     try {
       const response = await axiosInstance.post("/settings/domain", {
@@ -290,6 +310,11 @@ export function SettingsPage() {
   };
 
   const handleVerifyDomain = async (domainId: any) => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     setVerifyingDomains((prev: any) => ({ ...prev, [domainId]: true }));
     const loadingToast = toast.loading("جاري التحقق من النطاق...");
     try {
@@ -315,6 +340,11 @@ export function SettingsPage() {
   };
 
   const handleSetPrimaryDomain = async (domainId: any) => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     const loadingToast = toast.loading("جاري تحديث النطاق الرئيسي...");
     try {
       await axiosInstance.post("/settings/domain/set-primary", {
@@ -337,6 +367,11 @@ export function SettingsPage() {
 
   const handleDeleteDomain = async () => {
     if (!deleteDomainId) return;
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
 
     const loadingToast = toast.loading("جاري حذف النطاق...");
     try {

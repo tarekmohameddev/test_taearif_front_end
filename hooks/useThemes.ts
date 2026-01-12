@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getThemes, setActiveTheme, purchaseTheme } from "@/services/theme/themeService";
 import type { Theme, ThemesResponse, Category } from "@/components/settings/themes/types";
+import useAuthStore from "@/context/AuthContext";
 
 export interface UseThemesReturn {
   themes: Theme[];
@@ -33,6 +34,7 @@ export interface UseThemesReturn {
 }
 
 export function useThemes(): UseThemesReturn {
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const [themes, setThemes] = useState<Theme[]>([]);
   const [activeThemeId, setActiveThemeId] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -40,6 +42,11 @@ export function useThemes(): UseThemesReturn {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const fetchThemes = useCallback(async () => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -56,7 +63,7 @@ export function useThemes(): UseThemesReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [authLoading, userData?.token]);
 
   useEffect(() => {
     fetchThemes();
@@ -64,6 +71,11 @@ export function useThemes(): UseThemesReturn {
 
   const switchTheme = useCallback(
     async (themeId: string) => {
+      // Wait until token is fetched
+      if (authLoading || !userData?.token) {
+        return { success: false, error: "Token not ready" };
+      }
+
       try {
         setError(null);
         const result = await setActiveTheme(themeId);
@@ -91,10 +103,15 @@ export function useThemes(): UseThemesReturn {
         return { success: false, error: message };
       }
     },
-    [],
+    [authLoading, userData?.token],
   );
 
   const purchaseAndSwitch = useCallback(async (themeId: string) => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return { success: false, error: "Token not ready" };
+    }
+
     try {
       setError(null);
 
@@ -121,7 +138,7 @@ export function useThemes(): UseThemesReturn {
       setError(message);
       return { success: false, error: message };
     }
-  }, []);
+  }, [authLoading, userData?.token]);
 
   const handleThemeSwitch = useCallback(
     async (themeId: string) => {

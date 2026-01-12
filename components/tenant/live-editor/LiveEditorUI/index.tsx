@@ -28,6 +28,8 @@ import { DeleteComponentDialog } from "./components/Dialogs/DeleteComponentDialo
 import { DeletePageDialog } from "./components/Dialogs/DeletePageDialog";
 import { ChangesMadeDialog } from "./components/Dialogs/ChangesMadeDialog";
 import { DebugPanel } from "./components/DebugPanel";
+import { PremiumDialog } from "../PremiumDialog";
+import { useThemes } from "@/hooks/useThemes";
 
 export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const t = useEditorT();
@@ -96,6 +98,18 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const [showDebugControls, setShowDebugControls] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Premium Dialog State
+  const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
+  const [selectedPremiumTheme, setSelectedPremiumTheme] = useState<{
+    themeName: string;
+    themePrice: string;
+    currency: string;
+    themeId: string;
+  } | null>(null);
+
+  // Fetch themes data
+  const { themes, loading: themesLoading } = useThemes();
+
   // ⭐ CRITICAL: Use ref to track previous pageComponents to prevent infinite loops
   const prevPageComponentsRef = useRef<string>("");
 
@@ -112,6 +126,11 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     setDebugInfo,
     setPositionValidation,
     setWasComponentsSidebarManuallyClosed,
+    onPremiumComponentDetected: (theme) => {
+      setSelectedPremiumTheme(theme);
+      setPremiumDialogOpen(true);
+    },
+    themes,
   });
 
   // Detect when hasChangesMade changes from false to true
@@ -485,6 +504,21 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         {/* Debug Controls */}
         {showDebugControls && process.env.NODE_ENV === "development" && (
           <DebugControls onClose={() => setShowDebugControls(false)} />
+        )}
+
+        {/* Premium Dialog */}
+        {selectedPremiumTheme && (
+          <PremiumDialog
+            open={premiumDialogOpen}
+            onClose={() => {
+              setPremiumDialogOpen(false);
+              setSelectedPremiumTheme(null);
+            }}
+            themeName={selectedPremiumTheme.themeName}
+            themePrice={selectedPremiumTheme.themePrice}
+            currency={selectedPremiumTheme.currency}
+            themeId={selectedPremiumTheme.themeId}
+          />
         )}
       </div>
     </EnhancedLiveEditorDragDropContext>

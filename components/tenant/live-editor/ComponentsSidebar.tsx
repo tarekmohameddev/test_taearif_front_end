@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEditorT } from "@/context/editorI18nStore";
 import {
@@ -9,6 +9,9 @@ import {
 import { DraggableDrawerItem } from "@/services/live-editor/dragDrop";
 import { getComponents } from "@/lib/ComponentsList";
 import themesComponentsList from "@/lib/themes/themesComponentsList.json";
+import { PremiumDialog } from "./PremiumDialog";
+import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
 
 // Animation variants
 const collapseVariants = {
@@ -68,7 +71,33 @@ export const ComponentsSidebar = () => {
   const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] =
     useState(true);
   const [activeTab, setActiveTab] = useState<ThemeTab>("theme1");
+  
+  // Premium Dialog State (Temporary for testing)
+  const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
+  const [selectedPremiumComponent, setSelectedPremiumComponent] = useState<{
+    themeName: string;
+    themePrice: string;
+    currency: string;
+    themeId: string;
+  } | null>(null);
+  
   const t = useEditorT();
+
+  // ⭐ TEMPORARY: Auto-open Premium Dialog for testing
+  useEffect(() => {
+    // Open dialog automatically after a short delay for testing
+    const timer = setTimeout(() => {
+      setSelectedPremiumComponent({
+        themeName: "ثيم العقارات المميز",
+        themePrice: "299",
+        currency: "SAR",
+        themeId: "home13", // Example theme ID
+      });
+      setPremiumDialogOpen(true);
+    }, 1000); // Open after 1 second
+
+    return () => clearTimeout(timer);
+  }, []); // Run once on mount
 
   // الحصول على الأقسام المترجمة
   const availableSections = useMemo(() => {
@@ -145,6 +174,27 @@ export const ComponentsSidebar = () => {
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
+        {/* ⭐ TEMPORARY: Test Button to Open Premium Dialog */}
+        <div className="mb-2">
+          <Button
+            onClick={() => {
+              setSelectedPremiumComponent({
+                themeName: "ثيم العقارات المميز",
+                themePrice: "299",
+                currency: "SAR",
+                themeId: "home13", // Example theme ID
+              });
+              setPremiumDialogOpen(true);
+            }}
+            variant="outline"
+            size="sm"
+            className="w-full bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 border-purple-200 text-purple-700 hover:text-purple-900"
+          >
+            <Sparkles className="w-3 h-3 ml-1" />
+            عرض Premium Dialog (اختبار)
+          </Button>
+        </div>
+        
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-gray-900">
             {t("live_editor.components")}
@@ -587,6 +637,18 @@ export const ComponentsSidebar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Premium Dialog */}
+      {selectedPremiumComponent && (
+        <PremiumDialog
+          open={premiumDialogOpen}
+          onClose={() => setPremiumDialogOpen(false)}
+          themeName={selectedPremiumComponent.themeName}
+          themePrice={selectedPremiumComponent.themePrice}
+          currency={selectedPremiumComponent.currency}
+          themeId={selectedPremiumComponent.themeId}
+        />
+      )}
     </motion.div>
   );
 };

@@ -113,8 +113,9 @@ export function ThemeChangeDialog({
   const handlePurchase = () => {
     if (!selectedTheme) return;
     
-    // الانتقال إلى settings page مع themeId
-    router.push(`/dashboard/settings?tab=themes&themeId=${selectedTheme.id}`);
+    // فتح صفحة settings في تبويب جديد
+    const settingsUrl = `/dashboard/settings?tab=themes&themeId=${selectedTheme.id}`;
+    window.open(settingsUrl, '_blank');
     onClose();
   };
 

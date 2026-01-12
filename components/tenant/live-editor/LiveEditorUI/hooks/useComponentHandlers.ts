@@ -18,6 +18,9 @@ import {
   logDuring,
   logError,
 } from "@/lib/fileLogger";
+import { findThemeForComponent } from "@/lib/themes/themeComponentLookup";
+
+import type { Theme } from "@/components/settings/themes/types";
 
 interface UseComponentHandlersProps {
   pageComponents: any[];
@@ -26,6 +29,13 @@ interface UseComponentHandlersProps {
   setDebugInfo: (info: PositionDebugInfo | null) => void;
   setPositionValidation: (validation: any) => void;
   setWasComponentsSidebarManuallyClosed: (value: boolean) => void;
+  onPremiumComponentDetected?: (theme: {
+    themeName: string;
+    themePrice: string;
+    currency: string;
+    themeId: string;
+  }) => void;
+  themes?: Theme[];
 }
 
 export function useComponentHandlers({
@@ -35,6 +45,8 @@ export function useComponentHandlers({
   setDebugInfo,
   setPositionValidation,
   setWasComponentsSidebarManuallyClosed,
+  onPremiumComponentDetected,
+  themes = [],
 }: UseComponentHandlersProps) {
   // دالة بسيطة لإضافة رقم 1 لكل مكون
   const getComponentNameWithOne = useCallback(
@@ -81,6 +93,35 @@ export function useComponentHandlers({
       const componentName =
         componentData.variant ||
         getComponentNameWithOne(normalizedComponentType);
+
+      // ========== PREMIUM CHECK: Verify theme access ==========
+      const themeId = findThemeForComponent(componentName);
+      if (themeId && themes.length > 0) {
+        // البحث عن الثيم في themes array
+        const theme = themes.find((t) => t.id === themeId);
+        if (theme && !theme.has_access) {
+          // منع الإضافة وإظهار PremiumDialog
+          logDuring(
+            "COMPONENT_ADD",
+            "PREMIUM_COMPONENT_BLOCKED",
+            {
+              componentName,
+              themeId,
+              themeName: theme.name,
+            }
+          );
+          
+          if (onPremiumComponentDetected) {
+            onPremiumComponentDetected({
+              themeName: theme.name,
+              themePrice: theme.price || "0",
+              currency: theme.currency || "SAR",
+              themeId: theme.id,
+            });
+          }
+          return; // منع الإضافة
+        }
+      }
 
       // ========== LOG DURING: Creating component ==========
       logDuring(

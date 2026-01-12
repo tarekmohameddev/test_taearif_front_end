@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,9 +80,6 @@ export default function PropertyFilter2({
   const uniqueId = id || variantId;
 
   // Subscribe to editor store updates for this propertyFilter variant
-  const ensureComponentVariant = useEditorStore(
-    (s) => s.ensureComponentVariant,
-  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const propertyFilterStates = useEditorStore((s) => s.propertyFilterStates);
 
@@ -125,7 +122,8 @@ export default function PropertyFilter2({
   const currentStoreData = useStore ? propertyFilterStates[uniqueId] || {} : {};
 
   // Get tenant data for this specific component variant
-  const getTenantComponentData = () => {
+  // ⭐ CRITICAL: Memoize to prevent infinite loops from reference changes
+  const tenantComponentData = useMemo(() => {
     if (!tenantData?.componentSettings) {
       return {};
     }
@@ -169,12 +167,14 @@ export default function PropertyFilter2({
       }
     }
     return {};
-  };
-
-  const tenantComponentData = getTenantComponentData();
+  }, [tenantData, id, uniqueId]);
 
   useEffect(() => {
     if (useStore) {
+      // ⭐ CRITICAL: Use getState() directly to avoid dependency issues
+      // ensureComponentVariant is stable but including it in deps can cause loops
+      const store = useEditorStore.getState();
+      
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
@@ -189,16 +189,12 @@ export default function PropertyFilter2({
               ...content,
               ...props,
             };
-      ensureComponentVariant("propertyFilter", uniqueId, initialData);
+      store.ensureComponentVariant("propertyFilter", uniqueId, initialData);
     }
-  }, [
-    uniqueId,
-    useStore,
-    ensureComponentVariant,
-    tenantComponentData,
-    content,
-    props,
-  ]);
+    // ⭐ CRITICAL: Only depend on uniqueId and useStore
+    // Don't include ensureComponentVariant, tenantComponentData, content, or props to prevent infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uniqueId, useStore]);
 
   // Get default data
   const defaultData = getDefaultPropertyFilterData();
