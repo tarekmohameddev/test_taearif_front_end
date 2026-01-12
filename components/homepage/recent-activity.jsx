@@ -11,20 +11,27 @@ import {
 } from "@/components/ui/card";
 const SkeletonLoader = () => {
   return (
-    <>
-      {[1, 2, 3].map((item) => (
-        <div
-          key={item}
-          className="animate-pulse flex items-center gap-4 rounded-lg border p-3"
-        >
-          <div className="rounded-full bg-gray-200 h-10 w-10"></div>
-          <div className="flex-1 space-y-2">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          </div>
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {[1, 2, 3, 4, 5, 6].map((item) => (
+        <Card key={item} className="animate-pulse flex flex-col h-full">
+          <CardContent className="p-5 flex flex-col h-full">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="rounded-full bg-gray-200 h-12 w-12 flex-shrink-0"></div>
+                <div className="flex-1">
+                  <div className="h-5 bg-gray-200 rounded w-full mb-2"></div>
+                </div>
+              </div>
+              <div className="flex-1 space-y-2 mt-auto">
+                <div className="h-3 bg-gray-200 rounded w-full"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       ))}
-    </>
+    </div>
   );
 };
 
@@ -202,29 +209,62 @@ export function RecentActivity() {
         <CardTitle>النشاط الأخير</CardTitle>
         <CardDescription>آخر الإجراءات التي تمت على موقعك</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         {loading ? (
           <SkeletonLoader />
+        ) : recentActivityData.activities?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentActivityData.activities.map((item, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow flex flex-col h-full">
+                <CardContent className="p-5 flex flex-col h-full">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="rounded-full bg-primary/10 p-3 flex-shrink-0">
+                        <item.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base mb-1 line-clamp-2">
+                          {item.action_labelAR || item.actionAR || item.action}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-2 mt-auto">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          القسم:
+                        </span>
+                        <span className="text-xs text-foreground">
+                          {item.sectionAR || item.section}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          الوقت:
+                        </span>
+                        <span className="text-xs text-foreground">
+                          {formatTimeAgo(item.time)}
+                        </span>
+                      </div>
+                      {item.actor_name && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-muted-foreground">
+                            من:
+                          </span>
+                          <span className="text-xs text-foreground">
+                            {formatActorName(item.actor_name)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         ) : (
-          recentActivityData.activities?.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-4 rounded-lg border p-3"
-            >
-              <div className="rounded-full bg-primary/10 p-2">
-                <item.icon className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">{item.action_labelAR || item.actionAR || item.action}</p>
-                <p className="text-sm text-muted-foreground">
-                  {item.sectionAR || item.section} • {formatTimeAgo(item.time)}
-                  {item.actor_name && (
-                    <span className="mr-2"> • {formatActorName(item.actor_name)}</span>
-                  )}
-                </p>
-              </div>
-            </div>
-          ))
+          <div className="text-center text-gray-500 py-8">
+            لا توجد أنشطة حديثة
+          </div>
         )}
       </CardContent>
     </Card>
