@@ -2215,7 +2215,7 @@ function PropertyCard({
                 className="w-[1.15rem] h-[1.15rem] filter brightness-0 contrast-100 mt-0.5"
               />
               {getPaymentMethodText(property.payment_method) && (
-                <span>/{getPaymentMethodText(property.payment_method)}</span>
+                <span className="text-sm">/{getPaymentMethodText(property.payment_method)}</span>
               )}
             </>
           )}
