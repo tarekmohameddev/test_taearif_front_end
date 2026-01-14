@@ -2152,10 +2152,10 @@ function PropertyCard({
                   إلغاء النشر
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={() => onShare(property)}>
+              {/* <DropdownMenuItem onClick={() => onShare(property)}>
                 <Share2 className="ml-2 h-4 w-4" />
                 شارك
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onClick={() => onDelete(property.id)}
@@ -2432,10 +2432,10 @@ function PropertyListItem({
                     إلغاء النشر
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={() => onShare(property)}>
+                {/* <DropdownMenuItem onClick={() => onShare(property)}>
                   <Share2 className="mr-2 h-4 w-4" />
                   شارك
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive"
                   onClick={() => onDelete(property.id)}
