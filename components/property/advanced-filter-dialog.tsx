@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, SlidersHorizontal, RotateCcw } from "lucide-react";
+import { X, SlidersHorizontal, RotateCcw, CalendarIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,6 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface FilterData {
@@ -67,6 +76,24 @@ export function AdvancedFilterDialog({
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
   
+  // New filter states
+  const [search, setSearch] = useState<string>("");
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [dateFrom, setDateFrom] = useState<Date | null>(null);
+  const [dateTo, setDateTo] = useState<Date | null>(null);
+  
+  // Filter options from API
+  const [filterOptions, setFilterOptions] = useState<{
+    employees?: Array<{ id: number; name: string; email?: string }>;
+    categories?: Array<{ id: number; name: string; name_ar?: string; name_en?: string }>;
+    payment_methods?: string[];
+    purposes?: string[];
+    date_range?: { min?: string; max?: string };
+  } | null>(null);
+  const [loadingFilterOptions, setLoadingFilterOptions] = useState(false);
+  
   // Cities and Districts data
   const [cities, setCities] = useState<Array<{ id: number; name_ar: string; name_en: string }>>([]);
   const [districts, setDistricts] = useState<Array<{ id: number; city_id: number; name_ar: string; name_en: string }>>([]);
@@ -110,6 +137,25 @@ export function AdvancedFilterDialog({
     }
   }, [selectedCityId]);
 
+  // Fetch filter options from API when dialog opens
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      if (!isOpen) return;
+      setLoadingFilterOptions(true);
+      try {
+        const response = await axiosInstance.get("/api/properties/filter-options");
+        if (response.data.status === "success" || response.data.data) {
+          setFilterOptions(response.data.data || response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching filter options:", error);
+      } finally {
+        setLoadingFilterOptions(false);
+      }
+    };
+    fetchFilterOptions();
+  }, [isOpen]);
+
   // Initialize filters from appliedFilters when dialog opens
   useEffect(() => {
     if (isOpen && filterData) {
@@ -119,11 +165,15 @@ export function AdvancedFilterDialog({
       const minArea = parseInt(filterData.specifics_filters.area_range.min);
 
       setSelectedPurposes(
-        Array.isArray(appliedFilters.purposes_filter)
-          ? appliedFilters.purposes_filter
-          : appliedFilters.purposes_filter
-            ? [appliedFilters.purposes_filter]
-            : []
+        Array.isArray(appliedFilters.purpose)
+          ? appliedFilters.purpose
+          : Array.isArray(appliedFilters.purposes_filter)
+            ? appliedFilters.purposes_filter
+            : appliedFilters.purpose
+              ? [appliedFilters.purpose]
+              : appliedFilters.purposes_filter
+                ? [appliedFilters.purposes_filter]
+                : []
       );
       setSelectedTypes(
         Array.isArray(appliedFilters.type)
@@ -163,6 +213,26 @@ export function AdvancedFilterDialog({
       ]);
       setSelectedCityId(appliedFilters.city_id || null);
       setSelectedDistrictId(appliedFilters.district_id || null);
+      
+      // Initialize new filters from appliedFilters
+      setSearch(appliedFilters.search || "");
+      setSelectedEmployeeIds(
+        Array.isArray(appliedFilters.employee_id)
+          ? appliedFilters.employee_id
+          : appliedFilters.employee_id
+            ? [appliedFilters.employee_id]
+            : []
+      );
+      setSelectedCategoryIds(
+        Array.isArray(appliedFilters.category_id)
+          ? appliedFilters.category_id
+          : appliedFilters.category_id
+            ? [appliedFilters.category_id]
+            : []
+      );
+      setSelectedPaymentMethod(appliedFilters.payment_method || null);
+      setDateFrom(appliedFilters.date_from ? new Date(appliedFilters.date_from) : null);
+      setDateTo(appliedFilters.date_to ? new Date(appliedFilters.date_to) : null);
     }
   }, [isOpen, filterData, appliedFilters]);
 
@@ -224,6 +294,35 @@ export function AdvancedFilterDialog({
     );
   };
 
+  const handleEmployeeToggle = (employeeId: number) => {
+    setSelectedEmployeeIds((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId],
+    );
+  };
+
+  const handleCategoryToggle = (categoryId: number) => {
+    setSelectedCategoryIds((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId],
+    );
+  };
+
+  // Translation function for payment methods
+  const translatePaymentMethod = (method: string): string => {
+    const translations: { [key: string]: string } = {
+      annual: "سنوي",
+      monthly: "شهري",
+      semi_annual: "نصف سنوي",
+      quarterly: "ربع سنوي",
+      cash: "نقدي",
+      installment: "تقسيط",
+    };
+    return translations[method] || method;
+  };
+
   const resetFilters = () => {
     setSelectedPurposes([]);
     setSelectedTypes([]);
@@ -232,6 +331,12 @@ export function AdvancedFilterDialog({
     setSelectedBaths([]);
     setSelectedCityId(null);
     setSelectedDistrictId(null);
+    setSearch("");
+    setSelectedEmployeeIds([]);
+    setSelectedCategoryIds([]);
+    setSelectedPaymentMethod(null);
+    setDateFrom(null);
+    setDateTo(null);
     if (filterData) {
       const minPrice = parseInt(filterData.specifics_filters.price_range.min);
       const maxPrice = parseInt(filterData.specifics_filters.price_range.max);
@@ -251,9 +356,6 @@ export function AdvancedFilterDialog({
     const filters: any = {};
 
     // Only include filters that are different from defaults or have values
-    if (selectedPurposes.length > 0) {
-      filters.purposes_filter = selectedPurposes;
-    }
     if (selectedTypes.length > 0) {
       filters.type = selectedTypes;
     }
@@ -285,6 +387,34 @@ export function AdvancedFilterDialog({
     }
     if (areaRange[1] !== maxPrice) {
       filters.area_to = areaRange[1];
+    }
+
+    // Add new filters
+    if (search.trim()) {
+      filters.search = search.trim();
+    }
+    if (selectedEmployeeIds.length > 0) {
+      filters.employee_id = selectedEmployeeIds.length === 1 
+        ? selectedEmployeeIds[0] 
+        : selectedEmployeeIds;
+    }
+    if (selectedCategoryIds.length > 0) {
+      filters.category_id = selectedCategoryIds.length === 1 
+        ? selectedCategoryIds[0] 
+        : selectedCategoryIds;
+    }
+    if (selectedPaymentMethod) {
+      filters.payment_method = selectedPaymentMethod;
+    }
+    if (dateFrom) {
+      filters.date_from = format(dateFrom, "yyyy-MM-dd");
+    }
+    if (dateTo) {
+      filters.date_to = format(dateTo, "yyyy-MM-dd");
+    }
+    // Add purpose filter (using selectedPurposes)
+    if (selectedPurposes.length > 0) {
+      filters.purpose = selectedPurposes;
     }
 
     // Apply filters through callback (don't navigate - we're in dashboard)
@@ -321,6 +451,13 @@ export function AdvancedFilterDialog({
       parseInt(filterData?.specifics_filters.price_range.max || "0")
     )
       count++;
+    // Count new filters
+    if (search.trim()) count++;
+    if (selectedEmployeeIds.length > 0) count++;
+    if (selectedCategoryIds.length > 0) count++;
+    if (selectedPaymentMethod) count++;
+    if (dateFrom) count++;
+    if (dateTo) count++;
     return count;
   };
 
@@ -353,6 +490,23 @@ export function AdvancedFilterDialog({
             </div>
           </div>
         </DialogHeader>
+
+        {/* Search Field */}
+        <div className="space-y-4 border-b border-gray-200 pb-6">
+          <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
+            البحث
+          </h3>
+          <div className="relative">
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="ابحث في العنوان، العنوان، الوصف، السعر..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pr-10 border-black"
+            />
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
           {/* المدينة */}
@@ -581,6 +735,152 @@ export function AdvancedFilterDialog({
                   </Label>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* الموظفون */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
+              الموظفون
+            </h3>
+            {loadingFilterOptions ? (
+              <div className="text-sm text-gray-500">جاري التحميل...</div>
+            ) : filterOptions?.employees && filterOptions.employees.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
+                {filterOptions.employees.map((employee) => (
+                  <div key={employee.id} className="flex items-center space-x-3">
+                    <Checkbox
+                      id={`employee-${employee.id}`}
+                      checked={selectedEmployeeIds.includes(employee.id)}
+                      onCheckedChange={() => handleEmployeeToggle(employee.id)}
+                      className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
+                    />
+                    <Label
+                      htmlFor={`employee-${employee.id}`}
+                      className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                    >
+                      {employee.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">لا توجد موظفين متاحين</div>
+            )}
+          </div>
+
+          {/* الفئات */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
+              الفئات
+            </h3>
+            {loadingFilterOptions ? (
+              <div className="text-sm text-gray-500">جاري التحميل...</div>
+            ) : filterOptions?.categories && filterOptions.categories.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
+                {filterOptions.categories.map((category) => (
+                  <div key={category.id} className="flex items-center space-x-3">
+                    <Checkbox
+                      id={`category-${category.id}`}
+                      checked={selectedCategoryIds.includes(category.id)}
+                      onCheckedChange={() => handleCategoryToggle(category.id)}
+                      className="border-black data-[state=checked]:bg-black data-[state=checked]:border-black mx-1"
+                    />
+                    <Label
+                      htmlFor={`category-${category.id}`}
+                      className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                    >
+                      {category.name_ar || category.name_en || category.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">لا توجد فئات متاحة</div>
+            )}
+          </div>
+
+          {/* طريقة الدفع */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
+              طريقة الدفع
+            </h3>
+            <Select
+              value={selectedPaymentMethod || "all"}
+              onValueChange={(value) => {
+                setSelectedPaymentMethod(value === "all" ? null : value);
+              }}
+            >
+              <SelectTrigger className="w-full border-black">
+                <SelectValue placeholder="اختر طريقة الدفع" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع طرق الدفع</SelectItem>
+                {loadingFilterOptions ? (
+                  <SelectItem value="loading" disabled>جاري التحميل...</SelectItem>
+                ) : (
+                  filterOptions?.payment_methods?.map((method) => (
+                    <SelectItem key={method} value={method}>
+                      {translatePaymentMethod(method)}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* نطاق التاريخ */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-black border-b border-gray-200 pb-2">
+              تاريخ الإنشاء
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm text-gray-700">من تاريخ</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-right font-normal border-black"
+                    >
+                      <CalendarIcon className="ml-2 h-4 w-4" />
+                      {dateFrom ? format(dateFrom, "yyyy-MM-dd", { locale: ar }) : "اختر التاريخ"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={dateFrom || undefined}
+                      onSelect={(date) => setDateFrom(date || null)}
+                      initialFocus
+                      locale={ar}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm text-gray-700">إلى تاريخ</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-right font-normal border-black"
+                    >
+                      <CalendarIcon className="ml-2 h-4 w-4" />
+                      {dateTo ? format(dateTo, "yyyy-MM-dd", { locale: ar }) : "اختر التاريخ"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={dateTo || undefined}
+                      onSelect={(date) => setDateTo(date || null)}
+                      initialFocus
+                      locale={ar}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
         </div>

@@ -610,7 +610,15 @@ export function PropertiesManagementPage() {
         if (value !== null && value !== undefined && value !== "") {
           if (Array.isArray(value)) {
             if (value.length > 0) {
-              params.set(key, value.join(","));
+              // For arrays, use multiple params: employee_id[]=1&employee_id[]=2
+              // But also support comma-separated for backward compatibility
+              if (key === "employee_id" || key === "category_id" || key === "purpose") {
+                value.forEach((item) => {
+                  params.append(`${key}[]`, item.toString());
+                });
+              } else {
+                params.set(key, value.join(","));
+              }
             }
           } else {
             params.set(key, value.toString());
