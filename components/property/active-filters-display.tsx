@@ -58,9 +58,28 @@ export function ActiveFiltersDisplay({
     }
   }, [filters.city_id]);
 
+  // Translation function for payment methods
+  const translatePaymentMethod = (method: string): string => {
+    const translations: { [key: string]: string } = {
+      annual: "سنوي",
+      monthly: "شهري",
+      semi_annual: "نصف سنوي",
+      quarterly: "ربع سنوي",
+      cash: "نقدي",
+      installment: "تقسيط",
+    };
+    return translations[method] || method;
+  };
+
   const getFilterDisplayName = (key: string, value: any, filters: any) => {
     switch (key) {
       case "purposes_filter":
+        return value === "rent"
+          ? "للإيجار"
+          : value === "sale"
+            ? "للبيع"
+            : value;
+      case "purpose":
         return value === "rent"
           ? "للإيجار"
           : value === "sale"
@@ -90,6 +109,14 @@ export function ActiveFiltersDisplay({
         return `${value}+ حمامات`;
       case "features":
         return value;
+      case "payment_method":
+        return `طريقة الدفع: ${translatePaymentMethod(value)}`;
+      case "search":
+        return `البحث: ${value}`;
+      case "date_from":
+        return `من تاريخ: ${value}`;
+      case "date_to":
+        return `إلى تاريخ: ${value}`;
       case "city_id": {
         const city = cities.find((c) => c.id === parseInt(value));
         return city ? `المدينة: ${city.name_ar || city.name_en}` : `المدينة: ${value}`;
