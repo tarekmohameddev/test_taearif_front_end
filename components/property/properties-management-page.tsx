@@ -82,6 +82,7 @@ import EmptyState from "@/components/empty-state";
 import { ErrorDisplay } from "@/components/ui/error-display";
 import { AdvancedFilterDialog } from "@/components/property/advanced-filter-dialog";
 import { ActiveFiltersDisplay } from "@/components/property/active-filters-display";
+import { PropertyStatisticsCards } from "@/components/property/property-statistics-cards";
 
 // Share Dialog Component
 function ShareDialog({
@@ -1168,6 +1169,9 @@ export function PropertiesManagementPage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {/* إحصائيات الوحدات */}
+            <PropertyStatisticsCards />
 
             {/* عرض الفلاتر النشطة */}
             <ActiveFiltersDisplay
