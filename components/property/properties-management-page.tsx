@@ -2339,7 +2339,7 @@ function PropertyListItem({
               <h3 className="font-semibold">
                 {property.title || property.contents[0].title}
               </h3>
-              <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
+              <p className="text-sm text-muted-foreground flex  items-center gap-1">
                 <MapPin className="h-3 w-3" />{" "}
                 {formattedAddress}
               </p>
@@ -2347,16 +2347,12 @@ function PropertyListItem({
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
             <div className="flex flex-row-reverse items-center gap-1">
-              <Bath className="h-4 w-4 text-muted-foreground" />
-              <span>{property.bath || 0} حمام</span>
+              <Eye className="h-4 w-4 text-muted-foreground" />
+              <span>{property.visits || 0} مشاهدات</span>
             </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Ruler className="h-4 w-4 text-muted-foreground" />
               <span>{property.size || property.area || 0} م²</span>
-            </div>
-            <div className="flex flex-row-reverse items-center gap-1">
-              <Building className="h-4 w-4 text-muted-foreground" />
-              <span>{property.type || "غير محدد"}</span>
             </div>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
