@@ -2197,9 +2197,9 @@ function PropertyCard({
           className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-3" : "grid-cols-2"}`}
         >
           <div className="flex flex-col items-center">
-            <span className="text-muted-foreground">حمام</span>
+            <span className="text-muted-foreground">مشاهدات</span>
             <span className="font-medium flex items-center gap-1">
-              <Bath className="h-3 w-3" /> {property.bath || 0}
+              <Eye className="h-3 w-3" /> {property.visits || 0}
             </span>
           </div>
           <div className="flex flex-col items-center">
