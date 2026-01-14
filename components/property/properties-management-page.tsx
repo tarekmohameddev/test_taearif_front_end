@@ -1951,6 +1951,77 @@ interface PropertyCardProps {
   >;
 }
 
+// Helper function to extract city and district/neighborhood from property
+function formatAddress(property: any): string {
+  // First, check if property has city and district/neighborhood fields directly
+  const city = property?.city?.name_ar || property?.city?.name || property?.city_name || property?.city;
+  const district = property?.district?.name_ar || property?.district?.name || property?.district_name || property?.district || property?.neighborhood?.name_ar || property?.neighborhood?.name || property?.neighborhood;
+  
+  // If we have both city and district, return them
+  if (district && city) {
+    return `${district}، ${city}`;
+  } else if (city) {
+    return city;
+  } else if (district) {
+    return district;
+  }
+  
+  // If not available directly, try to parse from address
+  const address = property?.address || property?.contents?.[0]?.address;
+  if (!address) return "";
+  
+  // Common Arabic city names
+  const cities = [
+    "الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام", 
+    "الخبر", "الطائف", "بريدة", "تبوك", "خميس مشيط", "حائل",
+    "الجبيل", "نجران", "أبها", "ينبع", "الباحة", "عرعر", "سكاكا"
+  ];
+  
+  // Try to find city in address
+  let parsedCity = "";
+  let parsedDistrict = "";
+  
+  // Split by common separators
+  const addressParts = address.split(/[،,،\-–—]/).map(p => p.trim()).filter(p => p);
+  
+  // Find city (usually at the end or contains city name)
+  for (let i = addressParts.length - 1; i >= 0; i--) {
+    const part = addressParts[i];
+    for (const cityName of cities) {
+      if (part.includes(cityName)) {
+        parsedCity = cityName;
+        break;
+      }
+    }
+    if (parsedCity) break;
+  }
+  
+  // District is usually the first part or before city
+  if (addressParts.length > 0) {
+    const cityIndex = addressParts.findIndex(p => p.includes(parsedCity));
+    
+    if (cityIndex > 0) {
+      // Get the part before city (usually district/neighborhood)
+      parsedDistrict = addressParts[cityIndex - 1];
+    } else if (addressParts.length > 0 && !parsedCity) {
+      // If city not found, use first part as district
+      parsedDistrict = addressParts[0];
+    }
+  }
+  
+  // Return formatted: district, city or just city if no district
+  if (parsedDistrict && parsedCity) {
+    return `${parsedDistrict}، ${parsedCity}`;
+  } else if (parsedCity) {
+    return parsedCity;
+  } else if (parsedDistrict) {
+    return parsedDistrict;
+  }
+  
+  // Fallback: return original address if parsing fails
+  return address;
+}
+
 function PropertyCard({
   property,
   isFavorite,
@@ -1963,6 +2034,9 @@ function PropertyCard({
 }: PropertyCardProps & { setReorderPopup: any }) {
   const router = useRouter();
   const { userData } = useAuthStore();
+  
+  const formattedAddress = formatAddress(property);
+  
   return (
     <Card className="overflow-hidden" dir="rtl">
       <div className="relative">
@@ -2002,7 +2076,7 @@ function PropertyCard({
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3" />
-              {property.address || property.contents[0].address}
+              {formattedAddress}
             </CardDescription>
           </div>
           <DropdownMenu>
@@ -2218,6 +2292,8 @@ function PropertyListItem({
   setReorderPopup,
 }: PropertyCardProps) {
   const router = useRouter();
+  
+  const formattedAddress = formatAddress(property);
 
   return (
     <Card>
@@ -2262,7 +2338,7 @@ function PropertyListItem({
               </h3>
               <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
                 <MapPin className="h-3 w-3" />{" "}
-                {property.address || property.contents[0].address}
+                {formattedAddress}
               </p>
             </div>
             <div className="text-lg font-semibold">
