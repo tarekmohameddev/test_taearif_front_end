@@ -25,24 +25,14 @@ interface LocationCardProps {
   propertyData: PropertyData;
 }
 
-export function LocationCard({ propertyData }: LocationCardProps) {
+export function LocationCard({ propertyData, hideHeader = false }: LocationCardProps & { hideHeader?: boolean }) {
   const handleInputChange = (field: keyof PropertyData, value: string) => {
     // This function is not needed here since the inputs are read-only
     // but keeping the structure for consistency
   };
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="h-5 w-5" />
-          تفاصيل الموقع
-        </CardTitle>
-        <CardDescription>
-          سيتم ملء العنوان والإحداثيات تلقائياً عند تحديد موقع على الخريطة
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+  const content = (
+    <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="address">العنوان</Label>
           <Input
@@ -86,6 +76,26 @@ export function LocationCard({ propertyData }: LocationCardProps) {
             </p>
           </div>
         )}
+    </div>
+  );
+
+  if (hideHeader) {
+    return content;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <MapPin className="h-5 w-5" />
+          تفاصيل الموقع
+        </CardTitle>
+        <CardDescription>
+          سيتم ملء العنوان والإحداثيات تلقائياً عند تحديد موقع على الخريطة
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {content}
       </CardContent>
     </Card>
   );

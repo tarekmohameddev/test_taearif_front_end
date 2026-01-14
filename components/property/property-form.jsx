@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Loader } from "@googlemaps/js-api-loader";
 import { MapSection } from "@/components/property/map-section";
 import { LocationCard } from "@/components/property/location-card";
@@ -15,6 +16,7 @@ import {
   Video,
   Globe,
   Search,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +39,11 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import toast from "react-hot-toast";
@@ -180,6 +187,14 @@ export default function PropertyForm({ mode }) {
 
   const [currentFeature, setCurrentFeature] = useState("");
   const [errors, setErrors] = useState({});
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isThumbnailOpen, setIsThumbnailOpen] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isFloorPlansOpen, setIsFloorPlansOpen] = useState(false);
+  const [isVirtualTourOpen, setIsVirtualTourOpen] = useState(false);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [isFaqsOpen, setIsFaqsOpen] = useState(false);
   const [images, setImages] = useState({
     thumbnail: null,
     gallery: [],
@@ -1262,7 +1277,7 @@ export default function PropertyForm({ mode }) {
             <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>معلومات الوحدة الأساسية</CardTitle>
+                  <CardTitle className="text-xl">معلومات الوحدة الأساسية</CardTitle>
                   <CardDescription>
                     أدخل المعلومات الأساسية للوحدة
                   </CardDescription>
@@ -1596,14 +1611,37 @@ export default function PropertyForm({ mode }) {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>تفاصيل الوحدة</CardTitle>
-                  <CardDescription>أدخل مواصفات وميزات الوحدة</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="featureInput">الميزات</Label>
+              <Collapsible
+                open={isDetailsOpen}
+                onOpenChange={setIsDetailsOpen}
+              >
+                <Card>
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl">تفاصيل الوحدة</CardTitle>
+                          <CardDescription>أدخل مواصفات وميزات الوحدة</CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isDetailsOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="featureInput">الميزات</Label>
                     <div className="flex flex-col sm:flex-row gap-2">
                       <Input
                         id="featureInput"
@@ -2266,21 +2304,47 @@ export default function PropertyForm({ mode }) {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                        </CardContent>
+                      </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
 
-              <Card
-                className={errors.thumbnail ? "border-red-500 border-2" : ""}
+              <Collapsible
+                open={isThumbnailOpen}
+                onOpenChange={setIsThumbnailOpen}
               >
-                <CardHeader>
-                  <CardTitle>صورة الوحدة الرئيسية</CardTitle>
-                  <CardDescription>
-                    قم بتحميل صورة رئيسية تمثل الوحدة{" "}
-                    <span className="text-red-500">*</span>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col md:flex-row items-center gap-6">
+                <Card
+                  className={errors.thumbnail ? "border-red-500 border-2" : ""}
+                >
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl">صورة الوحدة الرئيسية</CardTitle>
+                          <CardDescription>
+                            قم بتحميل صورة رئيسية تمثل الوحدة{" "}
+                            <span className="text-red-500">*</span>
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isThumbnailOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent>
+                        <div className="flex flex-col md:flex-row items-center gap-6">
                     <div className="border rounded-md p-2 flex-1 w-full">
                       <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
                         {previews.thumbnail ? (
@@ -2336,22 +2400,48 @@ export default function PropertyForm({ mode }) {
                           {errors.thumbnail}
                         </p>
                       )}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                      </CardContent>
+                    </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
 
-              <Card className="xl:col-span-2">
-                <CardHeader>
-                  <CardTitle>معرض صور الوحدة</CardTitle>
-                  <CardDescription>
-                    قم بتحميل صور متعددة لعرض تفاصيل الوحدة
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {previews.gallery.map((preview, index) => (
+              <Collapsible
+                open={isGalleryOpen}
+                onOpenChange={setIsGalleryOpen}
+              >
+                <Card className="xl:col-span-2">
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl">معرض صور الوحدة</CardTitle>
+                          <CardDescription>
+                            قم بتحميل صور متعددة لعرض تفاصيل الوحدة
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isGalleryOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {previews.gallery.map((preview, index) => (
                         <div
                           key={index}
                           className="border rounded-md p-2 relative"
@@ -2407,21 +2497,47 @@ export default function PropertyForm({ mode }) {
                       يمكنك رفع صور بصيغة JPG أو PNG. الحد الأقصى لعدد الصور هو
                       10.
                     </p>
-                  </div>
-                </CardContent>
-              </Card>
+                          </div>
+                      </CardContent>
+                    </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
 
-              <Card className="xl:col-span-2">
-                <CardHeader>
-                  <CardTitle>فيديو الوحدة</CardTitle>
-                  <CardDescription>
-                    قم بتحميل فيديو واحد لعرض تفاصيل الوحدة
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex flex-col md:flex-row items-center gap-6">
-                      <div className="border rounded-md p-2 flex-1 w-full">
+              <Collapsible
+                open={isVideoOpen}
+                onOpenChange={setIsVideoOpen}
+              >
+                <Card className="xl:col-span-2">
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl">فيديو الوحدة</CardTitle>
+                          <CardDescription>
+                            قم بتحميل فيديو واحد لعرض تفاصيل الوحدة
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isVideoOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex flex-col md:flex-row items-center gap-6">
+                            <div className="border rounded-md p-2 flex-1 w-full">
                         {videoPreview ? (
                           <>
                             <div
@@ -2473,37 +2589,63 @@ export default function PropertyForm({ mode }) {
                             </div>
                           </div>
                         )}
-                      </div>
-                    </div>
-                    <input
-                      ref={videoInputRef}
-                      type="file"
-                      accept="video/*"
-                      className="hidden"
-                      onChange={(e) => handleFileChange(e, "video")}
-                    />
-                    {errors.video && (
-                      <p className="text-red-500 text-sm">{errors.video}</p>
-                    )}
-                    <p className="text-sm text-muted-foreground">
-                      يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى لحجم
-                      الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+                            </div>
+                          </div>
+                          <input
+                            ref={videoInputRef}
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            onChange={(e) => handleFileChange(e, "video")}
+                          />
+                          {errors.video && (
+                            <p className="text-red-500 text-sm">{errors.video}</p>
+                          )}
+                          <p className="text-sm text-muted-foreground">
+                            يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى لحجم
+                            الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
+                          </p>
+                        </div>
+                      </CardContent>
+                    </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
 
-              <Card className="xl:col-span-2">
-                <CardHeader>
-                  <CardTitle>مخططات الطوابق</CardTitle>
-                  <CardDescription>
-                    قم بتحميل مخططات الطوابق والتصاميم الهندسية للوحدة
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {previews.floorPlans.map((preview, index) => (
+              <Collapsible
+                open={isFloorPlansOpen}
+                onOpenChange={setIsFloorPlansOpen}
+              >
+                <Card className="xl:col-span-2">
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl">مخططات الطوابق</CardTitle>
+                          <CardDescription>
+                            قم بتحميل مخططات الطوابق والتصاميم الهندسية للوحدة
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isFloorPlansOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {previews.floorPlans.map((preview, index) => (
                         <div
                           key={index}
                           className="border rounded-md p-2 relative"
@@ -2556,20 +2698,46 @@ export default function PropertyForm({ mode }) {
                       يمكنك رفع مخططات بصيغة JPG أو PNG. الحد الأقصى لعدد
                       المخططات هو 5.
                     </p>
-                  </div>
-                </CardContent>
-              </Card>
+                        </div>
+                      </CardContent>
+                    </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
 
-              <Card className="xl:col-span-2">
-                <CardHeader>
-                  <CardTitle> الجولات الافتراضية</CardTitle>
-                  <CardDescription>
-                    أضف رابط الجولة الافتراضية للوحدة
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+              <Collapsible
+                open={isVirtualTourOpen}
+                onOpenChange={setIsVirtualTourOpen}
+              >
+                <Card className="xl:col-span-2">
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle> الجولات الافتراضية</CardTitle>
+                          <CardDescription>
+                            أضف رابط الجولة الافتراضية للوحدة
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isVirtualTourOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Globe className="h-4 w-4 text-muted-foreground" />
                         <Label htmlFor="virtualTourUrl">
@@ -2639,25 +2807,88 @@ export default function PropertyForm({ mode }) {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-              <div className="xl:col-span-2 space-y-6">
-                {/* Map Section */}
-
-                <MapSection onLocationUpdate={handleLocationUpdate} />
-                <LocationCard propertyData={formData} />
-              </div>
-              <Card className="xl:col-span-2">
-                <CardHeader>
-                  <CardTitle>الأسئلة الشائعة الخاصة بالوحدة</CardTitle>
-                  <CardDescription>
-                    أضف أسئلة وأجوبة شائعة حول هذه الوحدة لمساعدة المشترين
-                    المحتملين.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Add New FAQ Form */}
-                  <div className="space-y-4 p-4 border rounded-md">
+                      </CardContent>
+                    </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+              <Collapsible
+                open={isLocationOpen}
+                onOpenChange={setIsLocationOpen}
+              >
+                <Card className="xl:col-span-2">
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl flex items-center gap-2">
+                            <MapPin className="h-5 w-5" />
+                            موقع الوحدة
+                          </CardTitle>
+                          <CardDescription>
+                            اختر موقع الوحدة على الخريطة وعرض تفاصيل الموقع
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isLocationOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent className="space-y-6 pt-6">
+                        {/* Map Section Content */}
+                        <MapSection onLocationUpdate={handleLocationUpdate} hideHeader={true} />
+                        {/* Location Details */}
+                        <LocationCard propertyData={formData} hideHeader={true} />
+                      </CardContent>
+                    </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+              <Collapsible
+                open={isFaqsOpen}
+                onOpenChange={setIsFaqsOpen}
+              >
+                <Card className="xl:col-span-2">
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xl">الأسئلة الشائعة الخاصة بالوحدة</CardTitle>
+                          <CardDescription>
+                            أضف أسئلة وأجوبة شائعة حول هذه الوحدة لمساعدة المشترين
+                            المحتملين.
+                          </CardDescription>
+                        </div>
+                        <motion.div
+                          animate={{ rotate: isFaqsOpen ? 180 : 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15, ease: "easeInOut" }}
+                    >
+                      <CardContent className="space-y-6">
+                        {/* Add New FAQ Form */}
+                        <div className="space-y-4 p-4 border rounded-md">
                     <h3 className="text-lg font-medium">إضافة سؤال جديد</h3>
                     <div className="space-y-2">
                       <Label htmlFor="newQuestion">السؤال</Label>
@@ -2772,8 +3003,11 @@ export default function PropertyForm({ mode }) {
                       لم تتم إضافة أي أسئلة شائعة بعد.
                     </p>
                   )}
-                </CardContent>
-              </Card>
+                      </CardContent>
+                    </motion.div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
               <Card className="xl:col-span-2">
                 <CardFooter className="flex flex-col items-end border-t p-6 space-y-4">
                   <div className="w-full">

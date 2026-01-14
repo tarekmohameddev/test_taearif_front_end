@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { MapPin, Search } from "lucide-react";
 
-export function MapSection({ onLocationUpdate }) {
+export function MapSection({ onLocationUpdate, hideHeader = false }) {
   const mapRef = useRef(null);
   const searchInputRef = useRef(null);
   const [map, setMap] = useState(null);
@@ -169,15 +169,8 @@ export function MapSection({ onLocationUpdate }) {
     }
   };
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>اختر موقع الوحدة</CardTitle>
-        <CardDescription>
-          ابحث عن عنوان أو انقر على الخريطة لتحديد الموقع بدقة
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+  const content = (
+    <div className="space-y-4">
         {/* Search Box */}
         <div className="relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -230,6 +223,23 @@ export function MapSection({ onLocationUpdate }) {
             <p>حالة الخريطة: {isMapLoaded ? "محملة" : "غير محملة"}</p>
           </div>
         )}
+    </div>
+  );
+
+  if (hideHeader) {
+    return content;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>اختر موقع الوحدة</CardTitle>
+        <CardDescription>
+          ابحث عن عنوان أو انقر على الخريطة لتحديد الموقع بدقة
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {content}
       </CardContent>
     </Card>
   );
