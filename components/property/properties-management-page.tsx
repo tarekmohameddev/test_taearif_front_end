@@ -16,6 +16,7 @@ import {
   Edit,
   ExternalLink,
   Filter,
+  FilterX,
   Grid3X3,
   Eye,
   Heart,
@@ -454,6 +455,17 @@ export function PropertiesManagementPage() {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
+  const [filterCityId, setFilterCityId] = useState<string | null>(null);
+  const [filterDistrictId, setFilterDistrictId] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<string | null>(null);
+  const [filterPurpose, setFilterPurpose] = useState<string | null>(null);
+  const [filterBeds, setFilterBeds] = useState<string | null>(null);
+  const [filterPriceFrom, setFilterPriceFrom] = useState<string>("");
+  const [filterPriceTo, setFilterPriceTo] = useState<string>("");
+  const [cities, setCities] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -1056,6 +1068,35 @@ export function PropertiesManagementPage() {
     fetchProperties(1, filters);
   };
 
+  const applyFilters = () => {
+    const newFilters: Record<string, any> = {};
+    
+    if (filterCityId) newFilters.city_id = filterCityId;
+    if (filterDistrictId) newFilters.district_id = filterDistrictId;
+    if (filterType) newFilters.type = filterType;
+    if (filterPurpose) newFilters.purpose = filterPurpose;
+    if (filterBeds) newFilters.beds = filterBeds;
+    if (filterPriceFrom) newFilters.price_from = filterPriceFrom;
+    if (filterPriceTo) newFilters.price_to = filterPriceTo;
+    
+    setAppliedFilters(newFilters);
+    setCurrentPage(1);
+    fetchProperties(1, newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setFilterCityId(null);
+    setFilterDistrictId(null);
+    setFilterType(null);
+    setFilterPurpose(null);
+    setFilterBeds(null);
+    setFilterPriceFrom("");
+    setFilterPriceTo("");
+    setAppliedFilters({});
+    setCurrentPage(1);
+    fetchProperties(1);
+  };
+
   const handleRemoveFilter = (filterKey: string, filterValue?: any) => {
     const newFilters: Record<string, any> = { ...appliedFilters };
 
@@ -1080,6 +1121,43 @@ export function PropertiesManagementPage() {
     setCurrentPage(1);
     fetchProperties(1);
   };
+
+  // Fetch cities on mount
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        setLoadingCities(true);
+        const response = await axiosInstance.get("https://nzl-backend.com/api/cities?country_id=1");
+        setCities(response.data?.data || []);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+    fetchCities();
+  }, []);
+
+  // Fetch districts when city is selected
+  useEffect(() => {
+    if (filterCityId) {
+      const fetchDistricts = async () => {
+        try {
+          setLoadingDistricts(true);
+          const response = await axiosInstance.get(`https://nzl-backend.com/api/districts?city_id=${filterCityId}`);
+          setDistricts(response.data?.data || []);
+        } catch (error) {
+          console.error("Error fetching districts:", error);
+        } finally {
+          setLoadingDistricts(false);
+        }
+      };
+      fetchDistricts();
+    } else {
+      setDistricts([]);
+      setFilterDistrictId(null);
+    }
+  }, [filterCityId]);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب
@@ -1203,19 +1281,6 @@ export function PropertiesManagementPage() {
                     <span className="sr-only">List view</span>
                   </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setFilterDialogOpen(true)}
-                  className="gap-2 border-black text-black hover:bg-gray-100 w-full md:w-auto"
-                >
-                  <Filter className="h-4 w-4" />
-                  فلترة
-                  {Object.keys(appliedFilters).length > 0 && (
-                    <span className="bg-black text-white text-xs rounded-full px-2 py-0.5">
-                      {Object.keys(appliedFilters).length}
-                    </span>
-                  )}
-                </Button>
                 <Dialog>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
@@ -1740,6 +1805,173 @@ export function PropertiesManagementPage() {
 
             {/* إحصائيات الوحدات */}
             <PropertyStatisticsCards />
+
+            {/* الفلاتر */}
+            <Card className="mb-6 border-0 shadow-none">
+              <CardContent className="">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                  {/* المدينة */}
+                  <div className="space-y-2">
+                    <Label>المدينة</Label>
+                    <Select
+                      value={filterCityId || undefined}
+                      onValueChange={(value) => {
+                        setFilterCityId(value || null);
+                        setFilterDistrictId(null);
+                        setTimeout(() => applyFilters(), 0);
+                      }}
+                      disabled={loadingCities}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر المدينة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cities.map((city) => (
+                          <SelectItem key={city.id} value={city.id.toString()}>
+                            {city.name_ar || city.name_en || city.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* الحي */}
+                  <div className="space-y-2">
+                    <Label>الحي</Label>
+                    <Select
+                      value={filterDistrictId || undefined}
+                      onValueChange={(value) => {
+                        setFilterDistrictId(value || null);
+                        setTimeout(() => applyFilters(), 0);
+                      }}
+                      disabled={loadingDistricts || !filterCityId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الحي" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districts.map((district) => (
+                          <SelectItem key={district.id} value={district.id.toString()}>
+                            {district.name_ar || district.name_en || district.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* نوع العقار */}
+                  <div className="space-y-2">
+                    <Label>نوع العقار</Label>
+                    <Select
+                      value={filterType || undefined}
+                      onValueChange={(value) => {
+                        setFilterType(value || null);
+                        setTimeout(() => applyFilters(), 0);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر النوع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="شقة">شقة</SelectItem>
+                        <SelectItem value="فيلا">فيلا</SelectItem>
+                        <SelectItem value="منزل">منزل</SelectItem>
+                        <SelectItem value="أرض">أرض</SelectItem>
+                        <SelectItem value="محل">محل</SelectItem>
+                        <SelectItem value="مكتب">مكتب</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* إيجار أو بيع */}
+                  <div className="space-y-2">
+                    <Label>نوع المعاملة</Label>
+                    <Select
+                      value={filterPurpose || undefined}
+                      onValueChange={(value) => {
+                        setFilterPurpose(value || null);
+                        setTimeout(() => applyFilters(), 0);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر النوع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sale">للبيع</SelectItem>
+                        <SelectItem value="rent">للإيجار</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* عدد الغرف */}
+                  <div className="space-y-2">
+                    <Label>عدد الغرف</Label>
+                    <Select
+                      value={filterBeds || undefined}
+                      onValueChange={(value) => {
+                        setFilterBeds(value || null);
+                        setTimeout(() => applyFilters(), 0);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر عدد الغرف" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1</SelectItem>
+                        <SelectItem value="2">2</SelectItem>
+                        <SelectItem value="3">3</SelectItem>
+                        <SelectItem value="4">4</SelectItem>
+                        <SelectItem value="5">5+</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* السعر */}
+                  <div className="space-y-2">
+                    <Label>السعر</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        placeholder="من"
+                        value={filterPriceFrom}
+                        onChange={(e) => {
+                          setFilterPriceFrom(e.target.value);
+                        }}
+                        onBlur={() => applyFilters()}
+                        className="flex-1"
+                      />
+                      <Input
+                        type="number"
+                        placeholder="إلى"
+                        value={filterPriceTo}
+                        onChange={(e) => {
+                          setFilterPriceTo(e.target.value);
+                        }}
+                        onBlur={() => applyFilters()}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+
+                  {/* زر إعادة التعيين */}
+                  <div className="space-y-2 flex items-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleClearFilters} 
+                      className={`w-full text-sm ${
+                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo
+                          ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          : ""
+                      }`}
+                    >
+                      <FilterX className="h-3.5 w-3.5 mr-1.5" />
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* عرض الفلاتر النشطة */}
             <ActiveFiltersDisplay
