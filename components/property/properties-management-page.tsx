@@ -2194,21 +2194,8 @@ function PropertyCard({
           )}
         </div>
         <div
-          className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-5" : "grid-cols-4"}`}
+          className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-3" : "grid-cols-2"}`}
         >
-          <div className="flex flex-col items-end">
-            <span className="text-muted-foreground">مشاهدات</span>
-            <span className="font-medium flex items-center gap-1">
-              <Eye className="h-3 w-3" /> {property.visits || 0}
-            </span>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="text-muted-foreground">غرفة</span>
-            <span className="font-medium flex items-center gap-1">
-              <Bed className="h-3 w-3" />
-              {property.beds || 0}
-            </span>
-          </div>
           <div className="flex flex-col items-end">
             <span className="text-muted-foreground">حمام</span>
             <span className="font-medium flex items-center gap-1">
@@ -2376,14 +2363,6 @@ function PropertyListItem({
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
-            <div className="flex flex-row-reverse items-center gap-1">
-              <MessageCircle className="h-4 w-4 text-muted-foreground" />
-              <span>{property.visits || 0} زيارة</span>
-            </div>
-            <div className="flex flex-row-reverse items-center gap-1">
-              <Bed className="h-4 w-4 text-muted-foreground" />
-              <span>{property.beds || 0} غرفة</span>
-            </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Bath className="h-4 w-4 text-muted-foreground" />
               <span>{property.bath || 0} حمام</span>
