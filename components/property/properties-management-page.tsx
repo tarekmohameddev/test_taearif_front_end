@@ -441,6 +441,12 @@ const getPaymentMethodText = (paymentMethod: any) => {
   return paymentMethods[paymentMethod] || null;
 };
 
+const truncateTitle = (title: string, maxLength: number = 40): string => {
+  if (!title) return "";
+  if (title.length <= maxLength) return title;
+  return title.substring(0, maxLength) + "...";
+};
+
 export function PropertiesManagementPage() {
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -1992,7 +1998,7 @@ function PropertyCard({
             <CardTitle
               className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents[0].title).length > 20 ? "text-sm " : ""}`}
             >
-              {property.title || property.contents[0].title}
+              {truncateTitle(property.title || property.contents[0].title)}
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3" />
@@ -2252,7 +2258,7 @@ function PropertyListItem({
           <div className="flex flex-row-reverse items-start justify-between">
             <div>
               <h3 className="font-semibold">
-                {property.title || property.contents[0].title}
+                {truncateTitle(property.title || property.contents[0].title)}
               </h3>
               <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
                 <MapPin className="h-3 w-3" />{" "}

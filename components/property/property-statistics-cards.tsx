@@ -62,11 +62,11 @@ export const PropertyStatisticsCards = () => {
 
   const statsCards = [
     {
-      title: "للبيع",
-      value: statistics?.for_sale || 0,
-      icon: Tag,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      title: "إجمالي الوحدات",
+      value: statistics?.total || 0,
+      icon: Building,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
     },
     {
       title: "للإيجار",
@@ -76,11 +76,11 @@ export const PropertyStatisticsCards = () => {
       bgColor: "bg-green-50",
     },
     {
-      title: "إجمالي الوحدات",
-      value: statistics?.total || 0,
-      icon: Building,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
+      title: "للبيع",
+      value: statistics?.for_sale || 0,
+      icon: Tag,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
     },
   ];
 
