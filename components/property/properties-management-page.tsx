@@ -2310,15 +2310,6 @@ function PropertyListItem({
         </div>
         <div className="flex flex-1 flex-col p-4">
           <div className="flex flex-row-reverse items-start justify-between">
-            <div>
-              <h3 className="font-semibold">
-                {property.title || property.contents[0].title}
-              </h3>
-              <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
-                <MapPin className="h-3 w-3" />{" "}
-                {formattedAddress}
-              </p>
-            </div>
             <div className="text-lg font-semibold">
               {property.transaction_type === "sale" ||
               property.purpose === "sale" ? (
@@ -2343,6 +2334,15 @@ function PropertyListItem({
                   )}
                 </div>
               )}
+            </div>
+            <div className="text-right">
+              <h3 className="font-semibold">
+                {property.title || property.contents[0].title}
+              </h3>
+              <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
+                <MapPin className="h-3 w-3" />{" "}
+                {formattedAddress}
+              </p>
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
