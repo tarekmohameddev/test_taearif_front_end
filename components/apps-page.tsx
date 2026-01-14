@@ -63,6 +63,7 @@ interface App {
   installation_id?: number | null;
   isPurchased?: boolean;
   pricingModel?: "subscription" | "one_time" | null;
+  subscriptionExpiresAt?: string | null;
 }
 
 export function AppsPage() {
@@ -145,6 +146,7 @@ export function AppsPage() {
           installation_id: app.installation_id || null,
           isPurchased: app.isPurchased || false,
           pricingModel: app.pricingModel || null,
+          subscriptionExpiresAt: app.subscriptionExpiresAt || null,
         }));
         const appsWithPixels = addPixelsApp(fetchedApps);
         setApps(appsWithPixels);
@@ -221,6 +223,7 @@ export function AppsPage() {
             installation_id: app.installation_id || null,
             isPurchased: app.isPurchased || false,
             pricingModel: app.pricingModel || null,
+            subscriptionExpiresAt: app.subscriptionExpiresAt || null,
           }));
           const appsWithPixels = addPixelsApp(fetchedApps);
           setApps(appsWithPixels);
@@ -719,6 +722,25 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
     return `${numericPrice.toLocaleString('ar-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ريال`;
   };
 
+  const formatExpiryDate = (dateString: string | null | undefined) => {
+    if (!dateString) return null;
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  const showSubscriptionExpiry = 
+    isSubscription && 
+    app.isPurchased && 
+    app.subscriptionExpiresAt;
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="p-4 pb-0">
@@ -771,6 +793,13 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
             <Badge variant="outline" className="text-orange-600 border-orange-600">
               في انتظار الدفع
             </Badge>
+          </div>
+        )}
+        {showSubscriptionExpiry && (
+          <div className="mt-2">
+            <p className="text-xs text-muted-foreground">
+              ينتهي الاشتراك في: <span className="font-medium">{formatExpiryDate(app.subscriptionExpiresAt)}</span>
+            </p>
           </div>
         )}
       </CardContent>
@@ -866,6 +895,25 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
     return `${numericPrice.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ريال`;
   };
 
+  const formatExpiryDate = (dateString: string | null | undefined) => {
+    if (!dateString) return null;
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  const showSubscriptionExpiry = 
+    isSubscription && 
+    app.isPurchased && 
+    app.subscriptionExpiresAt;
+
   return (
     <Card>
       <div className="flex flex-col sm:flex-row">
@@ -920,6 +968,13 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
                   {app.category}
                 </Badge>
               </div>
+              {showSubscriptionExpiry && (
+                <div className="mt-2">
+                  <p className="text-xs text-muted-foreground">
+                    ينتهي الاشتراك في: <span className="font-medium">{formatExpiryDate(app.subscriptionExpiresAt)}</span>
+                  </p>
+                </div>
+              )}
             </div>
             <div className="flex gap-2 mt-4 sm:mt-0">
               {isInstalled ? (
