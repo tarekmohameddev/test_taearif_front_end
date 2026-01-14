@@ -34,6 +34,10 @@ import {
   ChevronDown,
   Download,
   Upload,
+  CheckCircle,
+  AlertCircle,
+  AlertTriangle,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +59,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,6 +95,20 @@ import { ErrorDisplay } from "@/components/ui/error-display";
 import { AdvancedFilterDialog } from "@/components/property/advanced-filter-dialog";
 import { ActiveFiltersDisplay } from "@/components/property/active-filters-display";
 import { PropertyStatisticsCards } from "@/components/property/property-statistics-cards";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
+import type { DateRange } from "react-day-picker";
 
 // Share Dialog Component
 function ShareDialog({
@@ -426,6 +452,30 @@ export function PropertiesManagementPage() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportDateRange, setExportDateRange] = useState<DateRange | undefined>(undefined);
+  const [importResult, setImportResult] = useState<{
+    status: "success" | "partial_success" | "error" | null;
+    message: string;
+    code?: string;
+    imported_count?: number;
+    updated_count?: number;
+    failed_count?: number;
+    errors?: Array<{
+      row: number;
+      field: string;
+      error: string;
+      expected: string;
+      actual: string | null;
+      severity: string;
+      suggestion: string;
+    }>;
+    details?: {
+      suggestion?: string;
+      [key: string]: any;
+    };
+  } | null>(null);
   const { clickedONSubButton, userData } = useAuthStore();
 
   const router = useRouter();
@@ -480,7 +530,15 @@ export function PropertiesManagementPage() {
         return;
       }
 
+      // التحقق من حجم الملف (10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        toast.error("حجم الملف كبير جداً. الحد الأقصى المسموح به هو 10MB");
+        return;
+      }
+
       setImportFile(file);
+      setImportResult(null); // إعادة تعيين النتيجة عند اختيار ملف جديد
     }
   };
 
@@ -491,31 +549,127 @@ export function PropertiesManagementPage() {
     }
 
     setIsImporting(true);
+    setImportResult(null);
 
     try {
       const formData = new FormData();
       formData.append("file", importFile);
 
-      await axiosInstance.post("/properties/bulk-import", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const response = await axiosInstance.post(
+        "/properties/bulk-import",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+          },
         },
-      });
+      );
 
-      toast.success("تم استيراد الوحدات بنجاح");
-      setImportDialogOpen(false);
-      setImportFile(null);
+      const data = response.data;
 
-      // إعادة تحميل قائمة الوحدات
-      fetchProperties(currentPage, appliedFilters);
+      // معالجة الاستجابة الناجحة (200 OK)
+      if (response.status === 200 && data.status === "success") {
+        setImportResult({
+          status: "success",
+          message: data.message || "تم استيراد الوحدات بنجاح",
+          code: data.code,
+          imported_count: data.imported_count || 0,
+          updated_count: data.updated_count || 0,
+          failed_count: data.failed_count || 0,
+          errors: [],
+        });
+
+        // إعادة تحميل قائمة الوحدات
+        fetchProperties(currentPage, appliedFilters);
+      }
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "حدث خطأ أثناء استيراد الوحدات";
-      toast.error(errorMessage);
-      if (error instanceof Error) {
-        logError(error, "handleImport");
+      const response = error.response;
+      const data = response?.data;
+
+      // معالجة النجاح الجزئي (422 مع partial_success)
+      if (
+        response?.status === 422 &&
+        data?.status === "partial_success"
+      ) {
+        setImportResult({
+          status: "partial_success",
+          message: data.message || "تم الاستيراد جزئياً",
+          code: data.code,
+          imported_count: data.imported_count || 0,
+          updated_count: data.updated_count || 0,
+          failed_count: data.failed_count || 0,
+          errors: data.errors || [],
+        });
+
+        // إعادة تحميل قائمة الوحدات
+        fetchProperties(currentPage, appliedFilters);
+      }
+      // معالجة الأخطاء
+      else {
+        const errorCode = data?.code || "UNKNOWN_ERROR";
+        let errorMessage = data?.message || "حدث خطأ أثناء استيراد الوحدات";
+        let suggestion = data?.details?.suggestion;
+
+        // ترجمة رسائل الخطأ حسب الكود
+        switch (errorCode) {
+          case "IMPORT_VALIDATION_ERROR":
+            if (data?.errors?.file) {
+              errorMessage = Array.isArray(data.errors.file)
+                ? data.errors.file[0]
+                : data.errors.file;
+            }
+            break;
+          case "IMPORT_FILE_TOO_LARGE":
+            errorMessage =
+              "حجم الملف يتجاوز الحد الأقصى المسموح به (10MB)";
+            suggestion =
+              "يرجى تقسيم الملف إلى ملفات أصغر (حد أقصى 10MB لكل ملف) أو تقليل عدد الصفوف.";
+            break;
+          case "IMPORT_FILE_INVALID":
+            errorMessage = "الملف غير صحيح أو تالف";
+            suggestion =
+              "يرجى التأكد من أن الملف هو ملف Excel (.xlsx) أو CSV (.csv) صحيح. جرب فتحه في Excel أولاً للتحقق من أنه غير تالف.";
+            break;
+          case "IMPORT_PERMISSION_DENIED":
+            if (response?.status === 401) {
+              errorMessage = "يجب تسجيل الدخول لاستيراد الوحدات";
+            } else if (response?.status === 403) {
+              if (data?.details?.limit) {
+                errorMessage =
+                  "سيؤدي الاستيراد الجماعي إلى تجاوز حد قائمة الوحدات الخاص بك";
+                suggestion = `الحد: ${data.details.limit}، الحالي: ${data.details.current_count}، المتوقع إضافته: ${data.details.incoming_count}، المتاح: ${data.details.available_slots}. يرجى إزالة بعض الوحدات الموجودة أو ترقية الباقة لزيادة الحد.`;
+              } else {
+                errorMessage = "لم يتم العثور على باقة نشطة للمستخدم";
+                suggestion =
+                  "يرجى تفعيل باقة عضوية لاستيراد الوحدات.";
+              }
+            }
+            break;
+          case "IMPORT_PROCESSING_ERROR":
+            errorMessage = "حدث خطأ أثناء معالجة الاستيراد";
+            suggestion =
+              "يرجى التحقق من تنسيق الملف والبيانات، ثم المحاولة مرة أخرى. إذا استمرت المشكلة، يرجى الاتصال بالدعم.";
+            break;
+        }
+
+        setImportResult({
+          status: "error",
+          message: errorMessage,
+          code: errorCode,
+          imported_count: 0,
+          updated_count: 0,
+          failed_count: 0,
+          errors: data?.errors || [],
+          details: {
+            suggestion: suggestion || data?.details?.suggestion,
+            ...data?.details,
+          },
+        });
+
+        if (error instanceof Error) {
+          logError(error, "handleImport");
+        }
       }
     } finally {
       setIsImporting(false);
@@ -584,6 +738,109 @@ export function PropertiesManagementPage() {
       setIsDownloadingTemplate(false);
     }
   };
+
+  const handleExport = async () => {
+    // التحقق من وجود نطاق تاريخ محدد
+    if (!exportDateRange?.from || !exportDateRange?.to) {
+      toast.error("يرجى تحديد نطاق التاريخ للتصدير");
+      return;
+    }
+
+    setIsExporting(true);
+    setExportDialogOpen(false);
+    
+    try {
+      // بناء معاملات الفلترة
+      const params = new URLSearchParams();
+      
+      // إضافة نطاق التاريخ المحدد
+      params.set("date_from", format(exportDateRange.from, "yyyy-MM-dd"));
+      params.set("date_to", format(exportDateRange.to, "yyyy-MM-dd"));
+      
+      // إضافة الفلاتر المطبقة
+      Object.entries(appliedFilters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          // تخطي date_from و date_to لأننا نستخدم exportDateRange
+          if (key === "date_from" || key === "date_to") {
+            return;
+          }
+          
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              if (key === "employee_id" || key === "category_id" || key === "purpose") {
+                value.forEach((item) => {
+                  params.append(`${key}[]`, item.toString());
+                });
+              } else {
+                params.set(key, value.join(","));
+              }
+            }
+          } else {
+            params.set(key, value.toString());
+          }
+        }
+      });
+
+      const response = await axiosInstance.get(
+        `/properties/export?${params.toString()}`,
+        {
+          responseType: "blob",
+          headers: {
+            Accept:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv",
+          },
+        },
+      );
+
+      // التحقق من أن الاستجابة هي blob
+      if (response.data instanceof Blob) {
+        // الحصول على اسم الملف من headers أو استخدام اسم افتراضي
+        const contentDisposition = response.headers["content-disposition"];
+        let filename = `properties-export-${new Date().toISOString().split("T")[0]}.xlsx`;
+
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(
+            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+          );
+          if (filenameMatch && filenameMatch[1]) {
+            filename = filenameMatch[1].replace(/['"]/g, "");
+            // معالجة UTF-8 encoding إذا كان موجوداً
+            if (filename.startsWith("UTF-8''")) {
+              filename = decodeURIComponent(filename.replace("UTF-8''", ""));
+            }
+          }
+        }
+
+        // إنشاء رابط للتحميل
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+
+        // تنظيف
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        toast.success("تم تصدير الوحدات بنجاح");
+      } else {
+        throw new Error("استجابة غير صحيحة من الخادم");
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "حدث خطأ أثناء تصدير الوحدات";
+      toast.error(errorMessage);
+      if (error instanceof Error) {
+        logError(error, "handleExport");
+      }
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const fetchProperties = async (page = 1, filters = {}) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
     const { userData } = useAuthStore.getState();
@@ -907,6 +1164,15 @@ export function PropertiesManagementPage() {
                   <Upload className="h-4 w-4" />
                   استيراد وحدات
                 </Button>
+                <Button
+                  variant="outline"
+                  className="gap-1 w-full md:w-auto"
+                  onClick={() => setExportDialogOpen(true)}
+                  disabled={isExporting || loading}
+                >
+                  <Download className="h-4 w-4" />
+                  {isExporting ? "جاري التصدير..." : "تصدير وحدات"}
+                </Button>
                 <div className="flex gap-2 w-full md:w-auto">
                   <Button
                     variant="outline"
@@ -1109,66 +1375,362 @@ export function PropertiesManagementPage() {
               </DialogContent>
             </Dialog>
 
-            {/* نافذة منبثقة لاستيراد الوحدات */}
-            <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>استيراد وحدات</DialogTitle>
-                  <DialogDescription>
-                    قم بتحميل القالب واملأه بالبيانات المطلوبة ثم قم برفعه
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="flex flex-col gap-4">
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2"
-                      onClick={handleDownloadTemplate}
-                      disabled={isDownloadingTemplate}
-                    >
-                      <Download className="h-4 w-4" />
-                      {isDownloadingTemplate
-                        ? "جاري التحميل..."
-                        : "تحميل القالب"}
-                    </Button>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="import-file">رفع ملف Excel</Label>
-                      <Input
-                        id="import-file"
-                        type="file"
-                        accept=".xlsx,.xls,.csv"
-                        onChange={handleFileChange}
-                        disabled={isImporting}
-                      />
-                      {importFile && (
-                        <p className="text-sm text-muted-foreground">
-                          الملف المختار: {importFile.name}
-                        </p>
+            {/* نافذة منبثقة لتصدير الوحدات */}
+            <CustomDialog
+              open={exportDialogOpen}
+              onOpenChange={(open) => {
+                setExportDialogOpen(open);
+                if (!open) {
+                  setExportDateRange(undefined);
+                }
+              }}
+              maxWidth="max-w-2xl"
+            >
+              <CustomDialogContent>
+                <CustomDialogClose
+                  onClose={() => {
+                    setExportDialogOpen(false);
+                    setExportDateRange(undefined);
+                  }}
+                />
+                <CustomDialogHeader>
+                  <CustomDialogTitle>تصدير الوحدات</CustomDialogTitle>
+                  <CustomDialogDescription>
+                    حدد نطاق التاريخ للوحدات التي تريد تصديرها
+                  </CustomDialogDescription>
+                </CustomDialogHeader>
+                <div className="px-4 sm:px-6 py-4">
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="mb-2 block">نطاق التاريخ</Label>
+                      <div className="flex justify-center">
+                        <Calendar
+                          mode="range"
+                          selected={exportDateRange}
+                          onSelect={setExportDateRange}
+                          numberOfMonths={2}
+                          locale={ar}
+                          toDate={new Date()}
+                          className="rounded-md border"
+                        />
+                      </div>
+                      {exportDateRange?.from && exportDateRange?.to && (
+                        <div className="mt-4 p-3 bg-muted rounded-md">
+                          <p className="text-sm">
+                            <strong>الفترة المحددة:</strong>{" "}
+                            {format(exportDateRange.from, "yyyy-MM-dd", { locale: ar })} -{" "}
+                            {format(exportDateRange.to, "yyyy-MM-dd", { locale: ar })}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
-                <DialogFooter className="gap-3">
+                <div className="border-t border-gray-200 px-4 sm:px-6 py-4 flex justify-end gap-3">
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setImportDialogOpen(false);
-                      setImportFile(null);
+                      setExportDialogOpen(false);
+                      setExportDateRange(undefined);
                     }}
-                    disabled={isImporting}
+                    disabled={isExporting}
                   >
                     إلغاء
                   </Button>
                   <Button
-                    onClick={handleImport}
-                    disabled={!importFile || isImporting}
+                    onClick={handleExport}
+                    disabled={!exportDateRange?.from || !exportDateRange?.to || isExporting}
                   >
-                    {isImporting ? "جاري الاستيراد..." : "استيراد"}
+                    {isExporting ? "جاري التصدير..." : "تصدير"}
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </div>
+              </CustomDialogContent>
+            </CustomDialog>
+
+            {/* نافذة منبثقة لاستيراد الوحدات */}
+            <CustomDialog
+              open={importDialogOpen}
+              onOpenChange={(open) => {
+                setImportDialogOpen(open);
+                if (!open) {
+                  setImportFile(null);
+                  setImportResult(null);
+                }
+              }}
+              maxWidth="max-w-xl"
+            >
+              <CustomDialogContent className="overflow-y-auto">
+                <CustomDialogClose
+                  onClose={() => {
+                    setImportDialogOpen(false);
+                    setImportFile(null);
+                    setImportResult(null);
+                  }}
+                />
+                <CustomDialogHeader>
+                  <CustomDialogTitle>استيراد وحدات</CustomDialogTitle>
+                  <CustomDialogDescription>
+                    قم بتحميل القالب واملأه بالبيانات المطلوبة ثم قم برفعه
+                  </CustomDialogDescription>
+                </CustomDialogHeader>
+
+                {!importResult ? (
+                  <>
+                    <div className="grid gap-4 py-4 px-4 sm:px-6">
+                      <div className="flex flex-col gap-4">
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2"
+                          onClick={handleDownloadTemplate}
+                          disabled={isDownloadingTemplate}
+                        >
+                          <Download className="h-4 w-4" />
+                          {isDownloadingTemplate
+                            ? "جاري التحميل..."
+                            : "تحميل القالب"}
+                        </Button>
+
+                        <div className="grid gap-2">
+                          <Label htmlFor="import-file">رفع ملف Excel</Label>
+                          <Input
+                            id="import-file"
+                            type="file"
+                            accept=".xlsx,.xls,.csv"
+                            onChange={handleFileChange}
+                            disabled={isImporting}
+                          />
+                          {importFile && (
+                            <p className="text-sm text-muted-foreground">
+                              الملف المختار: {importFile.name} (
+                              {(importFile.size / 1024 / 1024).toFixed(2)} MB)
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="border-t border-gray-200 px-4 sm:px-6 py-4 flex justify-end gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setImportDialogOpen(false);
+                          setImportFile(null);
+                          setImportResult(null);
+                        }}
+                        disabled={isImporting}
+                      >
+                        إلغاء
+                      </Button>
+                      <Button
+                        onClick={handleImport}
+                        disabled={!importFile || isImporting}
+                      >
+                        {isImporting ? "جاري الاستيراد..." : "استيراد"}
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="grid gap-4 py-4 px-4 sm:px-6">
+                    {/* عرض النتائج */}
+                    {importResult.status === "success" && (
+                      <Card className="border-green-200 bg-green-50">
+                        <CardHeader>
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <CardTitle className="text-green-800">
+                              نجاح الاستيراد
+                            </CardTitle>
+                          </div>
+                          <CardDescription className="text-green-700">
+                            {importResult.message}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-3">
+                            {(importResult.imported_count ?? 0) > 0 && (
+                              <Badge
+                                variant="outline"
+                                className="bg-green-100 text-green-800 border-green-300"
+                              >
+                                تم إنشاء: {importResult.imported_count}
+                              </Badge>
+                            )}
+                            {(importResult.updated_count ?? 0) > 0 && (
+                              <Badge
+                                variant="outline"
+                                className="bg-blue-100 text-blue-800 border-blue-300"
+                              >
+                                تم تحديث: {importResult.updated_count}
+                              </Badge>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {importResult.status === "partial_success" && (
+                      <Card className="border-yellow-200 bg-yellow-50">
+                        <CardHeader>
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                            <CardTitle className="text-yellow-800">
+                              نجاح جزئي
+                            </CardTitle>
+                          </div>
+                          <CardDescription className="text-yellow-700">
+                            {importResult.message}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="flex flex-wrap gap-3">
+                            {(importResult.imported_count ?? 0) > 0 && (
+                              <Badge
+                                variant="outline"
+                                className="bg-green-100 text-green-800 border-green-300"
+                              >
+                                تم إنشاء: {importResult.imported_count}
+                              </Badge>
+                            )}
+                            {(importResult.updated_count ?? 0) > 0 && (
+                              <Badge
+                                variant="outline"
+                                className="bg-blue-100 text-blue-800 border-blue-300"
+                              >
+                                تم تحديث: {importResult.updated_count}
+                              </Badge>
+                            )}
+                            {(importResult.failed_count ?? 0) > 0 && (
+                              <Badge
+                                variant="outline"
+                                className="bg-red-100 text-red-800 border-red-300"
+                              >
+                                فشل: {importResult.failed_count}
+                              </Badge>
+                            )}
+                          </div>
+
+                          {importResult.errors && importResult.errors.length > 0 && (
+                            <div className="mt-4">
+                              <h4 className="text-sm font-semibold mb-2 text-yellow-800">
+                                تفاصيل الأخطاء ({importResult.errors.length})
+                              </h4>
+                              <ScrollArea className="h-[300px] w-full rounded-md border border-yellow-200 bg-white p-4">
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead className="w-[80px]">الصف</TableHead>
+                                      <TableHead className="w-[120px]">الحقل</TableHead>
+                                      <TableHead>الخطأ</TableHead>
+                                      <TableHead className="w-[150px]">المتوقع</TableHead>
+                                      <TableHead className="w-[120px]">الفعلي</TableHead>
+                                      <TableHead>الاقتراح</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {importResult.errors.map((error, index) => (
+                                      <TableRow key={index}>
+                                        <TableCell className="font-medium">
+                                          {error.row}
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                          {error.field}
+                                        </TableCell>
+                                        <TableCell className="text-red-600">
+                                          {error.error}
+                                        </TableCell>
+                                        <TableCell className="text-sm text-muted-foreground">
+                                          {error.expected}
+                                        </TableCell>
+                                        <TableCell className="text-sm">
+                                          {error.actual || "-"}
+                                        </TableCell>
+                                        <TableCell className="text-sm text-blue-600">
+                                          {error.suggestion}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </ScrollArea>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {importResult.status === "error" && (
+                      <Card className="border-red-200 bg-red-50">
+                        <CardHeader>
+                          <div className="flex items-center gap-2">
+                            <AlertCircle className="h-5 w-5 text-red-600" />
+                            <CardTitle className="text-red-800">خطأ في الاستيراد</CardTitle>
+                          </div>
+                          <CardDescription className="text-red-700">
+                            {importResult.message}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          {importResult.details?.suggestion && (
+                            <div className="mt-4 p-3 bg-red-100 border border-red-200 rounded-lg">
+                              <p className="text-sm text-red-800">
+                                <strong>اقتراح:</strong> {importResult.details.suggestion}
+                              </p>
+                            </div>
+                          )}
+                          {importResult.errors && importResult.errors.length > 0 && (
+                            <div className="mt-4">
+                              <h4 className="text-sm font-semibold mb-2 text-red-800">
+                                تفاصيل الأخطاء
+                              </h4>
+                              <ScrollArea className="h-[200px] w-full rounded-md border border-red-200 bg-white p-4">
+                                <div className="space-y-2">
+                                  {importResult.errors.map((error, index) => (
+                                    <div
+                                      key={index}
+                                      className="p-2 bg-red-50 border border-red-200 rounded text-sm"
+                                    >
+                                      <p className="font-medium text-red-800">
+                                        الصف {error.row} - {error.field}: {error.error}
+                                      </p>
+                                      {error.suggestion && (
+                                        <p className="text-red-600 mt-1">
+                                          {error.suggestion}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <div className="border-t border-gray-200 px-4 sm:px-6 py-4 flex justify-end gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setImportDialogOpen(false);
+                          setImportFile(null);
+                          setImportResult(null);
+                        }}
+                      >
+                        إغلاق
+                      </Button>
+                      {importResult.status !== "success" && (
+                        <Button
+                          onClick={() => {
+                            setImportResult(null);
+                          }}
+                        >
+                          إعادة المحاولة
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </CustomDialogContent>
+            </CustomDialog>
 
             {/* إحصائيات الوحدات */}
             <PropertyStatisticsCards />
