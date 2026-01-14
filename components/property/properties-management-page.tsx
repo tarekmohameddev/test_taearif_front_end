@@ -2037,8 +2037,16 @@ function PropertyCard({
   
   const formattedAddress = formatAddress(property);
   
+  const handleCardClick = () => {
+    router.push(`/dashboard/properties/${property.id}`);
+  };
+  
   return (
-    <Card className="overflow-hidden" dir="rtl">
+    <Card 
+      className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" 
+      dir="rtl"
+      onClick={handleCardClick}
+    >
       <div className="relative">
         <div className="aspect-[16/9] w-full overflow-hidden">
           <img
@@ -2081,7 +2089,12 @@ function PropertyCard({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="-mr-2 bg-muted hover:bg-muted/80">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="-mr-2 bg-muted hover:bg-muted/80"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <MoreHorizontal className="h-1 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -2217,7 +2230,7 @@ function PropertyCard({
           ) : null}
         </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-between p-4 pt-0">
+      <CardFooter className="flex items-center justify-between p-4 pt-0" onClick={(e) => e.stopPropagation()}>
         <Button
           variant="outline"
           size="sm"
@@ -2272,9 +2285,16 @@ function PropertyListItem({
   const router = useRouter();
   
   const formattedAddress = formatAddress(property);
+  
+  const handleCardClick = () => {
+    router.push(`/dashboard/properties/${property.id}`);
+  };
 
   return (
-    <Card>
+    <Card 
+      className="cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleCardClick}
+    >
       <div className="flex flex-col sm:flex-row-reverse">
         <div className="relative sm:w-1/3 md:w-1/4">
           <div className="aspect-[16/9] sm:aspect-auto sm:h-full w-full overflow-hidden">
@@ -2366,7 +2386,7 @@ function PropertyListItem({
                 </span>
               ))}
           </div>
-          <div className="mt-auto pt-4 flex gap-2 justify-end">
+          <div className="mt-auto pt-4 flex gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
             <Button
               variant="outline"
               size="sm"
@@ -2379,7 +2399,12 @@ function PropertyListItem({
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="bg-muted hover:bg-muted/80">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="bg-muted hover:bg-muted/80"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <MoreHorizontal className="h-1 w-4" />
                 </Button>
               </DropdownMenuTrigger>
