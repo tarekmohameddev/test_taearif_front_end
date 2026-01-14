@@ -2233,7 +2233,7 @@ function PropertyCard({
           {property.transaction_type === "sale" ||
           property.purpose === "sale" ? (
             <>
-              <span>{property.price.toLocaleString()}</span>
+              <span>{Math.floor(parseFloat(property.price) || 0).toLocaleString()}</span>
               <img
                 src="/Saudi_Riyal_Symbol.svg"
                 alt="ريال سعودي"
@@ -2242,7 +2242,7 @@ function PropertyCard({
             </>
           ) : (
             <>
-              <span>{property.price.toLocaleString()}</span>
+              <span>{Math.floor(parseFloat(property.price) || 0).toLocaleString()}</span>
               <img
                 src="/Saudi_Riyal_Symbol.svg"
                 alt="ريال سعودي"
@@ -2323,7 +2323,7 @@ function PropertyListItem({
               {property.transaction_type === "sale" ||
               property.purpose === "sale" ? (
                 <div className="flex gap-1">
-                  <span>{property.price.toLocaleString()}</span>
+                  <span>{Math.floor(parseFloat(property.price) || 0).toLocaleString()}</span>
                   <img
                     src="/Saudi_Riyal_Symbol.svg"
                     alt="ريال سعودي"
@@ -2332,7 +2332,7 @@ function PropertyListItem({
                 </div>
               ) : (
                 <div className="flex gap-1">
-                  <span>{property.price.toLocaleString()}</span>
+                  <span>{Math.floor(parseFloat(property.price) || 0).toLocaleString()}</span>
                   <img
                     src="/Saudi_Riyal_Symbol.svg"
                     alt="ريال سعودي"
@@ -2346,6 +2346,10 @@ function PropertyListItem({
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
+            <div className="flex flex-row-reverse items-center gap-1">
+              <Bath className="h-4 w-4 text-muted-foreground" />
+              <span>{property.bath || 0} حمام</span>
+            </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Ruler className="h-4 w-4 text-muted-foreground" />
               <span>{property.size || property.area || 0} م²</span>
