@@ -61,6 +61,8 @@ interface App {
   billing_type?: "free" | "paid" | "subscription";
   status?: "installed" | "pending_payment" | "uninstalled";
   installation_id?: number | null;
+  isPurchased?: boolean;
+  pricingModel?: "subscription" | "one_time" | null;
 }
 
 export function AppsPage() {
@@ -141,6 +143,8 @@ export function AppsPage() {
           billing_type: (app.billing_type || "free") as "free" | "paid" | "subscription",
           status: (app.status || (app.installed ? "installed" : "uninstalled")) as "installed" | "pending_payment" | "uninstalled",
           installation_id: app.installation_id || null,
+          isPurchased: app.isPurchased || false,
+          pricingModel: app.pricingModel || null,
         }));
         const appsWithPixels = addPixelsApp(fetchedApps);
         setApps(appsWithPixels);
@@ -196,13 +200,16 @@ export function AppsPage() {
     setShowPaymentPopup(false);
     setPaymentUrl("");
 
-    if (currentInstallationId) {
-      const loadingToast = toast.loading("جاري التحقق من الدفع...");
+    if (currentAppId) {
+      const loadingToast = toast.loading("جاري تثبيت التطبيق...");
       try {
-        const verified = await verifyPaymentStatus(currentInstallationId);
+        // Step 3: Install app after successful payment
+        const installResponse = await axiosInstance.post("/apps/install", {
+          app_id: currentAppId,
+        });
 
-        if (verified) {
-          // Refresh apps list
+        if (installResponse.data.status === "success") {
+          // Refresh apps list to get updated data including isPurchased
           hasFetchedRef.current = false;
           const res = await axiosInstance.get("/apps");
           const fetchedApps: App[] = res.data.data.apps.map((app: any) => ({
@@ -212,12 +219,14 @@ export function AppsPage() {
             billing_type: (app.billing_type || "free") as "free" | "paid" | "subscription",
             status: (app.status || (app.installed ? "installed" : "uninstalled")) as "installed" | "pending_payment" | "uninstalled",
             installation_id: app.installation_id || null,
+            isPurchased: app.isPurchased || false,
+            pricingModel: app.pricingModel || null,
           }));
           const appsWithPixels = addPixelsApp(fetchedApps);
           setApps(appsWithPixels);
 
           const installed = appsWithPixels.filter(
-            (app) => app.installed === true || app.status === "installed",
+            (app) => app.installed === true || app.status === "installed"
           );
           setInstalledApps(installed);
 
@@ -226,17 +235,24 @@ export function AppsPage() {
           toast.success("تم تأكيد الدفع وتثبيت التطبيق بنجاح");
         } else {
           toast.dismiss(loadingToast);
-          toast.error("فشل في التحقق من الدفع. يرجى المحاولة مرة أخرى");
+          toast.error(
+            installResponse.data.message || "فشل في تثبيت التطبيق بعد الدفع"
+          );
         }
-      } catch (error) {
+      } catch (error: any) {
         toast.dismiss(loadingToast);
-        toast.error("حدث خطأ أثناء التحقق من الدفع");
-        console.error("Error verifying payment:", error);
+        toast.error(
+          error.response?.data?.message || "حدث خطأ أثناء تثبيت التطبيق"
+        );
+        console.error("Error installing app after payment:", error);
+      } finally {
+        setCurrentAppId(null);
+        setCurrentInstallationId(null);
       }
+    } else {
+      setCurrentAppId(null);
+      setCurrentInstallationId(null);
     }
-
-    setCurrentAppId(null);
-    setCurrentInstallationId(null);
   };
 
   const handleInstall = async (appId: string | number) => {
@@ -258,77 +274,95 @@ export function AppsPage() {
       return;
     }
 
-    // Check if payment is needed
-    const needsPayment =
+    // Check if app needs purchase
+    const needsPurchase = 
       parseFloat(app.price) > 0 &&
       app.billing_type !== "free" &&
-      app.status !== "installed" &&
-      !app.installed;
+      !app.isPurchased;
 
-    // Always call /apps/install - it will return payment_url if payment is needed
-    const loadingToast = toast.loading(
-      needsPayment ? "جاري إعداد عملية الدفع..." : "جاري تثبيت التطبيق..."
-    );
     try {
-      const response = await axiosInstance.post("/apps/install", {
-        app_id: Number(appId),
-      });
+      if (needsPurchase) {
+        // App needs to be purchased first - get purchase URL
+        const loadingToast = toast.loading("جاري إعداد عملية الدفع...");
+        try {
+          const purchaseResponse = await axiosInstance.get(
+            `/apps/${appId}/purchase-url`
+          );
 
-      // Check if payment is required (response contains payment_url)
-      if (response.data.status === "success" && response.data.data?.payment_url) {
-        // Payment required - open payment popup
-        setPaymentUrl(response.data.data.payment_url);
-        setCurrentAppId(Number(appId));
-        setCurrentInstallationId(response.data.data.installation?.id || null);
-        setShowPaymentPopup(true);
-        toast.dismiss(loadingToast);
-
-        // Update app status to pending_payment
-        const updatedApps: App[] = apps.map((app) => {
-          if (app.id === appId) {
-            return {
-              ...app,
-              status: "pending_payment" as const,
-              installation_id: response.data.data.installation?.id || null,
-            };
+          if (
+            purchaseResponse.data.status === "success" &&
+            purchaseResponse.data.data?.payment_url
+          ) {
+            // Open payment popup
+            setPaymentUrl(purchaseResponse.data.data.payment_url);
+            setCurrentAppId(Number(appId));
+            setShowPaymentPopup(true);
+            toast.dismiss(loadingToast);
+          } else {
+            toast.dismiss(loadingToast);
+            toast.error(
+              purchaseResponse.data.message || "فشل في الحصول على رابط الدفع"
+            );
           }
-          return app;
-        });
-        setApps(updatedApps);
-      } else if (response.data.status === "success") {
-        // Free app or already paid - installation completed
-        const updatedApps: App[] = apps.map((app) => {
-          if (app.id === appId) {
-            return {
-              ...app,
-              installed: true,
-              status: "installed" as const,
-              installation_id: response.data.data?.installation?.id || null,
-            };
-          }
-          return app;
-        });
-
-        setApps(updatedApps);
-
-        const updatedInstalledApps = updatedApps.filter(
-          (app) => app.installed === true || app.status === "installed",
-        );
-        setInstalledApps(updatedInstalledApps);
-
-        fetchSideMenus("apps");
-        toast.dismiss(loadingToast);
-        toast.success("تم تثبيت التطبيق بنجاح");
+        } catch (error: any) {
+          toast.dismiss(loadingToast);
+          toast.error(
+            error.response?.data?.message || "فشل في الحصول على رابط الدفع"
+          );
+          console.error("فشل في الحصول على رابط الدفع:", error);
+        }
       } else {
-        toast.dismiss(loadingToast);
-        toast.error(response.data.message || "فشل في تثبيت التطبيق");
+        // App is free or already purchased - install directly
+        const loadingToast = toast.loading("جاري تثبيت التطبيق...");
+        try {
+          const installResponse = await axiosInstance.post("/apps/install", {
+            app_id: Number(appId),
+          });
+
+          if (installResponse.data.status === "success") {
+            // Installation successful
+            const updatedApps: App[] = apps.map((app) => {
+              if (app.id === appId) {
+                return {
+                  ...app,
+                  installed: true,
+                  status: "installed" as const,
+                  installation_id:
+                    installResponse.data.data?.installation?.id || null,
+                };
+              }
+              return app;
+            });
+
+            setApps(updatedApps);
+
+            const updatedInstalledApps = updatedApps.filter(
+              (app) => app.installed === true || app.status === "installed"
+            );
+            setInstalledApps(updatedInstalledApps);
+
+            fetchSideMenus("apps");
+            toast.dismiss(loadingToast);
+            toast.success("تم تثبيت التطبيق بنجاح");
+          } else {
+            toast.dismiss(loadingToast);
+            toast.error(
+              installResponse.data.message || "فشل في تثبيت التطبيق"
+            );
+          }
+        } catch (error: any) {
+          toast.dismiss(loadingToast);
+          toast.error(
+            error.response?.data?.message || "فشل في تثبيت التطبيق"
+          );
+          console.error("فشل في تثبيت التطبيق:", error);
+        }
       }
     } catch (error: any) {
-      toast.dismiss(loadingToast);
       toast.error(
-        error.response?.data?.message || "فشل في تثبيت التطبيق"
+        error.response?.data?.message || "حدث خطأ أثناء معالجة الطلب"
       );
-      console.error("فشل في تثبيت التطبيق:", error);
+      console.error("حدث خطأ:", error);
     }
   };
 
@@ -667,15 +701,22 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
   const needsPayment =
     parseFloat(app.price) > 0 &&
     app.billing_type !== "free" &&
+    !app.isPurchased &&
     app.status !== "installed" &&
     !app.installed;
   const isPendingPayment = app.status === "pending_payment";
+  const isSubscription = app.pricingModel === "subscription";
 
   const formatPrice = (price: string) => {
-    if (price === "مجاني" || price === "0.00" || parseFloat(price) === 0) {
+    // Remove commas from price string before parsing
+    const cleanPrice = price.replace(/,/g, '');
+    const numericPrice = parseFloat(cleanPrice);
+    
+    if (price === "مجاني" || cleanPrice === "0.00" || numericPrice === 0 || isNaN(numericPrice)) {
       return "مجاني";
     }
-    return `${parseFloat(price).toFixed(2)} ريال`;
+    // Format with Arabic number formatting (add commas for thousands)
+    return `${numericPrice.toLocaleString('ar-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ريال`;
   };
 
   return (
@@ -683,13 +724,11 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
       <CardHeader className="p-4 pb-0">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="rounded-md border p-1 h-12 w-12 flex items-center justify-center">
-              <img
-                src={app.icon || "/placeholder.svg"}
-                alt={app.name}
-                className="h-10 w-10 object-contain"
-              />
-            </div>
+            <img
+              src={app.icon || "/placeholder.svg"}
+              alt={app.name}
+              className="h-12 w-12 object-contain"
+            />
             <div>
               <CardTitle className="text-base">{app.name}</CardTitle>
               <CardDescription className="text-xs">
@@ -697,11 +736,18 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
               </CardDescription>
             </div>
           </div>
-          {app.featured && (
-            <Badge variant="secondary" className="text-xs">
-              مميز
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {isSubscription && (
+              <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs">
+                اشتراك
+              </Badge>
+            )}
+            {app.featured && (
+              <Badge variant="secondary" className="text-xs">
+                مميز
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4">
@@ -710,20 +756,22 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
         </p>
         <div className="mt-3 flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-primary text-primary" />
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
             <span className="text-sm font-medium">{app.rating}</span>
-            <span className="text-xs text-muted-foreground">
-              ({app.reviews})
-            </span>
           </div>
-          <Badge variant={formatPrice(app.price) === "مجاني" ? "outline" : "secondary"}>
+          <Badge 
+            variant={formatPrice(app.price) === "مجاني" ? "outline" : "secondary"}
+            className="text-sm font-semibold px-3 py-1.5"
+          >
             {formatPrice(app.price)}
           </Badge>
         </div>
         {isPendingPayment && (
-          <Badge variant="outline" className="mt-2 text-orange-600 border-orange-600">
-            في انتظار الدفع
-          </Badge>
+          <div className="mt-2">
+            <Badge variant="outline" className="text-orange-600 border-orange-600">
+              في انتظار الدفع
+            </Badge>
+          </div>
         )}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex gap-2">
@@ -778,7 +826,7 @@ function AppCard({ app, onInstall, onUninstall }: AppProps) {
             ) : needsPayment ? (
               <>
                 <ShoppingCart className="h-4 w-4" />
-                شراء
+                {isSubscription ? "اشتراك" : "شراء"}
               </>
             ) : (
               <>
@@ -800,33 +848,52 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
   const needsPayment =
     parseFloat(app.price) > 0 &&
     app.billing_type !== "free" &&
+    !app.isPurchased &&
     app.status !== "installed" &&
     !app.installed;
   const isPendingPayment = app.status === "pending_payment";
+  const isSubscription = app.pricingModel === "subscription";
 
   const formatPrice = (price: string) => {
-    if (price === "مجاني" || price === "0.00" || parseFloat(price) === 0) {
+    // Remove commas from price string before parsing
+    const cleanPrice = price.replace(/,/g, '');
+    const numericPrice = parseFloat(cleanPrice);
+    
+    if (price === "مجاني" || cleanPrice === "0.00" || numericPrice === 0 || isNaN(numericPrice)) {
       return "مجاني";
     }
-    return `${parseFloat(price).toFixed(2)} ريال`;
+    // Format with Arabic number formatting (add commas for thousands)
+    return `${numericPrice.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ريال`;
   };
 
   return (
     <Card>
       <div className="flex flex-col sm:flex-row">
-        <div className="p-4 sm:w-64 flex items-center gap-3">
-          <div className="rounded-md border p-1 h-12 w-12 flex items-center justify-center">
+        <div className="p-4 sm:w-64 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
             <img
               src={app.icon || "/placeholder.svg"}
               alt={app.name}
-              className="h-10 w-10 object-contain"
+              className="h-12 w-12 object-contain"
             />
+            <div>
+              <h3 className="font-medium">{app.name}</h3>
+              <p className="text-xs text-muted-foreground">
+                بواسطة {app.developer}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-medium">{app.name}</h3>
-            <p className="text-xs text-muted-foreground">
-              بواسطة {app.developer}
-            </p>
+          <div className="flex items-center gap-2">
+            {isSubscription && (
+              <Badge variant="outline" className="text-blue-600 border-blue-600 text-xs">
+                اشتراك
+              </Badge>
+            )}
+            {app.featured && (
+              <Badge variant="secondary" className="text-xs">
+                مميز
+              </Badge>
+            )}
           </div>
         </div>
         <div className="flex-1 p-4 border-t sm:border-t-0 sm:border-r">
@@ -835,25 +902,18 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
               <p className="text-sm text-muted-foreground">{app.description}</p>
               <div className="mt-2 flex items-center gap-4">
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-primary text-primary" />
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-medium">{app.rating}</span>
-                  <span className="text-xs text-muted-foreground">
-                    ({app.reviews})
-                  </span>
                 </div>
                 <Badge
                   variant={formatPrice(app.price) === "مجاني" ? "outline" : "secondary"}
+                  className="text-sm font-semibold px-3 py-1.5"
                 >
                   {formatPrice(app.price)}
                 </Badge>
                 {isPendingPayment && (
                   <Badge variant="outline" className="text-orange-600 border-orange-600">
                     في انتظار الدفع
-                  </Badge>
-                )}
-                {app.featured && (
-                  <Badge variant="secondary" className="text-xs">
-                    مميز
                   </Badge>
                 )}
                 <Badge variant="outline" className="text-xs">
@@ -913,7 +973,7 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
                   ) : needsPayment ? (
                     <>
                       <ShoppingCart className="h-4 w-4" />
-                      شراء
+                      {isSubscription ? "اشتراك" : "شراء"}
                     </>
                   ) : (
                     <>
