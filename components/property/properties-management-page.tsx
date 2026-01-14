@@ -2196,13 +2196,13 @@ function PropertyCard({
         <div
           className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-3" : "grid-cols-2"}`}
         >
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-center">
             <span className="text-muted-foreground">حمام</span>
             <span className="font-medium flex items-center gap-1">
               <Bath className="h-3 w-3" /> {property.bath || 0}
             </span>
           </div>
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-center">
             <span className="text-muted-foreground">المساحة</span>
             <span className="font-medium flex items-center gap-1">
               <Ruler className="h-3 w-3" /> {property.size || property.area || 0} م²
