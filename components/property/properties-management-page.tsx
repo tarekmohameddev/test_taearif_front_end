@@ -1809,7 +1809,7 @@ export function PropertiesManagementPage() {
             {/* الفلاتر */}
             <Card className="mb-6 border-0 shadow-none">
               <CardContent className="">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
                   {/* المدينة */}
                   <div className="space-y-2">
                     <Label>المدينة</Label>
@@ -1954,12 +1954,14 @@ export function PropertiesManagementPage() {
                   </div>
 
                   {/* زر إعادة التعيين */}
-                  <div className="space-y-2 flex items-end">
+                  <div className="space-y-2 max-w-[130px]">
+                    <Label className="opacity-0 text-[1px]">ازالة الفلاتر</Label>
+                    <Label className="opacity-0 text-[1px]">إعادة تعيين</Label>
                     <Button 
                       variant="outline" 
                       size="sm"
                       onClick={handleClearFilters} 
-                      className={`w-full text-sm ${
+                      className={`w-fit text-sm ${
                         filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo
                           ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
                           : ""
