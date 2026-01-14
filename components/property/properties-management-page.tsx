@@ -2195,31 +2195,6 @@ function PropertyCard({
             </div>
           )}
         </div>
-        <div className="text-lg font-semibold flex gap-1 justify-center ">
-          {property.transaction_type === "sale" ||
-          property.purpose === "sale" ? (
-            <>
-              <span>{property.price.toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className="w-[1.15rem]   h-[1.15rem] filter brightness-0 contrast-100 mt-0.5"
-              />
-            </>
-          ) : (
-            <>
-              <span>{property.price.toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className="w-[1.15rem] h-[1.15rem] filter brightness-0 contrast-100 mt-0.5"
-              />
-              {getPaymentMethodText(property.payment_method) && (
-                <span className="text-sm">/{getPaymentMethodText(property.payment_method)}</span>
-              )}
-            </>
-          )}
-        </div>
         <div className="flex flex-wrap gap-1 pt-2">
           {Array.isArray(property.features) && property.features.length > 0 ? (
             <>
@@ -2242,11 +2217,11 @@ function PropertyCard({
           ) : null}
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2 p-4 pt-0">
+      <CardFooter className="flex items-center justify-between p-4 pt-0">
         <Button
           variant="outline"
           size="sm"
-          className="w-full gap-1"
+          className="w-1/2 gap-1"
           onClick={() =>
             router.push("/dashboard/properties/" + property.id + "/edit")
           }
@@ -2254,21 +2229,31 @@ function PropertyCard({
           <Edit className="h-3.5 w-3.5" />
           تعديل
         </Button>
-        <Button
-          size="sm"
-          variant="secondary"
-          className="w-full gap-1"
-          onClick={() => {
-            const domain = useAuthStore.getState().userData?.domain || "";
-            const url = domain.startsWith("http")
-              ? `${domain}property/${property.slug}`
-              : `https://${domain}/property/${property.slug}`;
-            window.open(url, "_blank");
-          }}
-        >
-          <ExternalLink className="h-3.5 w-3.5" />
-          معاينة
-        </Button>
+        <div className="text-xl font-semibold flex gap-1">
+          {property.transaction_type === "sale" ||
+          property.purpose === "sale" ? (
+            <>
+              <span>{property.price.toLocaleString()}</span>
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
+                alt="ريال سعودي"
+                className="w-[1.35rem] h-[1.35rem] filter brightness-0 contrast-100 mt-0.5"
+              />
+            </>
+          ) : (
+            <>
+              <span>{property.price.toLocaleString()}</span>
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
+                alt="ريال سعودي"
+                className="w-[1.35rem] h-[1.35rem] filter brightness-0 contrast-100 mt-0.5"
+              />
+              {getPaymentMethodText(property.payment_method) && (
+                <span className="text-sm">/{getPaymentMethodText(property.payment_method)}</span>
+              )}
+            </>
+          )}
+        </div>
       </CardFooter>
     </Card>
   );
@@ -2361,10 +2346,6 @@ function PropertyListItem({
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-sm">
-            <div className="flex flex-row-reverse items-center gap-1">
-              <Bath className="h-4 w-4 text-muted-foreground" />
-              <span>{property.bath || 0} حمام</span>
-            </div>
             <div className="flex flex-row-reverse items-center gap-1">
               <Ruler className="h-4 w-4 text-muted-foreground" />
               <span>{property.size || property.area || 0} م²</span>
