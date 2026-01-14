@@ -2345,15 +2345,15 @@ function PropertyListItem({
               </p>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-4 text-sm">
-            <div className="flex flex-row-reverse items-center gap-1">
-              <Eye className="h-4 w-4 text-muted-foreground" />
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Badge variant="outline" className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200">
+              <Eye className="h-3 w-3" />
               <span>{property.visits || 0} مشاهدات</span>
-            </div>
-            <div className="flex flex-row-reverse items-center gap-1">
-              <Ruler className="h-4 w-4 text-muted-foreground" />
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1 bg-green-50 text-green-700 border-green-200">
+              <Ruler className="h-3 w-3" />
               <span>{property.size || property.area || 0} م²</span>
-            </div>
+            </Badge>
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
             {property.features &&
