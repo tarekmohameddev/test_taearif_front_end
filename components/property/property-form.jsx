@@ -1205,7 +1205,7 @@ export default function PropertyForm({ mode }) {
       <div className="flex flex-1 flex-col md:flex-row">
         <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-[1000px] mx-auto">
             {mode === "add" && hasReachedLimit && (
               <div
                 className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-6"
