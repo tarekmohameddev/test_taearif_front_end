@@ -2168,31 +2168,6 @@ function PropertyCard({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-2">
-        <div className="text-lg font-semibold flex gap-1">
-          {property.transaction_type === "sale" ||
-          property.purpose === "sale" ? (
-            <>
-              <span>بسعر {property.price.toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className="w-5 h-5 filter brightness-0 contrast-100"
-              />
-            </>
-          ) : (
-            <>
-              <span>بسعر {property.price.toLocaleString()}</span>
-              <img
-                src="/Saudi_Riyal_Symbol.svg"
-                alt="ريال سعودي"
-                className="w-5 h-5 filter brightness-0 contrast-100"
-              />
-              {getPaymentMethodText(property.payment_method) && (
-                <span>/{getPaymentMethodText(property.payment_method)}</span>
-              )}
-            </>
-          )}
-        </div>
         <div
           className={`grid gap-2 text-sm ${property.status === "منشور" && property.creator ? "grid-cols-3" : "grid-cols-2"}`}
         >
@@ -2218,6 +2193,31 @@ function PropertyCard({
                   : property.creator.name}
               </div>
             </div>
+          )}
+        </div>
+        <div className="text-lg font-semibold flex gap-1 justify-center ">
+          {property.transaction_type === "sale" ||
+          property.purpose === "sale" ? (
+            <>
+              <span>{property.price.toLocaleString()}</span>
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
+                alt="ريال سعودي"
+                className="w-[1.15rem]   h-[1.15rem] filter brightness-0 contrast-100 mt-0.5"
+              />
+            </>
+          ) : (
+            <>
+              <span>{property.price.toLocaleString()}</span>
+              <img
+                src="/Saudi_Riyal_Symbol.svg"
+                alt="ريال سعودي"
+                className="w-[1.15rem] h-[1.15rem] filter brightness-0 contrast-100 mt-0.5"
+              />
+              {getPaymentMethodText(property.payment_method) && (
+                <span>/{getPaymentMethodText(property.payment_method)}</span>
+              )}
+            </>
           )}
         </div>
         <div className="flex flex-wrap gap-1 pt-2">
@@ -2337,27 +2337,25 @@ function PropertyListItem({
             <div className="text-lg font-semibold">
               {property.transaction_type === "sale" ||
               property.purpose === "sale" ? (
-                <div className="flex items-center gap-1">
+                <div className="flex gap-1">
+                  <span>{property.price.toLocaleString()}</span>
                   <img
                     src="/Saudi_Riyal_Symbol.svg"
                     alt="ريال سعودي"
-                    className="w-5 h-5 filter brightness-0 contrast-100"
+                    className="w-[1.15rem] h-[1.15rem] filter brightness-0 contrast-100 mt-0.5"
                   />
-                  <span>بسعر {property.price.toLocaleString()}</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1">
-                  {getPaymentMethodText(property.payment_method) && (
-                    <span>
-                      {getPaymentMethodText(property.payment_method)}/
-                    </span>
-                  )}
+                <div className="flex gap-1">
+                  <span>{property.price.toLocaleString()}</span>
                   <img
                     src="/Saudi_Riyal_Symbol.svg"
                     alt="ريال سعودي"
-                    className="w-5 h-5 filter brightness-0 contrast-100"
+                    className="w-[1.15rem] h-[1.15rem] filter brightness-0 contrast-100 mt-0.5"
                   />
-                  <span>بسعر {property.price.toLocaleString()}</span>
+                  {getPaymentMethodText(property.payment_method) && (
+                    <span>/{getPaymentMethodText(property.payment_method)}</span>
+                  )}
                 </div>
               )}
             </div>
