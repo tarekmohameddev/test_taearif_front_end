@@ -2312,7 +2312,7 @@ function PropertyListItem({
           <div className="flex flex-row-reverse items-start justify-between">
             <div>
               <h3 className="font-semibold">
-                {truncateTitle(property.title || property.contents[0].title)}
+                {property.title || property.contents[0].title}
               </h3>
               <p className="text-sm text-muted-foreground flex flex-row-reverse items-center gap-1">
                 <MapPin className="h-3 w-3" />{" "}
@@ -2381,20 +2381,6 @@ function PropertyListItem({
               <Edit className="mr-1 h-3.5 w-3.5" />
               تعديل
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                const domain = useAuthStore.getState().userData?.domain || "";
-                const url = domain.startsWith("http")
-                  ? `${domain}property/${property.slug}`
-                  : `https://${domain}/property/${property.slug}`;
-                window.open(url, "_blank");
-              }}
-            >
-              <ExternalLink className="mr-1 h-3.5 w-3.5" />
-              معاينة
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="bg-muted hover:bg-muted/80">
@@ -2402,6 +2388,18 @@ function PropertyListItem({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    const domain = useAuthStore.getState().userData?.domain || "";
+                    const url = domain.startsWith("http")
+                      ? `${domain}property/${property.slug}`
+                      : `https://${domain}/property/${property.slug}`;
+                    window.open(url, "_blank");
+                  }}
+                >
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  معاينة
+                </DropdownMenuItem>
                 {/* ترتيب الوحدة في الرئيسية */}
                 {property.featured && (
                   <DropdownMenuItem
