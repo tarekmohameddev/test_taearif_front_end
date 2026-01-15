@@ -12,6 +12,7 @@ import {
   Loader2,
   ImageIcon,
   Plus,
+  Minus,
   MapPin,
   Video,
   Globe,
@@ -193,6 +194,7 @@ export default function PropertyForm({ mode }) {
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isFaqsOpen, setIsFaqsOpen] = useState(false);
   const [isOwnerDetailsOpen, setIsOwnerDetailsOpen] = useState(false);
+  const [selectedFacilities, setSelectedFacilities] = useState([]);
   const [images, setImages] = useState({
     thumbnail: null,
     gallery: [],
@@ -1190,6 +1192,61 @@ export default function PropertyForm({ mode }) {
     setFormData((prev) => ({ ...prev, city_id: cityId, district_id: null }));
   };
 
+  // قائمة المرافق
+  const facilitiesList = [
+    { key: "bedrooms", label: "غرف النوم" },
+    { key: "bathrooms", label: "غرف الحمام" },
+    { key: "rooms", label: "الغرف" },
+    { key: "floors", label: "الأدوار" },
+    { key: "floor_number", label: "رقم الدور" },
+    { key: "driver_room", label: "غرفة السائق" },
+    { key: "maid_room", label: "غرفة الخادمات" },
+    { key: "dining_room", label: "غرفة الطعام" },
+    { key: "living_room", label: "الصالة" },
+    { key: "majlis", label: "المجلس" },
+    { key: "storage_room", label: "المخزن" },
+    { key: "basement", label: "القبو" },
+    { key: "swimming_pool", label: "المسبح" },
+    { key: "kitchen", label: "المطبخ" },
+    { key: "balcony", label: "الشرفة" },
+    { key: "garden", label: "الحديقة" },
+    { key: "annex", label: "الملحق" },
+    { key: "elevator", label: "المصعد" },
+    { key: "private_parking", label: "موقف سيارة مخصص" },
+  ];
+
+  // تحديث selectedFacilities بناءً على القيم الموجودة في formData
+  useEffect(() => {
+    const activeFacilities = facilitiesList
+      .filter((facility) => {
+        const value = Number(formData[facility.key]) || 0;
+        return value > 0;
+      })
+      .map((facility) => facility.key);
+
+    setSelectedFacilities(activeFacilities);
+  }, [
+    formData.bedrooms,
+    formData.bathrooms,
+    formData.rooms,
+    formData.floors,
+    formData.floor_number,
+    formData.driver_room,
+    formData.maid_room,
+    formData.dining_room,
+    formData.living_room,
+    formData.majlis,
+    formData.storage_room,
+    formData.basement,
+    formData.swimming_pool,
+    formData.kitchen,
+    formData.balcony,
+    formData.garden,
+    formData.annex,
+    formData.elevator,
+    formData.private_parking,
+  ]);
+
   const pageTitle = mode === "add" ? "إضافة وحدة جديدة" : "تعديل الوحدة";
   const submitButtonText = mode === "add" ? "نشر الوحدة" : "حفظ ونشر التغييرات";
   const draftButtonText =
@@ -2120,144 +2177,105 @@ export default function PropertyForm({ mode }) {
                       مرافق الوحدة
                     </h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <PropertyCounter
-                        label="غرف النوم"
-                        value={formData.bedrooms}
-                        onChange={(value) =>
-                          handleCounterChange("bedrooms", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="غرف الحمام"
-                        value={formData.bathrooms}
-                        onChange={(value) =>
-                          handleCounterChange("bathrooms", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="الغرف"
-                        value={formData.rooms}
-                        onChange={(value) =>
-                          handleCounterChange("rooms", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="الأدوار"
-                        value={formData.floors}
-                        onChange={(value) =>
-                          handleCounterChange("floors", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="رقم الدور"
-                        value={formData.floor_number}
-                        onChange={(value) =>
-                          handleCounterChange("floor_number", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="غرفة السائق"
-                        value={formData.driver_room}
-                        onChange={(value) =>
-                          handleCounterChange("driver_room", value)
-                        }
-                      />
+                    {/* قائمة المرافق المضافة */}
+                    {selectedFacilities.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-md font-medium text-right">
+                          المرافق المضافة:
+                        </h4>
+                        <div className="flex flex-col gap-3">
+                          {selectedFacilities.map((facilityKey) => {
+                            const facility = facilitiesList.find(
+                              (f) => f.key === facilityKey
+                            );
+                            if (!facility) return null;
+                            const currentValue =
+                              Number(formData[facilityKey]) || 0;
 
-                      <PropertyCounter
-                        label="غرفة الخادمات"
-                        value={formData.maid_room}
-                        onChange={(value) =>
-                          handleCounterChange("maid_room", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="غرفة الطعام"
-                        value={formData.dining_room}
-                        onChange={(value) =>
-                          handleCounterChange("dining_room", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="الصالة"
-                        value={formData.living_room}
-                        onChange={(value) =>
-                          handleCounterChange("living_room", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="المجلس"
-                        value={formData.majlis}
-                        onChange={(value) =>
-                          handleCounterChange("majlis", value)
-                        }
-                      />
+                            return (
+                              <div
+                                key={facilityKey}
+                                className="flex items-center justify-between p-3 border rounded-md bg-muted/30"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium">
+                                    {facility.label}
+                                  </span>
+                                  <Badge variant="secondary" className="text-lg">
+                                    {currentValue}
+                                  </Badge>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => {
+                                      const newValue = Math.max(0, currentValue - 1);
+                                      handleCounterChange(facilityKey, newValue);
+                                      if (newValue === 0) {
+                                        setSelectedFacilities((prev) =>
+                                          prev.filter((key) => key !== facilityKey)
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => {
+                                      handleCounterChange(
+                                        facilityKey,
+                                        currentValue + 1
+                                      );
+                                    }}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
 
-                      <PropertyCounter
-                        label="المخزن"
-                        value={formData.storage_room}
-                        onChange={(value) =>
-                          handleCounterChange("storage_room", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="القبو"
-                        value={formData.basement}
-                        onChange={(value) =>
-                          handleCounterChange("basement", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="المسبح"
-                        value={formData.swimming_pool}
-                        onChange={(value) =>
-                          handleCounterChange("swimming_pool", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="المطبخ"
-                        value={formData.kitchen}
-                        onChange={(value) =>
-                          handleCounterChange("kitchen", value)
-                        }
-                      />
+                    {/* Badges المرافق */}
+                    <div className="flex flex-wrap gap-2">
+                      {facilitiesList.map((facility) => {
+                        const currentValue =
+                          Number(formData[facility.key]) || 0;
+                        const isSelected = selectedFacilities.includes(facility.key);
 
-                      <PropertyCounter
-                        label="الشرفة"
-                        value={formData.balcony}
-                        onChange={(value) =>
-                          handleCounterChange("balcony", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="الحديقة"
-                        value={formData.garden}
-                        onChange={(value) =>
-                          handleCounterChange("garden", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="الملحق"
-                        value={formData.annex}
-                        onChange={(value) =>
-                          handleCounterChange("annex", value)
-                        }
-                      />
-                      <PropertyCounter
-                        label="المصعد"
-                        value={formData.elevator}
-                        onChange={(value) =>
-                          handleCounterChange("elevator", value)
-                        }
-                      />
-
-                      <PropertyCounter
-                        label="موقف سيارة مخصص"
-                        value={formData.private_parking}
-                        onChange={(value) =>
-                          handleCounterChange("private_parking", value)
-                        }
-                      />
+                        return (
+                          <Badge
+                            key={facility.key}
+                            variant={isSelected ? "default" : "outline"}
+                            className="cursor-pointer text-sm py-2 px-4 hover:bg-primary/80 transition-colors"
+                            onClick={() => {
+                              if (!isSelected) {
+                                setSelectedFacilities((prev) => [
+                                  ...prev,
+                                  facility.key,
+                                ]);
+                                if (currentValue === 0) {
+                                  handleCounterChange(facility.key, 1);
+                                }
+                              }
+                            }}
+                          >
+                            {facility.label}
+                            {currentValue > 0 && (
+                              <span className="mr-1">({currentValue})</span>
+                            )}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   </div>
                         </CardContent>
