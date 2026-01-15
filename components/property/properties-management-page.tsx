@@ -1224,23 +1224,6 @@ export function PropertiesManagementPage() {
               </div>
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:flex-wrap">
                 <Button
-                  className="gap-1 w-full md:w-auto"
-                  onClick={() => {
-                    const propertiesLength = pagination?.total || 0;
-                    const limit =
-                      useAuthStore.getState().userData?.package
-                        ?.real_estate_limit_number;
-                    if (propertiesLength >= limit) {
-                      setIsLimitReached(true);
-                    } else {
-                      router.push("/dashboard/buildings");
-                    }
-                  }}
-                >
-                  <Plus className="h-4 w-4" />
-                  ادارة العمارات
-                </Button>
-                <Button
                   variant="outline"
                   className="gap-1 w-full md:w-auto"
                   onClick={() => setImportDialogOpen(true)}
