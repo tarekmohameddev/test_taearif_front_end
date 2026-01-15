@@ -2183,7 +2183,15 @@ export default function PropertyForm({ mode }) {
                         <h4 className="text-md font-medium text-right">
                           المرافق المضافة:
                         </h4>
-                        <div className="flex flex-col gap-3">
+                        <div
+                          className={`grid gap-3 ${
+                            selectedFacilities.length === 1
+                              ? "grid-cols-1"
+                              : selectedFacilities.length === 2
+                              ? "grid-cols-2"
+                              : "grid-cols-3"
+                          }`}
+                        >
                           {selectedFacilities.map((facilityKey) => {
                             const facility = facilitiesList.find(
                               (f) => f.key === facilityKey
