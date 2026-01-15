@@ -29,6 +29,13 @@ import axiosInstance from "@/lib/axiosInstance";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import useAuthStore from "@/context/AuthContext";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 
 interface PropertyData {
   id: number;
@@ -81,6 +88,7 @@ export default function PropertyDetailsPage() {
   const [property, setProperty] = useState<PropertyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeedDialogOpen, setIsDeedDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -541,44 +549,53 @@ export default function PropertyDetailsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {property.water_meter_number && (
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          رقم عداد الماء
-                        </p>
-                        <p className="font-medium">
-                          {property.water_meter_number}
-                        </p>
-                      </div>
-                    )}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {property.water_meter_number && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            رقم عداد الماء
+                          </p>
+                          <p className="font-medium">
+                            {property.water_meter_number}
+                          </p>
+                        </div>
+                      )}
 
-                    {property.electricity_meter_number && (
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          رقم عداد الكهرباء
-                        </p>
-                        <p className="font-medium">
-                          {property.electricity_meter_number}
-                        </p>
-                      </div>
-                    )}
+                      {property.electricity_meter_number && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            رقم عداد الكهرباء
+                          </p>
+                          <p className="font-medium">
+                            {property.electricity_meter_number}
+                          </p>
+                        </div>
+                      )}
+
+                      {property.project_id && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            رقم المشروع
+                          </p>
+                          <p className="font-medium">{property.project_id}</p>
+                        </div>
+                      )}
+                    </div>
 
                     {property.deed_number && (
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          رقم الصك
+                        <p className="text-sm text-muted-foreground mb-2">
+                          الصك
                         </p>
-                        <p className="font-medium">{property.deed_number}</p>
-                      </div>
-                    )}
-
-                    {property.project_id && (
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          رقم المشروع
-                        </p>
-                        <p className="font-medium">{property.project_id}</p>
+                        <div className="relative w-full rounded-lg overflow-hidden border">
+                          <img
+                            src={property.deed_number}
+                            alt="صورة الصك"
+                            className="w-full h-auto object-contain max-h-96 cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => setIsDeedDialogOpen(true)}
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
@@ -588,6 +605,31 @@ export default function PropertyDetailsPage() {
           </div>
         </main>
       </div>
+
+      {/* Dialog لعرض صورة الصك */}
+      {property.deed_number && (
+        <CustomDialog
+          open={isDeedDialogOpen}
+          onOpenChange={setIsDeedDialogOpen}
+          maxWidth="max-w-5xl"
+        >
+          <CustomDialogContent className="p-0">
+            <CustomDialogClose onClose={() => setIsDeedDialogOpen(false)} />
+            <CustomDialogHeader>
+              <CustomDialogTitle>صورة الصك</CustomDialogTitle>
+            </CustomDialogHeader>
+            <div className="p-4 sm:p-6">
+              <div className="relative w-full rounded-lg overflow-hidden">
+                <img
+                  src={property.deed_number}
+                  alt="صورة الصك"
+                  className="w-full h-auto object-contain max-h-[70vh] mx-auto"
+                />
+              </div>
+            </div>
+          </CustomDialogContent>
+        </CustomDialog>
+      )}
     </div>
   );
 }
