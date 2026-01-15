@@ -2280,6 +2280,7 @@ function PropertyCard({
   const router = useRouter();
   const { userData } = useAuthStore();
   const [columnsCount, setColumnsCount] = useState(4);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
   
   // تحديث عدد الأعمدة بناءً على حجم الشاشة
   useEffect(() => {
@@ -2292,6 +2293,7 @@ function PropertyCard({
       } else {
         setColumnsCount(1); // default
       }
+      setIsSmallScreen(width < 2500);
     };
     
     updateColumnsCount();
@@ -2299,6 +2301,23 @@ function PropertyCard({
     return () => window.removeEventListener('resize', updateColumnsCount);
   }, []);
   
+  // التحقق من وجود سعر بمواصفات (سنوي، شهري، إلخ) في أي card في نفس الـ row
+  const hasStackedFooterInSameRow = () => {
+    if (!allProperties || allProperties.length === 0) return false;
+    
+    const currentRow = Math.floor(currentIndex / columnsCount);
+    const rowStart = currentRow * columnsCount;
+    const rowEnd = rowStart + columnsCount;
+    
+    for (let i = rowStart; i < rowEnd && i < allProperties.length; i++) {
+      const prop = allProperties[i];
+      if (getPaymentMethodText(prop.payment_method) && prop.transaction_type !== "sale" && prop.purpose !== "sale") {
+        return true;
+      }
+    }
+    return false;
+  };
+
   // التحقق من وجود مميزات في أي card في نفس الـ row
   const hasFeaturesInSameRow = () => {
     if (!allProperties || allProperties.length === 0) return false;
@@ -2322,6 +2341,8 @@ function PropertyCard({
   const handleCardClick = () => {
     router.push(`/dashboard/properties/${property.id}`);
   };
+  
+  const isStackedFooter = hasStackedFooterInSameRow();
   
   return (
     <Card 
@@ -2511,19 +2532,11 @@ function PropertyCard({
           ) : null}
         </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-between p-4 pt-0" onClick={(e) => e.stopPropagation()}>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-1/2 gap-1"
-          onClick={() =>
-            router.push("/dashboard/properties/" + property.id + "/edit")
-          }
-        >
-          <Edit className="h-3.5 w-3.5" />
-          تعديل
-        </Button>
-        <div className="text-xl font-semibold flex gap-1">
+      <CardFooter 
+        className={`p-4 pt-0 ${isStackedFooter ? "flex flex-col gap-2" : "flex items-center justify-between"}`} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className={`font-semibold flex gap-1 ${isStackedFooter ? "text-lg w-full justify-center" : "text-xl"}`}>
           {property.transaction_type === "sale" ||
           property.purpose === "sale" ? (
             <>
@@ -2540,7 +2553,7 @@ function PropertyCard({
               <img
                 src="/Saudi_Riyal_Symbol.svg"
                 alt="ريال سعودي"
-                className="w-[1.35rem] h-[1.35rem] filter brightness-0 contrast-100 mt-0.5"
+                className={`filter brightness-0 contrast-100 mt-0.5 ${getPaymentMethodText(property.payment_method) ? "w-[1.1rem] h-[1.1rem]" : "w-[1.35rem] h-[1.35rem]"}`}
               />
               {getPaymentMethodText(property.payment_method) && (
                 <span className="text-sm">/{getPaymentMethodText(property.payment_method)}</span>
@@ -2548,8 +2561,20 @@ function PropertyCard({
             </>
           )}
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`gap-1 ${isStackedFooter ? "w-full" : "w-1/2"}`}
+          onClick={() =>
+            router.push("/dashboard/properties/" + property.id + "/edit")
+          }
+        >
+          <Edit className="h-3.5 w-3.5" />
+          تعديل
+        </Button>
       </CardFooter>
     </Card>
+
   );
 }
 
