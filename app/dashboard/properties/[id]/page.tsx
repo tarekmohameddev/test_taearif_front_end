@@ -24,6 +24,7 @@ import {
   FileText,
   AlertCircle,
   Loader2,
+  User,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
@@ -364,6 +365,27 @@ export default function PropertyDetailsPage() {
                       )}
                     </div>
                   </div>
+
+                  {/* المنشئ */}
+                  {property.creator && (
+                    <div className="flex items-start gap-3">
+                      <User className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm text-muted-foreground mb-1">
+                          المنشئ
+                        </p>
+                        <div className="rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white inline-block">
+                          {property.creator.name === "User"
+                            ? userData?.first_name && userData?.last_name
+                              ? `${userData.first_name} ${userData.last_name}`
+                              : userData?.username ||
+                                userData?.first_name ||
+                                "User"
+                            : property.creator.name}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
