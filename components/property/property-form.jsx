@@ -2437,13 +2437,13 @@ export default function PropertyForm({ mode }) {
                     >
                       <CardContent>
                         <div className="space-y-4">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          <div className="flex flex-wrap gap-2">
                             {previews.gallery.map((preview, index) => (
                         <div
                           key={index}
-                          className="border rounded-md p-2 relative"
+                          className="border rounded-md p-1 relative w-16 h-16 flex-shrink-0"
                         >
-                          <div className="h-40 bg-muted rounded-md overflow-hidden">
+                          <div className="w-full h-full bg-muted rounded-md overflow-hidden">
                             <img
                               src={preview}
                               alt={`Gallery image ${index + 1}`}
@@ -2453,29 +2453,26 @@ export default function PropertyForm({ mode }) {
                           <Button
                             variant="destructive"
                             size="icon"
-                            className="absolute top-4 right-4 h-6 w-6"
+                            className="absolute -top-1 -right-1 h-4 w-4 rounded-full"
                             onClick={() => removeImage("gallery", index)}
                           >
-                            <X className="h-3 w-3" />
+                            <X className="h-2.5 w-2.5" />
                           </Button>
-                          <p className="text-xs text-center mt-2 truncate">
-                            صورة {index + 1}
-                          </p>
                         </div>
                       ))}
                       <div
-                        className="border rounded-md p-2 h-[11rem] flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
+                        className="border rounded-md p-1 w-16 h-16 flex-shrink-0 flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => triggerFileInput("gallery")}
                       >
-                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                        <div className="h-4 w-4 rounded-full bg-muted flex items-center justify-center">
                           {uploading ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <Loader2 className="h-2 w-2 animate-spin" />
                           ) : (
-                            <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                            <ImageIcon className="h-2 w-2 text-muted-foreground" />
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          إضافة صورة
+                        <p className="text-[10px] text-muted-foreground">
+                          إضافة
                         </p>
                       </div>
                     </div>
