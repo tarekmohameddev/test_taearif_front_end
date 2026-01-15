@@ -176,6 +176,7 @@ export default function PropertyForm({ mode }) {
     payment_method: "",
     pricePerMeter: "",
     PropertyType: "",
+    advertising_license: "",
     video_url: "",
     virtual_tour: "",
   });
@@ -549,6 +550,7 @@ export default function PropertyForm({ mode }) {
             payment_method: property.payment_method || "",
             pricePerMeter: property.pricePerMeter || "",
             PropertyType: propertyType,
+            advertising_license: property.advertising_license || "",
             faqs: property.faqs || "",
             video_url: property.video_url || "",
             virtual_tour: property.virtual_tour || "",
@@ -1122,6 +1124,7 @@ export default function PropertyForm({ mode }) {
           payment_method: formData.payment_method || null,
           pricePerMeter: formData.pricePerMeter || 0,
           type: formData.PropertyType || "",
+          advertising_license: formData.advertising_license || "",
           faqs: faqs,
           video_url:
             videoPaths.length > 0 ? videoPaths[0] : formData.video_url || "",
@@ -1575,33 +1578,53 @@ export default function PropertyForm({ mode }) {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="PropertyType">نوع الوحدة</Label>
-                    <Select
-                      name="PropertyType"
-                      value={formData.PropertyType}
-                      onValueChange={(value) =>
-                        handleInputChange({
-                          target: { name: "PropertyType", value },
-                        })
-                      }
-                    >
-                      <SelectTrigger
-                        id="PropertyType"
-                        className={errors.PropertyType ? "border-red-500" : ""}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="PropertyType">نوع الوحدة</Label>
+                      <Select
+                        name="PropertyType"
+                        value={formData.PropertyType}
+                        onValueChange={(value) =>
+                          handleInputChange({
+                            target: { name: "PropertyType", value },
+                          })
+                        }
                       >
-                        <SelectValue placeholder="اختر النوع" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="residential">سكني</SelectItem>
-                        <SelectItem value="commercial">تجاري</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.PropertyType && (
-                      <p className="text-sm text-red-500">
-                        {errors.PropertyType}
-                      </p>
-                    )}
+                        <SelectTrigger
+                          id="PropertyType"
+                          className={errors.PropertyType ? "border-red-500" : ""}
+                        >
+                          <SelectValue placeholder="اختر النوع" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="residential">سكني</SelectItem>
+                          <SelectItem value="commercial">تجاري</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.PropertyType && (
+                        <p className="text-sm text-red-500">
+                          {errors.PropertyType}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="advertising_license">ترخيص اعلاني</Label>
+                      <Input
+                        id="advertising_license"
+                        name="advertising_license"
+                        value={formData.advertising_license}
+                        onChange={handleInputChange}
+                        placeholder="أدخل رقم الترخيص الاعلاني"
+                        className={errors.advertising_license ? "border-red-500" : ""}
+                        dir="rtl"
+                      />
+                      {errors.advertising_license && (
+                        <p className="text-sm text-red-500">
+                          {errors.advertising_license}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
