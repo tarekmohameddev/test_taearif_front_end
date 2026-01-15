@@ -2267,6 +2267,7 @@ export default function PropertyForm({ mode }) {
                             className="cursor-pointer text-sm py-2 px-4 hover:bg-primary/80 transition-colors"
                             onClick={() => {
                               if (!isSelected) {
+                                // تفعيل المرفق
                                 setSelectedFacilities((prev) => [
                                   ...prev,
                                   facility.key,
@@ -2274,6 +2275,12 @@ export default function PropertyForm({ mode }) {
                                 if (currentValue === 0) {
                                   handleCounterChange(facility.key, 1);
                                 }
+                              } else {
+                                // إلغاء تفعيل المرفق
+                                setSelectedFacilities((prev) =>
+                                  prev.filter((key) => key !== facility.key)
+                                );
+                                handleCounterChange(facility.key, 0);
                               }
                             }}
                           >
