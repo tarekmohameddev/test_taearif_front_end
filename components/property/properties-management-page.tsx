@@ -2727,6 +2727,35 @@ function PropertyListItem({
               <Ruler className="h-3 w-3" />
               <span>{property.size || property.area || 0} م²</span>
             </Badge>
+            {property.beds && (
+              <Badge variant="outline" className="flex items-center gap-1 bg-purple-50 text-purple-700 border-purple-200">
+                <Bed className="h-3 w-3" />
+                <span>{property.beds} غرفة</span>
+              </Badge>
+            )}
+            {property.bath && (
+              <Badge variant="outline" className="flex items-center gap-1 bg-cyan-50 text-cyan-700 border-cyan-200">
+                <Bath className="h-3 w-3" />
+                <span>{property.bath} حمام</span>
+              </Badge>
+            )}
+            {property.type && (
+              <Badge variant="outline" className="flex items-center gap-1 bg-orange-50 text-orange-700 border-orange-200">
+                <Building className="h-3 w-3" />
+                <span>
+                  {property.type === "residential" ? "سكني" : 
+                   property.type === "commercial" ? "تجاري" : 
+                   property.type === "industrial" ? "صناعي" : 
+                   property.type === "land" ? "أرض" : property.type}
+                </span>
+              </Badge>
+            )}
+            {property.show_reservations && (
+              <Badge variant="outline" className="flex items-center gap-1 bg-pink-50 text-pink-700 border-pink-200">
+                <CalendarIcon className="h-3 w-3" />
+                <span>قابل للحجز</span>
+              </Badge>
+            )}
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
             {property.features &&
