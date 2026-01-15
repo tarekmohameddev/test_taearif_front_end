@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ChevronDown, Building2, Home, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { motion, AnimatePresence } from "framer-motion";
 import useAuthStore from "@/context/AuthContext";
 import useStore from "@/context/Store";
 
@@ -46,6 +47,7 @@ export function EnhancedSidebar({
   const pathname = usePathname();
   const [isNewUser, setIsNewUser] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isPropertyManagementOpen, setIsPropertyManagementOpen] = useState(false);
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
     activeTab || "dashboard",
   );
@@ -104,6 +106,23 @@ export function EnhancedSidebar({
       }
     }
   }, [currentPath, currentTab, setActiveTab]);
+
+  // فتح قسم إدارة العقارات تلقائياً إذا كان المسار الحالي يطابق أحد العناصر الفرعية
+  useEffect(() => {
+    const propertyManagementPaths = [
+      "/dashboard/units",
+      "/dashboard/projects",
+      "/dashboard/buildings",
+    ];
+    if (
+      propertyManagementPaths.some(
+        (path) =>
+          currentPath === path || currentPath.startsWith(path + "/"),
+      )
+    ) {
+      setIsPropertyManagementOpen(true);
+    }
+  }, [currentPath]);
 
   // دالة للحصول على الرابط مع إضافة token إذا لزم الأمر
   const getItemUrl = (item: any) => {
@@ -326,6 +345,135 @@ export function EnhancedSidebar({
 
           {!loading && !error && (
             <div className="space-y-1">
+              {/* إدارة العقارات - Collapsible Section with Framer Motion */}
+              <div>
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setIsPropertyManagementOpen(!isPropertyManagementOpen)}
+                        className={cn(
+                          "justify-start gap-3 h-auto py-2 px-3 w-full",
+                          isCollapsed && "justify-center px-2",
+                        )}
+                      >
+                        <Building2 className="h-5 w-5 text-muted-foreground" />
+                        {!isCollapsed && (
+                          <div className="flex items-center justify-between w-full">
+                            <span className="text-sm font-medium">إدارة العقارات</span>
+                            <motion.div
+                              animate={{
+                                rotate: isPropertyManagementOpen ? 180 : 0,
+                              }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                            </motion.div>
+                          </div>
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    {isCollapsed && (
+                      <TooltipContent side="left">
+                        <p className="font-medium">إدارة العقارات</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+                {!isCollapsed && (
+                  <AnimatePresence>
+                    {isPropertyManagementOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="space-y-1 pr-8 pl-4 pt-1">
+                          <motion.div
+                            initial={{ x: -10, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.1, duration: 0.2 }}
+                          >
+                            <Link href="/dashboard/units">
+                              <Button
+                                variant={
+                                  currentPath === "/dashboard/units" ||
+                                  currentPath.startsWith("/dashboard/units")
+                                    ? "secondary"
+                                    : "ghost"
+                                }
+                                className={cn(
+                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
+                                  (currentPath === "/dashboard/units" ||
+                                    currentPath.startsWith("/dashboard/units")) &&
+                                    "bg-primary/10 text-primary border-r-2 border-primary",
+                                )}
+                              >
+                                <Home className="h-4 w-4" />
+                                <span className="text-sm font-medium">الوحدات</span>
+                              </Button>
+                            </Link>
+                          </motion.div>
+                          <motion.div
+                            initial={{ x: -10, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.15, duration: 0.2 }}
+                          >
+                            <Link href="/dashboard/projects">
+                              <Button
+                                variant={
+                                  currentPath === "/dashboard/projects" ||
+                                  currentPath.startsWith("/dashboard/projects")
+                                    ? "secondary"
+                                    : "ghost"
+                                }
+                                className={cn(
+                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
+                                  (currentPath === "/dashboard/projects" ||
+                                    currentPath.startsWith("/dashboard/projects")) &&
+                                    "bg-primary/10 text-primary border-r-2 border-primary",
+                                )}
+                              >
+                                <Building2 className="h-4 w-4" />
+                                <span className="text-sm font-medium">المشاريع</span>
+                              </Button>
+                            </Link>
+                          </motion.div>
+                          <motion.div
+                            initial={{ x: -10, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.2 }}
+                          >
+                            <Link href="/dashboard/buildings">
+                              <Button
+                                variant={
+                                  currentPath === "/dashboard/buildings" ||
+                                  currentPath.startsWith("/dashboard/buildings")
+                                    ? "secondary"
+                                    : "ghost"
+                                }
+                                className={cn(
+                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
+                                  (currentPath === "/dashboard/buildings" ||
+                                    currentPath.startsWith("/dashboard/buildings")) &&
+                                    "bg-primary/10 text-primary border-r-2 border-primary",
+                                )}
+                              >
+                                <Building className="h-4 w-4" />
+                                <span className="text-sm font-medium">العمارات</span>
+                              </Button>
+                            </Link>
+                          </motion.div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                )}
+              </div>
+
               {mainNavItems.map((item: any) => (
                 <NavItem
                   key={item.id}
