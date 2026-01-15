@@ -1219,8 +1219,13 @@ export default function PropertyForm({ mode }) {
   useEffect(() => {
     const activeFacilities = facilitiesList
       .filter((facility) => {
-        const value = Number(formData[facility.key]) || 0;
-        return value > 0;
+        const value = formData[facility.key];
+        // التحقق من أن القيمة موجودة وليست فارغة و >= 0
+        if (value === "" || value === undefined || value === null) {
+          return false;
+        }
+        const numValue = Number(value);
+        return !isNaN(numValue) && numValue >= 0;
       })
       .map((facility) => facility.key);
 
@@ -2220,12 +2225,16 @@ export default function PropertyForm({ mode }) {
                                     size="icon"
                                     className="h-8 w-8"
                                     onClick={() => {
-                                      const newValue = Math.max(0, currentValue - 1);
-                                      handleCounterChange(facilityKey, newValue);
-                                      if (newValue === 0) {
+                                      if (currentValue === 0) {
+                                        // إذا كانت القيمة 0، إلغاء تفعيل المرفق
                                         setSelectedFacilities((prev) =>
                                           prev.filter((key) => key !== facilityKey)
                                         );
+                                        handleCounterChange(facilityKey, "");
+                                      } else {
+                                        // تقليل القيمة بمقدار 1
+                                        const newValue = Math.max(0, currentValue - 1);
+                                        handleCounterChange(facilityKey, newValue);
                                       }
                                     }}
                                   >
@@ -2267,14 +2276,12 @@ export default function PropertyForm({ mode }) {
                             className="cursor-pointer text-sm py-2 px-4 hover:bg-primary/80 transition-colors"
                             onClick={() => {
                               if (!isSelected) {
-                                // تفعيل المرفق
+                                // تفعيل المرفق بقيمة 0
                                 setSelectedFacilities((prev) => [
                                   ...prev,
                                   facility.key,
                                 ]);
-                                if (currentValue === 0) {
-                                  handleCounterChange(facility.key, 1);
-                                }
+                                handleCounterChange(facility.key, 0);
                               } else {
                                 // إلغاء تفعيل المرفق
                                 setSelectedFacilities((prev) =>
