@@ -1341,10 +1341,26 @@ export default function PropertyForm({ mode }) {
             <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl">معلومات الوحدة الأساسية</CardTitle>
-                  <CardDescription>
-                    أدخل المعلومات الأساسية للوحدة
-                  </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-xl">معلومات الوحدة الأساسية</CardTitle>
+                      <CardDescription>
+                        أدخل المعلومات الأساسية للوحدة
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center space-x-2 gap-2">
+                      <Switch
+                        id="featured"
+                        checked={formData.featured}
+                        onCheckedChange={(checked) =>
+                          handleSwitchChange("featured", checked)
+                        }
+                      />
+                      <Label htmlFor="featured" className="mr-2">
+                        عرض هذه الوحدة في الصفحة الرئيسية
+                      </Label>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -1827,19 +1843,6 @@ export default function PropertyForm({ mode }) {
                         {formData.features.length} ميزة مضافة
                       </p>
                     )}
-                  </div>
-
-                  <div className="flex items-center space-x-2 pt-4 gap-2">
-                    <Switch
-                      id="featured"
-                      checked={formData.featured}
-                      onCheckedChange={(checked) =>
-                        handleSwitchChange("featured", checked)
-                      }
-                    />
-                    <Label htmlFor="featured" className="mr-2">
-                      عرض هذه الوحدة في الصفحة الرئيسية
-                    </Label>
                   </div>
 
                   {/* الخصائص - Property Specifications */}
