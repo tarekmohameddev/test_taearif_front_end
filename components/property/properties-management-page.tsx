@@ -2002,10 +2002,12 @@ export function PropertiesManagementPage() {
                     <>
                       {viewMode === "grid" ? (
                         <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-4  ">
-                          {normalizedProperties.map((property: any) => (
+                          {normalizedProperties.map((property: any, index: number) => (
                             <PropertyCard
                               key={property.id}
                               property={property}
+                              allProperties={normalizedProperties}
+                              currentIndex={index}
                               isFavorite={favorites.includes(
                                 property.id.toString(),
                               )}
@@ -2171,6 +2173,8 @@ export function PropertiesManagementPage() {
 
 interface PropertyCardProps {
   property: any;
+  allProperties?: any[];
+  currentIndex?: number;
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
   onDelete: (id: string) => void;
@@ -2258,6 +2262,8 @@ function formatAddress(property: any): string {
 
 function PropertyCard({
   property,
+  allProperties = [],
+  currentIndex = 0,
   isFavorite,
   onToggleFavorite,
   onDelete,
@@ -2268,6 +2274,43 @@ function PropertyCard({
 }: PropertyCardProps & { setReorderPopup: any }) {
   const router = useRouter();
   const { userData } = useAuthStore();
+  const [columnsCount, setColumnsCount] = useState(4);
+  
+  // تحديث عدد الأعمدة بناءً على حجم الشاشة
+  useEffect(() => {
+    const updateColumnsCount = () => {
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        setColumnsCount(4); // lg:grid-cols-4
+      } else if (width >= 640) {
+        setColumnsCount(3); // sm:grid-cols-3
+      } else {
+        setColumnsCount(1); // default
+      }
+    };
+    
+    updateColumnsCount();
+    window.addEventListener('resize', updateColumnsCount);
+    return () => window.removeEventListener('resize', updateColumnsCount);
+  }, []);
+  
+  // التحقق من وجود مميزات في أي card في نفس الـ row
+  const hasFeaturesInSameRow = () => {
+    if (!allProperties || allProperties.length === 0) return false;
+    
+    const currentRow = Math.floor(currentIndex / columnsCount);
+    const rowStart = currentRow * columnsCount;
+    const rowEnd = rowStart + columnsCount;
+    
+    // التحقق من وجود مميزات في أي card في نفس الـ row
+    for (let i = rowStart; i < rowEnd && i < allProperties.length; i++) {
+      const prop = allProperties[i];
+      if (Array.isArray(prop.features) && prop.features.length > 0) {
+        return true;
+      }
+    }
+    return false;
+  };
   
   const formattedAddress = formatAddress(property);
   
@@ -2442,26 +2485,25 @@ function PropertyCard({
             </div>
           )}
         </div>
-        <div className="pt-2 min-h-[30px]">
+        <div className={hasFeaturesInSameRow() ? "pt-2 min-h-[30px]" : ""}>
           {Array.isArray(property.features) && property.features.length > 0 ? (
             <div className="grid grid-cols-2 gap-1">
               {property.features
                 .slice(0, 2)
                 .map((feature: string, index: number) => (
-                  <div className="flex justify-center">
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="text-xs font-semibold justify-center max-w-[150px]"
-                  >
-                    {feature}
-                  </Badge>
+                  <div key={index} className="flex justify-center">
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-semibold justify-center max-w-[150px]"
+                    >
+                      {feature}
+                    </Badge>
                   </div>
                 ))}
             </div>
-          ) : (
+          ) : hasFeaturesInSameRow() ? (
             <div className="h-[30px]"></div>
-          )}
+          ) : null}
         </div>
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 pt-0" onClick={(e) => e.stopPropagation()}>
