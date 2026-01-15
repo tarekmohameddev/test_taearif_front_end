@@ -1492,10 +1492,12 @@ export default function PropertyForm({ mode }) {
                       id="description"
                       name="description"
                       placeholder="شقة جميلة مع تشطيبات حديثة وإطلالات رائعة على المدينة"
-                      rows={10}
+                      rows={25}
                       value={formData.description}
                       onChange={handleInputChange}
-                      className={errors.description ? "border-red-500" : ""}
+                      className={
+                        errors.description ? "border-red-500" : ""
+                      }
                     />
                     {errors.description && (
                       <p className="text-sm text-red-500">
