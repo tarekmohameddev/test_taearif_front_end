@@ -1557,7 +1557,6 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                       <Card className="border-blue-200 bg-blue-50">
                         <CardHeader className="pb-3">
                           <div className="flex items-start gap-3">
-                            <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                             <div className="flex-1">
                               <CardTitle className="text-blue-900 text-base mb-2">
                                 خطوات الاستيراد
@@ -1584,8 +1583,10 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                                   </li>
                                 </ol>
                                 <div className="mt-3 pt-3 border-t border-blue-200">
-                                  <p className="text-xs text-blue-700">
+                                  <p className="text-xs text-blue-700 space-y-2">
                                     <strong>ملاحظة مهمة:</strong> تأكد من اتباع تنسيق القالب بدقة وتعبئة جميع الحقول المطلوبة للحصول على أفضل النتائج
+                                    <br />
+                                    <strong className="text-red-700">⚠️ تحذير:</strong> ممنوع منعاً باتاً تغيير أو إضافة أعمدة (Columns) في القالب. يجب استخدام الأعمدة الموجودة فقط كما هي في القالب الأصلي.
                                   </p>
                                 </div>
                               </CardDescription>
