@@ -2442,26 +2442,26 @@ function PropertyCard({
             </div>
           )}
         </div>
-        <div className="flex flex-wrap gap-1 pt-2">
+        <div className="pt-2 min-h-[30px]">
           {Array.isArray(property.features) && property.features.length > 0 ? (
-            <>
+            <div className="grid grid-cols-2 gap-1">
               {property.features
-                .slice(0, 3)
+                .slice(0, 2)
                 .map((feature: string, index: number) => (
-                  <span
+                  <div className="flex justify-center">
+                  <Badge
                     key={index}
-                    className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+                    variant="outline"
+                    className="text-xs font-semibold justify-center max-w-[150px]"
                   >
                     {feature}
-                  </span>
+                  </Badge>
+                  </div>
                 ))}
-              {property.features.length > 3 && (
-                <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
-                  +{property.features.length - 3} more
-                </span>
-              )}
-            </>
-          ) : null}
+            </div>
+          ) : (
+            <div className="h-[30px]"></div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 pt-0" onClick={(e) => e.stopPropagation()}>
