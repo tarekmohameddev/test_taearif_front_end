@@ -2658,25 +2658,6 @@ function PropertyListItem({
               className="h-full w-full object-cover"
             />
           </div>
-          {property.featured && (
-            <div className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
-              مميز
-            </div>
-          )}
-          <div
-            className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-medium ${
-              property.status === "منشور"
-                ? "bg-green-500 text-white"
-                : "bg-amber-500 text-white"
-            }`}
-          >
-            {property.status}
-          </div>
-          {property.status === "منشور" && property.creator && (
-            <div className="absolute right-2 top-12 rounded-md bg-blue-500 px-2 py-1 text-xs font-medium text-white">
-              {property.creator.name}
-            </div>
-          )}
         </div>
         <div className="flex flex-1 flex-col p-4">
           <div className="flex flex-row-reverse items-start justify-between">
@@ -2714,6 +2695,28 @@ function PropertyListItem({
                 {formattedAddress}
               </p>
             </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {property.featured && (
+              <Badge variant="outline" className="bg-primary text-primary-foreground border-primary">
+                مميز
+              </Badge>
+            )}
+            <Badge
+              variant="outline"
+              className={`${
+                property.status === "منشور"
+                  ? "bg-green-500 text-white border-green-500"
+                  : "bg-amber-500 text-white border-amber-500"
+              }`}
+            >
+              {property.status}
+            </Badge>
+            {property.status === "منشور" && property.creator && (
+              <Badge variant="outline" className="bg-blue-500 text-white border-blue-500">
+                {property.creator.name}
+              </Badge>
+            )}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <Badge variant="outline" className="flex items-center gap-1 bg-blue-50 text-blue-700 border-blue-200">
