@@ -944,7 +944,7 @@ export default function AddProjectPage(): JSX.Element {
                         onCheckedChange={handleSwitchChange}
                       />
                       <Label htmlFor="featured" className="mr-2">
-                        عرض هذا المشروع في الصفحة الرئيسية
+                        عرض هذا المشروع في الصفحة الرئيسية (مميز)
                       </Label>
                     </div>
                   </div>

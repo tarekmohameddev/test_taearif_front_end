@@ -1357,7 +1357,7 @@ export default function PropertyForm({ mode }) {
                         }
                       />
                       <Label htmlFor="featured" className="mr-2">
-                        عرض هذه الوحدة في الصفحة الرئيسية
+                        عرض هذه الوحدة في الصفحة الرئيسية (مميزة)
                       </Label>
                     </div>
                   </div>
