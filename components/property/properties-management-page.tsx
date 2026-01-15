@@ -1220,8 +1220,8 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight">
+              <div className={showIncompleteOnly ? "w-full text-center" : ""}>
+                <h1 className={`text-2xl font-bold tracking-tight ${showIncompleteOnly ? "text-red-800 dark:text-red-700" : ""}`}>
                   {showIncompleteOnly ? "الوحدات الغير مكتملة" : "إدارة الوحدات"}
                 </h1>
                 <p className="text-muted-foreground">
@@ -1230,7 +1230,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                     : "أضف وأدرج قوائم الوحدات لموقعك على الويب"}
                 </p>
               </div>
-              <div className="flex flex-col gap-2 md:flex-row md:items-center md:flex-wrap">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center">
                 {!showIncompleteOnly && (
                   <Button
                     variant="outline"
