@@ -1552,6 +1552,49 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
 
                 {!importResult ? (
                   <>
+                    {/* قسم الشرح والتوضيح */}
+                    <div className="mx-4 sm:mx-6 mt-4 mb-4">
+                      <Card className="border-blue-200 bg-blue-50">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start gap-3">
+                            <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                              <CardTitle className="text-blue-900 text-base mb-2">
+                                خطوات الاستيراد
+                              </CardTitle>
+                              <CardDescription className="text-blue-800 text-sm leading-relaxed">
+                                <ol className="list-decimal list-inside space-y-2 pr-2">
+                                  <li>
+                                    <strong>قم بتحميل القالب:</strong> اضغط على زر "تحميل القالب" أدناه لتحميل ملف Excel جاهز للاستخدام
+                                  </li>
+                                  <li>
+                                    <strong>افتح الملف واملأه بالبيانات:</strong> بعد تحميل القالب، افتحه في برنامج Excel أو أي برنامج جداول بيانات وابدأ بإدخال معلومات الوحدات العقارية في الأعمدة المخصصة
+                                  </li>
+                                  <li>
+                                    <strong>تأكد من صحة البيانات:</strong> راجع جميع المعلومات المدخلة وتأكد من صحتها واكتمالها قبل المتابعة
+                                  </li>
+                                  <li>
+                                    <strong>احفظ الملف:</strong> بعد الانتهاء من إدخال جميع البيانات، احفظ الملف بصيغة Excel (.xlsx أو .xls)
+                                  </li>
+                                  <li>
+                                    <strong>ارفع الملف:</strong> استخدم زر "رفع ملف Excel" أدناه لاختيار الملف المملوء بالبيانات ورفعه إلى النظام
+                                  </li>
+                                  <li>
+                                    <strong>ابدأ الاستيراد:</strong> اضغط على زر "استيراد" لبدء عملية استيراد الوحدات إلى النظام
+                                  </li>
+                                </ol>
+                                <div className="mt-3 pt-3 border-t border-blue-200">
+                                  <p className="text-xs text-blue-700">
+                                    <strong>ملاحظة مهمة:</strong> تأكد من اتباع تنسيق القالب بدقة وتعبئة جميع الحقول المطلوبة للحصول على أفضل النتائج
+                                  </p>
+                                </div>
+                              </CardDescription>
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </div>
+
                     <div className="grid gap-4 py-4 px-4 sm:px-6">
                       <div className="flex flex-col gap-4">
                         <Button
