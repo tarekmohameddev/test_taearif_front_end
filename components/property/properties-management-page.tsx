@@ -1598,8 +1598,8 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                     <div className="grid gap-4 py-4 px-4 sm:px-6">
                       <div className="flex flex-col gap-4">
                         <Button
-                          variant="outline"
-                          className="w-full gap-2"
+                          variant="default"
+                          className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                           onClick={handleDownloadTemplate}
                           disabled={isDownloadingTemplate}
                         >
