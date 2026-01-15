@@ -448,13 +448,19 @@ const truncateTitle = (title: string, maxLength: number = 40): string => {
   return title.substring(0, maxLength) + "...";
 };
 
-export function PropertiesManagementPage() {
+interface PropertiesManagementPageProps {
+  showIncompleteOnly?: boolean;
+}
+
+export function PropertiesManagementPage({ showIncompleteOnly = false }: PropertiesManagementPageProps) {
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>(
+    showIncompleteOnly ? { status: 0 } : {}
+  );
   const [filterCityId, setFilterCityId] = useState<string | null>(null);
   const [filterDistrictId, setFilterDistrictId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string | null>(null);
@@ -1168,9 +1174,9 @@ export function PropertiesManagementPage() {
     }
 
     if (!isInitialized && !loading) {
-      fetchProperties(1);
+      fetchProperties(1, showIncompleteOnly ? { status: 0 } : {});
     }
-  }, [fetchProperties, isInitialized, loading]);
+  }, [fetchProperties, isInitialized, loading, showIncompleteOnly]);
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-4">
@@ -1216,30 +1222,46 @@ export function PropertiesManagementPage() {
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  إدارة الوحدات
+                  {showIncompleteOnly ? "الوحدات الغير مكتملة" : "إدارة الوحدات"}
                 </h1>
                 <p className="text-muted-foreground">
-                  أضف وأدرج قوائم الوحدات لموقعك على الويب
+                  {showIncompleteOnly 
+                    ? "عرض الوحدات غير المكتملة التي تحتاج إلى إكمال البيانات"
+                    : "أضف وأدرج قوائم الوحدات لموقعك على الويب"}
                 </p>
               </div>
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:flex-wrap">
-                <Button
-                  variant="outline"
-                  className="gap-1 w-full md:w-auto"
-                  onClick={() => setImportDialogOpen(true)}
-                >
-                  <Upload className="h-4 w-4" />
-                  استيراد وحدات
-                </Button>
-                <Button
-                  variant="outline"
-                  className="gap-1 w-full md:w-auto"
-                  onClick={() => setExportDialogOpen(true)}
-                  disabled={isExporting || loading}
-                >
-                  <Download className="h-4 w-4" />
-                  {isExporting ? "جاري التصدير..." : "تصدير وحدات"}
-                </Button>
+                {!showIncompleteOnly && (
+                  <Button
+                    variant="outline"
+                    className="gap-1 w-full md:w-auto"
+                    onClick={() => router.push("/dashboard/properties/incomplete")}
+                  >
+                    <AlertCircle className="h-4 w-4" />
+                    الوحدات الغير مكتملة
+                  </Button>
+                )}
+                {!showIncompleteOnly && (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="gap-1 w-full md:w-auto"
+                      onClick={() => setImportDialogOpen(true)}
+                    >
+                      <Upload className="h-4 w-4" />
+                      استيراد وحدات
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="gap-1 w-full md:w-auto"
+                      onClick={() => setExportDialogOpen(true)}
+                      disabled={isExporting || loading}
+                    >
+                      <Download className="h-4 w-4" />
+                      {isExporting ? "جاري التصدير..." : "تصدير وحدات"}
+                    </Button>
+                  </>
+                )}
                 <div className="flex gap-2 w-full md:w-auto">
                   <Button
                     variant="outline"
