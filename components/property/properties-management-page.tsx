@@ -2768,6 +2768,26 @@ function PropertyListItem({
                 </span>
               ))}
           </div>
+          {(property.created_at || property.updated_at) && (
+            <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              {property.created_at && (
+                <div className="flex items-center gap-1">
+                  <CalendarIcon className="h-3 w-3" />
+                  <span>
+                    تاريخ الإنشاء: {format(new Date(property.created_at), "yyyy-MM-dd HH:mm", { locale: ar })}
+                  </span>
+                </div>
+              )}
+              {property.updated_at && (
+                <div className="flex items-center gap-1">
+                  <CalendarIcon className="h-3 w-3" />
+                  <span>
+                    آخر تعديل: {format(new Date(property.updated_at), "yyyy-MM-dd HH:mm", { locale: ar })}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
           <div className="mt-auto pt-4 flex gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
             <Button
               variant="outline"
