@@ -345,7 +345,20 @@ export function EnhancedSidebar({
 
           {!loading && !error && (
             <div className="space-y-1">
-              {/* إدارة العقارات - Collapsible Section with Framer Motion */}
+              {/* العناصر الثلاثة الأولى */}
+              {mainNavItems.slice(0, 3).map((item: any) => (
+                <NavItem
+                  key={item.id}
+                  item={item}
+                  isActive={
+                    activeTab
+                      ? currentTab === item.id && activeTab === item.id
+                      : internalActiveTab === item.id
+                  }
+                />
+              ))}
+
+              {/* إدارة العقارات - Collapsible Section with Framer Motion (الرابط الرابع) */}
               <div>
                 <TooltipProvider delayDuration={300}>
                   <Tooltip>
@@ -474,7 +487,8 @@ export function EnhancedSidebar({
                 )}
               </div>
 
-              {mainNavItems.map((item: any) => (
+              {/* باقي العناصر (من الرابع فما فوق) */}
+              {mainNavItems.slice(3).map((item: any) => (
                 <NavItem
                   key={item.id}
                   item={item}
