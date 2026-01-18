@@ -176,14 +176,68 @@ export function useLiveEditorHandlers(state: any) {
     if (id === "global-header") {
       const store = useEditorStore.getState();
 
+      // ⭐ CRITICAL: Preserve logo.image/logo.text from current globalHeaderData before changing theme
+      // This ensures data is preserved when switching from header2 to header1 (like footer behavior)
+      const currentGlobalHeaderData = store.globalHeaderData || {};
+      const preservedLogoImage = currentGlobalHeaderData?.logo?.image;
+      const preservedLogoText = currentGlobalHeaderData?.logo?.text;
+
       // Get default data for the new theme
       const newDefaultData = createDefaultData("header", newTheme);
 
       // ⭐ Add variant to newDefaultData to ensure it's included
-      const newDefaultDataWithVariant = {
+      // ⭐ Also Include CustomBranding if available
+      const customBranding = store.WebsiteLayout?.CustomBranding?.header;
+      const newDefaultDataWithVariant: any = {
         ...newDefaultData,
         variant: newTheme,
       };
+
+      // Ensure logo structure exists
+      if (!newDefaultDataWithVariant.logo) {
+        newDefaultDataWithVariant.logo = {};
+      }
+
+      // Priority: CustomBranding > Preserved from current data > Default
+      // Inject CustomBranding (highest priority)
+      if (customBranding) {
+        // Header usually has logo object at root or inside logo property
+        // Check standard header structure (usually logo.image and logo.text/alt)
+        if (customBranding.logo) {
+          if (typeof newDefaultDataWithVariant.logo === "object") {
+            newDefaultDataWithVariant.logo.image = customBranding.logo;
+          } else {
+             // Fallback if structure is different
+             newDefaultDataWithVariant.logo = customBranding.logo;
+          }
+        }
+        if (customBranding.name) {
+          if (typeof newDefaultDataWithVariant.logo === "object") {
+             // Usually text or alt
+             newDefaultDataWithVariant.logo.text = customBranding.name;
+             newDefaultDataWithVariant.logo.alt = customBranding.name;
+          }
+        }
+      } else {
+        // ⭐ CRITICAL: If no CustomBranding, preserve logo.image/text from current globalHeaderData
+        // This matches footer behavior - preserves data when changing theme
+        if (preservedLogoImage) {
+          if (typeof newDefaultDataWithVariant.logo === "object") {
+            newDefaultDataWithVariant.logo.image = preservedLogoImage;
+          }
+          console.log("[LiveEditorHandlers] Preserved logo.image from current globalHeaderData:", preservedLogoImage);
+        }
+        if (preservedLogoText) {
+          if (typeof newDefaultDataWithVariant.logo === "object") {
+            newDefaultDataWithVariant.logo.text = preservedLogoText;
+            newDefaultDataWithVariant.logo.alt = preservedLogoText;
+          }
+          console.log("[LiveEditorHandlers] Preserved logo.text from current globalHeaderData:", preservedLogoText);
+        }
+        if (!preservedLogoImage && !preservedLogoText) {
+          console.warn("[LiveEditorHandlers] No CustomBranding or preserved data found for header");
+        }
+      }
 
       // IMPORTANT: Update variant FIRST, then data
       // This ensures the variant is saved before any other operations
@@ -191,6 +245,9 @@ export function useLiveEditorHandlers(state: any) {
 
       // Update data with variant included
       store.setGlobalHeaderData(newDefaultDataWithVariant);
+
+      // ⭐ CRITICAL: Update tempData to show change immediately in Editor Sidebar
+      store.setTempData(newDefaultDataWithVariant);
 
       // Update globalComponentsData with BOTH variant and data
       store.setGlobalComponentsData({
@@ -209,20 +266,77 @@ export function useLiveEditorHandlers(state: any) {
     if (id === "global-footer") {
       const store = useEditorStore.getState();
 
+      // ⭐ CRITICAL: Preserve logo/name from current globalFooterData before changing theme
+      // This ensures data is preserved when switching from footer2 to footer1 (like footer2 behavior)
+      const currentGlobalFooterData = store.globalFooterData || {};
+      const preservedLogo = currentGlobalFooterData?.content?.companyInfo?.logo;
+      const preservedName = currentGlobalFooterData?.content?.companyInfo?.name;
+
       // Get default data for the new theme
       const newDefaultData = createDefaultData("footer", newTheme);
 
       // ⭐ Add variant to newDefaultData to ensure it's included
-      const newDefaultDataWithVariant = {
+      // ⭐ Also Include CustomBranding if available
+      const customBranding = store.WebsiteLayout?.CustomBranding?.footer;
+      
+      console.log("[LiveEditorHandlers] Debug CustomBranding:", { 
+          customBranding, 
+          websiteLayout: store.WebsiteLayout 
+      });
+
+      const newDefaultDataWithVariant: any = {
         ...newDefaultData,
         variant: newTheme,
       };
+
+      // Ensure content.companyInfo structure exists
+      if (!newDefaultDataWithVariant.content) {
+        newDefaultDataWithVariant.content = {};
+      }
+      if (!newDefaultDataWithVariant.content.companyInfo) {
+        newDefaultDataWithVariant.content.companyInfo = {};
+      }
+
+      // Priority: CustomBranding > Preserved from current data > Default
+      // Inject CustomBranding (highest priority)
+      if (customBranding) {
+        if (customBranding.logo) {
+          newDefaultDataWithVariant.content.companyInfo.logo =
+            customBranding.logo;
+        }
+        if (customBranding.name) {
+          newDefaultDataWithVariant.content.companyInfo.name =
+            customBranding.name;
+        }
+        console.log("[LiveEditorHandlers] Injected Branding:", newDefaultDataWithVariant.content.companyInfo);
+      } else {
+        // ⭐ CRITICAL: If no CustomBranding, preserve logo/name from current globalFooterData
+        // This matches footer2 behavior - preserves data when changing theme
+        if (preservedLogo) {
+          newDefaultDataWithVariant.content.companyInfo.logo = preservedLogo;
+          console.log("[LiveEditorHandlers] Preserved logo from current globalFooterData:", preservedLogo);
+        }
+        if (preservedName) {
+          newDefaultDataWithVariant.content.companyInfo.name = preservedName;
+          console.log("[LiveEditorHandlers] Preserved name from current globalFooterData:", preservedName);
+        }
+        if (!preservedLogo && !preservedName) {
+          console.warn("[LiveEditorHandlers] No CustomBranding or preserved data found for footer");
+        }
+      }
 
       // IMPORTANT: Update variant FIRST, then data
       store.setGlobalFooterVariant(newTheme);
 
       // Update data with variant included
       store.setGlobalFooterData(newDefaultDataWithVariant);
+
+      // ⭐ CRITICAL: Update tempData to show change immediately in Editor Sidebar
+      // Using setTimeout to ensure this runs after any effects that might try to reset it
+      setTimeout(() => {
+         console.log("[LiveEditorHandlers] Forcing tempData update via setTimeout");
+         store.setTempData(newDefaultDataWithVariant);
+      }, 50);
 
       // Update globalComponentsData with BOTH variant and data
       store.setGlobalComponentsData({

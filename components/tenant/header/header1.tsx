@@ -237,13 +237,6 @@ const Header1 = (props: HeaderProps = {}) => {
   const isGlobalHeader =
     variantId === "global-header" || uniqueId === "global-header";
 
-  // Debug: Log component render
-  console.log("🎯 Header1 Component Rendered:", {
-    variantId,
-    uniqueId,
-    isGlobalHeader,
-    forceUpdate,
-  });
 
   // Subscribe to editor store updates for this header variant
   const ensureComponentVariant = useEditorStore(
@@ -286,6 +279,9 @@ const Header1 = (props: HeaderProps = {}) => {
       fetchTenantData(tenantId);
     }
   }, [tenantId, fetchTenantData]);
+
+  // Subscribe to website layout for custom branding
+  const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
@@ -352,19 +348,32 @@ const Header1 = (props: HeaderProps = {}) => {
     }
 
     // Apply branding data with highest priority
-    if (tenantData?.branding) {
-      // Logo priority: tenantData.branding.logo (highest) → result.logo.image → default
+    // 1. Custom Branding (from editor store WebsiteLayout)
+    if (customBranding?.header) {
       if (!result.logo) {
         result.logo = {};
       }
-      if (tenantData.branding.logo) {
+      if (customBranding.header.logo) {
+        result.logo.image = customBranding.header.logo;
+      }
+      if (customBranding.header.name) {
+        result.logo.text = customBranding.header.name;
+      }
+    }
+
+    // 2. Tenant Branding (historical fallback)
+    if (tenantData?.branding) {
+      if (!result.logo) {
+        result.logo = {};
+      }
+      // Only apply if not already set by customBranding
+      if (tenantData.branding.logo && !customBranding?.header?.logo) {
         result.logo.image = tenantData.branding.logo;
       }
-      
-      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → result.logo.text → default
-      if (tenantData.branding.name) {
+
+      if (tenantData.branding.name && !customBranding?.header?.name) {
         result.logo.text = tenantData.branding.name;
-      } else if (tenantData.websiteName) {
+      } else if (tenantData.websiteName && !customBranding?.header?.name) {
         result.logo.text = tenantData.websiteName;
       }
     }
@@ -379,6 +388,7 @@ const Header1 = (props: HeaderProps = {}) => {
     tenantComponentData,
     storeData,
     tenantData,
+    customBranding,
   ]);
 
   // Force re-render when globalHeaderData changes
@@ -446,9 +456,6 @@ const Header1 = (props: HeaderProps = {}) => {
     [mergedData],
   );
 
-  // Debug: Log header styles when they change
-  console.log("🎨 Header Styles:", headerStyles);
-  console.log("🎨 Background Color:", headerStyles.background);
 
   const logoStyles = useMemo(
     () => ({
@@ -487,10 +494,10 @@ const Header1 = (props: HeaderProps = {}) => {
                 "#1f2937",
             }}
           >
-            {mergedData.logo?.type !== "text" && (tenantData?.branding?.logo || mergedData.logo?.image) && (
+            {mergedData.logo?.type !== "text" && (customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo) && (
               <img
-                src={tenantData?.branding?.logo || mergedData.logo?.image}
-                alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.text || "Logo"}
+                src={customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo}
+                alt={customBranding?.header?.name || mergedData.logo?.text || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
                 className="h-full max-h-16 w-auto object-contain"
                 style={{
                   maxHeight: "4rem", // 64px
@@ -502,9 +509,10 @@ const Header1 = (props: HeaderProps = {}) => {
             {(mergedData.logo?.type === "text" ||
               mergedData.logo?.type === "image+text") && (
               <span style={logoStyles}>
-                {tenantData?.branding?.name ||
-                  tenantData?.websiteName ||
+                {customBranding?.header?.name ||
                   mergedData.logo?.text ||
+                  tenantData?.branding?.name ||
+                  tenantData?.websiteName ||
                   "الشركة العقارية"}
               </span>
             )}
@@ -651,10 +659,10 @@ const Header1 = (props: HeaderProps = {}) => {
                 <div className="flex items-center justify-between">
                   {mergedData.actions?.mobile?.showLogo && (
                     <div className="flex items-center gap-2">
-                      {(tenantData?.branding?.logo || mergedData.logo?.image) && (
+                      {(customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo) && (
                         <img
-                          src={tenantData?.branding?.logo || mergedData.logo?.image}
-                          alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.text || "Logo"}
+                          src={customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo}
+                          alt={customBranding?.header?.name || mergedData.logo?.text || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
                           className="size-8"
                         />
                       )}
@@ -667,9 +675,10 @@ const Header1 = (props: HeaderProps = {}) => {
                             "#1f2937",
                         }}
                       >
-                        {tenantData?.branding?.name ||
-                          tenantData?.websiteName ||
+                        {customBranding?.header?.name ||
                           mergedData.logo?.text ||
+                          tenantData?.branding?.name ||
+                          tenantData?.websiteName ||
                           "الشركة العقارية"}
                       </span>
                     </div>

@@ -164,6 +164,9 @@ export default function Header2(props: Header2Props) {
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
+  // Subscribe to website layout for custom branding
+  const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
+
   // ─────────────────────────────────────────────────────────
   // 3. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
@@ -285,19 +288,32 @@ export default function Header2(props: Header2Props) {
     };
 
     // Apply branding data with highest priority
-    if (tenantData?.branding) {
-      // Logo priority: tenantData.branding.logo (highest) → merged.logo.image → default
+    // 1. Custom Branding (from editor store WebsiteLayout)
+    if (customBranding?.header) {
       if (!merged.logo) {
         merged.logo = {};
       }
-      if (tenantData.branding.logo) {
+      if (customBranding.header.logo) {
+        merged.logo.image = customBranding.header.logo;
+      }
+      if (customBranding.header.name) {
+        merged.logo.alt = customBranding.header.name;
+      }
+    }
+
+    // 2. Tenant Branding (historical fallback)
+    if (tenantData?.branding) {
+      if (!merged.logo) {
+        merged.logo = {};
+      }
+      // Only apply if not already set by customBranding
+      if (tenantData.branding.logo && !customBranding?.header?.logo) {
         merged.logo.image = tenantData.branding.logo;
       }
-      
-      // Alt/Name priority: tenantData.branding.name (highest) → tenantData.websiteName → merged.logo.alt → default
-      if (tenantData.branding.name) {
+
+      if (tenantData.branding.name && !customBranding?.header?.name) {
         merged.logo.alt = tenantData.branding.name;
-      } else if (tenantData.websiteName) {
+      } else if (tenantData.websiteName && !customBranding?.header?.name) {
         merged.logo.alt = tenantData.websiteName;
       }
     }
@@ -503,8 +519,8 @@ export default function Header2(props: Header2Props) {
             }}
           >
             <Image
-              src={tenantData?.branding?.logo || mergedData.logo?.image || "/images/main/logo.png"}
-              alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.alt || "rules"}
+              src={customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo || "/images/main/logo.png"}
+              alt={customBranding?.header?.name || mergedData.logo?.alt || tenantData?.branding?.name || tenantData?.websiteName || "rules"}
               fill
               style={{ objectFit: "contain" }}
             />

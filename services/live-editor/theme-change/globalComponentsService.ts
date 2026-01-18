@@ -36,8 +36,8 @@ import type { ThemeData } from "./types";
  * @param headerData - بيانات Header من الثيم
  *                   Header data from theme
  *
- * @param headerVariant - نوع Header (مثل "StaticHeader1" أو "StaticHeader2")
- *                      Header variant (e.g., "StaticHeader1" or "StaticHeader2")
+ * @param headerVariant - نوع Header (مثل "header1" أو "header2")
+ *                      Header variant (e.g., "header1" or "header2")
  *
  * @example
  * ```typescript
@@ -71,6 +71,10 @@ export function applyGlobalHeader(
   // إنشاء كائن جديد لضمان اكتشاف React للتغيير
   // Create new object to ensure React detects the change
   store.setGlobalHeaderData(newHeaderDataWithVariant);
+
+  // ⭐ CRITICAL: تحديث tempData ليظهر التغيير فوراً في Editor Sidebar
+  // ⭐ CRITICAL: Update tempData to show change immediately in Editor Sidebar
+  store.setTempData(newHeaderDataWithVariant);
 
   // تحديث globalComponentsData مع variant والبيانات
   // ⭐ CRITICAL: التأكد من أن header data يحتوي على variant داخله
@@ -117,6 +121,10 @@ export function applyGlobalFooter(
   // Get default data for the new footer variant
   const newDefaultFooterData = createDefaultData("footer", footerVariant);
 
+  // استخراج CustomBranding من store
+  // Extract CustomBranding from store
+  const customBranding = store.WebsiteLayout?.CustomBranding?.footer;
+
   // دمج بيانات الثيم مع البيانات الافتراضية (بيانات الثيم لها الأولوية)
   // ⭐ IMPORTANT: يجب إضافة variant بعد spread لضمان وجوده دائماً
   // Merge theme data with default data (theme data takes priority)
@@ -127,6 +135,37 @@ export function applyGlobalFooter(
     variant: footerVariant, // ✅ Ensure variant is ALWAYS included (after spread)
   };
 
+  // ⭐ CRITICAL: حقن بيانات CustomBranding في حالة المكون الجديد
+  // هذا يضمن ظهور البيانات في Editor Sidebar مباشرة بعد التغيير
+  // ⭐ CRITICAL: Inject CustomBranding data into new component state
+  // This ensures data appears in Editor Sidebar immediately after change
+  if (customBranding) {
+    if (!newFooterDataWithVariant.content) {
+      newFooterDataWithVariant.content = {};
+    }
+    if (!newFooterDataWithVariant.content.companyInfo) {
+      newFooterDataWithVariant.content.companyInfo = {};
+    }
+
+    // حقن اللوجو إذا كان موجوداً
+    // Inject logo if exists
+    if (customBranding.logo) {
+      newFooterDataWithVariant.content.companyInfo.logo = customBranding.logo;
+      console.log(
+        `[applyGlobalFooter] Injected CustomBranding logo into ${footerVariant}`,
+      );
+    }
+
+    // حقن الاسم إذا كان موجوداً
+    // Inject name if exists
+    if (customBranding.name) {
+      newFooterDataWithVariant.content.companyInfo.name = customBranding.name;
+      console.log(
+        `[applyGlobalFooter] Injected CustomBranding name into ${footerVariant}`,
+      );
+    }
+  }
+
   // ⭐ IMPORTANT: تحديث variant أولاً، ثم البيانات (نفس منطق editor sidebar)
   // ⭐ IMPORTANT: Update variant FIRST, then data (same as editor sidebar)
   store.setGlobalFooterVariant(footerVariant);
@@ -134,6 +173,10 @@ export function applyGlobalFooter(
   // إنشاء كائن جديد لضمان اكتشاف React للتغيير
   // Create new object to ensure React detects the change
   store.setGlobalFooterData(newFooterDataWithVariant);
+
+  // ⭐ CRITICAL: تحديث tempData ليظهر التغيير فوراً في Editor Sidebar
+  // ⭐ CRITICAL: Update tempData to show change immediately in Editor Sidebar
+  store.setTempData(newFooterDataWithVariant);
 
   // تحديث globalComponentsData مع variant والبيانات
   // ⭐ CRITICAL: التأكد من أن footer data يحتوي على variant داخله
@@ -176,7 +219,7 @@ export function applyGlobalComponentsFromTheme(themeData: ThemeData): void {
   // تحديد نوع Header
   // Determine header variant
   const headerVariant =
-    header?.variant || globalHeaderVariant || "StaticHeader1";
+    header?.variant || globalHeaderVariant || "header1";
 
   if (headerVariant) {
     applyGlobalHeader(header, headerVariant);
@@ -185,7 +228,7 @@ export function applyGlobalComponentsFromTheme(themeData: ThemeData): void {
   // تحديد نوع Footer
   // Determine footer variant
   const footerVariant =
-    footer?.variant || globalFooterVariant || "StaticFooter1";
+    footer?.variant || globalFooterVariant || "footer1";
 
   if (footerVariant) {
     applyGlobalFooter(footer, footerVariant);
@@ -223,11 +266,11 @@ export function mergeGlobalComponentsWithBackup(themeData: ThemeData): void {
   // تطبيق Header variant إذا كان محدداً في themeData
   // ⭐ CRITICAL: تطبيق variants من themeData (تجاوز variants من النسخ الاحتياطي)
   // هذا يضمن أنه عند تغيير الثيمات، يتم تطبيق variants الصحيحة (header2/footer2)
-  // حتى لو كان النسخ الاحتياطي يحتوي على variants قديمة (StaticHeader1/StaticFooter1)
+  // حتى لو كان النسخ الاحتياطي يحتوي على variants قديمة (header1/footer1)
   // Apply header variant if specified in themeData
   // ⭐ CRITICAL: Apply variants from themeData (override backup variants)
   // This ensures that when switching themes, correct variants (header2/footer2) are applied
-  // even if backup contains old variants (StaticHeader1/StaticFooter1)
+  // even if backup contains old variants (header1/footer1)
   if (globalHeaderVariant) {
     store.setGlobalHeaderVariant(globalHeaderVariant);
 
@@ -323,7 +366,7 @@ export function restoreGlobalComponents(globalData: any): void {
   const headerVariant =
     globalData.globalHeaderVariant ||
     globalData.header?.variant ||
-    "StaticHeader1";
+    "header1";
 
   // استبدال Header بالكامل
   // Replace header completely
@@ -341,7 +384,7 @@ export function restoreGlobalComponents(globalData: any): void {
   const footerVariant =
     globalData.globalFooterVariant ||
     globalData.footer?.variant ||
-    "StaticFooter1";
+    "footer1";
 
   // استبدال Footer بالكامل
   // Replace footer completely

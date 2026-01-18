@@ -403,10 +403,6 @@ const useTenantStore = create((set) => ({
           editorStore.setStaticPageData(slug, pageData);
         });
 
-        console.log(
-          "[fetchTenantData] Loaded StaticPages into editorStore:",
-          Object.keys(convertedStaticPages),
-        );
       }
 
       set({

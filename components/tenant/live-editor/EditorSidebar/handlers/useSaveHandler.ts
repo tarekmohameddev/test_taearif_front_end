@@ -90,11 +90,81 @@ export const useSaveHandler = ({
         ...globalComponentsData,
         header: latestTempData,
       });
+
+      // Transfer logo/name from tempData to CustomBranding.header
+      // Priority: latestTempData values > current CustomBranding values
+      const headerLogo = latestTempData?.logo?.image || latestTempData?.logo;
+      
+      // ⭐ CRITICAL: For header2, logo.alt is used (company name field)
+      // For header1, logo.text is used
+      // Priority: logo.alt first (header2) > logo.text (header1)
+      // This ensures header2's company name field (logo.alt) takes priority
+      const headerName = latestTempData?.logo?.alt || latestTempData?.logo?.text;
+
+      console.log("🔍 [handleGlobalComponentSave] Header Save Debug:", {
+        latestTempData,
+        logo: latestTempData?.logo,
+        logoImage: latestTempData?.logo?.image,
+        logoText: latestTempData?.logo?.text,
+        logoAlt: latestTempData?.logo?.alt,
+        headerLogo,
+        headerName,
+      });
+
+      // Get current CustomBranding to preserve existing values if new ones are not provided
+      const currentCustomBranding = store.WebsiteLayout?.CustomBranding;
+      const currentHeaderBranding: any = currentCustomBranding?.header || {};
+      
+      // ⭐ CRITICAL: If latestTempData has logo object, use its values (even if empty strings)
+      // This ensures that explicitly set empty values are saved
+      const hasLogoInTempData = latestTempData?.logo !== undefined;
+      
+      // If logo object exists in tempData, use its values; otherwise preserve current CustomBranding
+      const logoToSave = hasLogoInTempData 
+        ? (headerLogo !== undefined ? headerLogo : currentHeaderBranding?.logo || "")
+        : (currentHeaderBranding?.logo || "");
+      
+      const nameToSave = hasLogoInTempData
+        ? (headerName !== undefined ? headerName : currentHeaderBranding?.name || "")
+        : (currentHeaderBranding?.name || "");
+
+      console.log("💾 [handleGlobalComponentSave] Updating CustomBranding.header:", {
+        hasLogoInTempData,
+        logoToSave,
+        nameToSave,
+        headerLogo,
+        headerName,
+        currentHeaderBranding,
+        latestTempDataLogo: latestTempData?.logo,
+      });
+
+      // Always update CustomBranding when saving header (even if values are empty)
+      store.updateCustomBranding("header", {
+        logo: logoToSave,
+        name: nameToSave,
+      });
+      
+      // ⭐ CRITICAL: Get updated state immediately after updateCustomBranding
+      const storeAfterUpdate = useEditorStore.getState();
+      console.log("✅ [handleGlobalComponentSave] CustomBranding.header updated:", {
+        logo: logoToSave,
+        name: nameToSave,
+        storeAfterUpdateCustomBranding: storeAfterUpdate.WebsiteLayout?.CustomBranding,
+        storeAfterUpdateHeader: storeAfterUpdate.WebsiteLayout?.CustomBranding?.header,
+        storeAfterUpdateHeaderName: storeAfterUpdate.WebsiteLayout?.CustomBranding?.header?.name,
+      });
+
       onComponentUpdate(componentId, latestTempData);
 
       const storeAfter = useEditorStore.getState();
       const pageComponentsAfter =
         storeAfter.pageComponentsByPage[currentPage] || [];
+      
+      console.log("🔍 [handleGlobalComponentSave] Final store state check:", {
+        finalCustomBranding: storeAfter.WebsiteLayout?.CustomBranding,
+        finalHeader: storeAfter.WebsiteLayout?.CustomBranding?.header,
+        finalHeaderName: storeAfter.WebsiteLayout?.CustomBranding?.header?.name,
+      });
 
       onClose();
       return;
@@ -114,6 +184,19 @@ export const useSaveHandler = ({
         ...globalComponentsData,
         footer: latestTempData,
       });
+
+      // Transfer logo/name from tempData to CustomBranding.footer
+      const footerLogo = latestTempData?.content?.companyInfo?.logo;
+      const footerName = latestTempData?.content?.companyInfo?.name;
+
+      if (footerLogo || footerName) {
+        const currentCustomBranding = store.WebsiteLayout?.CustomBranding;
+        store.updateCustomBranding("footer", {
+          logo: footerLogo || currentCustomBranding?.footer?.logo || "",
+          name: footerName || currentCustomBranding?.footer?.name || "",
+        });
+      }
+
       onComponentUpdate(componentId, latestTempData);
 
       const storeAfter = useEditorStore.getState();

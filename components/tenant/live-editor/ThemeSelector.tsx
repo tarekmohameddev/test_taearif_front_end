@@ -98,7 +98,7 @@ export function ThemeSelector({
     const themeId = findThemeForComponent(selectedTheme);
     if (themeId && themes.length > 0) {
       const theme = themes.find((t: Theme) => t.id === themeId);
-      if (theme && !theme.has_access) {
+      if (theme && !theme.has_access && process.env.NODE_ENV !== "development") {
         // إغلاق ThemeSelector dialog أولاً
         setIsOpen(false);
         // منع التطبيق وإظهار PremiumDialog

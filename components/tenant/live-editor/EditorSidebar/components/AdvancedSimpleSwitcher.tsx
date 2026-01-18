@@ -33,22 +33,27 @@ export function AdvancedSimpleSwitcher({
 
   // دالة للتعامل مع تحديث البيانات حسب نوع المكون
   const handleUpdateByPath = (path: string, value: any) => {
+    // Debug: Log all footer updates
+    if (type === "footer") {
+      console.log("🔍 [AdvancedSimpleSwitcher] Footer Update:", {
+        type,
+        componentName,
+        path,
+        value,
+        selectedComponentId: selectedComponent?.id,
+      });
+    }
+
+    // Note: CustomBranding updates are now handled during save (in handleGlobalComponentSave)
+    // Changes are saved to tempData only, and transferred to CustomBranding on save button click
+
     if (onUpdateByPath) {
-      // Use the unified update function
+      // Use the unified update function (which updates tempData)
       onUpdateByPath(path, value);
     } else {
-      // Check if this is a global component
-      if (selectedComponent?.id === "global-header") {
-        updateGlobalComponentByPath("header", path, value);
-      } else if (selectedComponent?.id === "global-footer") {
-        updateGlobalComponentByPath("footer", path, value);
-      } else if (type === "header" && componentName === "header1") {
-        updateGlobalHeaderByPath(path, value);
-      } else if (type === "footer" && componentName === "footer1") {
-        updateGlobalFooterByPath(path, value);
-      } else {
-        updateByPath(path, value);
-      }
+      // For all components (including global), use updateByPath to update tempData
+      // This ensures changes are saved to tempData first, then transferred on save
+      updateByPath(path, value);
     }
   };
 

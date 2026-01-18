@@ -248,6 +248,9 @@ export default function StaticFooter({
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
+  // Subscribe to website layout for custom branding
+  const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
+
   // Force re-render state
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -327,9 +330,12 @@ export default function StaticFooter({
       };
     }
 
-    // Apply branding data as fallback for logo and name
-    if (tenantData?.branding) {
-      // Ensure content.companyInfo exists
+    // Debug: Log customBranding for StaticFooter1
+    console.log("🔍 [StaticFooter1] customBranding:", customBranding);
+
+    // Apply branding data with highest priority
+    // 1. Custom Branding (from editor store WebsiteLayout)
+    if (customBranding?.footer) {
       if (!result.content) {
         result.content = {};
       }
@@ -337,15 +343,31 @@ export default function StaticFooter({
         result.content.companyInfo = {};
       }
 
-      // Logo priority: tenantData.branding.logo (highest) → result.content.companyInfo.logo → default
-      if (tenantData.branding.logo) {
+      if (customBranding.footer.logo) {
+        result.content.companyInfo.logo = customBranding.footer.logo;
+      }
+      if (customBranding.footer.name) {
+        result.content.companyInfo.name = customBranding.footer.name;
+      }
+    }
+
+    // 2. Tenant Branding (historical fallback)
+    if (tenantData?.branding) {
+      if (!result.content) {
+        result.content = {};
+      }
+      if (!result.content.companyInfo) {
+        result.content.companyInfo = {};
+      }
+
+      // Only apply if not already set by customBranding
+      if (tenantData.branding.logo && !customBranding?.footer?.logo) {
         result.content.companyInfo.logo = tenantData.branding.logo;
       }
-      
-      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → result.content.companyInfo.name → default
-      if (tenantData.branding.name) {
+
+      if (tenantData.branding.name && !customBranding?.footer?.name) {
         result.content.companyInfo.name = tenantData.branding.name;
-      } else if (tenantData.websiteName) {
+      } else if (tenantData.websiteName && !customBranding?.footer?.name) {
         result.content.companyInfo.name = tenantData.websiteName;
       }
     }
@@ -494,21 +516,64 @@ export default function StaticFooter({
           {mergedData.content.companyInfo.enabled && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                {(tenantData?.branding?.logo || mergedData.content.companyInfo.logo) ? (
-                  <div className="flex ">
-                    <Image
-                      src={tenantData?.branding?.logo || mergedData.content.companyInfo.logo}
-                      alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.content.companyInfo.name || ""}
-                      width={100}
-                      height={100}
-                      className="rounded-full object-contain"
-                    />
-                  </div>
-                ) : (
-                  <div className="grid size-10 place-items-center rounded-full border border-emerald-500">
-                    <MapPin className="size-5" />
-                  </div>
-                )}
+                {/* Logic for determining the logo source with strict priority */}
+                {(() => {
+                  // 1. Custom Branding (Highest Priority)
+                  const brandingLogo = customBranding?.footer?.logo;
+                  if (brandingLogo) {
+                     return (
+                      <div className="flex">
+                        <Image
+                          src={brandingLogo}
+                          alt={customBranding?.footer?.name || mergedData.content.companyInfo.name || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
+                          width={100}
+                          height={100}
+                          className="rounded-full object-contain"
+                        />
+                      </div>
+                     );
+                  }
+
+                  // 2. Merged Data Logo (if not empty string and not default empty)
+                  const contentLogo = mergedData.content.companyInfo.logo;
+                  if (contentLogo && contentLogo.trim() !== "") {
+                     return (
+                      <div className="flex">
+                        <Image
+                          src={contentLogo}
+                          alt={mergedData.content.companyInfo.name || tenantData?.branding?.name || "Logo"}
+                          width={100}
+                          height={100}
+                          className="rounded-full object-contain"
+                        />
+                      </div>
+                     );
+                  }
+
+                  // 3. Tenant Branding (Fallback)
+                  const tenantLogo = tenantData?.branding?.logo;
+                  if (tenantLogo) {
+                     return (
+                      <div className="flex">
+                        <Image
+                          src={tenantLogo}
+                          alt={tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
+                          width={100}
+                          height={100}
+                          className="rounded-full object-contain"
+                        />
+                      </div>
+                     );
+                  }
+
+                  // 4. Default / Fallback Icon (If no logo found anywhere)
+                  return (
+                    <div className="grid size-10 place-items-center rounded-full border border-emerald-500">
+                      <MapPin className="size-5" />
+                    </div>
+                  );
+                })()}
+
                 <div>
                   <h3
                     className={`text-lg font-${mergedData.styling.typography.titleWeight} text-white`}
@@ -516,9 +581,10 @@ export default function StaticFooter({
                       fontSize: `var(--${mergedData.styling.typography.titleSize})`,
                     }}
                   >
-                    {tenantData?.branding?.name ||
-                      tenantData?.websiteName ||
+                    {customBranding?.footer?.name ||
                       mergedData.content.companyInfo.name ||
+                      tenantData?.branding?.name ||
+                      tenantData?.websiteName ||
                       ""}
                   </h3>
                   <p className="text-sm text-white/80">

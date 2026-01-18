@@ -38,8 +38,8 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     // Ensure header and footer contain variant inside their data
     const headerData = state.globalComponentsData?.header || {};
     const footerData = state.globalComponentsData?.footer || {};
-    const headerVariant = state.globalHeaderVariant || "StaticHeader1";
-    const footerVariant = state.globalFooterVariant || "StaticFooter1";
+    const headerVariant = state.globalHeaderVariant || "header1";
+    const footerVariant = state.globalFooterVariant || "footer1";
 
     // Get static page slugs to exclude them from pages
     const staticPageSlugs = new Set(Object.keys(state.staticPagesData || {}));

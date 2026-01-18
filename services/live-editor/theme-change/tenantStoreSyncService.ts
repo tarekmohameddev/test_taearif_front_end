@@ -135,14 +135,14 @@ export function updateTenantGlobalComponentsData(): any {
     ...store.globalComponentsData,
     header: {
       ...(store.globalHeaderData || {}),
-      variant: store.globalHeaderVariant || "StaticHeader1",
+      variant: store.globalHeaderVariant || "header1",
     },
     footer: {
       ...(store.globalFooterData || {}),
-      variant: store.globalFooterVariant || "StaticFooter1",
+      variant: store.globalFooterVariant || "footer1",
     },
-    globalHeaderVariant: store.globalHeaderVariant || "StaticHeader1",
-    globalFooterVariant: store.globalFooterVariant || "StaticFooter1",
+    globalHeaderVariant: store.globalHeaderVariant || "header1",
+    globalFooterVariant: store.globalFooterVariant || "footer1",
   };
 }
 

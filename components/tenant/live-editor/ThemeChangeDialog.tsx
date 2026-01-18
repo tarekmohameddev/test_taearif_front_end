@@ -387,15 +387,15 @@ export function ThemeChangeDialog({
           </Button>
           {selectedTheme && (
             <Button
-              onClick={selectedThemeCanUse ? handleApply : handlePurchase}
+              onClick={selectedThemeCanUse || process.env.NODE_ENV === "development" ? handleApply : handlePurchase}
               disabled={isResetting}
               className={`gap-2 ${
-                selectedThemeCanUse
+                (selectedThemeCanUse || process.env.NODE_ENV === "development")
                   ? "bg-indigo-600 hover:bg-indigo-700"
                   : "bg-orange-600 hover:bg-orange-700"
               }`}
             >
-              {selectedThemeCanUse ? (
+              {(selectedThemeCanUse || process.env.NODE_ENV === "development") ? (
                 <>
                   <Palette className="w-4 h-4" />
                   {isRTL ? "تطبيق الثيم" : "Apply Theme"}

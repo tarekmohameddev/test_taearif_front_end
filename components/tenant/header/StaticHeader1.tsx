@@ -191,7 +191,11 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalHeaderData = tenantGlobalComponentsData?.header;
   const tenantId = useTenantStore((s) => s.tenantId);
-  const router = useRouter();
+
+  // Subscribe to website layout for custom branding
+  const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
+
+  // ─────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (tenantId) {
@@ -271,19 +275,32 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
     }
 
     // Apply branding data with highest priority
-    if (tenantData?.branding) {
-      // Logo priority: tenantData.branding.logo (highest) → result.logo.image → default
+    // 1. Custom Branding (from editor store WebsiteLayout)
+    if (customBranding?.header) {
       if (!result.logo) {
         result.logo = {};
       }
-      if (tenantData.branding.logo) {
+      if (customBranding.header.logo) {
+        result.logo.image = customBranding.header.logo;
+      }
+      if (customBranding.header.name) {
+        result.logo.text = customBranding.header.name;
+      }
+    }
+
+    // 2. Tenant Branding (historical fallback)
+    if (tenantData?.branding) {
+      if (!result.logo) {
+        result.logo = {};
+      }
+      // Only apply if not already set by customBranding
+      if (tenantData.branding.logo && !customBranding?.header?.logo) {
         result.logo.image = tenantData.branding.logo;
       }
-      
-      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → result.logo.text → default
-      if (tenantData.branding.name) {
+
+      if (tenantData.branding.name && !customBranding?.header?.name) {
         result.logo.text = tenantData.branding.name;
-      } else if (tenantData.websiteName) {
+      } else if (tenantData.websiteName && !customBranding?.header?.name) {
         result.logo.text = tenantData.websiteName;
       }
     }
@@ -360,19 +377,32 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
     }
 
     // Apply branding data with highest priority
-    if (tenantData?.branding) {
-      // Logo priority: tenantData.branding.logo (highest) → result.logo.image → default
+    // 1. Custom Branding (from editor store WebsiteLayout)
+    if (customBranding?.header) {
       if (!result.logo) {
         result.logo = {};
       }
-      if (tenantData.branding.logo) {
+      if (customBranding.header.logo) {
+        result.logo.image = customBranding.header.logo;
+      }
+      if (customBranding.header.name) {
+        result.logo.text = customBranding.header.name;
+      }
+    }
+
+    // 2. Tenant Branding (historical fallback)
+    if (tenantData?.branding) {
+      if (!result.logo) {
+        result.logo = {};
+      }
+      // Only apply if not already set by customBranding
+      if (tenantData.branding.logo && !customBranding?.header?.logo) {
         result.logo.image = tenantData.branding.logo;
       }
-      
-      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → result.logo.text → default
-      if (tenantData.branding.name) {
+
+      if (tenantData.branding.name && !customBranding?.header?.name) {
         result.logo.text = tenantData.branding.name;
-      } else if (tenantData.websiteName) {
+      } else if (tenantData.websiteName && !customBranding?.header?.name) {
         result.logo.text = tenantData.websiteName;
       }
     }
@@ -388,6 +418,7 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
     tenantId,
     tenantData,
     loadingTenantData,
+    customBranding,
   ]);
 
   // Monitor globalHeaderData changes
@@ -548,10 +579,10 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                 "#1f2937",
             }}
           >
-            {mergedData.logo?.type !== "text" && (tenantData?.branding?.logo || mergedData.logo?.image) && (
+            {mergedData.logo?.type !== "text" && (customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo) && (
               <img
-                src={tenantData?.branding?.logo || mergedData.logo?.image}
-                alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.text || "Logo"}
+                src={customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo}
+                alt={customBranding?.header?.name || mergedData.logo?.text || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
                 className="h-full max-h-16 w-auto object-contain"
                 style={{
                   maxHeight: "4rem", // 64px
@@ -570,9 +601,10 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                     : ""
                 }
               >
-                {tenantData?.branding?.name ||
-                  tenantData?.websiteName ||
+                {customBranding?.header?.name ||
                   mergedData.logo?.text ||
+                  tenantData?.branding?.name ||
+                  tenantData?.websiteName ||
                   "الشركة العقارية"}
               </span>
             )}
@@ -853,10 +885,10 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                 <div className="flex items-center justify-between">
                   {mergedData.actions?.mobile?.showLogo && (
                     <div className="flex items-center gap-2">
-                      {(tenantData?.branding?.logo || mergedData.logo?.image) && (
+                      {(customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo) && (
                         <img
-                          src={tenantData?.branding?.logo || mergedData.logo?.image}
-                          alt={tenantData?.branding?.name || tenantData?.websiteName || mergedData.logo?.text || "Logo"}
+                          src={customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo}
+                          alt={customBranding?.header?.name || mergedData.logo?.text || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
                           className="size-8" // 32x32px مثل الكود الأصلي
                           style={{
                             width: "32px",
@@ -873,9 +905,10 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
                             "#1f2937",
                         }}
                       >
-                        {tenantData?.branding?.name ||
-                          tenantData?.websiteName ||
+                        {customBranding?.header?.name ||
                           mergedData.logo?.text ||
+                          tenantData?.branding?.name ||
+                          tenantData?.websiteName ||
                           "الشركة العقارية"}
                       </span>
                     </div>

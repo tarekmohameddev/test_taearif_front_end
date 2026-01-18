@@ -199,8 +199,22 @@ interface EditorStore {
       mainBgColor: string;
     };
     currentTheme?: number | null; // 1 or 2
+    CustomBranding?: {
+      header: {
+        logo: string;
+        name: string;
+      };
+      footer: {
+        logo: string;
+        name: string;
+      };
+    };
   };
   setWebsiteLayout: (data: any) => void;
+  updateCustomBranding: (
+    type: "header" | "footer",
+    data: { logo?: string; name?: string },
+  ) => void;
   addPageToWebsiteLayout: (pageData: any) => void;
   setCurrentTheme: (themeNumber: number) => void;
 
@@ -661,7 +675,7 @@ interface EditorStore {
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   showDialog: false,
-  openSaveDialogFn: () => {},
+  openSaveDialogFn: () => { },
   tempData: {},
   currentPage: "homepage",
   hasChangesMade: false,
@@ -669,8 +683,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   // Initialize Global Components with default data
   globalHeaderData: getDefaultHeaderData(),
   globalFooterData: getDefaultFooterData(),
-  globalHeaderVariant: "StaticHeader1", // Default to StaticHeader1
-  globalFooterVariant: "StaticFooter1", // ⭐ NEW: Default to StaticFooter1
+  globalHeaderVariant: "header1", // Default to header1
+  globalFooterVariant: "footer1", // ⭐ NEW: Default to footer1
 
   // Initialize Global Components Data
   globalComponentsData: {
@@ -684,6 +698,16 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       pages: [],
     },
     currentTheme: null,
+    CustomBranding: {
+      header: {
+        logo: "",
+        name: "",
+      },
+      footer: {
+        logo: "",
+        name: "",
+      },
+    },
   },
 
   // Static Pages Data - Initialize as empty
@@ -771,6 +795,50 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
 
   setCurrentPage: (page) => set(() => ({ currentPage: page })),
 
+  setWebsiteLayout: (data) => set(() => ({ WebsiteLayout: data })),
+  updateCustomBranding: (type, data) =>
+    set((state) => {
+      console.log("🔧 [updateCustomBranding] Called:", { type, data });
+      console.log("🔧 [updateCustomBranding] Current CustomBranding:", state.WebsiteLayout?.CustomBranding);
+      
+      const currentTypeData = state.WebsiteLayout?.CustomBranding?.[type] || {
+        logo: "",
+        name: "",
+      };
+
+      const updatedTypeData = {
+        ...currentTypeData,
+        ...data,
+      };
+
+      const updatedBranding = {
+        ...(state.WebsiteLayout?.CustomBranding || {}),
+        [type]: updatedTypeData,
+      };
+
+      console.log("🔧 [updateCustomBranding] Step by step:", {
+        type,
+        dataReceived: data,
+        currentTypeData,
+        updatedTypeData,
+        updatedBranding,
+        updatedBrandingHeader: updatedBranding.header,
+        updatedBrandingFooter: updatedBranding.footer,
+      });
+
+      const newWebsiteLayout = {
+        ...state.WebsiteLayout,
+        CustomBranding: updatedBranding as any,
+      };
+
+      console.log("🔧 [updateCustomBranding] New WebsiteLayout.CustomBranding:", newWebsiteLayout.CustomBranding);
+      console.log("🔧 [updateCustomBranding] New WebsiteLayout.CustomBranding.header:", newWebsiteLayout.CustomBranding?.header);
+
+      return {
+        WebsiteLayout: newWebsiteLayout,
+        hasChangesMade: true,
+      };
+    }),
   setTempData: (data) => set(() => ({ tempData: data })),
 
   // Global Components management
@@ -981,18 +1049,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       // If tempData is empty, try to get current component data
       else if (!state.tempData || Object.keys(state.tempData).length === 0) {
         // For global components, use the global data as base
-        if (
-          state.currentPage === "global-header" ||
-          path.includes("menu") ||
-          path.includes("logo")
-        ) {
-          // This is likely a global header component, use globalHeaderData as base
+        if (state.currentPage === "global-header") {
+          // This is a global header component, use globalHeaderData as base
           newData = { ...state.globalHeaderData };
-        } else if (
-          state.currentPage === "global-footer" ||
-          path.includes("footer")
-        ) {
-          // This is likely a global footer component, use globalFooterData as base
+        } else if (state.currentPage === "global-footer") {
+          // This is a global footer component, use globalFooterData as base
           newData = { ...state.globalFooterData };
         } else {
           // For other components, use empty object
@@ -1000,19 +1061,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         }
       } else {
         // If tempData exists, use it as base and merge with global data for missing fields
-        if (
-          state.currentPage === "global-header" ||
-          path.includes("menu") ||
-          path.includes("logo")
-        ) {
+        if (state.currentPage === "global-header") {
           // Merge tempData with globalHeaderData to ensure all fields are present
           // Use deep merge to preserve nested objects like menu arrays
           // Priority: tempData > globalHeaderData (tempData should override)
           newData = deepMerge(state.globalHeaderData, state.tempData);
-        } else if (
-          state.currentPage === "global-footer" ||
-          path.includes("footer")
-        ) {
+        } else if (state.currentPage === "global-footer") {
           // Merge tempData with globalFooterData to ensure all fields are present
           // Use deep merge to preserve nested objects
           newData = deepMerge(state.globalFooterData, state.tempData);
@@ -1551,7 +1605,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       setTimeout(() => {
         const newState = get();
         let updatedData: any;
-        
+
         switch (componentType) {
           case "hero":
             updatedData = newState.heroStates[variantId];
@@ -2723,7 +2777,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   // Set static page data
   setStaticPageData: (slug, data) =>
     set((state) => {
-      console.log(`📝 Setting static page data for: ${slug}`, data);
 
       // ⭐ NEW: If theme change is in progress, ensure immediate update
       // If themeChangeTimestamp is recent (within last 5 seconds),
@@ -3046,264 +3099,264 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             ([id, comp]: [string, any]) => {
               if (comp.data && comp.componentName) {
                 switch (comp.type) {
-                    case "header":
-                      newState.headerStates = headerFunctions.setData(
+                  case "header":
+                    newState.headerStates = headerFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).headerStates;
+                    break;
+                  case "hero":
+                    newState.heroStates = heroFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).heroStates;
+                    break;
+                  case "halfTextHalfImage":
+                    newState.halfTextHalfImageStates =
+                      halfTextHalfImageFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).headerStates;
-                      break;
-                    case "hero":
-                      newState.heroStates = heroFunctions.setData(
+                      ).halfTextHalfImageStates;
+                    break;
+                  case "propertySlider":
+                    newState.propertySliderStates =
+                      propertySliderFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).heroStates;
-                      break;
-                    case "halfTextHalfImage":
-                      newState.halfTextHalfImageStates =
-                        halfTextHalfImageFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).halfTextHalfImageStates;
-                      break;
-                    case "propertySlider":
-                      newState.propertySliderStates =
-                        propertySliderFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).propertySliderStates;
-                      break;
-                    case "ctaValuation":
-                      newState.ctaValuationStates =
-                        ctaValuationFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).ctaValuationStates;
-                      break;
-                    case "stepsSection":
-                      newState.stepsSectionStates =
-                        stepsSectionFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).stepsSectionStates;
-                      break;
-                    case "testimonials":
-                      newState.testimonialsStates =
-                        testimonialsFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).testimonialsStates;
-                      break;
-                    case "projectDetails":
-                      newState.projectDetailsStates =
-                        projectDetailsFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).projectDetailsStates;
-                      break;
-                    case "propertyDetail":
-                      newState.propertyDetailStates =
-                        propertyDetailFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).propertyDetailStates;
-                      break;
-                    case "propertiesShowcase":
-                      newState.propertiesShowcaseStates =
-                        propertiesShowcaseFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).propertiesShowcaseStates;
-                      break;
-                    case "card":
-                      // Determine which card variant based on componentName
-                      if (
-                        comp.componentName === "card5" ||
-                        comp.id?.includes("card5")
-                      ) {
-                        newState.card5States = card5Functions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).card5States;
-                      } else {
-                        newState.card4States = card4Functions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).card4States;
-                      }
-                      break;
-                    case "whyChooseUs":
-                      newState.whyChooseUsStates = whyChooseUsFunctions.setData(
+                      ).propertySliderStates;
+                    break;
+                  case "ctaValuation":
+                    newState.ctaValuationStates =
+                      ctaValuationFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).whyChooseUsStates;
-                      break;
-                    case "logosTicker":
-                      newState.logosTickerStates = logosTickerFunctions.setData(
+                      ).ctaValuationStates;
+                    break;
+                  case "stepsSection":
+                    newState.stepsSectionStates =
+                      stepsSectionFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).logosTickerStates;
-                      break;
-                    case "partners":
-                      newState.partnersStates = partnersFunctions.setData(
+                      ).stepsSectionStates;
+                    break;
+                  case "testimonials":
+                    newState.testimonialsStates =
+                      testimonialsFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).partnersStates;
-                      break;
-                    case "contactMapSection":
-                      newState.contactMapSectionStates =
-                        contactMapSectionFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).contactMapSectionStates;
-                      break;
-                    case "footer":
-                      newState.footerStates = footerFunctions.setData(
+                      ).testimonialsStates;
+                    break;
+                  case "projectDetails":
+                    newState.projectDetailsStates =
+                      projectDetailsFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).footerStates;
-                      break;
-                    case "grid":
-                      newState.gridStates = gridFunctions.setData(
+                      ).projectDetailsStates;
+                    break;
+                  case "propertyDetail":
+                    newState.propertyDetailStates =
+                      propertyDetailFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).gridStates;
-                      break;
-                    case "filterButtons":
-                      newState.filterButtonsStates =
-                        filterButtonsFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).filterButtonsStates;
-                      break;
-                    case "propertyFilter":
-                      newState.propertyFilterStates =
-                        propertyFilterFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).propertyFilterStates;
-                      break;
-                    case "mapSection":
-                      newState.mapSectionStates = mapSectionFunctions.setData(
+                      ).propertyDetailStates;
+                    break;
+                  case "propertiesShowcase":
+                    newState.propertiesShowcaseStates =
+                      propertiesShowcaseFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).mapSectionStates;
-                      break;
-                    case "contactFormSection":
-                      newState.contactFormSectionStates =
-                        contactFormSectionFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).contactFormSectionStates;
-                      break;
-                    case "contactCards":
-                      newState.contactCardsStates =
-                        contactCardsFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).contactCardsStates;
-                      break;
-                    case "applicationForm":
-                      newState.applicationFormStates =
-                        applicationFormFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).applicationFormStates;
-                      break;
-                    case "inputs":
-                      newState.inputsStates = inputsFunctions.setData(
+                      ).propertiesShowcaseStates;
+                    break;
+                  case "card":
+                    // Determine which card variant based on componentName
+                    if (
+                      comp.componentName === "card5" ||
+                      comp.id?.includes("card5")
+                    ) {
+                      newState.card5States = card5Functions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).inputsStates;
-                      break;
-                    case "inputs2":
-                      newState.inputs2States = inputs2Functions.setData(
+                      ).card5States;
+                    } else {
+                      newState.card4States = card4Functions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).inputs2States;
-                      break;
-                    case "imageText":
-                      newState.imageTextStates = imageTextFunctions.setData(
+                      ).card4States;
+                    }
+                    break;
+                  case "whyChooseUs":
+                    newState.whyChooseUsStates = whyChooseUsFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).whyChooseUsStates;
+                    break;
+                  case "logosTicker":
+                    newState.logosTickerStates = logosTickerFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).logosTickerStates;
+                    break;
+                  case "partners":
+                    newState.partnersStates = partnersFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).partnersStates;
+                    break;
+                  case "contactMapSection":
+                    newState.contactMapSectionStates =
+                      contactMapSectionFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).imageTextStates;
-                      break;
-                    case "contactUsHomePage":
-                      newState.contactUsHomePageStates =
-                        contactUsHomePageFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).contactUsHomePageStates;
-                      break;
-                    case "blogsSections":
-                      newState.blogsSectionsStates =
-                        blogsSectionsFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).blogsSectionsStates;
-                      break;
-                    case "title":
-                      newState.titleStates = titleFunctions.setData(
+                      ).contactMapSectionStates;
+                    break;
+                  case "footer":
+                    newState.footerStates = footerFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).footerStates;
+                    break;
+                  case "grid":
+                    newState.gridStates = gridFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).gridStates;
+                    break;
+                  case "filterButtons":
+                    newState.filterButtonsStates =
+                      filterButtonsFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).titleStates;
-                      break;
-                    case "responsiveImage":
-                      newState.responsiveImageStates =
-                        responsiveImageFunctions.setData(
-                          newState,
-                          comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
-                          comp.data,
-                        ).responsiveImageStates;
-                      break;
-                    case "photosGrid":
-                      newState.photosGridStates = photosGridFunctions.setData(
+                      ).filterButtonsStates;
+                    break;
+                  case "propertyFilter":
+                    newState.propertyFilterStates =
+                      propertyFilterFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).photosGridStates;
-                      break;
-                    case "video":
-                      newState.videoStates = videoFunctions.setData(
+                      ).propertyFilterStates;
+                    break;
+                  case "mapSection":
+                    newState.mapSectionStates = mapSectionFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).mapSectionStates;
+                    break;
+                  case "contactFormSection":
+                    newState.contactFormSectionStates =
+                      contactFormSectionFunctions.setData(
                         newState,
                         comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
                         comp.data,
-                      ).videoStates;
-                      break;
-                  }
+                      ).contactFormSectionStates;
+                    break;
+                  case "contactCards":
+                    newState.contactCardsStates =
+                      contactCardsFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).contactCardsStates;
+                    break;
+                  case "applicationForm":
+                    newState.applicationFormStates =
+                      applicationFormFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).applicationFormStates;
+                    break;
+                  case "inputs":
+                    newState.inputsStates = inputsFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).inputsStates;
+                    break;
+                  case "inputs2":
+                    newState.inputs2States = inputs2Functions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).inputs2States;
+                    break;
+                  case "imageText":
+                    newState.imageTextStates = imageTextFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).imageTextStates;
+                    break;
+                  case "contactUsHomePage":
+                    newState.contactUsHomePageStates =
+                      contactUsHomePageFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).contactUsHomePageStates;
+                    break;
+                  case "blogsSections":
+                    newState.blogsSectionsStates =
+                      blogsSectionsFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).blogsSectionsStates;
+                    break;
+                  case "title":
+                    newState.titleStates = titleFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).titleStates;
+                    break;
+                  case "responsiveImage":
+                    newState.responsiveImageStates =
+                      responsiveImageFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).responsiveImageStates;
+                    break;
+                  case "photosGrid":
+                    newState.photosGridStates = photosGridFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).photosGridStates;
+                    break;
+                  case "video":
+                    newState.videoStates = videoFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).videoStates;
+                    break;
                 }
-              },
-            );
-          }
+              }
+            },
+          );
+        }
         ,
       );
 
@@ -3562,7 +3615,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     // ========== LOG BEFORE ==========
     const stateBefore = get();
     const beforeComponents = stateBefore.pageComponentsByPage[slug] || [];
-    
+
     logBefore(
       "EDITOR_STORE",
       "FORCE_UPDATE_PAGE_COMPONENTS",
@@ -3595,7 +3648,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       setTimeout(() => {
         const stateAfter = get();
         const afterComponents = stateAfter.pageComponentsByPage[slug] || [];
-        
+
         logAfter(
           "EDITOR_STORE",
           "FORCE_UPDATE_PAGE_COMPONENTS_COMPLETE",
@@ -3635,11 +3688,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     });
   },
 
-  // WebsiteLayout functions
-  setWebsiteLayout: (data) =>
-    set((state) => ({
-      WebsiteLayout: data,
-    })),
 
   addPageToWebsiteLayout: (pageData) =>
     set((state) => ({

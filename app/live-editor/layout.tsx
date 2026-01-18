@@ -1622,8 +1622,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
       });
     }
 
-    // Console log لعرض availablePages بعد الـ merge
-    console.log("🔍 availablePages after merge:", pages);
 
     return pages;
   }, [tenantData, recentlyAddedPages, editorWebsiteLayout]);
@@ -1886,16 +1884,6 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
             editorStore.pageComponentsByPage[pageSlug];
           if (storePageComponents && storePageComponents.length > 0) {
             // Always prioritize store data if it exists (it has recent changes)
-            const normalized = normalizeComponentSettings(pageData);
-            const tenantComponentCount = Object.keys(normalized).length;
-            console.log(
-              "[EditorNavBar] Store has data for page, skipping tenantData load:",
-              {
-                pageSlug,
-                storeCount: storePageComponents.length,
-                tenantCount: tenantComponentCount,
-              },
-            );
             return; // Skip this page - store data takes priority
           }
 
@@ -2194,24 +2182,10 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
     const addedPages: string[] = [];
     defaultPages.forEach((defaultPage) => {
       if (!existingPaths.includes(defaultPage.path)) {
-        console.log(`🔧 Adding default data for page: ${defaultPage.path}`);
         addPageToWebsiteLayout(defaultPage);
         addedPages.push(defaultPage.path);
-      } else {
-        console.log(
-          `ℹ️ Page ${defaultPage.path} already exists in WebsiteLayout`,
-        );
       }
     });
-
-    if (addedPages.length > 0) {
-      console.log(
-        `✅ Added default data for ${addedPages.length} pages:`,
-        addedPages,
-      );
-    } else {
-      console.log(`ℹ️ All default pages already exist in WebsiteLayout`);
-    }
   }, [tenantData]);
 
   // useEffect(() => {

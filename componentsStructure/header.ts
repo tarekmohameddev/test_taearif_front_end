@@ -713,6 +713,7 @@ export const headerStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "logo.image", label: "Logo Image", type: "image" },
+        { key: "logo.alt", label: "Company Name", type: "text" },
         {
           key: "links",
           label: "Navigation Links",

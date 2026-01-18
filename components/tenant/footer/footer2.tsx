@@ -162,6 +162,9 @@ export default function Footer2(props: Footer2Props) {
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
+  // Subscribe to website layout for custom branding
+  const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
+
   // Check if this is a global footer
   const isGlobalFooter = uniqueId === "global-footer";
 
@@ -263,9 +266,10 @@ export default function Footer2(props: Footer2Props) {
           ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
         };
 
+
     // Apply branding data with highest priority
-    if (tenantData?.branding) {
-      // Ensure content.companyInfo exists
+    // 1. Custom Branding (from editor store WebsiteLayout)
+    if (customBranding?.footer) {
       if (!baseData.content) {
         baseData.content = {};
       }
@@ -273,15 +277,31 @@ export default function Footer2(props: Footer2Props) {
         baseData.content.companyInfo = {};
       }
 
-      // Logo priority: tenantData.branding.logo (highest) → baseData.content.companyInfo.logo → default
-      if (tenantData.branding.logo) {
+      if (customBranding.footer.logo) {
+        baseData.content.companyInfo.logo = customBranding.footer.logo;
+      }
+      if (customBranding.footer.name) {
+        baseData.content.companyInfo.name = customBranding.footer.name;
+      }
+    }
+
+    // 2. Tenant Branding (historical fallback)
+    if (tenantData?.branding) {
+      if (!baseData.content) {
+        baseData.content = {};
+      }
+      if (!baseData.content.companyInfo) {
+        baseData.content.companyInfo = {};
+      }
+
+      // Only apply if not already set by customBranding
+      if (tenantData.branding.logo && !customBranding?.footer?.logo) {
         baseData.content.companyInfo.logo = tenantData.branding.logo;
       }
-      
-      // Name priority: tenantData.branding.name (highest) → tenantData.websiteName → baseData.content.companyInfo.name → default
-      if (tenantData.branding.name) {
+
+      if (tenantData.branding.name && !customBranding?.footer?.name) {
         baseData.content.companyInfo.name = tenantData.branding.name;
-      } else if (tenantData.websiteName) {
+      } else if (tenantData.websiteName && !customBranding?.footer?.name) {
         baseData.content.companyInfo.name = tenantData.websiteName;
       }
     }
@@ -352,14 +372,15 @@ export default function Footer2(props: Footer2Props) {
             {/* Right Section - Company Info */}
             <div className="w-full lg:w-1/2 xl:w-2/5">
               <div className="flex items-center gap-3 mb-6">
-                {(tenantData?.branding?.logo || mergedData.content?.companyInfo?.logo) ? (
+                {(customBranding?.footer?.logo || mergedData.content?.companyInfo?.logo || tenantData?.branding?.logo) ? (
                   <div className="flex">
                     <Image
-                      src={tenantData?.branding?.logo || mergedData.content?.companyInfo?.logo}
+                      src={customBranding?.footer?.logo || mergedData.content?.companyInfo?.logo || tenantData?.branding?.logo}
                       alt={replaceBaheya(
-                        tenantData?.branding?.name ||
-                          tenantData?.websiteName ||
+                        customBranding?.footer?.name ||
                           mergedData.content?.companyInfo?.name ||
+                          tenantData?.branding?.name ||
+                          tenantData?.websiteName ||
                           "Baheya Real Estate",
                       )}
                       width={100}
@@ -379,13 +400,14 @@ export default function Footer2(props: Footer2Props) {
                     </div>
                   </Link>
                 )}
-                {(tenantData?.branding?.name || tenantData?.websiteName || mergedData.content?.companyInfo?.name) && (
+                {(customBranding?.footer?.name || mergedData.content?.companyInfo?.name || tenantData?.branding?.name || tenantData?.websiteName) && (
                   <div>
                     <h3 className="text-lg font-bold text-white">
                       {replaceBaheya(
-                        tenantData?.branding?.name ||
-                          tenantData?.websiteName ||
+                        customBranding?.footer?.name ||
                           mergedData.content?.companyInfo?.name ||
+                          tenantData?.branding?.name ||
+                          tenantData?.websiteName ||
                           ""
                       )}
                     </h3>

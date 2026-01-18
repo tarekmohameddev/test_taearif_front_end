@@ -99,7 +99,7 @@ export function useComponentHandlers({
       if (themeId && themes.length > 0) {
         // البحث عن الثيم في themes array
         const theme = themes.find((t) => t.id === themeId);
-        if (theme && !theme.has_access) {
+        if (theme && !theme.has_access && process.env.NODE_ENV !== "development") {
           // منع الإضافة وإظهار PremiumDialog
           logDuring(
             "COMPONENT_ADD",
@@ -110,7 +110,7 @@ export function useComponentHandlers({
               themeName: theme.name,
             }
           );
-          
+
           if (onPremiumComponentDetected) {
             onPremiumComponentDetected({
               themeName: theme.name,
@@ -153,7 +153,7 @@ export function useComponentHandlers({
       // ========== LOG BEFORE: Store state ==========
       const store = useEditorStore.getState();
       const currentPage = store.currentPage || "homepage";
-      
+
       logBefore(
         "COMPONENT_ADD",
         "STORE_STATE_BEFORE",
@@ -201,7 +201,7 @@ export function useComponentHandlers({
       try {
         // For halfTextHalfImage components, pass componentName as variantId to ensure correct theme data
         const variantId = normalizedComponentType === "halfTextHalfImage" ? componentName : newComponent.id;
-        
+
         store.ensureComponentVariant(
           newComponent.type,
           variantId, // ✅ Use componentName for halfTextHalfImage, component.id for others

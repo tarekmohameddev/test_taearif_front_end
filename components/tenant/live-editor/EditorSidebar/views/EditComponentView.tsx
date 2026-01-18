@@ -59,10 +59,10 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
   const getComponentName = () => {
     // Handle global components
     if (selectedComponent.id === "global-header") {
-      return globalHeaderVariant || "StaticHeader1";
+      return globalHeaderVariant || "header1";
     }
     if (selectedComponent.id === "global-footer") {
-      return globalFooterVariant || "StaticFooter1";
+      return globalFooterVariant || "footer1";
     }
 
     // أولاً: تحقق من componentName مباشرة
@@ -222,7 +222,7 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
               </h4>
             </div>
             <span className="px-3 py-1 text-xs font-semibold text-purple-700 bg-purple-100 rounded-full shadow-sm">
-              {selectedComponent.componentName}
+              {getComponentName()}
             </span>
           </div>
           <p className="text-sm text-slate-600 mb-4 leading-relaxed">
@@ -236,6 +236,14 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                 currentTheme={globalHeaderVariant || "StaticHeader1"}
                 onThemeChange={(newTheme) => {
                   try {
+                    const store = useEditorStore.getState();
+
+                    // ⭐ CRITICAL: Preserve logo.image/logo.text from current globalHeaderData before changing theme
+                    // This ensures data is preserved when switching from header2 to header1 (like footer behavior)
+                    const currentGlobalHeaderData = store.globalHeaderData || {};
+                    const preservedLogoImage = currentGlobalHeaderData?.logo?.image;
+                    const preservedLogoText = currentGlobalHeaderData?.logo?.text;
+
                     // Get default data for the new theme
                     const newDefaultData = createDefaultData(
                       "header",
@@ -243,10 +251,46 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                     );
 
                     // ⭐ Add variant to newDefaultData to ensure it's included
-                    const newDefaultDataWithVariant = {
+                    const newDefaultDataWithVariant: any = {
                       ...newDefaultData,
                       variant: newTheme,
                     };
+
+                    // Ensure logo structure exists
+                    if (!newDefaultDataWithVariant.logo) {
+                      newDefaultDataWithVariant.logo = {};
+                    }
+
+                    // ⭐ CRITICAL: Get CustomBranding
+                    const customBranding = store.WebsiteLayout?.CustomBranding?.header;
+
+                    // Priority: CustomBranding > Preserved from current data > Default
+                    if (customBranding) {
+                      if (customBranding.logo) {
+                        if (typeof newDefaultDataWithVariant.logo === "object") {
+                          newDefaultDataWithVariant.logo.image = customBranding.logo;
+                        }
+                      }
+                      if (customBranding.name) {
+                        if (typeof newDefaultDataWithVariant.logo === "object") {
+                          newDefaultDataWithVariant.logo.text = customBranding.name;
+                          newDefaultDataWithVariant.logo.alt = customBranding.name;
+                        }
+                      }
+                    } else {
+                      // If no CustomBranding, preserve logo.image/text from current globalHeaderData
+                      if (preservedLogoImage) {
+                        if (typeof newDefaultDataWithVariant.logo === "object") {
+                          newDefaultDataWithVariant.logo.image = preservedLogoImage;
+                        }
+                      }
+                      if (preservedLogoText) {
+                        if (typeof newDefaultDataWithVariant.logo === "object") {
+                          newDefaultDataWithVariant.logo.text = preservedLogoText;
+                          newDefaultDataWithVariant.logo.alt = preservedLogoText;
+                        }
+                      }
+                    }
 
                     // IMPORTANT: Update variant FIRST, then data
                     // This ensures the variant is saved before any other operations
@@ -276,6 +320,14 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                 currentTheme={globalFooterVariant || "StaticFooter1"}
                 onThemeChange={(newTheme) => {
                   try {
+                    const store = useEditorStore.getState();
+
+                    // ⭐ CRITICAL: Preserve logo/name from current globalFooterData before changing theme
+                    // This ensures data is preserved when switching from footer2 to footer1 (like footer2 behavior)
+                    const currentGlobalFooterData = store.globalFooterData || {};
+                    const preservedLogo = currentGlobalFooterData?.content?.companyInfo?.logo;
+                    const preservedName = currentGlobalFooterData?.content?.companyInfo?.name;
+
                     // Get default data for the new theme
                     const newDefaultData = createDefaultData(
                       "footer",
@@ -287,6 +339,35 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                       ...newDefaultData,
                       variant: newTheme,
                     };
+
+                    // Ensure content.companyInfo structure exists
+                    if (!newDefaultDataWithVariant.content) {
+                      newDefaultDataWithVariant.content = {};
+                    }
+                    if (!newDefaultDataWithVariant.content.companyInfo) {
+                      newDefaultDataWithVariant.content.companyInfo = {};
+                    }
+
+                    // ⭐ CRITICAL: Get CustomBranding
+                    const customBranding = store.WebsiteLayout?.CustomBranding?.footer;
+
+                    // Priority: CustomBranding > Preserved from current data > Default
+                    if (customBranding) {
+                      if (customBranding.logo) {
+                        newDefaultDataWithVariant.content.companyInfo.logo = customBranding.logo;
+                      }
+                      if (customBranding.name) {
+                        newDefaultDataWithVariant.content.companyInfo.name = customBranding.name;
+                      }
+                    } else {
+                      // If no CustomBranding, preserve logo/name from current globalFooterData
+                      if (preservedLogo) {
+                        newDefaultDataWithVariant.content.companyInfo.logo = preservedLogo;
+                      }
+                      if (preservedName) {
+                        newDefaultDataWithVariant.content.companyInfo.name = preservedName;
+                      }
+                    }
 
                     // IMPORTANT: Update variant FIRST, then data
                     setGlobalFooterVariant(newTheme);

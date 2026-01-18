@@ -122,8 +122,8 @@ export function backupCurrentComponentSettings(): BackupResult {
   // ⭐ CRITICAL: التأكد من أن variant موجود داخل بيانات header و footer
   // Backup global components data
   // ⭐ CRITICAL: Ensure variant is inside header and footer data
-  const headerVariant = store.globalHeaderVariant || "StaticHeader1";
-  const footerVariant = store.globalFooterVariant || "StaticFooter1";
+  const headerVariant = store.globalHeaderVariant || "header1";
+  const footerVariant = store.globalFooterVariant || "footer1";
 
   if (
     store.globalComponentsData ||

@@ -363,6 +363,16 @@ export const footerStructure: ComponentStructure = {
       ],
       simpleFields: [
         {
+          key: "content.companyInfo.logo",
+          label: "Logo",
+          type: "image",
+        },
+        {
+          key: "content.companyInfo.name",
+          label: "Company Name",
+          type: "text",
+        },
+        {
           key: "content",
           label: "Content",
           type: "object",
@@ -794,6 +804,11 @@ export const footerStructure: ComponentStructure = {
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "content.companyInfo.logo",
+          label: "Logo",
+          type: "image",
+        },
         {
           key: "content.companyInfo.name",
           label: "Company Name",
