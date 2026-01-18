@@ -39,6 +39,7 @@ import {
   AlertCircle,
   AlertTriangle,
   Calendar as CalendarIcon,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -486,6 +487,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
     imported_count?: number;
     updated_count?: number;
     failed_count?: number;
+    incomplete_count?: number;
     errors?: Array<{
       row: number;
       field: string;
@@ -514,6 +516,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
       isInitialized,
       pagination,
       propertiesAllData,
+      incompleteCount,
     },
     setPropertiesManagement,
   } = useStore();
@@ -566,6 +569,266 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
     }
   };
 
+  // دالة لترجمة أسماء الحقول من رقم إلى اسم عربي
+  const translateFieldName = (field: string | number): string => {
+    const fieldMap: { [key: string]: string } = {
+      "0": "عمر المبنى",
+      "1": "العنوان",
+      "2": "الوصف",
+      "3": "السعر",
+      "4": "المساحة",
+      "5": "عدد الغرف",
+      "6": "عدد الحمامات",
+      "7": "الطابق",
+      "8": "نوع المبنى",
+      "9": "نوع الوحدة",
+      "10": "المدينة",
+      "11": "الحي",
+      "12": "العنوان التفصيلي",
+      "building_age": "عمر المبنى",
+      "title": "العنوان",
+      "description": "الوصف",
+      "price": "السعر",
+      "area": "المساحة",
+      "bedrooms": "عدد الغرف",
+      "bathrooms": "عدد الحمامات",
+      "floor": "الطابق",
+      "building_type": "نوع المبنى",
+      "property_type": "نوع الوحدة",
+      "city": "المدينة",
+      "district": "الحي",
+      "address": "العنوان التفصيلي",
+    };
+
+    const fieldStr = String(field);
+    return fieldMap[fieldStr] || `الحقل ${fieldStr}`;
+  };
+
+  // دالة لترجمة رسائل الخطأ
+  const translateErrorMessage = (error: string): string => {
+    if (!error) return "";
+
+    // تنظيف النص من المسافات الزائدة
+    const cleanedError = error.trim();
+
+    const errorTranslations: { [key: string]: string } = {
+      "The building_age may not be greater than 200.":
+        "عمر المبنى لا يمكن أن يكون أكبر من 200 سنة.",
+      "The building_age field is required.": "حقل عمر المبنى مطلوب.",
+      "The building_age must be a number.": "عمر المبنى يجب أن يكون رقماً.",
+      "The building_age must be at least 0.": "عمر المبنى يجب أن يكون على الأقل 0.",
+      "Valid value according to field requirements":
+        "قيمة صحيحة وفقاً لمتطلبات الحقل",
+      "Please check the 0 field and ensure it meets the requirements.":
+        "يرجى التحقق من الحقل والتأكد من أنه يلبي المتطلبات.",
+      "Please verify your file format and data, then try again. If the problem persists, contact support.":
+        "يرجى التحقق من تنسيق الملف والبيانات، ثم المحاولة مرة أخرى. إذا استمرت المشكلة، يرجى الاتصال بالدعم.",
+      "Please verify your file format and data, then try again. If the problem persists, contact support":
+        "يرجى التحقق من تنسيق الملف والبيانات، ثم المحاولة مرة أخرى. إذا استمرت المشكلة، يرجى الاتصال بالدعم.",
+      "A critical error occurred while processing the import. Please try again or contact support.":
+        "حدث خطأ حرج أثناء معالجة الاستيراد. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.",
+      "The selected status is invalid.":
+        "الحالة المحددة غير صحيحة.",
+      "The city_name must be a string.":
+        "اسم المدينة يجب أن يكون نصاً.",
+      "The district_name must be a string.":
+        "اسم الحي يجب أن يكون نصاً.",
+      "The gallery_images must be a string.":
+        "صور المعرض يجب أن تكون نصاً.",
+      "Please check that the 0 value is valid and exists in your system.":
+        "يرجى التحقق من أن القيمة صحيحة وموجودة في النظام.",
+    };
+
+    // البحث عن ترجمة مباشرة
+    if (errorTranslations[cleanedError]) {
+      return errorTranslations[cleanedError];
+    }
+
+    // ترجمة رسائل عامة
+    let translated = cleanedError;
+
+    // ترجمة رسائل validation عامة - بناءً على أسماء الحقول
+    const fieldNameMap: { [key: string]: string } = {
+      building_age: "عمر المبنى",
+      title: "العنوان",
+      description: "الوصف",
+      price: "السعر",
+      area: "المساحة",
+      bedrooms: "عدد الغرف",
+      bathrooms: "عدد الحمامات",
+      floor: "الطابق",
+      building_type: "نوع المبنى",
+      property_type: "نوع الوحدة",
+      city: "المدينة",
+      district: "الحي",
+      address: "العنوان التفصيلي",
+      city_name: "اسم المدينة",
+      district_name: "اسم الحي",
+      gallery_images: "صور المعرض",
+      status: "الحالة",
+    };
+
+    // ترجمة رسائل validation عامة
+    translated = translated.replace(
+      /The (\w+) may not be greater than (\d+)\./g,
+      (match, field, value) => {
+        const fieldName = fieldNameMap[field] || field;
+        return `حقل ${fieldName} لا يمكن أن يكون أكبر من ${value}.`;
+      }
+    );
+    translated = translated.replace(
+      /The (\w+) field is required\./g,
+      (match, field) => {
+        const fieldName = fieldNameMap[field] || field;
+        return `حقل ${fieldName} مطلوب.`;
+      }
+    );
+    translated = translated.replace(
+      /The (\w+) must be a number\./g,
+      (match, field) => {
+        const fieldName = fieldNameMap[field] || field;
+        return `حقل ${fieldName} يجب أن يكون رقماً.`;
+      }
+    );
+    translated = translated.replace(
+      /The (\w+) must be at least (\d+)\./g,
+      (match, field, value) => {
+        const fieldName = fieldNameMap[field] || field;
+        return `حقل ${fieldName} يجب أن يكون على الأقل ${value}.`;
+      }
+    );
+    // ترجمة رسائل "must be a string"
+    translated = translated.replace(
+      /The (\w+) must be a string\./g,
+      (match, field) => {
+        const fieldName = fieldNameMap[field] || field;
+        return `حقل ${fieldName} يجب أن يكون نصاً.`;
+      }
+    );
+    // ترجمة رسائل "selected ... is invalid"
+    translated = translated.replace(
+      /The selected (\w+) is invalid\./g,
+      (match, field) => {
+        const fieldName = fieldNameMap[field] || field;
+        // استخدام ترجمة خاصة للحالة
+        if (field === "status") {
+          return `الحالة المحددة غير صحيحة.`;
+        }
+        return `الحقل ${fieldName} المحدد غير صحيح.`;
+      }
+    );
+    // ترجمة رسائل الاقتراحات - للأرقام أولاً
+    translated = translated.replace(
+      /Please check the (\d+) field and ensure it meets the requirements\./g,
+      (match, fieldNum) => {
+        const fieldName = translateFieldName(fieldNum);
+        return `يرجى التحقق من حقل ${fieldName} والتأكد من أنه يلبي المتطلبات.`;
+      }
+    );
+    // ترجمة رسائل "Please check that the X value is valid and exists in your system."
+    translated = translated.replace(
+      /Please check that the (\d+) value is valid and exists in your system\./g,
+      (match, value) => {
+        const fieldName = translateFieldName(value);
+        return `يرجى التحقق من أن قيمة ${fieldName} صحيحة وموجودة في النظام.`;
+      }
+    );
+    // ترجمة رسائل الاقتراحات العامة (للحقول النصية) - فقط إذا لم تكن رقم
+    translated = translated.replace(
+      /Please check the ([a-zA-Z_]+) field and ensure it meets the requirements\./g,
+      (match, field) => {
+        const fieldName = fieldNameMap[field] || field;
+        return `يرجى التحقق من حقل ${fieldName} والتأكد من أنه يلبي المتطلبات.`;
+      }
+    );
+
+    // ترجمة رسائل الاقتراحات العامة - استخدام includes للتحقق من وجود النص
+    if (translated.toLowerCase().includes("please verify your file format and data")) {
+      translated = "يرجى التحقق من تنسيق الملف والبيانات، ثم المحاولة مرة أخرى. إذا استمرت المشكلة، يرجى الاتصال بالدعم.";
+    } else {
+      // ترجمة باستخدام regex
+      translated = translated.replace(
+        /Please verify your file format and data, then try again\. If the problem persists, contact support\.?/gi,
+        "يرجى التحقق من تنسيق الملف والبيانات، ثم المحاولة مرة أخرى. إذا استمرت المشكلة، يرجى الاتصال بالدعم."
+      );
+    }
+
+    return translated;
+  };
+
+  // دالة لترجمة رسائل الاستيراد
+  const translateImportMessage = (message: string): string => {
+    if (!message) return "";
+
+    const messageTranslations: { [key: string]: string } = {
+      "Import completed with 2 validation error(s).":
+        "تم إكمال الاستيراد مع 2 خطأ في التحقق من الصحة.",
+      "Import completed with 1 validation error(s).":
+        "تم إكمال الاستيراد مع خطأ واحد في التحقق من الصحة.",
+      "An error occurred during import processing":
+        "حدث خطأ أثناء معالجة الاستيراد",
+      "A critical error occurred while processing the import. Please try again or contact support.":
+        "حدث خطأ حرج أثناء معالجة الاستيراد. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.",
+    };
+
+    // البحث عن ترجمة مباشرة
+    if (messageTranslations[message]) {
+      return messageTranslations[message];
+    }
+
+    // ترجمة رسائل عامة
+    let translated = message;
+
+    // ترجمة رسائل validation errors
+    translated = translated.replace(
+      /Import completed with (\d+) validation error\(s\)\./g,
+      (match, count) => {
+        const num = parseInt(count);
+        if (num === 1) {
+          return "تم إكمال الاستيراد مع خطأ واحد في التحقق من الصحة.";
+        } else if (num === 2) {
+          return "تم إكمال الاستيراد مع خطأين في التحقق من الصحة.";
+        } else if (num > 2 && num < 11) {
+          return `تم إكمال الاستيراد مع ${count} أخطاء في التحقق من الصحة.`;
+        } else {
+          return `تم إكمال الاستيراد مع ${count} خطأ في التحقق من الصحة.`;
+        }
+      }
+    );
+
+    // ترجمة رسائل الأخطاء العامة
+    translated = translated.replace(
+      /An error occurred during import processing/gi,
+      "حدث خطأ أثناء معالجة الاستيراد"
+    );
+    translated = translated.replace(
+      /A critical error occurred while processing the import\. Please try again or contact support\./gi,
+      "حدث خطأ حرج أثناء معالجة الاستيراد. يرجى المحاولة مرة أخرى أو الاتصال بالدعم."
+    );
+
+    return translated;
+  };
+
+  // دالة لترجمة الأخطاء في المصفوفة
+  const translateErrors = (errors: any[]): any[] => {
+    if (!errors || !Array.isArray(errors)) {
+      return [];
+    }
+
+    return errors.map((error) => ({
+      ...error,
+      field: translateFieldName(error.field),
+      error: translateErrorMessage(error.error || ""),
+      expected:
+        error.expected === "Valid value according to field requirements"
+          ? "قيمة صحيحة وفقاً لمتطلبات الحقل"
+          : error.expected || "",
+      suggestion: error.suggestion
+        ? translateErrorMessage(error.suggestion)
+        : error.suggestion || "",
+    }));
+  };
+
   const handleImport = async () => {
     if (!importFile) {
       toast.error("يرجى اختيار ملف للاستيراد");
@@ -596,16 +859,31 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
       if (response.status === 200 && data.status === "success") {
         setImportResult({
           status: "success",
-          message: data.message || "تم استيراد الوحدات بنجاح",
+          message: translateImportMessage(data.message || "تم استيراد الوحدات بنجاح"),
           code: data.code,
           imported_count: data.imported_count || 0,
           updated_count: data.updated_count || 0,
           failed_count: data.failed_count || 0,
+          incomplete_count: data.incomplete_count || 0,
           errors: [],
         });
 
         // إعادة تحميل قائمة الوحدات
         fetchProperties(currentPage, appliedFilters);
+
+        // إذا كان هناك مسودات، اعرض رسالة واعرض خيار التوجيه
+        if (data.incomplete_count > 0) {
+          toast.success(
+            `تم الاستيراد! ${data.imported_count || 0} وحدة مكتملة و ${data.incomplete_count} مسودة.`,
+            {
+              duration: 5000,
+              action: {
+                label: "عرض المسودات",
+                onClick: () => router.push("/dashboard/properties/incomplete"),
+              },
+            }
+          );
+        }
       }
     } catch (error: any) {
       const response = error.response;
@@ -618,22 +896,39 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
       ) {
         setImportResult({
           status: "partial_success",
-          message: data.message || "تم الاستيراد جزئياً",
+          message: translateImportMessage(data.message || "تم الاستيراد جزئياً"),
           code: data.code,
           imported_count: data.imported_count || 0,
           updated_count: data.updated_count || 0,
           failed_count: data.failed_count || 0,
-          errors: data.errors || [],
+          incomplete_count: data.incomplete_count || 0,
+          errors: translateErrors(data.errors || []),
         });
 
         // إعادة تحميل قائمة الوحدات
         fetchProperties(currentPage, appliedFilters);
+
+        // إذا كان هناك مسودات، اعرض رسالة واعرض خيار التوجيه
+        if (data.incomplete_count > 0) {
+          toast.success(
+            `تم الاستيراد! ${data.imported_count || 0} وحدة مكتملة و ${data.incomplete_count} مسودة.`,
+            {
+              duration: 5000,
+              action: {
+                label: "عرض المسودات",
+                onClick: () => router.push("/dashboard/properties/incomplete"),
+              },
+            }
+          );
+        }
       }
       // معالجة الأخطاء
       else {
         const errorCode = data?.code || "UNKNOWN_ERROR";
         let errorMessage = data?.message || "حدث خطأ أثناء استيراد الوحدات";
-        let suggestion = data?.details?.suggestion;
+        let suggestion = data?.details?.suggestion
+          ? translateErrorMessage(data.details.suggestion)
+          : undefined;
 
         // ترجمة رسائل الخطأ حسب الكود
         switch (errorCode) {
@@ -672,23 +967,35 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
             break;
           case "IMPORT_PROCESSING_ERROR":
             errorMessage = "حدث خطأ أثناء معالجة الاستيراد";
-            suggestion =
-              "يرجى التحقق من تنسيق الملف والبيانات، ثم المحاولة مرة أخرى. إذا استمرت المشكلة، يرجى الاتصال بالدعم.";
+            if (!suggestion) {
+              suggestion = data?.details?.suggestion
+                ? translateErrorMessage(data.details.suggestion)
+                : "يرجى التحقق من تنسيق الملف والبيانات، ثم المحاولة مرة أخرى. إذا استمرت المشكلة، يرجى الاتصال بالدعم.";
+            }
             break;
         }
 
+        // ترجمة suggestion إذا كان موجوداً ولم يتم ترجمته بعد
+        if (!suggestion && data?.details?.suggestion) {
+          suggestion = translateErrorMessage(data.details.suggestion);
+        }
+
+        // ترجمة details.error إذا كان موجوداً
+        const translatedDetails = {
+          ...data?.details,
+          suggestion: suggestion || (data?.details?.suggestion ? translateErrorMessage(data.details.suggestion) : ""),
+          error: data?.details?.error ? translateErrorMessage(data.details.error) : data?.details?.error,
+        };
+
         setImportResult({
           status: "error",
-          message: errorMessage,
+          message: translateImportMessage(errorMessage),
           code: errorCode,
           imported_count: 0,
           updated_count: 0,
           failed_count: 0,
-          errors: data?.errors || [],
-          details: {
-            suggestion: suggestion || data?.details?.suggestion,
-            ...data?.details,
-          },
+          errors: translateErrors(data?.errors || []),
+          details: translatedDetails,
         });
 
         if (error instanceof Error) {
@@ -923,6 +1230,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
       const propertiesList = response.data?.data?.properties || [];
       const pagination = response.data?.data?.pagination || null;
       const propertiesAllData = response.data?.data || null;
+      const incompleteCount = response.data?.data?.incomplete_count || 0;
 
       const mappedProperties = propertiesList.map((property, index) => ({
         ...property,
@@ -941,6 +1249,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
         properties: mappedProperties,
         pagination,
         propertiesAllData,
+        incompleteCount,
         loading: false,
         isInitialized: true,
       });
@@ -949,6 +1258,69 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
 
       setPropertiesManagement({
         error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات الوحدات"),
+        loading: false,
+        isInitialized: true,
+      });
+    }
+  };
+
+  const fetchDrafts = async (page = 1, filters = {}) => {
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      setPropertiesManagement({
+        loading: false,
+        error: "Authentication required. Please login.",
+      });
+      return;
+    }
+
+    setPropertiesManagement({ loading: true, error: null });
+
+    try {
+      const params = new URLSearchParams();
+      params.set("page", page.toString());
+      if (filters.per_page) params.set("per_page", filters.per_page.toString());
+      if (filters.search) params.set("search", filters.search);
+
+      const response = await retryWithBackoff(
+        async () => {
+          const res = await axiosInstance.get(
+            `/properties/drafts`,
+          );
+          return res;
+        },
+        3,
+        1000,
+      );
+
+      const drafts = response.data?.data?.drafts || [];
+      const pagination = response.data?.data?.pagination || null;
+
+      const mappedDrafts = drafts.map((draft) => ({
+        ...draft,
+        thumbnail: draft.featured_image,
+        listingType:
+          String(draft.transaction_type) === "1" ||
+          draft.transaction_type === "sale"
+            ? "للبيع"
+            : "للإيجار",
+        status: "مسودة",
+        lastUpdated: new Date(draft.created_at).toLocaleDateString("ar-AE"),
+        features: Array.isArray(draft.features) ? draft.features : [],
+        missing_fields: draft.missing_fields || [],
+        validation_errors: draft.validation_errors || [],
+      }));
+
+      setPropertiesManagement({
+        properties: mappedDrafts,
+        pagination,
+        loading: false,
+        isInitialized: true,
+      });
+    } catch (error) {
+      const errorInfo = logError(error, "fetchDrafts");
+      setPropertiesManagement({
+        error: formatErrorMessage(error, "حدث خطأ أثناء جلب المسودات"),
         loading: false,
         isInitialized: true,
       });
@@ -1058,6 +1430,31 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
     }
   };
 
+  const handleCompleteDraft = async (draftId: string) => {
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      alert("Authentication required. Please login.");
+      return;
+    }
+
+    try {
+      // First fetch draft details to pre-fill the form
+      const response = await axiosInstance.get(`/properties/drafts/${draftId}`);
+      const draft = response.data?.data;
+      
+      if (!draft) {
+        toast.error("لم يتم العثور على المسودة");
+        return;
+      }
+
+      // Redirect to edit page with draft data
+      router.push(`/dashboard/properties/${draftId}/edit?draft=true`);
+    } catch (error) {
+      toast.error("فشل في جلب بيانات المسودة");
+      console.error("Error fetching draft:", error);
+    }
+  };
+
   const handleShare = (property: any) => {
     setSelectedProperty(property);
     setShareDialogOpen(true);
@@ -1065,13 +1462,21 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchProperties(page, appliedFilters);
+    if (showIncompleteOnly) {
+      fetchDrafts(page, appliedFilters);
+    } else {
+      fetchProperties(page, appliedFilters);
+    }
   };
 
   const handleApplyFilters = (filters: any) => {
     setAppliedFilters(filters);
     setCurrentPage(1);
-    fetchProperties(1, filters);
+    if (showIncompleteOnly) {
+      fetchDrafts(1, filters);
+    } else {
+      fetchProperties(1, filters);
+    }
   };
 
   const applyFilters = () => {
@@ -1174,7 +1579,11 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
     }
 
     if (!isInitialized && !loading) {
-      fetchProperties(1, showIncompleteOnly ? { status: 0 } : {});
+      if (showIncompleteOnly) {
+        fetchDrafts(1, {});
+      } else {
+        fetchProperties(1, {});
+      }
     }
   }, [fetchProperties, isInitialized, loading, showIncompleteOnly]);
 
@@ -1220,7 +1629,18 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <div className={showIncompleteOnly ? "w-full text-center" : ""}>
+              {showIncompleteOnly && (
+                  <Button
+                    variant="outline"
+                    className="gap-1 w-full md:w-auto"
+                    onClick={() => router.push("/dashboard/properties")}
+                  >
+                    <Home className="h-4 w-4" />
+                    جميع الوحدات
+                  </Button>
+                )}
+              <div className={showIncompleteOnly ? "w-full text-center " : ""}>
+                
                 <h1 className={`text-2xl font-bold tracking-tight ${showIncompleteOnly ? "text-red-800 dark:text-red-700" : ""}`}>
                   {showIncompleteOnly ? "الوحدات الغير مكتملة" : "إدارة الوحدات"}
                 </h1>
@@ -1231,14 +1651,18 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                 </p>
               </div>
               <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                {!showIncompleteOnly && (
+            
+                {!showIncompleteOnly && incompleteCount > 0 && (
                   <Button
                     variant="outline"
-                    className="gap-1 w-full md:w-auto"
+                    className="gap-1 w-full md:w-auto relative"
                     onClick={() => router.push("/dashboard/properties/incomplete")}
                   >
                     <AlertCircle className="h-4 w-4" />
                     الوحدات الغير مكتملة
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {incompleteCount}
+                    </span>
                   </Button>
                 )}
                 {!showIncompleteOnly && (
@@ -1426,6 +1850,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                   إضافة وحدة
                 </Button>
               </div>
+              
             </div>
 
             {/* نافذة منبثقة عند الوصول للحد الأقصى */}
@@ -1533,9 +1958,9 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                   setImportResult(null);
                 }
               }}
-              maxWidth="max-w-xl"
+              maxWidth="max-w-5xl"
             >
-              <CustomDialogContent className="overflow-y-auto">
+              <CustomDialogContent className="overflow-y-auto overflow-x-hidden">
                 <CustomDialogClose
                   onClose={() => {
                     setImportDialogOpen(false);
@@ -1733,8 +2158,9 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                               <h4 className="text-sm font-semibold mb-2 text-yellow-800">
                                 تفاصيل الأخطاء ({importResult.errors.length})
                               </h4>
-                              <ScrollArea className="h-[300px] w-full rounded-md border border-yellow-200 bg-white p-4">
-                                <Table>
+                              <div className="rounded-md border border-yellow-200 bg-white overflow-hidden">
+                                <div className="h-[300px] w-full overflow-y-auto overflow-x-auto p-4">
+                                  <Table className="min-w-full">
                                   <TableHeader>
                                     <TableRow>
                                       <TableHead className="w-[80px]">الصف</TableHead>
@@ -1769,8 +2195,9 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                                       </TableRow>
                                     ))}
                                   </TableBody>
-                                </Table>
-                              </ScrollArea>
+                                  </Table>
+                                </div>
+                              </div>
                             </div>
                           )}
                         </CardContent>
@@ -2066,6 +2493,8 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                               onToggleStatus={handleToggleStatus}
                               onShare={handleShare}
                               setReorderPopup={setReorderPopup}
+                              showIncompleteOnly={showIncompleteOnly}
+                              onCompleteDraft={handleCompleteDraft}
                             />
                           ))}
                         </div>
@@ -2084,6 +2513,8 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                               onToggleStatus={handleToggleStatus}
                               onShare={handleShare}
                               setReorderPopup={setReorderPopup}
+                              showIncompleteOnly={showIncompleteOnly}
+                              onCompleteDraft={handleCompleteDraft}
                             />
                           ))}
                         </div>
@@ -2224,18 +2655,15 @@ interface PropertyCardProps {
   property: any;
   allProperties?: any[];
   currentIndex?: number;
-  isFavorite: boolean;
-  onToggleFavorite: (id: string) => void;
-  onDelete: (id: string) => void;
-  onDuplicate: (property: any) => void;
-  onToggleStatus: (property: any) => void;
-  onShare: (property: any) => void;
-  setReorderPopup: React.Dispatch<
-    React.SetStateAction<{
-      open: boolean;
-      type: "featured" | "normal";
-    }>
-  >;
+  isFavorite?: boolean;
+  onToggleFavorite?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDuplicate?: (property: any) => void;
+  onToggleStatus?: (property: any) => void;
+  onShare?: (property: any) => void;
+  setReorderPopup?: any;
+  showIncompleteOnly?: boolean;
+  onCompleteDraft?: (id: string) => void;
 }
 
 // Helper function to extract city and district/neighborhood from property
@@ -2320,7 +2748,9 @@ function PropertyCard({
   onToggleStatus,
   onShare,
   setReorderPopup,
-}: PropertyCardProps & { setReorderPopup: any }) {
+  showIncompleteOnly = false,
+  onCompleteDraft,
+}: PropertyCardProps & { setReorderPopup: any; showIncompleteOnly?: boolean; onCompleteDraft?: (id: string) => void }) {
   const router = useRouter();
   const { userData } = useAuthStore();
   const [columnsCount, setColumnsCount] = useState(4);
@@ -2423,16 +2853,43 @@ function PropertyCard({
       </div>
       <CardHeader className="p-4">
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-1">
             <CardTitle
-              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents[0].title).length > 20 ? "text-sm " : ""}`}
+              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents?.[0]?.title || "Untitled").length > 20 ? "text-sm " : ""}`}
             >
-              {truncateTitle(property.title || property.contents[0].title)}
+              {truncateTitle(property.title || property.contents?.[0]?.title || "Untitled")}
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3" />
-              {formattedAddress}
+              {formattedAddress || "لا يوجد عنوان"}
             </CardDescription>
+            {showIncompleteOnly && (
+              <div className="mt-2 space-y-1">
+                {property.missing_fields && property.missing_fields.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {property.missing_fields.slice(0, 3).map((field: string, index: number) => (
+                      <Badge key={index} variant="destructive" className="text-xs">
+                        {field}
+                      </Badge>
+                    ))}
+                    {property.missing_fields.length > 3 && (
+                      <Badge variant="destructive" className="text-xs">
+                        +{property.missing_fields.length - 3} أكثر
+                      </Badge>
+                    )}
+                  </div>
+                )}
+                {property.validation_errors && property.validation_errors.length > 0 && (
+                  <div className="text-xs text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="inline h-3 w-3 ml-1" />
+                    {property.validation_errors[0]}
+                    {property.validation_errors.length > 1 && (
+                      <span> (+{property.validation_errors.length - 1} أخطاء أخرى)</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -2476,6 +2933,14 @@ function PropertyCard({
                 <Edit className="ml-2 h-4 w-4" />
                 تعديل
               </DropdownMenuItem>
+              {showIncompleteOnly && onCompleteDraft && (
+                <DropdownMenuItem
+                  onClick={() => onCompleteDraft(property.id.toString())}
+                >
+                  <CheckCircle className="ml-2 h-4 w-4" />
+                  إكمال المسودة
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 onClick={() => {
                   const domain = useAuthStore.getState().userData?.domain || "";
@@ -2631,7 +3096,9 @@ function PropertyListItem({
   onToggleStatus,
   onShare,
   setReorderPopup,
-}: PropertyCardProps) {
+  showIncompleteOnly = false,
+  onCompleteDraft,
+}: PropertyCardProps & { showIncompleteOnly?: boolean; onCompleteDraft?: (id: string) => void }) {
   const router = useRouter();
   
   const formattedAddress = formatAddress(property);
@@ -2688,12 +3155,39 @@ function PropertyListItem({
             </div>
             <div className="text-right">
               <h3 className="font-semibold">
-                {property.title || property.contents[0].title}
+                {property.title || property.contents?.[0]?.title || "Untitled"}
               </h3>
               <p className="text-sm text-muted-foreground flex  items-center gap-1">
                 <MapPin className="h-3 w-3" />{" "}
-                {formattedAddress}
+                {formattedAddress || "لا يوجد عنوان"}
               </p>
+              {showIncompleteOnly && (
+                <div className="mt-2 space-y-1">
+                  {property.missing_fields && property.missing_fields.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {property.missing_fields.slice(0, 3).map((field: string, index: number) => (
+                        <Badge key={index} variant="destructive" className="text-xs">
+                          {field}
+                        </Badge>
+                      ))}
+                      {property.missing_fields.length > 3 && (
+                        <Badge variant="destructive" className="text-xs">
+                          +{property.missing_fields.length - 3} أكثر
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                  {property.validation_errors && property.validation_errors.length > 0 && (
+                    <div className="text-xs text-amber-600 dark:text-amber-400">
+                      <AlertTriangle className="inline h-3 w-3 ml-1" />
+                      {property.validation_errors[0]}
+                      {property.validation_errors.length > 1 && (
+                        <span> (+{property.validation_errors.length - 1} أخطاء أخرى)</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
