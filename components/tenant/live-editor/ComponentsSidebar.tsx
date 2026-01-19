@@ -872,10 +872,10 @@ const TabsColumn = ({ activeMainTab, setActiveMainTab, onTabClick, t }: TabsColu
   };
 
   return (
-    <div className="w-[15%] border-r border-slate-200/60 bg-slate-50/50 flex flex-col py-2 gap-2 px-1">
+    <div className="w-[60px] border-r border-slate-200/60 bg-slate-50 flex flex-col py-2 gap-2 px-1 relative z-10 flex-shrink-0">
       <button
         onClick={() => handleTabClick("components")}
-        className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border ${
+        className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border  ${
           activeMainTab === "components"
             ? "bg-blue-200 text-blue-700 border-blue-200"
             : "text-slate-600 hover:bg-slate-50 border-transparent"
@@ -940,7 +940,7 @@ const TabsContentArea = ({
           initial="hidden"
           animate="show"
           exit="exit"
-          className="w-[85%] overflow-hidden"
+          className="absolute left-[60px] top-0 right-0 bottom-0 overflow-hidden z-0"
         >
           <Tabs
             value={activeMainTab}
@@ -949,7 +949,7 @@ const TabsContentArea = ({
           >
             <TabsContent
               value="components"
-              className="flex-1 overflow-hidden mt-0 p-4"
+              className="flex-1 overflow-hidden mt-0 p-4 z-0"
             >
               <div dir={direction}>
                 <ComponentsListView
@@ -1031,7 +1031,7 @@ export const ComponentsSidebar = ({ onTabsContentOpenChange }: ComponentsSidebar
             initial="hidden"
             animate="show"
             exit="exit"
-            className="flex-1 overflow-hidden flex"
+            className="flex-1 overflow-hidden relative"
             layout
           >
             {/* Tabs Column - 15% */}
