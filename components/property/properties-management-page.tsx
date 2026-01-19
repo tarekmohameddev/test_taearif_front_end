@@ -3121,10 +3121,10 @@ function PropertyCard({
         </div>
       </CardContent>
       <CardFooter 
-        className={`p-4 pt-0 ${isStackedFooter ? "flex flex-col gap-2" : "flex items-center justify-between"}`} 
+        className="p-4 pt-0 flex flex-col gap-2" 
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={`font-semibold flex gap-1 ${isStackedFooter ? "text-lg w-full justify-center" : "text-xl"}`}>
+        <div className="font-semibold flex gap-1 text-lg w-full justify-center">
           {property.transaction_type === "sale" ||
           property.purpose === "sale" ? (
             <>
@@ -3152,7 +3152,7 @@ function PropertyCard({
         <Button
           variant="outline"
           size="sm"
-          className={`gap-1 ${isStackedFooter ? "w-full" : "w-1/2"}`}
+          className="gap-1 w-full"
           onClick={() =>
             router.push("/dashboard/properties/" + property.id + "/edit")
           }
