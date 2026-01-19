@@ -9,36 +9,67 @@ import {
   isValidLocale,
 } from "@/lib/i18n/config";
 
-// Import translation files
-import arTranslations from "@/lib/i18n/locales/ar.json";
-import enTranslations from "@/lib/i18n/locales/en.json";
-
-const translations = {
-  ar: arTranslations,
-  en: enTranslations,
-};
+// Type for translations
+type Translations = Record<string, any>;
 
 interface EditorI18nState {
   locale: Locale;
-  translations: typeof translations;
+  translations: Partial<Record<Locale, Translations>>;
+  isLoading: boolean;
+  loadTranslations: (locale: Locale) => Promise<void>;
   setLocale: (locale: Locale) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
-  getCurrentTranslations: () => typeof arTranslations;
+  getCurrentTranslations: () => Translations | null;
 }
 
 export const useEditorI18nStore = create<EditorI18nState>()(
   persist(
     (set, get) => ({
       locale: defaultLocale,
-      translations,
+      translations: {},
+      isLoading: false,
 
-      setLocale: (locale: Locale) => {
+      loadTranslations: async (locale: Locale) => {
+        // Skip if already loaded
+        if (get().translations[locale]) {
+          return;
+        }
+
+        set({ isLoading: true });
+        try {
+          // Dynamic import of translation file
+          const translationModule = await import(
+            `@/lib/i18n/locales/${locale}.json`
+          );
+          set((state) => ({
+            translations: {
+              ...state.translations,
+              [locale]: translationModule.default,
+            },
+            isLoading: false,
+          }));
+        } catch (error) {
+          console.error(`Failed to load translations for locale "${locale}":`, error);
+          set({ isLoading: false });
+        }
+      },
+
+      setLocale: async (locale: Locale) => {
         set({ locale });
+        // Automatically load translations for the new locale
+        await get().loadTranslations(locale);
       },
 
       t: (key: string, params?: Record<string, string | number>) => {
         const { locale, translations } = get();
         const currentTranslations = translations[locale];
+
+        // If translations not loaded yet, return key
+        if (!currentTranslations) {
+          // Try to load translations synchronously (this is a fallback)
+          get().loadTranslations(locale).catch(() => {});
+          return key;
+        }
 
         // Navigate through nested object using dot notation
         const keys = key.split(".");
@@ -49,13 +80,18 @@ export const useEditorI18nStore = create<EditorI18nState>()(
             value = value[k];
           } else {
             // Fallback to default locale if key not found
-            value = translations[defaultLocale];
-            for (const fallbackKey of keys) {
-              if (value && typeof value === "object" && fallbackKey in value) {
-                value = value[fallbackKey];
-              } else {
-                return key; // Return key if not found anywhere
+            const defaultTranslations = translations[defaultLocale];
+            if (defaultTranslations) {
+              value = defaultTranslations;
+              for (const fallbackKey of keys) {
+                if (value && typeof value === "object" && fallbackKey in value) {
+                  value = value[fallbackKey];
+                } else {
+                  return key; // Return key if not found anywhere
+                }
               }
+            } else {
+              return key;
             }
             break;
           }
@@ -77,7 +113,7 @@ export const useEditorI18nStore = create<EditorI18nState>()(
 
       getCurrentTranslations: () => {
         const { locale, translations } = get();
-        return translations[locale];
+        return translations[locale] || null;
       },
     }),
     {

@@ -93,6 +93,7 @@ export default function PropertyDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isDeedDialogOpen, setIsDeedDialogOpen] = useState(false);
   const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [missingFieldsAr, setMissingFieldsAr] = useState<string[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
@@ -128,6 +129,7 @@ export default function PropertyDetailsPage() {
               featured_image: draftData.featured_image_url || draftData.featured_image,
             };
             setMissingFields(draftData.missing_fields || []);
+            setMissingFieldsAr(draftData.missing_fields_ar || []);
             setValidationErrors(draftData.validation_errors || []);
           } else {
             propertyData = response.data.data.property;
@@ -290,9 +292,9 @@ export default function PropertyDetailsPage() {
             </div>
 
             {/* Display missing fields and validation errors for drafts */}
-            {isDraft && (missingFields.length > 0 || validationErrors.length > 0) && (
+            {isDraft && (missingFieldsAr.length > 0 || validationErrors.length > 0) && (
               <div className="space-y-4">
-                {missingFields.length > 0 && (
+                {missingFieldsAr.length > 0 && (
                   <Card className="bg-orange-50 border-orange-200">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-2">
@@ -302,7 +304,7 @@ export default function PropertyDetailsPage() {
                             الحقول المطلوبة المفقودة:
                           </h3>
                           <div className="flex flex-wrap gap-2">
-                            {missingFields.map((field, index) => (
+                            {missingFieldsAr.map((field, index) => (
                               <Badge
                                 key={index}
                                 variant="outline"

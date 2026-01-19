@@ -14,6 +14,7 @@ import { LanguageSwitcher } from "@/components/tenant/live-editor/LanguageSwitch
 import {
   useEditorT,
   useEditorLocale,
+  useEditorI18nStore,
 } from "@/context/editorI18nStore";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/live-editor/LanguageDropdown";
@@ -3375,6 +3376,8 @@ export default function LiveEditorLayout({
   const { setLocale } = useEditorLocale();
   const t = useEditorT();
   const pathname = usePathname();
+  const loadTranslations = useEditorI18nStore((state) => state.loadTranslations);
+  const locale = useEditorI18nStore((state) => state.locale);
 
   // State for arrow tooltip
   const [showArrowTooltip, setShowArrowTooltip] = useState(false);
@@ -3383,6 +3386,13 @@ export default function LiveEditorLayout({
 
   // Token validation
   const { tokenValidation } = useTokenValidation();
+
+  // Load translations for the current locale on mount
+  useEffect(() => {
+    if (locale) {
+      loadTranslations(locale);
+    }
+  }, [locale, loadTranslations]);
 
   // تحديث الـ store عند تحميل الصفحة
   useEffect(() => {

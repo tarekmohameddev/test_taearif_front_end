@@ -195,6 +195,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
   const [currentFeature, setCurrentFeature] = useState("");
   const [errors, setErrors] = useState({});
   const [missingFields, setMissingFields] = useState([]);
+  const [missingFieldsAr, setMissingFieldsAr] = useState([]);
   const [validationErrors, setValidationErrors] = useState([]);
   const [isCompletingDraft, setIsCompletingDraft] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -479,6 +480,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
           // Set missing fields and validation errors for drafts
           if (isDraft) {
             setMissingFields(property.missing_fields || []);
+            setMissingFieldsAr(property.missing_fields_ar || []);
             setValidationErrors(property.validation_errors || []);
           }
           const projectsResponse = await axiosInstance.get("/user/projects");
@@ -1336,12 +1338,15 @@ export default function PropertyForm({ mode, isDraft = false }) {
 
     try {
       // Prepare data for completion
+      // Convert "sold" to "sale" for incomplete properties
+      const normalizedPurpose = formData.purpose === "sold" ? "sale" : formData.purpose;
+      
       const completionData = {
         title: formData.title,
         address: formData.address,
         description: formData.description,
         city_id: formData.city_id,
-        purpose: formData.purpose,
+        purpose: normalizedPurpose,
         type: formData.PropertyType || "",
         area: parseInt(formData.size) || 0,
         state_id: formData.district_id || null,
@@ -1560,9 +1565,9 @@ export default function PropertyForm({ mode, isDraft = false }) {
             )}
 
             {/* Display missing fields and validation errors for drafts */}
-            {isDraft && (missingFields.length > 0 || validationErrors.length > 0) && (
+            {isDraft && (missingFieldsAr.length > 0 || validationErrors.length > 0) && (
               <div className="space-y-4">
-                {missingFields.length > 0 && (
+                {missingFieldsAr.length > 0 && (
                   <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                     <div className="flex items-start gap-2">
                       <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
@@ -1571,7 +1576,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
                           الحقول المطلوبة المفقودة:
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          {missingFields.map((field, index) => (
+                          {missingFieldsAr.map((field, index) => (
                             <Badge
                               key={index}
                               variant="outline"

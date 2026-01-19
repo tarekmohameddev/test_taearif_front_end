@@ -390,16 +390,16 @@ function PropertyCard({
               {formattedAddress || "لا يوجد عنوان"}
             </CardDescription>
             <div className="mt-2 space-y-1">
-              {property.missing_fields && property.missing_fields.length > 0 && (
+              {property.missing_fields_ar && property.missing_fields_ar.length > 0 && (
                 <div className="flex flex-wrap gap-1">
-                  {property.missing_fields.slice(0, 3).map((field: string, index: number) => (
+                  {property.missing_fields_ar.slice(0, 3).map((field: string, index: number) => (
                     <Badge key={index} variant="destructive" className="text-xs">
                       {field}
                     </Badge>
                   ))}
-                  {property.missing_fields.length > 3 && (
+                  {property.missing_fields_ar.length > 3 && (
                     <Badge variant="destructive" className="text-xs">
-                      +{property.missing_fields.length - 3} أكثر
+                      +{property.missing_fields_ar.length - 3} أكثر
                     </Badge>
                   )}
                 </div>
@@ -647,16 +647,16 @@ function PropertyListItem({
                 {formattedAddress || "لا يوجد عنوان"}
               </p>
               <div className="mt-2 space-y-1">
-                {property.missing_fields && property.missing_fields.length > 0 && (
+                {property.missing_fields_ar && property.missing_fields_ar.length > 0 && (
                   <div className="flex flex-wrap gap-1">
-                    {property.missing_fields.slice(0, 3).map((field: string, index: number) => (
+                    {property.missing_fields_ar.slice(0, 3).map((field: string, index: number) => (
                       <Badge key={index} variant="destructive" className="text-xs">
                         {field}
                       </Badge>
                     ))}
-                    {property.missing_fields.length > 3 && (
+                    {property.missing_fields_ar.length > 3 && (
                       <Badge variant="destructive" className="text-xs">
-                        +{property.missing_fields.length - 3} أكثر
+                        +{property.missing_fields_ar.length - 3} أكثر
                       </Badge>
                     )}
                   </div>
@@ -887,7 +887,7 @@ export function IncompletePropertiesManagementPage() {
           status: "مسودة",
           lastUpdated: new Date(draft.created_at).toLocaleDateString("ar-AE"),
           features: Array.isArray(draft.features) ? draft.features : [],
-          missing_fields: draft.missing_fields || [],
+          missing_fields_ar: draft.missing_fields_ar || [],
           validation_errors: draft.validation_errors || [],
         };
       });
@@ -1186,7 +1186,7 @@ export function IncompletePropertiesManagementPage() {
               status: "مسودة",
               lastUpdated: new Date(draft.created_at).toLocaleDateString("ar-AE"),
               features: Array.isArray(draft.features) ? draft.features : [],
-              missing_fields: draft.missing_fields || [],
+              missing_fields_ar: draft.missing_fields_ar || [],
               validation_errors: draft.validation_errors || [],
             };
           });

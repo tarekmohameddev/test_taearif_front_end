@@ -8,7 +8,7 @@ import useAuthStore from "@/context/AuthContext";
 interface PropertyStatistics {
   for_sale: number;
   for_rent: number;
-  total: number;
+  complete_count: number;
 }
 
 export const PropertyStatisticsCards = () => {
@@ -40,7 +40,7 @@ export const PropertyStatisticsCards = () => {
           setStatistics({
             for_sale: data.complete?.for_sale || 0,
             for_rent: data.complete?.for_rent || 0,
-            total: data.total || 0,
+            complete_count: data.complete_count || 0,
           });
         } else {
           setError("Invalid response format");
@@ -63,7 +63,7 @@ export const PropertyStatisticsCards = () => {
   const statsCards = [
     {
       title: "إجمالي الوحدات",
-      value: statistics?.total || 0,
+      value: statistics?.complete_count || 0,
       icon: Building,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
