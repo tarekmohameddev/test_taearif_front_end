@@ -2981,7 +2981,7 @@ function PropertyCard({
                 <MoreHorizontal className="h-1 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
               {/* ترتيب الوحدة في الرئيسية */}
               {property.featured && (
                 <DropdownMenuItem
@@ -3383,7 +3383,7 @@ function PropertyListItem({
                   <MoreHorizontal className="h-1 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem
                   onClick={() => {
                     const domain = useAuthStore.getState().userData?.domain || "";
