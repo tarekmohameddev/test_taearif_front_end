@@ -95,81 +95,6 @@ const ComponentsListView = ({
     return getAvailableSectionsTranslated(t);
   }, [t]);
 
-  // الحصول على جميع الفئات الفريدة من المكونات
-  const allCategories = useMemo(() => {
-    const allComponents = getAllComponentsTranslated(t);
-    const categories = new Set<string>();
-    allComponents.forEach((component) => {
-      if (component.category) {
-        categories.add(component.category);
-      }
-    });
-    const categoriesArray = Array.from(categories);
-    
-    // ترتيب مخصص للتصنيفات
-    const categoryOrder = [
-      "marketing",    // الأول - التسويق
-      "banner",      // الثاني - البانرات
-      "ecommerce",   // الثالث - التجارة الإلكترونية
-      "content",     // الرابع - المحتوى
-    ];
-    
-    // ترتيب التصنيفات: أولاً حسب الترتيب المخصص، ثم الباقي أبجدياً
-    const sorted = categoriesArray.sort((a, b) => {
-      const indexA = categoryOrder.indexOf(a);
-      const indexB = categoryOrder.indexOf(b);
-      
-      // إذا كان كلا التصنيفين في القائمة المخصصة
-      if (indexA !== -1 && indexB !== -1) {
-        return indexA - indexB;
-      }
-      // إذا كان فقط A في القائمة المخصصة
-      if (indexA !== -1) {
-        return -1;
-      }
-      // إذا كان فقط B في القائمة المخصصة
-      if (indexB !== -1) {
-        return 1;
-      }
-      // إذا لم يكن أي منهما في القائمة المخصصة، ترتيب أبجدي
-      return a.localeCompare(b);
-    });
-    
-    return sorted;
-  }, [t]);
-
-  // تهيئة جميع التصنيفات كمفتوحة افتراضياً
-  useEffect(() => {
-    if (allCategories.length > 0 && expandedCategories.size === 0) {
-      setExpandedCategories(new Set(allCategories));
-    }
-  }, [allCategories, expandedCategories.size]);
-
-  // الحصول على جميع المكونات مقسمة حسب الفئات
-  const componentsByCategory = useMemo(() => {
-    const grouped: Record<string, ComponentType[]> = {};
-    allCategories.forEach((category) => {
-      const components = getComponentsByCategoryTranslated(category, t);
-      if (components.length > 0) {
-        grouped[category] = components;
-      }
-    });
-    return grouped;
-  }, [allCategories, t]);
-
-  // Toggle category expansion
-  const toggleCategory = (category: string) => {
-    setExpandedCategories((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
-      }
-      return newSet;
-    });
-  };
-
   // تصفية المكونات للبحث (يشمل header و footer)
   const filteredSections = useMemo(
     () =>
@@ -217,6 +142,88 @@ const ComponentsListView = ({
       return passesCurrentFilter && isInTheme;
     });
   }, [activeTab, filteredSections]);
+
+  // الحصول على جميع الفئات الفريدة من المكونات المصفاة حسب الثيم
+  const allCategories = useMemo(() => {
+    const categories = new Set<string>();
+    displaySections.forEach((section) => {
+      // الحصول على category من المكون
+      const allComponents = getAllComponentsTranslated(t);
+      const component = allComponents.find((comp) => comp.name === section.component);
+      if (component?.category) {
+        categories.add(component.category);
+      }
+    });
+    const categoriesArray = Array.from(categories);
+    
+    // ترتيب مخصص للتصنيفات
+    const categoryOrder = [
+      "marketing",    // الأول - التسويق
+      "banner",      // الثاني - البانرات
+      "ecommerce",   // الثالث - التجارة الإلكترونية
+      "content",     // الرابع - المحتوى
+    ];
+    
+    // ترتيب التصنيفات: أولاً حسب الترتيب المخصص، ثم الباقي أبجدياً
+    const sorted = categoriesArray.sort((a, b) => {
+      const indexA = categoryOrder.indexOf(a);
+      const indexB = categoryOrder.indexOf(b);
+      
+      // إذا كان كلا التصنيفين في القائمة المخصصة
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+      // إذا كان فقط A في القائمة المخصصة
+      if (indexA !== -1) {
+        return -1;
+      }
+      // إذا كان فقط B في القائمة المخصصة
+      if (indexB !== -1) {
+        return 1;
+      }
+      // إذا لم يكن أي منهما في القائمة المخصصة، ترتيب أبجدي
+      return a.localeCompare(b);
+    });
+    
+    return sorted;
+  }, [displaySections, t]);
+
+  // تهيئة جميع التصنيفات كمفتوحة افتراضياً
+  useEffect(() => {
+    if (allCategories.length > 0 && expandedCategories.size === 0) {
+      setExpandedCategories(new Set(allCategories));
+    }
+  }, [allCategories, expandedCategories.size]);
+
+  // الحصول على المكونات المصفاة مقسمة حسب الفئات
+  const componentsByCategory = useMemo(() => {
+    const grouped: Record<string, typeof displaySections> = {};
+    const allComponents = getAllComponentsTranslated(t);
+    
+    allCategories.forEach((category) => {
+      const categoryComponents = displaySections.filter((section) => {
+        const component = allComponents.find((comp) => comp.name === section.component);
+        return component?.category === category;
+      });
+      if (categoryComponents.length > 0) {
+        grouped[category] = categoryComponents;
+      }
+    });
+    return grouped;
+  }, [allCategories, displaySections, t]);
+
+  // Toggle category expansion
+  const toggleCategory = (category: string) => {
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
 
   // الحصول على معلومات المكونات الاساسية
   const basicComponentsInfo = useMemo(() => {
@@ -284,7 +291,7 @@ const ComponentsListView = ({
         {/* المكونات الاساسية Dropdown */}
         <div className="border border-gray-200 rounded-md overflow-hidden">
           <motion.button
-            onClick={() => setIsBasicComponentsDropdownOpen((v) => !v)}
+            onClick={() => setIsBasicComponentsDropdownOpen(!isBasicComponentsDropdownOpen)}
             className="w-full px-3 py-2 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
             whileTap={{ scale: 0.98 }}
           >
@@ -470,16 +477,17 @@ const ComponentsListView = ({
           className="space-y-3"
         >
           {Object.keys(componentsByCategory).length > 0 ? (
-            Object.entries(componentsByCategory).map(([category, components]) => {
+            Object.entries(componentsByCategory).map(([category, sections]) => {
               const isCategoryExpanded = expandedCategories.has(category);
-              // Filter components by search term
-              const filteredComponents = components.filter(
-                (component) =>
-                  component.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  component.description.toLowerCase().includes(searchTerm.toLowerCase()),
+              
+              // Filter sections by search term (already filtered in displaySections, but double-check)
+              const filteredSections = sections.filter(
+                (section) =>
+                  section.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  section.description.toLowerCase().includes(searchTerm.toLowerCase()),
               );
 
-              if (filteredComponents.length === 0) return null;
+              if (filteredSections.length === 0) return null;
 
               return (
                 <motion.div
@@ -551,36 +559,104 @@ const ComponentsListView = ({
                         }}
                         className="overflow-hidden"
                       >
-                        <div className="grid grid-cols-2 gap-1.5 pt-2">
-                          {filteredComponents.map((component) => {
-                            return (
-                              <motion.div
-                                key={component.id}
-                                variants={listItem}
-                                className="group relative"
-                              >
-                                <DraggableDrawerItem
-                                  componentType={component.name}
-                                  section={component.section}
-                                  data={{
-                                    label: component.displayName,
-                                    description: component.description,
-                                    icon: component.id,
-                                  }}
-                                >
-                                  <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
-                                    <div className="flex flex-col items-center justify-center text-center space-y-1">
-                                      <div className="text-xl">
-                                        {getSectionIconTranslated(component.id, t)}
-                                      </div>
-                                      <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
-                                        {component.displayName}
-                                      </h3>
-                                    </div>
-                                  </div>
-                                </DraggableDrawerItem>
-                              </motion.div>
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                          {filteredSections.map((section) => {
+                            const themeComponentNames =
+                              (themesComponentsList[activeTab] as string[]) || [];
+                            const variantsForSection = themeComponentNames.filter(
+                              (name) => getBaseComponentName(name) === section.component,
                             );
+
+                            if (variantsForSection.length <= 1) {
+                              const variantName =
+                                variantsForSection.length === 1
+                                  ? variantsForSection[0]
+                                  : undefined;
+
+                              const variantSuffix =
+                                variantName &&
+                                variantName.startsWith(section.component)
+                                  ? variantName.slice(section.component.length)
+                                  : "";
+                              const displayLabel =
+                                variantSuffix && variantSuffix.length > 0
+                                  ? `${section.name} ${variantSuffix}`
+                                  : section.name;
+
+                              return (
+                                <motion.div
+                                  key={`${section.type}-${variantName || "default"}`}
+                                  variants={listItem}
+                                  className="group relative"
+                                >
+                                  <DraggableDrawerItem
+                                    componentType={section.component}
+                                    section={section.section}
+                                    data={{
+                                      label: displayLabel,
+                                      description: section.description,
+                                      icon: section.type,
+                                      ...(variantName
+                                        ? { variant: variantName }
+                                        : {}),
+                                    }}
+                                  >
+                                    <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                                      <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                        <div className="text-xl">
+                                          {getSectionIconTranslated(section.type, t)}
+                                        </div>
+                                        <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
+                                          {displayLabel}
+                                        </h3>
+                                      </div>
+                                    </div>
+                                  </DraggableDrawerItem>
+                                </motion.div>
+                              );
+                            }
+
+                            return variantsForSection.map((variantName) => {
+                              const variantSuffix = variantName.startsWith(
+                                section.component,
+                              )
+                                ? variantName.slice(section.component.length)
+                                : "";
+                              const displayLabel =
+                                variantSuffix && variantSuffix.length > 0
+                                  ? `${section.name} ${variantSuffix}`
+                                  : section.name;
+
+                              return (
+                                <motion.div
+                                  key={`${section.type}-${variantName}`}
+                                  variants={listItem}
+                                  className="group relative"
+                                >
+                                  <DraggableDrawerItem
+                                    componentType={section.component}
+                                    section={section.section}
+                                    data={{
+                                      label: displayLabel,
+                                      description: section.description,
+                                      icon: section.type,
+                                      variant: variantName,
+                                    }}
+                                  >
+                                    <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                                      <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                        <div className="text-xl">
+                                          {getSectionIconTranslated(section.type, t)}
+                                        </div>
+                                        <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
+                                          {displayLabel}
+                                        </h3>
+                                      </div>
+                                    </div>
+                                  </DraggableDrawerItem>
+                                </motion.div>
+                              );
+                            });
                           })}
                         </div>
                       </motion.div>
