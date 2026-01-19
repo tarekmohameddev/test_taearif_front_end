@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, ChevronDown, Building2, Home, Building, Settings, LayoutTemplate, Users, UserCog, FileText, Download, Code, MessageSquare } from "lucide-react";
+import {
+  ChevronDown,
+  Building2,
+  Building,
+  Settings,
+  LayoutTemplate,
+  Users,
+  UserCog,
+  FileText,
+  Download,
+  Code,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -12,9 +24,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import useAuthStore from "@/context/AuthContext";
-import useStore from "@/context/Store";
 
 // Hook لمراقبة ارتفاع الشاشة
 const useScreenHeight = () => {
@@ -54,21 +65,11 @@ export function EnhancedSidebar({
     activeTab || "dashboard",
   );
   const { isShortScreen, isVeryShortScreen } = useScreenHeight();
-
-  const { sidebarData, fetchSideMenus } = useStore();
-  const { mainNavItems, loading, error } = sidebarData;
+  
+  // Track previous path to prevent unnecessary re-renders
+  const previousPathRef = useRef(pathname);
 
   const { userData, IsLoading: authLoading } = useAuthStore();
-
-  useEffect(() => {
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
-      return; // Exit early if token is not ready
-    }
-
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    fetchSideMenus();
-  }, [fetchSideMenus, userData?.token, authLoading]);
 
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
@@ -87,201 +88,82 @@ export function EnhancedSidebar({
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
-  const isContentSection = currentPath.startsWith("/content");
-  const isLiveEditorSection = currentPath.startsWith("/live-editor");
-  const currentTab = isContentSection
-    ? "content"
-    : isLiveEditorSection
-      ? "live-editor"
-      : mainNavItems.find(
-          (item: any) =>
-            item.path === currentPath ||
-            (item.path !== "/" && currentPath.startsWith(item.path)),
-        )?.id || "dashboard";
 
   // تحديث العنصر النشط عند تغيير المسار
   useEffect(() => {
-    if (currentTab) {
-      setInternalActiveTab(currentTab);
-      if (typeof setActiveTab === "function") {
-        setActiveTab(currentTab);
-      }
+    // Static sidebar: just keep internal tab in sync with provided activeTab or current path
+    const computed =
+      activeTab ||
+      (currentPath.startsWith("/dashboard") ? "dashboard" : "dashboard");
+    setInternalActiveTab(computed);
+    if (typeof setActiveTab === "function") {
+      setActiveTab(computed);
     }
-  }, [currentPath, currentTab, setActiveTab]);
+  }, [currentPath, activeTab, setActiveTab]);
 
-  // فتح قسم إدارة العقارات تلقائياً إذا كان المسار الحالي يطابق أحد العناصر الفرعية
+  // Static sidebar: no auto-open logic at all (dropdowns are independent & manual)
   useEffect(() => {
-    const propertyManagementPaths = [
-      "/dashboard/units",
-      "/dashboard/projects",
-      "/dashboard/buildings",
-    ];
-    if (
-      propertyManagementPaths.some(
-        (path) =>
-          currentPath === path || currentPath.startsWith(path + "/"),
-      )
-    ) {
-      setIsPropertyManagementOpen(true);
-    }
+    previousPathRef.current = currentPath;
   }, [currentPath]);
 
-  // فتح قسم إدارة الموقع تلقائياً إذا كان المسار الحالي يطابق أحد العناصر الفرعية
-  useEffect(() => {
-    const siteManagementPaths = [
-      "/dashboard/settings",
-      "/dashboard/site-settings",
-      "/dashboard/design",
-      "/dashboard/design-editor",
-    ];
-    if (
-      siteManagementPaths.some(
-        (path) =>
-          currentPath === path || currentPath.startsWith(path + "/"),
-      )
-    ) {
-      setIsSiteManagementOpen(true);
-    }
-  }, [currentPath]);
+  const isActivePath = (href: string) =>
+    currentPath === href || currentPath.startsWith(href + "/");
 
-  // فتح قسم إدارة العملاء تلقائياً إذا كان المسار الحالي يطابق أحد العناصر الفرعية
-  useEffect(() => {
-    const customerManagementPaths = [
-      "/dashboard/crm",
-      "/dashboard/customers",
-      "/dashboard/property-requests",
-    ];
-    if (
-      customerManagementPaths.some(
-        (path) =>
-          currentPath === path || currentPath.startsWith(path + "/"),
-      )
-    ) {
-      setIsCustomerManagementOpen(true);
-    }
-  }, [currentPath]);
-
-
-  // دالة للحصول على الرابط مع إضافة token إذا لزم الأمر
-  const getItemUrl = (item: any) => {
-    if (item.isAPP) {
-      const token = useAuthStore.getState().token;
-      return `${item.path}?token=${token}`;
-    }
-    return item.path;
-  };
-
-  // دالة للتعامل مع النقر على العنصر
-  const handleItemClick = (item: any, e: any) => {
-    if (item.isAPP) {
-      e.preventDefault(); // منع التنقل الافتراضي
-      const url = getItemUrl(item);
-      window.open(url, "_blank"); // فتح في تبويب جديد
-    }
-    // إذا كان isAPP = false، سيتم استخدام Link العادي (نفس الصفحة)
-  };
-
-  const NavItem = ({
-    item,
-    isActive,
+  const StaticLink = ({
+    href,
+    title,
+    description,
+    icon,
   }: {
-    item: (typeof mainNavItems)[0];
-    isActive: boolean;
-  }) => (
-    <TooltipProvider delayDuration={300}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={isActive ? "secondary" : "ghost"}
-            className={cn(
-              "justify-start gap-3 h-auto py-2 px-3 w-full",
-              isCollapsed && "justify-center px-2",
-              isActive &&
-                "bg-primary/10 text-primary border-r-2 border-primary",
-            )}
-            asChild={!item.isAPP} // استخدام asChild فقط إذا لم يكن APP
-          >
-            {item.isAPP ? (
-              // إذا كان APP، استخدام button عادي مع onClick
-              <div
-                onClick={(e) => handleItemClick(item, e)}
-                className="cursor-pointer flex items-center w-full"
-              >
-                <item.icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive ? "text-primary" : "text-muted-foreground",
-                  )}
-                />
-                {!isCollapsed && (
-                  <div className="flex flex-col items-start ml-3">
-                    <span className="text-sm font-medium">{item.label}</span>
-                    {!isShortScreen && (
-                      <span className="text-xs text-muted-foreground hidden md:inline-block">
-                        {item.description}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
-              // إذا لم يكن APP، استخدام Link العادي
-              <Link
-                href={(() => {
-                  // التحقق من المسارات المباشرة (بدون dashboard)
-                  if (item.isDirectPath) {
-                    return item.path;
-                  }
-
-                  // التحقق من وجود dashboard في بداية المسار
-                  if (item.path.startsWith("/dashboard")) {
-                    // إذا كان موجود، إزالته
-                    return item.path;
-                  } else if (item.path.startsWith("/")) {
-                    // إذا كان يبدأ بـ /، إضافة dashboard قبل /
-                    return `/dashboard${item.path}`;
-                  } else {
-                    // إذا لم يكن يبدأ بـ /، إضافة dashboard/ والـ slug
-                    return `/dashboard/${item.path}`;
-                  }
-                })()}
-              >
-                <item.icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive ? "text-primary" : "text-muted-foreground",
-                  )}
-                />
+    href: string;
+    title: string;
+    description?: string;
+    icon: React.ReactNode;
+  }) => {
+    const isActive = isActivePath(href);
+    return (
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={isActive ? "secondary" : "ghost"}
+              className={cn(
+                "justify-start gap-3 h-auto py-2 px-3 w-full",
+                isCollapsed && "justify-center px-2",
+                isActive &&
+                  "bg-primary/10 text-primary border-r-2 border-primary",
+              )}
+              asChild
+            >
+              <Link href={href}>
+                {icon}
                 {!isCollapsed && (
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">{item.label}</span>
-                    {!isShortScreen && (
+                    <span className="text-sm font-medium">{title}</span>
+                    {!!description && !isShortScreen && (
                       <span className="text-xs text-muted-foreground hidden md:inline-block">
-                        {item.description}
+                        {description}
                       </span>
                     )}
                   </div>
                 )}
               </Link>
-            )}
-          </Button>
-        </TooltipTrigger>
-        {isCollapsed && (
-          <TooltipContent side="left">
-            <div>
-              <p className="font-medium">{item.label}</p>
-              <p className="text-xs text-muted-foreground">
-                {item.description}
-              </p>
-              {item.isAPP && (
-                <p className="text-xs text-blue-500">يفتح في تبويب جديد</p>
-              )}
-            </div>
-          </TooltipContent>
-        )}
-      </Tooltip>
-    </TooltipProvider>
-  );
+            </Button>
+          </TooltipTrigger>
+          {isCollapsed && (
+            <TooltipContent side="left">
+              <div>
+                <p className="font-medium">{title}</p>
+                {!!description && (
+                  <p className="text-xs text-muted-foreground">{description}</p>
+                )}
+              </div>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   const SidebarContent = () => {
     const userData = useAuthStore.getState().userData;
@@ -301,477 +183,273 @@ export function EnhancedSidebar({
           </div>
         </div>
 
-        <div className="px-3 flex-shrink-0">
-          <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
-                  onClick={() => {
-                    const userData = useAuthStore.getState().userData;
-                    console.log("🔗 Full userData:", userData);
-                    console.log("🔗 Domain from userData:", userData?.domain);
-
-                    // التحقق من وجود userData
-                    if (!userData) {
-                      console.warn("userData is null or undefined");
-                      alert("يرجى تسجيل الدخول أولاً");
-                      return;
-                    }
-
-                    const domain = userData?.domain || "";
-
-                    // التحقق من صحة الـ domain
-                    if (!domain || domain.trim() === "") {
-                      alert("يرجى إعداد domain صحيح في إعدادات الحساب");
-                      return;
-                    }
-
-                    // تنظيف الـ domain من المسافات
-                    const cleanDomain = domain.trim();
-
-                    // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
-                    if (
-                      !cleanDomain.includes(".") &&
-                      !cleanDomain.startsWith("http")
-                    ) {
-                      alert(
-                        "تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح",
-                      );
-                      return;
-                    }
-
-                    const url = cleanDomain.startsWith("http")
-                      ? cleanDomain
-                      : `https://${cleanDomain}`;
-
-                    // التحقق من صحة الـ URL قبل فتحه
-                    try {
-                      new URL(url);
-                      console.log("Opening URL:", url);
-                      window.open(url, "_blank");
-                    } catch (error) {
-                      console.error("Invalid URL:", url, error);
-                      alert("URL غير صحيح. يرجى التحقق من إعدادات الـ domain");
-                    }
-                  }}
-                >
-                  <ExternalLink className="h-4 w-4 text-primary" />
-                  {!isCollapsed && <span>معاينة الموقع</span>}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>فتح الموقع في نافذة جديدة</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-
         <div
           className={cn(
             "flex-1 py-2 px-1 overflow-y-auto overflow-x-hidden min-h-0",
             isVeryShortScreen && "hide-scrollbar",
           )}
         >
-          {error && (
-            <div className="px-3 py-2">
-              <span className="text-sm text-red-500">{error}</span>
+          <div className="space-y-1">
+            {/* Static top items */}
+            <StaticLink
+              href="/dashboard"
+              title="لوحة التحكم"
+              description="لوحة التحكم"
+              icon={<FileText className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard"
+              title="نظره عامه عن الموقع"
+              description="نظره عامه عن الموقع"
+              icon={<FileText className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/settings"
+              title="اعدادات الموقع"
+              description="اعدادات الموقع"
+              icon={<Settings className="h-5 w-5 text-muted-foreground" />}
+            />
+
+            {/* إدارة عملائك - Dropdown */}
+            <div>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      onClick={() =>
+                        setIsCustomerManagementOpen(!isCustomerManagementOpen)
+                      }
+                      className={cn(
+                        "justify-start gap-3 h-auto py-2 px-3 w-full",
+                        isCollapsed && "justify-center px-2",
+                      )}
+                    >
+                      <Users className="h-5 w-5 text-muted-foreground" />
+                      {!isCollapsed && (
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-sm font-medium">
+                            ادارة عملائك
+                          </span>
+                          <motion.div
+                            animate={{
+                              rotate: isCustomerManagementOpen ? 180 : 0,
+                            }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          </motion.div>
+                        </div>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && (
+                    <TooltipContent side="left">
+                      <p className="font-medium">ادارة عملائك</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+              {!isCollapsed && (
+                <motion.div
+                  initial={false}
+                  animate={{
+                    height: isCustomerManagementOpen ? "auto" : 0,
+                    opacity: isCustomerManagementOpen ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-1 pr-8 pl-4 pt-1">
+                    <StaticLink
+                      href="/dashboard/crm"
+                      title="CRM"
+                      icon={<UserCog className="h-4 w-4 text-muted-foreground" />}
+                    />
+                    <StaticLink
+                      href="/dashboard/customers"
+                      title="العملاء"
+                      icon={<Users className="h-4 w-4 text-muted-foreground" />}
+                    />
+                    <StaticLink
+                      href="/dashboard/property-requests"
+                      title="طلبات العملاء"
+                      icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+                    />
+                  </div>
+                </motion.div>
+              )}
             </div>
-          )}
 
-          {!loading && !error && (
-            <div className="space-y-1">
-              {/* العناصر الثلاثة الأولى */}
-              {mainNavItems.slice(0, 3).map((item: any) => (
-                <NavItem
-                  key={item.id}
-                  item={item}
-                  isActive={
-                    activeTab
-                      ? currentTab === item.id && activeTab === item.id
-                      : internalActiveTab === item.id
-                  }
-                />
-              ))}
-
-              {/* إدارة العقارات - Collapsible Section with Framer Motion (الرابط الرابع) */}
-              <div>
-                <TooltipProvider delayDuration={300}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        onClick={() => setIsPropertyManagementOpen(!isPropertyManagementOpen)}
-                        className={cn(
-                          "justify-start gap-3 h-auto py-2 px-3 w-full",
-                          isCollapsed && "justify-center px-2",
-                        )}
-                      >
-                        <Building2 className="h-5 w-5 text-muted-foreground" />
-                        {!isCollapsed && (
-                          <div className="flex items-center justify-between w-full">
-                            <span className="text-sm font-medium">إدارة العقارات</span>
-                            <motion.div
-                              animate={{
-                                rotate: isPropertyManagementOpen ? 180 : 0,
-                              }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                            </motion.div>
-                          </div>
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    {isCollapsed && (
-                      <TooltipContent side="left">
-                        <p className="font-medium">إدارة العقارات</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-                {!isCollapsed && (
-                  <AnimatePresence>
-                    {isPropertyManagementOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="space-y-1 pr-8 pl-4 pt-1">
+            {/* إدارة العقارات - Dropdown */}
+            <div>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      onClick={() =>
+                        setIsPropertyManagementOpen(!isPropertyManagementOpen)
+                      }
+                      className={cn(
+                        "justify-start gap-3 h-auto py-2 px-3 w-full",
+                        isCollapsed && "justify-center px-2",
+                      )}
+                    >
+                      <Building2 className="h-5 w-5 text-muted-foreground" />
+                      {!isCollapsed && (
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-sm font-medium">
+                            إدارة العقارات
+                          </span>
                           <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.1, duration: 0.2 }}
+                            animate={{
+                              rotate: isPropertyManagementOpen ? 180 : 0,
+                            }}
+                            transition={{ duration: 0.2 }}
                           >
-                            <Link href="/dashboard/units">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/units" ||
-                                  currentPath.startsWith("/dashboard/units")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/units" ||
-                                    currentPath.startsWith("/dashboard/units")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <Home className="h-4 w-4" />
-                                <span className="text-sm font-medium">الوحدات</span>
-                              </Button>
-                            </Link>
-                          </motion.div>
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.15, duration: 0.2 }}
-                          >
-                            <Link href="/dashboard/projects">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/projects" ||
-                                  currentPath.startsWith("/dashboard/projects")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/projects" ||
-                                    currentPath.startsWith("/dashboard/projects")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <Building2 className="h-4 w-4" />
-                                <span className="text-sm font-medium">المشاريع</span>
-                              </Button>
-                            </Link>
-                          </motion.div>
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.2 }}
-                          >
-                            <Link href="/dashboard/buildings">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/buildings" ||
-                                  currentPath.startsWith("/dashboard/buildings")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/buildings" ||
-                                    currentPath.startsWith("/dashboard/buildings")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <Building className="h-4 w-4" />
-                                <span className="text-sm font-medium">العمارات</span>
-                              </Button>
-                            </Link>
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
                           </motion.div>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                )}
-              </div>
-
-              {/* إدارة الموقع - Collapsible Section with Framer Motion */}
-              <div>
-                <TooltipProvider delayDuration={300}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        onClick={() => setIsSiteManagementOpen(!isSiteManagementOpen)}
-                        className={cn(
-                          "justify-start gap-3 h-auto py-2 px-3 w-full",
-                          isCollapsed && "justify-center px-2",
-                        )}
-                      >
-                        <Settings className="h-5 w-5 text-muted-foreground" />
-                        {!isCollapsed && (
-                          <div className="flex items-center justify-between w-full">
-                            <span className="text-sm font-medium">إدارة الموقع</span>
-                            <motion.div
-                              animate={{
-                                rotate: isSiteManagementOpen ? 180 : 0,
-                              }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                            </motion.div>
-                          </div>
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    {isCollapsed && (
-                      <TooltipContent side="left">
-                        <p className="font-medium">إدارة الموقع</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-                {!isCollapsed && (
-                  <AnimatePresence>
-                    {isSiteManagementOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="space-y-1 pr-8 pl-4 pt-1">
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.1, duration: 0.2 }}
-                          >
-                            <Link href="/dashboard/site-settings">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/site-settings" ||
-                                  currentPath.startsWith("/dashboard/site-settings")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/site-settings" ||
-                                    currentPath.startsWith("/dashboard/site-settings")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <Settings className="h-4 w-4" />
-                                <span className="text-sm font-medium">إعدادات الموقع</span>
-                              </Button>
-                            </Link>
-                          </motion.div>
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.15, duration: 0.2 }}
-                          >
-                            <Link href="/dashboard/design-editor">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/design-editor" ||
-                                  currentPath.startsWith("/dashboard/design-editor")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/design-editor" ||
-                                    currentPath.startsWith("/dashboard/design-editor")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <LayoutTemplate className="h-4 w-4" />
-                                <span className="text-sm font-medium">تعديل تصميم الموقع</span>
-                              </Button>
-                            </Link>
-                          </motion.div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                )}
-              </div>
-
-              {/* إدارة العملاء - Collapsible Section with Framer Motion */}
-              <div>
-                <TooltipProvider delayDuration={300}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        onClick={() => setIsCustomerManagementOpen(!isCustomerManagementOpen)}
-                        className={cn(
-                          "justify-start gap-3 h-auto py-2 px-3 w-full",
-                          isCollapsed && "justify-center px-2",
-                        )}
-                      >
-                        <Users className="h-5 w-5 text-muted-foreground" />
-                        {!isCollapsed && (
-                          <div className="flex items-center justify-between w-full">
-                            <span className="text-sm font-medium">إدارة العملاء</span>
-                            <motion.div
-                              animate={{
-                                rotate: isCustomerManagementOpen ? 180 : 0,
-                              }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                            </motion.div>
-                          </div>
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    {isCollapsed && (
-                      <TooltipContent side="left">
-                        <p className="font-medium">إدارة العملاء</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-                {!isCollapsed && (
-                  <AnimatePresence>
-                    {isCustomerManagementOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                      >
-                        <div className="space-y-1 pr-8 pl-4 pt-1">
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.1, duration: 0.2 }}
-                          >
-                            <Link href="/dashboard/crm">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/crm" ||
-                                  currentPath.startsWith("/dashboard/crm")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/crm" ||
-                                    currentPath.startsWith("/dashboard/crm")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <UserCog className="h-4 w-4" />
-                                <span className="text-sm font-medium">CRM</span>
-                              </Button>
-                            </Link>
-                          </motion.div>
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.15, duration: 0.2 }}
-                          >
-                            <Link href="/dashboard/customers">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/customers" ||
-                                  currentPath.startsWith("/dashboard/customers")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/customers" ||
-                                    currentPath.startsWith("/dashboard/customers")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <Users className="h-4 w-4" />
-                                <span className="text-sm font-medium">إدارة العملاء</span>
-                              </Button>
-                            </Link>
-                          </motion.div>
-                          <motion.div
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.2 }}
-                          >
-                            <Link href="/dashboard/property-requests">
-                              <Button
-                                variant={
-                                  currentPath === "/dashboard/property-requests" ||
-                                  currentPath.startsWith("/dashboard/property-requests")
-                                    ? "secondary"
-                                    : "ghost"
-                                }
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  (currentPath === "/dashboard/property-requests" ||
-                                    currentPath.startsWith("/dashboard/property-requests")) &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                              >
-                                <FileText className="h-4 w-4" />
-                                <span className="text-sm font-medium">طلبات العملاء</span>
-                              </Button>
-                            </Link>
-                          </motion.div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                )}
-              </div>
-
-              {/* باقي العناصر (من الرابع فما فوق) */}
-              {mainNavItems.slice(3).map((item: any) => (
-                <NavItem
-                  key={item.id}
-                  item={item}
-                  isActive={
-                    activeTab
-                      ? currentTab === item.id && activeTab === item.id
-                      : internalActiveTab === item.id
-                  }
-                />
-              ))}
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && (
+                    <TooltipContent side="left">
+                      <p className="font-medium">إدارة العقارات</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+              {!isCollapsed && (
+                <motion.div
+                  initial={false}
+                  animate={{
+                    height: isPropertyManagementOpen ? "auto" : 0,
+                    opacity: isPropertyManagementOpen ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-1 pr-8 pl-4 pt-1">
+                    <StaticLink
+                      href="/dashboard/properties"
+                      title="نظره عامه عن العقارات"
+                      icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+                    />
+                    <StaticLink
+                      href="/dashboard/projects"
+                      title="المشاريع"
+                      icon={<Building2 className="h-4 w-4 text-muted-foreground" />}
+                    />
+                    <StaticLink
+                      href="/dashboard/buildings"
+                      title="العمارات"
+                      icon={<Building className="h-4 w-4 text-muted-foreground" />}
+                    />
+                  </div>
+                </motion.div>
+              )}
             </div>
-          )}
+
+            {/* إدارة الموقع - Dropdown */}
+            <div>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setIsSiteManagementOpen(!isSiteManagementOpen)}
+                      className={cn(
+                        "justify-start gap-3 h-auto py-2 px-3 w-full",
+                        isCollapsed && "justify-center px-2",
+                      )}
+                    >
+                      <Settings className="h-5 w-5 text-muted-foreground" />
+                      {!isCollapsed && (
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-sm font-medium">إدارة الموقع</span>
+                          <motion.div
+                            animate={{
+                              rotate: isSiteManagementOpen ? 180 : 0,
+                            }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                          </motion.div>
+                        </div>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && (
+                    <TooltipContent side="left">
+                      <p className="font-medium">إدارة الموقع</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+              {!isCollapsed && (
+                <motion.div
+                  initial={false}
+                  animate={{
+                    height: isSiteManagementOpen ? "auto" : 0,
+                    opacity: isSiteManagementOpen ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-1 pr-8 pl-4 pt-1">
+                    <StaticLink
+                      href="/dashboard/settings"
+                      title="إعدادات الموقع"
+                      icon={<Settings className="h-4 w-4 text-muted-foreground" />}
+                    />
+                    <StaticLink
+                      href="/dashboard/content"
+                      title="محرر الموقع"
+                      icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+                    />
+                    <StaticLink
+                      href="/dashboard/templates"
+                      title="القوالب"
+                      icon={<LayoutTemplate className="h-4 w-4 text-muted-foreground" />}
+                    />
+                    <StaticLink
+                      href="/live-editor"
+                      title="المحرر المباشر"
+                      icon={<LayoutTemplate className="h-4 w-4 text-muted-foreground" />}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Static bottom items requested */}
+            <StaticLink
+              href="/dashboard/matching"
+              title="مركز توافق الطلبات الذكائي"
+              description="احصل على توافق ذكي مع الطلبات"
+              icon={<MessageSquare className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/apps"
+              title="التطبيقات"
+              description="التطبيقات"
+              icon={<Code className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/access-control"
+              title="ادارة الموظفين"
+              description="ادارة الموظفين"
+              icon={<Users className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/rental-management"
+              title="ادارة الايجارات"
+              description="ادارة ايجارتك"
+              icon={<Download className="h-5 w-5 text-muted-foreground" />}
+            />
+          </div>
         </div>
       </div>
     );
