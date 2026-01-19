@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
   getErrorInfo,
   retryWithBackoff,
@@ -450,18 +450,21 @@ const truncateTitle = (title: string, maxLength: number = 40): string => {
 };
 
 interface PropertiesManagementPageProps {
-  showIncompleteOnly?: boolean;
+  // تم إزالة showIncompleteOnly - استخدم IncompletePropertiesManagementPage للوحدات الغير مكتملة
+  isIncompletePage?: boolean; // إخفاء زر "الوحدات الغير مكتملة" في صفحة الوحدات الغير مكتملة
 }
 
-export function PropertiesManagementPage({ showIncompleteOnly = false }: PropertiesManagementPageProps) {
+export function PropertiesManagementPage({ isIncompletePage = false }: PropertiesManagementPageProps) {
+  // تتبع ما إذا تم تحميل البيانات في هذا المكون
+  const hasLoadedRef = useRef(false);
+  const fetchCalledRef = useRef(false);
+  
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>(
-    showIncompleteOnly ? { status: 0 } : {}
-  );
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
   const [filterCityId, setFilterCityId] = useState<string | null>(null);
   const [filterDistrictId, setFilterDistrictId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string | null>(null);
@@ -502,7 +505,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
       [key: string]: any;
     };
   } | null>(null);
-  const { clickedONSubButton, userData } = useAuthStore();
+  const { clickedONSubButton, userData, IsLoading: authLoading } = useAuthStore();
 
   const router = useRouter();
   const {
@@ -1216,11 +1219,13 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
       });
 
       // استخدام نظام إعادة المحاولة
+      console.log("Making API request to /properties with params:", params.toString());
       const response = await retryWithBackoff(
         async () => {
           const res = await axiosInstance.get(
             `/properties?${params.toString()}`,
           );
+          console.log("API response received:", res);
           return res;
         },
         3,
@@ -1264,7 +1269,8 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
     }
   };
 
-  const fetchDrafts = async (page = 1, filters = {}) => {
+  // fetchDrafts تم نقله إلى IncompletePropertiesManagementPage
+  const _fetchDrafts_removed = async (page = 1, filters = {}) => {
     const { userData } = useAuthStore.getState();
     if (!userData?.token) {
       setPropertiesManagement({
@@ -1277,15 +1283,34 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
     setPropertiesManagement({ loading: true, error: null });
 
     try {
+      // بناء معاملات الفلترة
       const params = new URLSearchParams();
       params.set("page", page.toString());
-      if (filters.per_page) params.set("per_page", filters.per_page.toString());
-      if (filters.search) params.set("search", filters.search);
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              // For arrays, use multiple params: employee_id[]=1&employee_id[]=2
+              // But also support comma-separated for backward compatibility
+              if (key === "employee_id" || key === "category_id" || key === "purpose") {
+                value.forEach((item) => {
+                  params.append(`${key}[]`, item.toString());
+                });
+              } else {
+                params.set(key, value.join(","));
+              }
+            }
+          } else {
+            params.set(key, value.toString());
+          }
+        }
+      });
 
       const response = await retryWithBackoff(
         async () => {
           const res = await axiosInstance.get(
-            `/properties/drafts`,
+            `/properties/drafts?${params.toString()}`,
           );
           return res;
         },
@@ -1293,23 +1318,35 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
         1000,
       );
 
-      const drafts = response.data?.data?.drafts || [];
-      const pagination = response.data?.data?.pagination || null;
+      // الـ API يعيد البيانات مباشرة في data كمصفوفة، وليس في data.drafts
+      const drafts = Array.isArray(response.data?.data) 
+        ? response.data.data 
+        : response.data?.data?.drafts || [];
+      const pagination = response.data?.pagination || response.data?.data?.pagination || null;
 
-      const mappedDrafts = drafts.map((draft) => ({
-        ...draft,
-        thumbnail: draft.featured_image,
-        listingType:
+      const mappedDrafts = drafts.map((draft) => {
+        // تحديد نوع القائمة بناءً على purpose أو transaction_type
+        let listingType = "للإيجار";
+        if (
+          draft.purpose === "sold" ||
+          draft.purpose === "sale" ||
           String(draft.transaction_type) === "1" ||
           draft.transaction_type === "sale"
-            ? "للبيع"
-            : "للإيجار",
-        status: "مسودة",
-        lastUpdated: new Date(draft.created_at).toLocaleDateString("ar-AE"),
-        features: Array.isArray(draft.features) ? draft.features : [],
-        missing_fields: draft.missing_fields || [],
-        validation_errors: draft.validation_errors || [],
-      }));
+        ) {
+          listingType = "للبيع";
+        }
+
+        return {
+          ...draft,
+          thumbnail: draft.featured_image,
+          listingType,
+          status: "مسودة",
+          lastUpdated: new Date(draft.created_at).toLocaleDateString("ar-AE"),
+          features: Array.isArray(draft.features) ? draft.features : [],
+          missing_fields: draft.missing_fields || [],
+          validation_errors: draft.validation_errors || [],
+        };
+      });
 
       setPropertiesManagement({
         properties: mappedDrafts,
@@ -1430,30 +1467,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
     }
   };
 
-  const handleCompleteDraft = async (draftId: string) => {
-    const { userData } = useAuthStore.getState();
-    if (!userData?.token) {
-      alert("Authentication required. Please login.");
-      return;
-    }
-
-    try {
-      // First fetch draft details to pre-fill the form
-      const response = await axiosInstance.get(`/properties/drafts/${draftId}`);
-      const draft = response.data?.data;
-      
-      if (!draft) {
-        toast.error("لم يتم العثور على المسودة");
-        return;
-      }
-
-      // Redirect to edit page with draft data
-      router.push(`/dashboard/properties/${draftId}/edit?draft=true`);
-    } catch (error) {
-      toast.error("فشل في جلب بيانات المسودة");
-      console.error("Error fetching draft:", error);
-    }
-  };
+  // handleCompleteDraft تم نقله إلى IncompletePropertiesManagementPage
 
   const handleShare = (property: any) => {
     setSelectedProperty(property);
@@ -1462,21 +1476,13 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    if (showIncompleteOnly) {
-      fetchDrafts(page, appliedFilters);
-    } else {
-      fetchProperties(page, appliedFilters);
-    }
+    fetchProperties(page, appliedFilters);
   };
 
   const handleApplyFilters = (filters: any) => {
     setAppliedFilters(filters);
     setCurrentPage(1);
-    if (showIncompleteOnly) {
-      fetchDrafts(1, filters);
-    } else {
-      fetchProperties(1, filters);
-    }
+    fetchProperties(1, filters);
   };
 
   const applyFilters = () => {
@@ -1571,21 +1577,110 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
   }, [filterCityId]);
 
   useEffect(() => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    const { userData } = useAuthStore.getState();
-    if (!userData?.token) {
-      console.log("No token available, skipping fetchProperties in useEffect");
-      return;
+    // Wait until token is fetched (following makeSureIsTokenExist.txt pattern)
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
     }
 
-    if (!isInitialized && !loading) {
-      if (showIncompleteOnly) {
-        fetchDrafts(1, {});
-      } else {
-        fetchProperties(1, {});
+    // إعادة تعيين fetchCalledRef عند تغيير نوع الصفحة
+    const currentPageType = isIncompletePage ? 'incomplete' : 'normal';
+    if (hasLoadedRef.current && fetchCalledRef.current) {
+      // إذا تغير نوع الصفحة، إعادة تعيين للسماح بتحميل البيانات الجديدة
+      const lastPageType = (fetchCalledRef as any).lastPageType;
+      if (lastPageType !== currentPageType) {
+        fetchCalledRef.current = false;
+        hasLoadedRef.current = false;
       }
     }
-  }, [fetchProperties, isInitialized, loading, showIncompleteOnly]);
+    (fetchCalledRef as any).lastPageType = currentPageType;
+
+    // تحميل البيانات عند mount فقط إذا لم يتم تحميلها من قبل
+    if (!fetchCalledRef.current) {
+      fetchCalledRef.current = true;
+      hasLoadedRef.current = true;
+      
+      const loadProperties = async () => {
+        // إعادة تعيين الحالة
+        setPropertiesManagement({
+          isInitialized: false,
+          loading: true,
+          properties: [],
+          pagination: null,
+          error: null,
+        });
+
+        try {
+          // إرسال الطلب مباشرة - استخدام /properties/drafts للوحدات الغير مكتملة
+          const endpoint = isIncompletePage ? "/properties/drafts?page=1" : "/properties?page=1";
+          console.log("Making API request to", endpoint);
+          const response = await axiosInstance.get(endpoint);
+          console.log("API response received:", response);
+
+          // معالجة الاستجابة بناءً على نوع الصفحة
+          let propertiesList: any[] = [];
+          let pagination = null;
+          let propertiesAllData = null;
+          let incompleteCount = 0;
+
+          if (isIncompletePage) {
+            // للوحدات الغير مكتملة: البيانات مباشرة في data كمصفوفة
+            propertiesList = Array.isArray(response.data?.data) 
+              ? response.data.data 
+              : response.data?.data?.drafts || [];
+            pagination = response.data?.pagination || response.data?.data?.pagination || null;
+          } else {
+            // للوحدات العادية
+            propertiesList = response.data?.data?.properties || [];
+            pagination = response.data?.data?.pagination || null;
+            propertiesAllData = response.data?.data || null;
+            incompleteCount = response.data?.data?.incomplete_count || 0;
+          }
+
+          const mappedProperties = propertiesList.map((property: any) => {
+            let listingType = "للإيجار";
+            if (
+              property.purpose === "sold" ||
+              property.purpose === "sale" ||
+              String(property.transaction_type) === "1" ||
+              property.transaction_type === "sale"
+            ) {
+              listingType = "للبيع";
+            }
+
+            return {
+              ...property,
+              thumbnail: property.featured_image,
+              listingType,
+              status: isIncompletePage ? "مسودة" : (property.status === 1 ? "منشور" : "مسودة"),
+              lastUpdated: new Date(property.updated_at || property.created_at).toLocaleDateString("ar-AE"),
+              features: Array.isArray(property.features) ? property.features : [],
+              missing_fields: isIncompletePage ? (property.missing_fields || []) : undefined,
+              validation_errors: isIncompletePage ? (property.validation_errors || []) : undefined,
+            };
+          });
+
+          setPropertiesManagement({
+            properties: mappedProperties,
+            pagination,
+            propertiesAllData,
+            incompleteCount,
+            loading: false,
+            isInitialized: true,
+          });
+        } catch (error) {
+          console.error("Error fetching properties:", error);
+          setPropertiesManagement({
+            error: formatErrorMessage(error, "حدث خطأ أثناء جلب بيانات الوحدات"),
+            loading: false,
+            isInitialized: true,
+          });
+          fetchCalledRef.current = false; // إعادة تعيين في حالة الخطأ
+        }
+      };
+
+      loadProperties();
+    }
+  }, [userData?.token, authLoading, isIncompletePage]); // Include token, authLoading, and isIncompletePage in dependencies
 
   const renderSkeletons = () => (
     <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-4">
@@ -1629,30 +1724,18 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              {showIncompleteOnly && (
-                  <Button
-                    variant="outline"
-                    className="gap-1 w-full md:w-auto"
-                    onClick={() => router.push("/dashboard/properties")}
-                  >
-                    <Home className="h-4 w-4" />
-                    جميع الوحدات
-                  </Button>
-                )}
-              <div className={showIncompleteOnly ? "w-full text-center " : ""}>
-                
-                <h1 className={`text-2xl font-bold tracking-tight ${showIncompleteOnly ? "text-red-800 dark:text-red-700" : ""}`}>
-                  {showIncompleteOnly ? "الوحدات الغير مكتملة" : "إدارة الوحدات"}
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  {isIncompletePage ? "الوحدات الغير مكتملة" : "إدارة الوحدات"}
                 </h1>
                 <p className="text-muted-foreground">
-                  {showIncompleteOnly 
-                    ? "عرض الوحدات غير المكتملة التي تحتاج إلى إكمال البيانات"
+                  {isIncompletePage 
+                    ? "إكمال الوحدات الغير مكتملة وإضافة البيانات المطلوبة"
                     : "أضف وأدرج قوائم الوحدات لموقعك على الويب"}
                 </p>
               </div>
               <div className="flex flex-col gap-2 md:flex-row md:items-center">
-            
-                {!showIncompleteOnly && incompleteCount > 0 && (
+                {!isIncompletePage && incompleteCount > 0 && (
                   <Button
                     variant="outline"
                     className="gap-1 w-full md:w-auto relative"
@@ -1665,27 +1748,25 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                     </span>
                   </Button>
                 )}
-                {!showIncompleteOnly && (
-                  <>
-                    <Button
-                      variant="outline"
-                      className="gap-1 w-full md:w-auto"
-                      onClick={() => setImportDialogOpen(true)}
-                    >
-                      <Upload className="h-4 w-4" />
-                      استيراد وحدات
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="gap-1 w-full md:w-auto"
-                      onClick={() => setExportDialogOpen(true)}
-                      disabled={isExporting || loading}
-                    >
-                      <Download className="h-4 w-4" />
-                      {isExporting ? "جاري التصدير..." : "تصدير وحدات"}
-                    </Button>
-                  </>
-                )}
+                <>
+                  <Button
+                    variant="outline"
+                    className="gap-1 w-full md:w-auto"
+                    onClick={() => setImportDialogOpen(true)}
+                  >
+                    <Upload className="h-4 w-4" />
+                    استيراد وحدات
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="gap-1 w-full md:w-auto"
+                    onClick={() => setExportDialogOpen(true)}
+                    disabled={isExporting || loading}
+                  >
+                    <Download className="h-4 w-4" />
+                    {isExporting ? "جاري التصدير..." : "تصدير وحدات"}
+                  </Button>
+                </>
                 <div className="flex gap-2 w-full md:w-auto">
                   <Button
                     variant="outline"
@@ -2493,8 +2574,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                               onToggleStatus={handleToggleStatus}
                               onShare={handleShare}
                               setReorderPopup={setReorderPopup}
-                              showIncompleteOnly={showIncompleteOnly}
-                              onCompleteDraft={handleCompleteDraft}
+                              showIncompleteOnly={isIncompletePage}
                             />
                           ))}
                         </div>
@@ -2513,8 +2593,7 @@ export function PropertiesManagementPage({ showIncompleteOnly = false }: Propert
                               onToggleStatus={handleToggleStatus}
                               onShare={handleShare}
                               setReorderPopup={setReorderPopup}
-                              showIncompleteOnly={showIncompleteOnly}
-                              onCompleteDraft={handleCompleteDraft}
+                              showIncompleteOnly={isIncompletePage}
                             />
                           ))}
                         </div>

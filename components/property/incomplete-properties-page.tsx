@@ -1,6 +1,6 @@
 "use client";
-import { PropertiesManagementPage } from "./properties-management-page";
+import { IncompletePropertiesManagementPage } from "./incomplete-properties-management-page";
 
 export function IncompletePropertiesPage() {
-  return <PropertiesManagementPage showIncompleteOnly={true} />;
+  return <IncompletePropertiesManagementPage />;
 }
