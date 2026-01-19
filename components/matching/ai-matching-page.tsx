@@ -43,7 +43,9 @@ import {
   Target,
   Zap,
   ThumbsUp,
+  AlertCircle,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Mock data for customer requests
 const customerRequests = [
@@ -298,6 +300,7 @@ function calculateMatchScore(request: any, property: any) {
 }
 
 export function AIMatchingPage() {
+  const router = useRouter();
   const {
     matchingPage: {
       customers,
@@ -405,6 +408,14 @@ export function AIMatchingPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => router.push("/dashboard/incomplete-requests")}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  الطلبات الغير مكتملة
+                </Button>
                 <Badge variant="outline" className="gap-1">
                   <Zap className="h-3 w-3 text-yellow-500" />
                   مدعوم بالذكاء الاصطناعي
