@@ -1241,7 +1241,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
           setPropertiesManagement({ properties: updatedProperties });
         }
 
-        router.push("/dashboard/properties");
+        router.push(isDraft ? "/dashboard/properties/incomplete" : "/dashboard/properties");
       } catch (error) {
         toast.error("حدث خطأ أثناء حفظ الوحدة. يرجى المحاولة مرة أخرى.");
         setSubmitError("حدث خطأ أثناء حفظ الوحدة. يرجى المحاولة مرة أخرى.");
@@ -1612,7 +1612,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => router.push("/dashboard/properties")}
+                  onClick={() => router.push(isDraft ? "/dashboard/properties/incomplete" : "/dashboard/properties")}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -3474,7 +3474,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
                     <div className="flex flex-col sm:flex-row justify-between w-full gap-4">
                       <Button
                         variant="outline"
-                        onClick={() => router.push("/dashboard/properties")}
+                        onClick={() => router.push(isDraft ? "/dashboard/properties/incomplete" : "/dashboard/properties")}
                         className="w-full sm:w-auto"
                       >
                         إلغاء
