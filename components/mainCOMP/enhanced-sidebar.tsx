@@ -203,12 +203,6 @@ export function EnhancedSidebar({
               description="نظره عامه عن الموقع"
               icon={<FileText className="h-5 w-5 text-muted-foreground" />}
             />
-            <StaticLink
-              href="/dashboard/settings"
-              title="اعدادات الموقع"
-              description="اعدادات الموقع"
-              icon={<Settings className="h-5 w-5 text-muted-foreground" />}
-            />
 
             {/* إدارة عملائك - Dropdown */}
             <div>
