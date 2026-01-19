@@ -363,10 +363,6 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
               }
             }}
             onDeviceChange={handleDeviceChange}
-            onOpenBrandingSettings={() => {
-              state.setSidebarView("branding-settings");
-              state.setSidebarOpen(true);
-            }}
             onOpenAddSection={() => {
               state.setSidebarView("add-section");
               state.setSidebarOpen(true);
