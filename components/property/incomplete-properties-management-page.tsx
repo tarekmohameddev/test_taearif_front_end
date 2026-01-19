@@ -426,7 +426,7 @@ function PropertyCard({
                 <MoreHorizontal className="h-1 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
               {property.featured && (
                 <DropdownMenuItem
                   onClick={() => {
@@ -453,14 +453,6 @@ function PropertyCard({
                 <Edit className="ml-2 h-4 w-4" />
                 تعديل
               </DropdownMenuItem>
-              {onCompleteDraft && (
-                <DropdownMenuItem
-                  onClick={() => onCompleteDraft(property.id.toString())}
-                >
-                  <CheckCircle className="ml-2 h-4 w-4" />
-                  إكمال المسودة
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem
                 onClick={() => {
                   const domain = useAuthStore.getState().userData?.domain || "";
@@ -709,7 +701,7 @@ function PropertyListItem({
               variant="outline"
               size="sm"
               onClick={() =>
-                router.push("/dashboard/properties/" + property.id + "/edit")
+                router.push("/dashboard/properties/" + property.id + "/edit?draft=true")
               }
             >
               <Edit className="mr-1 h-3.5 w-3.5" />
@@ -726,7 +718,7 @@ function PropertyListItem({
                   <MoreHorizontal className="h-1 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem
                   onClick={() => {
                     const domain = useAuthStore.getState().userData?.domain || "";
@@ -757,14 +749,6 @@ function PropertyListItem({
                   <List className="mr-2 h-4 w-4" />
                   ترتيب الوحدة
                 </DropdownMenuItem>
-                {onCompleteDraft && (
-                  <DropdownMenuItem
-                    onClick={() => onCompleteDraft(property.id.toString())}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    إكمال المسودة
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem onClick={() => onDuplicate(property)}>
                   <Copy className="mr-2 h-4 w-4" />
                   مضاعفة
