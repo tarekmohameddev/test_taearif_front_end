@@ -83,7 +83,7 @@ import useAuthStore from "@/context/AuthContext";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
 import { PropertyCounter } from "@/components/property/propertyCOMP/property-counter";
-import { ChevronLeft, HelpCircle, Eye, EyeOff, Trash2 } from "lucide-react";
+import { ChevronLeft, HelpCircle, Eye, EyeOff, Trash2, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import loader from "@/lib/googleMapsLoader";
 
@@ -102,12 +102,13 @@ const MapComponent = dynamic(() => import("@/components/map-component"), {
 /**
  * @typedef {Object} PropertyFormProps
  * @property {'add' | 'edit'} mode
+ * @property {boolean} [isDraft] - Whether this is a draft/incomplete property
  */
 
 /**
  * @param {PropertyFormProps} props
  */
-export default function PropertyForm({ mode }) {
+export default function PropertyForm({ mode, isDraft = false }) {
   const {
     homepage: { setupProgressData, fetchSetupProgressData },
   } = useStore();
@@ -188,6 +189,9 @@ export default function PropertyForm({ mode }) {
 
   const [currentFeature, setCurrentFeature] = useState("");
   const [errors, setErrors] = useState({});
+  const [missingFields, setMissingFields] = useState([]);
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [isCompletingDraft, setIsCompletingDraft] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isThumbnailOpen, setIsThumbnailOpen] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
@@ -457,8 +461,20 @@ export default function PropertyForm({ mode }) {
       const fetchProperty = async () => {
         setLoadingProperty(true);
         try {
-          const response = await axiosInstance.get(`/properties/${id}`);
-          const property = response.data.data.property;
+          // Use different endpoint for draft properties
+          const endpoint = isDraft 
+            ? `/properties/drafts/${id}` 
+            : `/properties/${id}`;
+          const response = await axiosInstance.get(endpoint);
+          const property = isDraft 
+            ? response.data.data 
+            : response.data.data.property;
+          
+          // Set missing fields and validation errors for drafts
+          if (isDraft) {
+            setMissingFields(property.missing_fields || []);
+            setValidationErrors(property.validation_errors || []);
+          }
           const projectsResponse = await axiosInstance.get("/user/projects");
           const projects = projectsResponse.data.data.user_projects;
           setProjects(projects);
@@ -466,6 +482,34 @@ export default function PropertyForm({ mode }) {
           const matchedProject = projects.find(
             (p) => p.id === property.project_id,
           );
+
+          // Extract data from different structures for draft vs regular property
+          let title, address, description, cityId, districtId;
+          if (isDraft && property.contents && property.contents.length > 0) {
+            // Draft API structure: data is in contents[0]
+            const content = property.contents[0];
+            title = content.title || "";
+            address = content.address || "";
+            description = content.description || "";
+            cityId = content.city_id || property.city_id || null;
+            districtId = content.state_id || property.state_id || null;
+          } else {
+            // Regular property API structure
+            title = property.title || "";
+            address = property.address || "";
+            description = property.description || "";
+            cityId = property.city_id || null;
+            districtId = property.state_id || null;
+          }
+
+          // Extract characteristics data for draft
+          let characteristics = {};
+          if (isDraft && property.user_property_characteristics) {
+            characteristics = property.user_property_characteristics;
+          } else if (!isDraft) {
+            // For regular properties, characteristics might be in property directly
+            characteristics = property;
+          }
 
           // معالجة الميزات
           let featuresArray = [];
@@ -490,13 +534,6 @@ export default function PropertyForm({ mode }) {
             );
           }
           // تحديد قيم transaction_type و PropertyType بناءً على البيانات المُستلمة
-          // let transactionType = "";
-          // if (property.type) {
-          //   transactionType = property.type;
-          // } else if (property.purpose) {
-          //   transactionType = property.purpose;
-          // }
-
           let propertyType = "";
           if (property.PropertyType) {
             propertyType = property.PropertyType;
@@ -510,10 +547,10 @@ export default function PropertyForm({ mode }) {
           setFormData({
             ...formData,
             project_id: matchedProject ? matchedProject.id.toString() : "",
-            title: property.title || "",
+            title: title,
             category: property.category_id?.toString() || "",
-            description: property.description || "",
-            address: property.address || "",
+            description: description,
+            address: address,
             building_id: property.building_id || "",
             water_meter_number: property.water_meter_number || "",
             electricity_meter_number: property.electricity_meter_number || "",
@@ -521,40 +558,40 @@ export default function PropertyForm({ mode }) {
             price: property.price || "",
             purpose: property.purpose || "",
             bedrooms: property.beds?.toString() || "",
-            bathrooms: property.bath?.toString() || "",
-            size: property.size?.toString() || "",
+            bathrooms: property.bath?.toString() || characteristics.bathrooms?.toString() || "",
+            size: property.size?.toString() || characteristics.size?.toString() || property.area?.toString() || "",
             features: featuresArray,
             status: property.status === 1 ? "published" : "draft",
-            featured: property.featured || false,
+            featured: property.featured === 1 || property.featured === true,
             latitude: property.latitude || 24.766316905850978,
             longitude: property.longitude || 46.73579692840576,
-            length: property.length?.toString() || "",
-            width: property.width?.toString() || "",
-            facade_id: property.facade_id?.toString() || "",
-            street_width_north: property.street_width_north?.toString() || "",
-            street_width_south: property.street_width_south?.toString() || "",
-            street_width_east: property.street_width_east?.toString() || "",
-            street_width_west: property.street_width_west?.toString() || "",
-            building_age: property.building_age?.toString() || "",
-            rooms: property.rooms?.toString() || "",
-            floors: property.floors?.toString() || "",
-            floor_number: property.floor_number?.toString() || "",
-            driver_room: property.driver_room?.toString() || "",
-            maid_room: property.maid_room?.toString() || "",
-            dining_room: property.dining_room?.toString() || "",
-            living_room: property.living_room?.toString() || "",
-            majlis: property.majlis?.toString() || "",
-            storage_room: property.storage_room?.toString() || "",
-            basement: property.basement?.toString() || "",
-            swimming_pool: property.swimming_pool?.toString() || "",
-            kitchen: property.kitchen?.toString() || "",
-            balcony: property.balcony?.toString() || "",
-            garden: property.garden?.toString() || "",
-            annex: property.annex?.toString() || "",
-            elevator: property.elevator?.toString() || "",
-            private_parking: property.private_parking?.toString() || "",
-            city_id: property.city_id,
-            district_id: property.state_id,
+            length: property.length?.toString() || characteristics.length?.toString() || "",
+            width: property.width?.toString() || characteristics.width?.toString() || "",
+            facade_id: property.facade_id?.toString() || characteristics.facade_id?.toString() || "",
+            street_width_north: property.street_width_north?.toString() || characteristics.street_width_north?.toString() || "",
+            street_width_south: property.street_width_south?.toString() || characteristics.street_width_south?.toString() || "",
+            street_width_east: property.street_width_east?.toString() || characteristics.street_width_east?.toString() || "",
+            street_width_west: property.street_width_west?.toString() || characteristics.street_width_west?.toString() || "",
+            building_age: property.building_age?.toString() || characteristics.building_age?.toString() || "",
+            rooms: property.rooms?.toString() || characteristics.rooms?.toString() || "",
+            floors: property.floors?.toString() || characteristics.floors?.toString() || "",
+            floor_number: property.floor_number?.toString() || characteristics.floor_number?.toString() || "",
+            driver_room: property.driver_room?.toString() || characteristics.driver_room?.toString() || "",
+            maid_room: property.maid_room?.toString() || characteristics.maid_room?.toString() || "",
+            dining_room: property.dining_room?.toString() || characteristics.dining_room?.toString() || "",
+            living_room: property.living_room?.toString() || characteristics.living_room?.toString() || "",
+            majlis: property.majlis?.toString() || characteristics.majlis?.toString() || "",
+            storage_room: property.storage_room?.toString() || characteristics.storage_room?.toString() || "",
+            basement: property.basement?.toString() || characteristics.basement?.toString() || "",
+            swimming_pool: property.swimming_pool?.toString() || characteristics.swimming_pool?.toString() || "",
+            kitchen: property.kitchen?.toString() || characteristics.kitchen?.toString() || "",
+            balcony: property.balcony?.toString() || characteristics.balcony?.toString() || "",
+            garden: property.garden?.toString() || characteristics.garden?.toString() || "",
+            annex: property.annex?.toString() || characteristics.annex?.toString() || "",
+            elevator: property.elevator?.toString() || characteristics.elevator?.toString() || "",
+            private_parking: property.private_parking?.toString() || characteristics.private_parking?.toString() || "",
+            city_id: cityId,
+            district_id: districtId,
             payment_method: property.payment_method || "",
             pricePerMeter: property.pricePerMeter || "",
             PropertyType: propertyType,
@@ -566,22 +603,40 @@ export default function PropertyForm({ mode }) {
           });
 
           // تعيين الصور الموجودة مسبقاً للعرض
-          const thumbnailUrl =
-            property.featured_image && property.featured_image !== ""
+          let thumbnailUrl = null;
+          let galleryUrls = [];
+          let floorPlanUrls = [];
+
+          if (isDraft) {
+            // Draft API structure
+            thumbnailUrl = property.featured_image_url || 
+                          (property.featured_image && property.featured_image !== "" 
+                            ? property.featured_image 
+                            : null);
+            galleryUrls = property.gallery_images && Array.isArray(property.gallery_images)
+              ? property.gallery_images.filter((img) => img && img !== "")
+              : [];
+            floorPlanUrls = property.floor_planning_image && Array.isArray(property.floor_planning_image)
+              ? property.floor_planning_image.filter((img) => img && img !== "")
+              : [];
+          } else {
+            // Regular property API structure
+            thumbnailUrl = property.featured_image && property.featured_image !== ""
               ? property.featured_image
               : null;
-          const galleryUrls = property.gallery
-            ? Array.isArray(property.gallery)
-              ? property.gallery.filter((img) => img && img !== "")
-              : [property.gallery].filter((img) => img && img !== "")
-            : [];
-          const floorPlanUrls = property.floor_planning_image
-            ? Array.isArray(property.floor_planning_image)
-              ? property.floor_planning_image.filter((img) => img && img !== "")
-              : [property.floor_planning_image].filter(
-                  (img) => img && img !== "",
-                )
-            : [];
+            galleryUrls = property.gallery
+              ? Array.isArray(property.gallery)
+                ? property.gallery.filter((img) => img && img !== "")
+                : [property.gallery].filter((img) => img && img !== "")
+              : [];
+            floorPlanUrls = property.floor_planning_image
+              ? Array.isArray(property.floor_planning_image)
+                ? property.floor_planning_image.filter((img) => img && img !== "")
+                : [property.floor_planning_image].filter(
+                    (img) => img && img !== "",
+                  )
+              : [];
+          }
 
           // تأكد من أن الـ URL صحيح
           if (thumbnailUrl && !thumbnailUrl.startsWith("http")) {
@@ -603,7 +658,7 @@ export default function PropertyForm({ mode }) {
       };
       fetchProperty();
     }
-  }, [mode, id, userData?.token, authLoading]);
+  }, [mode, id, userData?.token, authLoading, isDraft]);
 
   const handleAddFaq = () => {
     if (newQuestion.trim() === "" || newAnswer.trim() === "") {
@@ -1258,7 +1313,102 @@ export default function PropertyForm({ mode }) {
     formData.private_parking,
   ]);
 
-  const pageTitle = mode === "add" ? "إضافة وحدة جديدة" : "تعديل الوحدة";
+  // Handle completing a draft property
+  const handleCompleteDraft = async () => {
+    if (authLoading || !userData?.token || !id) {
+      toast.error("Authentication required. Please login.");
+      return;
+    }
+
+    if (!validateForm()) {
+      toast.error("يرجى إكمال جميع الحقول المطلوبة");
+      return;
+    }
+
+    setIsCompletingDraft(true);
+    setSubmitError(null);
+
+    try {
+      // Prepare data for completion
+      const completionData = {
+        title: formData.title,
+        address: formData.address,
+        description: formData.description,
+        city_id: formData.city_id,
+        purpose: formData.purpose,
+        type: formData.PropertyType || "",
+        area: parseInt(formData.size) || 0,
+        state_id: formData.district_id || null,
+        category_id: parseInt(formData.category) || null,
+        price: Number(formData.price) || null,
+        beds: parseInt(formData.bedrooms) || null,
+        bath: parseInt(formData.bathrooms) || null,
+        featured_image: previews.thumbnail || null,
+        gallery_images: previews.gallery || [],
+      };
+
+      const response = await axiosInstance.post(
+        `/properties/drafts/${id}/complete`,
+        completionData
+      );
+
+      if (response.data.status === "success") {
+        toast.success("تم إكمال المسودة بنجاح");
+        router.push("/dashboard/properties");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "حدث خطأ أثناء إكمال المسودة";
+      setSubmitError(errorMessage);
+      toast.error(errorMessage);
+      
+      // Handle validation errors
+      if (error.response?.data?.errors) {
+        const validationErrors = error.response.data.errors;
+        const newErrors = {};
+        Object.keys(validationErrors).forEach((key) => {
+          newErrors[key] = Array.isArray(validationErrors[key])
+            ? validationErrors[key][0]
+            : validationErrors[key];
+        });
+        setErrors(newErrors);
+      }
+    } finally {
+      setIsCompletingDraft(false);
+    }
+  };
+
+  // Helper function to check if a field is missing
+  const isFieldMissing = (fieldName) => {
+    if (!isDraft || !missingFields.length) return false;
+    return missingFields.some(
+      (field) => field.toLowerCase() === fieldName.toLowerCase()
+    );
+  };
+
+  // Helper function to check if a card has missing required fields
+  const cardHasMissingFields = (cardFields) => {
+    if (!isDraft || !missingFields.length) return false;
+    return cardFields.some((field) => isFieldMissing(field));
+  };
+
+  // Map field names to display names
+  const getFieldDisplayName = (fieldName) => {
+    const fieldMap = {
+      title: "اسم الوحدة",
+      address: "العنوان",
+      description: "الوصف",
+      city_id: "المدينة",
+      purpose: "نوع المعاملة",
+      type: "نوع الوحدة",
+      area: "المساحة",
+    };
+    return fieldMap[fieldName] || fieldName;
+  };
+
+  const pageTitle = mode === "add" ? "إضافة وحدة جديدة" : isDraft ? "إكمال الوحدة غير المكتملة" : "تعديل الوحدة";
   const submitButtonText = mode === "add" ? "نشر الوحدة" : "حفظ ونشر التغييرات";
   const draftButtonText =
     mode === "add" ? "حفظ كمسودة" : "حفظ التغييرات كمسودة";
@@ -1403,6 +1553,54 @@ export default function PropertyForm({ mode }) {
               </div>
             )}
 
+            {/* Display missing fields and validation errors for drafts */}
+            {isDraft && (missingFields.length > 0 || validationErrors.length > 0) && (
+              <div className="space-y-4">
+                {missingFields.length > 0 && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-orange-900 mb-2">
+                          الحقول المطلوبة المفقودة:
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {missingFields.map((field, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="bg-orange-100 text-orange-800 border-orange-300"
+                            >
+                              {field}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {validationErrors.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-red-900 mb-2">
+                          أخطاء التحقق:
+                        </h3>
+                        <ul className="list-disc list-inside space-y-1">
+                          {validationErrors.map((error, index) => (
+                            <li key={index} className="text-sm text-red-800">
+                              {error}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-2 min-w-0">
                 <Button
@@ -1418,21 +1616,43 @@ export default function PropertyForm({ mode }) {
               </div>
               <div className="flex flex-col items-end gap-2 min-w-0">
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSubmit(false)}
-                    disabled={isLoading}
-                    className="w-full sm:w-auto"
-                  >
-                    {isLoading ? "جاري الحفظ..." : draftButtonText}
-                  </Button>
-                  <Button
-                    onClick={() => handleSubmit(true)}
-                    disabled={isLoading}
-                    className="w-full sm:w-auto"
-                  >
-                    {isLoading ? "جاري الحفظ..." : submitButtonText}
-                  </Button>
+                  {isDraft ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleSubmit(false)}
+                        disabled={isLoading || isCompletingDraft}
+                        className="w-full sm:w-auto"
+                      >
+                        {isLoading ? "جاري الحفظ..." : "حفظ التغييرات"}
+                      </Button>
+                      <Button
+                        onClick={handleCompleteDraft}
+                        disabled={isLoading || isCompletingDraft}
+                        className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+                      >
+                        {isCompletingDraft ? "جاري الإكمال..." : "إكمال المسودة"}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => handleSubmit(false)}
+                        disabled={isLoading}
+                        className="w-full sm:w-auto"
+                      >
+                        {isLoading ? "جاري الحفظ..." : draftButtonText}
+                      </Button>
+                      <Button
+                        onClick={() => handleSubmit(true)}
+                        disabled={isLoading}
+                        className="w-full sm:w-auto"
+                      >
+                        {isLoading ? "جاري الحفظ..." : submitButtonText}
+                      </Button>
+                    </>
+                  )}
                 </div>
                 {submitError && (
                   <div className="text-red-500 text-sm mt-2 text-right w-full">
@@ -1447,7 +1667,14 @@ export default function PropertyForm({ mode }) {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">معلومات الوحدة الأساسية</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl">معلومات الوحدة الأساسية</CardTitle>
+                        {isDraft && cardHasMissingFields(["title", "description", "address", "purpose", "category", "city_id"]) && (
+                          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                            حقول مطلوبة
+                          </Badge>
+                        )}
+                      </div>
                       <CardDescription>
                         أدخل المعلومات الأساسية للوحدة
                       </CardDescription>
@@ -1470,6 +1697,11 @@ export default function PropertyForm({ mode }) {
                   <div className="space-y-2">
                     <Label htmlFor="title">
                       اسم الوحدة <span className="text-red-500">*</span>
+                      {isDraft && isFieldMissing("title") && (
+                        <Badge variant="outline" className="mr-2 bg-orange-100 text-orange-800 border-orange-300 text-xs">
+                          مطلوب
+                        </Badge>
+                      )}
                     </Label>
                     <Input
                       id="title"
@@ -1477,7 +1709,13 @@ export default function PropertyForm({ mode }) {
                       placeholder="شقة حديثة مع إطلالة على المدينة"
                       value={formData.title}
                       onChange={handleInputChange}
-                      className={errors.title ? "border-red-500" : ""}
+                      className={
+                        errors.title
+                          ? "border-red-500"
+                          : isDraft && isFieldMissing("title")
+                            ? "border-orange-400 bg-orange-50"
+                            : ""
+                      }
                     />
                     {errors.title && (
                       <p className="text-sm text-red-500">{errors.title}</p>
@@ -1487,6 +1725,11 @@ export default function PropertyForm({ mode }) {
                   <div className="space-y-2">
                     <Label htmlFor="description">
                       وصف الوحدة <span className="text-red-500">*</span>
+                      {isDraft && isFieldMissing("description") && (
+                        <Badge variant="outline" className="mr-2 bg-orange-100 text-orange-800 border-orange-300 text-xs">
+                          مطلوب
+                        </Badge>
+                      )}
                     </Label>
                     <Textarea
                       id="description"
@@ -1496,7 +1739,11 @@ export default function PropertyForm({ mode }) {
                       value={formData.description}
                       onChange={handleInputChange}
                       className={
-                        errors.description ? "border-red-500" : ""
+                        errors.description
+                          ? "border-red-500"
+                          : isDraft && isFieldMissing("description")
+                            ? "border-orange-400 bg-orange-50"
+                            : ""
                       }
                     />
                     {errors.description && (
@@ -1509,6 +1756,11 @@ export default function PropertyForm({ mode }) {
                     <div className="space-y-2">
                       <Label htmlFor="address">
                         العنوان <span className="text-red-500">*</span>
+                        {isDraft && isFieldMissing("address") && (
+                          <Badge variant="outline" className="mr-2 bg-orange-100 text-orange-800 border-orange-300 text-xs">
+                            مطلوب
+                          </Badge>
+                        )}
                       </Label>
                       <Input
                         id="address"
@@ -1516,7 +1768,13 @@ export default function PropertyForm({ mode }) {
                         placeholder="123 شارع الرئيسي"
                         value={formData.address}
                         onChange={handleInputChange}
-                        className={errors.address ? "border-red-500" : ""}
+                        className={
+                          errors.address
+                            ? "border-red-500"
+                            : isDraft && isFieldMissing("address")
+                              ? "border-orange-400 bg-orange-50"
+                              : ""
+                        }
                       />
                       {errors.address && (
                         <p className="text-sm text-red-500">{errors.address}</p>
@@ -1629,6 +1887,11 @@ export default function PropertyForm({ mode }) {
                     <div className="space-y-2">
                       <Label htmlFor="purpose">
                         نوع القائمة <span className="text-red-500">*</span>
+                        {isDraft && isFieldMissing("purpose") && (
+                          <Badge variant="outline" className="mr-2 bg-orange-100 text-orange-800 border-orange-300 text-xs">
+                            مطلوب
+                          </Badge>
+                        )}
                       </Label>
                       <Select
                         name="purpose"
@@ -1641,7 +1904,13 @@ export default function PropertyForm({ mode }) {
                       >
                         <SelectTrigger
                           id="purpose"
-                          className={errors.purpose ? "border-red-500" : ""}
+                          className={
+                            errors.purpose
+                              ? "border-red-500"
+                              : isDraft && isFieldMissing("purpose")
+                                ? "border-orange-400 bg-orange-50"
+                                : ""
+                          }
                         >
                           <SelectValue placeholder="اختر النوع" />
                         </SelectTrigger>
@@ -1740,12 +2009,19 @@ export default function PropertyForm({ mode }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col space-y-2">
                         <Label htmlFor="city" className="mb-1">
-                          اختر المدينة
+                          اختر المدينة <span className="text-red-500">*</span>
+                          {isDraft && isFieldMissing("city_id") && (
+                            <Badge variant="outline" className="mr-2 bg-orange-100 text-orange-800 border-orange-300 text-xs">
+                              مطلوب
+                            </Badge>
+                          )}
                         </Label>
-                        <CitySelector
-                          selectedCityId={formData.city_id}
-                          onCitySelect={handleCitySelect}
-                        />
+                        <div className={isDraft && isFieldMissing("city_id") ? "border-2 border-orange-400 rounded-md" : ""}>
+                          <CitySelector
+                            selectedCityId={formData.city_id}
+                            onCitySelect={handleCitySelect}
+                          />
+                        </div>
                       </div>
 
                       <div className="flex flex-col space-y-2">
@@ -1768,7 +2044,14 @@ export default function PropertyForm({ mode }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="PropertyType">نوع الوحدة</Label>
+                      <Label htmlFor="PropertyType">
+                        نوع الوحدة <span className="text-red-500">*</span>
+                        {isDraft && isFieldMissing("type") && (
+                          <Badge variant="outline" className="mr-2 bg-orange-100 text-orange-800 border-orange-300 text-xs">
+                            مطلوب
+                          </Badge>
+                        )}
+                      </Label>
                       <Select
                         name="PropertyType"
                         value={formData.PropertyType}
@@ -1780,7 +2063,13 @@ export default function PropertyForm({ mode }) {
                       >
                         <SelectTrigger
                           id="PropertyType"
-                          className={errors.PropertyType ? "border-red-500" : ""}
+                          className={
+                            errors.PropertyType
+                              ? "border-red-500"
+                              : isDraft && isFieldMissing("type")
+                                ? "border-orange-400 bg-orange-50"
+                                : ""
+                          }
                         >
                           <SelectValue placeholder="اختر النوع" />
                         </SelectTrigger>
@@ -1824,7 +2113,14 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">تفاصيل الوحدة</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl">تفاصيل الوحدة</CardTitle>
+                        {isDraft && cardHasMissingFields(["type", "area", "size"]) && (
+                          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                            حقول مطلوبة
+                          </Badge>
+                        )}
+                      </div>
                       <CardDescription>أدخل مواصفات وميزات الوحدة</CardDescription>
                     </div>
                     <motion.div
@@ -1959,13 +2255,27 @@ export default function PropertyForm({ mode }) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="size">المساحة</Label>
+                        <Label htmlFor="size">
+                          المساحة <span className="text-red-500">*</span>
+                          {isDraft && (isFieldMissing("area") || isFieldMissing("size")) && (
+                            <Badge variant="outline" className="mr-2 bg-orange-100 text-orange-800 border-orange-300 text-xs">
+                              مطلوب
+                            </Badge>
+                          )}
+                        </Label>
                         <Input
                           id="size"
                           name="size"
                           value={formData.size}
                           inputMode="decimal"
                           pattern="[0-9]*\.?[0-9]*"
+                          className={
+                            errors.size
+                              ? "border-red-500"
+                              : isDraft && (isFieldMissing("area") || isFieldMissing("size"))
+                                ? "border-orange-400 bg-orange-50"
+                                : ""
+                          }
                           onChange={(e) => {
                             const numbersAndDecimal =
                               e.currentTarget.value.replace(/[^0-9.]/g, "");
@@ -2424,7 +2734,14 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">صورة الوحدة الرئيسية</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl">صورة الوحدة الرئيسية</CardTitle>
+                        {isDraft && cardHasMissingFields(["featured_image"]) && (
+                          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                            حقول مطلوبة
+                          </Badge>
+                        )}
+                      </div>
                       <CardDescription>
                         قم بتحميل صورة رئيسية تمثل الوحدة{" "}
                         <span className="text-red-500">*</span>
@@ -2519,7 +2836,9 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">معرض صور الوحدة</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl">معرض صور الوحدة</CardTitle>
+                      </div>
                       <CardDescription>
                         قم بتحميل صور متعددة لعرض تفاصيل الوحدة
                       </CardDescription>
@@ -2611,7 +2930,9 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">فيديو الوحدة</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl">فيديو الوحدة</CardTitle>
+                      </div>
                       <CardDescription>
                         قم بتحميل فيديو واحد لعرض تفاصيل الوحدة
                       </CardDescription>
@@ -2718,7 +3039,9 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">مخططات الطوابق</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl">مخططات الطوابق</CardTitle>
+                      </div>
                       <CardDescription>
                         قم بتحميل مخططات الطوابق والتصاميم الهندسية للوحدة
                       </CardDescription>
@@ -2810,7 +3133,9 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle> الجولات الافتراضية</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle> الجولات الافتراضية</CardTitle>
+                      </div>
                       <CardDescription>
                         أضف رابط الجولة الافتراضية للوحدة
                       </CardDescription>
@@ -2916,10 +3241,17 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl flex items-center gap-2">
-                        <MapPin className="h-5 w-5" />
-                        موقع الوحدة
-                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl flex items-center gap-2">
+                          <MapPin className="h-5 w-5" />
+                          موقع الوحدة
+                        </CardTitle>
+                        {isDraft && cardHasMissingFields(["city_id"]) && (
+                          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                            حقول مطلوبة
+                          </Badge>
+                        )}
+                      </div>
                       <CardDescription>
                         اختر موقع الوحدة على الخريطة وعرض تفاصيل الموقع
                       </CardDescription>
@@ -2958,7 +3290,9 @@ export default function PropertyForm({ mode }) {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-xl">الأسئلة الشائعة الخاصة بالوحدة</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-xl">الأسئلة الشائعة الخاصة بالوحدة</CardTitle>
+                      </div>
                       <CardDescription>
                         أضف أسئلة وأجوبة شائعة حول هذه الوحدة لمساعدة المشترين
                         المحتملين.

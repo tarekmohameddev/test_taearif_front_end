@@ -447,7 +447,7 @@ function PropertyCard({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
-                  router.push("/dashboard/properties/" + property.id + "/edit")
+                  router.push("/dashboard/properties/" + property.id + "/edit?draft=true")
                 }
               >
                 <Edit className="ml-2 h-4 w-4" />
@@ -571,7 +571,7 @@ function PropertyCard({
           size="sm"
           className={`gap-1 ${isStackedFooter ? "w-full" : "w-1/2"}`}
           onClick={() =>
-            router.push("/dashboard/properties/" + property.id + "/edit")
+            router.push("/dashboard/properties/" + property.id + "/edit?draft=true")
           }
         >
           <Edit className="h-3.5 w-3.5" />
