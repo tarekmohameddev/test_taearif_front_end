@@ -169,23 +169,6 @@ export function proxy(request: NextRequest) {
     tenantId = getTenantIdFromCustomDomain(host);
   }
 
-  // إضافة cache headers للمكونات الثابتة (عندما لا يوجد tenantId)
-  if (
-    !tenantId &&
-    (pathname === "/" ||
-      pathname === "/solutions" ||
-      pathname === "/updates" ||
-      pathname === "/landing" ||
-      pathname === "/about-us")
-  ) {
-    // تحسين cache للمكونات Taearif
-    response.headers.set(
-      "Cache-Control",
-      "public, max-age=31536000, immutable",
-    );
-    response.headers.set("X-Component-Type", "taearif-static");
-  }
-
   /*
    * ========================================
    * AUTO-REDIRECT TO ARABIC LOCALE (EXCEPT LIVE-EDITOR) - DISABLED
