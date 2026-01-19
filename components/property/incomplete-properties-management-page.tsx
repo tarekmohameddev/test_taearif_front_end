@@ -530,10 +530,10 @@ function PropertyCard({
         </div>
       </CardContent>
       <CardFooter 
-        className={`p-4 pt-0 ${isStackedFooter ? "flex flex-col gap-2" : "flex items-center justify-between"}`} 
+        className="p-4 pt-0 flex flex-col gap-2" 
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={`font-semibold flex gap-1 ${isStackedFooter ? "text-lg w-full justify-center" : "text-xl"}`}>
+        <div className="font-semibold flex gap-1 text-lg w-full justify-center">
           {property.transaction_type === "sale" ||
           property.purpose === "sale" ? (
             <>
@@ -561,7 +561,7 @@ function PropertyCard({
         <Button
           variant="outline"
           size="sm"
-          className={`gap-1 ${isStackedFooter ? "w-full" : "w-1/2"}`}
+          className="gap-1 w-full"
           onClick={() =>
             router.push("/dashboard/properties/" + property.id + "/edit?draft=true")
           }
@@ -597,9 +597,9 @@ function PropertyListItem({
       className="cursor-pointer hover:shadow-lg transition-shadow"
       onClick={handleCardClick}
     >
-      <div className="flex flex-col sm:flex-row-reverse">
-        <div className="relative sm:w-1/3 md:w-1/4">
-          <div className="aspect-[16/9] sm:aspect-auto sm:h-full w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row-reverse h-64">
+        <div className="relative w-full sm:w-64 flex-shrink-0 h-full">
+          <div className="w-full h-full overflow-hidden">
             <img
               src={
                 property.thumbnail ||
