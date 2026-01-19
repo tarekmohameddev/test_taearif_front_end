@@ -3192,8 +3192,8 @@ function PropertyListItem({
       onClick={handleCardClick}
     >
       <div className="flex flex-col sm:flex-row-reverse">
-        <div className="relative sm:w-1/3 md:w-1/4">
-          <div className="aspect-[16/9] sm:aspect-auto sm:h-full w-full overflow-hidden">
+        <div className="relative w-full sm:w-64 h-48 sm:h-48 flex-shrink-0">
+          <div className="w-full h-full overflow-hidden">
             <img
               src={
                 property.thumbnail ||
