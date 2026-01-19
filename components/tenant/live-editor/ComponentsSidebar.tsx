@@ -706,8 +706,8 @@ const CompactBrandingSettings = () => {
   return (
     <div className="space-y-4">
       {/* Colors Section */}
-      <div className="space-y-3">
-        <div className="p-3 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-lg border border-blue-200/50">
+      <div className="space-y-3  pt-5">
+        <div className="p-3 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-lg border border-blue-200/50 ">
           <h4 className="text-xs font-semibold text-slate-800 mb-3">
             {t("editor_sidebar.brand_colors")}
           </h4>
@@ -801,38 +801,6 @@ export const ComponentsSidebar = () => {
       exit="exit"
       className="fixed left-0 top-15 h-full w-[350px] bg-gradient-to-br from-slate-50 via-white to-slate-50 border-r border-slate-200/60 flex flex-col z-30 pb-20"
     >
-      {/* Header */}
-      <div className="p-4 border-b border-slate-200/60 bg-white/50 backdrop-blur-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-slate-800">
-            {t("live_editor.components")}
-          </h2>
-          <motion.button
-            onClick={() => setIsExpanded((v) => !v)}
-            className="p-1 rounded-md hover:bg-gray-100"
-            whileTap={{ scale: 0.95 }}
-            aria-expanded={isExpanded}
-            aria-label="Toggle sidebar"
-          >
-            <motion.svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              animate={{ rotate: isExpanded ? 180 : 0 }}
-              transition={{ type: "tween", duration: 0.2 }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </motion.svg>
-          </motion.button>
-        </div>
-      </div>
-
       {/* Main Content Area - Split into 2 columns */}
       <AnimatePresence initial={false} mode="wait">
         {isExpanded && (
