@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorT, useEditorLocale } from "@/context/editorI18nStore";
 import {
   getAvailableSectionsTranslated,
   getSectionIconTranslated,
@@ -685,6 +685,8 @@ export const ComponentsSidebar = () => {
   const [activeThemeTab, setActiveThemeTab] = useState<ThemeTab>("theme1");
   const [activeMainTab, setActiveMainTab] = useState<MainTab>("components");
   const t = useEditorT();
+  const { locale } = useEditorLocale();
+  const direction = locale === "ar" ? "rtl" : "ltr";
 
   return (
     <motion.div
@@ -740,28 +742,26 @@ export const ComponentsSidebar = () => {
             layout
           >
             {/* Tabs Column - 15% */}
-            <div className="w-[15%] border-r border-slate-200/60 bg-slate-50/50 flex flex-col items-center py-4 gap-2">
+            <div className="w-[15%] border-r border-slate-200/60 bg-slate-50/50 flex flex-col py-2 gap-2 px-1">
               <button
                 onClick={() => setActiveMainTab("components")}
-                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all ${
+                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all  border ${
                   activeMainTab === "components"
-                    ? "bg-blue-500 text-white shadow-md"
-                    : "text-slate-600 hover:bg-slate-200"
+                    ? "bg-blue-200 text-blue-700 border-blue-200"
+                    : "text-slate-600 hover:bg-slate-50 border-transparent"
                 }`}
               >
-                <LayoutGrid className="w-5 h-5" />
-                <span className="text-[10px] leading-tight">المكونات</span>
+                <span className={`text-xs leading-tight${activeMainTab === "components" ? " font-semibold" : ""}`}>المكونات</span>
               </button>
               <button
                 onClick={() => setActiveMainTab("branding")}
-                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all ${
+                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all  border ${
                   activeMainTab === "branding"
-                    ? "bg-blue-500 text-white shadow-md"
-                    : "text-slate-600 hover:bg-slate-200"
+                    ? "bg-blue-200 text-blue-700 border-blue-200"
+                    : "text-slate-600 hover:bg-slate-50 border-transparent"
                 }`}
               >
-                <Palette className="w-5 h-5" />
-                <span className="text-[10px] leading-tight">إعدادات الألوان</span>
+                <span className={`text-xs leading-tight${activeMainTab === "branding" ? " font-semibold" : ""}`}>الألوان</span>
               </button>
             </div>
 
@@ -776,22 +776,26 @@ export const ComponentsSidebar = () => {
                   value="components"
                   className="flex-1 overflow-hidden mt-0 p-4"
                 >
-                  <ComponentsListView
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    activeTab={activeThemeTab}
-                    setActiveTab={setActiveThemeTab}
-                    isBasicComponentsDropdownOpen={isBasicComponentsDropdownOpen}
-                    setIsBasicComponentsDropdownOpen={setIsBasicComponentsDropdownOpen}
-                    t={t}
-                  />
+                  <div dir={direction}>
+                    <ComponentsListView
+                      searchTerm={searchTerm}
+                      setSearchTerm={setSearchTerm}
+                      activeTab={activeThemeTab}
+                      setActiveTab={setActiveThemeTab}
+                      isBasicComponentsDropdownOpen={isBasicComponentsDropdownOpen}
+                      setIsBasicComponentsDropdownOpen={setIsBasicComponentsDropdownOpen}
+                      t={t}
+                    />
+                  </div>
                 </TabsContent>
 
                 <TabsContent
                   value="branding"
                   className="flex-1 overflow-y-auto mt-0 p-2"
                 >
-                  <CompactBrandingSettings />
+                  <div dir={direction}>
+                    <CompactBrandingSettings />
+                  </div>
                 </TabsContent>
               </Tabs>
             </div>
