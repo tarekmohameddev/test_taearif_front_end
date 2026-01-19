@@ -12,6 +12,7 @@ import contentManagement from "./store/contentManagement";
 import recentActivity from "./store/recentActivity";
 import projectsManagement from "./store/projectsManagement";
 import propertiesManagement from "./store/propertiesManagement";
+import incompletePropertiesManagement from "./store/incompletePropertiesManagement";
 import blogManagement from "./store/blogManagement";
 import affiliate from "./store/affiliate";
 import sidebar from "./store/sidebar";
@@ -41,6 +42,7 @@ const useStore = create((set, get) => {
     ...recentActivity(set),
     ...projectsManagement(set),
     ...propertiesManagement(set),
+    ...incompletePropertiesManagement(set),
     ...blogManagement(set, get),
     ...affiliate(set, get),
     ...sidebar(set, get),

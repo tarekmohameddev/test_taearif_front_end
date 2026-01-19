@@ -810,7 +810,7 @@ export function IncompletePropertiesManagementPage() {
 
   const router = useRouter();
   const {
-    propertiesManagement: {
+    incomplete_propertiesManagement: {
       viewMode,
       favorites,
       properties,
@@ -819,7 +819,7 @@ export function IncompletePropertiesManagementPage() {
       isInitialized,
       pagination,
     },
-    setPropertiesManagement,
+    setIncompletePropertiesManagement,
   } = useStore();
 
   const [reorderPopup, setReorderPopup] = useState<{
@@ -836,14 +836,14 @@ export function IncompletePropertiesManagementPage() {
   const fetchDrafts = async (page = 1, filters = {}) => {
     const { userData } = useAuthStore.getState();
     if (!userData?.token) {
-      setPropertiesManagement({
+      setIncompletePropertiesManagement({
         loading: false,
         error: "Authentication required. Please login.",
       });
       return;
     }
 
-    setPropertiesManagement({ loading: true, error: null });
+    setIncompletePropertiesManagement({ loading: true, error: null });
 
     try {
       const params = new URLSearchParams();
@@ -900,7 +900,7 @@ export function IncompletePropertiesManagementPage() {
         };
       });
 
-      setPropertiesManagement({
+      setIncompletePropertiesManagement({
         properties: mappedDrafts,
         pagination,
         loading: false,
@@ -908,7 +908,7 @@ export function IncompletePropertiesManagementPage() {
       });
     } catch (error) {
       logError(error, "fetchDrafts");
-      setPropertiesManagement({
+      setIncompletePropertiesManagement({
         error: formatErrorMessage(error, "حدث خطأ أثناء جلب المسودات"),
         loading: false,
         isInitialized: true,
@@ -941,14 +941,14 @@ export function IncompletePropertiesManagementPage() {
   }, [properties]);
 
   const setViewMode = (mode: "grid" | "list") => {
-    setPropertiesManagement({ viewMode: mode });
+    setIncompletePropertiesManagement({ viewMode: mode });
   };
 
   const toggleFavorite = (id: string) => {
     const newFavorites = favorites.includes(id)
       ? favorites.filter((item: any) => item !== id)
       : [...favorites, id];
-    setPropertiesManagement({ favorites: newFavorites });
+    setIncompletePropertiesManagement({ favorites: newFavorites });
   };
 
   const handleDeleteProperty = async (id: string) => {
@@ -1156,7 +1156,7 @@ export function IncompletePropertiesManagementPage() {
       
       const loadDrafts = async () => {
         // إعادة تعيين الحالة
-        setPropertiesManagement({
+        setIncompletePropertiesManagement({
           isInitialized: false,
           loading: true,
           properties: [],
@@ -1199,7 +1199,7 @@ export function IncompletePropertiesManagementPage() {
             };
           });
 
-          setPropertiesManagement({
+          setIncompletePropertiesManagement({
             properties: mappedDrafts,
             pagination,
             loading: false,
@@ -1207,7 +1207,7 @@ export function IncompletePropertiesManagementPage() {
           });
         } catch (error) {
           console.error("Error fetching drafts:", error);
-          setPropertiesManagement({
+          setIncompletePropertiesManagement({
             error: formatErrorMessage(error, "حدث خطأ أثناء جلب المسودات"),
             loading: false,
             isInitialized: true,
