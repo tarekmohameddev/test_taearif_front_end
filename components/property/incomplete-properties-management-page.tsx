@@ -345,7 +345,7 @@ function PropertyCard({
   const formattedAddress = formatAddress(property);
   
   const handleCardClick = () => {
-    router.push(`/dashboard/properties/${property.id}`);
+    router.push(`/dashboard/properties/${property.id}?draft=true`);
   };
   
   const isStackedFooter = hasStackedFooterInSameRow();
@@ -589,7 +589,7 @@ function PropertyListItem({
   const formattedAddress = formatAddress(property);
   
   const handleCardClick = () => {
-    router.push(`/dashboard/properties/${property.id}`);
+    router.push(`/dashboard/properties/${property.id}?draft=true`);
   };
 
   return (

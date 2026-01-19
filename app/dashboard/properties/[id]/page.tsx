@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -80,7 +80,9 @@ interface PropertyData {
 export default function PropertyDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const propertyId = params?.id as string;
+  const isDraft = searchParams?.get("draft") === "true";
   const [activeTab, setActiveTab] = useState("properties");
 
   // جلب token و authLoading من store للمراقبة
@@ -90,6 +92,8 @@ export default function PropertyDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeedDialogOpen, setIsDeedDialogOpen] = useState(false);
+  const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -103,9 +107,32 @@ export default function PropertyDetailsPage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await axiosInstance.get(`/properties/${propertyId}`);
+        // Use different endpoint for draft properties
+        const endpoint = isDraft 
+          ? `/properties/drafts/${propertyId}` 
+          : `/properties/${propertyId}`;
+        const response = await axiosInstance.get(endpoint);
+        
         if (response.data.status === "success") {
-          setProperty(response.data.data.property);
+          let propertyData;
+          if (isDraft) {
+            const draftData = response.data.data;
+            // Extract data from contents[0] for drafts
+            const content = draftData.contents?.[0] || {};
+            propertyData = {
+              ...draftData,
+              title: content.title || draftData.title || "Untitled",
+              address: content.address || draftData.address || "",
+              description: content.description || draftData.description || null,
+              // Map other fields that might be in different locations
+              featured_image: draftData.featured_image_url || draftData.featured_image,
+            };
+            setMissingFields(draftData.missing_fields || []);
+            setValidationErrors(draftData.validation_errors || []);
+          } else {
+            propertyData = response.data.data.property;
+          }
+          setProperty(propertyData);
         } else {
           setError("فشل تحميل بيانات الوحدة");
         }
@@ -120,7 +147,7 @@ export default function PropertyDetailsPage() {
     };
 
     fetchPropertyDetails();
-  }, [propertyId, userData?.token, authLoading]);
+  }, [propertyId, userData?.token, authLoading, isDraft]);
 
   const formatCurrency = (amount: string | number) => {
     if (!amount) return "غير محدد";
@@ -220,14 +247,22 @@ export default function PropertyDetailsPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => router.push("/dashboard/properties")}
+                  onClick={() => router.push(isDraft ? "/dashboard/properties/incomplete" : "/dashboard/properties")}
                 >
                   <ArrowRight className="h-5 w-5" />
                 </Button>
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold">
-                    {property.title || `وحدة #${property.id}`}
-                  </h1>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-2xl md:text-3xl font-bold">
+                      {property.title || `وحدة #${property.id}`}
+                    </h1>
+                    {isDraft && (
+                      <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300 text-base px-3 py-1">
+                        <AlertCircle className="h-4 w-4 mr-1" />
+                        غير مكتمل
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground mt-1">
                     رقم الوحدة: {property.id}
                   </p>
@@ -237,7 +272,7 @@ export default function PropertyDetailsPage() {
                 <Button
                   variant="outline"
                   onClick={() =>
-                    router.push(`/dashboard/properties/${propertyId}/edit`)
+                    router.push(`/dashboard/properties/${propertyId}/edit${isDraft ? "?draft=true" : ""}`)
                   }
                   className="gap-2"
                 >
@@ -247,12 +282,64 @@ export default function PropertyDetailsPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => router.push("/dashboard/properties")}
+                  onClick={() => router.push(isDraft ? "/dashboard/properties/incomplete" : "/dashboard/properties")}
                 >
                   <X className="h-5 w-5" />
                 </Button>
               </div>
             </div>
+
+            {/* Display missing fields and validation errors for drafts */}
+            {isDraft && (missingFields.length > 0 || validationErrors.length > 0) && (
+              <div className="space-y-4">
+                {missingFields.length > 0 && (
+                  <Card className="bg-orange-50 border-orange-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-orange-900 mb-2">
+                            الحقول المطلوبة المفقودة:
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {missingFields.map((field, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="bg-orange-100 text-orange-800 border-orange-300"
+                              >
+                                {field}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                {validationErrors.length > 0 && (
+                  <Card className="bg-red-50 border-red-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-red-900 mb-2">
+                            أخطاء التحقق:
+                          </h3>
+                          <ul className="list-disc list-inside space-y-1">
+                            {validationErrors.map((error, index) => (
+                              <li key={index} className="text-sm text-red-800">
+                                {error}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
 
             <div className="grid gap-6 md:grid-cols-2">
               {/* معلومات أساسية */}
