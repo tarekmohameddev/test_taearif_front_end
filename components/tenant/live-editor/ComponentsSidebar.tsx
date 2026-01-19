@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEditorT } from "@/context/editorI18nStore";
 import {
@@ -10,8 +10,10 @@ import { DraggableDrawerItem } from "@/services/live-editor/dragDrop";
 import { getComponents } from "@/lib/ComponentsList";
 import themesComponentsList from "@/lib/themes/themesComponentsList.json";
 import { BrandingSettings } from "@/components/tenant/live-editor/EditorSidebar/components/BrandingSettings";
+import { ModernColorPicker } from "@/components/tenant/live-editor/EditorSidebar/components/ModernColorPicker";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { LayoutGrid, Palette, Settings } from "lucide-react";
+import { useEditorStore } from "@/context/editorStore";
 
 // Animation variants
 const collapseVariants = {
@@ -58,7 +60,7 @@ const listItem = {
 };
 
 type ThemeTab = "theme1" | "theme2";
-type MainTab = "components" | "branding" | "settings";
+type MainTab = "components" | "branding";
 
 // دالة لاستخراج baseName من componentName
 const getBaseComponentName = (componentName: string): string => {
@@ -510,6 +512,143 @@ const ComponentsListView = ({
   );
 };
 
+// Compact Branding Settings Component
+const CompactBrandingSettings = () => {
+  const t = useEditorT();
+  const {
+    WebsiteLayout,
+    setWebsiteLayout,
+    tempData,
+    setTempData,
+    updateByPath,
+  } = useEditorStore();
+
+  // Initialize branding data
+  const [brandingData, setBrandingData] = useState({
+    colors: {
+      primary: "",
+      secondary: "",
+      accent: "",
+    },
+    mainBgColor: "",
+  });
+
+  const isInitializing = useRef(true);
+
+  // Load branding data from WebsiteLayout
+  useEffect(() => {
+    isInitializing.current = true;
+    if (WebsiteLayout?.branding) {
+      const newBrandingData = {
+        colors: {
+          primary: WebsiteLayout.branding.colors?.primary || "",
+          secondary: WebsiteLayout.branding.colors?.secondary || "",
+          accent: WebsiteLayout.branding.colors?.accent || "",
+        },
+        mainBgColor: WebsiteLayout.branding.mainBgColor || "",
+      };
+      setBrandingData(newBrandingData);
+      setTempData(newBrandingData);
+      setTimeout(() => {
+        setTempData(newBrandingData);
+      }, 100);
+    } else {
+      const emptyBranding = {
+        colors: {
+          primary: "",
+          secondary: "",
+          accent: "",
+        },
+        mainBgColor: "",
+      };
+      setBrandingData(emptyBranding);
+      setTempData(emptyBranding);
+      setTimeout(() => {
+        setTempData(emptyBranding);
+      }, 100);
+    }
+    setTimeout(() => {
+      isInitializing.current = false;
+    }, 150);
+  }, [WebsiteLayout, setTempData]);
+
+  // Update tempData when brandingData changes
+  useEffect(() => {
+    if (!isInitializing.current) {
+      setTempData(brandingData);
+    }
+  }, [brandingData, setTempData]);
+
+  const handleColorChange = useCallback(
+    (colorType: "primary" | "secondary" | "accent", value: string) => {
+      setBrandingData((prev) => ({
+        ...prev,
+        colors: {
+          ...prev.colors,
+          [colorType]: value,
+        },
+      }));
+    },
+    [],
+  );
+
+  const handleMainBgColorChange = useCallback((value: string) => {
+    setBrandingData((prev) => ({
+      ...prev,
+      mainBgColor: value,
+    }));
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      {/* Colors Section */}
+      <div className="space-y-3">
+        <div className="p-3 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-lg border border-blue-200/50">
+          <h4 className="text-xs font-semibold text-slate-800 mb-3">
+            {t("editor_sidebar.brand_colors")}
+          </h4>
+
+          <div className="space-y-3">
+            {/* Primary Color */}
+            <ModernColorPicker
+              label={t("editor_sidebar.primary_color")}
+              value={brandingData.colors.primary}
+              onChange={(color) => handleColorChange("primary", color)}
+            />
+
+            {/* Secondary Color */}
+            <ModernColorPicker
+              label={t("editor_sidebar.secondary_color")}
+              value={brandingData.colors.secondary}
+              onChange={(color) => handleColorChange("secondary", color)}
+            />
+
+            {/* Accent Color */}
+            <ModernColorPicker
+              label={t("editor_sidebar.accent_color")}
+              value={brandingData.colors.accent}
+              onChange={(color) => handleColorChange("accent", color)}
+            />
+          </div>
+        </div>
+
+        {/* Main Background Color */}
+        <div className="p-3 bg-gradient-to-br from-slate-50 to-gray-50 rounded-lg border border-slate-200/50">
+          <h4 className="text-xs font-semibold text-slate-800 mb-3">
+            {t("editor_sidebar.main_background_color")}
+          </h4>
+
+          <ModernColorPicker
+            label={t("editor_sidebar.background_color")}
+            value={brandingData.mainBgColor}
+            onChange={handleMainBgColorChange}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Settings View Component
 const SettingsView = ({ t }: { t: any }) => {
   return (
@@ -622,18 +761,7 @@ export const ComponentsSidebar = () => {
                 }`}
               >
                 <Palette className="w-5 h-5" />
-                <span className="text-[10px] leading-tight">الألوان</span>
-              </button>
-              <button
-                onClick={() => setActiveMainTab("settings")}
-                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all ${
-                  activeMainTab === "settings"
-                    ? "bg-blue-500 text-white shadow-md"
-                    : "text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                <Settings className="w-5 h-5" />
-                <span className="text-[10px] leading-tight">الإعدادات</span>
+                <span className="text-[10px] leading-tight">إعدادات الألوان</span>
               </button>
             </div>
 
@@ -661,16 +789,9 @@ export const ComponentsSidebar = () => {
 
                 <TabsContent
                   value="branding"
-                  className="flex-1 overflow-y-auto mt-0 p-4"
+                  className="flex-1 overflow-y-auto mt-0 p-2"
                 >
-                  <BrandingSettings />
-                </TabsContent>
-
-                <TabsContent
-                  value="settings"
-                  className="flex-1 overflow-y-auto mt-0 p-4"
-                >
-                  <SettingsView t={t} />
+                  <CompactBrandingSettings />
                 </TabsContent>
               </Tabs>
             </div>
