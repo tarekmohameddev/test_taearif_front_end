@@ -80,6 +80,7 @@ const uploadVideo = async (file) => {
 };
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { useUserStore } from "@/store/userStore";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
 import { PropertyCounter } from "@/components/property/propertyCOMP/property-counter";
@@ -119,7 +120,11 @@ export default function PropertyForm({ mode, isDraft = false }) {
   } = useStore();
   const [submitError, setSubmitError] = useState(null);
   const { userData, fetchUserData, IsLoading: authLoading } = useAuthStore();
+  const { checkPermission } = useUserStore();
   const router = useRouter();
+  
+  // Check if user can access archive/owner details tab
+  const canAccessArchive = userData?.account_type === "tenant" || checkPermission("properties.owner_deed");
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProperty, setLoadingProperty] = useState(
@@ -201,6 +206,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isFaqsOpen, setIsFaqsOpen] = useState(false);
   const [isOwnerDetailsOpen, setIsOwnerDetailsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("form"); // "form" or "owner"
   const [selectedFacilities, setSelectedFacilities] = useState([]);
   const [images, setImages] = useState({
     thumbnail: null,
@@ -1616,6 +1622,28 @@ export default function PropertyForm({ mode, isDraft = false }) {
               </div>
               <div className="flex flex-col items-end gap-2 min-w-0">
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  {canAccessArchive && (
+                    <>
+                      {activeTab === "form" ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setActiveTab("owner")}
+                          className="gap-2 w-full sm:w-auto"
+                        >
+                          الأرشيف
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          onClick={() => setActiveTab("form")}
+                          className="gap-2 w-full sm:w-auto"
+                        >
+                          تفاصيل العقار
+                        </Button>
+                      )}
+                    </>
+                  )}
                   {isDraft ? (
                     <>
                       <Button
@@ -1662,7 +1690,9 @@ export default function PropertyForm({ mode, isDraft = false }) {
               </div>
             </div>
 
-            <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
+            {/* Tab Content */}
+            {activeTab === "form" ? (
+              <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -3438,127 +3468,6 @@ export default function PropertyForm({ mode, isDraft = false }) {
                 </AnimatePresence>
               </Card>
 
-              {userData?.account_type === "tenant" && (
-                <Card className="xl:col-span-2">
-                  <CardHeader 
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => setIsOwnerDetailsOpen(!isOwnerDetailsOpen)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-xl">تفاصيل المالك</CardTitle>
-                        <CardDescription>أدخل معلومات مالك العقار وصورة السند</CardDescription>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: isOwnerDetailsOpen ? 180 : 0 }}
-                        transition={{ duration: 0.50, ease: "easeInOut" }}
-                      >
-                        <ChevronDown className="h-4 w-4" />
-                      </motion.div>
-                    </div>
-                  </CardHeader>
-                  <AnimatePresence initial={false}>
-                    {isOwnerDetailsOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.50, ease: "easeInOut" }}
-                        style={{ overflow: "hidden" }}
-                      >
-                        <CardContent className="space-y-6">
-                          {/* رقم مالك العقار */}
-                          <div className="space-y-2">
-                            <Label htmlFor="owner_number">رقم مالك العقار</Label>
-                            <Input
-                              id="owner_number"
-                              name="owner_number"
-                              type="number"
-                              inputMode="numeric"
-                              value={formData.owner_number}
-                              onChange={handleInputChange}
-                              placeholder="أدخل رقم مالك العقار"
-                              className={errors.owner_number ? "border-red-500" : ""}
-                              dir="rtl"
-                            />
-                            {errors.owner_number && (
-                              <p className="text-sm text-red-500">
-                                {errors.owner_number}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* صورة السند */}
-                          <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-right">
-                              صورة السند (الصك)
-                            </h3>
-                            <div className="flex flex-col md:flex-row items-center gap-6">
-                              <div className="border rounded-md p-2 flex-1 w-full">
-                                <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
-                                  {previews.deedImage ? (
-                                    <>
-                                      <img
-                                        src={previews.deedImage}
-                                        alt="Deed image"
-                                        className="h-full w-full object-cover rounded-md"
-                                      />
-                                      <Button
-                                        variant="destructive"
-                                        size="icon"
-                                        className="absolute top-2 right-2 h-8 w-8"
-                                        onClick={() => removeImage("deedImage")}
-                                      >
-                                        <X className="h-4 w-4" />
-                                      </Button>
-                                    </>
-                                  ) : (
-                                    <ImageIcon className="h-12 w-12 text-muted-foreground" />
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex flex-col gap-4 w-full md:w-1/3">
-                                <input
-                                  ref={deedImageInputRef}
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={(e) => handleFileChange(e, "deedImage")}
-                                />
-                                <Button
-                                  variant="outline"
-                                  className="h-12 w-full"
-                                  onClick={() => triggerFileInput("deedImage")}
-                                  disabled={uploading}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {uploading ? (
-                                      <Loader2 className="h-5 w-5 animate-spin" />
-                                    ) : (
-                                      <Upload className="h-5 w-5" />
-                                    )}
-                                    <span>رفع صورة السند</span>
-                                  </div>
-                                </Button>
-                                <p className="text-sm text-muted-foreground">
-                                  يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم
-                                  الملف هو 10 ميجابايت.
-                                </p>
-                                {errors.deedImage && (
-                                  <p className="text-xs text-red-500">
-                                    {errors.deedImage}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Card>
-              )}
-
               <Card className="xl:col-span-2">
                 <CardFooter className="flex flex-col items-end border-t p-6 space-y-4">
                   <div className="w-full">
@@ -3599,6 +3508,106 @@ export default function PropertyForm({ mode, isDraft = false }) {
                 </CardFooter>
               </Card>
             </div>
+            ) : (
+              /* Tab: تفاصيل المالك */
+              canAccessArchive && (
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-xl">تفاصيل المالك</CardTitle>
+                      <CardDescription>أدخل معلومات مالك العقار وصورة السند</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* رقم مالك العقار */}
+                      <div className="space-y-2">
+                        <Label htmlFor="owner_number">رقم مالك العقار</Label>
+                        <Input
+                          id="owner_number"
+                          name="owner_number"
+                          type="number"
+                          inputMode="numeric"
+                          value={formData.owner_number}
+                          onChange={handleInputChange}
+                          placeholder="أدخل رقم مالك العقار"
+                          className={errors.owner_number ? "border-red-500" : ""}
+                          dir="rtl"
+                        />
+                        {errors.owner_number && (
+                          <p className="text-sm text-red-500">
+                            {errors.owner_number}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* صورة السند */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-right">
+                          صورة السند (الصك)
+                        </h3>
+                        <div className="flex flex-col md:flex-row items-center gap-6">
+                          <div className="border rounded-md p-2 flex-1 w-full">
+                            <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
+                              {previews.deedImage ? (
+                                <>
+                                  <img
+                                    src={previews.deedImage}
+                                    alt="Deed image"
+                                    className="h-full w-full object-cover rounded-md"
+                                  />
+                                  <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2 h-8 w-8"
+                                    onClick={() => removeImage("deedImage")}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              ) : (
+                                <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-4 w-full md:w-1/3">
+                            <input
+                              ref={deedImageInputRef}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handleFileChange(e, "deedImage")}
+                            />
+                            <Button
+                              variant="outline"
+                              className="h-12 w-full"
+                              onClick={() => triggerFileInput("deedImage")}
+                              disabled={uploading}
+                            >
+                              <div className="flex items-center gap-2">
+                                {uploading ? (
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                  <Upload className="h-5 w-5" />
+                                )}
+                                <span>رفع صورة السند</span>
+                              </div>
+                            </Button>
+                            <p className="text-sm text-muted-foreground">
+                              يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم
+                              الملف هو 10 ميجابايت.
+                            </p>
+                            {errors.deedImage && (
+                              <p className="text-xs text-red-500">
+                                {errors.deedImage}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )
+            )}
           </div>
         </main>
       </div>
