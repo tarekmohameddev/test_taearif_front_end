@@ -7,7 +7,7 @@ import {
   getSectionIconTranslated,
 } from "@/components/tenant/live-editor/EditorSidebar/constants";
 import { DraggableDrawerItem } from "@/services/live-editor/dragDrop";
-import { getComponents } from "@/lib/ComponentsList";
+import { getComponents, getAllComponentsTranslated, getComponentsByCategoryTranslated, ComponentType } from "@/lib/ComponentsList";
 import themesComponentsList from "@/lib/themes/themesComponentsList.json";
 import { BrandingSettings } from "@/components/tenant/live-editor/EditorSidebar/components/BrandingSettings";
 import { ModernColorPicker } from "@/components/tenant/live-editor/EditorSidebar/components/ModernColorPicker";
@@ -86,10 +86,89 @@ const ComponentsListView = ({
   setIsBasicComponentsDropdownOpen: (open: boolean) => void;
   t: any;
 }) => {
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(),
+  );
+
   // الحصول على الأقسام المترجمة
   const availableSections = useMemo(() => {
     return getAvailableSectionsTranslated(t);
   }, [t]);
+
+  // الحصول على جميع الفئات الفريدة من المكونات
+  const allCategories = useMemo(() => {
+    const allComponents = getAllComponentsTranslated(t);
+    const categories = new Set<string>();
+    allComponents.forEach((component) => {
+      if (component.category) {
+        categories.add(component.category);
+      }
+    });
+    const categoriesArray = Array.from(categories);
+    
+    // ترتيب مخصص للتصنيفات
+    const categoryOrder = [
+      "marketing",    // الأول - التسويق
+      "banner",      // الثاني - البانرات
+      "ecommerce",   // الثالث - التجارة الإلكترونية
+      "content",     // الرابع - المحتوى
+    ];
+    
+    // ترتيب التصنيفات: أولاً حسب الترتيب المخصص، ثم الباقي أبجدياً
+    const sorted = categoriesArray.sort((a, b) => {
+      const indexA = categoryOrder.indexOf(a);
+      const indexB = categoryOrder.indexOf(b);
+      
+      // إذا كان كلا التصنيفين في القائمة المخصصة
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+      // إذا كان فقط A في القائمة المخصصة
+      if (indexA !== -1) {
+        return -1;
+      }
+      // إذا كان فقط B في القائمة المخصصة
+      if (indexB !== -1) {
+        return 1;
+      }
+      // إذا لم يكن أي منهما في القائمة المخصصة، ترتيب أبجدي
+      return a.localeCompare(b);
+    });
+    
+    return sorted;
+  }, [t]);
+
+  // تهيئة جميع التصنيفات كمفتوحة افتراضياً
+  useEffect(() => {
+    if (allCategories.length > 0 && expandedCategories.size === 0) {
+      setExpandedCategories(new Set(allCategories));
+    }
+  }, [allCategories, expandedCategories.size]);
+
+  // الحصول على جميع المكونات مقسمة حسب الفئات
+  const componentsByCategory = useMemo(() => {
+    const grouped: Record<string, ComponentType[]> = {};
+    allCategories.forEach((category) => {
+      const components = getComponentsByCategoryTranslated(category, t);
+      if (components.length > 0) {
+        grouped[category] = components;
+      }
+    });
+    return grouped;
+  }, [allCategories, t]);
+
+  // Toggle category expansion
+  const toggleCategory = (category: string) => {
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
 
   // تصفية المكونات للبحث (يشمل header و footer)
   const filteredSections = useMemo(
@@ -186,7 +265,7 @@ const ComponentsListView = ({
               : "text-gray-600 hover:text-gray-900"
           }`}
         >
-          الثيم 1
+          {t("live_editor.theme_1")}
         </button>
         <button
           onClick={() => setActiveTab("theme2")}
@@ -196,7 +275,7 @@ const ComponentsListView = ({
               : "text-gray-600 hover:text-gray-900"
           }`}
         >
-          الثيم 2
+          {t("live_editor.theme_2")}
         </button>
       </div>
 
@@ -211,7 +290,7 @@ const ComponentsListView = ({
           >
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-900">
-                المكونات الاساسية
+                {t("live_editor.basic_components")}
               </span>
             </div>
             <motion.svg
@@ -383,112 +462,137 @@ const ComponentsListView = ({
           </AnimatePresence>
         </div>
 
-        {/* Other Components Grid */}
+        {/* Components by Categories */}
         <motion.div
           variants={listContainer}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 gap-1.5"
+          className="space-y-3"
         >
-          {displaySections.length > 0 ? (
-            displaySections.map((section) => {
-              const themeComponentNames =
-                (themesComponentsList[activeTab] as string[]) || [];
-              const variantsForSection = themeComponentNames.filter(
-                (name) => getBaseComponentName(name) === section.component,
+          {Object.keys(componentsByCategory).length > 0 ? (
+            Object.entries(componentsByCategory).map(([category, components]) => {
+              const isCategoryExpanded = expandedCategories.has(category);
+              // Filter components by search term
+              const filteredComponents = components.filter(
+                (component) =>
+                  component.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  component.description.toLowerCase().includes(searchTerm.toLowerCase()),
               );
 
-              if (variantsForSection.length <= 1) {
-                const variantName =
-                  variantsForSection.length === 1
-                    ? variantsForSection[0]
-                    : undefined;
+              if (filteredComponents.length === 0) return null;
 
-                const variantSuffix =
-                  variantName &&
-                  variantName.startsWith(section.component)
-                    ? variantName.slice(section.component.length)
-                    : "";
-                const displayLabel =
-                  variantSuffix && variantSuffix.length > 0
-                    ? `${section.name} ${variantSuffix}`
-                    : section.name;
-
-                return (
-                  <motion.div
-                    key={`${section.type}-${variantName || "default"}`}
-                    variants={listItem}
-                    className="group relative"
+              return (
+                <motion.div
+                  key={category}
+                  variants={listItem}
+                  className="space-y-2"
+                >
+                  {/* Category Header - Clickable */}
+                  <button
+                    onClick={() => toggleCategory(category)}
+                    className="w-full pb-2 pt-1 flex items-center justify-between hover:bg-gray-50 rounded-md px-1 transition-colors duration-150"
                   >
-                    <DraggableDrawerItem
-                      componentType={section.component}
-                      section={section.section}
-                      data={{
-                        label: displayLabel,
-                        description: section.description,
-                        icon: section.type,
-                        ...(variantName ? { variant: variantName } : {}),
-                      }}
+                    <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      {t(`categories.${category}.display_name`) || category}
+                    </h3>
+                    <motion.svg
+                      className="w-4 h-4 text-gray-500 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      animate={{ rotate: isCategoryExpanded ? 90 : 0 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
-                        <div className="flex flex-col items-center justify-center text-center space-y-1">
-                          <div className="text-xl">
-                            {getSectionIconTranslated(section.type, t)}
-                          </div>
-                          <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
-                            {displayLabel}
-                          </h3>
-                        </div>
-                      </div>
-                    </DraggableDrawerItem>
-                  </motion.div>
-                );
-              }
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </motion.svg>
+                  </button>
+                  <div className="mt-1 h-px bg-gray-200"></div>
 
-              return variantsForSection.map((variantName) => {
-                const variantSuffix = variantName.startsWith(section.component)
-                  ? variantName.slice(section.component.length)
-                  : "";
-                const displayLabel =
-                  variantSuffix && variantSuffix.length > 0
-                    ? `${section.name} ${variantSuffix}`
-                    : section.name;
-
-                return (
-                  <motion.div
-                    key={`${section.type}-${variantName}`}
-                    variants={listItem}
-                    className="group relative"
-                  >
-                    <DraggableDrawerItem
-                      componentType={section.component}
-                      section={section.section}
-                      data={{
-                        label: displayLabel,
-                        description: section.description,
-                        icon: section.type,
-                        variant: variantName,
-                      }}
-                    >
-                      <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
-                        <div className="flex flex-col items-center justify-center text-center space-y-1">
-                          <div className="text-xl">
-                            {getSectionIconTranslated(section.type, t)}
-                          </div>
-                          <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
-                            {displayLabel}
-                          </h3>
+                  {/* Components Grid - Collapsible */}
+                  <AnimatePresence initial={false}>
+                    {isCategoryExpanded && (
+                      <motion.div
+                        initial="collapsed"
+                        animate="open"
+                        exit="collapsed"
+                        variants={{
+                          open: {
+                            height: "auto",
+                            opacity: 1,
+                            transition: {
+                              height: {
+                                duration: 0.3,
+                                ease: "easeInOut",
+                              },
+                              opacity: {
+                                duration: 0.2,
+                                delay: 0.1,
+                              },
+                            },
+                          },
+                          collapsed: {
+                            height: 0,
+                            opacity: 0,
+                            transition: {
+                              height: {
+                                duration: 0.3,
+                                ease: "easeInOut",
+                              },
+                              opacity: {
+                                duration: 0.2,
+                              },
+                            },
+                          },
+                        }}
+                        className="overflow-hidden"
+                      >
+                        <div className="grid grid-cols-2 gap-1.5 pt-2">
+                          {filteredComponents.map((component) => {
+                            return (
+                              <motion.div
+                                key={component.id}
+                                variants={listItem}
+                                className="group relative"
+                              >
+                                <DraggableDrawerItem
+                                  componentType={component.name}
+                                  section={component.section}
+                                  data={{
+                                    label: component.displayName,
+                                    description: component.description,
+                                    icon: component.id,
+                                  }}
+                                >
+                                  <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
+                                    <div className="flex flex-col items-center justify-center text-center space-y-1">
+                                      <div className="text-xl">
+                                        {getSectionIconTranslated(component.id, t)}
+                                      </div>
+                                      <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
+                                        {component.displayName}
+                                      </h3>
+                                    </div>
+                                  </div>
+                                </DraggableDrawerItem>
+                              </motion.div>
+                            );
+                          })}
                         </div>
-                      </div>
-                    </DraggableDrawerItem>
-                  </motion.div>
-                );
-              });
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
             })
           ) : (
             <motion.div
               variants={listItem}
-              className="col-span-2 text-center py-8 text-gray-500"
+              className="text-center py-8 text-gray-500"
             >
               <svg
                 className="w-12 h-12 mx-auto mb-3 text-gray-300"
@@ -745,23 +849,25 @@ export const ComponentsSidebar = () => {
             <div className="w-[15%] border-r border-slate-200/60 bg-slate-50/50 flex flex-col py-2 gap-2 px-1">
               <button
                 onClick={() => setActiveMainTab("components")}
-                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all  border ${
+                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border ${
                   activeMainTab === "components"
                     ? "bg-blue-200 text-blue-700 border-blue-200"
                     : "text-slate-600 hover:bg-slate-50 border-transparent"
                 }`}
               >
-                <span className={`text-xs leading-tight${activeMainTab === "components" ? " font-semibold" : ""}`}>المكونات</span>
+                <LayoutGrid className="w-4 h-4" />
+                <span className={`text-xs leading-tight${activeMainTab === "components" ? " font-semibold" : ""}`}>{t("live_editor.components_tab")}</span>
               </button>
               <button
                 onClick={() => setActiveMainTab("branding")}
-                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all  border ${
+                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border ${
                   activeMainTab === "branding"
                     ? "bg-blue-200 text-blue-700 border-blue-200"
                     : "text-slate-600 hover:bg-slate-50 border-transparent"
                 }`}
               >
-                <span className={`text-xs leading-tight${activeMainTab === "branding" ? " font-semibold" : ""}`}>الألوان</span>
+                <Palette className="w-4 h-4" />
+                <span className={`text-xs leading-tight${activeMainTab === "branding" ? " font-semibold" : ""}`}>{t("live_editor.colors_tab")}</span>
               </button>
             </div>
 

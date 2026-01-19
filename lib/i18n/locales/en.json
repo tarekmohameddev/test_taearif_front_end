@@ -409,6 +409,11 @@
     "show_components": "Show Components",
     "editor": "Editor",
     "add_new_section": "Add New Section",
+    "basic_components": "Basic Components",
+    "components_tab": "Components",
+    "colors_tab": "Colors",
+    "theme_1": "Theme 1",
+    "theme_2": "Theme 2",
     "delete_page": "Delete Page",
     "debug": "Debug",
     "open_editor": "Open Editor",
@@ -460,6 +465,8 @@
   },
   "editor_sidebar": {
     "theme_settings": "Theme Settings",
+    "general_settings": "General Settings",
+    "general_settings_description": "General settings for the website and components",
     "page_theme": "Page Theme",
     "global": "Global",
     "transform_all_components": "Transform all components on this page with a single click ✨",
@@ -3629,6 +3636,50 @@
       "animation_type": "Animation Type",
       "duration_ms": "Duration (ms)",
       "delay_ms": "Delay (ms)"
+    }
+  },
+  "categories": {
+    "marketing": {
+      "display_name": "Marketing"
+    },
+    "banner": {
+      "display_name": "Banners"
+    },
+    "ecommerce": {
+      "display_name": "E-commerce"
+    },
+    "content": {
+      "display_name": "Content"
+    },
+    "navigation": {
+      "display_name": "Navigation"
+    },
+    "forms": {
+      "display_name": "Forms"
+    },
+    "social": {
+      "display_name": "Social"
+    },
+    "media": {
+      "display_name": "Media"
+    },
+    "layout": {
+      "display_name": "Layout"
+    },
+    "interactive": {
+      "display_name": "Interactive"
+    },
+    "contact": {
+      "display_name": "Contact"
+    },
+    "form": {
+      "display_name": "Forms"
+    },
+    "interaction": {
+      "display_name": "Interaction"
+    },
+    "page": {
+      "display_name": "Pages"
     }
   }
 }

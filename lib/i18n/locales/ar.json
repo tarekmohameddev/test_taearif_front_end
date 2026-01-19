@@ -413,7 +413,13 @@
     "show_components": "إظهار المكونات",
     "editor": "المحرر",
     "general_settings": "الإعدادات العامة",
+    "general_settings_description": "إعدادات عامة للموقع والمكونات",
     "add_new_section": "إضافة قسم جديد",
+    "basic_components": "المكونات الاساسية",
+    "components_tab": "المكونات",
+    "colors_tab": "الألوان",
+    "theme_1": "الثيم 1",
+    "theme_2": "الثيم 2",
     "delete_page": "حذف الصفحة",
     "debug": "تصحيح",
     "open_editor": "فتح المحرر",
@@ -3646,6 +3652,50 @@
       "animation_type": "نوع الرسوم المتحركة",
       "duration_ms": "المدة (مللي ثانية)",
       "delay_ms": "التأخير (مللي ثانية)"
+    }
+  },
+  "categories": {
+    "marketing": {
+      "display_name": "التسويق"
+    },
+    "banner": {
+      "display_name": "البانرات"
+    },
+    "ecommerce": {
+      "display_name": "التجارة الإلكترونية"
+    },
+    "content": {
+      "display_name": "المحتوى"
+    },
+    "navigation": {
+      "display_name": "التنقل"
+    },
+    "forms": {
+      "display_name": "النماذج"
+    },
+    "social": {
+      "display_name": "اجتماعي"
+    },
+    "media": {
+      "display_name": "وسائط"
+    },
+    "layout": {
+      "display_name": "التخطيط"
+    },
+    "interactive": {
+      "display_name": "تفاعلي"
+    },
+    "contact": {
+      "display_name": "الاتصال"
+    },
+    "form": {
+      "display_name": "النماذج"
+    },
+    "interaction": {
+      "display_name": "التفاعل"
+    },
+    "page": {
+      "display_name": "الصفحات"
     }
   }
 }
