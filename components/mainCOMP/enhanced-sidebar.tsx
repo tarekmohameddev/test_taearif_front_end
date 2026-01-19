@@ -13,6 +13,7 @@ import {
   Download,
   MessageSquare,
   Home,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -168,7 +169,73 @@ export function EnhancedSidebar({
             )}
           </div>
         </div>
+        <div className="px-3 flex-shrink-0">
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
+                  onClick={() => {
+                    const userData = useAuthStore.getState().userData;
+                    console.log("🔗 Full userData:", userData);
+                    console.log("🔗 Domain from userData:", userData?.domain);
 
+                    // التحقق من وجود userData
+                    if (!userData) {
+                      console.warn("userData is null or undefined");
+                      alert("يرجى تسجيل الدخول أولاً");
+                      return;
+                    }
+
+                    const domain = userData?.domain || "";
+
+                    // التحقق من صحة الـ domain
+                    if (!domain || domain.trim() === "") {
+                      alert("يرجى إعداد domain صحيح في إعدادات الحساب");
+                      return;
+                    }
+
+                    // تنظيف الـ domain من المسافات
+                    const cleanDomain = domain.trim();
+
+                    // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
+                    if (
+                      !cleanDomain.includes(".") &&
+                      !cleanDomain.startsWith("http")
+                    ) {
+                      alert(
+                        "تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح",
+                      );
+                      return;
+                    }
+
+                    const url = cleanDomain.startsWith("http")
+                      ? cleanDomain
+                      : `https://${cleanDomain}`;
+
+                    // التحقق من صحة الـ URL قبل فتحه
+                    try {
+                      new URL(url);
+                      console.log("Opening URL:", url);
+                      window.open(url, "_blank");
+                    } catch (error) {
+                      console.error("Invalid URL:", url, error);
+                      alert("URL غير صحيح. يرجى التحقق من إعدادات الـ domain");
+                    }
+                  }}
+                >
+                  <ExternalLink className="h-4 w-4 text-primary" />
+                  {!isCollapsed && <span>معاينة الموقع</span>}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>فتح الموقع في نافذة جديدة</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <div
           className={cn(
             "flex-1 py-2 px-1 overflow-y-auto overflow-x-hidden min-h-0",
