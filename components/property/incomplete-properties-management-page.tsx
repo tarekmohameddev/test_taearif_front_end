@@ -386,11 +386,11 @@ function PropertyCard({
             className="h-full w-full object-cover transition-all hover:scale-105"
           />
         </div>
-        {property.featured && (
+        {property.featured ? (
           <div className="absolute right-2 top-2 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground">
             مميز
           </div>
-        )}
+        ) : null}
         <div className="absolute left-2 top-2 rounded-md px-2 py-1 text-xs font-medium bg-amber-500 text-white">
           مسودة
         </div>
@@ -399,12 +399,12 @@ function PropertyCard({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle
-              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents?.[0]?.title || "").length > 20 ? "text-sm " : ""}`}
+              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents?.[0]?.title || "").length > 20 ? "text-xl " : ""}`}
             >
               {property.title || property.contents?.[0]?.title ? (
                 truncateTitle(property.title || property.contents?.[0]?.title)
               ) : (
-                <span className="text-sm text-muted-foreground font-normal">لا يوجد عنوان للعقار</span>
+                <span className="text-xl text-muted-foreground font-normal">لا يوجد عنوان للعقار</span>
               )}
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">
@@ -412,7 +412,7 @@ function PropertyCard({
               {formattedAddress || "لا يوجد عنوان"}
             </CardDescription>
             <div className="mt-2 space-y-1">
-              {property.missing_fields_ar && property.missing_fields_ar.length > 0 && (
+              {property.missing_fields_ar && property.missing_fields_ar.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
                   {property.missing_fields_ar.slice(0, 3).map((field: string, index: number) => (
                     <Badge key={index} variant="destructive" className="text-xs">
@@ -425,16 +425,7 @@ function PropertyCard({
                     </Badge>
                   )}
                 </div>
-              )}
-              {property.validation_errors && property.validation_errors.length > 0 && (
-                <div className="text-xs text-amber-600 dark:text-amber-400">
-                  <AlertTriangle className="inline h-3 w-3 ml-1" />
-                  {property.validation_errors[0]}
-                  {property.validation_errors.length > 1 && (
-                    <span> (+{property.validation_errors.length - 1} أخطاء أخرى)</span>
-                  )}
-                </div>
-              )}
+              ) : null}
             </div>
           </div>
           <DropdownMenu>
@@ -684,15 +675,6 @@ function PropertyListItem({
                       <Badge variant="destructive" className="text-xs">
                         +{property.missing_fields_ar.length - 3} أكثر
                       </Badge>
-                    )}
-                  </div>
-                )}
-                {property.validation_errors && property.validation_errors.length > 0 && (
-                  <div className="text-xs text-amber-600 dark:text-amber-400">
-                    <AlertTriangle className="inline h-3 w-3 ml-1" />
-                    {property.validation_errors[0]}
-                    {property.validation_errors.length > 1 && (
-                      <span> (+{property.validation_errors.length - 1} أخطاء أخرى)</span>
                     )}
                   </div>
                 )}
