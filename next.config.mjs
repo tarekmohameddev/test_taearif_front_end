@@ -9,14 +9,12 @@ try {
 const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
+    tsconfigPath: './tsconfig.json',
   },
   images: {
     unoptimized: true,
   },
   experimental: {
-    // في Next.js 16، Turbopack هو الافتراضي
-    // تحسينات للأداء
-    // optimizeCss: true, // DISABLED - causes 45min+ build times with critters on large projects
     scrollRestoration: true,
     // تحسين package imports - تقليل حجم bundle للمكتبات الكبيرة
     optimizePackageImports: [
@@ -29,45 +27,50 @@ const nextConfig = {
       '@radix-ui/react-tabs',
       '@radix-ui/react-tooltip',
       'date-fns',
+      'react-hot-toast',
+      'zustand',
     ],
+    // ⬅️ Turbopack settings - فقط في development
+    ...(process.env.NODE_ENV === "development" && {
+      turbo: {
+        rules: {
+          '*.svg': {
+            loaders: ['@svgr/webpack'],
+            as: '*.js',
+          },
+        },
+      },
+    }),
   },
   // تحسينات للأداء
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // ملاحظة: SWC minification مفعّل افتراضياً في Next.js 16+ (لا حاجة لـ swcMinify)
-  // تحسين cache - تقليل استهلاك الذاكرة في التطوير
+  // تحسين cache
   onDemandEntries: {
-    maxInactiveAge: 60 * 1000, // زيادة الوقت إلى 60 ثانية لتحسين الـ caching
-    pagesBufferLength: 2, // زيادة إلى 2 لتحسين الأداء
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: process.env.NODE_ENV === "development" ? 3 : 2,
   },
-  // تحسين البناء للصفحات الثابتة - معالجة مشكلة symlink على Windows
   output: process.platform === "win32" ? undefined : "standalone",
-  // استبعاد مجلدات trash و docs من البناء
-  webpack: (config, { isServer, dev }) => {
-    // استبعاد مجلدات trash و docs من المراقبة أثناء التطوير فقط
-    if (dev) {
-      config.watchOptions = {
-        ...config.watchOptions,
-        ignored: /node_modules|\.git|trash|docs|\.next|\.cache/,
-        // تقليل استهلاك الذاكرة في وضع المراقبة
-        aggregateTimeout: 300,
-        poll: false, // تعطيل polling لتوفير الذاكرة
-      };
-      // تحسين optimization مع code splitting للترجمة
+  
+  // ⬅️ Webpack configuration - فقط في PRODUCTION
+  webpack: (config, { isServer, dev, webpack }) => {
+    // ⬅️ Webpack في PRODUCTION فقط
+    if (!dev) {
+      // Production webpack optimizations
       config.optimization = {
         ...config.optimization,
         removeAvailableModules: true,
         removeEmptyChunks: true,
         mergeDuplicateChunks: true,
-        // تحسين splitChunks لتحميل الترجمة بشكل منفصل
+        // تحسين splitChunks لتحميل الترجمة والمكونات الكبيرة بشكل منفصل
         splitChunks: {
           chunks: 'all',
-          maxInitialRequests: 25, // زيادة عدد الطلبات الأولية المسموح بها
+          maxInitialRequests: 30,
           cacheGroups: {
             default: false,
             vendors: false,
-            // فصل ملفات الترجمة الكبيرة في chunk منفصل
+            // فصل ملفات الترجمة الكبيرة
             translations: {
               test: /[\\/]lib[\\/]i18n[\\/]locales[\\/]/,
               name: 'translations',
@@ -75,9 +78,9 @@ const nextConfig = {
               priority: 20,
               reuseExistingChunk: true,
             },
-            // فصل المكونات الكبيرة (property-form وغيرها)
+            // فصل المكونات الكبيرة
             largeComponents: {
-              test: /[\\/]components[\\/](property|property-form|edit-property)[\\/]/,
+              test: /[\\/]components[\\/](property|property-form|edit-property|crm|rental-management|marketing)[\\/]/,
               name: 'large-components',
               chunks: 'async',
               priority: 18,
@@ -114,16 +117,18 @@ const nextConfig = {
       // تحسين resolve لسرعة البحث عن الملفات
       config.resolve = {
         ...config.resolve,
-        // تقليل الوقت المستغرق في البحث عن الملفات
         symlinks: false,
-        // تحسين cache للملفات
-        cache: true,
+        cache: false, // في production لا نحتاج cache
+        // تحسين extension resolution
+        extensionAlias: {
+          '.js': ['.ts', '.tsx', '.js', '.jsx'],
+          '.jsx': ['.tsx', '.jsx'],
+        },
       };
       
       // تحسين module resolution
       config.module = {
         ...config.module,
-        // تحسين parsing
         unknownContextCritical: false,
         unknownContextRegExp: /$^/,
         unknownContextRequest: '.',
@@ -132,11 +137,11 @@ const nextConfig = {
 
     return config;
   },
-  // إعدادات Turbopack (Next.js 16)
-  // إضافة turbopack: {} لإسكات الخطأ - Turbopack هو الافتراضي في Next.js 16
-  // يعمل فقط في وضع التطوير
-  // ملاحظة: حد الذاكرة يتم التحكم فيه من خلال NODE_OPTIONS في package.json
-  ...(process.env.NODE_ENV === "development" && { turbopack: {} }),
+  
+  // ⬅️ Turbopack - فقط في DEVELOPMENT
+  ...(process.env.NODE_ENV === "development" && { 
+    turbopack: {} 
+  }),
 };
 
 mergeConfig(nextConfig, userConfig);

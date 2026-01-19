@@ -205,6 +205,24 @@ const truncateTitle = (title: string, maxLength: number = 40): string => {
   return title.substring(0, maxLength) + "...";
 };
 
+// Helper function to translate validation errors
+const translateValidationError = (error: string): string => {
+  if (typeof error !== 'string') return error;
+  
+  if (error.includes("City location is required") || 
+      error.includes("Please provide city_id or city_name")) {
+    return "المدينة مطلوبة. يرجى اختيار المدينة.";
+  }
+  
+  return error;
+};
+
+// Helper function to translate validation errors array
+const translateValidationErrors = (errors: string[]): string[] => {
+  if (!Array.isArray(errors)) return [];
+  return errors.map(translateValidationError);
+};
+
 // Helper function to extract city and district/neighborhood from property
 function formatAddress(property: any): string {
   const city = property?.city?.name_ar || property?.city?.name || property?.city_name || property?.city;
@@ -364,7 +382,7 @@ function PropertyCard({
               property.featured_image ||
               "/placeholder.svg"
             }
-            alt={property.title || property.contents[0].title}
+            alt={property.title || property.contents?.[0]?.title || "Property"}
             className="h-full w-full object-cover transition-all hover:scale-105"
           />
         </div>
@@ -381,9 +399,13 @@ function PropertyCard({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle
-              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents?.[0]?.title || "Untitled").length > 20 ? "text-sm " : ""}`}
+              className={`line-clamp-2 max-w-[300px] font-semibold ${(property.title || property.contents?.[0]?.title || "").length > 20 ? "text-sm " : ""}`}
             >
-              {truncateTitle(property.title || property.contents?.[0]?.title || "Untitled")}
+              {property.title || property.contents?.[0]?.title ? (
+                truncateTitle(property.title || property.contents?.[0]?.title)
+              ) : (
+                <span className="text-sm text-muted-foreground font-normal">لا يوجد عنوان للعقار</span>
+              )}
             </CardTitle>
             <CardDescription className="text-sm text-muted-foreground flex items-center gap-1">
               <MapPin className="h-3 w-3" />
@@ -606,7 +628,7 @@ function PropertyListItem({
                 property.featured_image ||
                 "/placeholder.svg"
               }
-              alt={property.title || property.contents[0].title}
+              alt={property.title || property.contents?.[0]?.title || "Property"}
               className="h-full w-full object-cover"
             />
           </div>
@@ -640,7 +662,11 @@ function PropertyListItem({
             </div>
             <div className="text-right">
               <h3 className="font-semibold">
-                {property.title || property.contents?.[0]?.title || "Untitled"}
+                {property.title || property.contents?.[0]?.title ? (
+                  property.title || property.contents?.[0]?.title
+                ) : (
+                  <span className="text-sm text-muted-foreground font-normal">لا يوجد عنوان للعقار</span>
+                )}
               </h3>
               <p className="text-sm text-muted-foreground flex  items-center gap-1">
                 <MapPin className="h-3 w-3" />{" "}
@@ -888,7 +914,7 @@ export function IncompletePropertiesManagementPage() {
           lastUpdated: new Date(draft.created_at).toLocaleDateString("ar-AE"),
           features: Array.isArray(draft.features) ? draft.features : [],
           missing_fields_ar: draft.missing_fields_ar || [],
-          validation_errors: draft.validation_errors || [],
+          validation_errors: translateValidationErrors(draft.validation_errors || []),
         };
       });
 
@@ -974,7 +1000,7 @@ export function IncompletePropertiesManagementPage() {
 
     try {
       const duplicateData = {
-        title: property.title || property.contents[0].title,
+        title: property.title || property.contents?.[0]?.title || "لا يوجد عنوان للعقار",
         price: property.price,
       };
 
@@ -1187,7 +1213,7 @@ export function IncompletePropertiesManagementPage() {
               lastUpdated: new Date(draft.created_at).toLocaleDateString("ar-AE"),
               features: Array.isArray(draft.features) ? draft.features : [],
               missing_fields_ar: draft.missing_fields_ar || [],
-              validation_errors: draft.validation_errors || [],
+              validation_errors: translateValidationErrors(draft.validation_errors || []),
             };
           });
 

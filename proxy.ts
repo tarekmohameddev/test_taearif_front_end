@@ -6,6 +6,15 @@ const defaultLocale = "en";
 // Default locale for live-editor pages
 const liveEditorDefaultLocale = "ar";
 
+// Cache environment variables to avoid repeated access
+const PRODUCTION_DOMAIN =
+  process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+const LOCAL_DOMAIN = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
+const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
+
+// Cache regex patterns
+const CUSTOM_DOMAIN_REGEX = /\.([a-z]{2,})$/i;
+
 function getLocale(pathname: string) {
   const segments = pathname.split("/");
   const firstSegment = segments[1];
@@ -28,126 +37,100 @@ function removeLocaleFromPathname(pathname: string) {
   return pathname;
 }
 
+// Optimized: Extract both locale and pathname without locale in one pass
+function extractLocaleAndPathname(pathname: string): {
+  locale: string;
+  pathnameWithoutLocale: string;
+} {
+  const segments = pathname.split("/");
+  const firstSegment = segments[1];
+
+  if (locales.includes(firstSegment)) {
+    return {
+      locale: firstSegment,
+      pathnameWithoutLocale: "/" + segments.slice(2).join("/"),
+    };
+  }
+
+  return {
+    locale: defaultLocale,
+    pathnameWithoutLocale: pathname,
+  };
+}
+
 // دالة للتحقق من Custom Domain (بدون API call للسرعة)
 function getTenantIdFromCustomDomain(host: string): string | null {
-  const productionDomain =
-    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
-  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
-  const isDevelopment = process.env.NODE_ENV === "development";
-
   // التحقق من أن المستخدم على الدومين الأساسي
-  const isOnBaseDomain = isDevelopment
-    ? host === localDomain || host === `${localDomain}:3000`
-    : host === productionDomain || host === `www.${productionDomain}`;
+  const isOnBaseDomain = IS_DEVELOPMENT
+    ? host === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
+    : host === PRODUCTION_DOMAIN || host === `www.${PRODUCTION_DOMAIN}`;
 
   // إذا كان الدومين الأساسي، لا نعتبره custom domain
   if (isOnBaseDomain) {
-    console.log("🔍 Proxy: Host is base domain, not custom domain:", host);
     return null;
   }
 
   // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
-  const isCustomDomain = /\.([a-z]{2,})$/i.test(host);
+  const isCustomDomain = CUSTOM_DOMAIN_REGEX.test(host);
 
   if (!isCustomDomain) {
-    console.log("🔍 Proxy: Host is not a custom domain:", host);
     return null;
   }
 
   // إرجاع الـ host نفسه كـ tenantId للـ Custom Domain (بدون API call)
-  console.log("✅ Proxy: Custom domain detected:", host);
   return host;
 }
 
+// Cache reserved words as Set for O(1) lookup instead of O(n) array.includes()
+const RESERVED_WORDS = new Set([
+  "www",
+  "api",
+  "admin",
+  "app",
+  "mail",
+  "ftp",
+  "blog",
+  "shop",
+  "store",
+  "dashboard",
+  "live-editor",
+  "auth",
+  "login",
+  "register",
+]);
+
 function getTenantIdFromHost(host: string): string | null {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  const productionDomain =
-    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
-  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
-  const isDevelopment = process.env.NODE_ENV === "development";
-
-  // Extract domain from API URL for local development
-  const apiHostname = new URL(apiUrl).hostname;
-
-  // قائمة بالكلمات المحجوزة التي لا يجب أن تكون tenantId
-  const reservedWords = [
-    "www",
-    "api",
-    "admin",
-    "app",
-    "mail",
-    "ftp",
-    "blog",
-    "shop",
-    "store",
-    "dashboard",
-    "live-editor",
-    "auth",
-    "login",
-    "register",
-  ];
-
-  console.log("🔍 Proxy: Checking host:", host);
-  console.log("🔍 Proxy: Local domain:", localDomain);
-  console.log("🔍 Proxy: Production domain:", productionDomain);
-  console.log("🔍 Proxy: Is development:", isDevelopment);
-  console.log("🔍 Proxy: NODE_ENV:", process.env.NODE_ENV);
-
   // For localhost development: tenant1.localhost:3000 -> tenant1
-  if (isDevelopment && host.includes(localDomain)) {
+  if (IS_DEVELOPMENT && host.includes(LOCAL_DOMAIN)) {
     const parts = host.split(".");
-    if (parts.length > 1 && parts[0] !== localDomain) {
-      const potentialTenantId = parts[0];
-      console.log("🔍 Proxy: Potential tenant ID (local):", potentialTenantId);
+    if (parts.length > 1 && parts[0] !== LOCAL_DOMAIN) {
+      const potentialTenantId = parts[0].toLowerCase();
 
-      // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
-      if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
-        console.log("✅ Proxy: Valid tenant ID (local):", potentialTenantId);
-        return potentialTenantId;
-      } else {
-        console.log("❌ Proxy: Reserved word (local):", potentialTenantId);
+      // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة (Set lookup is O(1))
+      if (!RESERVED_WORDS.has(potentialTenantId)) {
+        return parts[0]; // Return original case
       }
     }
   }
 
   // For production: tenant1.taearif.com -> tenant1
   // التحقق من أن الـ subdomain صحيح (يجب أن يكون لـ productionDomain فقط)
-  if (!isDevelopment && host.includes(productionDomain)) {
+  if (!IS_DEVELOPMENT && host.includes(PRODUCTION_DOMAIN)) {
     const parts = host.split(".");
     if (parts.length > 2) {
-      const potentialTenantId = parts[0];
+      const potentialTenantId = parts[0].toLowerCase();
       const domainPart = parts.slice(1).join(".");
 
       // التحقق من أن الـ domain هو productionDomain بالضبط
-      if (domainPart === productionDomain) {
-        console.log(
-          "🔍 Proxy: Potential tenant ID (production):",
-          potentialTenantId,
-        );
-
-        // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة
-        if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
-          console.log(
-            "✅ Proxy: Valid tenant ID (production):",
-            potentialTenantId,
-          );
-          return potentialTenantId;
-        } else {
-          console.log(
-            "❌ Proxy: Reserved word (production):",
-            potentialTenantId,
-          );
+      if (domainPart === PRODUCTION_DOMAIN) {
+        // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة (Set lookup is O(1))
+        if (!RESERVED_WORDS.has(potentialTenantId)) {
+          return parts[0]; // Return original case
         }
-      } else {
-        console.log(
-          "❌ Proxy: Invalid subdomain - not for production domain:",
-          domainPart,
-        );
       }
     }
   }
 
-  console.log("❌ Proxy: No valid tenant ID found");
   return null;
 }
 
@@ -155,62 +138,8 @@ export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const host = request.headers.get("host") || "";
 
-  // DEBUG: Log all requests
-  console.log("🔍 Proxy Debug - Request:", {
-    pathname,
-    host,
-    url: request.url,
-  });
-
-  // قائمة الصفحات التي يجب أن تكون على الدومين الأساسي فقط
-  const systemPages = [
-    "/dashboard",
-    "/live-editor",
-    "/login",
-    "/oauth",
-    "/onboarding",
-    "/register",
-    "/updates",
-    "/solutions",
-    "/landing",
-    "/about-us",
-  ];
-
-  // التحقق من أن الصفحات النظامية على الدومين الأساسي
-  const isSystemPage = systemPages.some((page) => pathname.startsWith(page));
-  const productionDomain =
-    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
-  const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
-  const isDevelopment = process.env.NODE_ENV === "development";
-
-  // التحقق من أن الصفحة على الدومين الأساسي
-  const isOnBaseDomain = isDevelopment
-    ? host === localDomain || host === `${localDomain}:3000`
-    : host === productionDomain || host === `www.${productionDomain}`;
-
-  // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
-  // لكن ليس الدومين الأساسي
-  const hasCustomDomainExtension = /\.([a-z]{2,})$/i.test(host);
-  const isCustomDomain = hasCustomDomainExtension && !isOnBaseDomain;
-
-  // إذا كان custom domain، اعتبر جميع الصفحات (بما في ذلك النظامية) كصفحات tenant
-  if (isCustomDomain) {
-    console.log(
-      "🔍 Proxy: Custom domain detected, treating all pages (including system pages) as tenant-specific:",
-      host,
-    );
-    // لا نحتاج لإعادة توجيه، فقط نمرر للخطوة التالية
-  }
-
-  // Extract tenantId from subdomain or custom domain
-  let tenantId = getTenantIdFromHost(host);
-
-  // إذا لم يتم العثور على tenantId من subdomain، تحقق من Custom Domain
-  if (!tenantId) {
-    tenantId = getTenantIdFromCustomDomain(host);
-  }
-
-  // Skip proxy for API routes, static files, and Next.js internals
+  // Skip proxy early for API routes, static files, and Next.js internals
+  // This check should be first to avoid unnecessary processing
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
@@ -222,8 +151,23 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // تحسين الأداء للمكونات الثابتة - إضافة cache headers
-  let response = NextResponse.next();
+  // التحقق من أن الصفحة على الدومين الأساسي
+  const isOnBaseDomain = IS_DEVELOPMENT
+    ? host === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
+    : host === PRODUCTION_DOMAIN || host === `www.${PRODUCTION_DOMAIN}`;
+
+  // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
+  // لكن ليس الدومين الأساسي
+  const hasCustomDomainExtension = CUSTOM_DOMAIN_REGEX.test(host);
+  const isCustomDomain = hasCustomDomainExtension && !isOnBaseDomain;
+
+  // Extract tenantId from subdomain or custom domain
+  let tenantId = getTenantIdFromHost(host);
+
+  // إذا لم يتم العثور على tenantId من subdomain، تحقق من Custom Domain
+  if (!tenantId) {
+    tenantId = getTenantIdFromCustomDomain(host);
+  }
 
   // إضافة cache headers للمكونات الثابتة (عندما لا يوجد tenantId)
   if (
@@ -299,62 +243,27 @@ export function proxy(request: NextRequest) {
 
   // No special handling needed for /en/live-editor - let it stay in English
 
-  // Check if pathname starts with a locale
-  const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
-  );
-
-  console.log("🔍 Proxy Debug - Locale Check:", {
-    pathname,
-    pathnameHasLocale,
-    tenantId,
-    host,
-  });
+  // Check if pathname starts with a locale (optimized check)
+  const firstPathSegment = pathname.split("/")[1];
+  const pathnameHasLocale = locales.includes(firstPathSegment);
 
   // If no locale in pathname, redirect to appropriate default locale
   if (!pathnameHasLocale) {
     // Use Arabic as default for all pages
     const locale = "ar";
 
-    // Redirect for all pages that don't have locale (including homepage, solutions, etc.)
-    const shouldRedirect = true;
-
-    console.log("🔍 Proxy Debug - Redirect Decision:", {
-      pathname,
-      locale,
-      tenantId,
-      shouldRedirect,
-      reason: "All pages without locale should redirect to add locale",
-    });
-
-    if (shouldRedirect) {
-      // Preserve query parameters during locale redirect
-      const searchParams = request.nextUrl.search; // Get ?key=value
-      const newUrl = new URL(
-        `/${locale}${pathname}${searchParams}`,
-        request.url,
-      );
-      console.log("🔄 Proxy Debug - Redirecting:", {
-        from: request.url,
-        to: newUrl.toString(),
-        preservedParams: searchParams,
-      });
-      return NextResponse.redirect(newUrl);
-    }
+    // Preserve query parameters during locale redirect
+    const searchParams = request.nextUrl.search;
+    const newUrl = new URL(
+      `/${locale}${pathname}${searchParams}`,
+      request.url,
+    );
+    return NextResponse.redirect(newUrl);
   }
 
-  // Extract locale and remove it from pathname for routing
-  const locale = getLocale(pathname);
-  const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
-
-  // 🔍 Debug logging for rewrite process
-  console.log("🔍 Proxy - Rewrite Debug:", {
-    originalPathname: pathname,
-    locale,
-    pathnameWithoutLocale,
-    tenantId,
-    host,
-  });
+  // Extract locale and remove it from pathname for routing (optimized single pass)
+  const { locale, pathnameWithoutLocale } =
+    extractLocaleAndPathname(pathname);
 
   // Special case: if pathname is just /locale (e.g., /en), rewrite to homepage
   if (pathname === `/${locale}`) {
@@ -382,32 +291,16 @@ export function proxy(request: NextRequest) {
     const ownerToken = request.cookies.get("owner_token")?.value;
 
     if (!ownerToken) {
-      console.log("🔒 Proxy: No owner token found, redirecting to login");
       const loginUrl = new URL(`/${locale}/owner/login`, request.url);
       return NextResponse.redirect(loginUrl);
     }
   }
 
-  // Rewrite the URL to remove the locale prefix
+  // Create response with rewrite (only create once)
   const url = request.nextUrl.clone();
   url.pathname = pathnameWithoutLocale;
 
-  console.log("🔍 Proxy - Before Rewrite:", {
-    originalUrl: request.url,
-    rewriteUrl: url.toString(),
-    pathnameWithoutLocale,
-  });
-
-  response = NextResponse.rewrite(url);
-
-  console.log("🔍 Proxy - After Rewrite:", {
-    responseUrl: response.url,
-    headers: {
-      "x-locale": response.headers.get("x-locale"),
-      "x-pathname": response.headers.get("x-pathname"),
-      "x-tenant-id": response.headers.get("x-tenant-id"),
-    },
-  });
+  const response = NextResponse.rewrite(url);
 
   // Set locale headers
   response.headers.set("x-locale", locale);
@@ -416,16 +309,27 @@ export function proxy(request: NextRequest) {
 
   // Set tenantId header if found
   if (tenantId) {
-    console.log("✅ Proxy: Setting tenant ID header:", tenantId);
     response.headers.set("x-tenant-id", tenantId);
 
     // تحديد نوع الـ domain
     const domainType = isCustomDomain ? "custom" : "subdomain";
     response.headers.set("x-domain-type", domainType);
+  }
 
-    console.log("✅ Proxy: Domain type:", domainType);
-  } else {
-    console.log("❌ Proxy: No tenant ID found for host:", host);
+  // إضافة cache headers للمكونات الثابتة (عندما لا يوجد tenantId)
+  if (
+    !tenantId &&
+    (pathnameWithoutLocale === "/" ||
+      pathnameWithoutLocale === "/solutions" ||
+      pathnameWithoutLocale === "/updates" ||
+      pathnameWithoutLocale === "/landing" ||
+      pathnameWithoutLocale === "/about-us")
+  ) {
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable",
+    );
+    response.headers.set("X-Component-Type", "taearif-static");
   }
 
   return response;

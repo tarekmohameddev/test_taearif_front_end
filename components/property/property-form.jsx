@@ -1368,10 +1368,17 @@ export default function PropertyForm({ mode, isDraft = false }) {
         router.push("/dashboard/properties");
       }
     } catch (error) {
-      const errorMessage =
+      let errorMessage =
         error.response?.data?.message ||
         error.message ||
         "حدث خطأ أثناء إكمال المسودة";
+      
+      // Replace English error message for incomplete properties
+      if (errorMessage.includes("City location is required") || 
+          errorMessage.includes("Please provide city_id or city_name")) {
+        errorMessage = "المدينة مطلوبة. يرجى اختيار المدينة.";
+      }
+      
       setSubmitError(errorMessage);
       toast.error(errorMessage);
       
@@ -1380,11 +1387,42 @@ export default function PropertyForm({ mode, isDraft = false }) {
         const validationErrors = error.response.data.errors;
         const newErrors = {};
         Object.keys(validationErrors).forEach((key) => {
-          newErrors[key] = Array.isArray(validationErrors[key])
+          let errorText = Array.isArray(validationErrors[key])
             ? validationErrors[key][0]
             : validationErrors[key];
+          
+          // Replace English error message for city
+          if (typeof errorText === 'string' && 
+              (errorText.includes("City location is required") || 
+               errorText.includes("Please provide city_id or city_name"))) {
+            errorText = "المدينة مطلوبة. يرجى اختيار المدينة.";
+          }
+          
+          newErrors[key] = errorText;
         });
         setErrors(newErrors);
+      }
+      
+      // Handle conflicts/messages array
+      if (error.response?.data?.conflicts) {
+        const conflicts = error.response.data.conflicts;
+        const translatedConflicts = conflicts.map((conflict) => {
+          let conflictMessage = conflict.message;
+          if (conflictMessage && 
+              (conflictMessage.includes("City location is required") || 
+               conflictMessage.includes("Please provide city_id or city_name"))) {
+            conflictMessage = "المدينة مطلوبة. يرجى اختيار المدينة.";
+          }
+          return { ...conflict, message: conflictMessage };
+        });
+        
+        // Update validationErrors with translated messages
+        const translatedValidationErrors = translatedConflicts
+          .map(conflict => conflict.message)
+          .filter(msg => msg);
+        if (translatedValidationErrors.length > 0) {
+          setValidationErrors(translatedValidationErrors);
+        }
       }
     } finally {
       setIsCompletingDraft(false);

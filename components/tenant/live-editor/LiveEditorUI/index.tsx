@@ -85,6 +85,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
   const [iframeReady, setIframeReady] = useState(false);
   const [isComponentsSidebarOpen, setIsComponentsSidebarOpen] = useState(false);
+  const [isTabsContentOpen, setIsTabsContentOpen] = useState(false);
   const [
     wasComponentsSidebarManuallyClosed,
     setWasComponentsSidebarManuallyClosed,
@@ -332,7 +333,9 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       <div className="flex min-h-screen bg-gray-50">
         {/* Components Sidebar */}
         <AnimatePresence>
-          {isComponentsSidebarOpen && <ComponentsSidebar />}
+          {isComponentsSidebarOpen && (
+            <ComponentsSidebar onTabsContentOpenChange={setIsTabsContentOpen} />
+          )}
         </AnimatePresence>
 
         {/* Main Content Area */}
@@ -340,7 +343,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
           className="flex-1 flex flex-col"
           animate={{
             marginRight: sidebarOpen ? sidebarWidth : 0,
-            marginLeft: isComponentsSidebarOpen ? 350 : 0,
+            marginLeft: isComponentsSidebarOpen ? (isTabsContentOpen ? 350 : 52) : 0,
           }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >

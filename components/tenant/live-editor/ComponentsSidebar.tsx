@@ -857,8 +857,135 @@ const SettingsView = ({ t }: { t: any }) => {
   );
 };
 
-export const ComponentsSidebar = () => {
+// Tabs Column Component (15%)
+type TabsColumnProps = {
+  activeMainTab: MainTab;
+  setActiveMainTab: (tab: MainTab) => void;
+  onTabClick: (tab: MainTab) => void;
+  t: any;
+};
+
+const TabsColumn = ({ activeMainTab, setActiveMainTab, onTabClick, t }: TabsColumnProps) => {
+  const handleTabClick = (tab: MainTab) => {
+    setActiveMainTab(tab);
+    onTabClick(tab);
+  };
+
+  return (
+    <div className="w-[15%] border-r border-slate-200/60 bg-slate-50/50 flex flex-col py-2 gap-2 px-1">
+      <button
+        onClick={() => handleTabClick("components")}
+        className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border ${
+          activeMainTab === "components"
+            ? "bg-blue-200 text-blue-700 border-blue-200"
+            : "text-slate-600 hover:bg-slate-50 border-transparent"
+        }`}
+      >
+        <LayoutGrid className="w-4 h-4" />
+        <span className={`text-xs leading-tight${activeMainTab === "components" ? " font-semibold" : ""}`}>
+          {t("live_editor.components_tab")}
+        </span>
+      </button>
+      <button
+        onClick={() => handleTabClick("branding")}
+        className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border ${
+          activeMainTab === "branding"
+            ? "bg-blue-200 text-blue-700 border-blue-200"
+            : "text-slate-600 hover:bg-slate-50 border-transparent"
+        }`}
+      >
+        <Palette className="w-4 h-4" />
+        <span className={`text-xs leading-tight${activeMainTab === "branding" ? " font-semibold" : ""}`}>
+          {t("live_editor.colors_tab")}
+        </span>
+      </button>
+    </div>
+  );
+};
+
+// Tabs Content Area Component (85%)
+type TabsContentAreaProps = {
+  activeMainTab: MainTab;
+  setActiveMainTab: (tab: MainTab) => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  activeThemeTab: ThemeTab;
+  setActiveThemeTab: (tab: ThemeTab) => void;
+  isBasicComponentsDropdownOpen: boolean;
+  setIsBasicComponentsDropdownOpen: (open: boolean) => void;
+  t: any;
+  direction: "rtl" | "ltr";
+  isOpen: boolean;
+};
+
+const TabsContentArea = ({
+  activeMainTab,
+  setActiveMainTab,
+  searchTerm,
+  setSearchTerm,
+  activeThemeTab,
+  setActiveThemeTab,
+  isBasicComponentsDropdownOpen,
+  setIsBasicComponentsDropdownOpen,
+  t,
+  direction,
+  isOpen,
+}: TabsContentAreaProps) => {
+  return (
+    <AnimatePresence initial={false}>
+      {isOpen && (
+        <motion.div
+          key="tabs-content"
+          variants={collapseVariants}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+          className="w-[85%] overflow-hidden"
+        >
+          <Tabs
+            value={activeMainTab}
+            onValueChange={(value) => setActiveMainTab(value as MainTab)}
+            className="h-full flex flex-col"
+          >
+            <TabsContent
+              value="components"
+              className="flex-1 overflow-hidden mt-0 p-4"
+            >
+              <div dir={direction}>
+                <ComponentsListView
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  activeTab={activeThemeTab}
+                  setActiveTab={setActiveThemeTab}
+                  isBasicComponentsDropdownOpen={isBasicComponentsDropdownOpen}
+                  setIsBasicComponentsDropdownOpen={setIsBasicComponentsDropdownOpen}
+                  t={t}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent
+              value="branding"
+              className="flex-1 overflow-y-auto mt-0 p-2"
+            >
+              <div dir={direction}>
+                <CompactBrandingSettings />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+type ComponentsSidebarProps = {
+  onTabsContentOpenChange?: (isOpen: boolean) => void;
+};
+
+export const ComponentsSidebar = ({ onTabsContentOpenChange }: ComponentsSidebarProps = {}) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isTabsContentOpen, setIsTabsContentOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] =
     useState(true);
@@ -868,14 +995,32 @@ export const ComponentsSidebar = () => {
   const { locale } = useEditorLocale();
   const direction = locale === "ar" ? "rtl" : "ltr";
 
+  const handleTabClick = (tab: MainTab) => {
+    // إذا كان نفس الـ tab وكان مفتوح، أغلق الـ TabsContentArea
+    if (tab === activeMainTab && isTabsContentOpen) {
+      setIsTabsContentOpen(false);
+      onTabsContentOpenChange?.(false);
+    } else {
+      // غير الـ tab وافتح الـ TabsContentArea
+      setActiveMainTab(tab);
+      setIsTabsContentOpen(true);
+      onTabsContentOpenChange?.(true);
+    }
+  };
+
   return (
     <motion.div
       key="components-sidebar"
       variants={slideInFromLeft}
       initial="hidden"
-      animate="show"
+      animate={{
+        x: 0,
+        opacity: 1,
+        width: isTabsContentOpen ? 350 : 60,
+      }}
       exit="exit"
-      className="fixed left-0 top-15 h-full w-[350px] bg-gradient-to-br from-slate-50 via-white to-slate-50 border-r border-slate-200/60 flex flex-col z-30 pb-20"
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="fixed left-0 top-15 h-full bg-gradient-to-br from-slate-50 via-white to-slate-50 border-r border-slate-200/60 flex flex-col z-30 pb-20 overflow-hidden"
     >
       {/* Main Content Area - Split into 2 columns */}
       <AnimatePresence initial={false} mode="wait">
@@ -890,65 +1035,27 @@ export const ComponentsSidebar = () => {
             layout
           >
             {/* Tabs Column - 15% */}
-            <div className="w-[15%] border-r border-slate-200/60 bg-slate-50/50 flex flex-col py-2 gap-2 px-1">
-              <button
-                onClick={() => setActiveMainTab("components")}
-                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border ${
-                  activeMainTab === "components"
-                    ? "bg-blue-200 text-blue-700 border-blue-200"
-                    : "text-slate-600 hover:bg-slate-50 border-transparent"
-                }`}
-              >
-                <LayoutGrid className="w-4 h-4" />
-                <span className={`text-xs leading-tight${activeMainTab === "components" ? " font-semibold" : ""}`}>{t("live_editor.components_tab")}</span>
-              </button>
-              <button
-                onClick={() => setActiveMainTab("branding")}
-                className={`w-12 h-12 flex flex-col items-center justify-center gap-1 rounded-lg transition-all border ${
-                  activeMainTab === "branding"
-                    ? "bg-blue-200 text-blue-700 border-blue-200"
-                    : "text-slate-600 hover:bg-slate-50 border-transparent"
-                }`}
-              >
-                <Palette className="w-4 h-4" />
-                <span className={`text-xs leading-tight${activeMainTab === "branding" ? " font-semibold" : ""}`}>{t("live_editor.colors_tab")}</span>
-              </button>
-            </div>
+            <TabsColumn
+              activeMainTab={activeMainTab}
+              setActiveMainTab={setActiveMainTab}
+              onTabClick={handleTabClick}
+              t={t}
+            />
 
             {/* Content Column - 85% */}
-            <div className="w-[85%] overflow-hidden">
-              <Tabs
-                value={activeMainTab}
-                onValueChange={(value) => setActiveMainTab(value as MainTab)}
-                className="h-full flex flex-col"
-              >
-                <TabsContent
-                  value="components"
-                  className="flex-1 overflow-hidden mt-0 p-4"
-                >
-                  <div dir={direction}>
-                    <ComponentsListView
-                      searchTerm={searchTerm}
-                      setSearchTerm={setSearchTerm}
-                      activeTab={activeThemeTab}
-                      setActiveTab={setActiveThemeTab}
-                      isBasicComponentsDropdownOpen={isBasicComponentsDropdownOpen}
-                      setIsBasicComponentsDropdownOpen={setIsBasicComponentsDropdownOpen}
-                      t={t}
-                    />
-                  </div>
-                </TabsContent>
-
-                <TabsContent
-                  value="branding"
-                  className="flex-1 overflow-y-auto mt-0 p-2"
-                >
-                  <div dir={direction}>
-                    <CompactBrandingSettings />
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
+            <TabsContentArea
+              activeMainTab={activeMainTab}
+              setActiveMainTab={setActiveMainTab}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              activeThemeTab={activeThemeTab}
+              setActiveThemeTab={setActiveThemeTab}
+              isBasicComponentsDropdownOpen={isBasicComponentsDropdownOpen}
+              setIsBasicComponentsDropdownOpen={setIsBasicComponentsDropdownOpen}
+              t={t}
+              direction={direction}
+              isOpen={isTabsContentOpen}
+            />
           </motion.div>
         )}
       </AnimatePresence>
