@@ -3191,8 +3191,8 @@ function PropertyListItem({
       className="cursor-pointer hover:shadow-lg transition-shadow"
       onClick={handleCardClick}
     >
-      <div className="flex flex-col sm:flex-row-reverse">
-        <div className="relative w-full sm:w-64 h-48 sm:h-48 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row-reverse h-64">
+        <div className="relative w-full sm:w-64 flex-shrink-0 h-full">
           <div className="w-full h-full overflow-hidden">
             <img
               src={
