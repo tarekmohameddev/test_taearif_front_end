@@ -38,8 +38,8 @@ export const PropertyStatisticsCards = () => {
 
         if (data && typeof data === "object") {
           setStatistics({
-            for_sale: data.for_sale || 0,
-            for_rent: data.for_rent || 0,
+            for_sale: data.complete?.for_sale || 0,
+            for_rent: data.complete?.for_rent || 0,
             total: data.total || 0,
           });
         } else {
