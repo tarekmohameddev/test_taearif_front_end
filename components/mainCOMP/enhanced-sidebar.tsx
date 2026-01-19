@@ -334,7 +334,7 @@ export function EnhancedSidebar({
                   <div className="space-y-1 pr-8 pl-4 pt-1">
                     <StaticLink
                       href="/dashboard/properties"
-                      title="نظره عامه عن العقارات"
+                      title="الوحدات"
                       icon={<FileText className="h-4 w-4 text-muted-foreground" />}
                     />
                     <StaticLink
@@ -403,16 +403,6 @@ export function EnhancedSidebar({
                       href="/dashboard/settings"
                       title="إعدادات الموقع"
                       icon={<Settings className="h-4 w-4 text-muted-foreground" />}
-                    />
-                    <StaticLink
-                      href="/dashboard/content"
-                      title="محرر الموقع"
-                      icon={<FileText className="h-4 w-4 text-muted-foreground" />}
-                    />
-                    <StaticLink
-                      href="/dashboard/templates"
-                      title="القوالب"
-                      icon={<LayoutTemplate className="h-4 w-4 text-muted-foreground" />}
                     />
                     <StaticLink
                       href="/live-editor"
