@@ -146,10 +146,10 @@ export default function HeroSkeleton1() {
               {/* Purpose Toggle Skeleton with Enhanced Shimmer */}
               <div className="flex justify-center">
                 <div className="inline-flex overflow-hidden rounded-xl border bg-gray-50 p-1 gap-1">
-                  <div className="h-8 w-16 bg-emerald-200 rounded-lg animate-pulse relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/70 to-transparent animate-shimmer"></div>
+                  <div className="h-8 w-16 bg-gray-200 rounded-lg animate-pulse relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/70 to-transparent animate-shimmer"></div>
                     <div
-                      className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-300/40 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/40 to-transparent animate-shimmer"
                       style={{ animationDelay: "1s" }}
                     ></div>
                   </div>
@@ -208,13 +208,13 @@ export default function HeroSkeleton1() {
                     style={{ animationDelay: "1.4s" }}
                   ></div>
                 </div>
-                <div className="h-12 bg-emerald-200 rounded-lg animate-pulse relative overflow-hidden">
+                <div className="h-12 bg-gray-200 rounded-lg animate-pulse relative overflow-hidden">
                   <div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/70 to-transparent animate-shimmer"
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/70 to-transparent animate-shimmer"
                     style={{ animationDelay: "0.5s" }}
                   ></div>
                   <div
-                    className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-300/40 to-transparent animate-shimmer"
+                    className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/40 to-transparent animate-shimmer"
                     style={{ animationDelay: "1.5s" }}
                   ></div>
                 </div>
@@ -232,7 +232,7 @@ export default function HeroSkeleton1() {
             {/* Purpose Toggle */}
             <div className="flex items-center">
               <div className="inline-flex overflow-hidden rounded-xl border bg-gray-100 p-1">
-                <div className="h-10 w-20 bg-emerald-200 rounded-lg animate-pulse"></div>
+                <div className="h-10 w-20 bg-gray-200 rounded-lg animate-pulse"></div>
                 <div className="h-10 w-20 bg-gray-200 rounded-lg animate-pulse"></div>
               </div>
             </div>
@@ -242,7 +242,7 @@ export default function HeroSkeleton1() {
             <div className="h-12 flex-1 bg-gray-200 rounded-lg animate-pulse"></div>
             <div className="h-12 flex-1 bg-gray-200 rounded-lg animate-pulse"></div>
             <div className="h-12 flex-1 bg-gray-200 rounded-lg animate-pulse"></div>
-            <div className="h-12 w-32 bg-emerald-200 rounded-lg animate-pulse"></div>
+            <div className="h-12 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
           </div>
 
           {/* Desktop Medium: Two rows */}
@@ -250,7 +250,7 @@ export default function HeroSkeleton1() {
             {/* First Row */}
             <div className="flex items-center gap-2">
               <div className="inline-flex overflow-hidden rounded-xl border bg-gray-100 p-1">
-                <div className="h-10 w-20 bg-emerald-200 rounded-lg animate-pulse"></div>
+                <div className="h-10 w-20 bg-gray-200 rounded-lg animate-pulse"></div>
                 <div className="h-10 w-20 bg-gray-200 rounded-lg animate-pulse"></div>
               </div>
               <div className="h-12 flex-1 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -261,7 +261,7 @@ export default function HeroSkeleton1() {
             <div className="flex items-center gap-2">
               <div className="h-12 flex-1 bg-gray-200 rounded-lg animate-pulse"></div>
               <div className="h-12 flex-1 bg-gray-200 rounded-lg animate-pulse"></div>
-              <div className="h-12 w-32 bg-emerald-200 rounded-lg animate-pulse"></div>
+              <div className="h-12 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
             </div>
           </div>
 
@@ -270,7 +270,7 @@ export default function HeroSkeleton1() {
             {/* Purpose Toggle */}
             <div className="flex justify-center">
               <div className="inline-flex overflow-hidden rounded-xl border bg-gray-100 p-1">
-                <div className="h-10 w-20 bg-emerald-200 rounded-lg animate-pulse"></div>
+                <div className="h-10 w-20 bg-gray-200 rounded-lg animate-pulse"></div>
                 <div className="h-10 w-20 bg-gray-200 rounded-lg animate-pulse"></div>
               </div>
             </div>
@@ -281,7 +281,7 @@ export default function HeroSkeleton1() {
               <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
               <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
               <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-              <div className="h-12 bg-emerald-200 rounded-lg animate-pulse"></div>
+              <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
             </div>
           </div>
         </div>

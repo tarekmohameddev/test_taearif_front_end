@@ -64,23 +64,23 @@ export default function WhyChooseUsSkeleton1() {
 // Individual Feature Card Skeleton Component
 function FeatureCardSkeleton({ delay = 0 }: { delay?: number }) {
   return (
-    <article className="rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-emerald-50">
+    <article className="rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-gray-50">
       {/* Icon Container Skeleton */}
       <div className="mx-auto flex size-20 items-center justify-center mb-6">
-        <div className="h-[7rem] w-[7rem] bg-emerald-50 rounded-2xl animate-pulse relative overflow-hidden">
+        <div className="h-[7rem] w-[7rem] bg-gray-50 rounded-2xl animate-pulse relative overflow-hidden">
           <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-100/60 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100/60 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 0.4}s` }}
           ></div>
           <div
-            className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-50/40 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-50/40 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 1.4}s` }}
           ></div>
 
           {/* Icon Shape Placeholder */}
-          <div className="absolute inset-4 bg-emerald-100 rounded-xl animate-pulse opacity-60">
-            <div className="absolute inset-2 bg-emerald-200 rounded-lg animate-pulse opacity-50">
-              <div className="absolute inset-1 bg-emerald-300 rounded animate-pulse opacity-40"></div>
+          <div className="absolute inset-4 bg-gray-100 rounded-xl animate-pulse opacity-60">
+            <div className="absolute inset-2 bg-gray-200 rounded-lg animate-pulse opacity-50">
+              <div className="absolute inset-1 bg-gray-300 rounded animate-pulse opacity-40"></div>
             </div>
           </div>
         </div>
@@ -88,13 +88,13 @@ function FeatureCardSkeleton({ delay = 0 }: { delay?: number }) {
 
       {/* Title Skeleton */}
       <div className="text-center mb-3">
-        <div className="h-5 md:h-6 bg-emerald-100 rounded animate-pulse w-32 mx-auto relative overflow-hidden">
+        <div className="h-5 md:h-6 bg-gray-100 rounded animate-pulse w-32 mx-auto relative overflow-hidden">
           <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 0.5}s` }}
           ></div>
           <div
-            className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 1.5}s` }}
           ></div>
         </div>

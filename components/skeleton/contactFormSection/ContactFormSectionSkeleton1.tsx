@@ -34,13 +34,13 @@ export default function ContactFormSectionSkeleton1() {
                 {/* Social Link 1 - Facebook */}
                 <div className="flex items-center gap-x-[8px]">
                   {/* Icon Skeleton */}
-                  <div className="w-6 h-6 bg-blue-200 rounded animate-pulse relative overflow-hidden">
+                  <div className="w-6 h-6 bg-gray-200 rounded animate-pulse relative overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300/60 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                       style={{ animationDelay: "0.2s" }}
                     ></div>
                     <div
-                      className="absolute inset-0 bg-gradient-to-l from-transparent via-blue-200/40 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                       style={{ animationDelay: "1.2s" }}
                     ></div>
                   </div>
@@ -86,13 +86,13 @@ export default function ContactFormSectionSkeleton1() {
                 {/* Social Link 3 - Instagram */}
                 <div className="flex items-center gap-x-[8px]">
                   {/* Icon Skeleton */}
-                  <div className="w-6 h-6 bg-pink-200 rounded animate-pulse relative overflow-hidden">
+                  <div className="w-6 h-6 bg-gray-200 rounded animate-pulse relative overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-pink-300/60 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                       style={{ animationDelay: "0.6s" }}
                     ></div>
                     <div
-                      className="absolute inset-0 bg-gradient-to-l from-transparent via-pink-200/40 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                       style={{ animationDelay: "1.6s" }}
                     ></div>
                   </div>
@@ -112,13 +112,13 @@ export default function ContactFormSectionSkeleton1() {
                 {/* Social Link 4 - LinkedIn */}
                 <div className="flex items-center gap-x-[8px]">
                   {/* Icon Skeleton */}
-                  <div className="w-6 h-6 bg-blue-300 rounded animate-pulse relative overflow-hidden">
+                  <div className="w-6 h-6 bg-gray-300 rounded animate-pulse relative overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/60 to-transparent animate-shimmer"
                       style={{ animationDelay: "0.8s" }}
                     ></div>
                     <div
-                      className="absolute inset-0 bg-gradient-to-l from-transparent via-blue-300/40 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/40 to-transparent animate-shimmer"
                       style={{ animationDelay: "1.8s" }}
                     ></div>
                   </div>
@@ -138,13 +138,13 @@ export default function ContactFormSectionSkeleton1() {
                 {/* Social Link 5 - WhatsApp */}
                 <div className="flex items-center gap-x-[8px]">
                   {/* Icon Skeleton */}
-                  <div className="w-6 h-6 bg-green-200 rounded animate-pulse relative overflow-hidden">
+                  <div className="w-6 h-6 bg-gray-200 rounded animate-pulse relative overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-green-300/60 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                       style={{ animationDelay: "1.0s" }}
                     ></div>
                     <div
-                      className="absolute inset-0 bg-gradient-to-l from-transparent via-green-200/40 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                       style={{ animationDelay: "2.0s" }}
                     ></div>
                   </div>
@@ -243,25 +243,25 @@ export default function ContactFormSectionSkeleton1() {
               </div>
 
               {/* Submit Button */}
-              <div className="bg-emerald-200 text-white rounded-[6px] w-full py-2 md:py-1 animate-pulse relative overflow-hidden">
+              <div className="bg-gray-200 text-white rounded-[6px] w-full py-2 md:py-1 animate-pulse relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.8s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "2.8s" }}
                 ></div>
 
                 {/* Button Text Skeleton */}
                 <div className="flex items-center justify-center">
-                  <div className="h-4 md:h-5 bg-emerald-300 rounded animate-pulse w-12 relative overflow-hidden">
+                  <div className="h-4 md:h-5 bg-gray-300 rounded animate-pulse w-12 relative overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/70 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/70 to-transparent animate-shimmer"
                       style={{ animationDelay: "1.9s" }}
                     ></div>
                     <div
-                      className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-300/40 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/40 to-transparent animate-shimmer"
                       style={{ animationDelay: "2.9s" }}
                     ></div>
                   </div>

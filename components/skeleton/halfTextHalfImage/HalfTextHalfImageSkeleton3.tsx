@@ -115,13 +115,13 @@ export default function HalfTextHalfImageSkeleton3() {
           </div>
 
           {/* Button Skeleton (Optional - shown as enabled) */}
-          <div className="transition-colors duration-300 flex items-center justify-center w-[119px] md:w-[148px] h-[46px] md:h-[52px] rounded-[10px] bg-emerald-200 animate-pulse relative overflow-hidden">
+          <div className="transition-colors duration-300 flex items-center justify-center w-[119px] md:w-[148px] h-[46px] md:h-[52px] rounded-[10px] bg-gray-200 animate-pulse relative overflow-hidden">
             <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
               style={{ animationDelay: "1.1s" }}
             ></div>
             <div
-              className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
               style={{ animationDelay: "2.1s" }}
             ></div>
           </div>
@@ -133,13 +133,13 @@ export default function HalfTextHalfImageSkeleton3() {
           className="w-full sm:w-[50%] mx-auto order-1 md:order-2 mb-[12px] md:mb-[0] md:flex-[.4] xl:flex-[.28] relative md:w-full h-[207px] md:h-[246px]"
         >
           {/* Background Shape Skeleton */}
-          <div className="absolute top-0 left-0 h-full overflow-hidden z-0 rounded-[5px] w-[54%] md:w-1/2 bg-emerald-600 animate-pulse">
+          <div className="absolute top-0 left-0 h-full overflow-hidden z-0 rounded-[5px] w-[54%] md:w-1/2 bg-gray-600 animate-pulse">
             <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-700/30 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-700/30 to-transparent animate-shimmer"
               style={{ animationDelay: "1.2s" }}
             ></div>
             <div
-              className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-500/20 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-500/20 to-transparent animate-shimmer"
               style={{ animationDelay: "2.2s" }}
             ></div>
           </div>

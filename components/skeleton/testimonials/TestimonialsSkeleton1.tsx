@@ -61,13 +61,13 @@ export default function TestimonialsSkeleton1() {
 
             {/* Pagination Dots Skeleton */}
             <div className="flex justify-center items-center gap-2 mt-8">
-              <div className="w-8 h-3 bg-emerald-200 rounded-md animate-pulse relative overflow-hidden">
+              <div className="w-8 h-3 bg-gray-200 rounded-md animate-pulse relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.5s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "2.5s" }}
                 ></div>
               </div>
@@ -104,13 +104,13 @@ function TestimonialCardSkeleton({ delay = 0 }: { delay?: number }) {
       {/* Card Container */}
       <div className="relative flex w-full max-w-xl flex-col rounded-2xl border bg-white p-6 shadow-sm ring-1 ring-black/5 h-[200px]">
         {/* Quote Icon Skeleton */}
-        <div className="absolute h-[27px] w-[34px] z-20 top-[-15px] left-0 flex justify-center items-center bg-emerald-100 rounded animate-pulse relative overflow-hidden">
+        <div className="absolute h-[27px] w-[34px] z-20 top-[-15px] left-0 flex justify-center items-center bg-gray-100 rounded animate-pulse relative overflow-hidden">
           <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 0.4}s` }}
           ></div>
           <div
-            className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 1.4}s` }}
           ></div>
         </div>
@@ -183,18 +183,18 @@ function TestimonialCardSkeleton({ delay = 0 }: { delay?: number }) {
               <div
                 key={star}
                 className={`w-3 h-3 rounded-sm animate-pulse relative overflow-hidden ${
-                  star <= 4 ? "bg-yellow-200" : "bg-gray-200"
+                  star <= 4 ? "bg-gray-200" : "bg-gray-200"
                 }`}
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-r from-transparent to-transparent animate-shimmer ${
-                    star <= 4 ? "via-yellow-300/60" : "via-gray-300/50"
+                    star <= 4 ? "via-gray-300/60" : "via-gray-300/50"
                   }`}
                   style={{ animationDelay: `${delay + 1.0 + star * 0.1}s` }}
                 ></div>
                 <div
                   className={`absolute inset-0 bg-gradient-to-l from-transparent to-transparent animate-shimmer ${
-                    star <= 4 ? "via-yellow-200/40" : "via-gray-200/30"
+                    star <= 4 ? "via-gray-200/40" : "via-gray-200/30"
                   }`}
                   style={{ animationDelay: `${delay + 2.0 + star * 0.1}s` }}
                 ></div>

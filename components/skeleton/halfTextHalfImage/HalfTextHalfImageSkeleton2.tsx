@@ -19,10 +19,10 @@ export default function HalfTextHalfImageSkeleton2() {
         <div className="md:col-span-5 order-2 md:order-2">
           {/* Eyebrow Text Skeleton */}
           <div className="mb-3">
-            <div className="h-6 md:h-7 bg-emerald-100 rounded animate-pulse w-48 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"></div>
+            <div className="h-6 md:h-7 bg-gray-100 rounded animate-pulse w-48 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"></div>
               <div
-                className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                 style={{ animationDelay: "1s" }}
               ></div>
             </div>
@@ -110,13 +110,13 @@ export default function HalfTextHalfImageSkeleton2() {
           <div className="grid text-center grid-cols-2 sm:grid-cols-4 gap-4 mt-10">
             {/* Stat 1: +100 عميل سعيد */}
             <div>
-              <div className="h-7 md:h-8 bg-emerald-100 rounded animate-pulse w-16 mx-auto relative overflow-hidden">
+              <div className="h-7 md:h-8 bg-gray-100 rounded animate-pulse w-16 mx-auto relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "0.9s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.9s" }}
                 ></div>
               </div>
@@ -136,13 +136,13 @@ export default function HalfTextHalfImageSkeleton2() {
 
             {/* Stat 2: +50 عقار تم بيعه */}
             <div>
-              <div className="h-7 md:h-8 bg-emerald-100 rounded animate-pulse w-12 mx-auto relative overflow-hidden">
+              <div className="h-7 md:h-8 bg-gray-100 rounded animate-pulse w-12 mx-auto relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.1s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "2.1s" }}
                 ></div>
               </div>
@@ -162,13 +162,13 @@ export default function HalfTextHalfImageSkeleton2() {
 
             {/* Stat 3: +250 عقار تم تأجيره */}
             <div>
-              <div className="h-7 md:h-8 bg-emerald-100 rounded animate-pulse w-16 mx-auto relative overflow-hidden">
+              <div className="h-7 md:h-8 bg-gray-100 rounded animate-pulse w-16 mx-auto relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.3s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "2.3s" }}
                 ></div>
               </div>
@@ -188,13 +188,13 @@ export default function HalfTextHalfImageSkeleton2() {
 
             {/* Stat 4: 40 تقييمات العملاء */}
             <div>
-              <div className="h-7 md:h-8 bg-emerald-100 rounded animate-pulse w-8 mx-auto relative overflow-hidden">
+              <div className="h-7 md:h-8 bg-gray-100 rounded animate-pulse w-8 mx-auto relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.5s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "2.5s" }}
                 ></div>
               </div>
@@ -216,14 +216,14 @@ export default function HalfTextHalfImageSkeleton2() {
 
         {/* Image Section: md:col-span-5 */}
         <div className="md:col-span-5 order-2 md:order-2">
-          <figure className="relative flex-1 pr-[15px] xl:pr-[21px] pb-[15px] xl:pb-[21px] bg-emerald-600 rounded-[10px]">
+          <figure className="relative flex-1 pr-[15px] xl:pr-[21px] pb-[15px] xl:pb-[21px] bg-gray-600 rounded-[10px]">
             {/* Background Shape Shimmer */}
             <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-700/30 to-transparent animate-shimmer rounded-[10px]"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-700/30 to-transparent animate-shimmer rounded-[10px]"
               style={{ animationDelay: "1.7s" }}
             ></div>
             <div
-              className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-500/20 to-transparent animate-shimmer rounded-[10px]"
+              className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-500/20 to-transparent animate-shimmer rounded-[10px]"
               style={{ animationDelay: "2.7s" }}
             ></div>
 

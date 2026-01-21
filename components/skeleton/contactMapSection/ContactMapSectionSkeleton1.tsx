@@ -180,18 +180,18 @@ export default function ContactMapSectionSkeleton1() {
                       <div
                         key={i}
                         className={`w-8 h-8 rounded animate-pulse relative overflow-hidden ${
-                          i < 3 ? "bg-yellow-200" : "bg-gray-200"
+                          i < 3 ? "bg-gray-200" : "bg-gray-200"
                         }`}
                       >
                         <div
                           className={`absolute inset-0 bg-gradient-to-r from-transparent ${
-                            i < 3 ? "via-yellow-300/60" : "via-gray-300/60"
+                            i < 3 ? "via-gray-300/60" : "via-gray-300/60"
                           } to-transparent animate-shimmer`}
                           style={{ animationDelay: `${1.2 + i * 0.1}s` }}
                         ></div>
                         <div
                           className={`absolute inset-0 bg-gradient-to-l from-transparent ${
-                            i < 3 ? "via-yellow-200/40" : "via-gray-200/40"
+                            i < 3 ? "via-gray-200/40" : "via-gray-200/40"
                           } to-transparent animate-shimmer`}
                           style={{ animationDelay: `${2.2 + i * 0.1}s` }}
                         ></div>
@@ -215,25 +215,25 @@ export default function ContactMapSectionSkeleton1() {
                 </div>
 
                 {/* Submit Button */}
-                <div className="w-full py-6 bg-emerald-200 rounded-xl animate-pulse relative overflow-hidden">
+                <div className="w-full py-6 bg-gray-200 rounded-xl animate-pulse relative overflow-hidden">
                   <div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                     style={{ animationDelay: "1.8s" }}
                   ></div>
                   <div
-                    className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer"
+                    className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                     style={{ animationDelay: "2.8s" }}
                   ></div>
 
                   {/* Button Text Skeleton */}
                   <div className="flex items-center justify-center">
-                    <div className="h-5 bg-emerald-300 rounded animate-pulse w-12 relative overflow-hidden">
+                    <div className="h-5 bg-gray-300 rounded animate-pulse w-12 relative overflow-hidden">
                       <div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/70 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/70 to-transparent animate-shimmer"
                         style={{ animationDelay: "1.9s" }}
                       ></div>
                       <div
-                        className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-300/40 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/40 to-transparent animate-shimmer"
                         style={{ animationDelay: "2.9s" }}
                       ></div>
                     </div>
@@ -262,13 +262,13 @@ export default function ContactMapSectionSkeleton1() {
                   {/* Map Pin/Marker */}
                   <div className="relative">
                     {/* Main Map Pin */}
-                    <div className="w-8 h-8 bg-red-200 rounded-full animate-pulse relative overflow-hidden">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse relative overflow-hidden">
                       <div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-red-300/60 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                         style={{ animationDelay: "2.1s" }}
                       ></div>
                       <div
-                        className="absolute inset-0 bg-gradient-to-l from-transparent via-red-200/40 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                         style={{ animationDelay: "3.1s" }}
                       ></div>
                     </div>
@@ -343,7 +343,7 @@ export default function ContactMapSectionSkeleton1() {
                 <div className="absolute top-4 left-4">
                   <div className="flex items-center space-x-2 bg-white/90 px-3 py-2 rounded-lg shadow-sm">
                     {/* Loading Spinner */}
-                    <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
 
                     {/* Loading Text */}
                     <div className="h-3 w-16 bg-gray-200 rounded animate-pulse relative overflow-hidden">

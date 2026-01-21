@@ -13,12 +13,12 @@ export default function CtaValuationSkeleton1() {
 
         <div className="mx-auto w-full max-w-9xl px-4 relative z-10">
           {/* المستطيل الأخضر داخل القسم - Green Rectangle Container */}
-          <div className="mx-auto max-w-7xl rounded-2xl px-6 py-10 shadow-md sm:px-10 sm:py-12 bg-emerald-200 relative overflow-hidden">
-            {/* Enhanced Emerald Background Shimmer */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-200">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/50 to-transparent animate-shimmer"></div>
+          <div className="mx-auto max-w-7xl rounded-2xl px-6 py-10 shadow-md sm:px-10 sm:py-12 bg-gray-200 relative overflow-hidden">
+            {/* Enhanced Gray Background Shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/50 to-transparent animate-shimmer"></div>
               <div
-                className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/30 to-transparent animate-shimmer"
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/30 to-transparent animate-shimmer"
                 style={{ animationDelay: "1s" }}
               ></div>
             </div>
@@ -129,13 +129,13 @@ export default function CtaValuationSkeleton1() {
                     ></div>
 
                     {/* Button Text Skeleton */}
-                    <div className="h-4 md:h-5 bg-emerald-200 rounded animate-pulse w-20 md:w-24 relative overflow-hidden">
+                    <div className="h-4 md:h-5 bg-gray-200 rounded animate-pulse w-20 md:w-24 relative overflow-hidden">
                       <div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                         style={{ animationDelay: "0.9s" }}
                       ></div>
                       <div
-                        className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                         style={{ animationDelay: "1.9s" }}
                       ></div>
                     </div>

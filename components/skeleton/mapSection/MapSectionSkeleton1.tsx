@@ -87,13 +87,13 @@ export default function MapSectionSkeleton1() {
                 {/* Map Pin/Marker Skeleton */}
                 <div className="relative">
                   {/* Main Map Pin */}
-                  <div className="w-8 h-8 bg-red-200 rounded-full animate-pulse relative overflow-hidden">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse relative overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-red-300/60 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                       style={{ animationDelay: "0.6s" }}
                     ></div>
                     <div
-                      className="absolute inset-0 bg-gradient-to-l from-transparent via-red-200/40 to-transparent animate-shimmer"
+                      className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                       style={{ animationDelay: "1.6s" }}
                     ></div>
                   </div>
@@ -168,7 +168,7 @@ export default function MapSectionSkeleton1() {
               <div className="absolute top-4 left-4">
                 <div className="flex items-center space-x-2 bg-white/90 px-3 py-2 rounded-lg shadow-sm">
                   {/* Loading Spinner */}
-                  <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
 
                   {/* Loading Text */}
                   <div className="h-3 w-16 bg-gray-200 rounded animate-pulse relative overflow-hidden">

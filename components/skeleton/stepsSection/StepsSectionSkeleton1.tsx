@@ -7,7 +7,7 @@ export default function StepsSectionSkeleton1() {
         className="mx-auto p-5 sm:p-18 px-20"
         dir="rtl"
         style={{
-          backgroundColor: "#f2fbf9", // Default background color
+          backgroundColor: "#f9fafb", // Default background color
           paddingTop: "72px",
           paddingBottom: "72px",
         }}
@@ -74,19 +74,19 @@ function StepItemSkeleton({ delay = 0 }: { delay?: number }) {
     <div className="flex items-start gap-4">
       {/* Icon/Image Skeleton */}
       <div className="mt-1 shrink-0">
-        <div className="size-10 sm:size-15 bg-emerald-100 rounded animate-pulse relative overflow-hidden">
+        <div className="size-10 sm:size-15 bg-gray-100 rounded animate-pulse relative overflow-hidden">
           <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 0.4}s` }}
           ></div>
           <div
-            className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+            className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
             style={{ animationDelay: `${delay + 1.4}s` }}
           ></div>
 
           {/* Icon Shape Placeholder */}
-          <div className="absolute inset-2 bg-emerald-200 rounded-sm animate-pulse opacity-60">
-            <div className="absolute inset-1 bg-emerald-300 rounded-xs animate-pulse opacity-40"></div>
+          <div className="absolute inset-2 bg-gray-200 rounded-sm animate-pulse opacity-60">
+            <div className="absolute inset-1 bg-gray-300 rounded-xs animate-pulse opacity-40"></div>
           </div>
         </div>
       </div>
@@ -95,13 +95,13 @@ function StepItemSkeleton({ delay = 0 }: { delay?: number }) {
       <div className="flex-1">
         {/* Title Skeleton */}
         <div className="mb-2 sm:mb-3">
-          <div className="h-5 sm:h-6 bg-emerald-100 rounded animate-pulse w-full relative overflow-hidden">
+          <div className="h-5 sm:h-6 bg-gray-100 rounded animate-pulse w-full relative overflow-hidden">
             <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
               style={{ animationDelay: `${delay + 0.5}s` }}
             ></div>
             <div
-              className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
               style={{ animationDelay: `${delay + 1.5}s` }}
             ></div>
           </div>

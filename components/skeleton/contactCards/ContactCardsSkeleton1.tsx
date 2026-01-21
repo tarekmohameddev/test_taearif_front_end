@@ -31,13 +31,13 @@ export default function ContactCardsSkeleton1() {
 
             <div className="relative z-10 flex flex-col items-center justify-center gap-y-[16px]">
               {/* Icon Skeleton */}
-              <div className="w-[40px] h-[40px] md:w-[60px] md:h-[60px] bg-blue-200 rounded-lg animate-pulse relative overflow-hidden">
+              <div className="w-[40px] h-[40px] md:w-[60px] md:h-[60px] bg-gray-200 rounded-lg animate-pulse relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-300/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "0.2s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-blue-200/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.2s" }}
                 ></div>
               </div>
@@ -92,13 +92,13 @@ export default function ContactCardsSkeleton1() {
 
             <div className="relative z-10 flex flex-col items-center justify-center gap-y-[16px]">
               {/* Icon Skeleton */}
-              <div className="w-[40px] h-[40px] md:w-[60px] md:h-[60px] bg-green-200 rounded-lg animate-pulse relative overflow-hidden">
+              <div className="w-[40px] h-[40px] md:w-[60px] md:h-[60px] bg-gray-200 rounded-lg animate-pulse relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-green-300/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "0.5s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-green-200/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.5s" }}
                 ></div>
               </div>
@@ -153,13 +153,13 @@ export default function ContactCardsSkeleton1() {
 
             <div className="relative z-10 flex flex-col items-center justify-center gap-y-[16px]">
               {/* Icon Skeleton */}
-              <div className="w-[40px] h-[40px] md:w-[60px] md:h-[60px] bg-orange-200 rounded-lg animate-pulse relative overflow-hidden">
+              <div className="w-[40px] h-[40px] md:w-[60px] md:h-[60px] bg-gray-200 rounded-lg animate-pulse relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-300/60 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                   style={{ animationDelay: "0.8s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-orange-200/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.8s" }}
                 ></div>
               </div>

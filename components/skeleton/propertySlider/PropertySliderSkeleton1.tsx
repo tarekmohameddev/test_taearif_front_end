@@ -29,13 +29,13 @@ export default function PropertySliderSkeleton1() {
             </div>
 
             {/* Mobile View All Button Skeleton */}
-            <div className="h-4 bg-emerald-100 rounded animate-pulse w-16 relative overflow-hidden">
+            <div className="h-4 bg-gray-100 rounded animate-pulse w-16 relative overflow-hidden">
               <div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                 style={{ animationDelay: "0.2s" }}
               ></div>
               <div
-                className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                 style={{ animationDelay: "1.2s" }}
               ></div>
             </div>
@@ -81,13 +81,13 @@ export default function PropertySliderSkeleton1() {
             </div>
 
             {/* Desktop View All Button Skeleton */}
-            <div className="h-4 bg-emerald-100 rounded animate-pulse w-16 relative overflow-hidden">
+            <div className="h-4 bg-gray-100 rounded animate-pulse w-16 relative overflow-hidden">
               <div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                 style={{ animationDelay: "0.5s" }}
               ></div>
               <div
-                className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                 style={{ animationDelay: "1.5s" }}
               ></div>
             </div>
@@ -152,9 +152,9 @@ export default function PropertySliderSkeleton1() {
                       <div className="absolute right-3 top-3 flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 shadow-sm">
                         {/* Bedroom Icon + Number */}
                         <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 bg-emerald-200 rounded animate-pulse relative overflow-hidden">
+                          <div className="w-4 h-4 bg-gray-200 rounded animate-pulse relative overflow-hidden">
                             <div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                               style={{
                                 animationDelay: `${0.9 + index * 0.1}s`,
                               }}
@@ -257,13 +257,13 @@ export default function PropertySliderSkeleton1() {
                         </div>
 
                         {/* Details Button Skeleton */}
-                        <div className="h-4 bg-emerald-100 rounded animate-pulse w-12 relative overflow-hidden">
+                        <div className="h-4 bg-gray-100 rounded animate-pulse w-12 relative overflow-hidden">
                           <div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                             style={{ animationDelay: `${1.8 + index * 0.1}s` }}
                           ></div>
                           <div
-                            className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                            className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                             style={{ animationDelay: `${2.8 + index * 0.1}s` }}
                           ></div>
                         </div>
@@ -281,7 +281,7 @@ export default function PropertySliderSkeleton1() {
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full animate-pulse ${
-                  index === 0 ? "bg-emerald-300" : "bg-gray-300"
+                  index === 0 ? "bg-gray-300" : "bg-gray-300"
                 }`}
                 style={{ animationDelay: `${3.0 + index * 0.1}s` }}
               />

@@ -113,15 +113,15 @@ export default function PropertyFilterSkeleton1() {
 
           {/* زر البحث - Search Button Skeleton */}
           <div className="w-full md:w-[15.18%] h-full relative">
-            <div className="flex items-center justify-center w-full h-12 md:h-14 bg-emerald-200 rounded-[10px] animate-pulse relative overflow-hidden">
+            <div className="flex items-center justify-center w-full h-12 md:h-14 bg-gray-200 rounded-[10px] animate-pulse relative overflow-hidden">
               {/* Button Text Skeleton */}
-              <div className="h-4 md:h-5 bg-emerald-300 rounded animate-pulse w-8 relative overflow-hidden">
+              <div className="h-4 md:h-5 bg-gray-300 rounded animate-pulse w-8 relative overflow-hidden">
                 <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/70 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-400/70 to-transparent animate-shimmer"
                   style={{ animationDelay: "0.9s" }}
                 ></div>
                 <div
-                  className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-300/40 to-transparent animate-shimmer"
+                  className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-300/40 to-transparent animate-shimmer"
                   style={{ animationDelay: "1.9s" }}
                 ></div>
               </div>

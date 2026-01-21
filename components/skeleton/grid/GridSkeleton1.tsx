@@ -42,9 +42,9 @@ export default function GridSkeleton1() {
                   <div className="absolute right-3 top-3 flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 shadow-sm">
                     {/* Bedroom Icon + Number */}
                     <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 bg-emerald-200 rounded animate-pulse relative overflow-hidden">
+                      <div className="w-4 h-4 bg-gray-200 rounded animate-pulse relative overflow-hidden">
                         <div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
                           style={{ animationDelay: `${0.2 + index * 0.1}s` }}
                         ></div>
                       </div>
@@ -139,13 +139,13 @@ export default function GridSkeleton1() {
                     </div>
 
                     {/* Details Button Skeleton */}
-                    <div className="h-4 bg-emerald-100 rounded animate-pulse w-12 relative overflow-hidden">
+                    <div className="h-4 bg-gray-100 rounded animate-pulse w-12 relative overflow-hidden">
                       <div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-200/60 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/60 to-transparent animate-shimmer"
                         style={{ animationDelay: `${1.1 + index * 0.1}s` }}
                       ></div>
                       <div
-                        className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-100/40 to-transparent animate-shimmer"
+                        className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-100/40 to-transparent animate-shimmer"
                         style={{ animationDelay: `${2.1 + index * 0.1}s` }}
                       ></div>
                     </div>
@@ -190,12 +190,12 @@ export default function GridSkeleton1() {
                   <div
                     key={page}
                     className={`h-8 w-8 rounded animate-pulse relative overflow-hidden ${
-                      page === 1 ? "bg-emerald-200" : "bg-gray-200"
+                      page === 1 ? "bg-gray-200" : "bg-gray-200"
                     }`}
                   >
                     <div
                       className={`absolute inset-0 bg-gradient-to-r from-transparent to-transparent animate-shimmer ${
-                        page === 1 ? "via-emerald-300/60" : "via-gray-300/60"
+                        page === 1 ? "via-gray-300/60" : "via-gray-300/60"
                       }`}
                       style={{ animationDelay: `${1.7 + page * 0.1}s` }}
                     ></div>

@@ -1,6 +1,6 @@
 "use client";
 
-export default function HalfTextHalfImageSkeleton1() {
+function HalfTextHalfImageSkeleton1() {
   return (
     <section
       className="mx-auto max-w-[1600px] px-4"
@@ -116,7 +116,7 @@ export default function HalfTextHalfImageSkeleton1() {
 
           {/* Button Skeleton */}
           <div
-            className="bg-emerald-200 rounded-lg animate-pulse flex items-center justify-center relative overflow-hidden"
+            className="bg-gray-200 rounded-lg animate-pulse flex items-center justify-center relative overflow-hidden"
             style={{
               width: "119px",
               height: "46px",
@@ -124,11 +124,11 @@ export default function HalfTextHalfImageSkeleton1() {
             }}
           >
             <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-300/60 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/60 to-transparent animate-shimmer"
               style={{ animationDelay: "1.0s" }}
             ></div>
             <div
-              className="absolute inset-0 bg-gradient-to-l from-transparent via-emerald-200/40 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-l from-transparent via-gray-200/40 to-transparent animate-shimmer"
               style={{ animationDelay: "2.0s" }}
             ></div>
           </div>
@@ -189,3 +189,5 @@ export default function HalfTextHalfImageSkeleton1() {
     </section>
   );
 }
+
+export default HalfTextHalfImageSkeleton1;
