@@ -348,6 +348,32 @@ export default function Card4(props: Card4Props) {
     return num.toLocaleString("en-US");
   };
 
+  // Translate property status to Arabic
+  const translateStatus = (status: string): string => {
+    const statusLower = status?.toLowerCase() || "";
+    switch (statusLower) {
+      case "available":
+        return "متاح";
+      case "rented":
+        return "تم تأجيره";
+      case "sold":
+        return "مُباع";
+      case "unavailable":
+        return "غير متاح";
+      case "للبيع":
+        return "للبيع";
+      case "للإيجار":
+        return "للإيجار";
+      case "مكتمل":
+        return "مكتمل";
+      case "قيد الإنشاء":
+        return "قيد الإنشاء";
+      default:
+        // If already in Arabic, return as is
+        return status;
+    }
+  };
+
   const property = mergedData.property || getDefaultCard4Data().property;
   const styling = mergedData.styling || {};
   const typography = mergedData.typography || {};
@@ -458,7 +484,7 @@ export default function Card4(props: Card4Props) {
               color: styling.statusColor || "#16a34a",
             }}
           >
-            {property.status}
+            {translateStatus(property.status)}
           </div>
         </div>
 
