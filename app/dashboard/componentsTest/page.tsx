@@ -2,7 +2,7 @@
 
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { JobForm } from "@/components/job-form/job-form";
+import JobForm1 from "@/components/tenant/jobForm/jobForm1";
 import { useState } from "react";
 
 export default function Page() {
@@ -23,7 +23,7 @@ export default function Page() {
                 نموذج تجريبي لتقديم طلبات الوظائف مع رفع ملف السيرة الذاتية
               </p>
             </div>
-            <JobForm />
+            <JobForm1 useStore={false} />
           </div>
         </main>
       </div>
