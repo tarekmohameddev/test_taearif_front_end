@@ -15,6 +15,7 @@ import {
   Home,
   ExternalLink,
   Grid,
+  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -286,6 +287,12 @@ export function EnhancedSidebar({
               title="طلبات العملاء"
               description="ادارة طلبات العملاء العقارية"
               icon={<FileText className="h-5 w-5 text-muted-foreground" />}
+            />
+            <StaticLink
+              href="/dashboard/job-applications"
+              title="المتقدمين للوظائف"
+              description="ادارة المتقدمين للوظائف"
+              icon={<Briefcase className="h-5 w-5 text-muted-foreground" />}
             />
             <StaticLink
               href="/dashboard/matching"
