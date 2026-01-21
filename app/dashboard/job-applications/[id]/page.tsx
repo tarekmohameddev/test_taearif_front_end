@@ -120,8 +120,20 @@ export default function JobApplicationDetailsPage() {
 
   const handleDownloadPDF = () => {
     if (application?.pdf_path) {
-      window.open(application.pdf_path, "_blank");
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement("a");
+      link.href = application.pdf_path;
+      link.download = `CV_${application.name}_${application.id}.pdf`;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
+  };
+
+  // Generate Google Docs Viewer URL for PDF preview
+  const getPDFViewerUrl = (pdfUrl: string) => {
+    return `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`;
   };
 
   if (authLoading || !userData?.token) {
@@ -366,18 +378,61 @@ export default function JobApplicationDetailsPage() {
             {application.pdf_path && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    معاينة السيرة الذاتية
-                  </CardTitle>
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      معاينة السيرة الذاتية
+                    </CardTitle>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1"
+                      onClick={handleDownloadPDF}
+                    >
+                      <Download className="h-4 w-4" />
+                      <span className="hidden sm:inline">تحميل</span>
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="border rounded-lg overflow-hidden">
-                    <iframe
-                      src={application.pdf_path}
-                      className="w-full h-[600px]"
-                      title="السيرة الذاتية"
-                    />
+                  <div className="border rounded-lg overflow-hidden bg-gray-50">
+                    <div className="w-full h-[600px] relative">
+                      <iframe
+                        src={getPDFViewerUrl(application.pdf_path)}
+                        className="w-full h-full border-0"
+                        title="السيرة الذاتية"
+                        allow="fullscreen"
+                      />
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg pointer-events-auto hidden">
+                          <p className="text-sm text-muted-foreground mb-2">
+                            إذا لم يظهر PDF، يمكنك:
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="gap-1"
+                              onClick={handleDownloadPDF}
+                            >
+                              <Download className="h-4 w-4" />
+                              تحميل
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground text-center">
+                      إذا لم يظهر PDF بشكل صحيح، يمكنك{" "}
+                      <button
+                        onClick={handleDownloadPDF}
+                        className="text-primary hover:underline font-medium"
+                      >
+                        تحميله
+                      </button>
+                    </p>
                   </div>
                 </CardContent>
               </Card>
