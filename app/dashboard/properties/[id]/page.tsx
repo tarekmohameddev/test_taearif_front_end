@@ -30,6 +30,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import useAuthStore from "@/context/AuthContext";
+import { useUserStore } from "@/store/userStore";
 import {
   CustomDialog,
   CustomDialogContent,
@@ -74,6 +75,8 @@ interface PropertyData {
   water_meter_number: string | null;
   electricity_meter_number: string | null;
   deed_number: string | null;
+  owner_number: string | null;
+  deed_image: string | null;
   creator: any | null;
 }
 
@@ -84,9 +87,14 @@ export default function PropertyDetailsPage() {
   const propertyId = params?.id as string;
   const isDraft = searchParams?.get("draft") === "true";
   const [activeTab, setActiveTab] = useState("properties");
+  const [detailsTab, setDetailsTab] = useState<"details" | "archive">("details");
 
   // جلب token و authLoading من store للمراقبة
   const { userData, IsLoading: authLoading } = useAuthStore();
+  const { checkPermission } = useUserStore();
+  
+  // Check if user can access archive/owner details tab
+  const canAccessArchive = userData?.account_type === "tenant" || checkPermission("properties.owner_deed");
 
   const [property, setProperty] = useState<PropertyData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -271,6 +279,29 @@ export default function PropertyDetailsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {canAccessArchive && (
+                  <>
+                    {detailsTab === "details" ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDetailsTab("archive")}
+                        className="gap-2"
+                      >
+                        الأرشيف
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDetailsTab("details")}
+                        className="gap-2"
+                      >
+                        تفاصيل العقار
+                      </Button>
+                    )}
+                  </>
+                )}
                 <Button
                   variant="outline"
                   onClick={() =>
@@ -343,6 +374,9 @@ export default function PropertyDetailsPage() {
               </div>
             )}
 
+            {/* Tab Content */}
+            {detailsTab === "details" ? (
+              <>
             <div className="grid gap-6 md:grid-cols-2">
               {/* معلومات أساسية */}
               <Card>
@@ -713,12 +747,86 @@ export default function PropertyDetailsPage() {
                 </CardContent>
               </Card>
             )}
+              </>
+            ) : (
+              /* Tab: الأرشيف */
+              canAccessArchive && (
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-xl">تفاصيل المالك</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        معلومات مالك العقار وصورة السند
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* رقم مالك العقار */}
+                      {property.owner_number ? (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            رقم مالك العقار
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {property.owner_number}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            رقم مالك العقار
+                          </p>
+                          <p className="text-muted-foreground">غير متوفر</p>
+                        </div>
+                      )}
+
+                      {/* رقم السند */}
+                      {property.deed_number && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            رقم السند (الصك)
+                          </p>
+                          <p className="text-lg font-semibold">
+                            {property.deed_number}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* صورة السند */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-right">
+                          صورة السند (الصك)
+                        </h3>
+                        {property.deed_image ? (
+                          <div className="border rounded-lg overflow-hidden">
+                            <div className="relative w-full">
+                              <img
+                                src={property.deed_image}
+                                alt="صورة السند"
+                                className="w-full h-auto object-contain max-h-[600px] cursor-pointer hover:opacity-90 transition-opacity"
+                                onClick={() => setIsDeedDialogOpen(true)}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="border rounded-lg p-8 flex flex-col items-center justify-center bg-muted/50">
+                            <FileText className="h-16 w-16 text-muted-foreground mb-4" />
+                            <p className="text-muted-foreground">
+                              لا توجد صورة سند متاحة
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )
+            )}
           </div>
         </main>
       </div>
 
       {/* Dialog لعرض صورة الصك */}
-      {property.deed_number && (
+      {(property.deed_number || property.deed_image) && (
         <CustomDialog
           open={isDeedDialogOpen}
           onOpenChange={setIsDeedDialogOpen}
@@ -732,7 +840,7 @@ export default function PropertyDetailsPage() {
             <div className="p-4 sm:p-6">
               <div className="relative w-full rounded-lg overflow-hidden">
                 <img
-                  src={property.deed_number}
+                  src={property.deed_image || property.deed_number}
                   alt="صورة الصك"
                   className="w-full h-auto object-contain max-h-[70vh] mx-auto"
                 />
