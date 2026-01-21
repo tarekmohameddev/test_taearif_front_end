@@ -834,34 +834,40 @@ export default function propertyDetail2(props: propertyDetail2Props) {
 
         {/* BEGIN: Gallery Thumbnails */}
         {mergedData.gallery?.showThumbnails !== false &&
-          propertyImages.length > 1 && (
+          propertyImages.length > 0 && property && (
             <section
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-10"
+              className="pt-10"
               data-purpose="image-gallery"
             >
-              {propertyImages.slice(1).map((imageSrc, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleThumbnailClick(imageSrc, index + 1)}
-                  className={`rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer relative border-2 ${
-                    mainImage === imageSrc
-                      ? "shadow-lg scale-105"
-                      : "border-transparent hover:scale-105"
-                  }`}
-                  style={{
-                    height: mergedData.gallery?.thumbnailHeight || "200px",
-                    borderColor:
-                      mainImage === imageSrc ? primaryColor : "transparent",
-                  }}
-                >
-                  <Image
-                    alt={`${property.title} - صورة ${index + 2}`}
-                    className="w-full h-full object-cover transition-transform duration-300"
-                    src={imageSrc}
-                    fill
-                  />
-                </div>
-              ))}
+              <SwiperCarousel
+                items={propertyImages
+                  .filter((imageSrc) => imageSrc && imageSrc.trim() !== "") // Filter out empty images
+                  .map((imageSrc, index) => (
+                    <div key={index} className="relative h-[12rem] md:h-[180px]">
+                      <Image
+                        src={imageSrc}
+                        alt={`${property.title || "العقار"} - صورة ${index + 1}`}
+                        fill
+                        className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
+                          mainImage === imageSrc ? "" : "border-transparent"
+                        }`}
+                        style={
+                          mainImage === imageSrc
+                            ? {
+                                borderColor: primaryColor,
+                                borderWidth: "2px",
+                              }
+                            : {}
+                        }
+                        onClick={() => handleThumbnailClick(imageSrc, index)}
+                      />
+                    </div>
+                  ))}
+                space={16}
+                autoplay={true}
+                desktopCount={4}
+                slideClassName="!h-[12rem] md:!h-[180px]"
+              />
             </section>
           )}
         {/* END: Gallery Thumbnails */}
