@@ -24,6 +24,8 @@ export * from "./imageTextFunctions";
 export * from "./contactUsHomePageFunctions";
 export * from "./blogsSectionsFunctions";
 export * from "./mapSectionFunctions";
+export * from "./applicationFormFunctions";
+export * from "./jobFormFunctions";
 export * from "./responsiveImageFunctions";
 export * from "./titleFunctions";
 export * from "./photosGridFunctions";

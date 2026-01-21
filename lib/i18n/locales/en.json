@@ -229,6 +229,10 @@
       "display_name": "Advanced Input System",
       "description": "Dynamic form system with customizable cards and fields with visibility controls"
     },
+    "jobForm": {
+      "display_name": "Job Application Form",
+      "description": "Job application form with PDF upload"
+    },
     "imageText": {
       "display_name": "Image Text",
       "description": "Background image with text overlay section",

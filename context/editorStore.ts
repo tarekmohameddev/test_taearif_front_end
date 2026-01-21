@@ -67,6 +67,7 @@ import { mapSectionFunctions } from "./editorStoreFunctions/mapSectionFunctions"
 import { contactCardsFunctions } from "./editorStoreFunctions/contactCardsFunctions";
 import { contactFormSectionFunctions } from "./editorStoreFunctions/contactFormSectionFunctions";
 import { applicationFormFunctions } from "./editorStoreFunctions/applicationFormFunctions";
+import { jobFormFunctions } from "./editorStoreFunctions/jobFormFunctions";
 import { inputsFunctions } from "./editorStoreFunctions/inputsFunctions";
 import { inputs2Functions } from "./editorStoreFunctions/inputs2Functions";
 import { imageTextFunctions } from "./editorStoreFunctions/imageTextFunctions";
@@ -551,6 +552,20 @@ interface EditorStore {
     value: any,
   ) => void;
 
+  // Job Form states
+  jobFormStates: Record<string, ComponentData>;
+  ensureJobFormVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getJobFormData: (variantId: string) => ComponentData;
+  setJobFormData: (variantId: string, data: ComponentData) => void;
+  updateJobFormByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
   // Image Text states
   imageTextStates: Record<string, ComponentData>;
   ensureImageTextVariant: (variantId: string, initial?: ComponentData) => void;
@@ -752,6 +767,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   contactCardsStates: {},
   contactFormSectionStates: {},
   applicationFormStates: {},
+  jobFormStates: {},
   inputsStates: {},
   inputs2States: {},
   imageTextStates: {},
@@ -1265,6 +1281,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return currentState.contactCardsStates[variantId];
         case "applicationForm":
           return currentState.applicationFormStates[variantId];
+        case "jobForm":
+          return currentState.jobFormStates[variantId];
         case "inputs":
           return currentState.inputsStates[variantId];
         case "inputs2":
@@ -1507,6 +1525,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             variantId,
             initial,
           );
+        case "jobForm":
+          return jobFormFunctions.ensureVariant(state, variantId, initial);
         case "inputs":
           return inputsFunctions.ensureVariant(state, variantId, initial);
         case "inputs2":
@@ -1740,6 +1760,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return contactFormSectionFunctions.getData(state, variantId);
       case "applicationForm":
         return applicationFormFunctions.getData(state, variantId);
+      case "jobForm":
+        return jobFormFunctions.getData(state, variantId);
       case "inputs":
         return inputsFunctions.getData(state, variantId);
       case "inputs2":
@@ -1875,6 +1897,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "applicationForm":
           newState = applicationFormFunctions.setData(state, variantId, data);
+          break;
+        case "jobForm":
+          newState = jobFormFunctions.setData(state, variantId, data);
           break;
         case "inputs":
           newState = inputsFunctions.setData(state, variantId, data);
@@ -2133,6 +2158,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "applicationForm":
           newState = applicationFormFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "jobForm":
+          newState = jobFormFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -2626,6 +2659,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updateApplicationFormByPath: (variantId, path, value) =>
     set((state) =>
       applicationFormFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Job Form specific functions
+  ensureJobFormVariant: (variantId, initial) =>
+    set((state) => jobFormFunctions.ensureVariant(state, variantId, initial)),
+  getJobFormData: (variantId) => {
+    const state = get();
+    return jobFormFunctions.getData(state, variantId);
+  },
+  setJobFormData: (variantId, data) =>
+    set((state) => jobFormFunctions.setData(state, variantId, data)),
+  updateJobFormByPath: (variantId, path, value) =>
+    set((state) =>
+      jobFormFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Inputs functions using modular approach
@@ -3286,6 +3333,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.data,
                       ).applicationFormStates;
                     break;
+                  case "jobForm":
+                    newState.jobFormStates = jobFormFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).jobFormStates;
+                    break;
                   case "inputs":
                     newState.inputsStates = inputsFunctions.setData(
                       newState,
@@ -3527,6 +3581,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.data,
               ).applicationFormStates;
               break;
+            case "jobForm":
+              newState.jobFormStates = jobFormFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).jobFormStates;
+              break;
             case "inputs":
               newState.inputsStates = inputsFunctions.setData(
                 newState,
@@ -3760,6 +3821,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         contactCardsStates: {},
         contactFormSectionStates: {},
         applicationFormStates: {},
+        jobFormStates: {},
         inputsStates: {},
         inputs2States: {},
         imageTextStates: {},

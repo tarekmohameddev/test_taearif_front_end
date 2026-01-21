@@ -10,6 +10,7 @@ export { projectDetailsStructure } from "./projectDetails";
 export { propertyDetailStructure } from "./propertyDetail";
 export { propertiesShowcaseStructure } from "./propertiesShowcase";
 export { cardStructure } from "./card";
+export { jobFormStructure } from "./jobForm";
 export { logosTickerStructure } from "./logosTicker";
 export { partnersStructure } from "./partners";
 export { contactMapSectionStructure } from "./contactMapSection";

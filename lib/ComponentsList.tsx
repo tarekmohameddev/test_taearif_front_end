@@ -43,6 +43,7 @@ import { propertyFilterStructure } from "@/componentsStructure/propertyFilter";
 import { mapSectionStructure } from "@/componentsStructure/mapSection";
 import { contactFormSectionStructure } from "@/componentsStructure/contactFormSection";
 import { contactCardsStructure } from "@/componentsStructure/contactCards";
+import { jobFormStructure } from "@/componentsStructure/jobForm";
 import { cardStructure } from "@/componentsStructure/card";
 import { propertiesPageStructure } from "@/componentsStructure/propertiesPage";
 import { inputsStructure } from "@/componentsStructure/inputs";
@@ -116,6 +117,7 @@ export const getSections = (
       "propertiesPage",
       "inputs",
       "inputs2",
+      "jobForm",
     ],
   },
 });
@@ -153,6 +155,7 @@ export const SECTIONS: Record<string, SectionType> = {
       "photosGrid",
       "inputs",
       "inputs2",
+      "jobForm",
     ],
   },
 };
@@ -537,6 +540,24 @@ export const getComponents = (
     subPath: "inputs2",
     icon: "📝",
     ...inputs2Structure,
+  },
+  jobForm: {
+    id: "jobForm",
+    name: "jobForm",
+    displayName: t("components.jobForm.display_name"),
+    description: t("components.jobForm.description"),
+    category: "form",
+    section: "homepage",
+    subPath: "jobForm",
+    icon: "💼",
+    variants: jobFormStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/jobForm/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "jobForm1",
+    ...jobFormStructure,
   },
   imageText: {
     id: "imageText",
@@ -992,6 +1013,24 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "inputs2",
     icon: "📝",
     ...inputs2Structure,
+  },
+  jobForm: {
+    id: "jobForm",
+    name: "jobForm",
+    displayName: "Job Application Form",
+    description: "Job application form with PDF upload",
+    category: "form",
+    section: "homepage",
+    subPath: "jobForm",
+    icon: "💼",
+    variants: jobFormStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/jobForm/${variant.id}.tsx`,
+    })),
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "jobForm1",
+    ...jobFormStructure,
   },
   imageText: {
     id: "imageText",
