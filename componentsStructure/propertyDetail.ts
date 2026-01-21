@@ -10,11 +10,6 @@ export const propertyDetailStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        {
-          key: "visible",
-          label: "Visible",
-          type: "boolean",
-        },
 
         // ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
@@ -92,40 +87,39 @@ export const propertyDetailStructure: ComponentStructure = {
         },
 
         // ═══════════════════════════════════════════════════════════
-        // CONTENT
-        // ═══════════════════════════════════════════════════════════
-        {
-          key: "content",
-          label: "Content",
-          type: "object",
-          fields: [
-            {
-              key: "whatsAppButtonText",
-              label: "WhatsApp Button Text",
-              type: "text",
-              placeholder: "استفسار عن طريق الواتساب",
-            },
-            {
-              key: "whatsAppPhoneNumber",
-              label: "WhatsApp Phone Number",
-              type: "text",
-              placeholder: "966501234567",
-            },
-          ],
-        },
-
-        // ═══════════════════════════════════════════════════════════
         // DISPLAY SETTINGS
         // ═══════════════════════════════════════════════════════════
         {
           key: "displaySettings",
           label: "Display Settings",
           type: "object",
+          fields: [],
+        },
+
+        // ═══════════════════════════════════════════════════════════
+        // WHATSAPP SETTINGS
+        // ═══════════════════════════════════════════════════════════
+        {
+          key: "whatsApp",
+          label: "WhatsApp Settings",
+          type: "object",
           fields: [
             {
-              key: "showWhatsAppButton",
+              key: "showButton",
               label: "Show WhatsApp Button",
               type: "boolean",
+            },
+            {
+              key: "buttonText",
+              label: "WhatsApp Button Text",
+              type: "text",
+              placeholder: "استفسار عن طريق الواتساب",
+            },
+            {
+              key: "phoneNumber",
+              label: "WhatsApp Phone Number",
+              type: "text",
+              placeholder: "966501234567",
             },
           ],
         },
@@ -135,8 +129,31 @@ export const propertyDetailStructure: ComponentStructure = {
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "styling.primaryColor", label: "Primary Color", type: "color" },
+        {
+          key: "whatsApp",
+          label: "WhatsApp Settings",
+          type: "object",
+          fields: [
+            {
+              key: "showButton",
+              label: "Show WhatsApp Button",
+              type: "boolean",
+            },
+            {
+              key: "buttonText",
+              label: "WhatsApp Button Text",
+              type: "text",
+              placeholder: "استفسار عن طريق الواتساب",
+            },
+            {
+              key: "phoneNumber",
+              label: "WhatsApp Phone Number",
+              type: "text",
+              placeholder: "966501234567",
+            },
+          ],
+        },
       ],
     },
     {
@@ -146,11 +163,6 @@ export const propertyDetailStructure: ComponentStructure = {
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
         // ═══════════════════════════════════════════════════════════
-        {
-          key: "visible",
-          label: "Visible",
-          type: "boolean",
-        },
 
         // ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
@@ -285,18 +297,6 @@ export const propertyDetailStructure: ComponentStructure = {
               type: "text",
               placeholder: "أرسل استفسارك",
             },
-            {
-              key: "whatsAppButtonText",
-              label: "WhatsApp Button Text",
-              type: "text",
-              placeholder: "استفسار عن طريق الواتساب",
-            },
-            {
-              key: "whatsAppPhoneNumber",
-              label: "WhatsApp Phone Number",
-              type: "text",
-              placeholder: "966501234567",
-            },
           ],
         },
 
@@ -331,11 +331,6 @@ export const propertyDetailStructure: ComponentStructure = {
             {
               key: "showMap",
               label: "Show Map",
-              type: "boolean",
-            },
-            {
-              key: "showWhatsAppButton",
-              label: "Show WhatsApp Button",
               type: "boolean",
             },
           ],
@@ -388,6 +383,34 @@ export const propertyDetailStructure: ComponentStructure = {
               label: "Thumbnail Height",
               type: "text",
               placeholder: "200px",
+            },
+          ],
+        },
+
+        // ═══════════════════════════════════════════════════════════
+        // WHATSAPP SETTINGS
+        // ═══════════════════════════════════════════════════════════
+        {
+          key: "whatsApp",
+          label: "WhatsApp Settings",
+          type: "object",
+          fields: [
+            {
+              key: "showButton",
+              label: "Show WhatsApp Button",
+              type: "boolean",
+            },
+            {
+              key: "buttonText",
+              label: "WhatsApp Button Text",
+              type: "text",
+              placeholder: "استفسار عن طريق الواتساب",
+            },
+            {
+              key: "phoneNumber",
+              label: "WhatsApp Phone Number",
+              type: "text",
+              placeholder: "966501234567",
             },
           ],
         },
@@ -496,7 +519,6 @@ export const propertyDetailStructure: ComponentStructure = {
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "content.descriptionTitle",
           label: "Description Title",
@@ -509,6 +531,30 @@ export const propertyDetailStructure: ComponentStructure = {
           type: "text",
         },
         { key: "styling.primaryColor", label: "Primary Color", type: "color" },
+        {
+          key: "whatsApp",
+          label: "WhatsApp Settings",
+          type: "object",
+          fields: [
+            {
+              key: "showButton",
+              label: "Show WhatsApp Button",
+              type: "boolean",
+            },
+            {
+              key: "buttonText",
+              label: "WhatsApp Button Text",
+              type: "text",
+              placeholder: "استفسار عن طريق الواتساب",
+            },
+            {
+              key: "phoneNumber",
+              label: "WhatsApp Phone Number",
+              type: "text",
+              placeholder: "966501234567",
+            },
+          ],
+        },
       ],
     },
   ],
