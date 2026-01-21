@@ -40,6 +40,7 @@ import {
   AlertTriangle,
   Calendar as CalendarIcon,
   Home,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -472,6 +473,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
   const [filterBeds, setFilterBeds] = useState<string | null>(null);
   const [filterPriceFrom, setFilterPriceFrom] = useState<string>("");
   const [filterPriceTo, setFilterPriceTo] = useState<string>("");
+  const [filterSearch, setFilterSearch] = useState<string>("");
   const [cities, setCities] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -1493,8 +1495,17 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     if (filterType) newFilters.type = filterType;
     if (filterPurpose) newFilters.purpose = filterPurpose;
     if (filterBeds) newFilters.beds = filterBeds;
-    if (filterPriceFrom) newFilters.price_from = filterPriceFrom;
-    if (filterPriceTo) newFilters.price_to = filterPriceTo;
+    if (filterPriceFrom) {
+      newFilters.price_from = filterPriceFrom;
+      newFilters.price_min = filterPriceFrom; // Support both formats
+    }
+    if (filterPriceTo) {
+      newFilters.price_to = filterPriceTo;
+      newFilters.price_max = filterPriceTo; // Support both formats
+    }
+    if (filterSearch.trim()) {
+      newFilters.search = filterSearch.trim();
+    }
     
     setAppliedFilters(newFilters);
     setCurrentPage(1);
@@ -1509,6 +1520,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     setFilterBeds(null);
     setFilterPriceFrom("");
     setFilterPriceTo("");
+    setFilterSearch("");
     setAppliedFilters({});
     setCurrentPage(1);
     fetchProperties(1);
@@ -1526,6 +1538,33 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
       }
     } else {
       delete newFilters[filterKey];
+    }
+
+    // Update local state when removing filters
+    if (filterKey === "search") {
+      setFilterSearch("");
+    }
+    if (filterKey === "price_from" || filterKey === "price_min") {
+      setFilterPriceFrom("");
+    }
+    if (filterKey === "price_to" || filterKey === "price_max") {
+      setFilterPriceTo("");
+    }
+    if (filterKey === "city_id") {
+      setFilterCityId(null);
+      setFilterDistrictId(null);
+    }
+    if (filterKey === "district_id") {
+      setFilterDistrictId(null);
+    }
+    if (filterKey === "type") {
+      setFilterType(null);
+    }
+    if (filterKey === "purpose") {
+      setFilterPurpose(null);
+    }
+    if (filterKey === "beds") {
+      setFilterBeds(null);
     }
 
     setAppliedFilters(newFilters);
@@ -2366,7 +2405,30 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
             {/* الفلاتر */}
             <Card className="border-0 shadow-none">
               <CardContent className="p-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-8 gap-4">
+                  {/* البحث */}
+                  <div className="space-y-2">
+                    <Label>البحث</Label>
+                    <div className="relative">
+                      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="text"
+                        placeholder="كود الوحدة أو العنوان"
+                        value={filterSearch}
+                        onChange={(e) => {
+                          setFilterSearch(e.target.value);
+                        }}
+                        onBlur={() => applyFilters()}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            applyFilters();
+                          }
+                        }}
+                        className="pr-10"
+                      />
+                    </div>
+                  </div>
+
                   {/* المدينة */}
                   <div className="space-y-2">
                     <Label>المدينة</Label>
@@ -2519,7 +2581,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       size="sm"
                       onClick={handleClearFilters} 
                       className={`w-fit text-sm ${
-                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo
+                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo || filterSearch
                           ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
                           : ""
                       }`}
