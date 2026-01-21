@@ -222,6 +222,34 @@ export function translateLabel(
     Initial: "components_structure.basic.initial",
     Unset: "components_structure.basic.unset",
 
+    // WhatsApp Settings
+    "WhatsApp Settings": "components_structure.basic.whatsapp_settings",
+    "Show WhatsApp Button": "components_structure.basic.show_whatsapp_button",
+    "WhatsApp Button Text": "components_structure.basic.whatsapp_button_text",
+    "WhatsApp Phone Number": "components_structure.basic.whatsapp_phone_number",
+
+    // Property Detail / Content Titles
+    "Description Title": "components_structure.basic.description_title",
+    "Specs Title": "components_structure.basic.specs_title",
+    "Contact Form Title": "components_structure.basic.contact_form_title",
+
+    // Display Settings
+    "Display Settings": "components_structure.basic.display_settings",
+    "Show Description": "components_structure.basic.show_description",
+    "Show Specs": "components_structure.basic.show_specs",
+    "Show Contact Form": "components_structure.basic.show_contact_form",
+    "Show Video": "components_structure.basic.show_video",
+
+    // Hero Section
+    "Hero Section": "components_structure.basic.hero_section",
+    "Hero Height": "components_structure.basic.hero_height",
+
+    // Gallery Settings
+    Gallery: "components_structure.basic.gallery",
+    "Show Thumbnails": "components_structure.basic.show_thumbnails",
+    "Thumbnail Grid Columns": "components_structure.basic.thumbnail_grid_columns",
+    "Thumbnail Height": "components_structure.basic.thumbnail_height",
+
     // PhotosGrid specific labels
     "Photos Grid 1 - Responsive gallery":
       "components_structure.photosGrid.photos_grid_1",
