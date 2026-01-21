@@ -417,6 +417,10 @@ function ProjectCard({ property }: { property: Property }) {
     return num.toLocaleString("ar-SA");
   };
 
+  const formatPriceNumber = (num: number) => {
+    return num.toLocaleString("en-US");
+  };
+
   // Check if title is longer than 20 characters
   const isLongTitle = property.title && property.title.length > 20;
   const titleFontSize = isLongTitle ? "text-base" : "text-xl";
@@ -519,8 +523,8 @@ function ProjectCard({ property }: { property: Property }) {
         {/* Price Section */}
         <div className="bg-[#896042] rounded-lg px-4 py-3 text-center">
           <div className="text-white text-base font-medium">
-            {formatNumber(property.price.min)} -{" "}
-            {formatNumber(property.price.max)} ريال سعودي
+            {formatPriceNumber(property.price.min)} -{" "}
+            {formatPriceNumber(property.price.max)} ريال سعودي
           </div>
         </div>
       </div>
@@ -828,7 +832,9 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // 6. DETERMINE WHICH DATA TO USE (API vs Static)
   // ─────────────────────────────────────────────────────────
   const useApiData = mergedData.dataSource?.enabled !== false;
-  const properties = useApiData ? apiProperties : mergedData.properties || [];
+  // Always limit to 3 properties maximum
+  const allProperties = useApiData ? apiProperties : mergedData.properties || [];
+  const properties = allProperties.slice(0, 3);
 
   // ─────────────────────────────────────────────────────────
   // 7. EARLY RETURN IF NOT VISIBLE
