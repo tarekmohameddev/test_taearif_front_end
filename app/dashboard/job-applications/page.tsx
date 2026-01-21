@@ -62,6 +62,7 @@ export default function JobApplicationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [perPage, setPerPage] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -81,8 +82,8 @@ export default function JobApplicationsPage() {
       const params = new URLSearchParams();
       params.set("per_page", String(perPage));
       params.set("page", String(currentPage));
-      if (searchTerm.trim()) {
-        params.set("search", searchTerm.trim());
+      if (activeSearchTerm.trim()) {
+        params.set("search", activeSearchTerm.trim());
       }
 
       const response = await axiosInstance.get<JobApplicationsListResponse>(
@@ -115,7 +116,7 @@ export default function JobApplicationsPage() {
     }
 
     fetchJobApplications();
-  }, [userData?.token, authLoading, searchTerm, perPage, currentPage]);
+  }, [userData?.token, authLoading, activeSearchTerm, perPage, currentPage]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "غير محدد";
@@ -139,6 +140,7 @@ export default function JobApplicationsPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
   };
 
