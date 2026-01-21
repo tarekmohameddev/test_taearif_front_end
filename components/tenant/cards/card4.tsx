@@ -344,6 +344,10 @@ export default function Card4(props: Card4Props) {
     return num.toLocaleString("ar-SA");
   };
 
+  const formatPriceNumber = (num: number) => {
+    return num.toLocaleString("en-US");
+  };
+
   const property = mergedData.property || getDefaultCard4Data().property;
   const styling = mergedData.styling || {};
   const typography = mergedData.typography || {};
@@ -609,8 +613,8 @@ export default function Card4(props: Card4Props) {
               color: styling.priceTextColor || "#ffffff",
             }}
           >
-            {formatNumber(property.price.min)} -{" "}
-            {formatNumber(property.price.max)} ريال سعودي
+            {formatPriceNumber(property.price.min)} -{" "}
+            {formatPriceNumber(property.price.max)} ريال سعودي
           </div>
         </div>
       </div>
