@@ -37,6 +37,8 @@ export const getDefaultpropertyDetail2Data = (): ComponentData => ({
     contactFormTitle: "استفسر عن هذا العقار",
     contactFormDescription: "استفسر عن المنزل واملأ البيانات لهذا العقار",
     submitButtonText: "أرسل استفسارك",
+    whatsAppButtonText: "استفسار عن طريق الواتساب",
+    whatsAppPhoneNumber: "",
   },
 
   // Display settings - ما الحقول التي تظهر
@@ -46,6 +48,7 @@ export const getDefaultpropertyDetail2Data = (): ComponentData => ({
     showContactForm: true,
     showVideoUrl: true,
     showMap: true,
+    showWhatsAppButton: false, // مخفي بشكل افتراضي
   },
 
   // Hero section settings

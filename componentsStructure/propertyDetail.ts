@@ -90,6 +90,45 @@ export const propertyDetailStructure: ComponentStructure = {
             },
           ],
         },
+
+        // ═══════════════════════════════════════════════════════════
+        // CONTENT
+        // ═══════════════════════════════════════════════════════════
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            {
+              key: "whatsAppButtonText",
+              label: "WhatsApp Button Text",
+              type: "text",
+              placeholder: "استفسار عن طريق الواتساب",
+            },
+            {
+              key: "whatsAppPhoneNumber",
+              label: "WhatsApp Phone Number",
+              type: "text",
+              placeholder: "966501234567",
+            },
+          ],
+        },
+
+        // ═══════════════════════════════════════════════════════════
+        // DISPLAY SETTINGS
+        // ═══════════════════════════════════════════════════════════
+        {
+          key: "displaySettings",
+          label: "Display Settings",
+          type: "object",
+          fields: [
+            {
+              key: "showWhatsAppButton",
+              label: "Show WhatsApp Button",
+              type: "boolean",
+            },
+          ],
+        },
       ],
 
       // ═══════════════════════════════════════════════════════════
@@ -246,6 +285,18 @@ export const propertyDetailStructure: ComponentStructure = {
               type: "text",
               placeholder: "أرسل استفسارك",
             },
+            {
+              key: "whatsAppButtonText",
+              label: "WhatsApp Button Text",
+              type: "text",
+              placeholder: "استفسار عن طريق الواتساب",
+            },
+            {
+              key: "whatsAppPhoneNumber",
+              label: "WhatsApp Phone Number",
+              type: "text",
+              placeholder: "966501234567",
+            },
           ],
         },
 
@@ -280,6 +331,11 @@ export const propertyDetailStructure: ComponentStructure = {
             {
               key: "showMap",
               label: "Show Map",
+              type: "boolean",
+            },
+            {
+              key: "showWhatsAppButton",
+              label: "Show WhatsApp Button",
               type: "boolean",
             },
           ],
