@@ -28,6 +28,8 @@ import {
   Phone,
   Calendar,
   User,
+  Eye,
+  Download,
 } from "lucide-react";
 
 // TypeScript interfaces based on API documentation
@@ -134,8 +136,15 @@ export default function JobApplicationsPage() {
     }
   };
 
-  const handleRowClick = (id: string) => {
+  const handleViewDetails = (id: string) => {
     router.push(`/dashboard/job-applications/${id}`);
+  };
+
+  const handleDownloadCV = (pdfPath: string | null, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (pdfPath) {
+      window.open(pdfPath, "_blank");
+    }
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -270,14 +279,14 @@ export default function JobApplicationsPage() {
                               <TableHead className="text-right">رقم الهاتف</TableHead>
                               <TableHead className="text-right">السيرة الذاتية</TableHead>
                               <TableHead className="text-right">تاريخ التقديم</TableHead>
+                              <TableHead className="text-right">الإجراءات</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {applications.map((application) => (
                               <TableRow
                                 key={application.id}
-                                className="cursor-pointer hover:bg-muted/50"
-                                onClick={() => handleRowClick(application.id)}
+                                className="hover:bg-muted/50"
                               >
                                 <TableCell className="font-medium">
                                   <div className="flex items-center gap-2">
@@ -311,6 +320,30 @@ export default function JobApplicationsPage() {
                                   <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4 text-muted-foreground" />
                                     {formatDate(application.created_at)}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="gap-1"
+                                      onClick={() => handleViewDetails(application.id)}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                      <span className="hidden sm:inline">تفاصيل</span>
+                                    </Button>
+                                    {application.pdf_path && (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-1"
+                                        onClick={(e) => handleDownloadCV(application.pdf_path, e)}
+                                      >
+                                        <Download className="h-4 w-4" />
+                                        <span className="hidden sm:inline">تنزيل CV</span>
+                                      </Button>
+                                    )}
                                   </div>
                                 </TableCell>
                               </TableRow>
