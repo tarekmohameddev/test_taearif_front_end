@@ -329,9 +329,9 @@ export default function JobForm1(props: JobFormProps = {}) {
         formDataToSend.append("pdf", formData.pdfFile);
       }
 
-      // Build API URL
-      const endpoint = mergedData.api?.endpoint || "/api/v1/tenant-website";
-      const apiUrl = `${endpoint}/${encodeURIComponent(finalTenantId)}/job-applications`;
+      // Build API URL - Fixed endpoint (non-modifiable)
+      const backendUrl = process.env.NEXT_PUBLIC_Backend_URL || "";
+      const apiUrl = `${backendUrl}/v1/tenant-website/${encodeURIComponent(finalTenantId)}/job-applications`;
 
       toast.loading("جاري إرسال الطلب...", { id: "submitting" });
 
@@ -412,12 +412,12 @@ export default function JobForm1(props: JobFormProps = {}) {
       {/* Header Section */}
       {header.title && (
         <div
-          className={`mb-8 ${header.textAlign || "text-center"} ${header.marginBottom || "mb-8"}`}
+          className={`${header.textAlign || "text-center"} mb-8`}
         >
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl mb-4 shadow-lg">
             <Briefcase className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent pb-5">
             {header.title}
           </h1>
           {header.description && (
