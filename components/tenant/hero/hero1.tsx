@@ -870,11 +870,32 @@ const Hero1 = (props: HeroProps = {}) => {
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
 
+  // Helper function to normalize height values
+  const normalizeHeight = (value: string | undefined, fallback: string): string => {
+    if (!value) return fallback;
+    const trimmed = value.trim();
+    // Check if it's a number only (no units like vh, px, %, etc.)
+    if (/^\d+(\.\d+)?$/.test(trimmed)) {
+      return `${trimmed}vh`;
+    }
+    // Convert percentage (%) to vh
+    if (/^\d+(\.\d+)?%$/.test(trimmed)) {
+      return trimmed.replace('%', 'vh');
+    }
+    // If it already has a unit (vh, px, etc.), return as is
+    return trimmed;
+  };
+
+  // Normalize height values
+  const heightDesktop = normalizeHeight(mergedData.height?.desktop, "90vh");
+  const heightTablet = normalizeHeight(mergedData.height?.tablet, heightDesktop);
+  const heightMobile = normalizeHeight(mergedData.height?.mobile, heightDesktop);
+
   // Generate dynamic styles with responsive height
   const sectionStyles = {
-    "--hero-height-desktop": mergedData.height?.desktop || "90vh",
-    "--hero-height-tablet": mergedData.height?.tablet || mergedData.height?.desktop || "90vh",
-    "--hero-height-mobile": mergedData.height?.mobile || mergedData.height?.desktop || "90vh",
+    "--hero-height-desktop": heightDesktop,
+    "--hero-height-tablet": heightTablet,
+    "--hero-height-mobile": heightMobile,
   } as React.CSSProperties;
 
   const titleStyles = {
