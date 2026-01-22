@@ -23,6 +23,10 @@ import {
   Settings,
   Users,
   LogOut,
+  UserCog,
+  Briefcase,
+  Download,
+  Grid,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +43,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import useStore from "@/context/Store";
@@ -221,6 +225,105 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
     }
   };
 
+  // Static menu items (same as desktop sidebar)
+  const staticMenuItems = [
+    {
+      id: "dashboard",
+      label: "لوحة التحكم",
+      description: "نظره عامه عن الموقع",
+      icon: FileText,
+      path: "/dashboard",
+    },
+    {
+      id: "settings",
+      label: "اعدادات الموقع",
+      description: "تكوين اعدادات الموقع",
+      icon: Settings,
+      path: "/dashboard/settings",
+    },
+    {
+      id: "customers",
+      label: "ادارة العملاء",
+      description: "ادارة عملائك",
+      icon: Users,
+      path: "/dashboard/customers",
+    },
+    {
+      id: "crm",
+      label: "CRM",
+      description: "تكوين اعدادات ادارة علاقات العملاء",
+      icon: UserCog,
+      path: "/dashboard/crm",
+    },
+    {
+      id: "projects",
+      label: "المشاريع",
+      description: "ادارة المشاريع",
+      icon: Building2,
+      path: "/dashboard/projects",
+    },
+    {
+      id: "properties",
+      label: "العقارات",
+      description: "ادارة العقارات",
+      icon: Home,
+      path: "/dashboard/properties",
+    },
+    {
+      id: "property-requests",
+      label: "طلبات العملاء",
+      description: "ادارة طلبات العملاء العقارية",
+      icon: FileText,
+      path: "/dashboard/property-requests",
+    },
+    {
+      id: "job-applications",
+      label: "المتقدمين للوظائف",
+      description: "ادارة المتقدمين للوظائف",
+      icon: Briefcase,
+      path: "/dashboard/job-applications",
+    },
+    {
+      id: "matching",
+      label: "مركز توافق الطلبات الذكائي",
+      description: "احصل على توافق ذكي مع الطلبات",
+      icon: MessageSquare,
+      path: "/dashboard/matching",
+    },
+    {
+      id: "live-editor",
+      label: "تعديل تصميم الموقع",
+      description: "ادارة محتوى الموقع",
+      icon: LayoutTemplate,
+      path: "/live-editor",
+      isDirectPath: true,
+    },
+    {
+      id: "access-control",
+      label: "ادارة الموظفين",
+      description: "ادارة الموظفين",
+      icon: Users,
+      path: "/dashboard/access-control",
+    },
+    {
+      id: "rental-management",
+      label: "ادارة الايجارات",
+      description: "ادارة ايجارتك",
+      icon: Download,
+      path: "/dashboard/rental-management",
+    },
+    {
+      id: "apps",
+      label: "التطبيقات",
+      description: "ادارة التطبيقات",
+      icon: Grid,
+      path: "/apps",
+    },
+  ];
+
+  // Use static menu items if mainNavItems is empty or not loaded
+  const menuItemsToUse = mainNavItems && mainNavItems.length > 0 ? mainNavItems : staticMenuItems;
+
   const hey = true;
   return (
     <header className="sticky top-0 z-30 bg-background flex flex-col gap-6">
@@ -237,6 +340,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[280px] p-0 z-50">
+                <SheetTitle className="sr-only">قائمة التنقل</SheetTitle>
                 <div className="flex h-full flex-col gap-2 overflow-hidden">
                   <div className="flex h-14 items-center border-b px-4 md:h-[60px] flex-shrink-0">
                     <div className="flex flex-col w-full">
@@ -325,89 +429,88 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
                         <span className="text-sm text-red-500">{error}</span>
                       </div>
                     )}
-                    {!loading && !error && (
-                      <nav className="space-y-1">
-                        {mainNavItems &&
-                          mainNavItems.map((item: MainNavItem) => {
-                            const isActive =
-                              currentTab === item.id ||
-                              (item.path !== "/" &&
-                                currentPath.startsWith(item.path));
-                            return (
-                              <Button
-                                key={item.id}
-                                variant={isActive ? "secondary" : "ghost"}
-                                className={cn(
-                                  "justify-start gap-3 h-auto py-2 px-3 w-full",
-                                  isActive &&
-                                    "bg-primary/10 text-primary border-r-2 border-primary",
-                                )}
-                                asChild={!item.isAPP}
-                              >
-                                {item.isAPP ? (
-                                  <div
-                                    onClick={(e) => handleItemClick(item, e)}
-                                    className="cursor-pointer flex items-center w-full"
-                                  >
-                                    <item.icon
-                                      className={cn(
-                                        "h-5 w-5",
-                                        isActive
-                                          ? "text-primary"
-                                          : "text-muted-foreground",
-                                      )}
-                                    />
-                                    <div className="flex flex-col items-start ml-3">
-                                      <span className="text-sm font-medium">
-                                        {item.label}
+                    <nav className="space-y-1">
+                      {menuItemsToUse &&
+                        menuItemsToUse.map((item: MainNavItem) => {
+                          const isActive =
+                            currentTab === item.id ||
+                            (item.path !== "/" &&
+                              currentPath.startsWith(item.path));
+                          const IconComponent = item.icon;
+                          return (
+                            <Button
+                              key={item.id}
+                              variant={isActive ? "secondary" : "ghost"}
+                              className={cn(
+                                "justify-start gap-3 h-auto py-2 px-3 w-full",
+                                isActive &&
+                                  "bg-primary/10 text-primary border-r-2 border-primary",
+                              )}
+                              asChild={!item.isAPP}
+                            >
+                              {item.isAPP ? (
+                                <div
+                                  onClick={(e) => handleItemClick(item, e)}
+                                  className="cursor-pointer flex items-center w-full"
+                                >
+                                  <IconComponent
+                                    className={cn(
+                                      "h-5 w-5",
+                                      isActive
+                                        ? "text-primary"
+                                        : "text-muted-foreground",
+                                    )}
+                                  />
+                                  <div className="flex flex-col items-start ml-3">
+                                    <span className="text-sm font-medium">
+                                      {item.label}
+                                    </span>
+                                    {item.description && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {item.description}
                                       </span>
-                                      {item.description && (
-                                        <span className="text-xs text-muted-foreground">
-                                          {item.description}
-                                        </span>
-                                      )}
-                                    </div>
+                                    )}
                                   </div>
-                                ) : (
-                                  <Link
-                                    href={(() => {
-                                      if (item.isDirectPath) {
-                                        return item.path;
-                                      }
-                                      if (item.path.startsWith("/dashboard")) {
-                                        return item.path;
-                                      } else if (item.path.startsWith("/")) {
-                                        return `/dashboard${item.path}`;
-                                      } else {
-                                        return `/dashboard/${item.path}`;
-                                      }
-                                    })()}
-                                  >
-                                    <item.icon
-                                      className={cn(
-                                        "h-5 w-5",
-                                        isActive
-                                          ? "text-primary"
-                                          : "text-muted-foreground",
-                                      )}
-                                    />
-                                    <div className="flex flex-col items-start">
-                                      <span className="text-sm font-medium">
-                                        {item.label}
+                                </div>
+                              ) : (
+                                <Link
+                                  href={(() => {
+                                    if (item.isDirectPath) {
+                                      return item.path;
+                                    }
+                                    if (item.path.startsWith("/dashboard")) {
+                                      return item.path;
+                                    } else if (item.path.startsWith("/")) {
+                                      return `/dashboard${item.path}`;
+                                    } else {
+                                      return `/dashboard/${item.path}`;
+                                    }
+                                  })()}
+                                >
+                                  <IconComponent
+                                    className={cn(
+                                      "h-5 w-5",
+                                      isActive
+                                        ? "text-primary"
+                                        : "text-muted-foreground",
+                                    )}
+                                  />
+                                  <div className="flex flex-col items-start">
+                                    <span className="text-sm font-medium">
+                                      {item.label}
+                                    </span>
+                                    {item.description && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {item.description}
                                       </span>
-                                      {item.description && (
-                                        <span className="text-xs text-muted-foreground">
-                                          {item.description}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </Link>
-                                )}
-                              </Button>
-                            );
-                          })}
-                      </nav>
-                    )}
+                                    )}
+                                  </div>
+                                </Link>
+                              )}
+                            </Button>
+                          );
+                        })}
+                    </nav>
                   </div>
                   {useAuthStore.getState().UserIslogged && (
                     <div className="mt-auto border-t p-4">
