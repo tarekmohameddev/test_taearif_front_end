@@ -9,11 +9,6 @@ export const getDefaultHeroData = (): ComponentData => ({
     tablet: "90vh",
     mobile: "90vh",
   },
-  minHeight: {
-    desktop: "520px",
-    tablet: "520px",
-    mobile: "520px",
-  },
   background: {
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
     alt: "صورة خلفية لغرفة معيشة حديثة",
@@ -191,11 +186,6 @@ export const getDefaultHero3Data = (): ComponentData => ({
     desktop: "90vh",
     tablet: "80vh",
     mobile: "70vh",
-  },
-  minHeight: {
-    desktop: "520px",
-    tablet: "400px",
-    mobile: "300px",
   },
   background: {
     video: "https://youtu.be/ULzl51V38lw?si=iwlRp_cUXmTe50Gc",

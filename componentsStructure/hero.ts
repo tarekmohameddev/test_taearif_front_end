@@ -7,7 +7,6 @@ export const heroStructure: ComponentStructure = {
       id: "hero1",
       name: "Hero 1 - Modern Search",
       fields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "height",
           label: "Height",
@@ -30,31 +29,6 @@ export const heroStructure: ComponentStructure = {
               label: "Mobile",
               type: "text",
               placeholder: "70vh",
-            },
-          ],
-        },
-        {
-          key: "minHeight",
-          label: "Minimum Height",
-          type: "object",
-          fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "520px",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "480px",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "400px",
             },
           ],
         },
@@ -362,7 +336,6 @@ export const heroStructure: ComponentStructure = {
         },
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.subtitle", label: "Subtitle", type: "text" },
@@ -372,7 +345,6 @@ export const heroStructure: ComponentStructure = {
       id: "hero2",
       name: "Hero 2 - Simple Image",
       fields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "height",
           label: "Height",
@@ -593,7 +565,6 @@ export const heroStructure: ComponentStructure = {
         },
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "content.title", label: "Title", type: "text" },
         { key: "content.description", label: "Description", type: "text" },
@@ -603,7 +574,6 @@ export const heroStructure: ComponentStructure = {
       id: "hero3",
       name: "Hero 3 - Video Background with Search",
       fields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "height",
           label: "Height",
@@ -626,31 +596,6 @@ export const heroStructure: ComponentStructure = {
               label: "Mobile",
               type: "text",
               placeholder: "70vh",
-            },
-          ],
-        },
-        {
-          key: "minHeight",
-          label: "Minimum Height",
-          type: "object",
-          fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "520px",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "400px",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "300px",
             },
           ],
         },
@@ -893,7 +838,6 @@ export const heroStructure: ComponentStructure = {
         },
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "background.video", label: "Background Video", type: "text" },
         { key: "background.image", label: "Background Image", type: "image" },
         { key: "content.title", label: "Title", type: "text" },
@@ -904,7 +848,6 @@ export const heroStructure: ComponentStructure = {
       id: "hero4",
       name: "Hero 4 - Contact Form Hero",
       fields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "title",
           label: "Title",
@@ -1087,7 +1030,6 @@ export const heroStructure: ComponentStructure = {
         },
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "backgroundImage", label: "Background Image", type: "image" },
         { key: "title", label: "Title", type: "text" },
         {

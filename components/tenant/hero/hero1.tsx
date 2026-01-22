@@ -870,11 +870,12 @@ const Hero1 = (props: HeroProps = {}) => {
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
 
-  // Generate dynamic styles
+  // Generate dynamic styles with responsive height
   const sectionStyles = {
-    height: mergedData.height?.desktop || "90vh",
-    minHeight: mergedData.minHeight?.desktop || "520px",
-  };
+    "--hero-height-desktop": mergedData.height?.desktop || "90vh",
+    "--hero-height-tablet": mergedData.height?.tablet || mergedData.height?.desktop || "90vh",
+    "--hero-height-mobile": mergedData.height?.mobile || mergedData.height?.desktop || "90vh",
+  } as React.CSSProperties;
 
   const titleStyles = {
     fontFamily: mergedData.content?.font?.title?.family || "Tajawal",
@@ -900,12 +901,34 @@ const Hero1 = (props: HeroProps = {}) => {
     return null;
   }
 
+  // Generate unique ID for style tag to avoid conflicts
+  const styleId = `hero1-height-${uniqueId.replace(/[^a-zA-Z0-9]/g, '-')}`;
+  
   return (
-    <section
-      className="relative w-full overflow-hidden max-h-[95dvh]"
-      style={sectionStyles as any}
-      data-debug="hero-component"
-    >
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          #${styleId} {
+            height: var(--hero-height-mobile);
+          }
+          @media (min-width: 768px) {
+            #${styleId} {
+              height: var(--hero-height-tablet);
+            }
+          }
+          @media (min-width: 1024px) {
+            #${styleId} {
+              height: var(--hero-height-desktop);
+            }
+          }
+        `
+      }} />
+      <section
+        id={styleId}
+        className="relative w-full overflow-hidden max-h-[95dvh]"
+        style={sectionStyles}
+        data-debug="hero-component"
+      >
       {/* Background Image */}
       <Image
         src={
@@ -1007,6 +1030,7 @@ const Hero1 = (props: HeroProps = {}) => {
         </div>
       )}
     </section>
+    </>
   );
 };
 

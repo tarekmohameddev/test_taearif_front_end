@@ -649,11 +649,12 @@ function Hero3(props: HeroProps) {
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
 
-  // Generate dynamic styles
+  // Generate dynamic styles with responsive height
   const sectionStyles = {
-    height: mergedData.height?.desktop || "90vh",
-    minHeight: mergedData.minHeight?.desktop || "520px",
-  };
+    "--hero-height-desktop": mergedData.height?.desktop || "90vh",
+    "--hero-height-tablet": mergedData.height?.tablet || mergedData.height?.desktop || "90vh",
+    "--hero-height-mobile": mergedData.height?.mobile || mergedData.height?.desktop || "90vh",
+  } as React.CSSProperties;
 
   const titleStyles = {
     fontFamily: mergedData.content?.font?.title?.family || "Tajawal",
@@ -718,12 +719,34 @@ function Hero3(props: HeroProps) {
   const primaryColor = "#059669"; // emerald-600
   const primaryColorHover = "#047857"; // emerald-700
 
+  // Generate unique ID for style tag to avoid conflicts
+  const styleId = `hero3-height-${uniqueId.replace(/[^a-zA-Z0-9]/g, '-')}`;
+  
   return (
-    <section
-      className="relative w-full overflow-hidden max-h-[95dvh]"
-      style={sectionStyles as any}
-      data-debug="hero-component"
-    >
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          #${styleId} {
+            height: var(--hero-height-mobile);
+          }
+          @media (min-width: 768px) {
+            #${styleId} {
+              height: var(--hero-height-tablet);
+            }
+          }
+          @media (min-width: 1024px) {
+            #${styleId} {
+              height: var(--hero-height-desktop);
+            }
+          }
+        `
+      }} />
+      <section
+        id={styleId}
+        className="relative w-full overflow-hidden max-h-[95dvh]"
+        style={sectionStyles}
+        data-debug="hero-component"
+      >
       {/* Background Video */}
       {videoId ? (
         <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
@@ -848,6 +871,7 @@ function Hero3(props: HeroProps) {
         </div>
       </div>
     </section>
+    </>
   );
 }
 
