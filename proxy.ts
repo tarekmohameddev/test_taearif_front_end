@@ -60,25 +60,40 @@ function extractLocaleAndPathname(pathname: string): {
 
 // دالة للتحقق من Custom Domain (بدون API call للسرعة)
 function getTenantIdFromCustomDomain(host: string): string | null {
+  // Remove port from host (e.g., "example.com:3000" -> "example.com")
+  const hostWithoutPort = host.split(":")[0];
+  
   // التحقق من أن المستخدم على الدومين الأساسي
   const isOnBaseDomain = IS_DEVELOPMENT
-    ? host === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
-    : host === PRODUCTION_DOMAIN || host === `www.${PRODUCTION_DOMAIN}`;
+    ? hostWithoutPort === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
+    : hostWithoutPort === PRODUCTION_DOMAIN || hostWithoutPort === `www.${PRODUCTION_DOMAIN}`;
 
   // إذا كان الدومين الأساسي، لا نعتبره custom domain
   if (isOnBaseDomain) {
     return null;
   }
 
+  // التحقق من أن الـ host ليس subdomain من localhost أو production domain
+  // إذا كان subdomain، يجب أن يتم التعامل معه في getTenantIdFromHost
+  if (IS_DEVELOPMENT && hostWithoutPort.includes(LOCAL_DOMAIN)) {
+    // هذا subdomain من localhost، يجب أن يتم التعامل معه في getTenantIdFromHost
+    return null;
+  }
+  
+  if (!IS_DEVELOPMENT && hostWithoutPort.includes(PRODUCTION_DOMAIN)) {
+    // هذا subdomain من production domain، يجب أن يتم التعامل معه في getTenantIdFromHost
+    return null;
+  }
+
   // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
-  const isCustomDomain = CUSTOM_DOMAIN_REGEX.test(host);
+  const isCustomDomain = CUSTOM_DOMAIN_REGEX.test(hostWithoutPort);
 
   if (!isCustomDomain) {
     return null;
   }
 
   // إرجاع الـ host نفسه كـ tenantId للـ Custom Domain (بدون API call)
-  return host;
+  return hostWithoutPort;
 }
 
 // Cache reserved words as Set for O(1) lookup instead of O(n) array.includes()
@@ -100,23 +115,54 @@ const RESERVED_WORDS = new Set([
 ]);
 
 function getTenantIdFromHost(host: string): string | null {
+  // Remove port from host (e.g., "kkkkk.localhost:3000" -> "kkkkk.localhost")
+  const hostWithoutPort = host.split(":")[0];
+  
   // For localhost development: tenant1.localhost:3000 -> tenant1
-  if (IS_DEVELOPMENT && host.includes(LOCAL_DOMAIN)) {
-    const parts = host.split(".");
+  if (IS_DEVELOPMENT && hostWithoutPort.includes(LOCAL_DOMAIN)) {
+    const parts = hostWithoutPort.split(".");
+    // Debug logging
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔍 getTenantIdFromHost - DEBUG:", {
+        host,
+        hostWithoutPort,
+        parts,
+        partsLength: parts.length,
+        firstPart: parts[0],
+        localDomain: LOCAL_DOMAIN,
+        isFirstPartNotLocalDomain: parts[0] !== LOCAL_DOMAIN,
+      });
+    }
+    
     if (parts.length > 1 && parts[0] !== LOCAL_DOMAIN) {
       const potentialTenantId = parts[0].toLowerCase();
 
       // تحقق من أن الـ tenantId ليس من الكلمات المحجوزة (Set lookup is O(1))
       if (!RESERVED_WORDS.has(potentialTenantId)) {
+        if (process.env.NODE_ENV === "development") {
+          console.log("✅ getTenantIdFromHost - Found tenantId:", parts[0]);
+        }
         return parts[0]; // Return original case
+      } else {
+        if (process.env.NODE_ENV === "development") {
+          console.log("❌ getTenantIdFromHost - Reserved word:", potentialTenantId);
+        }
+      }
+    } else {
+      if (process.env.NODE_ENV === "development") {
+        console.log("❌ getTenantIdFromHost - Invalid subdomain structure:", {
+          partsLength: parts.length,
+          firstPart: parts[0],
+          localDomain: LOCAL_DOMAIN,
+        });
       }
     }
   }
 
   // For production: tenant1.taearif.com -> tenant1
   // التحقق من أن الـ subdomain صحيح (يجب أن يكون لـ productionDomain فقط)
-  if (!IS_DEVELOPMENT && host.includes(PRODUCTION_DOMAIN)) {
-    const parts = host.split(".");
+  if (!IS_DEVELOPMENT && hostWithoutPort.includes(PRODUCTION_DOMAIN)) {
+    const parts = hostWithoutPort.split(".");
     if (parts.length > 2) {
       const potentialTenantId = parts[0].toLowerCase();
       const domainPart = parts.slice(1).join(".");
@@ -151,23 +197,42 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Remove port from host for processing (e.g., "kkkkk.localhost:3000" -> "kkkkk.localhost")
+  const hostWithoutPort = host.split(":")[0];
+  
   // التحقق من أن الصفحة على الدومين الأساسي
   const isOnBaseDomain = IS_DEVELOPMENT
-    ? host === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
-    : host === PRODUCTION_DOMAIN || host === `www.${PRODUCTION_DOMAIN}`;
+    ? hostWithoutPort === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
+    : hostWithoutPort === PRODUCTION_DOMAIN || hostWithoutPort === `www.${PRODUCTION_DOMAIN}`;
 
   // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
   // لكن ليس الدومين الأساسي
-  const hasCustomDomainExtension = CUSTOM_DOMAIN_REGEX.test(host);
+  const hasCustomDomainExtension = CUSTOM_DOMAIN_REGEX.test(hostWithoutPort);
   const isCustomDomain = hasCustomDomainExtension && !isOnBaseDomain;
 
   // Extract tenantId from subdomain or custom domain
   let tenantId = getTenantIdFromHost(host);
+  let domainType: "subdomain" | "custom" | null = tenantId ? "subdomain" : null;
 
   // إذا لم يتم العثور على tenantId من subdomain، تحقق من Custom Domain
   if (!tenantId) {
     tenantId = getTenantIdFromCustomDomain(host);
+    if (tenantId) {
+      domainType = "custom";
+    }
   }
+  
+  // Debug logging
+  console.log("🔍 proxy.ts - Tenant detection:", {
+    host,
+    hostWithoutPort,
+    tenantId,
+    domainType,
+    isOnBaseDomain,
+    hasCustomDomainExtension,
+    isCustomDomain,
+    pathname,
+  });
 
   /*
    * ========================================
@@ -292,11 +357,20 @@ export function proxy(request: NextRequest) {
 
   // Set tenantId header if found
   if (tenantId) {
+    console.log("✅ proxy.ts - Setting headers:", {
+      tenantId,
+      domainType,
+      pathname: pathnameWithoutLocale,
+      locale,
+    });
     response.headers.set("x-tenant-id", tenantId);
 
-    // تحديد نوع الـ domain
-    const domainType = isCustomDomain ? "custom" : "subdomain";
-    response.headers.set("x-domain-type", domainType);
+    // تحديد نوع الـ domain (استخدام domainType المحسوب مسبقاً)
+    if (domainType) {
+      response.headers.set("x-domain-type", domainType);
+    }
+  } else {
+    console.log("❌ proxy.ts - No tenantId found, headers not set");
   }
 
   // إضافة cache headers للمكونات الثابتة (عندما لا يوجد tenantId)

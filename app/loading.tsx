@@ -85,6 +85,12 @@ export default function Loading() {
   // التحقق من وجود tenantId
   useEffect(() => {
     const checkTenantId = () => {
+      // التأكد من أن window متاح
+      if (typeof window === "undefined") {
+        console.log("❌ Loading.tsx - window is undefined");
+        return;
+      }
+
       const hostname = window.location.hostname;
       const productionDomain =
         process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
@@ -109,20 +115,29 @@ export default function Loading() {
         "register",
       ];
 
-      if (process.env.NODE_ENV === "development") {
-        console.log("🔍 Loading.tsx - Checking hostname:", hostname);
-      }
+      console.log("🔍 Loading.tsx - Starting check:", {
+        hostname,
+        productionDomain,
+        localDomain,
+        isDevelopment,
+      });
 
       // 1️⃣ التحقق من أنه الدومين الأساسي
+      // Note: window.location.hostname لا يحتوي على port، لذا لا نحتاج للتحقق من :3000
       const isOnBaseDomain = isDevelopment
-        ? hostname === localDomain || hostname === `${localDomain}:3000`
+        ? hostname === localDomain
         : hostname === productionDomain ||
           hostname === `www.${productionDomain}`;
 
+      console.log("🔍 Loading.tsx - Base domain check:", {
+        hostname,
+        localDomain,
+        productionDomain,
+        isOnBaseDomain,
+      });
+
       if (isOnBaseDomain) {
-        if (process.env.NODE_ENV === "development") {
-          console.log("❌ Loading.tsx - Base domain, no tenant");
-        }
+        console.log("❌ Loading.tsx - Base domain, no tenant");
         setHasTenantId(false);
         return;
       }
@@ -136,6 +151,17 @@ export default function Loading() {
 
         // للتطوير: tenant1.localhost
         if (isDevelopment && hostname.includes(localDomain)) {
+          if (process.env.NODE_ENV === "development") {
+            console.log("🔍 Loading.tsx - Checking local subdomain:", {
+              hostname,
+              parts,
+              partsLength: parts.length,
+              firstPart: parts[0],
+              localDomain,
+              isFirstPartNotLocalDomain: parts[0] !== localDomain,
+            });
+          }
+          
           if (parts.length > 1 && parts[0] !== localDomain) {
             const potentialTenantId = parts[0];
             if (!reservedWords.includes(potentialTenantId.toLowerCase())) {
@@ -147,6 +173,21 @@ export default function Loading() {
               }
               setHasTenantId(true);
               return;
+            } else {
+              if (process.env.NODE_ENV === "development") {
+                console.log(
+                  "❌ Loading.tsx - Reserved word:",
+                  potentialTenantId,
+                );
+              }
+            }
+          } else {
+            if (process.env.NODE_ENV === "development") {
+              console.log("❌ Loading.tsx - Invalid subdomain structure:", {
+                partsLength: parts.length,
+                firstPart: parts[0],
+                localDomain,
+              });
             }
           }
         }
@@ -191,9 +232,7 @@ export default function Loading() {
       }
 
       // ❌ لا يوجد tenant
-      if (process.env.NODE_ENV === "development") {
-        console.log("❌ Loading.tsx - No tenant found");
-      }
+      console.log("❌ Loading.tsx - No tenant found, setting hasTenantId to false");
       setHasTenantId(false);
     };
 
@@ -218,16 +257,15 @@ export default function Loading() {
   const slug = getSlugFromPathname(pathname || "");
 
   // تقليل console.log في production
-  if (process.env.NODE_ENV === "development") {
-    console.log(
-      "🔄 Loading component - pathname:",
+  console.log(
+    "🔄 Loading component - Render:",
+    {
       pathname,
-      "slug:",
       slug,
-      "hasTenantId:",
       hasTenantId,
-    );
-  }
+      timestamp: new Date().toISOString(),
+    },
+  );
 
   // إذا لم يوجد tenantId، اعرض صفحة بيضاء فارغة
   if (hasTenantId === false) {
