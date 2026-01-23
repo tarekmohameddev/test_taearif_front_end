@@ -55,48 +55,25 @@ export const getDefaultHeaderData = (): ComponentData => {
         url: "/",
       },
       {
-        id: "for-rent",
-        type: "link",
-        text: "للإيجار",
-        url: "/for-rent",
-      },
-      {
-        id: "for-sale",
-        type: "link",
-        text: "للبيع",
-        url: "/for-sale",
+        ThemeTwo: "link",
+        name: "بحث عن عقار",
+        path: "/search",
+        submenu: [
+          {
+            text: "عقارات للإيجار",
+            url: "/for-rent",
+          },
+          {
+            text: "عقارات للبيع",
+            url: "/for-sale",
+          },
+        ],
       },
       {
         id: "services",
         type: "dropdown",
         text: "الخدمات",
         url: "/services",
-        submenu: [
-          {
-            type: "section",
-            title: "خدماتنا",
-            items: [
-              {
-                text: "خدمة 1",
-                url: "/service1",
-              },
-              {
-                text: "خدمة 2",
-                url: "/service2",
-                submenu: [
-                  {
-                    text: "خدمة 2-1",
-                    url: "/service2-1",
-                  },
-                  {
-                    text: "خدمة 2-2",
-                    url: "/service2-2",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
       },
       {
         id: "about",
