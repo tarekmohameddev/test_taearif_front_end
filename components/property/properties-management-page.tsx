@@ -463,7 +463,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
+  const [newFilters, setNewFilters] = useState<Record<string, any>>({});
   const [filterCityId, setFilterCityId] = useState<string | null>(null);
   const [filterDistrictId, setFilterDistrictId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string | null>(null);
@@ -473,6 +473,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
   const [filterPriceTo, setFilterPriceTo] = useState<string>("");
   const [filterSearch, setFilterSearch] = useState<string>("");
   const [localSearchValue, setLocalSearchValue] = useState<string>(""); // Local state for input
+  const [isInitialLoad, setIsInitialLoad] = useState(true); // Flag to prevent API call on initial load
   const [cities, setCities] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -873,7 +874,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
         });
 
         // إعادة تحميل قائمة الوحدات
-        fetchProperties(currentPage, appliedFilters);
+        fetchProperties(currentPage, newFilters);
 
         // إذا كان هناك مسودات، اعرض رسالة واعرض خيار التوجيه
         if (data.incomplete_count > 0) {
@@ -910,7 +911,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
         });
 
         // إعادة تحميل قائمة الوحدات
-        fetchProperties(currentPage, appliedFilters);
+        fetchProperties(currentPage, newFilters);
 
         // إذا كان هناك مسودات، اعرض رسالة واعرض خيار التوجيه
         if (data.incomplete_count > 0) {
@@ -1093,7 +1094,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
       params.set("date_to", format(exportDateRange.to, "yyyy-MM-dd"));
       
       // إضافة الفلاتر المطبقة
-      Object.entries(appliedFilters).forEach(([key, value]) => {
+      Object.entries(newFilters).forEach(([key, value]) => {
         if (value !== null && value !== undefined && value !== "") {
           // تخطي date_from و date_to لأننا نستخدم exportDateRange
           if (key === "date_from" || key === "date_to") {
@@ -1477,59 +1478,35 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchProperties(page, appliedFilters);
+    fetchProperties(page, newFilters);
   };
 
   const handleApplyFilters = (filters: any) => {
-    setAppliedFilters(filters);
-    setCurrentPage(1);
-    fetchProperties(1, filters);
-  };
-
-  const applyFilters = () => {
-    const newFilters: Record<string, any> = {};
-    
-    if (filterCityId) newFilters.city_id = filterCityId;
-    if (filterDistrictId) newFilters.district_id = filterDistrictId;
-    if (filterType) newFilters.type = filterType;
-    if (filterPurpose) newFilters.purpose = filterPurpose;
-    if (filterBeds) newFilters.beds = filterBeds;
-    if (filterPriceFrom) {
-      newFilters.price_from = filterPriceFrom;
-      newFilters.price_min = filterPriceFrom; // Support both formats
+    // تحديث الحالات المحلية من الفلاتر المرسلة
+    if (filters.city_id) setFilterCityId(filters.city_id);
+    if (filters.district_id) setFilterDistrictId(filters.district_id);
+    if (filters.type) setFilterType(filters.type);
+    if (filters.purpose) setFilterPurpose(filters.purpose);
+    if (filters.beds) setFilterBeds(filters.beds);
+    if (filters.price_from || filters.price_min) {
+      setFilterPriceFrom(filters.price_from || filters.price_min);
     }
-    if (filterPriceTo) {
-      newFilters.price_to = filterPriceTo;
-      newFilters.price_max = filterPriceTo; // Support both formats
+    if (filters.price_to || filters.price_max) {
+      setFilterPriceTo(filters.price_to || filters.price_max);
     }
-    if (filterSearch.trim()) {
-      newFilters.search = filterSearch.trim();
+    if (filters.search) {
+      setFilterSearch(filters.search);
+      setLocalSearchValue(filters.search);
     }
-    
-    setAppliedFilters(newFilters);
-    setCurrentPage(1);
-    fetchProperties(1, newFilters);
+    // newFilters سيتم تحديثه تلقائياً من useEffect
   };
 
   // دالة للبحث فقط (بدون باقي الفلاتر)
   const handleSearchOnly = useCallback(() => {
     const searchValue = localSearchValue.trim();
     setFilterSearch(searchValue); // Update the main state
-    
-    const newFilters: Record<string, any> = { ...appliedFilters };
-    
-    // تحديث فقط فلتر البحث
-    if (searchValue) {
-      newFilters.search = searchValue;
-    } else {
-      // إذا كان البحث فارغاً، إزالة فلتر البحث
-      delete newFilters.search;
-    }
-    
-    setAppliedFilters(newFilters);
-    setCurrentPage(1);
-    fetchProperties(1, newFilters);
-  }, [localSearchValue, appliedFilters, fetchProperties]);
+    // newFilters سيتم تحديثه تلقائياً من useEffect
+  }, [localSearchValue]);
 
   const handleClearFilters = useCallback(() => {
     setFilterCityId(null);
@@ -1541,25 +1518,10 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     setFilterPriceTo("");
     setFilterSearch("");
     setLocalSearchValue(""); // Clear local search value
-    setAppliedFilters({});
-    setCurrentPage(1);
-    fetchProperties(1);
+    // newFilters سيتم تحديثه تلقائياً من useEffect إلى {}
   }, []);
 
   const handleRemoveFilter = (filterKey: string, filterValue?: any) => {
-    const newFilters: Record<string, any> = { ...appliedFilters };
-
-    if (Array.isArray(newFilters[filterKey])) {
-      newFilters[filterKey] = newFilters[filterKey].filter(
-        (item: any) => item !== filterValue,
-      );
-      if (newFilters[filterKey].length === 0) {
-        delete newFilters[filterKey];
-      }
-    } else {
-      delete newFilters[filterKey];
-    }
-
     // Update local state when removing filters
     if (filterKey === "search") {
       setFilterSearch("");
@@ -1587,16 +1549,11 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     if (filterKey === "beds") {
       setFilterBeds(null);
     }
-
-    setAppliedFilters(newFilters);
-    setCurrentPage(1);
-    fetchProperties(1, newFilters);
+    // newFilters سيتم تحديثه تلقائياً من useEffect
   };
 
   const handleClearAllFilters = () => {
-    setAppliedFilters({});
-    setCurrentPage(1);
-    fetchProperties(1);
+    handleClearFilters();
   };
 
   // Fetch cities on mount
@@ -1635,6 +1592,50 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
       setFilterDistrictId(null);
     }
   }, [filterCityId]);
+
+  // بناء newFilters تلقائياً من الحالات المحلية للفلاتر
+  useEffect(() => {
+    const filters: Record<string, any> = {};
+    
+    if (filterCityId) filters.city_id = filterCityId;
+    if (filterDistrictId) filters.district_id = filterDistrictId;
+    if (filterType) filters.type = filterType;
+    if (filterPurpose) filters.purpose = filterPurpose;
+    if (filterBeds) filters.beds = filterBeds;
+    if (filterPriceFrom) {
+      filters.price_from = filterPriceFrom;
+      filters.price_min = filterPriceFrom; // Support both formats
+    }
+    if (filterPriceTo) {
+      filters.price_to = filterPriceTo;
+      filters.price_max = filterPriceTo; // Support both formats
+    }
+    if (filterSearch.trim()) {
+      filters.search = filterSearch.trim();
+    }
+    
+    setNewFilters(filters);
+  }, [filterCityId, filterDistrictId, filterType, filterPurpose, filterBeds, filterPriceFrom, filterPriceTo, filterSearch]);
+
+  // إرسال API request تلقائياً عند تغيير newFilters
+  useEffect(() => {
+    // تجنب إرسال API request عند التحميل الأولي
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+      return;
+    }
+
+    // التحقق من وجود التوكن قبل إرسال الطلب
+    const { userData } = useAuthStore.getState();
+    if (!userData?.token) {
+      return;
+    }
+
+    // إعادة تعيين الصفحة إلى 1 عند تغيير الفلاتر
+    setCurrentPage(1);
+    fetchProperties(1, newFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newFilters]);
 
   useEffect(() => {
     // Wait until token is fetched (following makeSureIsTokenExist.txt pattern)
@@ -2461,7 +2462,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       onValueChange={(value) => {
                         setFilterCityId(value || null);
                         setFilterDistrictId(null);
-                        setTimeout(() => applyFilters(), 0);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
                       }}
                       disabled={loadingCities}
                     >
@@ -2485,7 +2486,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       value={filterDistrictId || undefined}
                       onValueChange={(value) => {
                         setFilterDistrictId(value || null);
-                        setTimeout(() => applyFilters(), 0);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
                       }}
                       disabled={loadingDistricts || !filterCityId}
                     >
@@ -2509,7 +2510,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       value={filterType || undefined}
                       onValueChange={(value) => {
                         setFilterType(value || null);
-                        setTimeout(() => applyFilters(), 0);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
                       }}
                     >
                       <SelectTrigger>
@@ -2533,7 +2534,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       value={filterPurpose || undefined}
                       onValueChange={(value) => {
                         setFilterPurpose(value || null);
-                        setTimeout(() => applyFilters(), 0);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
                       }}
                     >
                       <SelectTrigger>
@@ -2553,7 +2554,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       value={filterBeds || undefined}
                       onValueChange={(value) => {
                         setFilterBeds(value || null);
-                        setTimeout(() => applyFilters(), 0);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
                       }}
                     >
                       <SelectTrigger>
@@ -2580,7 +2581,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                         onChange={(e) => {
                           setFilterPriceFrom(e.target.value);
                         }}
-                        onBlur={() => applyFilters()}
+                        // newFilters سيتم تحديثه تلقائياً من useEffect عند تغيير القيمة
                         className="flex-1"
                       />
                       <Input
@@ -2590,7 +2591,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                         onChange={(e) => {
                           setFilterPriceTo(e.target.value);
                         }}
-                        onBlur={() => applyFilters()}
+                        // newFilters سيتم تحديثه تلقائياً من useEffect عند تغيير القيمة
                         className="flex-1"
                       />
                     </div>
@@ -2620,7 +2621,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
 
             {/* عرض الفلاتر النشطة */}
             <ActiveFiltersDisplay
-              filters={appliedFilters}
+              filters={newFilters}
               onRemoveFilter={handleRemoveFilter}
               onClearAll={handleClearAllFilters}
             />
@@ -2714,7 +2715,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
             onClose={() => setFilterDialogOpen(false)}
             filterData={propertiesAllData}
             onApplyFilters={handleApplyFilters}
-            appliedFilters={appliedFilters}
+            appliedFilters={newFilters}
           />
 
           {reorderPopup.open && (
