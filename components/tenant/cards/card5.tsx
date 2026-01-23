@@ -31,11 +31,7 @@ interface Property {
     min: number;
     max: number;
   };
-  price: {
-    ThemeTwo?: string;
-    min: number;
-    max: number;
-  };
+  price: number;
   bathrooms?: {
     ThemeTwo?: string;
     min: number;

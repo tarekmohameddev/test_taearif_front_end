@@ -34,11 +34,7 @@ interface Property {
     min: number;
     max: number;
   };
-  price: {
-    ThemeTwo?: string;
-    min: number;
-    max: number;
-  };
+  price: number;
   bathrooms?: {
     ThemeTwo?: string;
     min: number;
@@ -341,7 +337,7 @@ export default function Card4(props: Card4Props) {
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
   const formatNumber = (num: number) => {
-    return num.toLocaleString("ar-SA");
+    return num.toLocaleString("en-US");
   };
 
   const formatPriceNumber = (num: number) => {
@@ -639,8 +635,7 @@ export default function Card4(props: Card4Props) {
               color: styling.priceTextColor || "#ffffff",
             }}
           >
-            {formatPriceNumber(property.price.min)} -{" "}
-            {formatPriceNumber(property.price.max)} ريال سعودي
+            {formatPriceNumber(property.price)} ريال
           </div>
         </div>
       </div>

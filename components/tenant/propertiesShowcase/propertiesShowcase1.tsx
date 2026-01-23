@@ -402,7 +402,7 @@ const StarIcon = () => (
 // Project Card Component
 function ProjectCard({ property }: { property: Property }) {
   const formatNumber = (num: number) => {
-    return num.toLocaleString("ar-SA");
+    return num.toLocaleString("en-US");
   };
 
   const formatPriceNumber = (num: number) => {
