@@ -50,6 +50,7 @@ interface Property {
   };
   images?: string[];
   payment_method?: string;
+  payment_method_en?: string;
   pricePerMeter?: string;
   building_age?: number;
   floors?: number;
@@ -67,8 +68,17 @@ interface Property {
   garden?: number;
   elevator?: number;
   private_parking?: number;
+  annex?: number;
+  rooms?: number;
   length?: string;
   width?: string;
+  street_width_north?: string;
+  street_width_south?: string;
+  street_width_east?: string;
+  street_width_west?: string;
+  facade_id?: number;
+  building?: string | null;
+  size?: string;
   floor_planning_image?: string[];
   video_url?: string;
   virtual_tour?: string;
@@ -917,7 +927,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                   {mergedData.content?.specsTitle || "مواصفات العقار"}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">
-                  {property.bedrooms > 0 ? (
+                  {/* غرف النوم */}
+                  {property.bedrooms > 0 && (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -943,8 +954,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرف النوم: {property.bedrooms}
                       </span>
                     </div>
-                  ) : null}
-                  {property.bathrooms && property.bathrooms > 0 ? (
+                  )}
+
+                  {/* الحمامات */}
+                  {property.bathrooms && property.bathrooms > 0 && (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -970,8 +983,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الحمامات: {property.bathrooms}
                       </span>
                     </div>
-                  ) : null}
-                  {property.area && parseFloat(property.area) > 0 ? (
+                  )}
+
+                  {/* المساحة */}
+                  {property.area && parseFloat(property.area) > 0 && (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -997,8 +1012,476 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         المساحة: {property.area} م²
                       </span>
                     </div>
-                  ) : null}
-                  {property.private_parking && property.private_parking > 0 ? (
+                  )}
+
+                  {/* Size (إذا كان مختلف عن area) */}
+                  {property.size &&
+                    property.size !== property.area &&
+                    parseFloat(property.size) > 0 && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          الحجم: {property.size} م²
+                        </span>
+                      </div>
+                    )}
+
+                  {/* الطول */}
+                  {property.length && parseFloat(property.length) > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        الطول: {property.length} م
+                      </span>
+                    </div>
+                  )}
+
+                  {/* العرض */}
+                  {property.width && parseFloat(property.width) > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        العرض: {property.width} م
+                      </span>
+                    </div>
+                  )}
+
+                  {/* عدد الغرف */}
+                  {property.rooms && property.rooms > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        عدد الغرف: {property.rooms}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* المطابخ */}
+                  {property.kitchen && property.kitchen > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        المطابخ: {property.kitchen}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* الصالات */}
+                  {property.living_room && property.living_room > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        الصالات: {property.living_room}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* المجالس */}
+                  {property.majlis && property.majlis > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        المجالس: {property.majlis}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* غرف الطعام */}
+                  {property.dining_room && property.dining_room > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        غرف الطعام: {property.dining_room}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* غرف الخادمة */}
+                  {property.maid_room && property.maid_room > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        غرف الخادمة: {property.maid_room}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* غرف السائق */}
+                  {property.driver_room && property.driver_room > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        غرف السائق: {property.driver_room}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* غرف التخزين */}
+                  {property.storage_room && property.storage_room > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        غرف التخزين: {property.storage_room}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* القبو */}
+                  {property.basement && property.basement > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        القبو: {property.basement}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* المسبح */}
+                  {property.swimming_pool && property.swimming_pool > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        المسبح: {property.swimming_pool}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* الشرفات */}
+                  {property.balcony && property.balcony > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        الشرفات: {property.balcony}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* الحديقة */}
+                  {property.garden && property.garden > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        الحديقة: {property.garden}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* المصعد */}
+                  {property.elevator && property.elevator > 0 && (
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="mb-3" style={{ color: textColor }}>
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: textColor }}
+                      >
+                        المصعد: {property.elevator}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* موقف السيارات */}
+                  {property.private_parking && property.private_parking > 0 && (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1024,8 +1507,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         موقف سيارات: {property.private_parking}
                       </span>
                     </div>
-                  ) : null}
-                  {property.building_age ? (
+                  )}
+
+                  {/* الملحق */}
+                  {property.annex && property.annex > 0 && (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1037,7 +1522,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth="1.5"
@@ -1048,14 +1533,13 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         className="font-bold text-lg"
                         style={{ color: textColor }}
                       >
-                        عمر العقار:{" "}
-                        {property.building_age === 0
-                          ? "جديد"
-                          : `${property.building_age} سنة`}
+                        الملحق: {property.annex}
                       </span>
                     </div>
-                  ) : null}
-                  {property.swimming_pool && property.swimming_pool > 0 ? (
+                  )}
+
+                  {/* عدد الطوابق */}
+                  {property.floors && property.floors > 0 && (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1067,7 +1551,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth="1.5"
@@ -1078,37 +1562,314 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         className="font-bold text-lg"
                         style={{ color: textColor }}
                       >
-                        مسبح خاص
+                        عدد الطوابق: {property.floors}
                       </span>
                     </div>
-                  ) : null}
-                  {property.maid_room && property.maid_room > 0 ? (
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="mb-3" style={{ color: textColor }}>
-                        <svg
-                          className="h-8 w-8"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
+                  )}
+
+                  {/* رقم الطابق */}
+                  {property.floor_number !== undefined &&
+                    property.floor_number !== null && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
                         >
-                          <path
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="1.5"
-                          ></path>
-                        </svg>
+                          رقم الطابق: {property.floor_number}
+                        </span>
                       </div>
-                      <span
-                        className="font-bold text-lg"
-                        style={{ color: textColor }}
-                      >
-                        غرفة خادمة
-                      </span>
-                    </div>
-                  ) : null}
+                    )}
+
+                  {/* عمر العقار */}
+                  {property.building_age !== undefined &&
+                    property.building_age !== null && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          عمر العقار:{" "}
+                          {property.building_age === 0
+                            ? "جديد"
+                            : `${property.building_age} سنة`}
+                        </span>
+                      </div>
+                    )}
+
+                  {/* طريقة الدفع */}
+                  {property.payment_method &&
+                    property.payment_method.trim() !== "" && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          طريقة الدفع: {property.payment_method}
+                        </span>
+                      </div>
+                    )}
+
+                  {/* السعر للمتر */}
+                  {property.pricePerMeter &&
+                    parseFloat(property.pricePerMeter) > 0 && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          السعر للمتر: {property.pricePerMeter} ريال
+                        </span>
+                      </div>
+                    )}
+
+                  {/* عرض الشارع الشمالي */}
+                  {property.street_width_north &&
+                    parseFloat(property.street_width_north) > 0 && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          عرض الشارع الشمالي: {property.street_width_north} م
+                        </span>
+                      </div>
+                    )}
+
+                  {/* عرض الشارع الجنوبي */}
+                  {property.street_width_south &&
+                    parseFloat(property.street_width_south) > 0 && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          عرض الشارع الجنوبي: {property.street_width_south} م
+                        </span>
+                      </div>
+                    )}
+
+                  {/* عرض الشارع الشرقي */}
+                  {property.street_width_east &&
+                    parseFloat(property.street_width_east) > 0 && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          عرض الشارع الشرقي: {property.street_width_east} م
+                        </span>
+                      </div>
+                    )}
+
+                  {/* عرض الشارع الغربي */}
+                  {property.street_width_west &&
+                    parseFloat(property.street_width_west) > 0 && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          عرض الشارع الغربي: {property.street_width_west} م
+                        </span>
+                      </div>
+                    )}
+
+                  {/* نوع الواجهة */}
+                  {property.facade_id !== undefined &&
+                    property.facade_id !== null && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          نوع الواجهة: {property.facade_id}
+                        </span>
+                      </div>
+                    )}
+
+                  {/* المبنى */}
+                  {property.building &&
+                    property.building !== null &&
+                    property.building.trim() !== "" && (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="mb-3" style={{ color: textColor }}>
+                          <svg
+                            className="h-8 w-8"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.5"
+                            ></path>
+                          </svg>
+                        </div>
+                        <span
+                          className="font-bold text-lg"
+                          style={{ color: textColor }}
+                        >
+                          المبنى: {property.building}
+                        </span>
+                      </div>
+                    )}
                 </div>
               </section>
             )}
