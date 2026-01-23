@@ -120,6 +120,6 @@ export const staticMenuItems: MainNavItem[] = [
     label: "التطبيقات",
     description: "ادارة التطبيقات",
     icon: Grid,
-    path: "/apps",
+    path: "/dashboard/apps",
   },
 ];

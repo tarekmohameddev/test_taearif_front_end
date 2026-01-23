@@ -1,16 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ExternalLink, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
 import useStore from "@/context/Store";
@@ -27,6 +22,7 @@ export function MobileSidebar({
   activeTab,
   setActiveTab,
 }: MobileSidebarProps) {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathname = usePathname();
   const { userData } = useAuthStore();
   const { sidebarData } = useStore();
@@ -70,7 +66,7 @@ export function MobileSidebar({
   };
 
   return (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="right" className="w-[280px] p-0 z-50">
         <SheetTitle className="sr-only">قائمة التنقل</SheetTitle>
@@ -88,73 +84,64 @@ export function MobileSidebar({
             </div>
           </div>
           <div className="px-3">
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
-                    onClick={() => {
-                      const userData = useAuthStore.getState().userData;
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
+              onClick={() => {
+                const userData = useAuthStore.getState().userData;
 
-                      // التحقق من وجود userData
-                      if (!userData) {
-                        console.warn("userData is null or undefined");
-                        alert("يرجى تسجيل الدخول أولاً");
-                        return;
-                      }
+                // التحقق من وجود userData
+                if (!userData) {
+                  console.warn("userData is null or undefined");
+                  alert("يرجى تسجيل الدخول أولاً");
+                  return;
+                }
 
-                      const domain = userData?.domain || "";
+                const domain = userData?.domain || "";
 
-                      // التحقق من صحة الـ domain
-                      if (!domain || domain.trim() === "") {
-                        alert(
-                          "يرجى إعداد domain صحيح في إعدادات الحساب",
-                        );
-                        return;
-                      }
+                // التحقق من صحة الـ domain
+                if (!domain || domain.trim() === "") {
+                  alert(
+                    "يرجى إعداد domain صحيح في إعدادات الحساب",
+                  );
+                  return;
+                }
 
-                      // تنظيف الـ domain من المسافات
-                      const cleanDomain = domain.trim();
+                // تنظيف الـ domain من المسافات
+                const cleanDomain = domain.trim();
 
-                      // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
-                      if (
-                        !cleanDomain.includes(".") &&
-                        !cleanDomain.startsWith("http")
-                      ) {
-                        alert(
-                          "تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح",
-                        );
-                        return;
-                      }
+                // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
+                if (
+                  !cleanDomain.includes(".") &&
+                  !cleanDomain.startsWith("http")
+                ) {
+                  alert(
+                    "تنسيق الـ domain غير صحيح. يجب أن يحتوي على نقطة (مثل: example.com) أو يكون URL صحيح",
+                  );
+                  return;
+                }
 
-                      const url = cleanDomain.startsWith("http")
-                        ? cleanDomain
-                        : `https://${cleanDomain}`;
+                const url = cleanDomain.startsWith("http")
+                  ? cleanDomain
+                  : `https://${cleanDomain}`;
 
-                      // التحقق من صحة الـ URL قبل فتحه
-                      try {
-                        new URL(url);
-                        console.log("Opening URL:", url);
-                        window.open(url, "_blank");
-                      } catch (error) {
-                        console.error("Invalid URL:", url, error);
-                        alert(
-                          "URL غير صحيح. يرجى التحقق من إعدادات الـ domain",
-                        );
-                      }
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4 text-primary" />
-                    <span>معاينة الموقع</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>فتح الموقع في نافذة جديدة</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                // التحقق من صحة الـ URL قبل فتحه
+                try {
+                  new URL(url);
+                  console.log("Opening URL:", url);
+                  window.open(url, "_blank");
+                } catch (error) {
+                  console.error("Invalid URL:", url, error);
+                  alert(
+                    "URL غير صحيح. يرجى التحقق من إعدادات الـ domain",
+                  );
+                }
+              }}
+            >
+              <ExternalLink className="h-4 w-4 text-primary" />
+              <span>معاينة الموقع</span>
+            </Button>
           </div>
           <div className="flex-1 overflow-auto py-2 px-1 min-h-0">
             {error && (

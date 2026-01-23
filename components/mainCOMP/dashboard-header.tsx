@@ -196,14 +196,14 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   return (
     <header className="sticky top-0 z-30 bg-background flex flex-col gap-6">
       {/* الـ navbar الأول مع المحتوى الحالي */}
-      <div className="h-24 items-center justify-between px-4 md:px-6 md:border-b flex">
+      <div className="h-16 items-center justify-between px-4 md:px-6 md:border-b flex">
         <div className="flex items-center gap-4">
           {/* زر القائمة للجوال */}
           {useAuthStore.getState().UserIslogged && (
             <div className="min-[1200px]:hidden">
               <MobileSidebar>
-                <Button variant="ghost" className="h-14 w-14 p-0">
-                  <Menu className="h-10 w-10" />
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-7 w-7" />
                 </Button>
               </MobileSidebar>
             </div>
