@@ -656,12 +656,13 @@ export default function propertyDetail2(props: propertyDetail2Props) {
     }
   }, [property]);
 
-  // صور العقار - computed value
+  // صور العقار - computed value (includes main images + floor planning images)
   const propertyImages =
     property && property.image
       ? [
           property.image,
           ...(property.images || []), // Add additional images if available
+          ...(property.floor_planning_image || []), // Add floor planning images
         ].filter((img) => img && img.trim() !== "")
       : []; // Filter out empty images
 
