@@ -37,11 +37,7 @@ interface Property {
     min: number;
     max: number;
   };
-  price: {
-    ThemeTwo?: string;
-    min: number;
-    max: number;
-  };
+  price: number;
   bathrooms?: {
     ThemeTwo?: string;
     min: number;
@@ -231,11 +227,7 @@ const convertApiPropertyToShowcaseFormat = (property: any): Property => {
       min: floorsMin,
       max: floorsMax,
     },
-    price: {
-      ThemeTwo: "price",
-      min: priceNum > 0 ? priceNum : 100000,
-      max: priceNum > 0 ? priceNum : 500000,
-    },
+    price: priceNum > 0 ? priceNum : 100000,
     bathrooms: {
       ThemeTwo: "bathrooms",
       min: bathrooms > 0 ? bathrooms : 1,
@@ -315,11 +307,7 @@ const convertApiProjectToShowcaseFormat = (project: any): Property => {
       min: floorsMin,
       max: floorsMax,
     },
-    price: {
-      ThemeTwo: "price",
-      min: minPrice > 0 ? minPrice : 500000,
-      max: maxPrice > 0 ? maxPrice : 1500000,
-    },
+    price: minPrice > 0 ? minPrice : (maxPrice > 0 ? maxPrice : 500000),
     bathrooms: {
       ThemeTwo: "bathrooms",
       min: 2,
@@ -523,8 +511,7 @@ function ProjectCard({ property }: { property: Property }) {
         {/* Price Section */}
         <div className="bg-[#896042] rounded-lg px-4 py-3 text-center">
           <div className="text-white text-base font-medium">
-            {formatPriceNumber(property.price.min)} -{" "}
-            {formatPriceNumber(property.price.max)} ريال سعودي
+            {formatPriceNumber(property.price)} ريال
           </div>
         </div>
       </div>

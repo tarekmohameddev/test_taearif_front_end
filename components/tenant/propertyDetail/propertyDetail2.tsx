@@ -901,7 +901,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
               {mergedData.content?.descriptionTitle || "وصف العقار"}
             </h2>
             <p
-              className="leading-relaxed text-right text-lg"
+              className="leading-relaxed text-right text-lg whitespace-pre-line"
               style={{ color: textColor }}
             >
               {property.description || "لا يوجد وصف متاح لهذا العقار"}
@@ -918,7 +918,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
           {/* Right Column: Specs & Form */}
           <div className="space-y-12 order-2 lg:order-1">
             {/* Specs Section */}
-            {mergedData.displaySettings?.showSpecs !== false && (
+            {mergedData.displaySettings?.showSpecs !== false ? (
               <section className="bg-transparent" data-purpose="property-specs">
                 <h2
                   className="text-3xl font-bold mb-8 text-right"
@@ -928,7 +928,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">
                   {/* غرف النوم */}
-                  {property.bedrooms > 0 && (
+                  {property.bedrooms > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -954,10 +954,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرف النوم: {property.bedrooms}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* الحمامات */}
-                  {property.bathrooms && property.bathrooms > 0 && (
+                  {property.bathrooms && property.bathrooms > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -983,10 +983,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الحمامات: {property.bathrooms}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* المساحة */}
-                  {property.area && parseFloat(property.area) > 0 && (
+                  {property.area && parseFloat(property.area) > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1012,12 +1012,12 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         المساحة: {property.area} م²
                       </span>
                     </div>
-                  )}
+                  ): null}
 
                   {/* Size (إذا كان مختلف عن area) */}
                   {property.size &&
                     property.size !== property.area &&
-                    parseFloat(property.size) > 0 && (
+                    parseFloat(property.size) > 0 ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1041,12 +1041,12 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           style={{ color: textColor }}
                         >
                           الحجم: {property.size} م²
-                        </span>
-                      </div>
-                    )}
+                      </span>
+                    </div>
+                  ) : null}
 
                   {/* الطول */}
-                  {property.length && parseFloat(property.length) > 0 && (
+                  {property.length && parseFloat(property.length) > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1072,10 +1072,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الطول: {property.length} م
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* العرض */}
-                  {property.width && parseFloat(property.width) > 0 && (
+                  {property.width && parseFloat(property.width) > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1101,10 +1101,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         العرض: {property.width} م
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* عدد الغرف */}
-                  {property.rooms && property.rooms > 0 && (
+                  {property.rooms && property.rooms > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1130,10 +1130,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         عدد الغرف: {property.rooms}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* المطابخ */}
-                  {property.kitchen && property.kitchen > 0 && (
+                  {property.kitchen && property.kitchen > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1159,10 +1159,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         المطابخ: {property.kitchen}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* الصالات */}
-                  {property.living_room && property.living_room > 0 && (
+                  {property.living_room && property.living_room > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1188,10 +1188,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الصالات: {property.living_room}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* المجالس */}
-                  {property.majlis && property.majlis > 0 && (
+                  {property.majlis && property.majlis > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1217,10 +1217,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         المجالس: {property.majlis}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* غرف الطعام */}
-                  {property.dining_room && property.dining_room > 0 && (
+                  {property.dining_room && property.dining_room > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1246,10 +1246,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرف الطعام: {property.dining_room}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* غرف الخادمة */}
-                  {property.maid_room && property.maid_room > 0 && (
+                  {property.maid_room && property.maid_room > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1275,10 +1275,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرف الخادمة: {property.maid_room}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* غرف السائق */}
-                  {property.driver_room && property.driver_room > 0 && (
+                  {property.driver_room && property.driver_room > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1304,10 +1304,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرف السائق: {property.driver_room}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* غرف التخزين */}
-                  {property.storage_room && property.storage_room > 0 && (
+                  {property.storage_room && property.storage_room > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1333,10 +1333,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         غرف التخزين: {property.storage_room}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* القبو */}
-                  {property.basement && property.basement > 0 && (
+                  {property.basement && property.basement > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1362,10 +1362,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         القبو: {property.basement}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* المسبح */}
-                  {property.swimming_pool && property.swimming_pool > 0 && (
+                  {property.swimming_pool && property.swimming_pool > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1391,10 +1391,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         المسبح: {property.swimming_pool}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* الشرفات */}
-                  {property.balcony && property.balcony > 0 && (
+                  {property.balcony && property.balcony > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1420,10 +1420,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الشرفات: {property.balcony}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* الحديقة */}
-                  {property.garden && property.garden > 0 && (
+                  {property.garden && property.garden > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1449,10 +1449,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الحديقة: {property.garden}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* المصعد */}
-                  {property.elevator && property.elevator > 0 && (
+                  {property.elevator && property.elevator > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1478,10 +1478,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         المصعد: {property.elevator}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* موقف السيارات */}
-                  {property.private_parking && property.private_parking > 0 && (
+                  {property.private_parking && property.private_parking > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1507,10 +1507,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         موقف سيارات: {property.private_parking}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* الملحق */}
-                  {property.annex && property.annex > 0 && (
+                  {property.annex && property.annex > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1536,10 +1536,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         الملحق: {property.annex}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* عدد الطوابق */}
-                  {property.floors && property.floors > 0 && (
+                  {property.floors && property.floors > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div className="mb-3" style={{ color: textColor }}>
                         <svg
@@ -1565,11 +1565,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                         عدد الطوابق: {property.floors}
                       </span>
                     </div>
-                  )}
+                  ): null}
 
                   {/* رقم الطابق */}
                   {property.floor_number !== undefined &&
-                    property.floor_number !== null && (
+                    property.floor_number !== null ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1595,11 +1595,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           رقم الطابق: {property.floor_number}
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* عمر العقار */}
                   {property.building_age !== undefined &&
-                    property.building_age !== null && (
+                    property.building_age !== null ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1628,11 +1628,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                             : `${property.building_age} سنة`}
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* طريقة الدفع */}
                   {property.payment_method &&
-                    property.payment_method.trim() !== "" && (
+                    property.payment_method.trim() !== "" ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1658,11 +1658,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           طريقة الدفع: {property.payment_method}
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* السعر للمتر */}
                   {property.pricePerMeter &&
-                    parseFloat(property.pricePerMeter) > 0 && (
+                    parseFloat(property.pricePerMeter) > 0 ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1688,11 +1688,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           السعر للمتر: {property.pricePerMeter} ريال
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* عرض الشارع الشمالي */}
                   {property.street_width_north &&
-                    parseFloat(property.street_width_north) > 0 && (
+                    parseFloat(property.street_width_north) > 0 ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1718,11 +1718,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           عرض الشارع الشمالي: {property.street_width_north} م
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* عرض الشارع الجنوبي */}
                   {property.street_width_south &&
-                    parseFloat(property.street_width_south) > 0 && (
+                    parseFloat(property.street_width_south) > 0 ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1748,11 +1748,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           عرض الشارع الجنوبي: {property.street_width_south} م
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* عرض الشارع الشرقي */}
                   {property.street_width_east &&
-                    parseFloat(property.street_width_east) > 0 && (
+                    parseFloat(property.street_width_east) > 0 ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1778,11 +1778,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           عرض الشارع الشرقي: {property.street_width_east} م
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* عرض الشارع الغربي */}
                   {property.street_width_west &&
-                    parseFloat(property.street_width_west) > 0 && (
+                    parseFloat(property.street_width_west) > 0 ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1808,11 +1808,11 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           عرض الشارع الغربي: {property.street_width_west} م
                         </span>
                       </div>
-                    )}
+                    ): null}
 
                   {/* نوع الواجهة */}
                   {property.facade_id !== undefined &&
-                    property.facade_id !== null && (
+                    property.facade_id !== null ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1838,12 +1838,12 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           نوع الواجهة: {property.facade_id}
                         </span>
                       </div>
-                    )}
+                    ) : null}
 
                   {/* المبنى */}
                   {property.building &&
                     property.building !== null &&
-                    property.building.trim() !== "" && (
+                    property.building.trim() !== "" ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1869,10 +1869,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           المبنى: {property.building}
                         </span>
                       </div>
-                    )}
+                    ) : null}
                 </div>
               </section>
-            )}
+            ) : null}
 
             {/* WhatsApp Button */}
             {mergedData.whatsApp?.showButton &&

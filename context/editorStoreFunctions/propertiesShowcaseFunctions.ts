@@ -69,11 +69,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
         min: 3,
         max: 5,
       },
-      price: {
-        ThemeTwo: "price",
-        min: 500000,
-        max: 1500000,
-      },
+      price: 500000,
       bathrooms: {
         ThemeTwo: "bathrooms",
         min: 2,
@@ -106,11 +102,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
         min: 4,
         max: 6,
       },
-      price: {
-        ThemeTwo: "price",
-        min: 3000,
-        max: 8000,
-      },
+      price: 3000,
       bathrooms: {
         ThemeTwo: "bathrooms",
         min: 3,
@@ -143,11 +135,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
         min: 4,
         max: 7,
       },
-      price: {
-        ThemeTwo: "price",
-        min: 800000,
-        max: 2000000,
-      },
+      price: 800000,
       bathrooms: {
         ThemeTwo: "bathrooms",
         min: 2,
