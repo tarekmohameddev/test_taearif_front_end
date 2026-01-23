@@ -3084,9 +3084,18 @@ function PropertyCard({
               )}
               <DropdownMenuItem
                 onClick={() => {
-                  const domain = useAuthStore.getState().userData?.domain || "";
+                  let domain = useAuthStore.getState().userData?.domain || "";
+                  if (process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN === "mandhoor.com") {
+                    domain = domain.replace("taearif", "mandhoor");
+                  }
+                  if (process.env.NODE_ENV === "development") {
+                    domain = domain.replace("taearif.com", "localhost:3000");
+                    domain = domain.replace("https://", "http://");
+                  }
                   const url = domain.startsWith("http")
                     ? `${domain}property/${property.slug}`
+                    : process.env.NODE_ENV === "development"
+                    ? `http://${domain}/property/${property.slug}`
                     : `https://${domain}/property/${property.slug}`;
                   window.open(url, "_blank");
                 }}
@@ -3448,9 +3457,18 @@ function PropertyListItem({
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem
                   onClick={() => {
-                    const domain = useAuthStore.getState().userData?.domain || "";
+                    let domain = useAuthStore.getState().userData?.domain || "";
+                    if (process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN === "mandhoor.com") {
+                      domain = domain.replace("taearif", "mandhoor");
+                    }
+                    if (process.env.NODE_ENV === "development") {
+                      domain = domain.replace("taearif.com", "localhost:3000");
+                      domain = domain.replace("https://", "http://");
+                    }
                     const url = domain.startsWith("http")
                       ? `${domain}property/${property.slug}`
+                      : process.env.NODE_ENV === "development"
+                      ? `http://${domain}/property/${property.slug}`
                       : `https://${domain}/property/${property.slug}`;
                     window.open(url, "_blank");
                   }}
