@@ -255,18 +255,7 @@ export default function EditCustomerPage() {
                     <CustomerForm
                       formData={formData}
                       onChange={(field, value) => {
-                        if (
-                          field === "type_id" ||
-                          field === "priority_id" ||
-                          field === "procedure_id" ||
-                          field === "stage_id" ||
-                          field === "city_id" ||
-                          field === "district_id"
-                        ) {
-                          handleChange(field)(value);
-                        } else {
-                          handleChange(field)({ target: { value } } as any);
-                        }
+                        handleChange(field)(value);
                       }}
                       errors={{
                         ...validationErrors,
