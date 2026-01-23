@@ -168,9 +168,6 @@ export default function IncompleteRequestsPage() {
   if (loading && requests.length === 0) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <div className="space-y-6">
               {/* Header Skeleton */}
@@ -236,7 +233,6 @@ export default function IncompleteRequestsPage() {
               </Card>
             </div>
           </main>
-        </div>
       </div>
     );
   }

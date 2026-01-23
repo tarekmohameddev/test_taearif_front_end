@@ -1,7 +1,5 @@
 "use client";
 
-import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import JobForm1 from "@/components/tenant/jobForm/jobForm1";
 import Header from "@/components/tenant/header/Header";
 import { useState } from "react";
@@ -11,9 +9,6 @@ export default function Page() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <DashboardSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="container mx-auto max-w-4xl">
             <div className="mb-6">
@@ -48,7 +43,6 @@ export default function Page() {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }

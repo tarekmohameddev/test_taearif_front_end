@@ -40,7 +40,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-// NOTE: DashboardHeader/Sidebar are rendered globally in `app/dashboard/layout.tsx`
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";

@@ -212,9 +212,6 @@ export function AffiliateDashboardPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Toaster position="top-center" />
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="space-y-8">
               {/* Header Skeleton */}
@@ -247,7 +244,6 @@ export function AffiliateDashboardPage() {
               <Skeleton className="h-32 w-full" />
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -264,9 +260,6 @@ export function AffiliateDashboardPage() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -276,7 +269,6 @@ export function AffiliateDashboardPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }

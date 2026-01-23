@@ -158,9 +158,6 @@ export function AffiliateRegistrationPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Toaster position="top-center" />
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="space-y-8">
               {/* Header Skeleton */}
@@ -193,7 +190,6 @@ export function AffiliateRegistrationPage() {
               <Skeleton className="h-32 w-full" />
             </div>
           </main>
-        </div>
       </div>
     );
   }

@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 import BuildingCard from "./building-card";
 import BuildingsStats from "./buildings-stats";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -189,9 +187,6 @@ export default function BuildingsManagementPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <DashboardSidebar />
         <div className="p-6 space-y-6 bg-white flex-1">
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -329,7 +324,6 @@ export default function BuildingsManagementPage() {
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 }

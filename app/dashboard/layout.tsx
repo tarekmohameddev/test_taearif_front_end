@@ -240,7 +240,7 @@ export default function DashboardLayout({
             <DashboardHeader />
             <div className="flex flex-1 flex-col md:flex-row">
               <EnhancedSidebar />
-              <main className="flex-1 p-4 md:p-6">
+              <main className="flex-1 p-4">
                 {children}
               </main>
             </div>

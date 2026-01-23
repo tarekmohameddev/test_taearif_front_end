@@ -53,8 +53,6 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { DashboardSidebar } from "@/components/dashboard-sidebar";
 
 export function PropertiesPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -158,9 +156,6 @@ export function PropertiesPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <DashboardSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -565,7 +560,6 @@ export function PropertiesPage() {
             </Tabs>
           </div>
         </main>
-      </div>
     </div>
   );
 }

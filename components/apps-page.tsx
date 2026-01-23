@@ -415,9 +415,6 @@ export function AppsPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -672,7 +669,6 @@ export function AppsPage() {
             </Tabs>
           </div>
         </main>
-      </div>
       {showPaymentPopup && paymentUrl && (
         <PaymentPopup
           paymentUrl={paymentUrl}
