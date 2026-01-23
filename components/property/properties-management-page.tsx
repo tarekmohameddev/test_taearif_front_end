@@ -474,6 +474,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
   const [filterPriceFrom, setFilterPriceFrom] = useState<string>("");
   const [filterPriceTo, setFilterPriceTo] = useState<string>("");
   const [filterSearch, setFilterSearch] = useState<string>("");
+  const [localSearchValue, setLocalSearchValue] = useState<string>(""); // Local state for input
   const [cities, setCities] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -1512,7 +1513,27 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     fetchProperties(1, newFilters);
   };
 
-  const handleClearFilters = () => {
+  // دالة للبحث فقط (بدون باقي الفلاتر)
+  const handleSearchOnly = useCallback(() => {
+    const searchValue = localSearchValue.trim();
+    setFilterSearch(searchValue); // Update the main state
+    
+    const newFilters: Record<string, any> = { ...appliedFilters };
+    
+    // تحديث فقط فلتر البحث
+    if (searchValue) {
+      newFilters.search = searchValue;
+    } else {
+      // إذا كان البحث فارغاً، إزالة فلتر البحث
+      delete newFilters.search;
+    }
+    
+    setAppliedFilters(newFilters);
+    setCurrentPage(1);
+    fetchProperties(1, newFilters);
+  }, [localSearchValue, appliedFilters, fetchProperties]);
+
+  const handleClearFilters = useCallback(() => {
     setFilterCityId(null);
     setFilterDistrictId(null);
     setFilterType(null);
@@ -1521,10 +1542,11 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     setFilterPriceFrom("");
     setFilterPriceTo("");
     setFilterSearch("");
+    setLocalSearchValue(""); // Clear local search value
     setAppliedFilters({});
     setCurrentPage(1);
     fetchProperties(1);
-  };
+  }, []);
 
   const handleRemoveFilter = (filterKey: string, filterValue?: any) => {
     const newFilters: Record<string, any> = { ...appliedFilters };
@@ -1543,6 +1565,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     // Update local state when removing filters
     if (filterKey === "search") {
       setFilterSearch("");
+      setLocalSearchValue(""); // Clear local search value
     }
     if (filterKey === "price_from" || filterKey === "price_min") {
       setFilterPriceFrom("");
@@ -2409,23 +2432,33 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                   {/* البحث */}
                   <div className="space-y-2">
                     <Label>البحث</Label>
-                    <div className="relative">
-                      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="text"
-                        placeholder="كود الوحدة أو العنوان"
-                        value={filterSearch}
-                        onChange={(e) => {
-                          setFilterSearch(e.target.value);
-                        }}
-                        onBlur={() => applyFilters()}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            applyFilters();
-                          }
-                        }}
-                        className="pr-10"
-                      />
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="text"
+                          placeholder="كود الوحدة أو العنوان"
+                          value={localSearchValue}
+                          onChange={(e) => {
+                            setLocalSearchValue(e.target.value); // Only update local state
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSearchOnly();
+                            }
+                          }}
+                          className="pr-10"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleSearchOnly}
+                        size="default"
+                        className="shrink-0"
+                      >
+                        <Search className="h-4 w-4 ml-2" />
+                        بحث
+                      </Button>
                     </div>
                   </div>
 
@@ -2581,7 +2614,7 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       size="sm"
                       onClick={handleClearFilters} 
                       className={`w-fit text-sm ${
-                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo || filterSearch
+                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo || localSearchValue
                           ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
                           : ""
                       }`}
