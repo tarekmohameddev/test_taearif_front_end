@@ -77,8 +77,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
@@ -681,9 +679,6 @@ export default function AddProjectPage(): JSX.Element {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -693,16 +688,12 @@ export default function AddProjectPage(): JSX.Element {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {hasReachedLimit && (
@@ -1380,7 +1371,6 @@ export default function AddProjectPage(): JSX.Element {
             </Card>
           </div>
         </main>
-      </div>
     </div>
   );
 }

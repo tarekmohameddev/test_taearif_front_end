@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { EnhancedSidebar } from "./mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "./mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -100,9 +98,6 @@ export default function CustomersPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -285,7 +280,6 @@ export default function CustomersPage() {
             </Tabs>
           </div>
         </main>
-      </div>
     </div>
   );
 }

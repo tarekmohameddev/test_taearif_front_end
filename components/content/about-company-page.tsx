@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import axiosInstance from "@/lib/axiosInstance"; // تأكد من المسار الصحيح
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -181,25 +179,18 @@ export function AboutCompanyPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <DashboardHeader />
-        <div className="flex flex-1">
-          <EnhancedSidebar activeTab="content" />
           <main className="flex-1 p-6">
             <div className="flex h-96 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           </main>
         </div>
-      </div>
     );
   }
 
   if (error) {
     return (
       <div className="flex min-h-screen flex-col">
-        <DashboardHeader />
-        <div className="flex flex-1">
-          <EnhancedSidebar activeTab="content" />
           <main className="flex-1 p-6">
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -207,7 +198,6 @@ export function AboutCompanyPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           </main>
-        </div>
       </div>
     );
   }
@@ -216,9 +206,6 @@ export function AboutCompanyPage() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col">
-        <DashboardHeader />
-        <div className="flex flex-1">
-          <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -229,15 +216,11 @@ export function AboutCompanyPage() {
             </div>
           </main>
         </div>
-      </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" />
         <main className="flex-1 p-6">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -483,7 +466,6 @@ export function AboutCompanyPage() {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }

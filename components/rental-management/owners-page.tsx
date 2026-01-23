@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -632,9 +630,6 @@ export function OwnersPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header */}
@@ -2399,7 +2394,6 @@ export function OwnersPage() {
             </Dialog>
           </div>
         </main>
-      </div>
     </div>
   );
 }

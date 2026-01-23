@@ -23,8 +23,6 @@ import {
   Save,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import {
   CrmActivityCard,
   CrmCard,
@@ -364,15 +362,11 @@ export default function EditDealPage() {
   if (loadingDeal) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -380,9 +374,6 @@ export default function EditDealPage() {
   if (error) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <Card>
               <CardContent className="p-6">
@@ -398,16 +389,12 @@ export default function EditDealPage() {
               </CardContent>
             </Card>
           </main>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6 max-w-6xl mx-auto">
             {/* Header */}
@@ -763,7 +750,6 @@ export default function EditDealPage() {
             )}
           </div>
         </main>
-      </div>
     </div>
   );
 }

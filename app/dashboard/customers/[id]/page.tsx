@@ -16,8 +16,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useAuthStore from "@/context/AuthContext";
 
@@ -72,9 +70,6 @@ export default function CustomerDetailsPage() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <EnhancedSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <DashboardHeader />
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-4 py-6 max-w-6xl" dir="rtl">
             {/* Header */}
@@ -439,7 +434,6 @@ export default function CustomerDetailsPage() {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }

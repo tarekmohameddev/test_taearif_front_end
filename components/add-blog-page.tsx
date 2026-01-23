@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { EnhancedSidebar } from "./mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "./mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -148,9 +146,6 @@ export default function AddBlogPage(): JSX.Element {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -439,6 +434,5 @@ export default function AddBlogPage(): JSX.Element {
           </div>
         </main>
       </div>
-    </div>
   );
 }

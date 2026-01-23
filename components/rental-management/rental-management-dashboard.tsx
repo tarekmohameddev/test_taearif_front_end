@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
 import { RentalApplicationsService } from "@/components/rental-management/services/rental-applications-service";
 import { RentalAgreementsService } from "@/components/rental-management/services/rental-agreements-service";
 import { RentalPaymentsService } from "@/components/rental-management/services/rental-payments-service";
@@ -83,9 +81,6 @@ export function RentalManagementDashboard() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <DashboardSidebar activeTab="properties" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -96,15 +91,11 @@ export function RentalManagementDashboard() {
             </div>
           </main>
         </div>
-      </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-8">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
@@ -258,7 +249,6 @@ export function RentalManagementDashboard() {
             */}
           </div>
         </main>
-      </div>
     </div>
   );
 }

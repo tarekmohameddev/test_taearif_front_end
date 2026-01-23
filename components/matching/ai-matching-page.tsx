@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import useStore from "@/context/Store";
-import { EnhancedSidebar } from "../mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "../mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -391,9 +389,6 @@ export function AIMatchingPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header */}
@@ -1118,7 +1113,6 @@ export function AIMatchingPage() {
             </Dialog>
           </div>
         </main>
-      </div>
     </div>
   );
 }

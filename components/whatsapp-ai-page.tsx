@@ -28,8 +28,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
 export function WhatsappAiPage() {
@@ -116,9 +114,6 @@ export function WhatsappAiPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-3 md:p-4 lg:p-6">
           <div className="space-y-6">
             <div>
@@ -914,7 +909,6 @@ export function WhatsappAiPage() {
             </Tabs>
           </div>
         </main>
-      </div>
     </div>
   );
 }

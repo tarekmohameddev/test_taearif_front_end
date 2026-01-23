@@ -40,8 +40,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+// NOTE: DashboardHeader/Sidebar are rendered globally in `app/dashboard/layout.tsx`
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
@@ -1465,19 +1464,9 @@ export default function PropertyForm({ mode, isDraft = false }) {
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {
     return (
-      <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
-          <main className="flex-1 p-4 md:p-6">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <p className="text-lg text-gray-500">
-                  يرجى تسجيل الدخول لعرض المحتوى
-                </p>
-              </div>
-            </div>
-          </main>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-lg text-gray-500">يرجى تسجيل الدخول لعرض المحتوى</p>
         </div>
       </div>
     );
@@ -1486,12 +1475,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
   // عرض skeleton loader أثناء جلب البيانات في وضع التعديل
   if (loadingProperty && mode === "edit") {
     return (
-      <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
-          <main className="flex-1 p-4 md:p-6">
-            <div className="space-y-6 max-w-[1000px] mx-auto">
+      <div className="space-y-6 max-w-[1000px] mx-auto">
               {/* Header Skeleton */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-2">
@@ -1574,20 +1558,12 @@ export default function PropertyForm({ mode, isDraft = false }) {
                   </CardContent>
                 </Card>
               ))}
-            </div>
-          </main>
-        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
-        <main className="flex-1 p-4 md:p-6">
-          <div className="space-y-6 max-w-[1000px] mx-auto">
+    <div className="space-y-6 max-w-[1000px] mx-auto">
             {mode === "add" && hasReachedLimit && (
               <div
                 className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-6"
@@ -3651,9 +3627,6 @@ export default function PropertyForm({ mode, isDraft = false }) {
                 </div>
               )
             )}
-          </div>
-        </main>
-      </div>
     </div>
   );
 }

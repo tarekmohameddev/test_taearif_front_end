@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Loader2, Save, X, Home, MapPin, DollarSign } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { PropertyRequestForm } from "@/components/property-requests/page-components/PropertyRequestForm";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
@@ -359,9 +357,6 @@ export default function EditPropertyRequestPage() {
   if (!userData?.token) {
     return (
       <div className="flex h-screen overflow-hidden" dir="rtl">
-        <EnhancedSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <DashboardHeader />
           <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
             <div className="container mx-auto px-4 py-6 max-w-6xl">
               <Card>
@@ -375,16 +370,12 @@ export default function EditPropertyRequestPage() {
               </Card>
             </div>
           </div>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex h-screen overflow-hidden" dir="rtl">
-      <EnhancedSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <DashboardHeader />
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-4 py-6 max-w-4xl">
             {/* Header */}
@@ -773,7 +764,6 @@ export default function EditPropertyRequestPage() {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }

@@ -1,7 +1,5 @@
 "use client";
 
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -471,9 +469,6 @@ export default function PropertyRequestsPage() {
   if (loading && propertyRequestsData.length === 0) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <div className="space-y-6">
               {/* Header Skeleton */}
@@ -617,7 +612,6 @@ export default function PropertyRequestsPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -735,9 +729,6 @@ export default function PropertyRequestsPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header */}
@@ -860,7 +851,6 @@ export default function PropertyRequestsPage() {
 
           </div>
         </main>
-      </div>
     </div>
   );
 }

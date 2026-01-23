@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Loader2, Save, X } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { CustomerForm } from "@/components/customers/page-components/CustomerForm";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
@@ -177,9 +175,6 @@ export default function EditCustomerPage() {
   if (!userData?.token) {
     return (
       <div className="flex h-screen overflow-hidden">
-        <EnhancedSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <DashboardHeader />
           <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
             <div className="container mx-auto px-4 py-6 max-w-6xl" dir="rtl">
               <Card>
@@ -194,15 +189,11 @@ export default function EditCustomerPage() {
             </div>
           </div>
         </div>
-      </div>
     );
   }
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <EnhancedSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <DashboardHeader />
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
           <div className="container mx-auto px-4 py-6 max-w-4xl" dir="rtl">
             {/* Header */}
@@ -325,7 +316,6 @@ export default function EditCustomerPage() {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }

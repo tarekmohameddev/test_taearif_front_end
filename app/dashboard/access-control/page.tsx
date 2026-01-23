@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -1570,9 +1568,6 @@ export default function AccessControlPage() {
 
   return (
     <div className="flex min-h-screen flex-col h-screen bg-white">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
-        <EnhancedSidebar />
 
         <div className="flex-1 overflow-auto p-6">
           <div className=" mx-auto">
@@ -1948,7 +1943,6 @@ export default function AccessControlPage() {
                 </Card>
             </div>
           </div>
-        </div>
       </div>
 
       {/* Role Details Dialog */}

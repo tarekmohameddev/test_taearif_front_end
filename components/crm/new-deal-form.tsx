@@ -47,8 +47,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
@@ -713,9 +711,6 @@ export default function NewDealForm() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6 overflow-y-auto">
           <div className="max-w-6xl mx-auto space-y-6">
             {/* Header */}
@@ -1563,7 +1558,6 @@ export default function NewDealForm() {
             </form>
           </div>
         </main>
-      </div>
     </div>
   );
 }

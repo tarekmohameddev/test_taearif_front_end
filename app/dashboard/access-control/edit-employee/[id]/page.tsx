@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -227,9 +225,6 @@ export default function EditEmployeePage() {
   if (employeeLoading) {
     return (
       <div className="flex min-h-screen flex-col h-screen bg-gray-50">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
-          <EnhancedSidebar />
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="h-8 w-8 animate-spin text-black" />
@@ -238,16 +233,12 @@ export default function EditEmployeePage() {
               </span>
             </div>
           </div>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col h-screen bg-gray-50">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
-        <EnhancedSidebar />
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
@@ -507,8 +498,7 @@ export default function EditEmployeePage() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+          </div>
     </div>
   );
 }

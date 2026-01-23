@@ -25,8 +25,6 @@ import {
   CheckCircle,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import {
   CrmActivityCard,
   CrmCard,
@@ -677,9 +675,6 @@ export default function DealDetailsPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6 max-w-6xl mx-auto">
             {/* Header */}
@@ -1422,7 +1417,6 @@ export default function DealDetailsPage() {
             </Card>
           </div>
         </main>
-      </div>
     </div>
   );
 }

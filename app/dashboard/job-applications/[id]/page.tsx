@@ -18,8 +18,6 @@ import {
   Download,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import useAuthStore from "@/context/AuthContext";
 
 // TypeScript interfaces based on API documentation
@@ -139,15 +137,11 @@ export default function JobApplicationDetailsPage() {
   if (authLoading || !userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -155,15 +149,11 @@ export default function JobApplicationDetailsPage() {
   if (loadingDetails) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -171,9 +161,6 @@ export default function JobApplicationDetailsPage() {
   if (error || !application) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <Card>
               <CardContent className="p-6">
@@ -192,15 +179,11 @@ export default function JobApplicationDetailsPage() {
             </Card>
           </main>
         </div>
-      </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6 max-w-6xl mx-auto">
             {/* Header */}
@@ -439,7 +422,6 @@ export default function JobApplicationDetailsPage() {
             )}
           </div>
         </main>
-      </div>
     </div>
   );
 }

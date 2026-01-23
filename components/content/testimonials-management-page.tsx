@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -90,9 +88,6 @@ export function TestimonialsManagementPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" />
         <main className="flex-1 p-6">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -343,6 +338,5 @@ export function TestimonialsManagementPage() {
           </div>
         </main>
       </div>
-    </div>
   );
 }

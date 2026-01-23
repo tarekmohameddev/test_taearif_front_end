@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -190,9 +188,6 @@ export default function ProjectActivityLogPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
         <div className="flex-1 overflow-auto p-6">
           <div className="mx-auto">
             {/* Header */}
@@ -422,7 +417,6 @@ export default function ProjectActivityLogPage() {
             </Card>
           </div>
         </div>
-      </div>
     </div>
   );
 }

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { EnhancedSidebar } from "./mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "./mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -107,9 +105,6 @@ export default function MessagesPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -333,7 +328,6 @@ export default function MessagesPage() {
             </Card>
           </div>
         </main>
-      </div>
     </div>
   );
 }

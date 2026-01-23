@@ -12,8 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { toast } from "@/hooks/use-toast";
 import {
   Copy,
@@ -116,9 +114,6 @@ export function AffiliateLinksPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header */}
@@ -358,7 +353,6 @@ export function AffiliateLinksPage() {
             </Card>
           </div>
         </main>
-      </div>
     </div>
   );
 }

@@ -40,7 +40,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -63,7 +62,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { HelpCenter } from "@/components/help-center";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -440,9 +438,6 @@ export function SettingsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader></DashboardHeader>
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="settings" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1091,7 +1086,6 @@ export function SettingsPage() {
             </Tabs>
           </div>
         </main>
-      </div>
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>

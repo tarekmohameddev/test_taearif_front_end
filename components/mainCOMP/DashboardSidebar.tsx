@@ -1,7 +1,7 @@
 "use client";
 
-import { DesktopSidebar } from "./DesktopSidebar";
-import { MobileSidebar } from "./MobileSidebar";
+import { DesktopSidebar } from "./sidebarComponents/DesktopSidebar";
+import { MobileSidebar } from "./sidebarComponents/MobileSidebar";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

@@ -1,7 +1,7 @@
 import { WelcomeDashboard } from "@/components/homepage/welcome-dashboard";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
-import { GuidedTour } from "@/components/mainCOMP/guided-tour";
+import { GuidedTour } from "@/components/mainCOMP/sidebarComponents/guided-tour";
 
 export const metadata = {
   title: "لوحة تحكم تعاريف",

@@ -26,8 +26,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 
@@ -231,25 +229,18 @@ export default function BuildingForm({ mode = "add" }) {
   if (loading && mode === "edit") {
     return (
       <div className="flex min-h-screen bg-white">
-        <EnhancedSidebar />
-        <div className="flex-1 flex flex-col">
-          <DashboardHeader />
           <div className="p-6 flex items-center justify-center">
             <div className="flex items-center space-x-2">
               <Loader2 className="w-6 h-6 animate-spin text-black" />
               <span className="text-black">جاري تحميل بيانات العمارة...</span>
             </div>
           </div>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen bg-white">
-      <EnhancedSidebar />
-      <div className="flex-1 flex flex-col">
-        <DashboardHeader />
         <div className="p-6 bg-white">
           {/* Header */}
           <div className="mb-8">
@@ -506,7 +497,6 @@ export default function BuildingForm({ mode = "add" }) {
             </div>
           </form>
         </div>
-      </div>
     </div>
   );
 }

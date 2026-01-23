@@ -26,8 +26,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import {
   Dialog,
   DialogContent,
@@ -550,9 +548,6 @@ export function WhatsAppCenterPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="whatsapp-center" />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Page Header */}
@@ -1001,7 +996,6 @@ export function WhatsAppCenterPage() {
             </Card> */}
           </div>
         </main>
-      </div>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

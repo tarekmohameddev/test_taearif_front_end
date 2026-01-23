@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import {
   Dialog,
   DialogContent,
@@ -481,10 +479,6 @@ export default function RolesPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="analytics" setActiveTab={() => {}} />
-
         <div className="flex-1 overflow-auto p-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -983,7 +977,6 @@ export default function RolesPage() {
             </Card>
           )}
         </div>
-      </div>
 
       <Dialog
         open={showCreateRoleDialog}

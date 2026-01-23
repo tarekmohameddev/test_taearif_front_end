@@ -1,7 +1,5 @@
 "use client";
 
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState, useCallback } from "react";
@@ -346,9 +344,6 @@ export default function CustomersPage() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -358,7 +353,6 @@ export default function CustomersPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -370,9 +364,6 @@ export default function CustomersPage() {
   if (isInitialLoad) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <main className="flex-1 p-4 md:p-6">
             <div className="space-y-6">
               {/* Header Skeleton */}
@@ -516,7 +507,6 @@ export default function CustomersPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -610,9 +600,6 @@ export default function CustomersPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header */}
@@ -681,7 +668,6 @@ export default function CustomersPage() {
             <CrmLinkCard />
           </div>
         </main>
-      </div>
     </div>
   );
 }

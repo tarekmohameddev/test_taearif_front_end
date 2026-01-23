@@ -9,8 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ArrowRight, Plus, Save, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 export default function SkillsManagementPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -73,9 +71,6 @@ export default function SkillsManagementPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" />
         <main className="flex-1 p-6">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -217,7 +212,6 @@ export default function SkillsManagementPage() {
             </CardContent>
           </Card>
         </main>
-      </div>
     </div>
   );
 }

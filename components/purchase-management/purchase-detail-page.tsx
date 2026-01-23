@@ -6,8 +6,6 @@ import useStore from "@/context/Store";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -459,9 +457,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col bg-gray-50" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -471,7 +466,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -479,9 +473,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col bg-gray-50" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4 space-x-reverse">
@@ -525,7 +516,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
               ))}
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -584,9 +574,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -1042,7 +1029,6 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
             </DialogContent>
           </Dialog>
         </main>
-      </div>
     </div>
   );
 }

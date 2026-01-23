@@ -4,8 +4,6 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { useUserStore } from "@/store/userStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Shield, RefreshCw } from "lucide-react";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 
 interface PermissionWrapperProps {
   children: React.ReactNode;
@@ -69,9 +67,6 @@ export default function PermissionWrapper({
 
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar />
           <main className="flex-1 py-6">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-center min-h-[60vh]">
@@ -103,7 +98,6 @@ export default function PermissionWrapper({
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }

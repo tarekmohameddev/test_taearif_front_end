@@ -10,8 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { DollarSign, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -285,9 +283,6 @@ export function AffiliateDashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-8">
             {/* Header */}
@@ -691,7 +686,6 @@ export function AffiliateDashboardPage() {
             </Card>
           </div>
         </main>
-      </div>
     </div>
   );
 }

@@ -7,6 +7,8 @@ import PermissionWrapper from "@/components/PermissionWrapper";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useAuthStore from "@/context/AuthContext";
+import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
+import { EnhancedSidebar } from "@/components/mainCOMP/sidebarComponents/enhanced-sidebar";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
@@ -233,7 +235,17 @@ export default function DashboardLayout({
   return (
     <GTMProvider containerId="GTM-KBL37C9T">
       <div dir="rtl" style={{ direction: "rtl" }}>
-        <PermissionWrapper>{children}</PermissionWrapper>
+        <PermissionWrapper>
+          <div className="flex min-h-screen flex-col" dir="rtl">
+            <DashboardHeader />
+            <div className="flex flex-1 flex-col md:flex-row">
+              <EnhancedSidebar />
+              <main className="flex-1 p-4 md:p-6">
+                {children}
+              </main>
+            </div>
+          </div>
+        </PermissionWrapper>
       </div>
     </GTMProvider>
   );

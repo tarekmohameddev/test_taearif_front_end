@@ -67,8 +67,6 @@ import {
   HandCoins,
 } from "lucide-react";
 
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 // Placeholder data - replace with your actual data fetching logic
 const employeeData = [
@@ -443,9 +441,6 @@ export function PlatformReportsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="reports" />
         <main className="flex-1 overflow-auto">
           <div className="space-y-6 p-3 sm:p-4 md:p-6 lg:p-8">
             {/* Header with controls */}
@@ -1830,7 +1825,6 @@ export function PlatformReportsPage() {
             </Tabs>
           </div>
         </main>
-      </div>
     </div>
   );
 }

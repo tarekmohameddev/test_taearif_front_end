@@ -23,8 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -561,9 +559,6 @@ export default function MenuManagementPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" />
         <main className="flex-1 p-6">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -879,7 +874,6 @@ export default function MenuManagementPage() {
             </TabsContent>
           </Tabs>
         </main>
-      </div>
 
       {/* نافذة تعديل العنصر */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

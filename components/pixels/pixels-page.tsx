@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Link, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { PixelList } from "./pixel-list";
 import { AddPixelForm } from "./add-pixel-form";
 import { EditPixelForm } from "./edit-pixel-form";
@@ -139,9 +137,6 @@ export function PixelsPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -174,7 +169,6 @@ export function PixelsPage() {
             />
           </div>
         </main>
-      </div>
 
       <AddPixelForm
         open={isAddDialogOpen}

@@ -33,8 +33,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
@@ -1049,9 +1047,6 @@ function AppListItem({ app, onInstall, onUninstall }: AppProps) {
 function AppsPageSkeleton() {
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="apps" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header Section */}
@@ -1099,7 +1094,6 @@ function AppsPageSkeleton() {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }

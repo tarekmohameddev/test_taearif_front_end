@@ -11,8 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -195,9 +193,6 @@ export function ContentManagementPage() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col">
-        <DashboardHeader />
-        <div className="flex flex-1">
-          <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -208,15 +203,11 @@ export function ContentManagementPage() {
             </div>
           </main>
         </div>
-      </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
         <main className="flex-1 p-6">
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -451,7 +442,6 @@ export function ContentManagementPage() {
             </div>
           )}
         </main>
-      </div>
     </div>
   );
 }

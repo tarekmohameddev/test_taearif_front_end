@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -199,9 +197,6 @@ export function ActivityLogsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="analytics" setActiveTab={() => {}} />
         <div className="flex-1 overflow-auto p-6">
           <div className="mx-auto ">
             <div className="mb-8">
@@ -426,6 +421,5 @@ export function ActivityLogsPage() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -15,8 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 export default function WhyChooseUsPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -131,9 +129,6 @@ export default function WhyChooseUsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" />
         <main className="flex-1 p-6">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -356,7 +351,6 @@ export default function WhyChooseUsPage() {
             </CardContent>
           </Card>
         </main>
-      </div>
     </div>
   );
 }

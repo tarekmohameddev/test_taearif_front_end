@@ -55,8 +55,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import EmptyState from "@/components/empty-state";
@@ -1237,9 +1235,6 @@ export function IncompletePropertiesManagementPage() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -1249,16 +1244,12 @@ export function IncompletePropertiesManagementPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* العنوان وزر العودة وأزرار العرض في نفس الصف */}
@@ -1767,7 +1758,6 @@ export function IncompletePropertiesManagementPage() {
             </div>
           )}
         </main>
-      </div>
     </div>
   );
 }

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
 import { EditorProvider } from "@/context/EditorProvider";
 

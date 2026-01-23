@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -173,9 +171,6 @@ export default function ViewEmployeePage() {
   if (detailsLoading) {
     return (
       <div className="flex h-screen bg-gray-50">
-        <EnhancedSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <DashboardHeader />
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="h-8 w-8 animate-spin text-black" />
@@ -184,7 +179,6 @@ export default function ViewEmployeePage() {
               </span>
             </div>
           </div>
-        </div>
       </div>
     );
   }
@@ -192,9 +186,6 @@ export default function ViewEmployeePage() {
   if (error || !employeeDetails) {
     return (
       <div className="flex h-screen bg-gray-50">
-        <EnhancedSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <DashboardHeader />
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
             <div className="text-center">
               <p className="text-red-600 font-medium mb-4">
@@ -204,7 +195,6 @@ export default function ViewEmployeePage() {
                 العودة
               </Button>
             </div>
-          </div>
         </div>
       </div>
     );
@@ -212,9 +202,6 @@ export default function ViewEmployeePage() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <EnhancedSidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader />
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
@@ -418,7 +405,6 @@ export default function ViewEmployeePage() {
               </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );

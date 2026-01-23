@@ -7,8 +7,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import type { Customer, PipelineStage, Appointment } from "@/types/crm";
 import useCrmStore from "@/context/store/crm";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import {
   CrmStatistics,
   CrmFilters,
@@ -345,9 +343,6 @@ export default function CrmPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header */}
@@ -440,6 +435,5 @@ export default function CrmPage() {
           </div>
         </main>
       </div>
-    </div>
   );
 }

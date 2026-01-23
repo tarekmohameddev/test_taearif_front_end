@@ -1,8 +1,6 @@
 "use client";
 import CustomTitle from "@/components/CustomTitle";
 import Head from "next/head";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -392,15 +390,11 @@ export function FooterManagementPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <DashboardHeader />
-        <div className="flex flex-1">
-          <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
           <main className="flex-1 p-6">
             <div className="flex items-center justify-center h-full">
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -409,9 +403,6 @@ export function FooterManagementPage() {
   if (error) {
     return (
       <div className="flex min-h-screen flex-col">
-        <DashboardHeader />
-        <div className="flex flex-1">
-          <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
           <main className="flex-1 p-6">
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -419,7 +410,6 @@ export function FooterManagementPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           </main>
-        </div>
       </div>
     );
   }
@@ -429,9 +419,6 @@ export function FooterManagementPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <EnhancedSidebar activeTab="content" setActiveTab={() => {}} />
         <main className="flex-1 p-6">
           <div className="mb-8">
             <div className="flex items-center justify-between">
@@ -1097,7 +1084,6 @@ export function FooterManagementPage() {
             </TabsContent>
           </Tabs>
         </main>
-      </div>
     </div>
   );
 }

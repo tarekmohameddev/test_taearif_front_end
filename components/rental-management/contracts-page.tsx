@@ -1,8 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { ContractsService } from "@/components/rental-management/services/contracts-service";
 import { ContractsStats } from "@/components/rental-management/contracts-stats";
 import { Button } from "@/components/ui/button";
@@ -19,9 +17,6 @@ export function ContractsPage() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -31,16 +26,12 @@ export function ContractsPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -73,7 +64,6 @@ export function ContractsPage() {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }

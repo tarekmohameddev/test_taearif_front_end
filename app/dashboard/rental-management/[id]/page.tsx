@@ -52,8 +52,6 @@ import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 
 interface RentalDetails {
   rental: {
@@ -691,12 +689,6 @@ export default function RentalDetailsPage() {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar
-          activeTab={sidebarActiveTab}
-          setActiveTab={setSidebarActiveTab}
-        />
         <main className="flex-1 p-4 md:p-6">
           <div className="w-full max-w-6xl mx-auto text-right" dir="rtl">
             {/* Header */}
@@ -1859,6 +1851,5 @@ export default function RentalDetailsPage() {
           </div>
         </main>
       </div>
-    </div>
   );
 }

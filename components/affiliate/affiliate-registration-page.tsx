@@ -13,8 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import { Toaster, toast } from "react-hot-toast";
 import { ArrowLeft, UserPlus, CreditCard, Shield } from "lucide-react";
 import Link from "next/link";
@@ -205,9 +203,6 @@ export function AffiliateRegistrationPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Toaster position="top-center" />
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -217,7 +212,6 @@ export function AffiliateRegistrationPage() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -225,9 +219,6 @@ export function AffiliateRegistrationPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Toaster position="top-center" />
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="affiliate" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="max-w-2xl mx-auto space-y-6">
             {/* Header */}
@@ -467,7 +458,6 @@ export function AffiliateRegistrationPage() {
             </Card>
           </div>
         </main>
-      </div>
     </div>
   );
 }

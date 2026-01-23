@@ -1,6 +1,4 @@
 "use client";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
 import { PurchaseFlowService } from "@/components/purchase-management/services/purchase-flow-service";
 import useAuthStore from "@/context/AuthContext";
 
@@ -11,9 +9,6 @@ export function PurchaseManagementDashboard() {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <DashboardSidebar activeTab="properties" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -23,16 +18,12 @@ export function PurchaseManagementDashboard() {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             <div>
@@ -48,6 +39,5 @@ export function PurchaseManagementDashboard() {
           </div>
         </main>
       </div>
-    </div>
   );
 }

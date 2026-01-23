@@ -33,8 +33,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
@@ -684,9 +682,6 @@ export default function EditProjectPage(): JSX.Element {
   if (!userData?.token) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -696,7 +691,6 @@ export default function EditProjectPage(): JSX.Element {
               </div>
             </div>
           </main>
-        </div>
       </div>
     );
   }
@@ -704,9 +698,6 @@ export default function EditProjectPage(): JSX.Element {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="space-y-6">
               {/* Header Skeleton */}
@@ -778,7 +769,6 @@ export default function EditProjectPage(): JSX.Element {
             </div>
           </main>
         </div>
-      </div>
     );
   }
 
@@ -789,9 +779,6 @@ export default function EditProjectPage(): JSX.Element {
 
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab="projects" setActiveTab={() => {}} />
         <main className="flex-1 p-4 md:p-6">
           <div className="space-y-6">
             {/* Header */}
@@ -1456,7 +1443,6 @@ export default function EditProjectPage(): JSX.Element {
             </Card>
           </div>
         </main>
-      </div>
     </div>
   );
 }

@@ -27,8 +27,6 @@ import {
   User,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import useAuthStore from "@/context/AuthContext";
 import { useUserStore } from "@/store/userStore";
 import {
@@ -91,7 +89,6 @@ export default function PropertyDetailsPage() {
   const searchParams = useSearchParams();
   const propertyId = params?.id as string;
   const isDraft = searchParams?.get("draft") === "true";
-  const [activeTab, setActiveTab] = useState("properties");
   const [detailsTab, setDetailsTab] = useState<"details" | "archive">("details");
 
   // جلب token و authLoading من store للمراقبة
@@ -207,55 +204,34 @@ export default function PropertyDetailsPage() {
   // إذا لم يكن هناك token أو كان التحميل جارياً، نعرض loading
   if (authLoading || !userData?.token || loading) {
     return (
-      <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <main className="flex-1 p-4 md:p-6">
-            <div className="flex items-center justify-center h-64">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          </main>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error || !property) {
     return (
-      <div className="flex min-h-screen flex-col" dir="rtl">
-        <DashboardHeader />
-        <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <main className="flex-1 p-4 md:p-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center justify-center text-center">
-                  <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
-                  <p className="text-muted-foreground mb-4">
-                    {error || "لم يتم العثور على تفاصيل الوحدة"}
-                  </p>
-                  <Button onClick={() => router.push("/dashboard/properties")}>
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                    العودة إلى الوحدات
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </main>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col items-center justify-center text-center">
+            <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+            <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
+            <p className="text-muted-foreground mb-4">
+              {error || "لم يتم العثور على تفاصيل الوحدة"}
+            </p>
+            <Button onClick={() => router.push("/dashboard/properties")}>
+              <ArrowRight className="ml-2 h-4 w-4" />
+              العودة إلى الوحدات
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col" dir="rtl">
-      <DashboardHeader />
-      <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <main className="flex-1 p-4 md:p-6">
-          <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
@@ -896,9 +872,6 @@ export default function PropertyDetailsPage() {
                 </div>
               )
             )}
-          </div>
-        </main>
-      </div>
 
       {/* Dialog لعرض صورة الصك */}
       {(property.deed_number || property.deed_image) && (
