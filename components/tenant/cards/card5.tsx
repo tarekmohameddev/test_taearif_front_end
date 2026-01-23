@@ -338,7 +338,7 @@ export default function Card5(props: Card5Props) {
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
   const formatNumber = (num: number) => {
-    return num.toLocaleString("ar-SA");
+    return num.toLocaleString("en-US");
   };
 
   const property = mergedData.property || getDefaultCard5Data().property;
@@ -603,9 +603,7 @@ export default function Card5(props: Card5Props) {
               color: styling.priceTextColor || "#896042",
             }}
           >
-            {property.price.min === property.price.max
-              ? `${formatNumber(property.price.min)} ريال سعودي`
-              : `${formatNumber(property.price.min)} - ${formatNumber(property.price.max)} ريال سعودي`}
+            {formatNumber(property.price)} ريال
           </div>
         </div>
 

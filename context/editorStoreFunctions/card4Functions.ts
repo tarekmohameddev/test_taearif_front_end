@@ -34,11 +34,7 @@ export const getDefaultCard4Data = (): ComponentData => ({
       min: 3,
       max: 5,
     },
-    price: {
-      ThemeTwo: "price",
-      min: 500000,
-      max: 1500000,
-    },
+    price: 500000,
     bathrooms: {
       ThemeTwo: "bathrooms",
       min: 2,

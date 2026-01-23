@@ -37,7 +37,11 @@ interface Property {
     min: number;
     max: number;
   };
-  price: number;
+  price: number | {
+    ThemeTwo?: string;
+    min: number;
+    max: number;
+  };
   bathrooms?: {
     ThemeTwo?: string;
     min: number;
@@ -241,8 +245,26 @@ const convertApiPropertyToShowcaseFormat = (property: any): Property => {
 // Helper function to convert API project to PropertiesShowcase format
 const convertApiProjectToShowcaseFormat = (project: any): Property => {
   // Parse price - projects usually have minPrice and maxPrice
-  const minPrice = parsePrice(project.minPrice);
-  const maxPrice = parsePrice(project.maxPrice);
+  // Also handle cases where price might be an object with min/max or a single value
+  let minPrice = 0;
+  let maxPrice = 0;
+  
+  // Check if price is an object with min/max
+  if (project.price && typeof project.price === 'object') {
+    minPrice = parsePrice(project.price.min || project.price.minPrice);
+    maxPrice = parsePrice(project.price.max || project.price.maxPrice);
+  } else {
+    // Try minPrice/maxPrice fields first
+    minPrice = parsePrice(project.minPrice);
+    maxPrice = parsePrice(project.maxPrice);
+    
+    // If no minPrice/maxPrice, try single price field
+    if (minPrice === 0 && maxPrice === 0) {
+      const singlePrice = parsePrice(project.price);
+      minPrice = singlePrice;
+      maxPrice = singlePrice;
+    }
+  }
 
   // Parse area - projects might have area range
   const minArea = parseArea(project.minArea) || 150;
@@ -307,7 +329,12 @@ const convertApiProjectToShowcaseFormat = (project: any): Property => {
       min: floorsMin,
       max: floorsMax,
     },
-    price: minPrice > 0 ? minPrice : (maxPrice > 0 ? maxPrice : 500000),
+    // For projects, we want to show price as a range (minPrice - maxPrice)
+    price: {
+      ThemeTwo: "price",
+      min: minPrice > 0 ? minPrice : 500000,
+      max: maxPrice > 0 ? maxPrice : 1500000,
+    },
     bathrooms: {
       ThemeTwo: "bathrooms",
       min: 2,
@@ -511,7 +538,9 @@ function ProjectCard({ property }: { property: Property }) {
         {/* Price Section */}
         <div className="bg-[#896042] rounded-lg px-4 py-3 text-center">
           <div className="text-white text-base font-medium">
-            {formatPriceNumber(property.price)} ريال
+            {typeof property.price === 'object' && 'min' in property.price && 'max' in property.price
+              ? `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`
+              : `${formatPriceNumber(property.price as number)} ريال`}
           </div>
         </div>
       </div>
