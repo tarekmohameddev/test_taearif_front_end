@@ -23,9 +23,11 @@ interface PropertyData {
 
 interface LocationCardProps {
   propertyData: PropertyData;
+  hideHeader?: boolean;
+  isDetailsPage?: boolean;
 }
 
-export function LocationCard({ propertyData, hideHeader = false }: LocationCardProps & { hideHeader?: boolean }) {
+export function LocationCard({ propertyData, hideHeader = false, isDetailsPage = false }: LocationCardProps) {
   const handleInputChange = (field: keyof PropertyData, value: string) => {
     // This function is not needed here since the inputs are read-only
     // but keeping the structure for consistency
@@ -35,39 +37,57 @@ export function LocationCard({ propertyData, hideHeader = false }: LocationCardP
     <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="address">العنوان</Label>
-          <Input
-            id="address"
-            placeholder="سيتم ملء العنوان تلقائياً"
-            value={propertyData.address}
-            readOnly
-          />
+          {isDetailsPage ? (
+            <p className="text-sm font-medium py-2 px-3 bg-muted rounded-md">
+              {propertyData.address || "غير محدد"}
+            </p>
+          ) : (
+            <Input
+              id="address"
+              placeholder="سيتم ملء العنوان تلقائياً"
+              value={propertyData.address}
+              readOnly
+            />
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="latitude">خط العرض</Label>
-            <Input
-              id="latitude"
-              placeholder="اختر الموقع على الخريطة"
-              value={propertyData.latitude?.toFixed(6) || ""}
-              readOnly
-              className="font-mono text-sm"
-            />
+            {isDetailsPage ? (
+              <p className="text-sm font-medium py-2 px-3 bg-muted rounded-md font-mono">
+                {propertyData.latitude?.toFixed(6) || "غير محدد"}
+              </p>
+            ) : (
+              <Input
+                id="latitude"
+                placeholder="اختر الموقع على الخريطة"
+                value={propertyData.latitude?.toFixed(6) || ""}
+                readOnly
+                className="font-mono text-sm"
+              />
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="longitude">خط الطول</Label>
-            <Input
-              id="longitude"
-              placeholder="اختر الموقع على الخريطة"
-              value={propertyData.longitude?.toFixed(6) || ""}
-              readOnly
-              className="font-mono text-sm"
-            />
+            {isDetailsPage ? (
+              <p className="text-sm font-medium py-2 px-3 bg-muted rounded-md font-mono">
+                {propertyData.longitude?.toFixed(6) || "غير محدد"}
+              </p>
+            ) : (
+              <Input
+                id="longitude"
+                placeholder="اختر الموقع على الخريطة"
+                value={propertyData.longitude?.toFixed(6) || ""}
+                readOnly
+                className="font-mono text-sm"
+              />
+            )}
           </div>
         </div>
 
-        {propertyData.latitude && propertyData.longitude && (
+        {!isDetailsPage && propertyData.latitude && propertyData.longitude && (
           <div className="p-3 bg-green-50 border border-green-200 rounded-md dark:bg-green-900/50 dark:border-green-700">
             <p className="text-sm text-green-800 dark:text-green-200">
               <strong>تم اختيار الموقع:</strong>{" "}

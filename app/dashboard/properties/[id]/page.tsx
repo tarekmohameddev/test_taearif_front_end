@@ -38,6 +38,7 @@ import {
   CustomDialogTitle,
   CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
+import { LocationCard } from "@/components/property/location-card";
 
 interface PropertyData {
   id: number;
@@ -61,6 +62,10 @@ interface PropertyData {
   description: string | null;
   latitude: number | null;
   longitude: number | null;
+  location?: {
+    latitude: number;
+    longitude: number;
+  } | null;
   featured: boolean;
   show_reservations: boolean;
   city_id: number | null;
@@ -747,6 +752,76 @@ export default function PropertyDetailsPage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* موقع الوحدة */}
+            {(() => {
+              // Get latitude and longitude from location object or direct properties
+              const lat = property.location?.latitude || property.latitude;
+              const lng = property.location?.longitude || property.longitude;
+              
+              return (lat && lng) ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      موقع الوحدة
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Location Details */}
+                    <LocationCard 
+                      propertyData={{
+                        title: property.title || "",
+                        description: property.description || "",
+                        price: property.price || "",
+                        propertyType: property.type || "",
+                        bedrooms: property.beds?.toString() || "",
+                        bathrooms: property.bath?.toString() || "",
+                        address: property.address || "",
+                        latitude: lat,
+                        longitude: lng,
+                      }} 
+                      hideHeader={true}
+                      isDetailsPage={true}
+                    />
+                    
+                    {/* Map Display */}
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">الخريطة</p>
+                      <div className="w-full h-96 rounded-lg overflow-hidden border">
+                        <iframe
+                          src={`https://maps.google.com/maps?q=${lat},${lng}&hl=ar&z=15&output=embed`}
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title="موقع العقار"
+                        />
+                      </div>
+                      <div className="flex justify-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            window.open(
+                              `https://maps.google.com/?q=${lat},${lng}&entry=gps`,
+                              "_blank",
+                              "noopener,noreferrer"
+                            )
+                          }
+                          className="gap-2"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          فتح في خرائط جوجل
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null;
+            })()}
               </>
             ) : (
               /* Tab: الأرشيف */
@@ -840,7 +915,7 @@ export default function PropertyDetailsPage() {
             <div className="p-4 sm:p-6">
               <div className="relative w-full rounded-lg overflow-hidden">
                 <img
-                  src={property.deed_image || property.deed_number}
+                  src={property.deed_image || property.deed_number || undefined}
                   alt="صورة الصك"
                   className="w-full h-auto object-contain max-h-[70vh] mx-auto"
                 />
