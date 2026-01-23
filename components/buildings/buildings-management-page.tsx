@@ -11,7 +11,7 @@ import {
 import BuildingCard from "./building-card";
 import BuildingsStats from "./buildings-stats";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -191,7 +191,7 @@ export default function BuildingsManagementPage() {
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />
       <div className="flex flex-1 flex-col md:flex-row">
-        <EnhancedSidebar />
+        <DashboardSidebar />
         <div className="p-6 space-y-6 bg-white flex-1">
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

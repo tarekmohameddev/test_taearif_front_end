@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/enhanced-sidebar";
+import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
 import { RentalApplicationsService } from "@/components/rental-management/services/rental-applications-service";
 import { RentalAgreementsService } from "@/components/rental-management/services/rental-agreements-service";
 import { RentalPaymentsService } from "@/components/rental-management/services/rental-payments-service";
@@ -85,7 +85,7 @@ export function RentalManagementDashboard() {
       <div className="flex min-h-screen flex-col" dir="rtl">
         <DashboardHeader />
         <div className="flex flex-1 flex-col md:flex-row">
-          <EnhancedSidebar activeTab="properties" setActiveTab={() => {}} />
+          <DashboardSidebar activeTab="properties" setActiveTab={() => {}} />
           <main className="flex-1 p-4 md:p-6">
             <div className="flex items-center justify-center h-64">
               <div className="text-center">

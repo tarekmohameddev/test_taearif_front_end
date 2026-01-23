@@ -3,20 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Building2,
-  Settings,
-  LayoutTemplate,
-  Users,
-  UserCog,
-  FileText,
-  Download,
-  MessageSquare,
-  Home,
-  ExternalLink,
-  Grid,
-  Briefcase,
-} from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -26,6 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
+import { staticMenuItems } from "./menu-items";
 
 // Hook لمراقبة ارتفاع الشاشة
 const useScreenHeight = () => {
@@ -46,46 +34,29 @@ const useScreenHeight = () => {
   return { isShortScreen, isVeryShortScreen };
 };
 
-interface EnhancedSidebarProps {
+interface DesktopSidebarProps {
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
 }
 
-export function EnhancedSidebar({
+export function DesktopSidebar({
   activeTab,
   setActiveTab,
-}: EnhancedSidebarProps) {
+}: DesktopSidebarProps) {
   const pathname = usePathname();
-  const [isNewUser, setIsNewUser] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [internalActiveTab, setInternalActiveTab] = useState<string>(
     activeTab || "dashboard",
   );
   const { isShortScreen, isVeryShortScreen } = useScreenHeight();
 
-  const { userData, IsLoading: authLoading } = useAuthStore();
-
-  useEffect(() => {
-    const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");
-    if (hasVisitedBefore) {
-      setIsNewUser(false);
-    } else {
-      setTimeout(
-        () => {
-          localStorage.setItem("hasVisitedBefore", "true");
-          setIsNewUser(false);
-        },
-        3 * 24 * 60 * 60 * 1000,
-      );
-    }
-  }, []);
+  const { userData } = useAuthStore();
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
 
   // تحديث العنصر النشط عند تغيير المسار
   useEffect(() => {
-    // Static sidebar: just keep internal tab in sync with provided activeTab or current path
     const computed =
       activeTab ||
       (currentPath.startsWith("/dashboard") ? "dashboard" : "dashboard");
@@ -246,90 +217,20 @@ export function EnhancedSidebar({
         >
           <div className="space-y-1">
             {/* Static menu items */}
-            <StaticLink
-              href="/dashboard"
-              title="لوحة التحكم"
-              description="نظره عامه عن الموقع"
-              icon={<FileText className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/settings"
-              title="اعدادات الموقع"
-              description="تكوين اعدادات الموقع"
-              icon={<Settings className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/customers"
-              title="ادارة العملاء"
-              description="ادارة عملائك"
-              icon={<Users className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/crm"
-              title="CRM"
-              description="تكوين اعدادات ادارة علاقات العملاء"
-              icon={<UserCog className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/projects"
-              title="المشاريع"
-              description="ادارة المشاريع"
-              icon={<Building2 className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/buildings"
-              title="العمارات"
-              description="ادارة العمارات والعقارات"
-              icon={<Building2 className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/properties"
-              title="العقارات"
-              description="ادارة العقارات"
-              icon={<Home className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/property-requests"
-              title="طلبات العملاء"
-              description="ادارة طلبات العملاء العقارية"
-              icon={<FileText className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/job-applications"
-              title="المتقدمين للوظائف"
-              description="ادارة المتقدمين للوظائف"
-              icon={<Briefcase className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/matching"
-              title="مركز توافق الطلبات الذكائي"
-              description="احصل على توافق ذكي مع الطلبات"
-              icon={<MessageSquare className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/live-editor"
-              title="تعديل تصميم الموقع"
-              description="ادارة محتوى الموقع"
-              icon={<LayoutTemplate className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/access-control"
-              title="ادارة الموظفين"
-              description="ادارة الموظفين"
-              icon={<Users className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/dashboard/rental-management"
-              title="ادارة الايجارات"
-              description="ادارة ايجارتك"
-              icon={<Download className="h-5 w-5 text-muted-foreground" />}
-            />
-            <StaticLink
-              href="/apps"
-              title="التطبيقات"
-              description="ادارة التطبيقات"
-              icon={<Grid className="h-5 w-5 text-muted-foreground" />}
-            />
+            {staticMenuItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <StaticLink
+                  key={item.id}
+                  href={item.path}
+                  title={item.label}
+                  description={item.description}
+                  icon={
+                    <IconComponent className="h-5 w-5 text-muted-foreground" />
+                  }
+                />
+              );
+            })}
           </div>
         </div>
       </div>
@@ -337,15 +238,13 @@ export function EnhancedSidebar({
   };
 
   return (
-    <>
-      <div
-        className={cn(
-          "hidden min-[1200px]:flex flex-col border-l bg-background transition-all duration-300 z-40 sticky top-16 h-[calc(100vh-4rem)]",
-          isCollapsed ? "w-[70px]" : "w-[240px]",
-        )}
-      >
-        <SidebarContent />
-      </div>
-    </>
+    <div
+      className={cn(
+        "hidden min-[1200px]:flex flex-col border-l bg-background transition-all duration-300 z-40 sticky top-16 h-[calc(100vh-4rem)]",
+        isCollapsed ? "w-[70px]" : "w-[240px]",
+      )}
+    >
+      <SidebarContent />
+    </div>
   );
 }

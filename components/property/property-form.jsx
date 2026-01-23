@@ -3207,7 +3207,7 @@ export default function PropertyForm({ mode, isDraft = false }) {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <CardTitle> الجولات الافتراضية</CardTitle>
+                        <CardTitle className="text-xl"> الجولات الافتراضية</CardTitle>
                       </div>
                       <CardDescription>
                         أضف رابط الجولة الافتراضية للوحدة
