@@ -44,13 +44,18 @@ export const getDefaultHeader2Data = (): ComponentData => {
       },
       {
         ThemeTwo: "link",
-        name: "عقارات للإيجار",
-        path: "/for-rent",
-      },
-      {
-        ThemeTwo: "link",
-        name: "عقارات للبيع",
-        path: "/for-sale",
+        name: "بحث عن عقار",
+        path: "/search",
+        submenu: [
+          {
+            text: "عقارات للإيجار",
+            url: "/for-rent",
+          },
+          {
+            text: "عقارات للبيع",
+            url: "/for-sale",
+          },
+        ],
       },
       {
         ThemeTwo: "link",

@@ -14,6 +14,7 @@ import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context/editorStoreFunctions/headerFunctions";
 import { logChange } from "@/lib/debugLogger";
+import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdown";
 
 // Default header data
 const getDefaultHeaderData = () => ({
@@ -272,7 +273,6 @@ const Header1 = (props: HeaderProps = {}) => {
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-  const router = useRouter();
 
   useEffect(() => {
     if (tenantId) {
@@ -414,6 +414,105 @@ const Header1 = (props: HeaderProps = {}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const cartCount = useStore((state) => state.cart?.items?.length || 0);
+  const router = useRouter();
+
+  // Mobile menu item component with nested submenu support
+  const MobileMenuItemWithSubmenu = ({
+    item,
+    mergedData,
+    pathname,
+    tenantId,
+    router,
+  }: {
+    item: any;
+    mergedData: any;
+    pathname: string;
+    tenantId: string | null;
+    router: any;
+  }) => {
+    const [isSubOpen, setIsSubOpen] = useState(false);
+
+    const renderMobileSubmenu = (submenuItems: any[], level: number = 0): React.ReactNode => {
+      return submenuItems.map((subItem: any, idx: number) => {
+        const hasNestedSubmenu = subItem.submenu && Array.isArray(subItem.submenu) && subItem.submenu.length > 0;
+        const href = subItem.url?.startsWith("http")
+          ? subItem.url
+          : tenantId
+            ? `${subItem.url || subItem.path || "/"}`
+            : subItem.url || subItem.path || "/";
+
+        if (hasNestedSubmenu) {
+          return (
+            <MobileMenuItemWithSubmenu
+              key={subItem.id || `mobile-sub-${level}-${idx}`}
+              item={subItem}
+              mergedData={mergedData}
+              pathname={pathname}
+              tenantId={tenantId}
+              router={router}
+            />
+          );
+        }
+
+        return (
+          <Link
+            key={subItem.id || `mobile-sub-${level}-${idx}`}
+            href={href}
+            className={cn(
+              "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted block",
+              level > 0 && "me-4",
+              pathname === href ? "text-emerald-700" : "text-foreground"
+            )}
+            style={{
+              color: pathname === href
+                ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
+                : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
+            }}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            {subItem.text || subItem.name}
+          </Link>
+        );
+      });
+    };
+
+    return (
+      <div key={item.id || item.text} className="space-y-2">
+        <button
+          onClick={() => setIsSubOpen(!isSubOpen)}
+          className={cn(
+            "flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
+            pathname === item.href ? "text-emerald-700" : "text-foreground"
+          )}
+          style={{
+            color: pathname === item.href
+              ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
+              : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
+          }}
+        >
+          <span>{item.name || item.text}</span>
+          <svg
+            className={cn("h-4 w-4 transition-transform", isSubOpen && "rotate-180")}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {isSubOpen && (
+          <div className="me-4 space-y-2 border-e pe-4">
+            {item.submenu.map((submenuSection: any) => {
+              if (submenuSection.items && Array.isArray(submenuSection.items)) {
+                return renderMobileSubmenu(submenuSection.items, 1);
+              }
+              return renderMobileSubmenu([submenuSection], 1);
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Close menu when route changes
   useEffect(() => {
@@ -432,9 +531,130 @@ const Header1 = (props: HeaderProps = {}) => {
             : item.url || "/",
         type: item.type,
         id: item.id,
+        submenu: item.submenu,
       })) || [],
     [mergedData.menu, tenantId],
   );
+
+  // Recursive function to render menu items with nested submenu support
+  const renderMenuItem = useCallback((item: any, level: number = 0): React.ReactNode => {
+    // If item has submenu, render as DropdownSubMenu
+    if (item.submenu && Array.isArray(item.submenu) && item.submenu.length > 0) {
+      return (
+        <DropdownSubMenu key={item.id || item.text} trigger={item.text || item.name}>
+          {item.submenu.map((submenuSection: any) => {
+            // Handle submenu sections (for mega_menu structure)
+            if (submenuSection.items && Array.isArray(submenuSection.items)) {
+              return submenuSection.items.map((subItem: any) => renderMenuItem(subItem, level + 1));
+            }
+            // Handle direct submenu items
+            return renderMenuItem(submenuSection, level + 1);
+          })}
+        </DropdownSubMenu>
+      );
+    }
+
+    // Regular menu item
+    const href = item.url?.startsWith("http")
+      ? item.url
+      : tenantId
+        ? `${item.url || item.path || "/"}`
+        : item.url || item.path || "/";
+
+    return (
+      <DropdownItem
+        key={item.id || item.text || item.name}
+        onClick={() => {
+          if (href && href !== "#") {
+            router.push(href);
+          }
+        }}
+      >
+        <Link href={href} className="w-full" onClick={(e) => e.stopPropagation()}>
+          {item.text || item.name}
+        </Link>
+      </DropdownItem>
+    );
+  }, [tenantId, router]);
+
+  // Render desktop menu item (for navigation bar)
+  const renderDesktopMenuItem = useCallback((item: any, index: number) => {
+    const href = item.href || item.url || "/";
+    const isActive = pathname === href;
+
+    // If dropdown or mega_menu with submenu, use CustomDropdown
+    if ((item.type === "dropdown" || item.type === "mega_menu") && item.submenu && Array.isArray(item.submenu) && item.submenu.length > 0) {
+      return (
+        <CustomDropdown
+          key={item.id || `menu-item-${index}`}
+          trigger={
+            <span
+              className={cn(
+                "relative pb-2 text-xl font-medium transition-colors",
+                isActive ? "text-emerald-700" : "text-muted-foreground hover:text-foreground"
+              )}
+              style={{
+                color: isActive
+                  ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
+                  : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
+              }}
+            >
+              {item.name}
+              {isActive && (
+                <span
+                  className="pointer-events-none absolute inset-x-0 -bottom-[6px] mx-auto block h-[2px] w-8 rounded-full"
+                  style={{
+                    backgroundColor: mergedData.colors?.accent || "#059669",
+                  }}
+                />
+              )}
+            </span>
+          }
+          triggerClassName="bg-transparent border-0 ring-0 shadow-none hover:bg-transparent p-0"
+          iconColor={
+            isActive
+              ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
+              : mergedData.colors?.link || mergedData.styling?.textColor || "#374151"
+          }
+        >
+          {item.submenu.map((submenuSection: any) => {
+            if (submenuSection.items && Array.isArray(submenuSection.items)) {
+              return submenuSection.items.map((subItem: any) => renderMenuItem(subItem));
+            }
+            return renderMenuItem(submenuSection);
+          })}
+        </CustomDropdown>
+      );
+    }
+
+    // Regular link
+    return (
+      <Link
+        key={item.id || `menu-item-${index}`}
+        href={href}
+        aria-current={isActive ? "page" : undefined}
+        className={cn(
+          "relative pb-2 text-xl font-medium transition-colors",
+          isActive ? "text-emerald-700" : "text-muted-foreground hover:text-foreground"
+        )}
+        style={{
+          color: isActive
+            ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
+            : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
+        }}
+      >
+        {item.name}
+        {isActive && (
+          <span
+            className="pointer-events-none absolute inset-x-0 -bottom-[6px] mx-auto block h-[2px] w-8 rounded-full"
+            style={{
+              backgroundColor: mergedData.colors?.accent || "#059669",
+            }}
+          />
+        )}
+      </Link>
+    );
+  }, [pathname, mergedData, renderMenuItem]);
 
   // Generate dynamic styles
   const headerStyles = useMemo(
@@ -520,39 +740,7 @@ const Header1 = (props: HeaderProps = {}) => {
 
           {/* Desktop Navigation */}
           <nav className="mx-auto hidden items-center gap-6 md:flex">
-            {navLinks.map((link: any, i: number) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={pathname === link.href ? "page" : undefined}
-                className={cn(
-                  "relative pb-2 text-xl font-medium transition-colors",
-                  pathname === link.href
-                    ? "text-emerald-700"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-                style={{
-                  color:
-                    pathname === link.href
-                      ? mergedData.colors?.linkActive ||
-                        mergedData.styling?.textColor ||
-                        "#059669"
-                      : mergedData.colors?.link ||
-                        mergedData.styling?.textColor ||
-                        "#374151",
-                }}
-              >
-                {link.name}
-                {pathname === link.href && (
-                  <span
-                    className="pointer-events-none absolute inset-x-0 -bottom-[6px] mx-auto block h-[2px] w-8 rounded-full"
-                    style={{
-                      backgroundColor: mergedData.colors?.accent || "#059669",
-                    }}
-                  />
-                )}
-              </Link>
-            ))}
+            {navLinks.map((link: any, i: number) => renderDesktopMenuItem(link, i))}
           </nav>
 
           {/* Actions */}
@@ -686,30 +874,47 @@ const Header1 = (props: HeaderProps = {}) => {
                 </div>
 
                 <div className="mt-6 grid gap-2">
-                  {navLinks.map((link: any, i: number) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
-                        pathname === link.href
-                          ? "text-emerald-700"
-                          : "text-foreground",
-                      )}
-                      style={{
-                        color:
-                          pathname === link.href
+                  {navLinks.map((link: any, i: number) => {
+                    const isActive = pathname === link.href;
+                    const hasSubmenu = link.submenu && Array.isArray(link.submenu) && link.submenu.length > 0;
+
+                    // Mobile menu item with submenu support
+                    if (hasSubmenu) {
+                      return (
+                        <MobileMenuItemWithSubmenu
+                          key={link.id || `mobile-menu-item-${i}`}
+                          item={link}
+                          mergedData={mergedData}
+                          pathname={pathname}
+                          tenantId={tenantId}
+                          router={router}
+                        />
+                      );
+                    }
+
+                    // Regular mobile menu item
+                    return (
+                      <Link
+                        key={link.id || `mobile-menu-item-${i}`}
+                        href={link.href}
+                        className={cn(
+                          "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
+                          isActive ? "text-emerald-700" : "text-foreground"
+                        )}
+                        style={{
+                          color: isActive
                             ? mergedData.colors?.linkActive ||
                               mergedData.styling?.textColor ||
                               "#059669"
                             : mergedData.colors?.link ||
                               mergedData.styling?.textColor ||
                               "#374151",
-                      }}
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
+                        }}
+                      >
+                        {link.name}
+                      </Link>
+                    );
+                  })}
                 </div>
               </SheetContent>
             </Sheet>

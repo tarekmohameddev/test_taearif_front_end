@@ -67,6 +67,38 @@ export const getDefaultHeaderData = (): ComponentData => {
         url: "/for-sale",
       },
       {
+        id: "services",
+        type: "dropdown",
+        text: "الخدمات",
+        url: "/services",
+        submenu: [
+          {
+            type: "section",
+            title: "خدماتنا",
+            items: [
+              {
+                text: "خدمة 1",
+                url: "/service1",
+              },
+              {
+                text: "خدمة 2",
+                url: "/service2",
+                submenu: [
+                  {
+                    text: "خدمة 2-1",
+                    url: "/service2-1",
+                  },
+                  {
+                    text: "خدمة 2-2",
+                    url: "/service2-2",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
         id: "about",
         type: "link",
         text: "من نحن",

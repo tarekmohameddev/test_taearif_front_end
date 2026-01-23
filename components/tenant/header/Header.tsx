@@ -5,14 +5,10 @@ import { Menu, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  CustomDropdown,
+  DropdownItem,
+  DropdownSubMenu,
+} from "@/components/customComponents/customDropdown";
 import { cn } from "@/lib/utils";
 
 interface MenuItem {
@@ -97,28 +93,25 @@ export default function Header({
   const renderMenuItem = (item: MenuItem, level: number = 0) => {
     if (item.children && item.children.length > 0) {
       return (
-        <DropdownMenuSub key={item.label}>
-          <DropdownMenuSubTrigger className="cursor-pointer [&>svg]:ms-0 [&>svg]:me-auto [&>svg]:rotate-180">
-            {item.label}
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent 
-            side="right" 
-            align="start" 
-            dir="rtl"
-            sideOffset={-1}
-          >
-            {item.children.map((child) => renderMenuItem(child, level + 1))}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <DropdownSubMenu key={item.label} trigger={item.label}>
+          {item.children.map((child) => renderMenuItem(child, level + 1))}
+        </DropdownSubMenu>
       );
     }
 
     return (
-      <DropdownMenuItem key={item.label} asChild>
-        <a href={item.href || "#"} className="cursor-pointer">
+      <DropdownItem
+        key={item.label}
+        onClick={() => {
+          if (item.href && item.href !== "#") {
+            window.location.href = item.href;
+          }
+        }}
+      >
+        <a href={item.href || "#"} className="w-full" onClick={(e) => e.stopPropagation()}>
           {item.label}
         </a>
-      </DropdownMenuItem>
+      </DropdownItem>
     );
   };
 
@@ -188,20 +181,13 @@ export default function Header({
           {defaultMenuItems.map((item) => {
             if (item.children && item.children.length > 0) {
               return (
-                <DropdownMenu key={item.label}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="text-sm font-medium hover:text-primary"
-                    >
-                      {item.label}
-                      <ChevronDown className="me-1 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" side="bottom" dir="rtl">
-                    {item.children.map((child) => renderMenuItem(child))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <CustomDropdown
+                  key={item.label}
+                  trigger={item.label}
+                  triggerClassName="bg-transparent shadow-none ring-0 hover:bg-transparent text-sm font-medium hover:text-primary px-0"
+                >
+                  {item.children.map((child) => renderMenuItem(child))}
+                </CustomDropdown>
               );
             }
 

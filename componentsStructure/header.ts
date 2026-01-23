@@ -253,6 +253,17 @@ export const headerStructure: ComponentStructure = {
                   of: [
                     { key: "text", label: "Label", type: "text" },
                     { key: "url", label: "URL", type: "text" },
+                    {
+                      key: "submenu",
+                      label: "Nested Submenu",
+                      type: "array",
+                      addLabel: "Add Nested Item",
+                      itemLabel: "Nested Item",
+                      of: [
+                        { key: "text", label: "Label", type: "text" },
+                        { key: "url", label: "URL", type: "text" },
+                      ],
+                    },
                   ],
                 },
               ],
@@ -466,6 +477,17 @@ export const headerStructure: ComponentStructure = {
                   of: [
                     { key: "text", label: "Label", type: "text" },
                     { key: "url", label: "URL", type: "text" },
+                    {
+                      key: "submenu",
+                      label: "Nested Submenu",
+                      type: "array",
+                      addLabel: "Add Nested Item",
+                      itemLabel: "Nested Item",
+                      of: [
+                        { key: "text", label: "Label", type: "text" },
+                        { key: "url", label: "URL", type: "text" },
+                      ],
+                    },
                   ],
                 },
               ],
@@ -537,6 +559,28 @@ export const headerStructure: ComponentStructure = {
           of: [
             { key: "name", label: "Link Text", type: "text" },
             { key: "path", label: "Link Path", type: "text" },
+            {
+              key: "submenu",
+              label: "Submenu",
+              type: "array",
+              addLabel: "Add Submenu Item",
+              itemLabel: "Submenu Item",
+              of: [
+                { key: "text", label: "Label", type: "text" },
+                { key: "url", label: "URL", type: "text" },
+                {
+                  key: "submenu",
+                  label: "Nested Submenu",
+                  type: "array",
+                  addLabel: "Add Nested Item",
+                  itemLabel: "Nested Item",
+                  of: [
+                    { key: "text", label: "Label", type: "text" },
+                    { key: "url", label: "URL", type: "text" },
+                  ],
+                },
+              ],
+            },
           ],
         },
         {
@@ -723,6 +767,28 @@ export const headerStructure: ComponentStructure = {
           of: [
             { key: "name", label: "Link Text", type: "text" },
             { key: "path", label: "Link Path", type: "text" },
+            {
+              key: "submenu",
+              label: "Submenu",
+              type: "array",
+              addLabel: "Add Submenu Item",
+              itemLabel: "Submenu Item",
+              of: [
+                { key: "text", label: "Label", type: "text" },
+                { key: "url", label: "URL", type: "text" },
+                {
+                  key: "submenu",
+                  label: "Nested Submenu",
+                  type: "array",
+                  addLabel: "Add Nested Item",
+                  itemLabel: "Nested Item",
+                  of: [
+                    { key: "text", label: "Label", type: "text" },
+                    { key: "url", label: "URL", type: "text" },
+                  ],
+                },
+              ],
+            },
           ],
         },
       ],
