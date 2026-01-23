@@ -34,7 +34,11 @@ interface Property {
     min: number;
     max: number;
   };
-  price: number;
+  price: number | {
+    ThemeTwo?: string;
+    min: number;
+    max: number;
+  };
   bathrooms?: {
     ThemeTwo?: string;
     min: number;
@@ -635,7 +639,26 @@ export default function Card4(props: Card4Props) {
               color: styling.priceTextColor || "#ffffff",
             }}
           >
-            {formatPriceNumber(property.price)} ريال
+            {(() => {
+              // Check if this is a project (based on URL or status)
+              const isProject = 
+                property.url?.includes('/project/') || 
+                property.status === 'مكتمل' || 
+                property.status === 'قيد الإنشاء';
+              
+              // If it's a project and price is an object with min/max, show as range
+              if (isProject && typeof property.price === 'object' && 'min' in property.price && 'max' in property.price) {
+                return `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`;
+              }
+              
+              // For properties or if price is a number, show as single value
+              // If price is object but it's a property, use min value or convert to number
+              if (typeof property.price === 'object' && 'min' in property.price) {
+                return `${formatPriceNumber(property.price.min)} ريال`;
+              }
+              
+              return `${formatPriceNumber(property.price as number)} ريال`;
+            })()}
           </div>
         </div>
       </div>
