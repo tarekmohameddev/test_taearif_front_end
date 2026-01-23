@@ -626,7 +626,6 @@ export const footerStructure: ComponentStructure = {
                 { key: "address", label: "Address", type: "text" },
                 { key: "email", label: "Email", type: "text" },
                 { key: "whatsapp", label: "WhatsApp", type: "text" },
-                { key: "whatsappUrl", label: "WhatsApp URL", type: "text" },
               ],
             },
             {
@@ -670,15 +669,6 @@ export const footerStructure: ComponentStructure = {
                 { key: "url", label: "URL", type: "text" },
               ],
             },
-          ],
-        },
-        {
-          key: "floatingWhatsApp",
-          label: "Floating WhatsApp",
-          type: "object",
-          fields: [
-            { key: "enabled", label: "Enabled", type: "boolean" },
-            { key: "url", label: "WhatsApp URL", type: "text" },
           ],
         },
         {

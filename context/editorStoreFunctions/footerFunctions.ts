@@ -156,7 +156,6 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       address: "المملكة العربية السعودية - الرياض",
       email: "contact@baheya.co",
       whatsapp: "0542120011",
-      whatsappUrl: "https://wa.link/0ysvug",
     },
     socialMedia: {
       enabled: true,
@@ -193,10 +192,6 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       { text: "سياسة الخصوصية", url: "/privacy-policy", ThemeTwo: "ThemeTwo" },
       { text: "سياسة الاستخدام", url: "/terms-of-use", ThemeTwo: "ThemeTwo" },
     ],
-  },
-  floatingWhatsApp: {
-    enabled: true,
-    url: "https://wa.link/0ysvug",
   },
   styling: {
     colors: {
