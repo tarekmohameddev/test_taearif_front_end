@@ -36,7 +36,6 @@ import {
   getCenterWrapperClasses,
   getCenterWrapperStyles,
 } from "@/lib/ComponentsInCenter";
-import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 import GA4Provider from "@/components/GA4Provider";
 import GTMProvider from "@/components/GTMProvider";
 import { trackProjectView } from "@/lib/ga4-tracking";
@@ -326,12 +325,6 @@ export default function TenantPageWrapper({
     }
   }, [tenantId, setTenantId, domainType]);
 
-  // تنظيف cache المنتهية الصلاحية عند تحميل المكون
-  useEffect(() => {
-    console.log("🔍 TenantPageWrapper - Clearing expired cache");
-    clearExpiredCache();
-  }, []);
-
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
     console.log("🔍 TenantPageWrapper - Data loading check:", {
@@ -344,33 +337,8 @@ export default function TenantPageWrapper({
 
     if (tenantId && !tenantData && !loadingTenantData) {
       console.log("✅ TenantPageWrapper - Conditions met, starting data load");
-      // محاولة تحميل البيانات من cache أولاً
-      const loadData = async () => {
-        try {
-          console.log("🔍 TenantPageWrapper - Checking cache for:", tenantId);
-          const cachedData = await preloadTenantData(tenantId);
-          if (cachedData) {
-            console.log("✅ TenantPageWrapper - Found cached data:", {
-              hasComponentSettings: !!cachedData.componentSettings,
-              componentSettingsKeys: cachedData.componentSettings
-                ? Object.keys(cachedData.componentSettings)
-                : [],
-            });
-            // إذا كانت البيانات موجودة في cache، استخدمها مباشرة
-            return;
-          } else {
-            console.log("❌ TenantPageWrapper - No cached data found");
-          }
-        } catch (error) {
-          console.error("❌ TenantPageWrapper - Cache error:", error);
-        }
-
-        // إذا لم تكن البيانات في cache، جلبها من API
-        console.log("🚀 TenantPageWrapper - Calling fetchTenantData API for:", tenantId);
-        fetchTenantData(tenantId);
-      };
-
-      loadData();
+      console.log("🚀 TenantPageWrapper - Calling fetchTenantData API for:", tenantId);
+      fetchTenantData(tenantId);
     } else {
       if (!tenantId) {
         console.log("❌ TenantPageWrapper - No tenantId, skipping data load");

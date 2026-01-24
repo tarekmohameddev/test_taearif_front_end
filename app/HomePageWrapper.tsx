@@ -43,7 +43,6 @@ import {
   getCenterWrapperClasses,
   getCenterWrapperStyles,
 } from "@/lib/ComponentsInCenter";
-import { preloadTenantData, clearExpiredCache } from "@/lib/preload";
 
 // ⭐ Cache للـ header components
 const headerComponentsCache = new Map<string, any>();
@@ -294,11 +293,6 @@ export default function HomePageWrapper({
     }
   }, [tenantId, domainType]);
 
-  // تنظيف cache المنتهية الصلاحية عند تحميل المكون
-  useEffect(() => {
-    clearExpiredCache();
-  }, []);
-
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
     if (
@@ -309,31 +303,7 @@ export default function HomePageWrapper({
     ) {
       console.warn("🏠 HomePageWrapper - Fetching tenant data for:", tenantId);
       hasFetchedRef.current = true;
-
-      // محاولة تحميل البيانات من cache أولاً
-      const loadData = async () => {
-        try {
-          const cachedData = await preloadTenantData(tenantId);
-          if (cachedData) {
-            // إذا كانت البيانات موجودة في cache، استخدمها مباشرة
-            console.log(
-              "🏠 HomePageWrapper - Using cached data for:",
-              tenantId,
-            );
-            return;
-          }
-        } catch (error) {
-          console.warn(
-            "🏠 HomePageWrapper - Cache failed, fetching from API:",
-            error,
-          );
-        }
-
-        // إذا لم تكن البيانات في cache، جلبها من API
-        fetchTenantData(tenantId);
-      };
-
-      loadData();
+      fetchTenantData(tenantId);
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
