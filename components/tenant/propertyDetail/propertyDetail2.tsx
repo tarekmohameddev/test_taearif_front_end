@@ -595,13 +595,23 @@ export default function propertyDetail2(props: propertyDetail2Props) {
       allImages.push(property.image);
     }
     if (property?.images) {
-      allImages.push(...property.images);
+      // Filter out the main image if it exists in images array to avoid duplicates
+      const additionalImages = property.images.filter(
+        (img) => img && img.trim() !== "" && img !== property.image,
+      );
+      allImages.push(...additionalImages);
     }
     if (property?.floor_planning_image) {
-      allImages.push(...property.floor_planning_image);
+      // Filter out the main image if it exists in floor planning images to avoid duplicates
+      const floorImages = property.floor_planning_image.filter(
+        (img) => img && img.trim() !== "" && img !== property.image,
+      );
+      allImages.push(...floorImages);
     }
-    // Filter out empty images to match propertyImages behavior
-    return allImages.filter((img) => img && img.trim() !== "");
+    // Filter out empty images and remove duplicates
+    const filtered = allImages.filter((img) => img && img.trim() !== "");
+    // Remove duplicates by converting to Set and back to array
+    return Array.from(new Set(filtered));
   };
 
   // Navigation functions for dialog
@@ -692,8 +702,14 @@ export default function propertyDetail2(props: propertyDetail2Props) {
     property && property.image
       ? [
           property.image,
-          ...(property.images || []), // Add additional images if available
-          ...(property.floor_planning_image || []), // Add floor planning images
+          // Filter out the main image if it exists in images array to avoid duplicates
+          ...(property.images || []).filter(
+            (img) => img && img.trim() !== "" && img !== property.image,
+          ),
+          // Filter out the main image if it exists in floor planning images to avoid duplicates
+          ...(property.floor_planning_image || []).filter(
+            (img) => img && img.trim() !== "" && img !== property.image,
+          ),
         ].filter((img) => img && img.trim() !== "")
       : []; // Filter out empty images
 
