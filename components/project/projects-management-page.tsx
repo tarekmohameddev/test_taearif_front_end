@@ -194,7 +194,7 @@ export function ProjectsManagementPage() {
   }, [fetchProjects, isInitialized, userData?.token]);
 
   const renderSkeletons = () => (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 6 }).map((_, idx) => (
         <SkeletonProjectCard key={idx} />
       ))}
@@ -206,7 +206,7 @@ export function ProjectsManagementPage() {
     console.log("projectsToRender length:", projectsToRender?.length);
 
     return viewMode === "grid" ? (
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {projectsToRender.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
