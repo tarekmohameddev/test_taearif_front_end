@@ -31,11 +31,10 @@ import { usePropertySubmit } from "./hooks/usePropertySubmit";
 import { usePropertyHandlers } from "./hooks/usePropertyHandlers";
 import { useSelectedFacilities } from "./hooks/useSelectedFacilities";
 import { facilitiesList, generateYears } from "./utils/constants";
-import type { PropertyFormProps } from "./types/propertyForm.types";
 
 const MapComponent = React.lazy(() => import("@/components/map-component"));
 
-export default function PropertyForm({ mode, isDraft = false }: PropertyFormProps) {
+export default function PropertyForm({ mode, isDraft = false }) {
   // Cleanup store when component unmounts
   useEffect(() => {
     return () => {
@@ -58,12 +57,12 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
     checkPermission("properties.owner_deed");
 
   // State management
-  const state = usePropertyFormState(mode, id as string | undefined);
+  const state = usePropertyFormState(mode, id);
 
   // Data fetching
   usePropertyData(
     mode,
-    id as string | undefined,
+    id,
     isDraft,
     authLoading,
     userData?.token,
@@ -131,7 +130,7 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
   // Submit
   const submit = usePropertySubmit(
     mode,
-    id as string | undefined,
+    id,
     isDraft,
     state.formData,
     state.images,
@@ -337,7 +336,7 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
             onSelectChange={(name, value) =>
               handlers.handleInputChange({
                 target: { name, value },
-              } as any)
+              })
             }
             onCitySelect={handlers.handleCitySelect}
             onDistrictSelect={(districtId) =>
@@ -475,7 +474,7 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
           <div className="space-y-6">
             <OwnerDetailsCard
               formData={state.formData}
-              previews={state.previews}
+              previews={state.previews} 
               images={state.images}
               errors={state.errors}
               uploading={fileUpload.uploading}

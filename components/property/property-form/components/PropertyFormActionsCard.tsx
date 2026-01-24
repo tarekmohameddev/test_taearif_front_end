@@ -31,17 +31,9 @@ export default function PropertyFormActionsCard({
   onCompleteDraft,
 }: PropertyFormActionsCardProps) {
   return (
-    <Card className="border-2 border-primary/20 shadow-lg">
+    <Card className="border border-primary/20 shadow-lg">
       <CardContent className="pt-6">
         <div className="space-y-4">
-          {/* Title */}
-          <div className="pb-2 border-b">
-            <h3 className="text-lg font-semibold">إجراءات الحفظ</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              احفظ أو انشر الوحدة أو عد للخلف
-            </p>
-          </div>
-
           {/* Error Message */}
           {submitError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
