@@ -980,12 +980,14 @@ const TabsContentArea = ({
 };
 
 type ComponentsSidebarProps = {
-  onTabsContentOpenChange?: (isOpen: boolean) => void;
+  // Props removed - using Zustand store instead
 };
 
-export const ComponentsSidebar = ({ onTabsContentOpenChange }: ComponentsSidebarProps = {}) => {
+export const ComponentsSidebar = ({}: ComponentsSidebarProps = {}) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isTabsContentOpen, setIsTabsContentOpen] = useState(false);
+  // Get state from Zustand store
+  const isTabsContentOpen = useEditorStore((s) => s.isTabsContentOpen);
+  const setIsTabsContentOpen = useEditorStore((s) => s.setIsTabsContentOpen);
   const [searchTerm, setSearchTerm] = useState("");
   const [isBasicComponentsDropdownOpen, setIsBasicComponentsDropdownOpen] =
     useState(true);
@@ -999,12 +1001,10 @@ export const ComponentsSidebar = ({ onTabsContentOpenChange }: ComponentsSidebar
     // إذا كان نفس الـ tab وكان مفتوح، أغلق الـ TabsContentArea
     if (tab === activeMainTab && isTabsContentOpen) {
       setIsTabsContentOpen(false);
-      onTabsContentOpenChange?.(false);
     } else {
       // غير الـ tab وافتح الـ TabsContentArea
       setActiveMainTab(tab);
       setIsTabsContentOpen(true);
-      onTabsContentOpenChange?.(true);
     }
   };
 

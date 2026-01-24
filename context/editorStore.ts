@@ -684,6 +684,14 @@ interface EditorStore {
   // Force update page components for immediate save
   forceUpdatePageComponents: (slug: string, components: any[]) => void;
 
+  // Components Sidebar states
+  isComponentsSidebarOpen: boolean;
+  isTabsContentOpen: boolean;
+  wasComponentsSidebarManuallyClosed: boolean;
+  setIsComponentsSidebarOpen: (isOpen: boolean) => void;
+  setIsTabsContentOpen: (isOpen: boolean) => void;
+  setWasComponentsSidebarManuallyClosed: (wasClosed: boolean) => void;
+
   // Clear all states (for theme change)
   clearAllStates: () => void;
 }
@@ -694,6 +702,11 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   tempData: {},
   currentPage: "homepage",
   hasChangesMade: false,
+
+  // Components Sidebar states - default values
+  isComponentsSidebarOpen: false,
+  isTabsContentOpen: false,
+  wasComponentsSidebarManuallyClosed: false,
 
   // Initialize Global Components with default data
   globalHeaderData: getDefaultHeaderData(),
@@ -810,6 +823,16 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
 
   setCurrentPage: (page) => set(() => ({ currentPage: page })),
+
+  // Components Sidebar actions
+  setIsComponentsSidebarOpen: (isOpen) => 
+    set(() => ({ isComponentsSidebarOpen: isOpen })),
+  
+  setIsTabsContentOpen: (isOpen) => 
+    set(() => ({ isTabsContentOpen: isOpen })),
+  
+  setWasComponentsSidebarManuallyClosed: (wasClosed) => 
+    set(() => ({ wasComponentsSidebarManuallyClosed: wasClosed })),
 
   setWebsiteLayout: (data) => set(() => ({ WebsiteLayout: data })),
   updateCustomBranding: (type, data) =>

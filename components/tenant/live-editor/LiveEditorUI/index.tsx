@@ -84,12 +84,14 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   // Local state
   const [sidebarWidth, setSidebarWidth] = useState(state.sidebarWidth);
   const [iframeReady, setIframeReady] = useState(false);
-  const [isComponentsSidebarOpen, setIsComponentsSidebarOpen] = useState(false);
-  const [isTabsContentOpen, setIsTabsContentOpen] = useState(false);
-  const [
-    wasComponentsSidebarManuallyClosed,
-    setWasComponentsSidebarManuallyClosed,
-  ] = useState(false);
+  
+  // Components Sidebar states from store
+  const isComponentsSidebarOpen = useEditorStore((s) => s.isComponentsSidebarOpen);
+  const isTabsContentOpen = useEditorStore((s) => s.isTabsContentOpen);
+  const wasComponentsSidebarManuallyClosed = useEditorStore((s) => s.wasComponentsSidebarManuallyClosed);
+  const setIsComponentsSidebarOpen = useEditorStore((s) => s.setIsComponentsSidebarOpen);
+  const setIsTabsContentOpen = useEditorStore((s) => s.setIsTabsContentOpen);
+  const setWasComponentsSidebarManuallyClosed = useEditorStore((s) => s.setWasComponentsSidebarManuallyClosed);
   const [showChangesDialog, setShowChangesDialog] = useState(false);
   const [previousHasChangesMade, setPreviousHasChangesMade] = useState(false);
   const [debugInfo, setDebugInfo] = useState<PositionDebugInfo | null>(null);
@@ -334,7 +336,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         {/* Components Sidebar */}
         <AnimatePresence>
           {isComponentsSidebarOpen && (
-            <ComponentsSidebar onTabsContentOpenChange={setIsTabsContentOpen} />
+            <ComponentsSidebar />
           )}
         </AnimatePresence>
 
