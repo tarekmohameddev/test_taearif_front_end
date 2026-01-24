@@ -18,7 +18,7 @@
  * - types/media.types.ts (Media)
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { X, ImageIcon, VideoIcon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -27,7 +27,7 @@ interface BlogMediaUploadProps {
   formData: {
     media_ids: number[];
   };
-  mediaUrls?: { id: number; url: string }[];
+  mediaUrls?: { id: number; url: string; type: "image" | "video" }[];
   onChange: (mediaIds: number[]) => void;
   onFilesChange: (files: File[]) => void;
 }
@@ -44,18 +44,36 @@ export function BlogMediaUpload({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const mediaInputRef = useRef<HTMLInputElement>(null);
 
+  // Create a stable key for mediaUrls to detect changes
+  const mediaUrlsKey = useMemo(
+    () => mediaUrls.map((m) => `${m.id}-${m.url}`).join(","),
+    [mediaUrls]
+  );
+
   // Update previews when mediaUrls changes (for edit mode)
   useEffect(() => {
-    if (mediaUrls.length > 0 && selectedFiles.length === 0) {
-      const urlPreviews = mediaUrls.map((m) => ({
-        id: m.id.toString(),
-        url: m.url,
-        file: null,
-        type: m.url.includes("video") || m.url.includes(".mp4") || m.url.includes(".mov") || m.url.includes(".webm") ? "video" : "image" as "image" | "video",
-      }));
-      setPreviews(urlPreviews);
+    if (mediaUrls.length === 0) {
+      // If no media URLs and no selected files, clear previews
+      if (selectedFiles.length === 0) {
+        setPreviews([]);
+      }
+      return;
     }
-  }, [mediaUrls]);
+
+    // Create previews from mediaUrls
+    const urlPreviews = mediaUrls.map((m) => ({
+      id: m.id.toString(),
+      url: m.url,
+      file: null,
+      type: m.type, // Use type from API
+    }));
+    
+    // Keep temporary previews (new files being added) and combine with URL previews
+    setPreviews((prev) => {
+      const tempPreviews = prev.filter((p) => p.id.startsWith("temp-"));
+      return [...urlPreviews, ...tempPreviews];
+    });
+  }, [mediaUrlsKey, selectedFiles.length]);
 
   const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);

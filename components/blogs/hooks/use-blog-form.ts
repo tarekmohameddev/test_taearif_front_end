@@ -48,6 +48,10 @@ export function useBlogForm(mode: "create" | "edit", blogId?: number) {
   // Store files to upload on submit
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  
+  // Store existing media URLs for display (from API)
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<{ id: number; url: string; type: "image" | "video" }[]>([]);
 
   // Load blog data for edit mode
   useEffect(() => {
@@ -67,6 +71,10 @@ export function useBlogForm(mode: "create" | "edit", blogId?: number) {
             category_ids: blog.categories.map((cat) => cat.id),
             media_ids: blog.media.map((m) => m.id),
           });
+          
+          // Store existing media URLs for display
+          setThumbnailUrl(blog.thumbnail?.url || null);
+          setMediaUrls(blog.media.map((m) => ({ id: m.id, url: m.url, type: m.type })));
         })
         .catch((err) => {
           console.error("Error loading blog:", err);
@@ -197,6 +205,8 @@ export function useBlogForm(mode: "create" | "edit", blogId?: number) {
     errors,
     loading,
     loadingBlog,
+    thumbnailUrl,
+    mediaUrls,
     handleChange,
     handleSubmit,
     handleFileChange,

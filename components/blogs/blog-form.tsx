@@ -48,6 +48,8 @@ export function BlogForm({ mode, blogId }: BlogFormProps) {
     errors,
     loading,
     loadingBlog,
+    thumbnailUrl,
+    mediaUrls,
     handleChange,
     handleSubmit,
     handleFileChange,
@@ -149,11 +151,7 @@ export function BlogForm({ mode, blogId }: BlogFormProps) {
               <CardContent>
                 <BlogThumbnailUpload
                   formData={formData}
-                  thumbnailUrl={
-                    formData.thumbnail_id
-                      ? undefined // Will be loaded from blog data in edit mode
-                      : undefined
-                  }
+                  thumbnailUrl={thumbnailUrl}
                   onChange={(thumbnailId) =>
                     handleChange("thumbnail_id", thumbnailId)
                   }
@@ -170,6 +168,7 @@ export function BlogForm({ mode, blogId }: BlogFormProps) {
               <CardContent>
                 <BlogMediaUpload
                   formData={formData}
+                  mediaUrls={mediaUrls}
                   onChange={(mediaIds) => handleChange("media_ids", mediaIds)}
                   onFilesChange={(files) => handleFilesChange(files)}
                 />

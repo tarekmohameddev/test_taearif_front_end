@@ -46,8 +46,12 @@ export function BlogThumbnailUpload({
 
   // Update preview when thumbnailUrl changes (for edit mode)
   useEffect(() => {
+    // Only update from URL if no file is selected
     if (thumbnailUrl && !selectedFile) {
       setPreviewUrl(thumbnailUrl);
+    } else if (!thumbnailUrl && !selectedFile) {
+      // Clear preview if no URL and no file
+      setPreviewUrl(null);
     }
   }, [thumbnailUrl, selectedFile]);
 
