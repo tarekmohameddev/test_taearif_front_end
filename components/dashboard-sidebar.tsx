@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
+  BookOpen,
   Building2,
   Download,
   FileText,
@@ -54,6 +55,12 @@ export function DashboardSidebar({
       path: "/content",
     },
     {
+      id: "blogs",
+      label: "Blogs",
+      icon: BookOpen,
+      path: "/dashboard/blogs",
+    },
+    {
       id: "apps",
       label: "Apps",
       icon: Download,
@@ -94,8 +101,11 @@ export function DashboardSidebar({
   // Determine active tab from pathname
   const currentPath = pathname || "/";
   const isContentSection = currentPath.startsWith("/content");
+  const isBlogsSection = currentPath.startsWith("/dashboard/blogs");
   const currentTab = isContentSection
     ? "content"
+    : isBlogsSection
+    ? "blogs"
     : navItems.find((item) => item.path === currentPath)?.id || "websites";
 
   const NavContent = () => (

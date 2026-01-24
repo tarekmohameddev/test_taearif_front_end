@@ -17,12 +17,12 @@ export function BlogTableHeader() {
   return (
     <TableHeader>
       <TableRow>
-        <TableHead className="w-[60px]">الصورة</TableHead>
-        <TableHead>العنوان</TableHead>
-        <TableHead>الحالة</TableHead>
-        <TableHead className="hidden md:table-cell">تاريخ النشر</TableHead>
-        <TableHead className="hidden lg:table-cell">المشاهدات</TableHead>
-        <TableHead className="w-[80px]">الإجراءات</TableHead>
+        <TableHead className="w-[60px] text-right">الصورة</TableHead>
+        <TableHead className="text-right">العنوان</TableHead>
+        <TableHead className="text-right">الحالة</TableHead>
+        <TableHead className="hidden md:table-cell text-right">تاريخ النشر</TableHead>
+        <TableHead className="hidden lg:table-cell text-right ">المشاهدات</TableHead>
+        <TableHead className="w-[80px] text-right">الإجراءات</TableHead>
       </TableRow>
     </TableHeader>
   );

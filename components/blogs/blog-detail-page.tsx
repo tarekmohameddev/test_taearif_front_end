@@ -39,7 +39,7 @@ import { BlogDetailAuthor } from "./components/detail/blog-detail-author";
 import { BlogLoadingState } from "./components/shared/blog-loading-state";
 import { BlogErrorState } from "./components/shared/blog-error-state";
 import { blogApi } from "./services/blog-api";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface BlogDetailPageProps {
@@ -99,6 +99,19 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
   return (
     <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="space-y-6">
+        {/* Back Button */}
+        <div className="flex items-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push("/dashboard/blogs")}
+            className="gap-2"
+          >
+            <ArrowRight className="h-4 w-4" />
+            العودة إلى قائمة المقالات
+          </Button>
+        </div>
+
         {/* Header with Actions */}
         <BlogDetailHeader
           blog={blog}
@@ -136,20 +149,20 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">معرف المقال:</span>
+                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 text-right">معرف المقال:</span>
                 <p className="text-gray-900 dark:text-gray-100">{blog.id}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">معرف المستخدم:</span>
+                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 text-right">معرف المستخدم:</span>
                 <p className="text-gray-900 dark:text-gray-100">{blog.user_id}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">الرابط اللطيف (Slug):</span>
+                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400  text-right">الرابط اللطيف (Slug):</span>
                 <p className="text-gray-900 dark:text-gray-100 font-mono">{blog.slug}</p>
               </div>
               {blog.published_at && (
                 <div>
-                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">تاريخ النشر:</span>
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 text-right">تاريخ النشر:</span>
                   <p className="text-gray-900 dark:text-gray-100">{formatDate(blog.published_at)}</p>
                 </div>
               )}
