@@ -1,0 +1,2063 @@
+blogs system doc :
+
+# Blog System API Documentation
+
+**Version:** 1.0  
+**Base URL:** `https://bigrises.com/api`  
+**Authentication:** Bearer Token (Sanctum)
+
+---
+
+## Table of Contents
+
+1. [Authentication](#authentication)
+2. [Posts API](#posts-api)
+3. [Categories API](#categories-api)
+4. [Media API](#media-api)
+5. [Data Models](#data-models)
+6. [Error Handling](#error-handling)
+7. [React.js Examples](#reactjs-examples)
+
+---
+
+## Authentication
+
+### Getting a Token
+
+**Endpoint:** `POST /api/login`
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "recaptcha_token": "recaptcha_token_here"
+}
+```
+
+**Response:**
+```json
+{
+  "user": { ... },
+  "token": "3047|uahD3zAkkIoIgCayvGoFcrqT6tPGGa1Yz3CGvK1f14a54d22"
+}
+```
+
+### Using the Token
+
+Include the token in the `Authorization` header for protected endpoints:
+
+```
+Authorization: Bearer 3047|uahD3zAkkIoIgCayvGoFcrqT6tPGGa1Yz3CGvK1f14a54d22
+```
+
+---
+
+## Posts API
+
+### 1. List Posts (Public)
+
+**Endpoint:** `GET /api/posts`
+
+**Query Parameters:**
+- `per_page` (optional, default: 15) - Number of items per page
+- `page` (optional, default: 1) - Page number
+
+**Example Request:**
+```bash
+GET /api/posts?per_page=20&page=1
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "My First Post",
+      "slug": "my-first-post",
+      "excerpt": "This is a short summary...",
+      "thumbnail": {
+        "id": 3,
+        "url": "https://taearifvideos.oss-me-central-1.aliyuncs.com/api-media/2026/01/image.jpg",
+        "type": "image",
+        "created_at": "2026-01-21T20:02:42.000000Z"
+      },
+      "published_at": "2026-01-21T20:01:47.000000Z"
+    }
+  ],
+  "pagination": {
+    "per_page": 20,
+    "current_page": 1,
+    "from": 1,
+    "to": 2,
+    "total": 2,
+    "last_page": 1
+  }
+}
+```
+
+**Notes:**
+- Only returns posts with `status: "published"`
+- Ordered by `published_at` descending (newest first)
+- Does not include full `content` field (only in detail view)
+- `thumbnail` is optional - only included if post has a thumbnail
+
+---
+
+### 2. Get Single Post by Slug (Public)
+
+**Endpoint:** `GET /api/posts/{slug}`
+
+**Example Request:**
+```bash
+GET /api/posts/my-first-post
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "id": 1,
+    "user_id": 1037,
+    "title": "My First Post",
+    "slug": "my-first-post",
+    "content": "<p>Full HTML content here...</p>",
+    "excerpt": "Short summary",
+    "thumbnail": {
+      "id": 3,
+      "url": "https://taearifvideos.oss-me-central-1.aliyuncs.com/api-media/2026/01/thumbnail.jpg",
+      "type": "image",
+      "created_at": "2026-01-21T20:02:42.000000Z"
+    },
+    "status": "published",
+    "published_at": "2026-01-21T20:01:47.000000Z",
+    "created_at": "2026-01-21T20:01:40.000000Z",
+    "updated_at": "2026-01-21T20:01:47.000000Z",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Technology"
+      }
+    ],
+    "media": [
+      {
+        "id": 2,
+        "url": "https://taearifvideos.oss-me-central-1.aliyuncs.com/api-media/2026/01/image.jpg",
+        "type": "image",
+        "created_at": "2026-01-21T20:02:42.000000Z"
+      }
+    ],
+    "author": {
+      "id": 1037,
+      "name": "John Doe"
+    }
+  }
+}
+```
+
+**Notes:**
+- Only returns published posts
+- Includes full content, categories, media, thumbnail, and author
+- `thumbnail` is optional - only included if post has a thumbnail
+- Returns 404 if post not found or not published
+
+---
+
+### 3. Create Post (Protected)
+
+**Endpoint:** `POST /api/posts`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "title": "My New Post",
+  "slug": "my-new-post",
+  "content": "<p>Full HTML content here...</p>",
+  "excerpt": "Optional excerpt (auto-generated if empty)",
+  "status": "draft",
+  "thumbnail_id": 3,
+  "category_ids": [1, 2],
+  "media_ids": [1, 2]
+}
+```
+
+**Field Details:**
+- `title` (required, string, max 255) - Post title
+- `slug` (optional, string, max 255, unique) - URL-friendly slug (auto-generated from title if empty)
+- `content` (required, string, max 100000) - Full post content (HTML allowed)
+- `excerpt` (optional, string, max 500) - Short summary (auto-generated from content if empty)
+- `status` (optional, enum: "draft" | "published", default: "draft") - Post status
+- `thumbnail_id` (optional, integer) - Media ID to use as thumbnail (must be owned by user)
+- `category_ids` (optional, array of integers) - Array of category IDs
+- `media_ids` (optional, array of integers) - Array of media IDs (must be owned by user)
+
+**Response (201 Created):**
+```json
+{
+  "data": {
+    "id": 3,
+    "user_id": 1037,
+    "title": "My New Post",
+    "slug": "my-new-post",
+    "content": "<p>Full HTML content here...</p>",
+    "excerpt": "Short summary",
+    "thumbnail": {
+      "id": 3,
+      "url": "https://taearifvideos.oss-me-central-1.aliyuncs.com/api-media/2026/01/thumbnail.jpg",
+      "type": "image",
+      "created_at": "2026-01-21T20:02:42.000000Z"
+    },
+    "status": "draft",
+    "published_at": null,
+    "created_at": "2026-01-21T20:10:00.000000Z",
+    "updated_at": "2026-01-21T20:10:00.000000Z",
+    "categories": [...],
+    "media": [...],
+    "author": {...}
+  }
+}
+```
+
+**Auto-Generated Fields:**
+- `slug`: If not provided, generated from `title` (e.g., "My Post" → "my-post")
+- `excerpt`: If empty, auto-generated from `content` (HTML stripped, ~200 chars)
+- `published_at`: Set automatically when `status` changes to "published"
+
+---
+
+### 4. Update Post (Protected)
+
+**Endpoint:** `PUT /api/posts/{id}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body (all fields optional - partial update):**
+```json
+{
+  "title": "Updated Title",
+  "slug": "updated-slug",
+  "content": "<p>Updated content...</p>",
+  "excerpt": "Updated excerpt",
+  "status": "published",
+  "thumbnail_id": 4,
+  "category_ids": [1, 3],
+  "media_ids": [2, 3]
+}
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "id": 1,
+    "user_id": 1037,
+    "title": "Updated Title",
+    "slug": "updated-slug",
+    "content": "<p>Updated content...</p>",
+    "excerpt": "Updated excerpt",
+    "thumbnail": {
+      "id": 4,
+      "url": "https://taearifvideos.oss-me-central-1.aliyuncs.com/api-media/2026/01/new-thumbnail.jpg",
+      "type": "image",
+      "created_at": "2026-01-21T20:12:00.000000Z"
+    },
+    "status": "published",
+    "published_at": "2026-01-21T20:15:00.000000Z",
+    "created_at": "2026-01-21T20:01:40.000000Z",
+    "updated_at": "2026-01-21T20:15:00.000000Z",
+    "categories": [...],
+    "media": [...],
+    "author": {...}
+  }
+}
+```
+
+**Notes:**
+- Only the post owner can update
+- All fields are optional (partial update supported)
+- `category_ids` and `media_ids` replace existing associations
+- `published_at` is set automatically when status changes to "published"
+- Returns 403 if user doesn't own the post
+- Returns 404 if post not found
+
+---
+
+### 5. Delete Post (Protected)
+
+**Endpoint:** `DELETE /api/posts/{id}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Post deleted successfully"
+}
+```
+
+**Notes:**
+- Only the post owner can delete
+- Returns 403 if user doesn't own the post
+- Returns 404 if post not found
+- Cascades delete to related categories and media associations
+
+---
+
+## Categories API
+
+### 1. List Categories (Public)
+
+**Endpoint:** `GET /api/categories`
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Technology"
+    },
+    {
+      "id": 2,
+      "name": "Design"
+    }
+  ]
+}
+```
+
+---
+
+### 2. Create Category (Protected)
+
+**Endpoint:** `POST /api/categories`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "New Category"
+}
+```
+
+**Field Details:**
+- `name` (required, string, max 255, unique) - Category name
+
+**Response (201 Created):**
+```json
+{
+  "data": {
+    "id": 3,
+    "name": "New Category"
+  }
+}
+```
+
+---
+
+### 3. Update Category (Protected)
+
+**Endpoint:** `PUT /api/categories/{id}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Updated Category Name"
+}
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "id": 1,
+    "name": "Updated Category Name"
+  }
+}
+```
+
+---
+
+### 4. Delete Category (Protected)
+
+**Endpoint:** `DELETE /api/categories/{id}`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Category deleted successfully"
+}
+```
+
+---
+
+## Media API
+
+### 1. Upload Media (Protected)
+
+**Endpoint:** `POST /api/media`
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+```
+
+**Request Body (Form Data):**
+- `file` (required, file) - Image or video file
+  - **Supported formats:** jpeg, png, gif, webp, mp4, mov, webm
+  - **Max size:** 50 MB (51200 KB)
+- `mediable_type` (optional, string) - Must be `"App\Models\Api\Post"` if provided
+- `mediable_id` (optional, integer) - Post ID to attach media to (required if `mediable_type` provided)
+
+**Example Request (cURL):**
+```bash
+curl -X POST "https://bigrises.com/api/media" \
+  -H "Authorization: Bearer {token}" \
+  -F "file=@/path/to/image.jpg" \
+  -F "mediable_type=App\Models\Api\Post" \
+  -F "mediable_id=1"
+```
+
+**Response (201 Created):**
+```json
+{
+  "data": {
+    "id": 2,
+    "url": "https://taearifvideos.oss-me-central-1.aliyuncs.com/api-media/2026/01/7c2eb5d5-74ed-4bc8-9bd5-d842fc4bc5a3.jpg",
+    "type": "image",
+    "created_at": "2026-01-21T20:02:42.000000Z"
+  }
+}
+```
+
+**Notes:**
+- Files are uploaded to Aliyun OSS (cloud storage)
+- URL format: `https://{bucket}.oss-{region}.aliyuncs.com/{path}`
+- Media can be uploaded without attaching to a post (orphan upload)
+- If attaching to post, user must own that post
+- `type` is automatically detected: "image" or "video"
+
+---
+
+## Data Models
+
+### Post Object (Full)
+
+```typescript
+interface Post {
+  id: number;
+  user_id: number;
+  title: string;
+  slug: string;
+  content: string; // HTML content
+  excerpt: string | null;
+  thumbnail: Media | null; // Optional thumbnail media
+  status: "draft" | "published";
+  published_at: string | null; // ISO 8601 datetime
+  created_at: string; // ISO 8601 datetime
+  updated_at: string; // ISO 8601 datetime
+  categories: Category[];
+  media: Media[];
+  author: {
+    id: number;
+    name: string;
+  } | null;
+}
+```
+
+### Post Object (List View)
+
+```typescript
+interface PostListItem {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  thumbnail: Media | null; // Optional thumbnail media
+  published_at: string | null; // ISO 8601 datetime
+}
+```
+
+### Category Object
+
+```typescript
+interface Category {
+  id: number;
+  name: string;
+}
+```
+
+### Media Object
+
+```typescript
+interface Media {
+  id: number;
+  url: string; // Full OSS URL
+  type: "image" | "video";
+  created_at: string; // ISO 8601 datetime
+}
+```
+
+### Pagination Object
+
+```typescript
+interface Pagination {
+  per_page: number;
+  current_page: number;
+  from: number | null; // First item number on current page
+  to: number | null; // Last item number on current page
+  total: number; // Total items across all pages
+  last_page: number; // Total number of pages
+}
+```
+
+---
+
+## Error Handling
+
+### Standard Error Response Format
+
+```json
+{
+  "message": "Error message here",
+  "errors": {
+    "field_name": ["Validation error message"]
+  }
+}
+```
+
+### HTTP Status Codes
+
+- `200 OK` - Success
+- `201 Created` - Resource created successfully
+- `400 Bad Request` - Invalid request
+- `401 Unauthorized` - Missing or invalid token
+- `403 Forbidden` - User doesn't have permission (e.g., doesn't own the resource)
+- `404 Not Found` - Resource not found
+- `422 Unprocessable Entity` - Validation errors
+
+### Common Error Scenarios
+
+**401 Unauthorized:**
+```json
+{
+  "message": "Unauthenticated."
+}
+```
+
+**403 Forbidden:**
+```json
+{
+  "message": "You do not own this post."
+}
+```
+
+**403 Forbidden (Thumbnail Ownership):**
+```json
+{
+  "message": "You do not own this thumbnail."
+}
+```
+
+**404 Not Found:**
+```json
+{
+  "message": "No query results for model [App\\Models\\Api\\Post] {id}"
+}
+```
+
+**422 Validation Error:**
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "title": ["The title field is required."],
+    "slug": ["The slug has already been taken."]
+  }
+}
+```
+
+---
+
+## React.js Examples
+
+### Setup
+
+```typescript
+// api/config.ts
+const API_BASE_URL = 'https://bigrises.com/api';
+
+export const apiClient = {
+  get: async (endpoint: string, token?: string) => {
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'GET',
+      headers,
+    });
+    return response.json();
+  },
+  
+  post: async (endpoint: string, data: any, token?: string) => {
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+  
+  put: async (endpoint: string, data: any, token: string) => {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+  
+  delete: async (endpoint: string, token: string) => {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+  
+  upload: async (endpoint: string, file: File, token: string, additionalData?: Record<string, any>) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (additionalData) {
+      Object.entries(additionalData).forEach(([key, value]) => {
+        formData.append(key, String(value));
+      });
+    }
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    return response.json();
+  },
+};
+```
+
+### Example: List Posts with Pagination
+
+```typescript
+import { useState, useEffect } from 'react';
+import { apiClient } from './api/config';
+
+interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  thumbnail: Media | null;
+  published_at: string | null;
+}
+
+interface PostsResponse {
+  data: Post[];
+  pagination: {
+    per_page: number;
+    current_page: number;
+    from: number | null;
+    to: number | null;
+    total: number;
+    last_page: number;
+  };
+}
+
+function PostsList() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [pagination, setPagination] = useState<PostsResponse['pagination'] | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        const response: PostsResponse = await apiClient.get(
+          `/posts?per_page=15&page=${currentPage}`
+        );
+        setPosts(response.data);
+        setPagination(response.pagination);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [currentPage]);
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div>
+      <h1>Blog Posts</h1>
+      {posts.map((post) => (
+        <article key={post.id}>
+          {post.thumbnail && (
+            <img src={post.thumbnail.url} alt={post.title} style={{ maxWidth: '300px' }} />
+          )}
+          <h2>{post.title}</h2>
+          <p>{post.excerpt}</p>
+          <a href={`/posts/${post.slug}`}>Read more</a>
+        </article>
+      ))}
+      
+      {pagination && (
+        <div className="pagination">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            Previous
+          </button>
+          <span>
+            Page {pagination.current_page} of {pagination.last_page}
+          </span>
+          <button
+            disabled={currentPage === pagination.last_page}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Example: Get Single Post
+
+```typescript
+import { useState, useEffect } from 'react';
+import { apiClient } from './api/config';
+
+function PostDetail({ slug }: { slug: string }) {
+  const [post, setPost] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await apiClient.get(`/posts/${slug}`);
+        setPost(response.data);
+      } catch (error) {
+        console.error('Error fetching post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [slug]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!post) return <div>Post not found</div>;
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      {post.thumbnail && (
+        <img src={post.thumbnail.url} alt={post.title} style={{ maxWidth: '100%' }} />
+      )}
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      {post.media.length > 0 && (
+        <div>
+          {post.media.map((media: any) => (
+            <img key={media.id} src={media.url} alt="" />
+          ))}
+        </div>
+      )}
+    </article>
+  );
+}
+```
+
+### Example: Create Post
+
+```typescript
+import { useState } from 'react';
+import { apiClient } from './api/config';
+
+function CreatePost({ token }: { token: string }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    status: 'draft',
+    thumbnail_id: null as number | null,
+    category_ids: [] as number[],
+    media_ids: [] as number[],
+  });
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [uploadedThumbnail, setUploadedThumbnail] = useState<any>(null);
+
+  const handleThumbnailUpload = async (file: File) => {
+    try {
+      const response = await apiClient.upload('/media', file, token);
+      setUploadedThumbnail(response.data);
+      setFormData({ ...formData, thumbnail_id: response.data.id });
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await apiClient.post('/posts', formData, token);
+      console.log('Post created:', response.data);
+      // Redirect or show success message
+    } catch (error: any) {
+      console.error('Error creating post:', error);
+      if (error.errors) {
+        // Handle validation errors
+        console.error('Validation errors:', error.errors);
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Title"
+        value={formData.title}
+        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+        required
+      />
+      <textarea
+        placeholder="Content"
+        value={formData.content}
+        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+        required
+      />
+      <div>
+        <label>Thumbnail (optional):</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              setThumbnailFile(file);
+              handleThumbnailUpload(file);
+            }
+          }}
+        />
+        {uploadedThumbnail && (
+          <div>
+            <img src={uploadedThumbnail.url} alt="Thumbnail" style={{ maxWidth: '200px' }} />
+            <p>Thumbnail ID: {uploadedThumbnail.id}</p>
+          </div>
+        )}
+      </div>
+      <select
+        value={formData.status}
+        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+      >
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+      </select>
+      <button type="submit">Create Post</button>
+    </form>
+  );
+}
+```
+
+### Example: Upload Media
+
+```typescript
+import { useState } from 'react';
+import { apiClient } from './api/config';
+
+function MediaUpload({ token, postId }: { token: string; postId?: number }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedMedia, setUploadedMedia] = useState<any>(null);
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const additionalData = postId
+        ? { mediable_type: 'App\\Models\\Api\\Post', mediable_id: postId }
+        : undefined;
+      
+      const response = await apiClient.upload('/media', file, token, additionalData);
+      setUploadedMedia(response.data);
+      console.log('Media uploaded:', response.data.url);
+    } catch (error) {
+      console.error('Error uploading media:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleUpload}>
+      <input
+        type="file"
+        accept="image/*,video/*"
+        onChange={(e) => setFile(e.target.files?.[0] || null)}
+        required
+      />
+      <button type="submit" disabled={uploading || !file}>
+        {uploading ? 'Uploading...' : 'Upload'}
+      </button>
+      {uploadedMedia && (
+        <div>
+          <p>Uploaded: {uploadedMedia.url}</p>
+          <img src={uploadedMedia.url} alt="Uploaded" style={{ maxWidth: '200px' }} />
+        </div>
+      )}
+    </form>
+  );
+}
+```
+
+### Example: Create Post with Thumbnail and Media (Complete Workflow)
+
+```typescript
+import { useState } from 'react';
+import { apiClient } from './api/config';
+
+function CreatePostWithMedia({ token }: { token: string }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    status: 'draft' as 'draft' | 'published',
+    category_ids: [] as number[],
+  });
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [thumbnailId, setThumbnailId] = useState<number | null>(null);
+  const [mediaIds, setMediaIds] = useState<number[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [creating, setCreating] = useState(false);
+
+  // Step 1: Upload thumbnail
+  const handleThumbnailUpload = async () => {
+    if (!thumbnailFile) return;
+    setUploading(true);
+    try {
+      const response = await apiClient.upload('/media', thumbnailFile, token);
+      setThumbnailId(response.data.id);
+      console.log('Thumbnail uploaded:', response.data.id);
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Step 2: Upload media files
+  const handleMediaUpload = async () => {
+    if (mediaFiles.length === 0) return;
+    setUploading(true);
+    try {
+      const uploadPromises = mediaFiles.map(file => 
+        apiClient.upload('/media', file, token)
+      );
+      const responses = await Promise.all(uploadPromises);
+      const ids = responses.map(r => r.data.id);
+      setMediaIds(ids);
+      console.log('Media uploaded:', ids);
+    } catch (error) {
+      console.error('Error uploading media:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Step 3: Create post with thumbnail_id and media_ids
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      const response = await apiClient.post('/posts', {
+        ...formData,
+        thumbnail_id: thumbnailId,
+        media_ids: mediaIds,
+      }, token);
+      console.log('Post created:', response.data);
+      // Reset form or redirect
+    } catch (error: any) {
+      console.error('Error creating post:', error);
+      if (error.errors) {
+        console.error('Validation errors:', error.errors);
+      }
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>Title:</label>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          required
+        />
+      </div>
+
+      <div>
+        <label>Content:</label>
+        <textarea
+          value={formData.content}
+          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+          required
+        />
+      </div>
+
+      <div>
+        <label>Thumbnail (optional):</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              setThumbnailFile(file);
+            }
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleThumbnailUpload}
+          disabled={!thumbnailFile || uploading}
+        >
+          {uploading ? 'Uploading...' : 'Upload Thumbnail'}
+        </button>
+        {thumbnailId && <p>✓ Thumbnail ID: {thumbnailId}</p>}
+      </div>
+
+      <div>
+        <label>Media Files (optional):</label>
+        <input
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          onChange={(e) => {
+            const files = Array.from(e.target.files || []);
+            setMediaFiles(files);
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleMediaUpload}
+          disabled={mediaFiles.length === 0 || uploading}
+        >
+          {uploading ? 'Uploading...' : `Upload ${mediaFiles.length} File(s)`}
+        </button>
+        {mediaIds.length > 0 && <p>✓ Media IDs: {mediaIds.join(', ')}</p>}
+      </div>
+
+      <div>
+        <label>Status:</label>
+        <select
+          value={formData.status}
+          onChange={(e) => setFormData({ ...formData, status: e.target.value as 'draft' | 'published' })}
+        >
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+
+      <button type="submit" disabled={creating || uploading}>
+        {creating ? 'Creating...' : 'Create Post'}
+      </button>
+    </form>
+  );
+}
+```
+
+### Example: Update Post
+
+```typescript
+import { useState, useEffect } from 'react';
+import { apiClient } from './api/config';
+
+function EditPost({ postId, token }: { postId: number; token: string }) {
+  const [post, setPost] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    status: 'draft',
+  });
+
+  useEffect(() => {
+    // Fetch post details first (you might need a separate endpoint for drafts)
+    // For now, assuming you have the post data
+  }, [postId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await apiClient.put(`/posts/${postId}`, formData, token);
+      console.log('Post updated:', response.data);
+    } catch (error: any) {
+      if (error.message?.includes('403')) {
+        alert('You do not own this post.');
+      }
+      console.error('Error updating post:', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Form fields */}
+    </form>
+  );
+}
+```
+
+### Example: Delete Post
+
+```typescript
+import { apiClient } from './api/config';
+
+async function deletePost(postId: number, token: string) {
+  try {
+    const response = await apiClient.delete(`/posts/${postId}`, token);
+    console.log('Post deleted:', response.message);
+    return true;
+  } catch (error: any) {
+    if (error.message?.includes('403')) {
+      alert('You do not own this post.');
+    } else if (error.message?.includes('404')) {
+      alert('Post not found.');
+    }
+    console.error('Error deleting post:', error);
+    return false;
+  }
+}
+
+// Usage in component
+function DeletePostButton({ postId, token, onDelete }: { 
+  postId: number; 
+  token: string;
+  onDelete: () => void;
+}) {
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      const success = await deletePost(postId, token);
+      if (success) {
+        onDelete();
+      }
+    }
+  };
+
+  return <button onClick={handleDelete}>Delete Post</button>;
+}
+```
+
+---
+
+## Important Notes
+
+1. **Auto-Generated Fields:**
+   - `slug`: Auto-generated from `title` if not provided
+   - `excerpt`: Auto-generated from `content` (HTML stripped, ~200 chars) if empty
+   - `published_at`: Set automatically when status changes to "published"
+
+2. **Thumbnail:**
+   - Thumbnail is optional - posts can exist without thumbnails
+   - Upload thumbnail via `/api/media` endpoint first, then use the returned `id` as `thumbnail_id`
+   - Thumbnail must be owned by the authenticated user
+   - Thumbnail appears separately from the `media` array in responses
+   - Thumbnail is shown in both list and detail views
+
+3. **Ownership:**
+   - Users can only update/delete their own posts
+   - Media must be owned by the user to attach to posts
+   - Thumbnail must be owned by the user to use as post thumbnail
+
+3. **Media Storage:**
+   - All media is stored on Aliyun OSS (cloud storage)
+   - URLs are permanent and publicly accessible
+   - Media can be uploaded without attaching to a post
+
+4. **Pagination:**
+   - Default: 15 items per page
+   - Can be customized with `per_page` query parameter
+   - Response includes pagination metadata
+
+5. **Status:**
+   - `draft`: Not visible in public list
+   - `published`: Visible in public list
+   - Only published posts appear in `GET /api/posts`
+
+---
+
+## Quick Reference
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/posts` | GET | Public | List published posts |
+| `/posts/{slug}` | GET | Public | Get post by slug |
+| `/posts` | POST | Protected | Create post |
+| `/posts/{id}` | PUT | Protected | Update post |
+| `/posts/{id}` | DELETE | Protected | Delete post |
+| `/categories` | GET | Public | List categories |
+| `/categories` | POST | Protected | Create category |
+| `/categories/{id}` | PUT | Protected | Update category |
+| `/categories/{id}` | DELETE | Protected | Delete category |
+| `/media` | POST | Protected | Upload media |
+
+---
+
+**Last Updated:** 2026-01-21  
+**API Version:** 1.1 (Added thumbnail support)
+
+
+
+
+
+
+
+Blog Media Upload Workflow Guide
+# Blog Media Upload Workflow Guide
+
+**For Frontend Developers**
+
+This guide explains how to handle media uploads (thumbnails and regular media) when creating or updating blog posts.
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Understanding Thumbnail vs Media](#understanding-thumbnail-vs-media)
+3. [Complete Workflow](#complete-workflow)
+4. [Step-by-Step Examples](#step-by-step-examples)
+5. [React.js Implementation](#reactjs-implementation)
+6. [Common Scenarios](#common-scenarios)
+7. [Error Handling](#error-handling)
+8. [Best Practices](#best-practices)
+
+---
+
+## Overview
+
+When creating a blog post, you can optionally include:
+- **Thumbnail**: A single featured image (shown in list views and detail page)
+- **Media**: Multiple images/videos (shown in the post content area)
+
+**Key Points:**
+- Both use the **same upload endpoint** (`POST /api/media`)
+- You must **upload files first** to get their IDs
+- Then use those IDs when creating/updating the post
+- All media must be owned by the authenticated user
+
+---
+
+## Understanding Thumbnail vs Media
+
+### Thumbnail
+- **Purpose**: Featured/preview image for the post
+- **Quantity**: One per post (optional)
+- **Storage**: Direct foreign key in `api_posts.thumbnail_id`
+- **Display**: Shown in list views and at the top of detail view
+- **Field**: `thumbnail_id` (single integer)
+
+### Regular Media
+- **Purpose**: Additional images/videos in post content
+- **Quantity**: Multiple per post (optional)
+- **Storage**: Polymorphic relationship via `api_media` table
+- **Display**: Shown in the `media` array in post responses
+- **Field**: `media_ids` (array of integers)
+
+---
+
+## Complete Workflow
+
+### Creating a Post with Thumbnail and Media
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Step 1: Upload Thumbnail                                    │
+│ POST /api/media                                             │
+│ → Returns: { id: 3, url: "...", type: "image" }            │
+│ → Save: thumbnailId = 3                                     │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 2: Upload Media Files (repeat for each file)            │
+│ POST /api/media (file 1)                                    │
+│ → Returns: { id: 5, url: "...", type: "image" }            │
+│ POST /api/media (file 2)                                    │
+│ → Returns: { id: 6, url: "...", type: "video" }            │
+│ POST /api/media (file 3)                                    │
+│ → Returns: { id: 7, url: "...", type: "image" }            │
+│ → Save: mediaIds = [5, 6, 7]                               │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 3: Create Post with IDs                                 │
+│ POST /api/posts                                              │
+│ Body: {                                                      │
+│   title: "...",                                              │
+│   content: "...",                                            │
+│   thumbnail_id: 3,        ← From Step 1                     │
+│   media_ids: [5, 6, 7]   ← From Step 2                     │
+│ }                                                            │
+│ → Returns: Post with thumbnail and media attached           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Step-by-Step Examples
+
+### Example 1: Create Post with Thumbnail Only
+
+```typescript
+// Step 1: Upload thumbnail
+const thumbnailFile = new File([...], 'thumbnail.jpg', { type: 'image/jpeg' });
+const thumbResponse = await apiClient.upload('/media', thumbnailFile, token);
+const thumbnailId = thumbResponse.data.id; // e.g., 3
+
+// Step 2: Create post
+const postResponse = await apiClient.post('/posts', {
+  title: "My Post",
+  content: "<p>Post content...</p>",
+  status: "published",
+  thumbnail_id: thumbnailId  // 3
+}, token);
+
+console.log('Post created:', postResponse.data);
+// Response includes: { ..., thumbnail: { id: 3, url: "..." } }
+```
+
+### Example 2: Create Post with Media Only (No Thumbnail)
+
+```typescript
+// Step 1: Upload multiple media files
+const mediaFiles = [file1, file2, file3];
+const mediaResponses = await Promise.all(
+  mediaFiles.map(file => apiClient.upload('/media', file, token))
+);
+const mediaIds = mediaResponses.map(r => r.data.id); // e.g., [5, 6, 7]
+
+// Step 2: Create post
+const postResponse = await apiClient.post('/posts', {
+  title: "My Post",
+  content: "<p>Post content...</p>",
+  status: "published",
+  media_ids: mediaIds  // [5, 6, 7]
+}, token);
+
+console.log('Post created:', postResponse.data);
+// Response includes: { ..., media: [{ id: 5, ... }, { id: 6, ... }, { id: 7, ... }] }
+```
+
+### Example 3: Create Post with Both Thumbnail and Media
+
+```typescript
+// Step 1: Upload thumbnail
+const thumbnailFile = new File([...], 'thumb.jpg');
+const thumbResponse = await apiClient.upload('/media', thumbnailFile, token);
+const thumbnailId = thumbResponse.data.id; // 3
+
+// Step 2: Upload media files
+const mediaFiles = [image1, video1, image2];
+const mediaResponses = await Promise.all(
+  mediaFiles.map(file => apiClient.upload('/media', file, token))
+);
+const mediaIds = mediaResponses.map(r => r.data.id); // [5, 6, 7]
+
+// Step 3: Create post
+const postResponse = await apiClient.post('/posts', {
+  title: "My Post",
+  content: "<p>Post content...</p>",
+  status: "published",
+  thumbnail_id: thumbnailId,  // 3
+  media_ids: mediaIds         // [5, 6, 7]
+}, token);
+
+console.log('Post created:', postResponse.data);
+// Response includes both:
+// - thumbnail: { id: 3, url: "..." }
+// - media: [{ id: 5, ... }, { id: 6, ... }, { id: 7, ... }]
+```
+
+### Example 4: Create Post Without Any Media
+
+```typescript
+// No uploads needed - just create the post
+const postResponse = await apiClient.post('/posts', {
+  title: "My Post",
+  content: "<p>Post content...</p>",
+  status: "published"
+  // No thumbnail_id or media_ids
+}, token);
+
+console.log('Post created:', postResponse.data);
+// Response: { ..., thumbnail: null, media: [] }
+```
+
+---
+
+## React.js Implementation
+
+### Complete Component Example
+
+```typescript
+import { useState } from 'react';
+import { apiClient } from './api/config';
+
+interface CreatePostFormData {
+  title: string;
+  content: string;
+  status: 'draft' | 'published';
+  category_ids: number[];
+}
+
+function CreatePostForm({ token }: { token: string }) {
+  const [formData, setFormData] = useState<CreatePostFormData>({
+    title: '',
+    content: '',
+    status: 'draft',
+    category_ids: [],
+  });
+
+  // Media state
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  
+  // Uploaded IDs
+  const [thumbnailId, setThumbnailId] = useState<number | null>(null);
+  const [mediaIds, setMediaIds] = useState<number[]>([]);
+  
+  // UI state
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({
+    thumbnail: false,
+    media: 0, // Number of media files uploaded
+  });
+
+  // Upload thumbnail
+  const handleThumbnailUpload = async () => {
+    if (!thumbnailFile) return;
+    
+    setUploadProgress(prev => ({ ...prev, thumbnail: true }));
+    try {
+      const response = await apiClient.upload('/media', thumbnailFile, token);
+      setThumbnailId(response.data.id);
+      console.log('Thumbnail uploaded:', response.data.id);
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error);
+      alert('Failed to upload thumbnail');
+    } finally {
+      setUploadProgress(prev => ({ ...prev, thumbnail: false }));
+    }
+  };
+
+  // Upload all media files
+  const handleMediaUpload = async () => {
+    if (mediaFiles.length === 0) return;
+    
+    setUploading(true);
+    setUploadProgress(prev => ({ ...prev, media: 0 }));
+    
+    try {
+      const uploadPromises = mediaFiles.map(async (file, index) => {
+        const response = await apiClient.upload('/media', file, token);
+        setUploadProgress(prev => ({ ...prev, media: index + 1 }));
+        return response.data.id;
+      });
+      
+      const ids = await Promise.all(uploadPromises);
+      setMediaIds(ids);
+      console.log('Media uploaded:', ids);
+    } catch (error) {
+      console.error('Error uploading media:', error);
+      alert('Failed to upload some media files');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Create post
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const payload: any = {
+        ...formData,
+      };
+      
+      // Add thumbnail_id if uploaded
+      if (thumbnailId) {
+        payload.thumbnail_id = thumbnailId;
+      }
+      
+      // Add media_ids if uploaded
+      if (mediaIds.length > 0) {
+        payload.media_ids = mediaIds;
+      }
+      
+      const response = await apiClient.post('/posts', payload, token);
+      console.log('Post created:', response.data);
+      
+      // Reset form
+      setFormData({
+        title: '',
+        content: '',
+        status: 'draft',
+        category_ids: [],
+      });
+      setThumbnailFile(null);
+      setMediaFiles([]);
+      setThumbnailId(null);
+      setMediaIds([]);
+      
+      alert('Post created successfully!');
+    } catch (error: any) {
+      console.error('Error creating post:', error);
+      if (error.errors) {
+        // Handle validation errors
+        console.error('Validation errors:', error.errors);
+      }
+      alert('Failed to create post');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Title */}
+      <div>
+        <label>Title:</label>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          required
+        />
+      </div>
+
+      {/* Content */}
+      <div>
+        <label>Content:</label>
+        <textarea
+          value={formData.content}
+          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+          required
+        />
+      </div>
+
+      {/* Thumbnail Upload */}
+      <div>
+        <label>Thumbnail (optional):</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              setThumbnailFile(file);
+              setThumbnailId(null); // Reset ID when new file selected
+            }
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleThumbnailUpload}
+          disabled={!thumbnailFile || uploadProgress.thumbnail}
+        >
+          {uploadProgress.thumbnail ? 'Uploading...' : 'Upload Thumbnail'}
+        </button>
+        {thumbnailId && (
+          <div>
+            <p>✓ Thumbnail uploaded (ID: {thumbnailId})</p>
+          </div>
+        )}
+      </div>
+
+      {/* Media Files Upload */}
+      <div>
+        <label>Media Files (optional):</label>
+        <input
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          onChange={(e) => {
+            const files = Array.from(e.target.files || []);
+            setMediaFiles(files);
+            setMediaIds([]); // Reset IDs when new files selected
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleMediaUpload}
+          disabled={mediaFiles.length === 0 || uploading}
+        >
+          {uploading
+            ? `Uploading... (${uploadProgress.media}/${mediaFiles.length})`
+            : `Upload ${mediaFiles.length} File(s)`}
+        </button>
+        {mediaIds.length > 0 && (
+          <div>
+            <p>✓ {mediaIds.length} media file(s) uploaded</p>
+            <p>IDs: {mediaIds.join(', ')}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Status */}
+      <div>
+        <label>Status:</label>
+        <select
+          value={formData.status}
+          onChange={(e) => setFormData({ ...formData, status: e.target.value as 'draft' | 'published' })}
+        >
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+
+      {/* Submit */}
+      <button type="submit" disabled={uploading || uploadProgress.thumbnail}>
+        Create Post
+      </button>
+    </form>
+  );
+}
+```
+
+### Simplified Hook Example
+
+```typescript
+import { useState } from 'react';
+import { apiClient } from './api/config';
+
+function useMediaUpload(token: string) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const uploadThumbnail = async (file: File): Promise<number> => {
+    setUploading(true);
+    setError(null);
+    try {
+      const response = await apiClient.upload('/media', file, token);
+      return response.data.id;
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload thumbnail');
+      throw err;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const uploadMedia = async (files: File[]): Promise<number[]> => {
+    setUploading(true);
+    setError(null);
+    try {
+      const responses = await Promise.all(
+        files.map(file => apiClient.upload('/media', file, token))
+      );
+      return responses.map(r => r.data.id);
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload media');
+      throw err;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return { uploadThumbnail, uploadMedia, uploading, error };
+}
+
+// Usage
+function CreatePost({ token }: { token: string }) {
+  const { uploadThumbnail, uploadMedia, uploading } = useMediaUpload(token);
+  const [thumbnailId, setThumbnailId] = useState<number | null>(null);
+  const [mediaIds, setMediaIds] = useState<number[]>([]);
+
+  const handleThumbnailChange = async (file: File) => {
+    const id = await uploadThumbnail(file);
+    setThumbnailId(id);
+  };
+
+  const handleMediaChange = async (files: File[]) => {
+    const ids = await uploadMedia(files);
+    setMediaIds(ids);
+  };
+
+  const handleSubmit = async (formData: any) => {
+    await apiClient.post('/posts', {
+      ...formData,
+      thumbnail_id: thumbnailId,
+      media_ids: mediaIds,
+    }, token);
+  };
+
+  // ... rest of component
+}
+```
+
+---
+
+## Common Scenarios
+
+### Scenario 1: User Uploads Thumbnail, Then Changes Mind
+
+```typescript
+// User uploads thumbnail (ID: 3)
+const thumbId = await uploadThumbnail(file1); // Returns 3
+
+// User changes thumbnail
+const newThumbId = await uploadThumbnail(file2); // Returns 5
+
+// Create post with new thumbnail (ID: 5)
+// Old thumbnail (ID: 3) remains in database but unused
+await createPost({ thumbnail_id: newThumbId });
+```
+
+**Note:** The old thumbnail file remains in OSS storage. You may want to implement cleanup logic if needed.
+
+### Scenario 2: User Uploads Media, Then Removes Some Before Creating Post
+
+```typescript
+// User uploads 5 files
+const allIds = await uploadMedia([f1, f2, f3, f4, f5]); // [5, 6, 7, 8, 9]
+
+// User removes f2 and f4 from UI
+const selectedIds = [5, 7, 9]; // User's selection
+
+// Create post with only selected media
+await createPost({ media_ids: selectedIds });
+// IDs 6 and 8 remain in database but unused
+```
+
+### Scenario 3: Update Post - Change Thumbnail
+
+```typescript
+// Upload new thumbnail
+const newThumbId = await uploadThumbnail(newFile); // Returns 10
+
+// Update post
+await apiClient.put(`/posts/${postId}`, {
+  thumbnail_id: newThumbId  // Replaces old thumbnail
+}, token);
+```
+
+### Scenario 4: Update Post - Add More Media
+
+```typescript
+// Get existing media IDs from post
+const post = await apiClient.get(`/posts/${postId}`);
+const existingMediaIds = post.data.media.map((m: any) => m.id); // [5, 6, 7]
+
+// Upload new media
+const newMediaIds = await uploadMedia([newFile1, newFile2]); // [8, 9]
+
+// Update post with combined media
+await apiClient.put(`/posts/${postId}`, {
+  media_ids: [...existingMediaIds, ...newMediaIds]  // [5, 6, 7, 8, 9]
+}, token);
+```
+
+---
+
+## Error Handling
+
+### Common Errors
+
+**1. Ownership Error (403)**
+```json
+{
+  "message": "You do not own this thumbnail."
+}
+```
+**Cause:** Trying to use a media ID that belongs to another user.
+
+**Solution:** Only use media IDs from your own uploads.
+
+---
+
+**2. Media Not Found (404)**
+```json
+{
+  "message": "No query results for model [App\\Models\\Api\\Media] {id}"
+}
+```
+**Cause:** Media ID doesn't exist in database.
+
+**Solution:** Ensure media was uploaded successfully before using its ID.
+
+---
+
+**3. Validation Error (422)**
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "thumbnail_id": ["The selected thumbnail id is invalid."]
+  }
+}
+```
+**Cause:** Invalid media ID format or doesn't exist.
+
+**Solution:** Check that `thumbnail_id` is a valid integer and the media exists.
+
+---
+
+### Error Handling Example
+
+```typescript
+async function createPostSafely(
+  formData: any,
+  thumbnailId: number | null,
+  mediaIds: number[],
+  token: string
+) {
+  try {
+    const payload: any = { ...formData };
+    
+    if (thumbnailId) {
+      // Validate thumbnail exists and is owned by user
+      try {
+        const media = await apiClient.get(`/media/${thumbnailId}`, token);
+        if (media.data.user_id !== currentUserId) {
+          throw new Error('You do not own this thumbnail');
+        }
+        payload.thumbnail_id = thumbnailId;
+      } catch (error) {
+        console.error('Thumbnail validation failed:', error);
+        throw new Error('Invalid thumbnail. Please upload again.');
+      }
+    }
+    
+    if (mediaIds.length > 0) {
+      // Validate all media IDs
+      try {
+        const mediaPromises = mediaIds.map(id => 
+          apiClient.get(`/media/${id}`, token)
+        );
+        const mediaResponses = await Promise.all(mediaPromises);
+        
+        // Check ownership
+        const invalidMedia = mediaResponses.filter(
+          r => r.data.user_id !== currentUserId
+        );
+        if (invalidMedia.length > 0) {
+          throw new Error('Some media files are not owned by you');
+        }
+        
+        payload.media_ids = mediaIds;
+      } catch (error) {
+        console.error('Media validation failed:', error);
+        throw new Error('Invalid media. Please upload again.');
+      }
+    }
+    
+    // Create post
+    return await apiClient.post('/posts', payload, token);
+  } catch (error: any) {
+    if (error.response?.status === 403) {
+      alert('You do not have permission to use this media.');
+    } else if (error.response?.status === 422) {
+      const errors = error.response.data.errors;
+      console.error('Validation errors:', errors);
+      alert('Please check your input and try again.');
+    } else {
+      console.error('Unexpected error:', error);
+      alert('An error occurred. Please try again.');
+    }
+    throw error;
+  }
+}
+```
+
+---
+
+## Best Practices
+
+### 1. **Upload Before Creating Post**
+✅ **Do:** Upload all media first, then create post with IDs
+```typescript
+const thumbId = await uploadThumbnail(file);
+const mediaIds = await uploadMedia(files);
+await createPost({ thumbnail_id: thumbId, media_ids: mediaIds });
+```
+
+❌ **Don't:** Try to upload and create in one step
+```typescript
+// This won't work - you need IDs first
+await createPost({ thumbnail_file: file }); // ❌
+```
+
+---
+
+### 2. **Show Upload Progress**
+✅ **Do:** Provide visual feedback during uploads
+```typescript
+const [uploading, setUploading] = useState(false);
+const [progress, setProgress] = useState(0);
+
+// Show: "Uploading thumbnail... (50%)"
+```
+
+---
+
+### 3. **Handle Upload Failures Gracefully**
+✅ **Do:** Allow user to retry failed uploads
+```typescript
+try {
+  const id = await uploadThumbnail(file);
+} catch (error) {
+  // Show error, allow retry
+  setUploadError('Upload failed. Please try again.');
+}
+```
+
+---
+
+### 4. **Validate Before Submission**
+✅ **Do:** Check that required uploads completed
+```typescript
+if (thumbnailFile && !thumbnailId) {
+  alert('Please upload thumbnail first');
+  return;
+}
+```
+
+---
+
+### 5. **Clean Up on Cancel**
+✅ **Do:** Consider cleanup if user cancels post creation
+```typescript
+// If user cancels, you might want to delete orphaned media
+// (This requires a DELETE endpoint for media)
+```
+
+---
+
+### 6. **Optimize Multiple Uploads**
+✅ **Do:** Upload in parallel when possible
+```typescript
+// Upload all media files in parallel
+const ids = await Promise.all(
+  files.map(file => uploadMedia(file))
+);
+```
+
+---
+
+### 7. **Store IDs Securely**
+✅ **Do:** Keep uploaded IDs in component state
+```typescript
+const [thumbnailId, setThumbnailId] = useState<number | null>(null);
+const [mediaIds, setMediaIds] = useState<number[]>([]);
+```
+
+---
+
+## Summary
+
+1. **Upload First**: Always upload media files before creating the post
+2. **Get IDs**: Save the `id` from each upload response
+3. **Use IDs**: Pass `thumbnail_id` (single) and `media_ids` (array) when creating/updating post
+4. **Validate Ownership**: The API automatically validates you own the media
+5. **Handle Errors**: Show user-friendly error messages
+6. **Optional**: Both thumbnail and media are optional - posts can exist without them
+
+---
+
+## Quick Reference
+
+| Action | Endpoint | Method | Returns |
+|--------|----------|--------|---------|
+| Upload thumbnail | `/api/media` | POST | `{ id: 3, url: "...", type: "image" }` |
+| Upload media | `/api/media` | POST | `{ id: 5, url: "...", type: "image" }` |
+| Create post | `/api/posts` | POST | Post with `thumbnail` and `media` |
+| Update post | `/api/posts/{id}` | PUT | Updated post |
+
+---
+
+**Last Updated:** 2026-01-21  
+**API Version:** 1.1
+
+Posts
+
+- `id`
+- `user_id` (author)
+- `title`
+- `slug`
+- `content` (long text)
+- `excerpt` (optional summary)
+- `status` (`draft`, `published`)
+- `published_at`
+- `created_at`
+- `updated_at`
+
+Categories
+
+- `id`
+- `name`
+- `slug`
+- `created_at`
+
+**Media (images)**
+
+- `id`
+- `path`
+- `type` (image, video)
+- `user_id`
+- `created_at`
