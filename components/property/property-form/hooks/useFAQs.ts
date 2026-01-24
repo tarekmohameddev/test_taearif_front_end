@@ -1,13 +1,23 @@
-import { useState } from "react";
 import toast from "react-hot-toast";
 import type { FAQ } from "../types/propertyForm.types";
 import { fetchSuggestedFaqs } from "../services/dataService";
+import { usePropertyFormStore } from "@/context/store/dashboard/properties/propertyForm";
 
 export const useFAQs = () => {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [newQuestion, setNewQuestion] = useState<string>("");
-  const [newAnswer, setNewAnswer] = useState<string>("");
-  const [suggestedFaqsList, setSuggestedFaqsList] = useState<any[]>([]);
+  // Use store state instead of local state
+  const faqs = usePropertyFormStore((state) => state.faqs);
+  const newQuestion = usePropertyFormStore((state) => state.newQuestion);
+  const newAnswer = usePropertyFormStore((state) => state.newAnswer);
+  const suggestedFaqsList = usePropertyFormStore((state) => state.suggestedFaqsList);
+  
+  // Get store actions
+  const setFaqs = usePropertyFormStore((state) => state.setFaqs);
+  const setNewQuestion = usePropertyFormStore((state) => state.setNewQuestion);
+  const setNewAnswer = usePropertyFormStore((state) => state.setNewAnswer);
+  const setSuggestedFaqsList = usePropertyFormStore((state) => state.setSuggestedFaqsList);
+  const addFaq = usePropertyFormStore((state) => state.addFaq);
+  const removeFaq = usePropertyFormStore((state) => state.removeFaq);
+  const updateFaq = usePropertyFormStore((state) => state.updateFaq);
 
   const handleAddFaq = () => {
     if (newQuestion.trim() === "" || newAnswer.trim() === "") {
@@ -22,7 +32,7 @@ export const useFAQs = () => {
       displayOnPage: true,
     };
 
-    setFaqs([...faqs, newFaq]);
+    addFaq(newFaq);
     setNewQuestion("");
     setNewAnswer("");
     toast.success("تم إضافة السؤال بنجاح");
@@ -33,16 +43,15 @@ export const useFAQs = () => {
   };
 
   const handleRemoveFaq = (id: number) => {
-    setFaqs(faqs.filter((faq) => faq.id !== id));
+    removeFaq(id);
     toast.success("تم حذف السؤال");
   };
 
   const handleToggleFaqDisplay = (id: number) => {
-    setFaqs(
-      faqs.map((faq) =>
-        faq.id === id ? { ...faq, displayOnPage: !faq.displayOnPage } : faq,
-      ),
-    );
+    const faq = faqs.find((f) => f.id === id);
+    if (faq) {
+      updateFaq(id, { displayOnPage: !faq.displayOnPage });
+    }
   };
 
   const loadSuggestedFaqs = async (): Promise<any[]> => {

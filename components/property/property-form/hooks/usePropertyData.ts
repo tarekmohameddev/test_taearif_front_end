@@ -166,11 +166,11 @@ export const usePropertyData = (
 
           if (property.faqs && Array.isArray(property.faqs)) {
             setFaqs(
-              property.faqs.map((faq: any, index: number) => ({
-                id: index + 1,
+              property.faqs.map((faq: any) => ({
+                id: faq.id || Date.now(), // Preserve original ID from backend
                 question: faq.question,
                 answer: faq.answer,
-                displayOnPage: faq.displayOnPage,
+                displayOnPage: faq.displayOnPage !== undefined ? faq.displayOnPage : true,
               })),
             );
           }
