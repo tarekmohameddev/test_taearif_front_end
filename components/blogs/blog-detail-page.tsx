@@ -17,8 +17,18 @@
 
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 import { useBlogDetail } from "./hooks/use-blog-detail";
 import { formatDate } from "./utils/blog-formatters";
 import { BlogDetailHeader } from "./components/detail/blog-detail-header";
@@ -29,6 +39,7 @@ import { BlogDetailAuthor } from "./components/detail/blog-detail-author";
 import { BlogLoadingState } from "./components/shared/blog-loading-state";
 import { BlogErrorState } from "./components/shared/blog-error-state";
 import { blogApi } from "./services/blog-api";
+import { AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface BlogDetailPageProps {
@@ -39,25 +50,34 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
   const router = useRouter();
   // يستخدم useBlogDetail لجلب تفاصيل المقال (يستخدم blog-api.ts داخلياً)
   const { blog, loading, error, refetch } = useBlogDetail(blogId);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const handleEdit = () => {
     router.push(`/dashboard/blogs/edit/${blogId}`);
   };
 
-  const handleDelete = async () => {
-    if (!confirm("هل أنت متأكد من حذف هذا المقال؟")) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
 
+  const handleDeleteConfirm = async () => {
+    setDeleting(true);
     try {
       // DELETE /posts/{id} - حذف مقال
       await blogApi.deleteBlog(Number(blogId));
       toast.success("تم حذف المقال بنجاح");
+      setDeleteDialogOpen(false);
       router.push("/dashboard/blogs");
     } catch (err: any) {
       console.error("Error deleting blog:", err);
       toast.error(err.message || "فشل في حذف المقال");
+      setDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
   };
 
   if (loading) {
@@ -83,7 +103,7 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
         <BlogDetailHeader
           blog={blog}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteClick}
         />
 
         {/* Excerpt */}
@@ -168,6 +188,55 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
           updatedAt={blog.updated_at}
         />
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <CustomDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} maxWidth="max-w-md">
+        <CustomDialogContent>
+          <CustomDialogClose onClose={handleDeleteCancel} />
+          <CustomDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <CustomDialogTitle className="text-red-600 dark:text-red-400">
+                تأكيد الحذف
+              </CustomDialogTitle>
+            </div>
+            <CustomDialogDescription className="text-base">
+              <div className="space-y-3">
+                <p className="font-semibold text-gray-900 dark:text-gray-100">
+                  ⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!
+                </p>
+                <p className="text-gray-700 dark:text-gray-300">
+                  سيتم حذف المقال <strong className="text-red-600 dark:text-red-400">"{blog.title}"</strong> بشكل نهائي من النظام.
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  جميع البيانات المرتبطة بهذا المقال (المحتوى، الصور، التصنيفات) سيتم حذفها نهائياً.
+                </p>
+              </div>
+            </CustomDialogDescription>
+          </CustomDialogHeader>
+          
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 flex flex-col sm:flex-row gap-3 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={handleDeleteCancel}
+              disabled={deleting}
+              className="w-full sm:w-auto"
+            >
+              إلغاء
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleting}
+              className="w-full sm:w-auto"
+            >
+              {deleting ? "جاري الحذف..." : "حذف نهائي"}
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
     </div>
   );
 }
