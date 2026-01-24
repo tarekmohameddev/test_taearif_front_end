@@ -420,6 +420,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [mainImage, setMainImage] = useState<string>("");
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -554,6 +555,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
       setProperty(mockProperty);
       setLoadingProperty(false);
       setMainImage(mockProperty.image || "");
+      setMainImageIndex(0);
       return;
     }
 
@@ -598,7 +600,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
     if (property?.floor_planning_image) {
       allImages.push(...property.floor_planning_image);
     }
-    return allImages;
+    // Filter out empty images to match propertyImages behavior
+    return allImages.filter((img) => img && img.trim() !== "");
   };
 
   // Navigation functions for dialog
@@ -633,7 +636,34 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   };
 
   const handleThumbnailClick = (imageSrc: string, index: number) => {
+    // Update main image and index when clicking thumbnail
+    setMainImage(imageSrc);
+    setMainImageIndex(index);
+    // Also open dialog
     handleImageClick(imageSrc, index);
+  };
+
+  // Navigation functions for main image (same logic as dialog)
+  const handleMainImagePrevious = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = mainImageIndex;
+      const previousIndex =
+        currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+      setMainImage(allImages[previousIndex]);
+      setMainImageIndex(previousIndex);
+    }
+  };
+
+  const handleMainImageNext = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = mainImageIndex;
+      const nextIndex =
+        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+      setMainImage(allImages[nextIndex]);
+      setMainImageIndex(nextIndex);
+    }
   };
 
   // جلب بيانات العقار عند تحميل المكون
@@ -653,6 +683,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   useEffect(() => {
     if (property?.image) {
       setMainImage(property.image);
+      setMainImageIndex(0);
     }
   }, [property]);
 
@@ -829,16 +860,52 @@ export default function propertyDetail2(props: propertyDetail2Props) {
           data-purpose="property-hero"
         >
           {/* Main Featured Image */}
-          <div className="relative h-[600px] w-full">
+          <div className="relative h-[600px] w-full group">
             {mainImage ? (
-              <Image
-                alt={property.title || "صورة العقار"}
-                className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer rounded-lg"
-                src={mainImage}
-                fill
-                priority
-                onClick={() => handleImageClick(mainImage, 0)}
-              />
+              <>
+                <Image
+                  alt={property.title || "صورة العقار"}
+                  className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer rounded-lg"
+                  src={mainImage}
+                  fill
+                  priority
+                  onClick={() => {
+                    handleImageClick(mainImage, mainImageIndex);
+                  }}
+                />
+
+                {/* Navigation arrows - show only if there's more than one image */}
+                {getAllImages().length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMainImagePrevious();
+                      }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      aria-label="الصورة السابقة"
+                    >
+                      <ChevronLeftIcon className="w-6 h-6" />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMainImageNext();
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      aria-label="الصورة التالية"
+                    >
+                      <ChevronRightIcon className="w-6 h-6" />
+                    </button>
+
+                    {/* Image counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {mainImageIndex + 1} / {getAllImages().length}
+                    </div>
+                  </>
+                )}
+              </>
             ) : (
               <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
                 <p className="text-gray-500">لا توجد صورة متاحة</p>
