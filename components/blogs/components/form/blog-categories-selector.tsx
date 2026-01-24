@@ -58,28 +58,30 @@ export function BlogCategoriesSelector({
   return (
     <div className="space-y-2">
       <Label>التصنيفات</Label>
-      <div className="border rounded-md p-4 space-y-3 max-h-48 overflow-y-auto">
+      <div className="border rounded-md p-4 max-h-48 overflow-y-auto">
         {categories.length === 0 ? (
           <p className="text-sm text-gray-500">لا توجد تصنيفات متاحة</p>
         ) : (
-          categories.map((category) => (
-            <div
-              key={category.id}
-              className="flex items-center space-x-2 space-x-reverse"
-            >
-              <Checkbox
-                id={`category-${category.id}`}
-                checked={formData.category_ids.includes(category.id)}
-                onCheckedChange={() => handleToggle(category.id)}
-              />
-              <Label
-                htmlFor={`category-${category.id}`}
-                className="cursor-pointer flex-1"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className="flex items-center space-x-2 space-x-reverse"
               >
-                {category.name}
-              </Label>
-            </div>
-          ))
+                <Checkbox
+                  id={`category-${category.id}`}
+                  checked={formData.category_ids.includes(category.id)}
+                  onCheckedChange={() => handleToggle(category.id)}
+                />
+                <Label
+                  htmlFor={`category-${category.id}`}
+                  className="cursor-pointer flex-1 text-sm"
+                >
+                  {category.name}
+                </Label>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

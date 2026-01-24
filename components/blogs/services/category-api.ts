@@ -9,6 +9,7 @@
  * 
  * @endpoints
  * - GET /categories - قائمة التصنيفات
+ * - POST /categories - إنشاء تصنيف جديد
  * 
  * @related
  * - types/category.types.ts (Category type)
@@ -16,7 +17,7 @@
  */
 
 import axiosInstance from "@/lib/axiosInstance";
-import type { CategoriesListResponse } from "../types/category.types";
+import type { CategoriesListResponse, Category } from "../types/category.types";
 
 /**
  * Get list of all categories
@@ -28,7 +29,19 @@ export async function getCategories(): Promise<CategoriesListResponse> {
   return response.data;
 }
 
+/**
+ * Create a new category
+ * @param name - Category name (required, string, max 255, unique)
+ * @returns Promise with created category
+ */
+export async function createCategory(name: string): Promise<{ data: Category }> {
+  // POST /categories
+  const response = await axiosInstance.post("/categories", { name });
+  return response.data;
+}
+
 // Export all functions as default object
 export const categoryApi = {
   getCategories,
+  createCategory,
 };

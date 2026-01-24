@@ -115,19 +115,6 @@ export function BlogForm({ mode, blogId }: BlogFormProps) {
               </CardContent>
             </Card>
 
-            {/* الحالة */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">الحالة</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BlogStatusSelector
-                  formData={formData}
-                  onChange={(status) => handleChange("status", status)}
-                />
-              </CardContent>
-            </Card>
-
             {/* التصنيفات */}
             <Card>
               <CardHeader>
@@ -171,6 +158,19 @@ export function BlogForm({ mode, blogId }: BlogFormProps) {
                   mediaUrls={mediaUrls}
                   onChange={(mediaIds) => handleChange("media_ids", mediaIds)}
                   onFilesChange={(files) => handleFilesChange(files)}
+                />
+              </CardContent>
+            </Card>
+
+            {/* الحالة */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">الحالة</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BlogStatusSelector
+                  formData={formData}
+                  onChange={(status) => handleChange("status", status)}
                 />
               </CardContent>
             </Card>
