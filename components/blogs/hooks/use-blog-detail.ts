@@ -15,7 +15,7 @@
  * - components/blogs/blog-detail-page.tsx (يعرض البيانات)
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { blogApi } from "../services/blog-api";
 import type { BlogPost } from "../types/blog.types";
 
@@ -23,43 +23,85 @@ export function useBlogDetail(blogId: number | string) {
   const [blog, setBlog] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isMountedRef = useRef(true);
+  const fetchingRef = useRef(false);
+  const currentBlogIdRef = useRef<number | string | null>(null);
 
-  const fetchBlog = async () => {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const fetchBlog = useCallback(async () => {
     if (!blogId) {
-      setError("معرف المقال مطلوب");
-      setLoading(false);
+      if (isMountedRef.current) {
+        setError("معرف المقال مطلوب");
+        setLoading(false);
+      }
       return;
     }
 
+    // Prevent duplicate calls for the same blogId
+    if (fetchingRef.current && currentBlogIdRef.current === blogId) {
+      return;
+    }
+
+    // If we already have the blog data for this ID, skip fetching
+    if (currentBlogIdRef.current === blogId && blog) {
+      return;
+    }
+
+    fetchingRef.current = true;
+    currentBlogIdRef.current = blogId;
+
     try {
-      setLoading(true);
-      setError(null);
+      if (isMountedRef.current) {
+        setLoading(true);
+        setError(null);
+      }
+      
       // GET /posts/{id} - جلب تفاصيل مقال
       const response = await blogApi.getBlogById(Number(blogId));
-      setBlog(response.data);
+      
+      // Double check: make sure we're still fetching the same blogId and component is mounted
+      if (isMountedRef.current && currentBlogIdRef.current === blogId) {
+        setBlog(response.data);
+        setLoading(false);
+      }
     } catch (err: any) {
-      console.error("Error fetching blog detail:", err);
-      setError(
-        err.response?.status === 404
-          ? "المقال غير موجود"
-          : err.message || "فشل في تحميل المقال"
-      );
-      setBlog(null);
+      if (isMountedRef.current && currentBlogIdRef.current === blogId) {
+        console.error("Error fetching blog detail:", err);
+        setError(
+          err.response?.status === 404
+            ? "المقال غير موجود"
+            : err.message || "فشل في تحميل المقال"
+        );
+        setBlog(null);
+        setLoading(false);
+      }
     } finally {
-      setLoading(false);
+      if (currentBlogIdRef.current === blogId) {
+        fetchingRef.current = false;
+      }
     }
-  };
+  }, [blogId, blog]);
 
   useEffect(() => {
-    if (blogId) {
-      fetchBlog();
-    }
-  }, [blogId]);
+    fetchBlog();
+  }, [fetchBlog]);
+
+  const refetch = useCallback(() => {
+    currentBlogIdRef.current = null;
+    fetchingRef.current = false;
+    fetchBlog();
+  }, [fetchBlog]);
 
   return {
     blog,
     loading,
     error,
-    refetch: fetchBlog,
+    refetch,
   };
 }

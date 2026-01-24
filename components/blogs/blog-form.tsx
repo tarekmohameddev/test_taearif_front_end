@@ -23,6 +23,8 @@
 
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 import { useBlogForm } from "./hooks/use-blog-form";
 import { BlogBasicInfo } from "./components/form/blog-basic-info";
 import { BlogContentEditor } from "./components/form/blog-content-editor";
@@ -64,9 +66,22 @@ export function BlogForm({ mode, blogId }: BlogFormProps) {
     <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <Card>
         <CardHeader>
-          <CardTitle>
-            {mode === "create" ? "إضافة مقال جديد" : "تعديل المقال"}
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>
+              {mode === "create" ? "إضافة مقال جديد" : "تعديل المقال"}
+            </CardTitle>
+            {mode === "edit" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/dashboard/blogs")}
+                className="gap-2"
+              >
+                <ArrowRight className="h-4 w-4" />
+                العودة
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
