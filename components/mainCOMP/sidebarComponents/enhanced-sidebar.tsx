@@ -325,7 +325,7 @@ export function EnhancedSidebar({
               icon={<Download className="h-5 w-5 text-muted-foreground" />}
             />
             <StaticLink
-              href="/apps"
+              href="/dashboard/apps"
               title="التطبيقات"
               description="ادارة التطبيقات"
               icon={<Grid className="h-5 w-5 text-muted-foreground" />}

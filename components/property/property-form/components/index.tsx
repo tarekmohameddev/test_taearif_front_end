@@ -9,3 +9,4 @@ export { default as LocationCard } from "./LocationCard";
 export { default as FAQsCard } from "./FAQsCard";
 export { default as OwnerDetailsCard } from "./OwnerDetailsCard";
 export { default as PropertyDetailsCard } from "./PropertyDetailsCard";
+export { default as PropertyFormActionsCard } from "./PropertyFormActionsCard";

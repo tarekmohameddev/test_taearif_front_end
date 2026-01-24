@@ -13,13 +13,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { MapSection } from "@/components/property/map-section";
 import { LocationCard as LocationCardComponent } from "@/components/property/location-card";
+import { usePropertyFormStore } from "@/context/store/dashboard/properties/propertyForm";
 
 interface LocationCardProps {
   formData: { latitude: number; longitude: number; address: string };
   isDraft: boolean;
   missingFields: string[];
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
   onLocationUpdate: (lat: number, lng: number, address: string) => void;
   cardHasMissingFields: (fields: string[]) => boolean;
 }
@@ -28,11 +27,26 @@ export default function LocationCard({
   formData,
   isDraft,
   missingFields,
-  isOpen,
-  setIsOpen,
   onLocationUpdate,
   cardHasMissingFields,
 }: LocationCardProps) {
+  const isOpen = usePropertyFormStore((state) => state.isLocationOpen);
+  const setIsOpen = usePropertyFormStore((state) => state.setIsLocationOpen);
+  const fullFormData = usePropertyFormStore((state) => state.formData);
+  
+  // Create PropertyData object for LocationCardComponent
+  const propertyData = {
+    title: fullFormData.title || "",
+    description: fullFormData.description || "",
+    price: fullFormData.price || "",
+    propertyType: fullFormData.PropertyType || "",
+    bedrooms: fullFormData.bedrooms || "",
+    bathrooms: fullFormData.bathrooms || "",
+    address: fullFormData.address || "",
+    latitude: fullFormData.latitude || null,
+    longitude: fullFormData.longitude || null,
+  };
+
   return (
     <Card className="xl:col-span-2">
       <CardHeader
@@ -80,7 +94,7 @@ export default function LocationCard({
               {/* Map Section Content */}
               <MapSection onLocationUpdate={onLocationUpdate} hideHeader={true} />
               {/* Location Details */}
-              <LocationCardComponent propertyData={formData} hideHeader={true} />
+              <LocationCardComponent propertyData={propertyData} hideHeader={true} />
             </CardContent>
           </motion.div>
         )}

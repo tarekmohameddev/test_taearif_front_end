@@ -1,136 +1,109 @@
-import { useState, useRef } from "react";
-import type {
-  FormData,
-  Images,
-  Previews,
-  ValidationErrors,
-  FAQ,
-} from "../types/propertyForm.types";
-
-const initialFormData: FormData = {
-  title: "",
-  description: "",
-  address: "",
-  building_id: "",
-  water_meter_number: "",
-  electricity_meter_number: "",
-  deed_number: "",
-  price: "",
-  category: "",
-  project_id: "",
-  purpose: "",
-  bedrooms: "",
-  bathrooms: "",
-  size: "",
-  features: [],
-  status: "draft",
-  featured: true,
-  latitude: 24.766316905850978,
-  longitude: 46.73579692840576,
-  city_id: null,
-  district_id: null,
-  rooms: "",
-  floors: "",
-  floor_number: "",
-  driver_room: "",
-  maid_room: "",
-  dining_room: "",
-  living_room: "",
-  majlis: "",
-  storage_room: "",
-  basement: "",
-  swimming_pool: "",
-  kitchen: "",
-  balcony: "",
-  garden: "",
-  annex: "",
-  elevator: "",
-  private_parking: "",
-  facade_id: "",
-  length: "",
-  width: "",
-  street_width_north: "",
-  street_width_south: "",
-  street_width_east: "",
-  street_width_west: "",
-  building_age: "",
-  payment_method: "",
-  pricePerMeter: "",
-  PropertyType: "",
-  advertising_license: "",
-  owner_number: "",
-  video_url: "",
-  virtual_tour: "",
-};
+import { useRef, useEffect } from "react";
+import { usePropertyFormStore } from "@/context/store/dashboard/properties/propertyForm";
 
 export const usePropertyFormState = (mode: "add" | "edit", id?: string) => {
-  // Form data
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [currentFeature, setCurrentFeature] = useState<string>("");
-  const [selectedFacilities, setSelectedFacilities] = useState<string[]>([]);
+  // Get state and actions from store
+  const formData = usePropertyFormStore((state) => state.formData);
+  const setFormData = usePropertyFormStore((state) => state.setFormData);
+  const currentFeature = usePropertyFormStore((state) => state.currentFeature);
+  const setCurrentFeature = usePropertyFormStore((state) => state.setCurrentFeature);
+  const selectedFacilities = usePropertyFormStore((state) => state.selectedFacilities);
+  const setSelectedFacilities = usePropertyFormStore((state) => state.setSelectedFacilities);
 
   // Validation & errors
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  const [missingFields, setMissingFields] = useState<string[]>([]);
-  const [missingFieldsAr, setMissingFieldsAr] = useState<string[]>([]);
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const errors = usePropertyFormStore((state) => state.errors);
+  const setErrors = usePropertyFormStore((state) => state.setErrors);
+  const missingFields = usePropertyFormStore((state) => state.missingFields);
+  const setMissingFields = usePropertyFormStore((state) => state.setMissingFields);
+  const missingFieldsAr = usePropertyFormStore((state) => state.missingFieldsAr);
+  const setMissingFieldsAr = usePropertyFormStore((state) => state.setMissingFieldsAr);
+  const validationErrors = usePropertyFormStore((state) => state.validationErrors);
+  const setValidationErrors = usePropertyFormStore((state) => state.setValidationErrors);
 
   // Files & media
-  const [images, setImages] = useState<Images>({
-    thumbnail: null,
-    gallery: [],
-    floorPlans: [],
-    deedImage: null,
-  });
-  const [previews, setPreviews] = useState<Previews>({
-    thumbnail: null,
-    gallery: [],
-    floorPlans: [],
-    deedImage: null,
-  });
-  const [video, setVideo] = useState<File | null>(null);
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const images = usePropertyFormStore((state) => state.images);
+  const setImages = usePropertyFormStore((state) => state.setImages);
+  const previews = usePropertyFormStore((state) => state.previews);
+  const setPreviews = usePropertyFormStore((state) => state.setPreviews);
+  const video = usePropertyFormStore((state) => state.video);
+  const setVideo = usePropertyFormStore((state) => state.setVideo);
+  const videoPreview = usePropertyFormStore((state) => state.videoPreview);
+  const setVideoPreview = usePropertyFormStore((state) => state.setVideoPreview);
 
   // FAQs
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [newQuestion, setNewQuestion] = useState<string>("");
-  const [newAnswer, setNewAnswer] = useState<string>("");
-  const [suggestedFaqsList, setSuggestedFaqsList] = useState<any[]>([]);
+  const faqs = usePropertyFormStore((state) => state.faqs);
+  const setFaqs = usePropertyFormStore((state) => state.setFaqs);
+  const newQuestion = usePropertyFormStore((state) => state.newQuestion);
+  const setNewQuestion = usePropertyFormStore((state) => state.setNewQuestion);
+  const newAnswer = usePropertyFormStore((state) => state.newAnswer);
+  const setNewAnswer = usePropertyFormStore((state) => state.setNewAnswer);
+  const suggestedFaqsList = usePropertyFormStore((state) => state.suggestedFaqsList);
+  const setSuggestedFaqsList = usePropertyFormStore((state) => state.setSuggestedFaqsList);
 
   // Loading states
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loadingProperty, setLoadingProperty] = useState<boolean>(
-    mode === "edit" && id ? true : false,
-  );
-  const [uploading, setUploading] = useState<boolean>(false);
-  const [isCompletingDraft, setIsCompletingDraft] = useState<boolean>(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const isLoading = usePropertyFormStore((state) => state.isLoading);
+  const setIsLoading = usePropertyFormStore((state) => state.setLoading);
+  const loadingProperty = usePropertyFormStore((state) => state.loadingProperty);
+  const setLoadingProperty = usePropertyFormStore((state) => state.setLoadingProperty);
+  const uploading = usePropertyFormStore((state) => state.uploading);
+  const setUploading = usePropertyFormStore((state) => state.setUploading);
+  const isCompletingDraft = usePropertyFormStore((state) => state.isCompletingDraft);
+  const setIsCompletingDraft = usePropertyFormStore((state) => state.setIsCompletingDraft);
+  const submitError = usePropertyFormStore((state) => state.submitError);
+  const setSubmitError = usePropertyFormStore((state) => state.setSubmitError);
 
   // UI states
-  const [activeTab, setActiveTab] = useState<"form" | "owner">("form");
-  const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(false);
-  const [isThumbnailOpen, setIsThumbnailOpen] = useState<boolean>(false);
-  const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
-  const [isVideoOpen, setIsVideoOpen] = useState<boolean>(false);
-  const [isFloorPlansOpen, setIsFloorPlansOpen] = useState<boolean>(false);
-  const [isVirtualTourOpen, setIsVirtualTourOpen] = useState<boolean>(false);
-  const [isLocationOpen, setIsLocationOpen] = useState<boolean>(false);
-  const [isFaqsOpen, setIsFaqsOpen] = useState<boolean>(false);
-  const [isOwnerDetailsOpen, setIsOwnerDetailsOpen] = useState<boolean>(false);
+  const activeTab = usePropertyFormStore((state) => state.activeTab);
+  const setActiveTab = usePropertyFormStore((state) => state.setActiveTab);
+  const isDetailsOpen = usePropertyFormStore((state) => state.isDetailsOpen);
+  const setIsDetailsOpen = usePropertyFormStore((state) => state.setIsDetailsOpen);
+  const isThumbnailOpen = usePropertyFormStore((state) => state.isThumbnailOpen);
+  const setIsThumbnailOpen = usePropertyFormStore((state) => state.setIsThumbnailOpen);
+  const isGalleryOpen = usePropertyFormStore((state) => state.isGalleryOpen);
+  const setIsGalleryOpen = usePropertyFormStore((state) => state.setIsGalleryOpen);
+  const isVideoOpen = usePropertyFormStore((state) => state.isVideoOpen);
+  const setIsVideoOpen = usePropertyFormStore((state) => state.setIsVideoOpen);
+  const isFloorPlansOpen = usePropertyFormStore((state) => state.isFloorPlansOpen);
+  const setIsFloorPlansOpen = usePropertyFormStore((state) => state.setIsFloorPlansOpen);
+  const isVirtualTourOpen = usePropertyFormStore((state) => state.isVirtualTourOpen);
+  const setIsVirtualTourOpen = usePropertyFormStore((state) => state.setIsVirtualTourOpen);
+  const isLocationOpen = usePropertyFormStore((state) => state.isLocationOpen);
+  const setIsLocationOpen = usePropertyFormStore((state) => state.setIsLocationOpen);
+  const isFaqsOpen = usePropertyFormStore((state) => state.isFaqsOpen);
+  const setIsFaqsOpen = usePropertyFormStore((state) => state.setIsFaqsOpen);
+  const isOwnerDetailsOpen = usePropertyFormStore((state) => state.isOwnerDetailsOpen);
+  const setIsOwnerDetailsOpen = usePropertyFormStore((state) => state.setIsOwnerDetailsOpen);
 
   // Map states
-  const [map, setMap] = useState<any>(null);
-  const [marker, setMarker] = useState<any>(null);
-  const [searchBox, setSearchBox] = useState<any>(null);
-  const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
+  const map = usePropertyFormStore((state) => state.map);
+  const setMap = usePropertyFormStore((state) => state.setMap);
+  const marker = usePropertyFormStore((state) => state.marker);
+  const setMarker = usePropertyFormStore((state) => state.setMarker);
+  const searchBox = usePropertyFormStore((state) => state.searchBox);
+  const setSearchBox = usePropertyFormStore((state) => state.setSearchBox);
+  const isMapLoaded = usePropertyFormStore((state) => state.isMapLoaded);
+  const setIsMapLoaded = usePropertyFormStore((state) => state.setIsMapLoaded);
 
   // Data states
-  const [categories, setCategories] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
-  const [facades, setFacades] = useState<any[]>([]);
-  const [buildings, setBuildings] = useState<any[]>([]);
+  const categories = usePropertyFormStore((state) => state.categories);
+  const setCategories = usePropertyFormStore((state) => state.setCategories);
+  const projects = usePropertyFormStore((state) => state.projects);
+  const setProjects = usePropertyFormStore((state) => state.setProjects);
+  const facades = usePropertyFormStore((state) => state.facades);
+  const setFacades = usePropertyFormStore((state) => state.setFacades);
+  const buildings = usePropertyFormStore((state) => state.buildings);
+  const setBuildings = usePropertyFormStore((state) => state.setBuildings);
 
-  // Refs
+  // Initialize loadingProperty based on mode
+  useEffect(() => {
+    if (mode === "edit" && id) {
+      setLoadingProperty(true);
+    } else {
+      setLoadingProperty(false);
+    }
+  }, [mode, id, setLoadingProperty]);
+
+  // Refs (still local as they're component-specific)
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const floorPlansInputRef = useRef<HTMLInputElement>(null);

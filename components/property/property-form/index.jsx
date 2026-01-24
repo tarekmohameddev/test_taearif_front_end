@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
 import { useUserStore } from "@/store/userStore";
+import { usePropertyFormStore } from "@/context/store/dashboard/properties/propertyForm";
 import {
   PropertyFormHeader,
   BasicInfoCard,
@@ -18,6 +19,7 @@ import {
   FAQsCard,
   OwnerDetailsCard,
   PropertyDetailsCard,
+  PropertyFormActionsCard,
 } from "./components";
 import { usePropertyFormState } from "./hooks/usePropertyFormState";
 import { usePropertyData } from "./hooks/usePropertyData";
@@ -34,6 +36,13 @@ import type { PropertyFormProps } from "./types/propertyForm.types";
 const MapComponent = React.lazy(() => import("@/components/map-component"));
 
 export default function PropertyForm({ mode, isDraft = false }: PropertyFormProps) {
+  // Cleanup store when component unmounts
+  useEffect(() => {
+    return () => {
+      // تنظيف الـ store عند الخروج من الصفحة
+      usePropertyFormStore.getState().clearStore();
+    };
+  }, []);
   const {
     propertiesManagement: { properties, loading, isInitialized },
     fetchProperties,
@@ -313,7 +322,8 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
 
       {/* Tab Content */}
       {state.activeTab === "form" ? (
-        <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
+        <div className="space-y-6">
+          <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
           <BasicInfoCard
             formData={state.formData}
             errors={state.errors}
@@ -418,11 +428,9 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
 
           <PropertyLocationCard
             formData={state.formData}
-            handleLocationUpdate={mapLocation.handleLocationUpdate}
+            onLocationUpdate={mapLocation.handleLocationUpdate}
             isDraft={isDraft}
             missingFields={state.missingFields}
-            isLocationOpen={state.isLocationOpen}
-            setIsLocationOpen={state.setIsLocationOpen}
             cardHasMissingFields={validation.cardHasMissingFields}
           />
 
@@ -440,6 +448,26 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
             onToggleFaqDisplay={faqsHook.handleToggleFaqDisplay}
             onSelectSuggestedFaq={faqsHook.handleSelectSuggestedFaq}
           />
+          
+          </div>
+
+          {/* Actions Card - في النهاية خارج الـ grid */}
+          <PropertyFormActionsCard
+          mode={mode}
+          isDraft={isDraft}
+          isLoading={submit.isLoading}
+          isCompletingDraft={submit.isCompletingDraft}
+          submitError={submit.submitError}
+          draftButtonText={draftButtonText}
+          submitButtonText={submitButtonText}
+          onBack={() =>
+            router.push(
+              isDraft ? "/dashboard/properties/incomplete" : "/dashboard/properties",
+            )
+          }
+          onSave={submit.handleSubmit}
+          onCompleteDraft={submit.handleCompleteDraft}
+        />
         </div>
       ) : (
         /* Tab: تفاصيل المالك */
@@ -455,6 +483,24 @@ export default function PropertyForm({ mode, isDraft = false }: PropertyFormProp
               onInputChange={handlers.handleInputChange}
               onFileChange={fileUpload.handleFileChange}
               onRemoveImage={fileUpload.removeImage}
+            />
+
+            {/* Actions Card - في النهاية */}
+            <PropertyFormActionsCard
+              mode={mode}
+              isDraft={isDraft}
+              isLoading={submit.isLoading}
+              isCompletingDraft={submit.isCompletingDraft}
+              submitError={submit.submitError}
+              draftButtonText={draftButtonText}
+              submitButtonText={submitButtonText}
+              onBack={() =>
+                router.push(
+                  isDraft ? "/dashboard/properties/incomplete" : "/dashboard/properties",
+                )
+              }
+              onSave={submit.handleSubmit}
+              onCompleteDraft={submit.handleCompleteDraft}
             />
           </div>
         )
