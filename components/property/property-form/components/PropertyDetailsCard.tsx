@@ -498,53 +498,6 @@ export default function PropertyDetailsCard({
                     </Select>
                   </div>
                 </div>
-
-                {/* أرقام العدادات */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="water_meter_number">رقم عداد المياه</Label>
-                    <Input
-                      id="water_meter_number"
-                      name="water_meter_number"
-                      placeholder="123456789"
-                      value={formData.water_meter_number}
-                      onChange={onInputChange}
-                      className={
-                        errors.water_meter_number ? "border-red-500" : ""
-                      }
-                      dir="rtl"
-                    />
-                    {errors.water_meter_number && (
-                      <p className="text-sm text-red-500">
-                        {errors.water_meter_number}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="electricity_meter_number">
-                      رقم عداد الكهرباء
-                    </Label>
-                    <Input
-                      id="electricity_meter_number"
-                      name="electricity_meter_number"
-                      placeholder="987654321"
-                      value={formData.electricity_meter_number}
-                      onChange={onInputChange}
-                      className={
-                        errors.electricity_meter_number
-                          ? "border-red-500"
-                          : ""
-                      }
-                      dir="rtl"
-                    />
-                    {errors.electricity_meter_number && (
-                      <p className="text-sm text-red-500">
-                        {errors.electricity_meter_number}
-                      </p>
-                    )}
-                  </div>
-                </div>
               </div>
               {/* مرافق الوحدة - Property Features */}
               <div className="space-y-4 whitespace-nowraps">
