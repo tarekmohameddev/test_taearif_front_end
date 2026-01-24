@@ -172,7 +172,7 @@ export default function Hero4(props: Hero4Props = {}) {
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
             {mergedData.title ||
               mergedData.content?.title ||
-              "عن تعاريفالعقارية"}
+              "عن تعاريف العقارية"}
           </h2>
         </div>
       </section>

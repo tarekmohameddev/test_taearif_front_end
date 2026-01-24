@@ -300,7 +300,7 @@ export const getDefaultHero3Data = (): ComponentData => ({
 // Default hero4 data structure
 export const getDefaultHero4Data = (): ComponentData => ({
   visible: true,
-  title: "عن تعاريفالعقارية",
+  title: "عن تعاريف العقارية",
   backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
   barType: "default", // "default" | "contact" | "propertyFilter"
   contact: false,
@@ -314,7 +314,7 @@ export const getDefaultHero4Data = (): ComponentData => ({
     },
   },
   content: {
-    title: "عن تعاريفالعقارية",
+    title: "عن تعاريف العقارية",
     alignment: "center",
     maxWidth: "5xl",
     font: {
