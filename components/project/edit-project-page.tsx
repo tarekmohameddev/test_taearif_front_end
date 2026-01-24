@@ -606,7 +606,12 @@ export default function EditProjectPage(): JSX.Element {
         latitude: newProject.latitude,
         longitude: newProject.longitude,
         featured: newProject.featured,
-        complete_status: newProject.complete_status === "1" ? 1 : 0,
+        complete_status:
+          newProject.complete_status === "1"
+            ? 1
+            : newProject.complete_status === "2"
+              ? 2
+              : 0,
         units: Number(newProject.units),
         completion_date: formattedDate,
         developer: newProject.developer,
@@ -699,7 +704,8 @@ export default function EditProjectPage(): JSX.Element {
     return (
       <div className="flex min-h-screen flex-col" dir="rtl">
           <main className="flex-1 p-4 md:p-6">
-            <div className="space-y-6">
+            <div className="mx-auto" style={{ maxWidth: '1100px' }}>
+              <div className="space-y-6">
               {/* Header Skeleton */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -766,6 +772,7 @@ export default function EditProjectPage(): JSX.Element {
                   </CardContent>
                 </Card>
               ))}
+              </div>
             </div>
           </main>
         </div>
@@ -780,7 +787,8 @@ export default function EditProjectPage(): JSX.Element {
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
         <main className="flex-1 p-4 md:p-6">
-          <div className="space-y-6">
+          <div className="mx-auto" style={{ maxWidth: '1100px' }}>
+            <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -909,6 +917,7 @@ export default function EditProjectPage(): JSX.Element {
                         <SelectValue placeholder="اختر الحالة" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="2">لم ينشأ بعد</SelectItem>
                         <SelectItem value="0">قيد الإنشاء</SelectItem>
                         <SelectItem value="1">منتهي</SelectItem>
                       </SelectContent>
@@ -1441,6 +1450,7 @@ export default function EditProjectPage(): JSX.Element {
                 </div>
               </CardFooter>
             </Card>
+            </div>
           </div>
         </main>
     </div>

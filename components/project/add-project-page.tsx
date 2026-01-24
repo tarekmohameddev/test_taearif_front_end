@@ -586,7 +586,12 @@ export default function AddProjectPage(): JSX.Element {
         latitude: parseFloat(convertedLatitude),
         longitude: parseFloat(convertedLongitude),
         featured: newProject.featured,
-        complete_status: newProject.status === "منتهي" ? 1 : 0,
+        complete_status:
+          newProject.status === "منتهي"
+            ? 1
+            : newProject.status === "لم ينشأ بعد"
+              ? 2
+              : 0,
         units: Number(convertedUnits),
         completion_date: formattedDate,
         developer: newProject.developer,
@@ -695,7 +700,8 @@ export default function AddProjectPage(): JSX.Element {
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
         <main className="flex-1 p-4 md:p-6">
-          <div className="space-y-6">
+          <div className="mx-auto" style={{ maxWidth: '1100px' }}>
+            <div className="space-y-6">
             {hasReachedLimit && (
               <div
                 className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-6"
@@ -829,6 +835,7 @@ export default function AddProjectPage(): JSX.Element {
                       onValueChange={(value) =>
                         handleSelectChange("status", value)
                       }
+                      value={newProject.status}
                     >
                       <SelectTrigger
                         id="status"
@@ -837,6 +844,7 @@ export default function AddProjectPage(): JSX.Element {
                         <SelectValue placeholder="اختر الحالة" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="لم ينشأ بعد">لم ينشأ بعد</SelectItem>
                         <SelectItem value="قيد الإنشاء">قيد الإنشاء</SelectItem>
                         <SelectItem value="منتهي">منتهي</SelectItem>
                       </SelectContent>
@@ -1369,6 +1377,7 @@ export default function AddProjectPage(): JSX.Element {
                 </div>
               </CardFooter>
             </Card>
+            </div>
           </div>
         </main>
     </div>
