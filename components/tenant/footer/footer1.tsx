@@ -257,7 +257,7 @@ export default function Footer(props: FooterProps = {}) {
   }, [tenantId, fetchTenantData]);
 
   // Check if this is a global footer
-  const isGlobalFooter = variantId === "global-footer";
+  const isGlobalFooter = variantId === "global-footer" || props.id === "global-footer";
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore
@@ -299,65 +299,118 @@ export default function Footer(props: FooterProps = {}) {
   const tenantComponentData = getTenantComponentData();
 
   // Merge data with priority:
-  // For global footer: overrideData > globalFooterData > props > default
-  // For regular footer: storeData > tenantComponentData > props > default
+  // overrideData > globalFooterData (if global) > storeData > tenantComponentData > props > default
   const mergedData = useMemo(() => {
-    const baseData = isGlobalFooter
-      ? {
-          ...getDefaultFooterData(),
-          ...props,
-          ...globalFooterData,
-          ...(props.overrideData || {}), // ⭐ NEW: Highest priority
+    const fallbackData = getDefaultFooterData();
+    
+    // Start with base data
+    let result = {
+      ...fallbackData,
+      ...props,
+      ...tenantComponentData,
+      ...storeData,
+    };
+
+    // If it's a global footer, incorporate global store data
+    if (isGlobalFooter) {
+      result = {
+        ...result,
+        ...globalFooterData,
+      };
+    }
+
+    // Apply overrideData (highest priority, used by Live Editor sidebar)
+    if (props.overrideData) {
+      result = {
+        ...result,
+        ...props.overrideData,
+      };
+    }
+
+    // ⭐ CRITICAL: Deep merge content and styling to prevent partial data loss
+    if (result.content) {
+      result.content = {
+        ...fallbackData.content,
+        ...props.content,
+        ...tenantComponentData.content,
+        ...storeData.content,
+        ...(isGlobalFooter ? globalFooterData?.content : {}),
+        ...(props.overrideData?.content || {}),
+      };
+
+      // Handle nested content objects (companyInfo, quickLinks, etc.)
+      const contentKeys = ["companyInfo", "quickLinks", "contactInfo", "socialMedia"];
+      contentKeys.forEach(key => {
+        if (result.content[key]) {
+          result.content[key] = {
+            ...(fallbackData.content as any)[key],
+            ...(props.content as any)?.[key],
+            ...(tenantComponentData.content as any)?.[key],
+            ...(storeData.content as any)?.[key],
+            ...(isGlobalFooter ? (globalFooterData?.content as any)?.[key] : {}),
+            ...(props.overrideData?.content as any)?.[key],
+          };
         }
-      : {
-          ...getDefaultFooterData(),
-          ...props,
-          ...tenantComponentData,
-          ...storeData,
-        };
+      });
+    }
 
-    const result = { ...baseData };
+    if (result.styling) {
+      result.styling = {
+        ...fallbackData.styling,
+        ...props.styling,
+        ...tenantComponentData.styling,
+        ...storeData.styling,
+        ...(isGlobalFooter ? globalFooterData?.styling : {}),
+        ...(props.overrideData?.styling || {}),
+      };
+      
+      // Handle nested styling objects
+      const stylingKeys = ["colors", "typography", "spacing", "effects"];
+      stylingKeys.forEach(key => {
+        if (result.styling[key]) {
+          result.styling[key] = {
+            ...(fallbackData.styling as any)[key],
+            ...(props.styling as any)?.[key],
+            ...(tenantComponentData.styling as any)?.[key],
+            ...(storeData.styling as any)?.[key],
+            ...(isGlobalFooter ? (globalFooterData?.styling as any)?.[key] : {}),
+            ...(props.overrideData?.styling as any)?.[key],
+          };
+        }
+      });
+    }
 
-
-    // Apply branding data with highest priority
+    // Apply branding data with high priority, but respect overrides
     // 1. Custom Branding (from editor store WebsiteLayout)
     if (customBranding?.footer) {
-      if (!result.content) {
-        result.content = {};
-      }
-      if (!result.content.companyInfo) {
-        result.content.companyInfo = {};
-      }
+      if (!result.content) result.content = {} as any;
+      if (!result.content.companyInfo) result.content.companyInfo = {} as any;
 
-      if (customBranding.footer.logo) {
+      // Only apply if not already provided by overrideData or explicit props
+      if (customBranding.footer.logo && !props.overrideData?.content?.companyInfo?.logo) {
         result.content.companyInfo.logo = customBranding.footer.logo;
       }
-      if (customBranding.footer.name) {
+      if (customBranding.footer.name && !props.overrideData?.content?.companyInfo?.name) {
         result.content.companyInfo.name = customBranding.footer.name;
       }
     }
 
     // 2. Tenant Branding (historical fallback)
     if (tenantData?.branding) {
-      if (!result.content) {
-        result.content = {};
-      }
-      if (!result.content.companyInfo) {
-        result.content.companyInfo = {};
-      }
+      if (!result.content) result.content = {} as any;
+      if (!result.content.companyInfo) result.content.companyInfo = {} as any;
 
-      // Only apply if not already set by customBranding
-      if (tenantData.branding.logo && !customBranding?.footer?.logo) {
+      // Only apply if not already set by customBranding or overrides
+      if (tenantData.branding.logo && !customBranding?.footer?.logo && !props.overrideData?.content?.companyInfo?.logo) {
         result.content.companyInfo.logo = tenantData.branding.logo;
       }
 
-      if (tenantData.branding.name && !customBranding?.footer?.name) {
+      if (tenantData.branding.name && !customBranding?.footer?.name && !props.overrideData?.content?.companyInfo?.name) {
         result.content.companyInfo.name = tenantData.branding.name;
-      } else if (tenantData.websiteName && !customBranding?.footer?.name) {
+      } else if (tenantData.websiteName && !customBranding?.footer?.name && !props.overrideData?.content?.companyInfo?.name) {
         result.content.companyInfo.name = tenantData.websiteName;
       }
     }
-
 
     return result;
   }, [

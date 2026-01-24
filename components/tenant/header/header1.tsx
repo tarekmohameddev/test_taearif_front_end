@@ -221,6 +221,7 @@ interface HeaderProps {
     };
   };
   // Editor props
+  overrideData?: any;
   variant?: string;
   useStore?: boolean;
   id?: string;
@@ -326,54 +327,96 @@ const Header1 = (props: HeaderProps = {}) => {
   const defaultData = useMemo(() => getDefaultHeaderDataFromFunctions(), []);
 
   // Merge data with priority:
-  // For global header: globalHeaderData > currentStoreData > default
-  // For regular header: currentStoreData > storeData > tenantComponentData > props > default
+  // overrideData > globalHeaderData (if global) > currentStoreData > storeData > tenantComponentData > props > default
   const mergedData = useMemo(() => {
-    let result;
+    const fallbackData = defaultData;
+    
+    // Start with base data
+    let result = {
+      ...fallbackData,
+      ...props,
+      ...tenantComponentData,
+      ...storeData,
+      ...currentStoreData,
+    };
+
+    // If it's a global header, incorporate globalHeaderData (highest priority from store)
     if (isGlobalHeader) {
-      // For global headers, prioritize globalHeaderData over everything else
       result = {
-        ...defaultData,
-        ...currentStoreData, // Apply currentStoreData first
-        ...globalHeaderData, // Then globalHeaderData overrides everything
-      };
-    } else {
-      result = {
-        ...defaultData,
-        ...props,
-        ...tenantComponentData,
-        ...storeData,
-        ...currentStoreData,
+        ...result,
+        ...globalHeaderData,
       };
     }
 
-    // Apply branding data with highest priority
+    // Apply overrideData (highest priority altogether, used by Live Editor sidebar)
+    if (props.overrideData) {
+      result = {
+        ...result,
+        ...props.overrideData,
+      };
+    }
+
+    // ⭐ CRITICAL: Deep merge logic for nested objects
+    if (result.background) {
+      result.background = {
+        ...fallbackData.background,
+        ...props.background,
+        ...tenantComponentData.background,
+        ...storeData.background,
+        ...currentStoreData.background,
+        ...(isGlobalHeader ? globalHeaderData?.background : {}),
+        ...(props.overrideData?.background || {}),
+      };
+    }
+
+    if (result.colors) {
+      result.colors = {
+        ...fallbackData.colors,
+        ...props.colors,
+        ...tenantComponentData.colors,
+        ...storeData.colors,
+        ...currentStoreData.colors,
+        ...(isGlobalHeader ? globalHeaderData?.colors : {}),
+        ...(props.overrideData?.colors || {}),
+      };
+    }
+
+    if (result.logo) {
+      result.logo = {
+        ...fallbackData.logo,
+        ...props.logo,
+        ...tenantComponentData.logo,
+        ...storeData.logo,
+        ...currentStoreData.logo,
+        ...(isGlobalHeader ? globalHeaderData?.logo : {}),
+        ...(props.overrideData?.logo || {}),
+      };
+    }
+
+    // Apply branding data with high priority, but respect overrides
     // 1. Custom Branding (from editor store WebsiteLayout)
     if (customBranding?.header) {
-      if (!result.logo) {
-        result.logo = {};
-      }
-      if (customBranding.header.logo) {
+      if (!result.logo) result.logo = {} as any;
+
+      if (customBranding.header.logo && !props.overrideData?.logo?.image) {
         result.logo.image = customBranding.header.logo;
       }
-      if (customBranding.header.name) {
+      if (customBranding.header.name && !props.overrideData?.logo?.text) {
         result.logo.text = customBranding.header.name;
       }
     }
 
     // 2. Tenant Branding (historical fallback)
     if (tenantData?.branding) {
-      if (!result.logo) {
-        result.logo = {};
-      }
-      // Only apply if not already set by customBranding
-      if (tenantData.branding.logo && !customBranding?.header?.logo) {
+      if (!result.logo) result.logo = {} as any;
+
+      if (tenantData.branding.logo && !customBranding?.header?.logo && !props.overrideData?.logo?.image) {
         result.logo.image = tenantData.branding.logo;
       }
 
-      if (tenantData.branding.name && !customBranding?.header?.name) {
+      if (tenantData.branding.name && !customBranding?.header?.name && !props.overrideData?.logo?.text) {
         result.logo.text = tenantData.branding.name;
-      } else if (tenantData.websiteName && !customBranding?.header?.name) {
+      } else if (tenantData.websiteName && !customBranding?.header?.name && !props.overrideData?.logo?.text) {
         result.logo.text = tenantData.websiteName;
       }
     }
