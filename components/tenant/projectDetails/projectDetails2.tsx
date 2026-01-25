@@ -787,35 +787,34 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         )}
         {/* END: Gallery Thumbnails */}
 
-        {/* BEGIN: Property Description */}
-        {mergedData.displaySettings?.showDescription && (
-          <section
-            className="bg-transparent py-10 rounded-lg"
-            data-purpose="description-block"
-            dir="rtl"
-          >
-            <h2
-              className="text-3xl font-bold mb-6 text-right"
-              style={{ color: mergedData.styling?.textColor || primaryColor }}
-            >
-              {mergedData.content?.descriptionTitle || "وصف المشروع"}
-            </h2>
-            <p
-              className="leading-relaxed text-right text-lg"
-              style={{ color: mergedData.styling?.textColor }}
-            >
-              {project.description || "لا يوجد وصف متاح لهذا المشروع"}
-            </p>
-          </section>
-        )}
-        {/* END: Property Description */}
+        {/* BEGIN: Main Grid Layout - Two Columns (Description & Specs | Video & Map) */}
+        <div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-10"
+          style={{ gap: mergedData.layout?.gap || "3rem" }}
+          dir="rtl"
+        >
+          {/* Right Column: Description & Specs */}
+          <div className="space-y-12">
+            {/* Property Description */}
+            {mergedData.displaySettings?.showDescription !== false && (
+              <section className="bg-transparent rounded-lg" data-purpose="description-block">
+                <h2
+                  className="text-3xl font-bold mb-6 text-right"
+                  style={{ color: mergedData.styling?.textColor || primaryColor }}
+                >
+                  {mergedData.content?.descriptionTitle || "وصف المشروع"}
+                </h2>
+                <p
+                  className="leading-relaxed text-right text-lg whitespace-pre-line"
+                  style={{ color: mergedData.styling?.textColor }}
+                >
+                  {project.description || "لا يوجد وصف متاح لهذا المشروع"}
+                </p>
+              </section>
+            )}
 
-        {/* BEGIN: Main Grid Layout (Specs & Video / Map & Form) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Right Column: Specs & Form */}
-          <div className="space-y-12 order-2 lg:order-1">
             {/* Specs Section */}
-            {mergedData.displaySettings?.showSpecs && (
+            {mergedData.displaySettings?.showSpecs !== false ? (
               <section className="bg-transparent" data-purpose="property-specs">
                 <h2
                   className="text-3xl font-bold mb-8 text-right"
@@ -983,10 +982,131 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   )}
                 </div>
               </section>
+            ) : null}
+          </div>
+          {/* END Right Column */}
+
+          {/* Left Column: Video & Map */}
+          <div className="space-y-12">
+            {/* Floor Plans */}
+            {project.floorplans && project.floorplans.length > 0 && (
+              <div className="mb-8">
+                <h3
+                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  مخططات الأرضية
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {project.floorplans.map((planImage, index) => (
+                    <div
+                      key={index}
+                      className="relative group"
+                      onClick={() =>
+                        handleThumbnailClick(
+                          planImage,
+                          projectImages.length + index,
+                        )
+                      }
+                    >
+                      <Image
+                        src={planImage}
+                        alt={`مخطط الأرضية ${index + 1}`}
+                        width={400}
+                        height={200}
+                        className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
-            {/* Contact Form */}
-            {/* {mergedData.displaySettings?.showContactForm && (
+            {/* Video */}
+            {mergedData.displaySettings?.showVideoUrl &&
+              project.videoUrl &&
+              project.videoUrl.trim() !== "" && (
+                <section
+                  className="rounded-lg overflow-hidden shadow-md bg-black relative h-64"
+                  data-purpose="video-section"
+                >
+                  <div className="w-full h-full rounded-lg overflow-hidden">
+                    <video
+                      controls
+                      className="w-full h-full object-cover"
+                      poster={project.image || undefined}
+                    >
+                      <source src={project.videoUrl} type="video/mp4" />
+                      متصفحك لا يدعم عرض الفيديو.
+                    </video>
+                  </div>
+                </section>
+              )}
+
+            {/* Map */}
+            {mergedData.displaySettings?.showMap &&
+              project.location &&
+              project.location.lat &&
+              project.location.lng && (
+                <section
+                  className="rounded-lg overflow-hidden shadow-md border-4 border-white h-[550px] relative"
+                  data-purpose="map-section"
+                >
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="موقع المشروع"
+                  />
+                  <div className="mt-4 text-center">
+                    <a
+                      href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+                      style={{ backgroundColor: primaryColor }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor =
+                          primaryColorHover;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = primaryColor;
+                      }}
+                    >
+                      <MapPinIcon className="w-4 h-4" />
+                      فتح في خرائط جوجل
+                    </a>
+                  </div>
+                </section>
+              )}
+          </div>
+          {/* END Left Column */}
+        </div>
+        {/* END: Main Grid Layout */}
+
+        {/* BEGIN: Contact Form - COMMENTED OUT */}
+        {/* {mergedData.displaySettings?.showContactForm && (
               <section
                 className="text-white p-8 rounded-lg h-fit"
                 data-purpose="contact-form"
@@ -1101,134 +1221,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 </form>
               </section>
             )} */}
-          </div>
-          {/* END Right Column */}
-          {/* Left Column: Video & Map */}
-          <div className="space-y-12 order-1 lg:order-2">
-            {/* Floor Plans */}
-            {project.floorplans && project.floorplans.length > 0 && (
-              <div className="mb-8">
-                <h3
-                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  مخططات الأرضية
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {project.floorplans.map((planImage, index) => (
-                    <div
-                      key={index}
-                      className="relative group"
-                      onClick={() =>
-                        handleThumbnailClick(
-                          planImage,
-                          projectImages.length + index,
-                        )
-                      }
-                    >
-                      <Image
-                        src={planImage}
-                        alt={`مخطط الأرضية ${index + 1}`}
-                        width={400}
-                        height={200}
-                        className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <svg
-                            className="w-8 h-8 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Video */}
-            {mergedData.displaySettings?.showVideoUrl &&
-              project.videoUrl &&
-              project.videoUrl.trim() !== "" && (
-                <div className="mb-8">
-                  <h3
-                    className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                    style={{ backgroundColor: primaryColor }}
-                  >
-                    فيديو المشروع
-                  </h3>
-                  <div className="w-full rounded-lg overflow-hidden shadow-lg">
-                    <video
-                      controls
-                      className="w-full h-auto"
-                      poster={project.image || undefined}
-                    >
-                      <source src={project.videoUrl} type="video/mp4" />
-                      متصفحك لا يدعم عرض الفيديو.
-                    </video>
-                  </div>
-                </div>
-              )}
-
-            {/* Map */}
-            {mergedData.displaySettings?.showMap &&
-              project.location &&
-              project.location.lat &&
-              project.location.lng && (
-                <div className="mb-8">
-                  <h3
-                    className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                    style={{ backgroundColor: primaryColor }}
-                  >
-                    موقع المشروع
-                  </h3>
-                  <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
-                    <iframe
-                      src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="موقع المشروع"
-                    />
-                  </div>
-                  <div className="mt-4 text-center">
-                    <a
-                      href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-                      style={{ backgroundColor: primaryColor }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor =
-                          primaryColorHover;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = primaryColor;
-                      }}
-                    >
-                      <MapPinIcon className="w-4 h-4" />
-                      فتح في خرائط جوجل
-                    </a>
-                  </div>
-                </div>
-              )}
-          </div>
-          {/* END Left Column */}
-        </div>
-        {/* END: Main Grid Layout */}
       </div>
       {/* END: Main Content Container */}
 
