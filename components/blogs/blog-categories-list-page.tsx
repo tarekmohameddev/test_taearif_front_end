@@ -15,13 +15,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCategories } from "./hooks/use-categories";
 import { BlogLoadingState } from "./components/shared/blog-loading-state";
 import { BlogErrorState } from "./components/shared/blog-error-state";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tag, Plus } from "lucide-react";
+import { Tag, Plus, ArrowRight } from "lucide-react";
 import { categoryApi } from "./services/category-api";
 import {
   CustomDialog,
@@ -36,6 +37,7 @@ import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 
 export function BlogCategoriesListPage() {
+  const router = useRouter();
   const { categories, loading, error, refetch } = useCategories();
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [categoryName, setCategoryName] = useState("");
@@ -75,7 +77,17 @@ export function BlogCategoriesListPage() {
     return (
       <div className="max-w-[1100px] mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/blogs")}
+              className="gap-2"
+            >
+              <ArrowRight className="h-4 w-4" />
+              العودة
+            </Button>
+            <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+          </div>
           <Button onClick={handleOpenCategoryDialog} className="gap-2">
             <Plus className="h-4 w-4" />
             إضافة تصنيف
@@ -90,7 +102,17 @@ export function BlogCategoriesListPage() {
     return (
       <div className="max-w-[1100px] mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/blogs")}
+              className="gap-2"
+            >
+              <ArrowRight className="h-4 w-4" />
+              العودة
+            </Button>
+            <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+          </div>
           <Button onClick={handleOpenCategoryDialog} className="gap-2">
             <Plus className="h-4 w-4" />
             إضافة تصنيف
@@ -109,7 +131,17 @@ export function BlogCategoriesListPage() {
     return (
       <div className="max-w-[1100px] mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/blogs")}
+              className="gap-2"
+            >
+              <ArrowRight className="h-4 w-4" />
+              العودة
+            </Button>
+            <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+          </div>
           <Button onClick={handleOpenCategoryDialog} className="gap-2">
             <Plus className="h-4 w-4" />
             إضافة تصنيف
@@ -133,7 +165,17 @@ export function BlogCategoriesListPage() {
   return (
     <div className="max-w-[1100px] mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/dashboard/blogs")}
+            className="gap-2"
+          >
+            <ArrowRight className="h-4 w-4" />
+            العودة
+          </Button>
+          <h1 className="text-2xl font-bold">تصنيفات المدونات</h1>
+        </div>
         <Button onClick={handleOpenCategoryDialog} className="gap-2">
           <Plus className="h-4 w-4" />
           إضافة تصنيف
