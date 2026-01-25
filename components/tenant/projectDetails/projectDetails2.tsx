@@ -345,6 +345,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   // UI state
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [mainImage, setMainImage] = useState<string>("");
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -419,6 +420,8 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
     if (isLiveEditor) {
       setProject(mockProject);
       setLoadingProject(false);
+      setMainImage(mockProject.image || "");
+      setMainImageIndex(0);
       setSelectedImage(mockProject.image || "");
       return;
     }
@@ -481,35 +484,55 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
     }
   }, [hookTenantId, tenantId, props.projectSlug, isLiveEditor]);
 
-  // تحديث الصورة المختارة عند تحميل المشروع
+  // تحديث الصورة الرئيسية عند تحميل المشروع
   useEffect(() => {
     if (project?.image) {
       setMainImage(project.image);
+      setMainImageIndex(0);
       setSelectedImage(project.image);
     }
   }, [project]);
 
-  // صور المشروع
+  // صور المشروع - computed value (includes main images + floor planning images)
   const projectImages =
     project && project.image
-      ? [project.image, ...(project.images || [])].filter(
-          (img) => img && img.trim() !== "",
-        )
-      : [];
+      ? [
+          project.image,
+          // Filter out the main image if it exists in images array to avoid duplicates
+          ...(project.images || []).filter(
+            (img) => img && img.trim() !== "" && img !== project.image,
+          ),
+          // Filter out the main image if it exists in floor planning images to avoid duplicates
+          ...(project.floorplans || []).filter(
+            (img) => img && img.trim() !== "" && img !== project.image,
+          ),
+        ].filter((img) => img && img.trim() !== "")
+      : []; // Filter out empty images
 
   // Get all images (main images + floor planning images)
   const getAllImages = () => {
     const allImages = [];
-    if (project?.images) {
-      allImages.push(...project.images);
-    }
     if (project?.image) {
-      allImages.unshift(project.image);
+      allImages.push(project.image);
+    }
+    if (project?.images) {
+      // Filter out the main image if it exists in images array to avoid duplicates
+      const additionalImages = project.images.filter(
+        (img) => img && img.trim() !== "" && img !== project.image,
+      );
+      allImages.push(...additionalImages);
     }
     if (project?.floorplans) {
-      allImages.push(...project.floorplans);
+      // Filter out the main image if it exists in floor planning images to avoid duplicates
+      const floorImages = project.floorplans.filter(
+        (img) => img && img.trim() !== "" && img !== project.image,
+      );
+      allImages.push(...floorImages);
     }
-    return allImages;
+    // Filter out empty images and remove duplicates
+    const filtered = allImages.filter((img) => img && img.trim() !== "");
+    // Remove duplicates by converting to Set and back to array
+    return Array.from(new Set(filtered));
   };
 
   // Navigation functions for dialog
@@ -544,6 +567,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   };
 
   const handleThumbnailClick = (imageSrc: string, index: number) => {
+    // Update main image and index when clicking thumbnail
+    setMainImage(imageSrc);
+    setMainImageIndex(index);
+    // Also open dialog
     handleImageClick(imageSrc, index);
   };
 
@@ -731,60 +758,43 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         {/* END: Hero Section */}
 
         {/* BEGIN: Gallery Thumbnails */}
-        {mergedData.gallery?.showThumbnails && projectImages.length > 0 && (
-          <section className="mt-4" data-purpose="image-gallery">
-            {projectImages.length > 1 && (
-              <p className="text-xs text-gray-500 mb-2 text-center">
-                اضغط على أي صورة لفتحها في نافذة منبثقة
-              </p>
-            )}
-            <SwiperCarousel
-              items={projectImages
-                .filter((imageSrc) => imageSrc && imageSrc.trim() !== "")
-                .map((imageSrc, index) => (
-                  <div key={index} className="relative h-[10rem] md:h-24">
-                    <Image
-                      src={imageSrc}
-                      alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
-                      fill
-                      className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
-                        mainImage === imageSrc ? "" : "border-transparent"
-                      }`}
-                      style={
-                        mainImage === imageSrc
-                          ? {
-                              borderColor: primaryColor,
-                              borderWidth: "2px",
-                            }
-                          : {}
-                      }
-                      onClick={() => {
-                        setMainImage(imageSrc);
-                        handleThumbnailClick(imageSrc, index);
-                      }}
-                    />
-                    {logoImage && (
-                      <div className="absolute bottom-2 right-2 opacity-80">
-                        <div className="w-12 h-fit bg-white/20 rounded flex items-center justify-center">
-                          <Image
-                            src={logoImage}
-                            alt="Logo"
-                            width={160}
-                            height={80}
-                            className="object-contain"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              space={16}
-              autoplay={true}
-              desktopCount={4}
-              slideClassName="!h-[10rem] md:!h-[96px]"
-            />
-          </section>
-        )}
+        {mergedData.gallery?.showThumbnails !== false &&
+          projectImages.length > 0 && project && (
+            <section
+              className="pt-10"
+              data-purpose="image-gallery"
+            >
+              <SwiperCarousel
+                items={projectImages
+                  .filter((imageSrc) => imageSrc && imageSrc.trim() !== "") // Filter out empty images
+                  .map((imageSrc, index) => (
+                    <div key={index} className="relative h-[12rem] md:h-[180px]">
+                      <Image
+                        src={imageSrc}
+                        alt={`${project.title || "المشروع"} - صورة ${index + 1}`}
+                        fill
+                        className={`w-full h-full object-cover cursor-pointer rounded-lg transition-all duration-300 border-2 ${
+                          mainImage === imageSrc ? "" : "border-transparent"
+                        }`}
+                        style={
+                          mainImage === imageSrc
+                            ? {
+                                borderColor: primaryColor,
+                                borderWidth: "2px",
+                              }
+                            : {}
+                        }
+                        onClick={() => handleThumbnailClick(imageSrc, index)}
+                      />
+                    </div>
+                  ))}
+                space={16}
+                autoplay={true}
+                desktopCount={4}
+                slideClassName="!h-[12rem] md:!h-[180px]"
+              />
+            </section>
+          )}
         {/* END: Gallery Thumbnails */}
 
         {/* BEGIN: Main Grid Layout - Two Columns (Description & Specs | Video & Map) */}
@@ -988,57 +998,6 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
 
           {/* Left Column: Video & Map */}
           <div className="space-y-12">
-            {/* Floor Plans */}
-            {project.floorplans && project.floorplans.length > 0 && (
-              <div className="mb-8">
-                <h3
-                  className="pr-4 md:pr-0 mb-8 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  مخططات الأرضية
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {project.floorplans.map((planImage, index) => (
-                    <div
-                      key={index}
-                      className="relative group"
-                      onClick={() =>
-                        handleThumbnailClick(
-                          planImage,
-                          projectImages.length + index,
-                        )
-                      }
-                    >
-                      <Image
-                        src={planImage}
-                        alt={`مخطط الأرضية ${index + 1}`}
-                        width={400}
-                        height={200}
-                        className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <svg
-                            className="w-8 h-8 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Video */}
             {mergedData.displaySettings?.showVideoUrl &&
               project.videoUrl &&

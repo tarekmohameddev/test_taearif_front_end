@@ -474,9 +474,10 @@ function ProjectCard({ property }: { property: Property }) {
             >
               {property.title}
             </h4>
-            <div className="text-green-600 font-semibold text-lg">
+            {/* حالة العقار (للبيع/للإيجار) - معطل مؤقتاً */}
+            {/* <div className="text-green-600 font-semibold text-lg">
               {property.status}
-            </div>
+            </div> */}
           </div>
           <div className="flex items-center gap-2 text-sm text-black">
             <span>في {property.city}</span>
