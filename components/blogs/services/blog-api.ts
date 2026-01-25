@@ -51,6 +51,29 @@ export async function getBlogsList(
 }
 
 /**
+ * Get list of posts by category ID
+ * @param categoryId - Category ID
+ * @param page - Page number (default: 1)
+ * @param perPage - Items per page (default: 15)
+ * @returns Promise with blogs list and pagination
+ */
+export async function getBlogsByCategory(
+  categoryId: number,
+  page: number = 1,
+  perPage: number = 15
+): Promise<BlogsListResponse> {
+  // GET /posts?category_id={categoryId}&per_page=15&page=1
+  const response = await axiosInstance.get("/posts", {
+    params: {
+      category_id: categoryId,
+      page,
+      per_page: perPage,
+    },
+  });
+  return response.data;
+}
+
+/**
  * Get single post by ID
  * @param id - Post ID
  * @returns Promise with post data
@@ -142,6 +165,7 @@ export async function getBlogStats(): Promise<{
 // Export all functions as default object
 export const blogApi = {
   getBlogsList,
+  getBlogsByCategory,
   getBlogById,
   createBlog,
   updateBlog,

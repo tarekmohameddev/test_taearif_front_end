@@ -117,11 +117,11 @@ export function BlogsListPage() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={handleOpenCategoryDialog}
+            onClick={() => router.push("/dashboard/blogs/categories")}
             className="gap-2"
           >
             <Tag className="h-4 w-4" />
-            إضافة تصنيفات
+            التصنيفات
           </Button>
           <Button onClick={() => router.push("/dashboard/blogs/create")} className="gap-2">
             <Plus className="h-4 w-4" />
