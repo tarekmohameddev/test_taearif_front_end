@@ -2657,10 +2657,10 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                   </div>
                 </div>
 
-                {/* السطر الثاني: البحث */}
-                <div className="flex flex-wrap gap-4">
+                {/* السطر الثاني: البحث والفلاتر النشطة */}
+                <div className="flex flex-wrap items-start gap-4">
                   {/* البحث */}
-                  <div className="space-y-2 w-[300px]">
+                  <div className="space-y-2 w-[300px] shrink-0">
                     <Label>البحث</Label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -2691,16 +2691,20 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                       </Button>
                     </div>
                   </div>
+
+                  {/* عرض الفلاتر النشطة */}
+                  <div className="flex-1 min-w-[300px] mt-0">
+                    <div className="pt-[20px]">
+                      <ActiveFiltersDisplay
+                        filters={newFilters}
+                        onRemoveFilter={handleRemoveFilter}
+                        onClearAll={handleClearAllFilters}
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* عرض الفلاتر النشطة */}
-            <ActiveFiltersDisplay
-              filters={newFilters}
-              onRemoveFilter={handleRemoveFilter}
-              onClearAll={handleClearAllFilters}
-            />
 
             {loading ? (
               renderSkeletons()

@@ -244,7 +244,7 @@ export function ActiveFiltersDisplay({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+    <div className="flex flex-wrap items-center gap-2 p-2 bg-gray-50 border border-gray-200 rounded-lg">
       <span className="text-sm font-medium text-gray-700">الفلاتر النشطة:</span>
 
       {activeFilters.map((filter, index) => (
