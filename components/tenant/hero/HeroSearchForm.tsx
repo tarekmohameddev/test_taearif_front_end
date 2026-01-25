@@ -255,103 +255,99 @@ export default function HeroSearchForm({
       aria-label="نموذج البحث عن العقارات"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        {/* Purpose Toggle (full width on mobile, one column on lg+) */}
-        {config.fields?.purpose?.enabled && (
-          <div className="sm:col-span-2 lg:col-span-1 flex items-center justify-center">
-            <div className="inline-flex overflow-hidden rounded-lg border bg-gray-50 p-1 w-full">
-              {config.fields.purpose.options?.map((option: any) => (
-                <Button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setPurpose(option.value)}
-                  style={
-                    purpose === option.value
-                      ? {
-                          backgroundColor: defaultPrimaryColor,
-                          color: "#ffffff",
-                        }
-                      : {}
-                  }
-                  onMouseEnter={(e) => {
-                    if (purpose === option.value) {
-                      e.currentTarget.style.backgroundColor =
-                        defaultPrimaryColorHover;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (purpose === option.value) {
-                      e.currentTarget.style.backgroundColor =
-                        defaultPrimaryColor;
-                    }
-                  }}
-                  className={
-                    purpose === option.value
-                      ? "rounded-md flex-1 py-2 text-sm font-semibold text-white transition-colors"
-                      : "rounded-md bg-transparent flex-1 py-2 text-sm font-semibold text-gray-700 hover:bg-white"
-                  }
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* City Dropdown */}
-        {config.fields?.city?.enabled && (
-          <div className="relative" ref={cityDropdownRef}>
-            <div
-              className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white cursor-pointer hover:bg-gray-50 transition-colors h-[50px]"
-              onClick={() => setIsCityOpen(!isCityOpen)}
-            >
-              <MapPin className="size-5 text-gray-400" />
-              <span className="flex-1 text-sm text-gray-700">
-                {cityName || config.fields.city.placeholder || "اختر المدينة"}
-              </span>
-              <ChevronDown className="size-5 text-gray-400" />
-            </div>
-            {isCityOpen && (
-              <div className="absolute top-full left-0 right-0 mt-2 z-[100] bg-white border border-gray-200 rounded-lg max-h-60 overflow-y-auto shadow-xl">
-                {cityLoading ? (
-                  <div className="px-4 py-3 text-center text-sm text-gray-500">
-                    جاري التحميل...
-                  </div>
-                ) : cityOptions.length === 0 ? (
-                  <div className="px-4 py-3 text-center text-sm text-gray-500">
-                    لا توجد مدن
-                  </div>
-                ) : (
-                  cityOptions.map((city) => (
-                    <div
-                      key={city.id}
-                      style={
-                        {
-                          "--hover-bg": `${defaultPrimaryColor}1A`, // 10% opacity
-                        } as React.CSSProperties
+        {/* Purpose Toggle - Always visible (full width on mobile, one column on lg+) */}
+        <div className="sm:col-span-2 lg:col-span-1 flex items-center justify-center">
+          <div className="inline-flex overflow-hidden rounded-lg border bg-gray-50 p-1 w-full">
+            {config.fields.purpose.options?.map((option: any) => (
+              <Button
+                key={option.value}
+                type="button"
+                onClick={() => setPurpose(option.value)}
+                style={
+                  purpose === option.value
+                    ? {
+                        backgroundColor: defaultPrimaryColor,
+                        color: "#ffffff",
                       }
-                      className="px-4 py-3 cursor-pointer text-sm transition-colors hover:bg-opacity-10"
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = `${defaultPrimaryColor}1A`;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "";
-                      }}
-                      onClick={() => {
-                        setCityId(city.id.toString());
-                        setCityName(city.name);
-                        setIsCityOpen(false);
-                      }}
-                    >
-                      {city.name}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+                    : {}
+                }
+                onMouseEnter={(e) => {
+                  if (purpose === option.value) {
+                    e.currentTarget.style.backgroundColor =
+                      defaultPrimaryColorHover;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (purpose === option.value) {
+                    e.currentTarget.style.backgroundColor =
+                      defaultPrimaryColor;
+                  }
+                }}
+                className={
+                  purpose === option.value
+                    ? "rounded-md flex-1 py-2 text-sm font-semibold text-white transition-colors"
+                    : "rounded-md bg-transparent flex-1 py-2 text-sm font-semibold text-gray-700 hover:bg-white"
+                }
+              >
+                {option.label}
+              </Button>
+            ))}
           </div>
-        )}
+        </div>
 
-        {/* District Dropdown (always visible, disabled when no city selected) */}
+        {/* City Dropdown - Always visible */}
+        <div className="relative" ref={cityDropdownRef}>
+          <div
+            className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white cursor-pointer hover:bg-gray-50 transition-colors h-[50px]"
+            onClick={() => setIsCityOpen(!isCityOpen)}
+          >
+            <MapPin className="size-5 text-gray-400" />
+            <span className="flex-1 text-sm text-gray-700">
+              {cityName || config.fields.city.placeholder || "اختر المدينة"}
+            </span>
+            <ChevronDown className="size-5 text-gray-400" />
+          </div>
+          {isCityOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 z-[100] bg-white border border-gray-200 rounded-lg max-h-60 overflow-y-auto shadow-xl">
+              {cityLoading ? (
+                <div className="px-4 py-3 text-center text-sm text-gray-500">
+                  جاري التحميل...
+                </div>
+              ) : cityOptions.length === 0 ? (
+                <div className="px-4 py-3 text-center text-sm text-gray-500">
+                  لا توجد مدن
+                </div>
+              ) : (
+                cityOptions.map((city) => (
+                  <div
+                    key={city.id}
+                    style={
+                      {
+                        "--hover-bg": `${defaultPrimaryColor}1A`, // 10% opacity
+                      } as React.CSSProperties
+                    }
+                    className="px-4 py-3 cursor-pointer text-sm transition-colors hover:bg-opacity-10"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = `${defaultPrimaryColor}1A`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "";
+                    }}
+                    onClick={() => {
+                      setCityId(city.id.toString());
+                      setCityName(city.name);
+                      setIsCityOpen(false);
+                    }}
+                  >
+                    {city.name}
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* District Dropdown - Always visible (disabled when no city selected) */}
         <div className="relative" ref={districtDropdownRef}>
           <div
             className={`flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white transition-colors h-[50px] ${
@@ -410,20 +406,18 @@ export default function HeroSearchForm({
           )}
         </div>
 
-        {/* Price Input */}
-        {config.fields?.price?.enabled && (
-          <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white h-[50px]">
-            <CircleDollarSign className="size-5 text-gray-400" />
-            <Input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder={config.fields.price.placeholder || "السعر الأقصى"}
-              className="flex-1 border-0 bg-transparent focus-visible:ring-0 text-sm p-0"
-              min={0}
-            />
-          </div>
-        )}
+        {/* Price Input - Always visible */}
+        <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-3 bg-white h-[50px]">
+          <CircleDollarSign className="size-5 text-gray-400" />
+          <Input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder={config.fields.price.placeholder || "السعر الأقصى"}
+            className="flex-1 border-0 bg-transparent focus-visible:ring-0 text-sm p-0"
+            min={0}
+          />
+        </div>
 
         {/* Search Button */}
         <button

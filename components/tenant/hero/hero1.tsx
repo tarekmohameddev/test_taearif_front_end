@@ -176,8 +176,142 @@ function SearchForm({
     >
       {/* Large Desktop: all in one row */}
       <div className="hidden items-stretch gap-2 xl:flex">
-        {/* Purpose toggle */}
-        {config.fields?.purpose?.enabled && (
+        {/* Purpose toggle - Always visible */}
+        <>
+          <div className="flex items-center">
+            <div className="inline-flex overflow-hidden rounded-xl border bg-muted/40 p-1">
+              {config.fields.purpose.options?.map((option: any) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setPurpose(option.value)}
+                  style={
+                    purpose === option.value
+                      ? {
+                          backgroundColor: defaultPrimaryColor,
+                          color: "#ffffff",
+                        }
+                      : {}
+                  }
+                  onMouseEnter={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor =
+                        defaultPrimaryColorHover;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (purpose === option.value) {
+                      e.currentTarget.style.backgroundColor =
+                        defaultPrimaryColor;
+                    }
+                  }}
+                  className={
+                    purpose === option.value
+                      ? "rounded-lg px-4 xl:px-5 py-2 text-sm font-semibold text-white transition-colors"
+                      : "rounded-lg bg-transparent px-4 xl:px-5 py-2 text-sm font-semibold text-foreground hover:bg-white"
+                  }
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <Divider />
+        </>
+
+        {/* City - Always visible */}
+        <>
+          <div className="flex min-w-[200px] xl:min-w-[220px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
+            <MapPin
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Input
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder={config.fields.city.placeholder}
+              className="h-9 border-0 bg-transparent pe-0 ps-0 focus-visible:ring-0"
+            />
+          </div>
+          <Divider />
+        </>
+
+        {/* Property Type - Always visible */}
+        <>
+          <div className="flex min-w-[150px] xl:min-w-[170px] items-center gap-2 rounded-xl px-3 py-2">
+            <Home
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger className="h-9 w-[140px] xl:w-[160px] border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
+                <SelectValue placeholder={config.fields.type.placeholder} />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {config.fields.type.options?.map((option: any) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Divider />
+        </>
+
+        {/* Price - Always visible */}
+        <>
+          <div className="flex min-w-[150px] xl:min-w-[170px] items-center gap-2 rounded-xl px-3 py-2">
+            <CircleDollarSign
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Select value={price} onValueChange={setPrice}>
+              <SelectTrigger className="h-9 w-[140px] xl:w-[160px] border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
+                <SelectValue placeholder={config.fields.price.placeholder} />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {config.fields.price.options?.map((option: any) => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Divider />
+        </>
+
+        {/* Keywords + Search - Always visible */}
+        <div className="flex min-w-[240px] xl:min-w-[260px] flex-1 items-center gap-3 rounded-xl px-3 py-2">
+          <button
+            type="submit"
+            style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                defaultPrimaryColorHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+            }}
+            className="grid size-10 place-items-center rounded-full text-white shadow transition-colors"
+            aria-label="بحث"
+          >
+            <Search className="size-5" />
+          </button>
+          <Input
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            placeholder={config.fields.keywords.placeholder}
+            className="h-10 border-0 bg-transparent pe-0 ps-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
+          />
+        </div>
+      </div>
+
+      {/* Medium Desktop/Tablet: two rows layout */}
+      <div className="hidden lg:grid xl:hidden gap-3">
+        <div className="flex items-stretch gap-2">
+          {/* Purpose toggle - Always visible */}
           <>
             <div className="flex items-center">
               <div className="inline-flex overflow-hidden rounded-xl border bg-muted/40 p-1">
@@ -208,8 +342,8 @@ function SearchForm({
                     }}
                     className={
                       purpose === option.value
-                        ? "rounded-lg px-4 xl:px-5 py-2 text-sm font-semibold text-white transition-colors"
-                        : "rounded-lg bg-transparent px-4 xl:px-5 py-2 text-sm font-semibold text-foreground hover:bg-white"
+                        ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
+                        : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
                     }
                   >
                     {option.label}
@@ -219,37 +353,32 @@ function SearchForm({
             </div>
             <Divider />
           </>
-        )}
 
-        {/* City */}
-        {config.fields?.city?.enabled && (
-          <>
-            <div className="flex min-w-[200px] xl:min-w-[220px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
-              <MapPin
-                className="size-4 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <Input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder={config.fields.city.placeholder}
-                className="h-9 border-0 bg-transparent pe-0 ps-0 focus-visible:ring-0"
-              />
-            </div>
-            <Divider />
-          </>
-        )}
+          {/* City - Always visible */}
+          <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
+            <MapPin
+              className="size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Input
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder={config.fields.city.placeholder}
+              className="h-9 border-0 bg-transparent pe-0 ps-0 focus-visible:ring-0"
+            />
+          </div>
+        </div>
 
-        {/* Property Type */}
-        {config.fields?.type?.enabled && (
+        <div className="flex items-stretch gap-2">
+          {/* Property Type - Always visible */}
           <>
-            <div className="flex min-w-[150px] xl:min-w-[170px] items-center gap-2 rounded-xl px-3 py-2">
+            <div className="flex min-w-[150px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
               <Home
                 className="size-4 text-muted-foreground"
                 aria-hidden="true"
               />
               <Select value={type} onValueChange={setType}>
-                <SelectTrigger className="h-9 w-[140px] xl:w-[160px] border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
+                <SelectTrigger className="h-9 border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
                   <SelectValue placeholder={config.fields.type.placeholder} />
                 </SelectTrigger>
                 <SelectContent align="end">
@@ -263,19 +392,19 @@ function SearchForm({
             </div>
             <Divider />
           </>
-        )}
 
-        {/* Price */}
-        {config.fields?.price?.enabled && (
+          {/* Price - Always visible */}
           <>
-            <div className="flex min-w-[150px] xl:min-w-[170px] items-center gap-2 rounded-xl px-3 py-2">
+            <div className="flex min-w-[150px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
               <CircleDollarSign
                 className="size-4 text-muted-foreground"
                 aria-hidden="true"
               />
               <Select value={price} onValueChange={setPrice}>
-                <SelectTrigger className="h-9 w-[140px] xl:w-[160px] border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
-                  <SelectValue placeholder={config.fields.price.placeholder} />
+                <SelectTrigger className="h-9 border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
+                  <SelectValue
+                    placeholder={config.fields.price.placeholder}
+                  />
                 </SelectTrigger>
                 <SelectContent align="end">
                   {config.fields.price.options?.map((option: any) => (
@@ -288,14 +417,15 @@ function SearchForm({
             </div>
             <Divider />
           </>
-        )}
 
-        {/* Keywords + Search */}
-        {config.fields?.keywords?.enabled && (
-          <div className="flex min-w-[240px] xl:min-w-[260px] flex-1 items-center gap-3 rounded-xl px-3 py-2">
+          {/* Keywords + Search - Always visible */}
+          <div className="flex min-w-[200px] flex-1 items-center gap-3 rounded-xl px-3 py-2">
             <button
               type="submit"
-              style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+              style={{
+                backgroundColor: defaultPrimaryColor,
+                color: "#ffffff",
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor =
                   defaultPrimaryColorHover;
@@ -315,384 +445,224 @@ function SearchForm({
               className="h-10 border-0 bg-transparent pe-0 ps-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
             />
           </div>
-        )}
-      </div>
-
-      {/* Medium Desktop/Tablet: two rows layout */}
-      <div className="hidden lg:grid xl:hidden gap-3">
-        <div className="flex items-stretch gap-2">
-          {/* Purpose toggle */}
-          {config.fields?.purpose?.enabled && (
-            <>
-              <div className="flex items-center">
-                <div className="inline-flex overflow-hidden rounded-xl border bg-muted/40 p-1">
-                  {config.fields.purpose.options?.map((option: any) => (
-                    <Button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setPurpose(option.value)}
-                      style={
-                        purpose === option.value
-                          ? {
-                              backgroundColor: defaultPrimaryColor,
-                              color: "#ffffff",
-                            }
-                          : {}
-                      }
-                      onMouseEnter={(e) => {
-                        if (purpose === option.value) {
-                          e.currentTarget.style.backgroundColor =
-                            defaultPrimaryColorHover;
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (purpose === option.value) {
-                          e.currentTarget.style.backgroundColor =
-                            defaultPrimaryColor;
-                        }
-                      }}
-                      className={
-                        purpose === option.value
-                          ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
-                          : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
-                      }
-                    >
-                      {option.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <Divider />
-            </>
-          )}
-
-          {/* City */}
-          {config.fields?.city?.enabled && (
-            <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
-              <MapPin
-                className="size-4 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <Input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder={config.fields.city.placeholder}
-                className="h-9 border-0 bg-transparent pe-0 ps-0 focus-visible:ring-0"
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-stretch gap-2">
-          {/* Property Type */}
-          {config.fields?.type?.enabled && (
-            <>
-              <div className="flex min-w-[150px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
-                <Home
-                  className="size-4 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <Select value={type} onValueChange={setType}>
-                  <SelectTrigger className="h-9 border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
-                    <SelectValue placeholder={config.fields.type.placeholder} />
-                  </SelectTrigger>
-                  <SelectContent align="end">
-                    {config.fields.type.options?.map((option: any) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Divider />
-            </>
-          )}
-
-          {/* Price */}
-          {config.fields?.price?.enabled && (
-            <>
-              <div className="flex min-w-[150px] flex-1 items-center gap-2 rounded-xl px-3 py-2">
-                <CircleDollarSign
-                  className="size-4 text-muted-foreground"
-                  aria-hidden="true"
-                />
-                <Select value={price} onValueChange={setPrice}>
-                  <SelectTrigger className="h-9 border-0 bg-transparent ps-0 focus:ring-0 focus:ring-offset-0">
-                    <SelectValue
-                      placeholder={config.fields.price.placeholder}
-                    />
-                  </SelectTrigger>
-                  <SelectContent align="end">
-                    {config.fields.price.options?.map((option: any) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Divider />
-            </>
-          )}
-
-          {/* Keywords + Search */}
-          {config.fields?.keywords?.enabled && (
-            <div className="flex min-w-[200px] flex-1 items-center gap-3 rounded-xl px-3 py-2">
-              <button
-                type="submit"
-                style={{
-                  backgroundColor: defaultPrimaryColor,
-                  color: "#ffffff",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    defaultPrimaryColorHover;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = defaultPrimaryColor;
-                }}
-                className="grid size-10 place-items-center rounded-full text-white shadow transition-colors"
-                aria-label="بحث"
-              >
-                <Search className="size-5" />
-              </button>
-              <Input
-                value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
-                placeholder={config.fields.keywords.placeholder}
-                className="h-10 border-0 bg-transparent pe-0 ps-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
-              />
-            </div>
-          )}
         </div>
       </div>
 
       {/* Small tablet layout */}
       <div className="hidden md:grid lg:hidden gap-3">
-        {config.fields?.purpose?.enabled && (
-          <div className="flex items-center justify-center">
-            <div className="inline-flex overflow-hidden rounded-xl border bg-muted/40 p-1">
-              {config.fields.purpose.options?.map((option: any) => (
-                <Button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setPurpose(option.value)}
-                  style={
-                    purpose === option.value
-                      ? {
-                          backgroundColor: defaultPrimaryColor,
-                          color: "#ffffff",
-                        }
-                      : {}
+        {/* Purpose toggle - Always visible */}
+        <div className="flex items-center justify-center">
+          <div className="inline-flex overflow-hidden rounded-xl border bg-muted/40 p-1">
+            {config.fields.purpose.options?.map((option: any) => (
+              <Button
+                key={option.value}
+                type="button"
+                onClick={() => setPurpose(option.value)}
+                style={
+                  purpose === option.value
+                    ? {
+                        backgroundColor: defaultPrimaryColor,
+                        color: "#ffffff",
+                      }
+                    : {}
+                }
+                onMouseEnter={(e) => {
+                  if (purpose === option.value) {
+                    e.currentTarget.style.backgroundColor =
+                      defaultPrimaryColorHover;
                   }
-                  onMouseEnter={(e) => {
-                    if (purpose === option.value) {
-                      e.currentTarget.style.backgroundColor =
-                        defaultPrimaryColorHover;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (purpose === option.value) {
-                      e.currentTarget.style.backgroundColor =
-                        defaultPrimaryColor;
-                    }
-                  }}
-                  className={
-                    purpose === option.value
-                      ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
-                      : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
+                }}
+                onMouseLeave={(e) => {
+                  if (purpose === option.value) {
+                    e.currentTarget.style.backgroundColor =
+                      defaultPrimaryColor;
                   }
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
+                }}
+                className={
+                  purpose === option.value
+                    ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors"
+                    : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white"
+                }
+              >
+                {option.label}
+              </Button>
+            ))}
           </div>
-        )}
+        </div>
 
-        {config.fields?.keywords?.enabled && (
-          <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  defaultPrimaryColorHover;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = defaultPrimaryColor;
-              }}
-              className="grid size-10 place-items-center rounded-full text-white shadow transition-colors"
-              aria-label="بحث"
-            >
-              <Search className="size-5" />
-            </button>
-            <Input
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              placeholder={config.fields.keywords.placeholder}
-              className="h-10"
-            />
-          </div>
-        )}
-
-        {config.fields?.city?.enabled && (
+        {/* Keywords - Always visible */}
+        <div className="flex items-center gap-2">
+          <button
+            type="submit"
+            style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                defaultPrimaryColorHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+            }}
+            className="grid size-10 place-items-center rounded-full text-white shadow transition-colors"
+            aria-label="بحث"
+          >
+            <Search className="size-5" />
+          </button>
           <Input
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder={config.fields.city.placeholder}
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            placeholder={config.fields.keywords.placeholder}
             className="h-10"
           />
-        )}
+        </div>
+
+        {/* City - Always visible */}
+        <Input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder={config.fields.city.placeholder}
+          className="h-10"
+        />
 
         <div className="grid grid-cols-2 gap-3">
-          {config.fields?.type?.enabled && (
-            <Select value={type} onValueChange={setType}>
-              <SelectTrigger className="h-10">
-                <Home className="ms-1 size-4 opacity-60" />
-                <SelectValue placeholder={config.fields.type.placeholder} />
-                <ChevronDown className="me-1 size-4 opacity-60" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {config.fields.type.options?.map((option: any) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          {config.fields?.price?.enabled && (
-            <Select value={price} onValueChange={setPrice}>
-              <SelectTrigger className="h-10">
-                <CircleDollarSign className="ms-1 size-4 opacity-60" />
-                <SelectValue placeholder={config.fields.price.placeholder} />
-                <ChevronDown className="me-1 size-4 opacity-60" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {config.fields.price.options?.map((option: any) => (
-                  <SelectItem key={option.id} value={option.id}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          {/* Property Type - Always visible */}
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger className="h-10">
+              <Home className="ms-1 size-4 opacity-60" />
+              <SelectValue placeholder={config.fields.type.placeholder} />
+              <ChevronDown className="me-1 size-4 opacity-60" />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {config.fields.type.options?.map((option: any) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {/* Price - Always visible */}
+          <Select value={price} onValueChange={setPrice}>
+            <SelectTrigger className="h-10">
+              <CircleDollarSign className="ms-1 size-4 opacity-60" />
+              <SelectValue placeholder={config.fields.price.placeholder} />
+              <ChevronDown className="me-1 size-4 opacity-60" />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {config.fields.price.options?.map((option: any) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {/* Mobile layout */}
       <div className="grid gap-3 md:hidden">
-        {config.fields?.purpose?.enabled && (
-          <div className="flex justify-center">
-            <div className="inline-flex overflow-hidden rounded-xl border bg-muted/40 p-1 w-full max-w-xs">
-              {config.fields.purpose.options?.map((option: any) => (
-                <Button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setPurpose(option.value)}
-                  style={
-                    purpose === option.value
-                      ? {
-                          backgroundColor: defaultPrimaryColor,
-                          color: "#ffffff",
-                        }
-                      : {}
+        {/* Purpose toggle - Always visible */}
+        <div className="flex justify-center">
+          <div className="inline-flex overflow-hidden rounded-xl border bg-muted/40 p-1 w-full max-w-xs">
+            {config.fields.purpose.options?.map((option: any) => (
+              <Button
+                key={option.value}
+                type="button"
+                onClick={() => setPurpose(option.value)}
+                style={
+                  purpose === option.value
+                    ? {
+                        backgroundColor: defaultPrimaryColor,
+                        color: "#ffffff",
+                      }
+                    : {}
+                }
+                onMouseEnter={(e) => {
+                  if (purpose === option.value) {
+                    e.currentTarget.style.backgroundColor =
+                      defaultPrimaryColorHover;
                   }
-                  onMouseEnter={(e) => {
-                    if (purpose === option.value) {
-                      e.currentTarget.style.backgroundColor =
-                        defaultPrimaryColorHover;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (purpose === option.value) {
-                      e.currentTarget.style.backgroundColor =
-                        defaultPrimaryColor;
-                    }
-                  }}
-                  className={
-                    purpose === option.value
-                      ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors flex-1"
-                      : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white flex-1"
+                }}
+                onMouseLeave={(e) => {
+                  if (purpose === option.value) {
+                    e.currentTarget.style.backgroundColor =
+                      defaultPrimaryColor;
                   }
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </div>
+                }}
+                className={
+                  purpose === option.value
+                    ? "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors flex-1"
+                    : "rounded-lg bg-transparent px-4 py-2 text-sm font-semibold text-foreground hover:bg-white flex-1"
+                }
+              >
+                {option.label}
+              </Button>
+            ))}
           </div>
-        )}
+        </div>
 
-        {config.fields?.keywords?.enabled && (
-          <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  defaultPrimaryColorHover;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = defaultPrimaryColor;
-              }}
-              className="grid size-10 shrink-0 place-items-center rounded-full text-white shadow transition-colors"
-              aria-label="بحث"
-            >
-              <Search className="size-5" />
-            </button>
-            <Input
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              placeholder={config.fields.keywords.placeholder}
-              className="h-10 flex-1"
-            />
-          </div>
-        )}
-
-        {config.fields?.city?.enabled && (
+        {/* Keywords - Always visible */}
+        <div className="flex items-center gap-2">
+          <button
+            type="submit"
+            style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                defaultPrimaryColorHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+            }}
+            className="grid size-10 shrink-0 place-items-center rounded-full text-white shadow transition-colors"
+            aria-label="بحث"
+          >
+            <Search className="size-5" />
+          </button>
           <Input
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder={config.fields.city.placeholder}
-            className="h-10"
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            placeholder={config.fields.keywords.placeholder}
+            className="h-10 flex-1"
           />
-        )}
+        </div>
+
+        {/* City - Always visible */}
+        <Input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder={config.fields.city.placeholder}
+          className="h-10"
+        />
 
         <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
-          {config.fields?.type?.enabled && (
-            <Select value={type} onValueChange={setType}>
-              <SelectTrigger className="h-10">
-                <Home className="ms-1 size-4 opacity-60" />
-                <SelectValue placeholder={config.fields.type.placeholder} />
-                <ChevronDown className="me-1 size-4 opacity-60" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {config.fields.type.options?.map((option: any) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          {config.fields?.price?.enabled && (
-            <Select value={price} onValueChange={setPrice}>
-              <SelectTrigger className="h-10">
-                <CircleDollarSign className="ms-1 size-4 opacity-60" />
-                <SelectValue placeholder={config.fields.price.placeholder} />
-                <ChevronDown className="me-1 size-4 opacity-60" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {config.fields.price.options?.map((option: any) => (
-                  <SelectItem key={option.id} value={option.id}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          {/* Property Type - Always visible */}
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger className="h-10">
+              <Home className="ms-1 size-4 opacity-60" />
+              <SelectValue placeholder={config.fields.type.placeholder} />
+              <ChevronDown className="me-1 size-4 opacity-60" />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {config.fields.type.options?.map((option: any) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {/* Price - Always visible */}
+          <Select value={price} onValueChange={setPrice}>
+            <SelectTrigger className="h-10">
+              <CircleDollarSign className="ms-1 size-4 opacity-60" />
+              <SelectValue placeholder={config.fields.price.placeholder} />
+              <ChevronDown className="me-1 size-4 opacity-60" />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {config.fields.price.options?.map((option: any) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </form>

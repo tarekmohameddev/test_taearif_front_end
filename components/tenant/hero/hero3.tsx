@@ -307,103 +307,97 @@ const SearchForm = React.memo(function SearchForm({
     >
       {/* Desktop Layout: all in one row */}
       <div className="hidden lg:flex items-end gap-4">
-        {/* Property Type */}
-        {config.fields?.type?.enabled && (
-          <div className="flex flex-col gap-2 flex-1">
-            <div className="flex items-center gap-2">
-              <Home className="size-5" style={{ color: "#896042" }} />
-              <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
-            </div>
-            <Select value={type} onValueChange={setType}>
-              <SelectTrigger 
-                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-                style={{ color: "black" }}
-              >
-                <SelectValue placeholder={type || "الكل"} />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {typeOptions.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* Property Type - Always visible */}
+        <div className="flex flex-col gap-2 flex-1">
+          <div className="flex items-center gap-2">
+            <Home className="size-5" style={{ color: "#896042" }} />
+            <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
           </div>
-        )}
-
-        {/* City */}
-        {config.fields?.city?.enabled && (
-          <div className="flex flex-col gap-2 flex-1">
-            <div className="flex items-center gap-2">
-              <MapPin className="size-5" style={{ color: "#896042" }} />
-              <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
-            </div>
-            <Select
-              value={cityId}
-              onValueChange={(value) => {
-                setCityId(value);
-                const city = cityOptions.find((c) => c.id.toString() === value);
-                if (city) setCityName(city.name);
-              }}
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger 
+              className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+              style={{ color: "black" }}
             >
-              <SelectTrigger 
-                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-                style={{ color: "black" }}
-              >
-                <SelectValue
-                  placeholder={
-                    cityLoading
-                      ? "جاري التحميل..."
-                      : cityName || "اختر المدينة"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {cityLoading ? (
-                  <SelectItem value="loading" disabled>
-                    جاري التحميل...
-                  </SelectItem>
-                ) : cityOptions.length === 0 ? (
-                  <SelectItem value="no-cities" disabled>
-                    لا توجد مدن
-                  </SelectItem>
-                ) : (
-                  cityOptions.map((city) => (
-                    <SelectItem key={city.id} value={city.id.toString()}>
-                      {city.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+              <SelectValue placeholder={type || "الكل"} />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {typeOptions.map((option: string) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Property Status */}
-        {config.fields?.status?.enabled && (
-          <div className="flex flex-col gap-2 flex-1">
-            <div className="flex items-center gap-2">
-              <Tag className="size-5" style={{ color: "#896042" }} />
-              <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
-            </div>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger 
-                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-                style={{ color: "black" }}
-              >
-                <SelectValue placeholder={status || "بيع / ايجار"} />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {statusOptions.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* City - Always visible */}
+        <div className="flex flex-col gap-2 flex-1">
+          <div className="flex items-center gap-2">
+            <MapPin className="size-5" style={{ color: "#896042" }} />
+            <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
           </div>
-        )}
+          <Select
+            value={cityId}
+            onValueChange={(value) => {
+              setCityId(value);
+              const city = cityOptions.find((c) => c.id.toString() === value);
+              if (city) setCityName(city.name);
+            }}
+          >
+            <SelectTrigger 
+              className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+              style={{ color: "black" }}
+            >
+              <SelectValue
+                placeholder={
+                  cityLoading
+                    ? "جاري التحميل..."
+                    : cityName || "اختر المدينة"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {cityLoading ? (
+                <SelectItem value="loading" disabled>
+                  جاري التحميل...
+                </SelectItem>
+              ) : cityOptions.length === 0 ? (
+                <SelectItem value="no-cities" disabled>
+                  لا توجد مدن
+                </SelectItem>
+              ) : (
+                cityOptions.map((city) => (
+                  <SelectItem key={city.id} value={city.id.toString()}>
+                    {city.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Property Status - Always visible */}
+        <div className="flex flex-col gap-2 flex-1">
+          <div className="flex items-center gap-2">
+            <Tag className="size-5" style={{ color: "#896042" }} />
+            <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
+          </div>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger 
+              className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+              style={{ color: "black" }}
+            >
+              <SelectValue placeholder={status || "بيع / ايجار"} />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {statusOptions.map((option: string) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Apply Button */}
         <div className="flex flex-col gap-2">
@@ -426,103 +420,97 @@ const SearchForm = React.memo(function SearchForm({
 
       {/* Tablet/Mobile Layout */}
       <div className="grid gap-4 lg:hidden">
-        {/* Property Type */}
-        {config.fields?.type?.enabled && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Home className="size-5" style={{ color: "#896042" }} />
-              <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
-            </div>
-            <Select value={type} onValueChange={setType}>
-              <SelectTrigger 
-                className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-                style={{ color: "black" }}
-              >
-                <SelectValue placeholder={type || "الكل"} />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {typeOptions.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* Property Type - Always visible */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Home className="size-5" style={{ color: "#896042" }} />
+            <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
           </div>
-        )}
-
-        {/* City */}
-        {config.fields?.city?.enabled && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <MapPin className="size-5" style={{ color: "#896042" }} />
-              <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
-            </div>
-            <Select
-              value={cityId}
-              onValueChange={(value) => {
-                setCityId(value);
-                const city = cityOptions.find((c) => c.id.toString() === value);
-                if (city) setCityName(city.name);
-              }}
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger 
+              className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+              style={{ color: "black" }}
             >
-              <SelectTrigger 
-                className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-                style={{ color: "black" }}
-              >
-                <SelectValue
-                  placeholder={
-                    cityLoading
-                      ? "جاري التحميل..."
-                      : cityName || "اختر المدينة"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {cityLoading ? (
-                  <SelectItem value="loading" disabled>
-                    جاري التحميل...
-                  </SelectItem>
-                ) : cityOptions.length === 0 ? (
-                  <SelectItem value="no-cities" disabled>
-                    لا توجد مدن
-                  </SelectItem>
-                ) : (
-                  cityOptions.map((city) => (
-                    <SelectItem key={city.id} value={city.id.toString()}>
-                      {city.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+              <SelectValue placeholder={type || "الكل"} />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {typeOptions.map((option: string) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Property Status */}
-        {config.fields?.status?.enabled && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Tag className="size-5" style={{ color: "#896042" }} />
-              <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
-            </div>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger 
-                className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-                style={{ color: "black" }}
-              >
-                <SelectValue placeholder={status || "بيع / ايجار"} />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {statusOptions.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* City - Always visible */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <MapPin className="size-5" style={{ color: "#896042" }} />
+            <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
           </div>
-        )}
+          <Select
+            value={cityId}
+            onValueChange={(value) => {
+              setCityId(value);
+              const city = cityOptions.find((c) => c.id.toString() === value);
+              if (city) setCityName(city.name);
+            }}
+          >
+            <SelectTrigger 
+              className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+              style={{ color: "black" }}
+            >
+              <SelectValue
+                placeholder={
+                  cityLoading
+                    ? "جاري التحميل..."
+                    : cityName || "اختر المدينة"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {cityLoading ? (
+                <SelectItem value="loading" disabled>
+                  جاري التحميل...
+                </SelectItem>
+              ) : cityOptions.length === 0 ? (
+                <SelectItem value="no-cities" disabled>
+                  لا توجد مدن
+                </SelectItem>
+              ) : (
+                cityOptions.map((city) => (
+                  <SelectItem key={city.id} value={city.id.toString()}>
+                    {city.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Property Status - Always visible */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Tag className="size-5" style={{ color: "#896042" }} />
+            <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
+          </div>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger 
+              className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+              style={{ color: "black" }}
+            >
+              <SelectValue placeholder={status || "بيع / ايجار"} />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {statusOptions.map((option: string) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Apply Button */}
         <button
