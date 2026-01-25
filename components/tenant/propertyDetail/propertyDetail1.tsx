@@ -2180,44 +2180,23 @@ export default function propertyDetail({
 
             {/* المشروع المرتبط */}
             {property.project && (
-              <div className="mb-8 md:mb-18">
-                <div className="flex flex-col justify-center items-start gap-y-6 md:gap-y-8">
-                  <h3 className="text-gray-600 font-bold text-xl leading-6 lg:text-2xl lg:leading-7">
-                    المشروع المرتبط
-                  </h3>
+              <div className="mb-4">
+                <div className="flex items-center gap-2 text-right">
+                  <span className="text-gray-600 text-base">
+                    المشروع التابع له :
+                  </span>
                   <Link
                     href={`/project/${property.project.slug}`}
-                    className="block group w-full"
+                    className="inline-flex items-center gap-2 hover:underline transition-all group"
+                    style={{ color: primaryColor }}
                   >
-                    <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                      <div className="relative h-64 w-full">
-                        {property.project.featured_image && (
-                          <Image
-                            src={property.project.featured_image}
-                            alt={property.project.title || "صورة المشروع"}
-                            fill
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="p-6">
-                        <h4 className="text-2xl font-bold mb-2 text-right group-hover:underline transition-all text-gray-800">
-                          {property.project.title}
-                        </h4>
-                        <div className="flex items-center justify-end mt-4">
-                          <span
-                            className="text-sm font-semibold"
-                            style={{ color: primaryColor }}
-                          >
-                            عرض تفاصيل المشروع
-                          </span>
-                          <ChevronLeftIcon
-                            className="w-5 h-5 mr-2 transition-transform group-hover:translate-x-1"
-                            style={{ color: primaryColor }}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    <span className="font-semibold text-base">
+                      {property.project.title}
+                    </span>
+                    <ChevronLeftIcon
+                      className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                      style={{ color: primaryColor }}
+                    />
                   </Link>
                 </div>
               </div>
