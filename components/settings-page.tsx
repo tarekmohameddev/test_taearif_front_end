@@ -754,10 +754,10 @@ export function SettingsPage() {
                 <Card className="mt-6">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      إعدادات DNS
+                      إعدادات Nameservers
                     </CardTitle>
                     <CardDescription>
-                      تكوين إعدادات DNS الخاصة بنطاقك لتوجيهها إلى موقعك
+                      تكوين Nameservers الخاصة بنطاقك لتوجيهها إلى Vercel
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -769,48 +769,37 @@ export function SettingsPage() {
                     >
                       <AccordionItem value="item-1">
                         <AccordionTrigger>
-                          كيفية إعداد سجلات DNS الخاصة بك
+                          كيفية إعداد Nameservers الخاصة بك
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-4">
                             <p className="text-sm text-muted-foreground">
                               {dnsInstructions?.description ||
-                                "لربط نطاقك، ستحتاج إلى تحديث سجلات DNS الخاصة بك لدى مسجل النطاق."}
+                                "لربط نطاقك، ستحتاج إلى تحديث Nameservers الخاصة بك لدى مسجل النطاق لتوجيهها إلى Vercel."}
                             </p>
                             <div className="rounded-lg border overflow-hidden">
                               <div className="grid grid-cols-12 gap-4 p-3 bg-muted/50 text-sm font-medium">
-                                <div className="col-span-2">النوع</div>
-                                <div className="col-span-3">الاسم</div>
-                                <div className="col-span-5">القيمة</div>
-                                <div className="col-span-2">TTL</div>
+                                <div className="col-span-2">الرقم</div>
+                                <div className="col-span-10">Nameserver</div>
                               </div>
-                              {dnsInstructions?.records?.map(
-                                (record: any, index: any) => (
-                                  <div
-                                    key={index}
-                                    className="grid grid-cols-12 gap-4 p-3 border-t"
-                                  >
-                                    <div className="col-span-2 font-medium">
-                                      {record.type}
-                                    </div>
-                                    <div className="col-span-3">
-                                      {record.name}
-                                    </div>
-                                    <div className="col-span-5 font-mono text-sm">
-                                      {record.value}
-                                    </div>
-                                    <div className="col-span-2">
-                                      {record.ttl}
-                                    </div>
-                                  </div>
-                                ),
-                              )}
+                              <div className="grid grid-cols-12 gap-4 p-3 border-t">
+                                <div className="col-span-2 font-medium">1</div>
+                                <div className="col-span-10 font-mono text-sm">
+                                  ns1.vercel-dns.com
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-12 gap-4 p-3 border-t">
+                                <div className="col-span-2 font-medium">2</div>
+                                <div className="col-span-10 font-mono text-sm">
+                                  ns2.vercel-dns.com
+                                </div>
+                              </div>
                             </div>
                             <div className="flex items-center p-3 rounded-lg bg-gray-100 text-gray-800">
                               <AlertCircle className="h-5 w-5 ml-2 flex-shrink-0" />
                               <p className="text-sm">
                                 {dnsInstructions?.note ||
-                                  `قد تستغرق تغييرات DNS ما يصل إلى 48 ساعة للانتشار عالميًا. هذا يعني أن نطاقك قد لا يعمل مباشرة بعد إجراء هذه التغييرات.`}
+                                  `قد تستغرق تغييرات Nameservers ما يصل إلى 48 ساعة للانتشار عالميًا. هذا يعني أن نطاقك قد لا يعمل مباشرة بعد إجراء هذه التغييرات.`}
                               </p>
                             </div>
                           </div>

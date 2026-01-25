@@ -237,11 +237,11 @@ export default function EditProjectPage(): JSX.Element {
         }
 
         if (
-          projectData.gallery_images &&
-          Array.isArray(projectData.gallery_images)
+          projectData.gallery &&
+          Array.isArray(projectData.gallery)
         ) {
           setGalleryImages(
-            projectData.gallery_images.map((img, index) => ({
+            projectData.gallery.map((img, index) => ({
               id: `existing-gallery-${index}`,
               url: img,
               file: new File([], img.split("/").pop() || "image.jpg"),
