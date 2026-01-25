@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
+import PropertyCard3 from "@/components/tenant/cards/card3";
 
 interface Project {
   id: string;
@@ -45,6 +46,39 @@ interface Project {
   bathrooms?: number;
   area?: string;
   features?: string[];
+  properties?: Array<{
+    id: number;
+    project_id?: number;
+    title: string;
+    slug: string;
+    address?: string;
+    description?: string;
+    price: string;
+    pricePerMeter?: string;
+    purpose?: string;
+    type?: string;
+    beds?: number;
+    bath?: number;
+    area?: string;
+    size?: string;
+    featured_image: string;
+    gallery?: string[];
+    location?: {
+      latitude: string;
+      longitude: string;
+    };
+    status?: boolean;
+    featured?: boolean;
+    property_status?: string;
+    features?: string[];
+    faqs?: any[];
+    category_id?: number;
+    payment_method?: string | null;
+    video_url?: string | null;
+    virtual_tour?: string | null;
+    created_at?: string;
+    updated_at?: string;
+  }>;
 }
 
 interface ProjectDetails2Props {
@@ -416,6 +450,74 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
       { name: "فلل", value: "villas" },
     ],
     features: ["إطلالة رائعة", "تصميم عصري", "مواصلات قريبة"],
+    properties: [
+      {
+        id: 1,
+        project_id: 1,
+        title: "عقار فاخر للبيع",
+        slug: "luxury-property-1",
+        address: "الرياض، حي النرجس",
+        description: "عقار فاخر في موقع ممتاز",
+        price: "1,250,000",
+        pricePerMeter: "8,333",
+        purpose: "sale",
+        type: "residential",
+        beds: 3,
+        bath: 2,
+        area: "150",
+        size: "150",
+        featured_image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+        gallery: [],
+        location: {
+          latitude: "24.7136",
+          longitude: "46.6753",
+        },
+        status: true,
+        featured: true,
+        property_status: "available",
+        features: [],
+        faqs: [],
+        category_id: 1,
+        payment_method: null,
+        video_url: null,
+        virtual_tour: null,
+        created_at: "2024-01-15",
+        updated_at: "2024-12-01",
+      },
+      {
+        id: 2,
+        project_id: 1,
+        title: "شقة للإيجار",
+        slug: "apartment-rent-1",
+        address: "الرياض، حي العليا",
+        description: "شقة حديثة للإيجار",
+        price: "5,000",
+        pricePerMeter: "33",
+        purpose: "rent",
+        type: "residential",
+        beds: 2,
+        bath: 1,
+        area: "120",
+        size: "120",
+        featured_image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+        gallery: [],
+        location: {
+          latitude: "24.7136",
+          longitude: "46.6753",
+        },
+        status: true,
+        featured: false,
+        property_status: "available",
+        features: [],
+        faqs: [],
+        category_id: 1,
+        payment_method: "monthly",
+        video_url: null,
+        virtual_tour: null,
+        created_at: "2024-01-15",
+        updated_at: "2024-12-01",
+      },
+    ],
   };
 
   // جلب بيانات المشروع
@@ -1127,6 +1229,63 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
           {/* END Left Column */}
         </div>
         {/* END: Main Grid Layout */}
+
+        {/* BEGIN: Related Properties Grid */}
+        {project.properties && project.properties.length > 0 ? (
+          <section className="mt-16" data-purpose="related-properties">
+            <h2
+              className="text-3xl font-bold mb-8 text-right"
+              style={{
+                color: mergedData.styling?.textColor || primaryColor,
+              }}
+            >
+              العقارات المرتبطة بهذا المشروع
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {project.properties.map((property) => {
+                // Transform API property data to PropertyCard3 format
+                const cardProperty = {
+                  id: String(property.id),
+                  slug: property.slug,
+                  title: property.title,
+                  district: property.address || "",
+                  price: property.price || "0",
+                  views: 0,
+                  bedrooms: property.beds || 0,
+                  bathrooms: property.bath || 0,
+                  area: property.area || property.size || "",
+                  type: property.type || "",
+                  transactionType: property.purpose === "sale" ? "للبيع" : property.purpose === "rent" ? "للإيجار" : "",
+                  image: property.featured_image || "",
+                  status: property.property_status === "available" || property.status === true ? "متاح" : property.property_status || "غير متاح",
+                  createdAt: property.created_at,
+                  description: property.description,
+                  features: property.features || [],
+                  location: property.location
+                    ? {
+                        lat: parseFloat(property.location.latitude),
+                        lng: parseFloat(property.location.longitude),
+                        address: property.address || "",
+                      }
+                    : undefined,
+                };
+
+                return (
+                  <PropertyCard3
+                    key={property.id}
+                    property={cardProperty}
+                    showImage={true}
+                    showPrice={true}
+                    showDetails={false}
+                    showViews={false}
+                    showStatus={false}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+        {/* END: Related Properties Grid */}
 
         {/* BEGIN: Contact Form - COMMENTED OUT */}
         {/* {mergedData.displaySettings?.showContactForm && (
