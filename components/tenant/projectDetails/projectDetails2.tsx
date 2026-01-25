@@ -8,7 +8,11 @@ import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultProjectDetails2Data } from "@/context/editorStoreFunctions/projectDetailsFunctions";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { MapPinIcon } from "lucide-react";
+import {
+  MapPinIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "lucide-react";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
 
@@ -574,6 +578,29 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
     handleImageClick(imageSrc, index);
   };
 
+  // Navigation functions for main image (same logic as dialog)
+  const handleMainImagePrevious = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = mainImageIndex;
+      const previousIndex =
+        currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+      setMainImage(allImages[previousIndex]);
+      setMainImageIndex(previousIndex);
+    }
+  };
+
+  const handleMainImageNext = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      const currentIndex = mainImageIndex;
+      const nextIndex =
+        currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+      setMainImage(allImages[nextIndex]);
+      setMainImageIndex(nextIndex);
+    }
+  };
+
   // Show loading skeleton
   if (tenantLoading || loadingProject) {
     return (
@@ -711,15 +738,52 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
           data-purpose="property-hero"
         >
           {/* Main Featured Image */}
-          <div className="relative h-[600px] w-full">
+          <div className="relative h-[600px] w-full group">
             {mainImage && project ? (
-              <Image
-                src={mainImage}
-                alt={project.title || "صورة المشروع"}
-                fill
-                className="w-full h-full object-cover cursor-pointer rounded-lg"
-                onClick={() => handleImageClick(mainImage, 0)}
-              />
+              <>
+                <Image
+                  src={mainImage}
+                  alt={project.title || "صورة المشروع"}
+                  fill
+                  className="w-full h-full object-cover transition-opacity duration-300 cursor-pointer rounded-lg"
+                  priority
+                  onClick={() => {
+                    handleImageClick(mainImage, mainImageIndex);
+                  }}
+                />
+
+                {/* Navigation arrows - show only if there's more than one image */}
+                {getAllImages().length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMainImagePrevious();
+                      }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      aria-label="الصورة السابقة"
+                    >
+                      <ChevronLeftIcon className="w-6 h-6" />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMainImageNext();
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                      aria-label="الصورة التالية"
+                    >
+                      <ChevronRightIcon className="w-6 h-6" />
+                    </button>
+
+                    {/* Image counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {mainImageIndex + 1} / {getAllImages().length}
+                    </div>
+                  </>
+                )}
+              </>
             ) : (
               <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
                 <div className="text-gray-500 text-center">
