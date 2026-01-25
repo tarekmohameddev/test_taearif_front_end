@@ -983,36 +983,35 @@ export default function propertyDetail2(props: propertyDetail2Props) {
           )}
         {/* END: Gallery Thumbnails */}
 
-        {/* BEGIN: Property Description */}
-        {mergedData.displaySettings?.showDescription !== false && (
-          <section
-            className="bg-transparent py-10 rounded-lg"
-            data-purpose="description-block"
-            dir="rtl"
-          >
-            <h2
-              className="text-3xl font-bold mb-6 text-right"
-              style={{ color: textColor }}
-            >
-              {mergedData.content?.descriptionTitle || "وصف العقار"}
-            </h2>
-            <p
-              className="leading-relaxed text-right text-lg whitespace-pre-line"
-              style={{ color: textColor }}
-            >
-              {property.description || "لا يوجد وصف متاح لهذا العقار"}
-            </p>
-          </section>
-        )}
-        {/* END: Property Description */}
-
-        {/* BEGIN: Main Grid Layout (Specs & Video / Map & Form) */}
+        {/* BEGIN: Main Grid Layout - Two Columns (Description & Specs | Video & Map) */}
         <div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-12"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-10"
           style={{ gap: mergedData.layout?.gap || "3rem" }}
+          dir="rtl"
         >
-          {/* Right Column: Specs & Form */}
-          <div className="space-y-12 order-2 lg:order-1">
+          {/* Right Column: Description & Specs */}
+          <div className="space-y-12">
+            {/* Property Description */}
+            {mergedData.displaySettings?.showDescription !== false && (
+              <section
+                className="bg-transparent rounded-lg"
+                data-purpose="description-block"
+              >
+                <h2
+                  className="text-3xl font-bold mb-6 text-right"
+                  style={{ color: textColor }}
+                >
+                  {mergedData.content?.descriptionTitle || "وصف العقار"}
+                </h2>
+                <p
+                  className="leading-relaxed text-right text-lg whitespace-pre-line"
+                  style={{ color: textColor }}
+                >
+                  {property.description || "لا يوجد وصف متاح لهذا العقار"}
+                </p>
+              </section>
+            )}
+
             {/* Specs Section */}
             {mergedData.displaySettings?.showSpecs !== false ? (
               <section className="bg-transparent" data-purpose="property-specs">
@@ -2188,7 +2187,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
           {/* END Right Column */}
 
           {/* Left Column: Video & Map */}
-          <div className="space-y-12 order-1 lg:order-2">
+          <div className="space-y-12">
             {/* Video Section */}
             {mergedData.displaySettings?.showVideoUrl !== false &&
               property.video_url && (
