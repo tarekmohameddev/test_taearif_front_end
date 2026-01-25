@@ -10,6 +10,7 @@ import {
   LayoutTemplate,
   Download,
   Grid,
+  BookOpen,
 } from "lucide-react";
 
 export type MainNavItem = {
@@ -78,6 +79,13 @@ export const staticMenuItems: MainNavItem[] = [
     description: "ادارة طلبات العملاء العقارية",
     icon: FileText,
     path: "/dashboard/property-requests",
+  },
+  {
+    id: "blogs",
+    label: "المدونة",
+    description: "ادارة المقالات والمدونة",
+    icon: BookOpen,
+    path: "/dashboard/blogs",
   },
   {
     id: "job-applications",
