@@ -77,6 +77,7 @@ interface Property {
   street_width_east?: string;
   street_width_west?: string;
   facade_id?: number;
+  facade_name?: string;
   building?: string | null;
   size?: string;
   floor_planning_image?: string[];
@@ -1906,8 +1907,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                     ): null}
 
                   {/* نوع الواجهة */}
-                  {property.facade_id !== undefined &&
-                    property.facade_id !== null ? (
+                  {property.facade_name &&
+                    property.facade_name.trim() !== "" ? (
                       <div className="flex flex-col items-center justify-center">
                         <div className="mb-3" style={{ color: textColor }}>
                           <svg
@@ -1930,7 +1931,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                           className="font-bold text-lg"
                           style={{ color: textColor }}
                         >
-                          نوع الواجهة: {property.facade_id}
+                          نوع الواجهة: {property.facade_name}
                         </span>
                       </div>
                     ) : null}
