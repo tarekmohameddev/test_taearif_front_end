@@ -234,22 +234,20 @@ export default function PropertyCard3({
             ) : null}
 
             {/* Price and Action */}
-            {/* its only hidden for now , i dont want to delete it */}
-
-            {/* {showPrice && (
+            {showPrice ? (
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-white">
                     {property.price}
                   </p>
-                  {property.transactionType && (
+                  {property.transactionType ? (
                     <p className="text-sm text-gray-300">
                       {property.transactionType}
                     </p>
-                  )}
+                  ) : null}
                 </div>
-                <Button
-                  className="text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-lg"
+                {/* <Button
+                  className="text-white font-medium px-2 py-1 rounded-lg transition-colors shadow-lg text-sm"
                   style={{ backgroundColor: primaryColor }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = primaryColorHover;
@@ -263,9 +261,9 @@ export default function PropertyCard3({
                   }}
                 >
                   عرض التفاصيل
-                </Button>
+                </Button> */}
               </div>
-            )} */}
+            ) : null}
           </div>
         </div>
       )}
@@ -308,21 +306,20 @@ export default function PropertyCard3({
             </div>
           ) : null}
 
-          {/* its only hidden for now , i dont want to delete it */}
-          {/* {showPrice && (
+          {showPrice ? (
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-gray-900">
                   {property.price}
                 </p>
-                {property.transactionType && (
+                {property.transactionType ? (
                   <p className="text-sm text-gray-500">
                     {property.transactionType}
                   </p>
-                )}
+                ) : null}
               </div>
-              <Button
-                className="text-white font-medium px-4 py-2 rounded-lg transition-colors"
+              {/* <Button
+                className="text-white font-medium px-4 py-2 rounded-lg transition-colors text-sm"
                 style={{ backgroundColor: primaryColor }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = primaryColorHover;
@@ -336,9 +333,9 @@ export default function PropertyCard3({
                 }}
               >
                 عرض التفاصيل
-              </Button>
+              </Button> */}
             </div>
-          )} */}
+          ) : null}
         </div>
       ) : null}
     </div>

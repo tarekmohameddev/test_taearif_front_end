@@ -1244,12 +1244,19 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {project.properties.map((property) => {
                 // Transform API property data to PropertyCard3 format
+                // Format price: remove .00 but keep other decimals
+                const formatPrice = (price: string | undefined): string => {
+                  if (!price) return "0";
+                  // Remove .00 at the end, but keep other decimal values
+                  return price.replace(/\.00$/, "");
+                };
+
                 const cardProperty = {
                   id: String(property.id),
                   slug: property.slug,
                   title: property.title,
                   district: property.address || "",
-                  price: property.price || "0",
+                  price: property.price ? `${formatPrice(property.price)} ريال` : "0 ريال",
                   views: 0,
                   bedrooms: property.beds || 0,
                   bathrooms: property.bath || 0,
