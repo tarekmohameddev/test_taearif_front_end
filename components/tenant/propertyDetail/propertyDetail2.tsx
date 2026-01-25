@@ -89,6 +89,12 @@ interface Property {
     answer: string;
     displayOnPage: boolean;
   }>;
+  project?: {
+    id: number;
+    title: string;
+    slug: string;
+    featured_image: string;
+  } | null;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -408,6 +414,12 @@ export default function propertyDetail2(props: propertyDetail2Props) {
         displayOnPage: true,
       },
     ],
+    project: {
+      id: 1,
+      title: "مشروع سكني فاخر",
+      slug: "luxury-residential-project",
+      featured_image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    },
   };
 
   // Property data state
@@ -2052,6 +2064,55 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                       );
                     })}
                 </div>
+              </section>
+            )}
+
+            {/* المشروع المرتبط */}
+            {property.project && (
+              <section className="bg-transparent" data-purpose="project-section">
+                <h2
+                  className="text-3xl font-bold mb-8 text-right"
+                  style={{ color: textColor }}
+                >
+                  المشروع المرتبط
+                </h2>
+                <Link
+                  href={`/project/${property.project.slug}`}
+                  className="block group"
+                >
+                  <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div className="relative h-64 w-full">
+                      {property.project.featured_image && (
+                        <Image
+                          src={property.project.featured_image}
+                          alt={property.project.title || "صورة المشروع"}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <h3
+                        className="text-2xl font-bold mb-2 text-right group-hover:underline transition-all"
+                        style={{ color: primaryColor }}
+                      >
+                        {property.project.title}
+                      </h3>
+                      <div className="flex items-center justify-end mt-4">
+                        <span
+                          className="text-sm font-semibold"
+                          style={{ color: primaryColor }}
+                        >
+                          عرض تفاصيل المشروع
+                        </span>
+                        <ChevronLeftIcon
+                          className="w-5 h-5 mr-2 transition-transform group-hover:translate-x-1"
+                          style={{ color: primaryColor }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
               </section>
             )}
 

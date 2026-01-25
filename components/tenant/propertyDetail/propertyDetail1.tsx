@@ -115,6 +115,12 @@ interface Property {
   createdAt?: string;
   created_at?: string;
   updated_at?: string;
+  project?: {
+    id: number;
+    title: string;
+    slug: string;
+    featured_image: string;
+  } | null;
 }
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
@@ -427,6 +433,12 @@ export default function propertyDetail({
         displayOnPage: true,
       },
     ],
+    project: {
+      id: 1,
+      title: "مشروع سكني فاخر",
+      slug: "luxury-residential-project",
+      featured_image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+    },
   };
 
   // Handle create reservation
@@ -2165,6 +2177,51 @@ export default function propertyDetail({
                 </div>
               </div>
             ) : null}
+
+            {/* المشروع المرتبط */}
+            {property.project && (
+              <div className="mb-8 md:mb-18">
+                <div className="flex flex-col justify-center items-start gap-y-6 md:gap-y-8">
+                  <h3 className="text-gray-600 font-bold text-xl leading-6 lg:text-2xl lg:leading-7">
+                    المشروع المرتبط
+                  </h3>
+                  <Link
+                    href={`/project/${property.project.slug}`}
+                    className="block group w-full"
+                  >
+                    <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                      <div className="relative h-64 w-full">
+                        {property.project.featured_image && (
+                          <Image
+                            src={property.project.featured_image}
+                            alt={property.project.title || "صورة المشروع"}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="p-6">
+                        <h4 className="text-2xl font-bold mb-2 text-right group-hover:underline transition-all text-gray-800">
+                          {property.project.title}
+                        </h4>
+                        <div className="flex items-center justify-end mt-4">
+                          <span
+                            className="text-sm font-semibold"
+                            style={{ color: primaryColor }}
+                          >
+                            عرض تفاصيل المشروع
+                          </span>
+                          <ChevronLeftIcon
+                            className="w-5 h-5 mr-2 transition-transform group-hover:translate-x-1"
+                            style={{ color: primaryColor }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* نموذج الحجز */}
             {/* انه مخفي فقط الان ولا اريد ازالته */}
