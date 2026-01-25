@@ -71,6 +71,13 @@ export function ActiveFiltersDisplay({
     return translations[method] || method;
   };
 
+  // دالة لتنسيق الأرقام بشكل أفضل
+  const formatPrice = (price: number | string): string => {
+    const numPrice = typeof price === "string" ? parseFloat(price) : price;
+    if (isNaN(numPrice)) return String(price);
+    return numPrice.toLocaleString("ar-SA");
+  };
+
   const getFilterDisplayName = (key: string, value: any, filters: any) => {
     switch (key) {
       case "purposes_filter":
@@ -96,9 +103,21 @@ export function ActiveFiltersDisplay({
                 ? "للبيع"
                 : value;
       case "price_from":
-        return `من ${value.toLocaleString()} ريال`;
+      case "price_min":
+        // إذا كان هناك price_max أو price_to، سنعرضهما معاً في badge واحد
+        const maxPrice = filters.price_max || filters.price_to;
+        if (maxPrice) {
+          return null; // سنعرضه في case price_max/price_to
+        }
+        return `من ${formatPrice(value)} ريال`;
       case "price_to":
-        return `إلى ${value.toLocaleString()} ريال`;
+      case "price_max":
+        // إذا كان هناك price_min أو price_from، اعرضهما معاً
+        const minPrice = filters.price_min || filters.price_from;
+        if (minPrice) {
+          return `من ${formatPrice(minPrice)} إلى ${formatPrice(value)} ريال`;
+        }
+        return `إلى ${formatPrice(value)} ريال`;
       case "area_from":
         return `من ${value} م²`;
       case "area_to":
@@ -137,22 +156,80 @@ export function ActiveFiltersDisplay({
       displayName: string;
     }> = [];
 
+    // معالجة خاصة للسعر - إذا كان هناك price_min و price_max، اعرضهما معاً
+    const hasPriceMin = filters.price_min && filters.price_min !== "" && filters.price_min !== 0;
+    const hasPriceMax = filters.price_max && filters.price_max !== "" && filters.price_max !== 0;
+    const hasPriceFrom = filters.price_from && filters.price_from !== "" && filters.price_from !== 0;
+    const hasPriceTo = filters.price_to && filters.price_to !== "" && filters.price_to !== 0;
+
+    // إذا كان هناك price_min و price_max، اعرضهما معاً وتجاهل price_from و price_to
+    if (hasPriceMin && hasPriceMax) {
+      activeFilters.push({
+        key: "price_range",
+        value: { min: filters.price_min, max: filters.price_max },
+        displayName: `من ${formatPrice(filters.price_min)} إلى ${formatPrice(filters.price_max)} ريال`,
+      });
+    } else if (hasPriceMin) {
+      activeFilters.push({
+        key: "price_min",
+        value: filters.price_min,
+        displayName: getFilterDisplayName("price_min", filters.price_min, filters),
+      });
+    } else if (hasPriceMax) {
+      activeFilters.push({
+        key: "price_max",
+        value: filters.price_max,
+        displayName: getFilterDisplayName("price_max", filters.price_max, filters),
+      });
+    } else if (hasPriceFrom && hasPriceTo) {
+      // للتوافق مع الكود القديم
+      activeFilters.push({
+        key: "price_range",
+        value: { min: filters.price_from, max: filters.price_to },
+        displayName: `من ${formatPrice(filters.price_from)} إلى ${formatPrice(filters.price_to)} ريال`,
+      });
+    } else if (hasPriceFrom) {
+      activeFilters.push({
+        key: "price_from",
+        value: filters.price_from,
+        displayName: getFilterDisplayName("price_from", filters.price_from, filters),
+      });
+    } else if (hasPriceTo) {
+      activeFilters.push({
+        key: "price_to",
+        value: filters.price_to,
+        displayName: getFilterDisplayName("price_to", filters.price_to, filters),
+      });
+    }
+
+    // معالجة باقي الفلاتر
     Object.entries(filters).forEach(([key, value]) => {
+      // تخطي price_from, price_to, price_min, price_max لأننا عالجناها أعلاه
+      if (key === "price_from" || key === "price_to" || key === "price_min" || key === "price_max") {
+        return;
+      }
+
       if (value && value !== "" && value !== 0) {
         if (Array.isArray(value) && value.length > 0) {
           value.forEach((item: any) => {
-          activeFilters.push({
-            key,
-            value: item,
-            displayName: getFilterDisplayName(key, item, filters),
-          });
+            const displayName = getFilterDisplayName(key, item, filters);
+            if (displayName !== null) {
+              activeFilters.push({
+                key,
+                value: item,
+                displayName,
+              });
+            }
           });
         } else if (!Array.isArray(value)) {
-          activeFilters.push({
-            key,
-            value,
-            displayName: getFilterDisplayName(key, value, filters),
-          });
+          const displayName = getFilterDisplayName(key, value, filters);
+          if (displayName !== null) {
+            activeFilters.push({
+              key,
+              value,
+              displayName,
+            });
+          }
         }
       }
     });

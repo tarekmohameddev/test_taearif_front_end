@@ -110,6 +110,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Share Dialog Component
 function ShareDialog({
@@ -471,6 +476,10 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
   const [filterBeds, setFilterBeds] = useState<string | null>(null);
   const [filterPriceFrom, setFilterPriceFrom] = useState<string>("");
   const [filterPriceTo, setFilterPriceTo] = useState<string>("");
+  // Temporary state for the popover inputs
+  const [tempPriceFrom, setTempPriceFrom] = useState<string>("");
+  const [tempPriceTo, setTempPriceTo] = useState<string>("");
+  const [isPricePopoverOpen, setIsPricePopoverOpen] = useState(false);
   const [filterSearch, setFilterSearch] = useState<string>("");
   const [localSearchValue, setLocalSearchValue] = useState<string>(""); // Local state for input
   const [isInitialLoad, setIsInitialLoad] = useState(true); // Flag to prevent API call on initial load
@@ -1516,6 +1525,8 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     setFilterBeds(null);
     setFilterPriceFrom("");
     setFilterPriceTo("");
+    setTempPriceFrom("");
+    setTempPriceTo("");
     setFilterSearch("");
     setLocalSearchValue(""); // Clear local search value
     // newFilters سيتم تحديثه تلقائياً من useEffect إلى {}
@@ -1527,11 +1538,20 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
       setFilterSearch("");
       setLocalSearchValue(""); // Clear local search value
     }
+    if (filterKey === "price_range") {
+      // إزالة كل من price_min و price_max عند إزالة price_range
+      setFilterPriceFrom("");
+      setTempPriceFrom("");
+      setFilterPriceTo("");
+      setTempPriceTo("");
+    }
     if (filterKey === "price_from" || filterKey === "price_min") {
       setFilterPriceFrom("");
+      setTempPriceFrom("");
     }
     if (filterKey === "price_to" || filterKey === "price_max") {
       setFilterPriceTo("");
+      setTempPriceTo("");
     }
     if (filterKey === "city_id") {
       setFilterCityId(null);
@@ -1603,12 +1623,10 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
     if (filterPurpose) filters.purpose = filterPurpose;
     if (filterBeds) filters.beds = filterBeds;
     if (filterPriceFrom) {
-      filters.price_from = filterPriceFrom;
-      filters.price_min = filterPriceFrom; // Support both formats
+      filters.price_min = filterPriceFrom;
     }
     if (filterPriceTo) {
-      filters.price_to = filterPriceTo;
-      filters.price_max = filterPriceTo; // Support both formats
+      filters.price_max = filterPriceTo;
     }
     if (filterSearch.trim()) {
       filters.search = filterSearch.trim();
@@ -2419,10 +2437,230 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
 
             {/* الفلاتر */}
             <Card className="border-0 shadow-none">
-              <CardContent className="p-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-8 gap-4">
+              <CardContent className="p-0 space-y-4">
+                {/* السطر الأول: باقي الفلاتر */}
+                <div className="flex flex-wrap gap-4">
+                  {/* المدينة */}
+                  <div className="space-y-2 w-[180px]">
+                    <Label>المدينة</Label>
+                    <Select
+                      value={filterCityId || undefined}
+                      onValueChange={(value) => {
+                        setFilterCityId(value || null);
+                        setFilterDistrictId(null);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
+                      }}
+                      disabled={loadingCities}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر المدينة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cities.map((city) => (
+                          <SelectItem key={city.id} value={city.id.toString()}>
+                            {city.name_ar || city.name_en || city.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* الحي */}
+                  <div className="space-y-2 w-[180px]">
+                    <Label>الحي</Label>
+                    <Select
+                      value={filterDistrictId || undefined}
+                      onValueChange={(value) => {
+                        setFilterDistrictId(value || null);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
+                      }}
+                      disabled={loadingDistricts || !filterCityId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الحي" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districts.map((district) => (
+                          <SelectItem key={district.id} value={district.id.toString()}>
+                            {district.name_ar || district.name_en || district.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* نوع العقار */}
+                  <div className="space-y-2 w-[150px]">
+                    <Label>نوع العقار</Label>
+                    <Select
+                      value={filterType || undefined}
+                      onValueChange={(value) => {
+                        setFilterType(value || null);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر النوع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="شقة">شقة</SelectItem>
+                        <SelectItem value="فيلا">فيلا</SelectItem>
+                        <SelectItem value="منزل">منزل</SelectItem>
+                        <SelectItem value="أرض">أرض</SelectItem>
+                        <SelectItem value="محل">محل</SelectItem>
+                        <SelectItem value="مكتب">مكتب</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* إيجار أو بيع */}
+                  <div className="space-y-2 w-[150px]">
+                    <Label>نوع المعاملة</Label>
+                    <Select
+                      value={filterPurpose || undefined}
+                      onValueChange={(value) => {
+                        setFilterPurpose(value || null);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر النوع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sale">للبيع</SelectItem>
+                        <SelectItem value="rent">للإيجار</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* عدد الغرف */}
+                  <div className="space-y-2 w-[140px]">
+                    <Label>عدد الغرف</Label>
+                    <Select
+                      value={filterBeds || undefined}
+                      onValueChange={(value) => {
+                        setFilterBeds(value || null);
+                        // newFilters سيتم تحديثه تلقائياً من useEffect
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر عدد الغرف" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1</SelectItem>
+                        <SelectItem value="2">2</SelectItem>
+                        <SelectItem value="3">3</SelectItem>
+                        <SelectItem value="4">4</SelectItem>
+                        <SelectItem value="5">5+</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* السعر */}
+                  <div className="space-y-2 w-[200px]">
+                    <Label>السعر</Label>
+                    <Popover open={isPricePopoverOpen} onOpenChange={(open) => {
+                      setIsPricePopoverOpen(open);
+                      if (open) {
+                        setTempPriceFrom(filterPriceFrom);
+                        setTempPriceTo(filterPriceTo);
+                      }
+                    }}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={`w-full justify-between ${
+                            filterPriceFrom || filterPriceTo
+                              ? "text-primary border-primary"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {filterPriceFrom || filterPriceTo ? (
+                            <span className="truncate">
+                              {filterPriceFrom && filterPriceTo
+                                ? `${Number(filterPriceFrom).toLocaleString()} - ${Number(filterPriceTo).toLocaleString()}`
+                                : filterPriceFrom
+                                ? `من ${Number(filterPriceFrom).toLocaleString()}`
+                                : `إلى ${Number(filterPriceTo).toLocaleString()}`}
+                            </span>
+                          ) : (
+                            "تحديد السعر"
+                          )}
+                          <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-4" align="start">
+                        <div className="space-y-4">
+                          <h4 className="font-medium leading-none">نطاق السعر</h4>
+                          <div className="flex gap-2">
+                            <div className="flex-1 space-y-2">
+                              <Label htmlFor="price-from">من</Label>
+                              <Input
+                                id="price-from"
+                                type="number"
+                                placeholder="0"
+                                value={tempPriceFrom}
+                                onChange={(e) =>
+                                  setTempPriceFrom(e.target.value)
+                                }
+                              />
+                            </div>
+                            <div className="flex-1 space-y-2">
+                              <Label htmlFor="price-to">إلى</Label>
+                              <Input
+                                id="price-to"
+                                type="number"
+                                placeholder="Any"
+                                value={tempPriceTo}
+                                onChange={(e) =>
+                                  setTempPriceTo(e.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-end pt-2">
+                            <Button
+                              size="sm"
+                              className="w-full"
+                              onClick={() => {
+                                setFilterPriceFrom(tempPriceFrom);
+                                setFilterPriceTo(tempPriceTo);
+                                setIsPricePopoverOpen(false);
+                              }}
+                            >
+                              تطبيق
+                            </Button>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* زر إعادة التعيين */}
+                  <div className="space-y-2 w-[130px]">
+                    <Label className="opacity-0 text-[1px]">ازالة الفلاتر</Label>
+                    <Label className="opacity-0 text-[1px]">إعادة تعيين</Label>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleClearFilters} 
+                      className={`w-full text-sm ${
+                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo || localSearchValue
+                          ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          : ""
+                      }`}
+                    >
+                      <FilterX className="h-3.5 w-3.5 mr-1.5" />
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                </div>
+
+                {/* السطر الثاني: البحث */}
+                <div className="flex flex-wrap gap-4">
                   {/* البحث */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 w-[300px]">
                     <Label>البحث</Label>
                     <div className="flex gap-2">
                       <div className="relative flex-1">
@@ -2452,168 +2690,6 @@ export function PropertiesManagementPage({ isIncompletePage = false }: Propertie
                         بحث
                       </Button>
                     </div>
-                  </div>
-
-                  {/* المدينة */}
-                  <div className="space-y-2">
-                    <Label>المدينة</Label>
-                    <Select
-                      value={filterCityId || undefined}
-                      onValueChange={(value) => {
-                        setFilterCityId(value || null);
-                        setFilterDistrictId(null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                      disabled={loadingCities}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المدينة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city) => (
-                          <SelectItem key={city.id} value={city.id.toString()}>
-                            {city.name_ar || city.name_en || city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* الحي */}
-                  <div className="space-y-2">
-                    <Label>الحي</Label>
-                    <Select
-                      value={filterDistrictId || undefined}
-                      onValueChange={(value) => {
-                        setFilterDistrictId(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                      disabled={loadingDistricts || !filterCityId}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الحي" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {districts.map((district) => (
-                          <SelectItem key={district.id} value={district.id.toString()}>
-                            {district.name_ar || district.name_en || district.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* نوع العقار */}
-                  <div className="space-y-2">
-                    <Label>نوع العقار</Label>
-                    <Select
-                      value={filterType || undefined}
-                      onValueChange={(value) => {
-                        setFilterType(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر النوع" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="شقة">شقة</SelectItem>
-                        <SelectItem value="فيلا">فيلا</SelectItem>
-                        <SelectItem value="منزل">منزل</SelectItem>
-                        <SelectItem value="أرض">أرض</SelectItem>
-                        <SelectItem value="محل">محل</SelectItem>
-                        <SelectItem value="مكتب">مكتب</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* إيجار أو بيع */}
-                  <div className="space-y-2">
-                    <Label>نوع المعاملة</Label>
-                    <Select
-                      value={filterPurpose || undefined}
-                      onValueChange={(value) => {
-                        setFilterPurpose(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر النوع" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sale">للبيع</SelectItem>
-                        <SelectItem value="rent">للإيجار</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* عدد الغرف */}
-                  <div className="space-y-2">
-                    <Label>عدد الغرف</Label>
-                    <Select
-                      value={filterBeds || undefined}
-                      onValueChange={(value) => {
-                        setFilterBeds(value || null);
-                        // newFilters سيتم تحديثه تلقائياً من useEffect
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر عدد الغرف" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1</SelectItem>
-                        <SelectItem value="2">2</SelectItem>
-                        <SelectItem value="3">3</SelectItem>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="5">5+</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* السعر */}
-                  <div className="space-y-2">
-                    <Label>السعر</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        placeholder="من"
-                        value={filterPriceFrom}
-                        onChange={(e) => {
-                          setFilterPriceFrom(e.target.value);
-                        }}
-                        // newFilters سيتم تحديثه تلقائياً من useEffect عند تغيير القيمة
-                        className="flex-1"
-                      />
-                      <Input
-                        type="number"
-                        placeholder="إلى"
-                        value={filterPriceTo}
-                        onChange={(e) => {
-                          setFilterPriceTo(e.target.value);
-                        }}
-                        // newFilters سيتم تحديثه تلقائياً من useEffect عند تغيير القيمة
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-
-                  {/* زر إعادة التعيين */}
-                  <div className="space-y-2 max-w-[130px]">
-                    <Label className="opacity-0 text-[1px]">ازالة الفلاتر</Label>
-                    <Label className="opacity-0 text-[1px]">إعادة تعيين</Label>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleClearFilters} 
-                      className={`w-fit text-sm ${
-                        filterCityId || filterDistrictId || filterType || filterPurpose || filterBeds || filterPriceFrom || filterPriceTo || localSearchValue
-                          ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700"
-                          : ""
-                      }`}
-                    >
-                      <FilterX className="h-3.5 w-3.5 mr-1.5" />
-                      إعادة تعيين
-                    </Button>
                   </div>
                 </div>
               </CardContent>
