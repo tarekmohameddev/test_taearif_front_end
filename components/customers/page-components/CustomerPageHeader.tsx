@@ -198,10 +198,11 @@ export const CustomerPageHeader = ({
         ...newCustomer,
         password: newCustomer.password || "123456",
         stage_id: newCustomer.stage_id === null ? "" : newCustomer.stage_id,
-        // تعيين priority_id إلى null عند الإرسال
-        priority_id: null,
         procedure_id: newCustomer.procedure_id ?? undefined,
       };
+
+      // إزالة priority_id من البيانات المرسلة
+      delete customerDataToSend.priority_id;
 
       // إزالة stage_id إذا كان فارغاً لتجنب مشاكل الـ API
       if (customerDataToSend.stage_id === "") {

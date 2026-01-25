@@ -142,7 +142,11 @@ export default function EditCustomerPage() {
     setClientErrors({});
 
     try {
-      await axiosInstance.put(`/customers/${customerId}`, formData);
+      // إزالة priority_id من البيانات المرسلة
+      const dataToSend = { ...formData };
+      delete dataToSend.priority_id;
+      
+      await axiosInstance.put(`/customers/${customerId}`, dataToSend);
 
       toast.success("تم تحديث بيانات العميل بنجاح!", {
         duration: 4000,
