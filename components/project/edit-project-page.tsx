@@ -1422,7 +1422,7 @@ export default function EditProjectPage(): JSX.Element {
               <CardFooter className="flex justify-between border-t p-6">
                 <Button
                   variant="outline"
-                  onClick={() => router.push("/projects")}
+                  onClick={() => router.push("/dashboard/projects")}
                 >
                   إلغاء
                 </Button>
