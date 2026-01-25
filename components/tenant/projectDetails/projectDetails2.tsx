@@ -900,7 +900,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-y-10 gap-x-6 text-center">
                   {/* Developer */}
-                  {project.developer && project.developer.trim() !== "" && (
+                  {project.developer && project.developer.trim() !== "" ? (
                     <div className="flex flex-col items-center justify-center">
                       <div style={{ color: primaryColor }} className="mb-3">
                         <svg
@@ -928,10 +928,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         المطور: {project.developer}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Units */}
-                  {project.units && project.units > 0 && (
+                  {project.units && project.units > 0 ? (
                     <div className="flex flex-col items-center justify-center">
                       <div style={{ color: primaryColor }} className="mb-3">
                         <svg
@@ -959,46 +959,46 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         عدد الوحدات: {project.units}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Completion Date */}
                   {project.completionDate &&
-                    project.completionDate.trim() !== "" && (
-                      <div className="flex flex-col items-center justify-center">
-                        <div style={{ color: primaryColor }} className="mb-3">
-                          <svg
-                            className="h-8 w-8"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="1.5"
-                            ></path>
-                          </svg>
-                        </div>
-                        <span
-                          className="font-bold text-lg"
-                          style={{
-                            color:
-                              mergedData.styling?.textColor || primaryColor,
-                          }}
+                  project.completionDate.trim() !== "" ? (
+                    <div className="flex flex-col items-center justify-center">
+                      <div style={{ color: primaryColor }} className="mb-3">
+                        <svg
+                          className="h-8 w-8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
-                          تاريخ التسليم:{" "}
-                          {new Date(project.completionDate).toLocaleDateString(
-                            "ar-US",
-                          )}
-                        </span>
+                          <path
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                          ></path>
+                        </svg>
                       </div>
-                    )}
+                      <span
+                        className="font-bold text-lg"
+                        style={{
+                          color:
+                            mergedData.styling?.textColor || primaryColor,
+                        }}
+                      >
+                        تاريخ التسليم:{" "}
+                        {new Date(project.completionDate).toLocaleDateString(
+                          "ar-US",
+                        )}
+                      </span>
+                    </div>
+                  ) : null}
 
                   {/* Address */}
-                  {project.address && project.address.trim() !== "" && (
+                  {project.address && project.address.trim() !== "" ? (
                     <div className="flex flex-col items-center justify-center">
                       <div style={{ color: primaryColor }} className="mb-3">
                         <svg
@@ -1032,10 +1032,10 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         {project.address}
                       </span>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Amenities */}
-                  {project.amenities && project.amenities.length > 0 && (
+                  {project.amenities && project.amenities.length > 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-2 md:col-span-3">
                       <div className="flex flex-wrap gap-2 justify-center">
                         {project.amenities.slice(0, 6).map((amenity, index) => (
@@ -1053,7 +1053,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                         ))}
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </section>
             ) : null}
