@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useAuthStore from "@/context/AuthContext";
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { EnhancedSidebar } from "@/components/mainCOMP/sidebarComponents/enhanced-sidebar";
+import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
@@ -239,7 +239,7 @@ export default function DashboardLayout({
           <div className="flex min-h-screen flex-col" dir="rtl">
             <DashboardHeader />
             <div className="flex flex-1 flex-col md:flex-row">
-              <EnhancedSidebar />
+              <DashboardSidebar />
               <main className="flex-1 p-4">
                 {children}
               </main>
