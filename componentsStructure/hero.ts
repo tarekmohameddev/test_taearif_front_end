@@ -734,16 +734,6 @@ export const heroStructure: ComponentStructure = {
                   type: "object",
                   fields: [
                     { key: "enabled", label: "Enabled", type: "boolean" },
-                    { key: "placeholder", label: "Placeholder", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
-                    {
-                      key: "options",
-                      label: "Options",
-                      type: "array",
-                      addLabel: "Add Option",
-                      itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" }],
-                    },
                   ],
                 },
                 {
@@ -752,16 +742,6 @@ export const heroStructure: ComponentStructure = {
                   type: "object",
                   fields: [
                     { key: "enabled", label: "Enabled", type: "boolean" },
-                    { key: "placeholder", label: "Placeholder", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
-                    {
-                      key: "options",
-                      label: "Options",
-                      type: "array",
-                      addLabel: "Add Option",
-                      itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" }],
-                    },
                   ],
                 },
                 {
@@ -770,16 +750,6 @@ export const heroStructure: ComponentStructure = {
                   type: "object",
                   fields: [
                     { key: "enabled", label: "Enabled", type: "boolean" },
-                    { key: "placeholder", label: "Placeholder", type: "text" },
-                    { key: "icon", label: "Icon", type: "text" },
-                    {
-                      key: "options",
-                      label: "Options",
-                      type: "array",
-                      addLabel: "Add Option",
-                      itemLabel: "Option",
-                      of: [{ key: "value", label: "Value", type: "text" }],
-                    },
                   ],
                 },
               ],

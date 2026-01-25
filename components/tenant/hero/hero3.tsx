@@ -260,9 +260,9 @@ const SearchForm = React.memo(function SearchForm({
       filters.city_id = cityId.trim();
     }
 
-    // Add type as search term if provided and not "الكل"
+    // Add type as type_id if provided and not "الكل"
     if (type && type.trim() && type !== "الكل") {
-      filters.search = type.trim();
+      filters.type_id = type.trim();
     }
 
     // Log for debugging
@@ -315,9 +315,11 @@ const SearchForm = React.memo(function SearchForm({
               <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
             </div>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042]">
-                <SelectValue placeholder="الكل" />
-                <ChevronDown className="size-4 opacity-60" />
+              <SelectTrigger 
+                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+                style={{ color: "black" }}
+              >
+                <SelectValue placeholder={type || "الكل"} />
               </SelectTrigger>
               <SelectContent align="end">
                 {typeOptions.map((option: string) => (
@@ -345,7 +347,10 @@ const SearchForm = React.memo(function SearchForm({
                 if (city) setCityName(city.name);
               }}
             >
-              <SelectTrigger className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042]">
+              <SelectTrigger 
+                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+                style={{ color: "black" }}
+              >
                 <SelectValue
                   placeholder={
                     cityLoading
@@ -353,7 +358,6 @@ const SearchForm = React.memo(function SearchForm({
                       : cityName || "اختر المدينة"
                   }
                 />
-                <ChevronDown className="size-4 opacity-60" />
               </SelectTrigger>
               <SelectContent align="end">
                 {cityLoading ? (
@@ -384,9 +388,11 @@ const SearchForm = React.memo(function SearchForm({
               <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
             </div>
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042]">
-                <SelectValue placeholder="بيع / ايجار" />
-                <ChevronDown className="size-4 opacity-60" />
+              <SelectTrigger 
+                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+                style={{ color: "black" }}
+              >
+                <SelectValue placeholder={status || "بيع / ايجار"} />
               </SelectTrigger>
               <SelectContent align="end">
                 {statusOptions.map((option: string) => (
@@ -428,9 +434,11 @@ const SearchForm = React.memo(function SearchForm({
               <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
             </div>
             <Select value={type} onValueChange={setType}>
-              <SelectTrigger className="h-12 border border-gray-200 rounded-2xl">
-                <SelectValue placeholder="الكل" />
-                <ChevronDown className="size-4 opacity-60" />
+              <SelectTrigger 
+                className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                style={{ color: "black" }}
+              >
+                <SelectValue placeholder={type || "الكل"} />
               </SelectTrigger>
               <SelectContent align="end">
                 {typeOptions.map((option: string) => (
@@ -458,7 +466,10 @@ const SearchForm = React.memo(function SearchForm({
                 if (city) setCityName(city.name);
               }}
             >
-              <SelectTrigger className="h-12 border border-gray-200 rounded-2xl">
+              <SelectTrigger 
+                className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                style={{ color: "black" }}
+              >
                 <SelectValue
                   placeholder={
                     cityLoading
@@ -466,7 +477,6 @@ const SearchForm = React.memo(function SearchForm({
                       : cityName || "اختر المدينة"
                   }
                 />
-                <ChevronDown className="size-4 opacity-60" />
               </SelectTrigger>
               <SelectContent align="end">
                 {cityLoading ? (
@@ -497,9 +507,11 @@ const SearchForm = React.memo(function SearchForm({
               <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
             </div>
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="h-12 border border-gray-200 rounded-2xl">
-                <SelectValue placeholder="بيع / ايجار" />
-                <ChevronDown className="size-4 opacity-60" />
+              <SelectTrigger 
+                className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                style={{ color: "black" }}
+              >
+                <SelectValue placeholder={status || "بيع / ايجار"} />
               </SelectTrigger>
               <SelectContent align="end">
                 {statusOptions.map((option: string) => (

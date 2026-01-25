@@ -91,6 +91,7 @@ export default function PropertyFilter2({
     propertyType,
     categoryId,
     price,
+    transactionType,
     setSearch,
     setCityId,
     setDistrict,
@@ -529,6 +530,18 @@ export default function PropertyFilter2({
     };
   }, [search, cityOptions]);
 
+  // Sync search string with selected city name if cityId is present but search is empty
+  useEffect(() => {
+    if (cityId && cityOptions.length > 0 && !search) {
+      const selectedCity = cityOptions.find(
+        (city) => city.id.toString() === cityId,
+      );
+      if (selectedCity) {
+        setSearch(selectedCity.name);
+      }
+    }
+  }, [cityId, cityOptions, search, setSearch]);
+
   const cityDropdownRef = useRef<HTMLDivElement>(null);
   const [isCityOpen, setIsCityOpen] = useState(false);
 
@@ -728,14 +741,14 @@ export default function PropertyFilter2({
   ];
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  // Update transactionType when status changes
+  // Sync selectedStatus with transactionType from store/URL
   useEffect(() => {
-    if (selectedStatus === "للبيع") {
-      setTransactionType("sale");
-    } else if (selectedStatus === "للإيجار") {
-      setTransactionType("rent");
+    if (transactionType === "sale") {
+      setSelectedStatus("للبيع");
+    } else if (transactionType === "rent") {
+      setSelectedStatus("للإيجار");
     }
-  }, [selectedStatus, setTransactionType]);
+  }, [transactionType]);
 
   return (
     <div className={` ${className || ""} max-w-[1600px] mx-auto`}>
@@ -1014,6 +1027,11 @@ export default function PropertyFilter2({
                     role="option"
                     onClick={() => {
                       setSelectedStatus(option.value);
+                      if (option.value === "للبيع") {
+                        setTransactionType("sale");
+                      } else if (option.value === "للإيجار") {
+                        setTransactionType("rent");
+                      }
                       setIsStatusOpen(false);
                     }}
                   >
