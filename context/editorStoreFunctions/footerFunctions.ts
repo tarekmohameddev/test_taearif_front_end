@@ -200,6 +200,7 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       textMuted: "rgba(255, 255, 255, 0.9)",
       accent: "#a67c5a",
       border: "rgba(255, 255, 255, 0.2)",
+      textAndLinksColor: "#ffffff",
     },
     typography: {
       titleSize: "xl",

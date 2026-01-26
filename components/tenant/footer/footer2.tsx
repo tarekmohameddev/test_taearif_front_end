@@ -101,6 +101,7 @@ interface Footer2Props {
       textMuted?: string;
       accent?: string;
       border?: string;
+      textAndLinksColor?: string;
       ThemeTwo?: string;
     };
     typography?: {
@@ -354,13 +355,16 @@ export default function Footer2(props: Footer2Props) {
     return text.replace(/باهية/g, "تعاريف").replace(/Baheya/gi, "taearif"); // case-insensitive للغة الإنجليزية
   };
 
+  // Get unified text and links color
+  const textAndLinksColor = mergedData.styling?.colors?.textAndLinksColor || "#ffffff";
+
   return (
     <>
       <footer
         className="relative z-10 bg-[#8b5f46] pt-16 md:pt-20 lg:pt-24 pb-8"
         style={{ backgroundColor: mergedData.background?.color || "#8b5f46" }}
       >
-        <div className="container mx-auto px-4 text-white max-w-6xl">
+        <div className="container mx-auto px-4 max-w-6xl" style={{ color: textAndLinksColor }}>
           {/* Main Content Section */}
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-8 mb-12">
             {/* Right Section - Company Info */}
@@ -396,7 +400,7 @@ export default function Footer2(props: Footer2Props) {
                 )}
                 {(customBranding?.footer?.name || mergedData.content?.companyInfo?.name || tenantData?.branding?.name || tenantData?.websiteName) && (
                   <div>
-                    <h3 className="text-lg font-bold text-white">
+                    <h3 className="text-lg font-bold" style={{ color: textAndLinksColor }}>
                       {replaceBaheya(
                         customBranding?.footer?.name ||
                           mergedData.content?.companyInfo?.name ||
@@ -406,7 +410,7 @@ export default function Footer2(props: Footer2Props) {
                       )}
                     </h3>
                     {mergedData.content?.companyInfo?.tagline && (
-                      <p className="text-sm text-white/80">
+                      <p className="text-sm" style={{ color: textAndLinksColor, opacity: 0.8 }}>
                         {replaceBaheya(mergedData.content.companyInfo.tagline)}
                       </p>
                     )}
@@ -427,7 +431,7 @@ export default function Footer2(props: Footer2Props) {
                       <path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path>
                     </svg>
                   </span>
-                  <span className="text-base">
+                  <span className="text-base" style={{ color: textAndLinksColor }}>
                     {replaceBaheya(mergedData.content?.contactInfo?.address)}
                   </span>
                 </li>
@@ -446,7 +450,7 @@ export default function Footer2(props: Footer2Props) {
                         <path d="M464 64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm0 48v40.805c-22.422 18.259-58.168 46.651-134.587 106.49-16.841 13.247-50.201 45.072-73.413 44.701-23.208.375-56.579-31.459-73.413-44.701C106.18 199.465 70.425 171.067 48 152.805V112h416zM48 400V214.398c22.914 18.251 55.409 43.862 104.938 82.646 21.857 17.205 60.134 55.186 103.062 54.955 42.717.231 80.509-37.199 103.053-54.947 49.528-38.783 82.032-64.401 104.947-82.653V400H48z"></path>
                       </svg>
                     </span>
-                    <span className="text-base">
+                    <span className="text-base" style={{ color: textAndLinksColor }}>
                       {replaceBaheya(mergedData.content?.contactInfo?.email)}
                     </span>
                   </a>
@@ -468,7 +472,7 @@ export default function Footer2(props: Footer2Props) {
                         <path d="M497.39 361.8l-112-48a24 24 0 0 0-28 6.9l-49.6 60.6A370.66 370.66 0 0 1 130.6 204.11l60.6-49.6a23.94 23.94 0 0 0 6.9-28l-48-112A24.16 24.16 0 0 0 122.6.61l-104 24A24 24 0 0 0 0 48c0 256.5 207.9 464 464 464a24 24 0 0 0 23.4-18.6l24-104a24.29 24.29 0 0 0-14.01-27.6z"></path>
                       </svg>
                     </span>
-                    <span className="text-base">
+                    <span className="text-base" style={{ color: textAndLinksColor }}>
                       {replaceBaheya(mergedData.content?.contactInfo?.whatsapp)}
                     </span>
                   </a>
@@ -476,7 +480,7 @@ export default function Footer2(props: Footer2Props) {
               </ul>
 
               {/* Company Description */}
-              <p className="text-base leading-relaxed text-white/90">
+              <p className="text-base leading-relaxed" style={{ color: textAndLinksColor, opacity: 0.9 }}>
                 {replaceBaheya(
                   mergedData.content?.companyInfo?.description ||
                     "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
@@ -486,13 +490,13 @@ export default function Footer2(props: Footer2Props) {
 
             {/* Left Section - Newsletter */}
             <div className="w-full lg:w-1/2 xl:w-3/5 ">
-              <h5 className="text-xl font-bold text-white mb-4">
+              <h5 className="text-xl font-bold mb-4" style={{ color: textAndLinksColor }}>
                 {replaceBaheya(
                   mergedData.content?.newsletter?.title ||
                     "اشترك في النشرة البريدية",
                 )}
               </h5>
-              <p className="text-base leading-relaxed text-white/90 mb-6">
+              <p className="text-base leading-relaxed mb-6" style={{ color: textAndLinksColor, opacity: 0.9 }}>
                 {replaceBaheya(
                   mergedData.content?.newsletter?.description ||
                     "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
@@ -538,6 +542,7 @@ export default function Footer2(props: Footer2Props) {
                       rel="noopener noreferrer"
                       className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition-opacity"
                       aria-label={platform.name}
+                      style={{ color: textAndLinksColor }}
                     >
                       {platform.name === "Facebook" && (
                         <svg
@@ -599,7 +604,7 @@ export default function Footer2(props: Footer2Props) {
           {/* Bottom Section - Copyright and Links */}
           <div className="border-t border-white/20 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-base text-white/90 text-center md:text-right">
+              <p className="text-base text-center md:text-right" style={{ color: textAndLinksColor, opacity: 0.9 }}>
                 {(() => {
                   const copyright =
                     mergedData.footerBottom?.copyright ||
@@ -619,7 +624,8 @@ export default function Footer2(props: Footer2Props) {
                     <Link
                       key={index}
                       href={link.url || "#"}
-                      className="text-base text-white hover:underline"
+                      className="text-base hover:underline"
+                      style={{ color: textAndLinksColor }}
                     >
                       {replaceBaheya(link.text)}
                     </Link>

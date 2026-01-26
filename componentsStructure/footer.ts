@@ -7,7 +7,6 @@ export const footerStructure: ComponentStructure = {
       id: "footer1",
       name: "Footer 1 - Modern Real Estate",
       fields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "background",
           label: "Background",
@@ -472,7 +471,6 @@ export const footerStructure: ComponentStructure = {
       id: "footer2",
       name: "Footer 2 - ThemeTwo",
       fields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "background",
           label: "Background",
@@ -682,18 +680,8 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 {
-                  key: "textPrimary",
+                  key: "textAndLinksColor",
                   label: "Primary Text Color",
-                  type: "color",
-                },
-                {
-                  key: "textSecondary",
-                  label: "Secondary Text Color",
-                  type: "color",
-                },
-                {
-                  key: "textMuted",
-                  label: "Muted Text Color",
                   type: "color",
                 },
                 {
@@ -706,6 +694,7 @@ export const footerStructure: ComponentStructure = {
                   label: "Border Color",
                   type: "color",
                 },
+
               ],
             },
             {
@@ -793,7 +782,6 @@ export const footerStructure: ComponentStructure = {
         },
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "content.companyInfo.logo",
           label: "Logo",

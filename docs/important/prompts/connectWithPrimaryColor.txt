@@ -1,0 +1,513 @@
+# PROMPT: تحويل الألوان الخضراء و Emerald إلى primaryColor
+
+## 🎯 الهدف
+
+هذا prompt يوضح كيفية تحويل أي ملف React/TypeScript لاستخدام `primaryColor` من `WebsiteLayout.branding.colors.primary` بدلاً من الألوان الخضراء و emerald الثابتة، مع جعل الأخضر/emerald كـ fallback إذا لم يوجد primaryColor.
+
+---
+
+## 📋 الخطوات المطلوبة
+
+### الخطوة 1: إضافة Imports المطلوبة
+
+أضف هذا import في أعلى الملف:
+
+```typescript
+import useTenantStore from "@/context-liveeditor/tenantStore";
+```
+
+---
+
+### الخطوة 2: الحصول على primaryColor من Store
+
+أضف هذا الكود داخل المكون (بعد تعريف المكون وقبل أي استخدام للألوان):
+
+```typescript
+// Get tenant data from store
+const { tenantData, loadingTenantData } = useTenantStore();
+
+// Get primary color from WebsiteLayout branding (fallback to emerald-600)
+// emerald-600 in Tailwind = #059669
+const primaryColor = 
+  tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+    ? tenantData.WebsiteLayout.branding.colors.primary
+    : "#059669"; // emerald-600 default (fallback)
+```
+
+**ملاحظات:**
+- إذا لم يوجد `primaryColor` في `WebsiteLayout.branding.colors.primary`، سيتم استخدام `#059669` (emerald-600) كـ fallback
+- يتم التحقق من أن القيمة ليست سلسلة فارغة باستخدام `trim()`
+
+---
+
+### الخطوة 3: إضافة الدوال المساعدة (Helper Functions)
+
+أضف هذه الدوال بعد تعريف `primaryColor`:
+
+#### 3.1. دالة getDarkerColor (لحالات Hover)
+
+```typescript
+// Helper function to create darker color for hover states
+const getDarkerColor = (hex: string, amount: number = 20): string => {
+  // emerald-700 in Tailwind = #047857 (fallback)
+  if (!hex || !hex.startsWith('#')) return "#047857";
+  const cleanHex = hex.replace('#', '');
+  if (cleanHex.length !== 6) return "#047857";
+  
+  const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+  const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+  const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+  
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+};
+```
+
+#### 3.2. دالة getLighterColor (لـ Skeleton Loading)
+
+```typescript
+// Helper function to create lighter color (for skeleton loading)
+const getLighterColor = (hex: string, opacity: number = 0.2): string => {
+  if (!hex || !hex.startsWith('#')) return `${primaryColor}33`; // 20% opacity default
+  // Return hex color with opacity using rgba
+  const cleanHex = hex.replace('#', '');
+  if (cleanHex.length !== 6) return `${primaryColor}33`;
+  
+  const r = parseInt(cleanHex.substr(0, 2), 16);
+  const g = parseInt(cleanHex.substr(2, 2), 16);
+  const b = parseInt(cleanHex.substr(4, 2), 16);
+  
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
+```
+
+#### 3.3. دالة hexToFilter (لتلوين SVG Images)
+
+```typescript
+// Helper function to convert hex color to CSS filter for SVG coloring
+// This converts any hex color to a CSS filter that can be applied to SVG images
+const hexToFilter = (hex: string): string => {
+  if (!hex || !hex.startsWith('#')) {
+    // Default emerald-600 filter (fallback)
+    return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+  }
+  
+  const cleanHex = hex.replace('#', '');
+  if (cleanHex.length !== 6) {
+    return "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)";
+  }
+
+  // Parse RGB values
+  const r = parseInt(cleanHex.substr(0, 2), 16) / 255;
+  const g = parseInt(cleanHex.substr(2, 2), 16) / 255;
+  const b = parseInt(cleanHex.substr(4, 2), 16) / 255;
+
+  // Convert RGB to HSL
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r:
+        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        break;
+      case g:
+        h = ((b - r) / d + 2) / 6;
+        break;
+      case b:
+        h = ((r - g) / d + 4) / 6;
+        break;
+    }
+  }
+
+  // Convert HSL to filter values
+  const hue = Math.round(h * 360);
+  const saturation = Math.round(s * 100);
+  const lightness = Math.round(l * 100);
+
+  // Calculate filter values
+  const brightness = lightness > 50 ? (lightness - 50) * 2 : 0;
+  const contrast = 100 + (saturation * 0.5);
+
+  return `brightness(0) saturate(100%) invert(${Math.round((1 - lightness / 100) * 100)}%) sepia(${Math.round(saturation)}%) saturate(${Math.round(saturation * 5)}%) hue-rotate(${hue}deg) brightness(${Math.round(100 + brightness)}%) contrast(${Math.round(contrast)}%)`;
+};
+```
+
+#### 3.4. إنشاء المتغيرات المشتقة
+
+```typescript
+const primaryColorHover = getDarkerColor(primaryColor, 20);
+const primaryColorLight = getLighterColor(primaryColor, 0.2); // 20% opacity for skeleton
+const primaryColorFilter = hexToFilter(primaryColor); // CSS filter for SVG coloring
+```
+
+---
+
+### الخطوة 4: استبدال الألوان الخضراء و Emerald
+
+#### 4.1. استبدال Tailwind Classes
+
+**قبل:**
+```tsx
+<button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+  زر
+</button>
+```
+
+**بعد:**
+```tsx
+<button 
+  className="text-white"
+  style={{ backgroundColor: primaryColor }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = primaryColorHover;
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = primaryColor;
+  }}
+>
+  زر
+</button>
+```
+
+#### 4.2. استبدال Classes في النصوص
+
+**قبل:**
+```tsx
+<p className="text-emerald-600">نص</p>
+```
+
+**بعد:**
+```tsx
+<p style={{ color: primaryColor }}>نص</p>
+```
+
+#### 4.3. استبدال Classes في الحدود
+
+**قبل:**
+```tsx
+<div className="border-emerald-600">عنصر</div>
+```
+
+**بعد:**
+```tsx
+<div style={{ borderColor: primaryColor }}>عنصر</div>
+```
+
+#### 4.4. استبدال Classes في Focus Rings
+
+**قبل:**
+```tsx
+<input className="focus:ring-emerald-500 focus:border-emerald-500" />
+```
+
+**بعد:**
+```tsx
+<input
+  style={{
+    '--focus-ring-color': primaryColor,
+    '--focus-border-color': primaryColor,
+  } as React.CSSProperties}
+  onFocus={(e) => {
+    e.currentTarget.style.borderColor = primaryColor;
+    e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+  }}
+  onBlur={(e) => {
+    e.currentTarget.style.borderColor = '';
+    e.currentTarget.style.boxShadow = '';
+  }}
+/>
+```
+
+#### 4.5. استبدال Classes في SVG Icons
+
+**قبل:**
+```tsx
+<HomeIcon className="w-4 h-4 text-emerald-600" />
+```
+
+**بعد:**
+```tsx
+<HomeIcon className="w-4 h-4" style={{ color: primaryColor }} />
+```
+
+#### 4.6. استبدال Classes في Skeleton Loading
+
+**قبل:**
+```tsx
+<div className="bg-emerald-100 animate-pulse">Loading...</div>
+```
+
+**بعد:**
+```tsx
+<div 
+  style={{ backgroundColor: primaryColorLight || `${primaryColor}33` }}
+  className="animate-pulse"
+>
+  Loading...
+</div>
+```
+
+#### 4.7. استبدال CSS Filters لـ SVG Images
+
+**قبل:**
+```tsx
+<img
+  src="/icon.svg"
+  style={{
+    filter: "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+  }}
+/>
+```
+
+**بعد:**
+```tsx
+<img
+  src="/icon.svg"
+  style={{
+    filter: primaryColorFilter,
+  }}
+/>
+```
+
+#### 4.8. استبدال Inline Colors
+
+**قبل:**
+```tsx
+<div style={{ backgroundColor: "#059669" }}>عنصر</div>
+```
+
+**بعد:**
+```tsx
+<div style={{ backgroundColor: primaryColor }}>عنصر</div>
+```
+
+---
+
+## 🔍 قائمة فحص الاستبدالات
+
+### Tailwind Classes التي يجب استبدالها:
+
+- `bg-emerald-*` → `style={{ backgroundColor: primaryColor }}`
+- `bg-green-*` → `style={{ backgroundColor: primaryColor }}`
+- `text-emerald-*` → `style={{ color: primaryColor }}`
+- `text-green-*` → `style={{ color: primaryColor }}`
+- `border-emerald-*` → `style={{ borderColor: primaryColor }}`
+- `border-green-*` → `style={{ borderColor: primaryColor }}`
+- `hover:bg-emerald-*` → `onMouseEnter` مع `primaryColorHover`
+- `hover:bg-green-*` → `onMouseEnter` مع `primaryColorHover`
+- `focus:ring-emerald-*` → `onFocus` مع `primaryColor`
+- `focus:ring-green-*` → `onFocus` مع `primaryColor`
+- `focus:border-emerald-*` → `onFocus` مع `primaryColor`
+- `focus:border-green-*` → `onFocus` مع `primaryColor`
+
+### Inline Colors التي يجب استبدالها:
+
+- `#059669` (emerald-600) → `primaryColor`
+- `#047857` (emerald-700) → `primaryColorHover`
+- `#10b981` (emerald-500) → `primaryColor`
+- `#34d399` (emerald-400) → `primaryColor`
+- `#6ee7b7` (emerald-300) → `primaryColorLight`
+- `#a7f3d0` (emerald-200) → `primaryColorLight`
+- `#d1fae5` (emerald-100) → `primaryColorLight`
+- أي لون أخضر آخر → `primaryColor` أو `primaryColorHover` أو `primaryColorLight` حسب السياق
+
+---
+
+## 📝 أمثلة عملية
+
+### مثال 1: زر بسيط
+
+**قبل:**
+```tsx
+<button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
+  اضغط هنا
+</button>
+```
+
+**بعد:**
+```tsx
+<button 
+  className="text-white px-4 py-2 rounded transition-colors"
+  style={{ backgroundColor: primaryColor }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = primaryColorHover;
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = primaryColor;
+  }}
+>
+  اضغط هنا
+</button>
+```
+
+### مثال 2: نص ملون
+
+**قبل:**
+```tsx
+<h1 className="text-emerald-600 font-bold text-2xl">عنوان</h1>
+```
+
+**بعد:**
+```tsx
+<h1 className="font-bold text-2xl" style={{ color: primaryColor }}>عنوان</h1>
+```
+
+### مثال 3: أيقونة
+
+**قبل:**
+```tsx
+<HomeIcon className="w-5 h-5 text-emerald-600" />
+```
+
+**بعد:**
+```tsx
+<HomeIcon className="w-5 h-5" style={{ color: primaryColor }} />
+```
+
+### مثال 4: حقل إدخال مع Focus
+
+**قبل:**
+```tsx
+<input className="border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500" />
+```
+
+**بعد:**
+```tsx
+<input
+  className="border border-gray-300"
+  style={{
+    '--focus-ring-color': primaryColor,
+    '--focus-border-color': primaryColor,
+  } as React.CSSProperties}
+  onFocus={(e) => {
+    e.currentTarget.style.borderColor = primaryColor;
+    e.currentTarget.style.boxShadow = `0 0 0 2px ${primaryColor}40`;
+  }}
+  onBlur={(e) => {
+    e.currentTarget.style.borderColor = '';
+    e.currentTarget.style.boxShadow = '';
+  }}
+/>
+```
+
+### مثال 5: SVG Image مع Filter
+
+**قبل:**
+```tsx
+<img
+  src="/Saudi_Riyal_Symbol.svg"
+  style={{
+    filter: "brightness(0) saturate(100%) invert(52%) sepia(74%) saturate(470%) hue-rotate(119deg) brightness(85%) contrast(94%)",
+  }}
+/>
+```
+
+**بعد:**
+```tsx
+<img
+  src="/Saudi_Riyal_Symbol.svg"
+  style={{
+    filter: primaryColorFilter,
+  }}
+/>
+```
+
+### مثال 6: Skeleton Loading
+
+**قبل:**
+```tsx
+<div className="bg-emerald-100 animate-pulse h-4 w-full rounded"></div>
+```
+
+**بعد:**
+```tsx
+<div 
+  className="animate-pulse h-4 w-full rounded"
+  style={{ backgroundColor: primaryColorLight || `${primaryColor}33` }}
+></div>
+```
+
+---
+
+## ⚠️ ملاحظات مهمة
+
+1. **Fallback دائماً:** دائماً استخدم `#059669` (emerald-600) كـ fallback في `primaryColor`
+2. **Fallback في الدوال:** جميع الدوال المساعدة يجب أن تعيد قيم emerald كـ fallback
+3. **الحفاظ على الوظائف:** لا تحذف أي className آخر غير المتعلق بالألوان
+4. **اختبار Hover States:** تأكد من إضافة `onMouseEnter` و `onMouseLeave` للأزرار
+5. **اختبار Focus States:** تأكد من إضافة `onFocus` و `onBlur` لحقول الإدخال
+6. **SVG Filters:** استخدم `primaryColorFilter` فقط للصور SVG التي تحتاج تلوين
+7. **Skeleton Loading:** استخدم `primaryColorLight` أو `${primaryColor}33` للخلفيات الشفافة
+
+---
+
+## ✅ Checklist بعد التحويل
+
+- [ ] تم إضافة `import useTenantStore`
+- [ ] تم إضافة `const { tenantData } = useTenantStore()`
+- [ ] تم إضافة `const primaryColor` مع fallback
+- [ ] تم إضافة جميع الدوال المساعدة (`getDarkerColor`, `getLighterColor`, `hexToFilter`)
+- [ ] تم إنشاء المتغيرات المشتقة (`primaryColorHover`, `primaryColorLight`, `primaryColorFilter`)
+- [ ] تم استبدال جميع `bg-emerald-*` و `bg-green-*`
+- [ ] تم استبدال جميع `text-emerald-*` و `text-green-*`
+- [ ] تم استبدال جميع `border-emerald-*` و `border-green-*`
+- [ ] تم استبدال جميع `hover:bg-emerald-*` و `hover:bg-green-*`
+- [ ] تم استبدال جميع `focus:ring-emerald-*` و `focus:ring-green-*`
+- [ ] تم استبدال جميع الألوان المباشرة (`#059669`, `#047857`, إلخ)
+- [ ] تم اختبار جميع حالات Hover
+- [ ] تم اختبار جميع حالات Focus
+- [ ] تم التحقق من أن Fallback يعمل عند عدم وجود primaryColor
+
+---
+
+## 🎯 النتيجة النهائية
+
+بعد تطبيق هذا Prompt على أي ملف:
+
+1. ✅ جميع الألوان الخضراء و emerald ستستخدم `primaryColor` من `WebsiteLayout.branding.colors.primary`
+2. ✅ إذا لم يوجد `primaryColor`، سيتم استخدام `#059669` (emerald-600) كـ fallback
+3. ✅ جميع حالات Hover ستستخدم `primaryColorHover`
+4. ✅ جميع حالات Skeleton Loading ستستخدم `primaryColorLight`
+5. ✅ جميع SVG Images ستستخدم `primaryColorFilter`
+6. ✅ الملف سيكون ديناميكياً ويتغير حسب إعدادات التاجر
+
+---
+
+## 📚 مرجع سريع
+
+```typescript
+// 1. Import
+import useTenantStore from "@/context-liveeditor/tenantStore";
+
+// 2. Get primaryColor
+const { tenantData } = useTenantStore();
+const primaryColor = 
+  tenantData?.WebsiteLayout?.branding?.colors?.primary && 
+  tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+    ? tenantData.WebsiteLayout.branding.colors.primary
+    : "#059669"; // emerald-600 fallback
+
+// 3. Helper functions (getDarkerColor, getLighterColor, hexToFilter)
+
+// 4. Derived variables
+const primaryColorHover = getDarkerColor(primaryColor, 20);
+const primaryColorLight = getLighterColor(primaryColor, 0.2);
+const primaryColorFilter = hexToFilter(primaryColor);
+
+// 5. Use in JSX
+style={{ backgroundColor: primaryColor }}
+style={{ color: primaryColor }}
+style={{ borderColor: primaryColor }}
+style={{ filter: primaryColorFilter }}
+```
+
+---
+
+**تم إنشاء هذا Prompt لاستخدامه مع أي ملف React/TypeScript لتحويل الألوان الخضراء و emerald إلى primaryColor ديناميكي.**
