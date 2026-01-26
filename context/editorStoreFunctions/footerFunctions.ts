@@ -181,6 +181,12 @@ export const getDefaultFooter2Data = (): ComponentData => ({
           url: "#",
         },
       ],
+      whatsappInquiry: {
+        enabled: true,
+        text: "استفسر عن طريق الواتساب",
+        phoneNumber: "",
+        message: "مرحباً، أريد الاستفسار عن",
+      },
     },
   },
   footerBottom: {
