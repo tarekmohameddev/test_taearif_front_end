@@ -13,7 +13,7 @@ import {
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
 import { Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
@@ -85,8 +85,40 @@ export const CustomerForm = ({
 }: CustomerFormProps) => {
   const [stages, setStages] = useState<Stage[]>([]);
   const [fetchingStages, setFetchingStages] = useState(false);
-  const { filterData } = useCustomersFiltersStore();
+  const [fetchingFilters, setFetchingFilters] = useState(false);
+  const { filterData, setFilterData } = useCustomersFiltersStore();
   const { userData } = useAuthStore();
+
+  // دالة جلب بيانات الفلاتر من الAPI
+  const fetchFilters = useCallback(async () => {
+    if (!userData?.token) {
+      return;
+    }
+
+    setFetchingFilters(true);
+    try {
+      const response = await axiosInstance.get("/customers/filters");
+      if (response.data.status === "success") {
+        setFilterData(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching filters:", error);
+    } finally {
+      setFetchingFilters(false);
+    }
+  }, [userData?.token, setFilterData]);
+
+  // جلب بيانات الفلاتر من الAPI إذا لم تكن موجودة
+  useEffect(() => {
+    if (!userData?.token) {
+      return;
+    }
+    
+    // التحقق من وجود بيانات أنواع العملاء
+    if (!filterData?.types || filterData.types.length === 0) {
+      fetchFilters();
+    }
+  }, [userData?.token, filterData?.types, fetchFilters]);
 
   // جلب المراحل من الAPI عند تحميل المكون
   useEffect(() => {
@@ -218,43 +250,52 @@ export const CustomerForm = ({
           >
             نوع العميل <span className="text-red-500">*</span>
           </Label>
-          <Select
-            onValueChange={(value) => onChange("type_id", parseInt(value, 10))}
-            value={String(formData.type_id || "")}
-          >
-            <SelectTrigger
-              className={
-                hasError("type_id") ? "border-red-500 focus:border-red-500" : ""
-              }
+          {fetchingFilters ? (
+            <div className="flex items-center justify-center py-2 border rounded-md">
+              <Loader2 className="h-4 w-4 animate-spin ml-2" />
+              <span className="text-sm text-muted-foreground">
+                جاري التحميل...
+              </span>
+            </div>
+          ) : (
+            <Select
+              onValueChange={(value) => onChange("type_id", parseInt(value, 10))}
+              value={String(formData.type_id || "")}
             >
-              <SelectValue placeholder="اختر النوع" />
-            </SelectTrigger>
-            <SelectContent>
-              {filterData?.types
-                ?.filter((type: any) => type.name !== "Both")
-                .map((type: any) => (
-                  <SelectItem key={type.id} value={type.id.toString()}>
-                    {translateType(type.name)}
-                  </SelectItem>
-                )) || [
-                <SelectItem key="1" value="1">
-                  مشتري
-                </SelectItem>,
-                <SelectItem key="2" value="2">
-                  مستثمر
-                </SelectItem>,
-                <SelectItem key="3" value="3">
-                  مستأجر
-                </SelectItem>,
-                <SelectItem key="4" value="4">
-                  مستأجر
-                </SelectItem>,
-                <SelectItem key="5" value="5">
-                  بائع
-                </SelectItem>,
-              ]}
-            </SelectContent>
-          </Select>
+              <SelectTrigger
+                className={
+                  hasError("type_id") ? "border-red-500 focus:border-red-500" : ""
+                }
+              >
+                <SelectValue placeholder="اختر النوع" />
+              </SelectTrigger>
+              <SelectContent>
+                {filterData?.types
+                  ?.filter((type: any) => type.name !== "Both")
+                  .map((type: any) => (
+                    <SelectItem key={type.id} value={type.id.toString()}>
+                      {translateType(type.name)}
+                    </SelectItem>
+                  )) || [
+                  <SelectItem key="1" value="1">
+                    مشتري
+                  </SelectItem>,
+                  <SelectItem key="2" value="2">
+                    مستثمر
+                  </SelectItem>,
+                  <SelectItem key="3" value="3">
+                    مستأجر
+                  </SelectItem>,
+                  <SelectItem key="4" value="4">
+                    مستأجر
+                  </SelectItem>,
+                  <SelectItem key="5" value="5">
+                    بائع
+                  </SelectItem>,
+                ]}
+              </SelectContent>
+            </Select>
+          )}
           {hasError("type_id") && (
             <p className="text-red-500 text-sm mt-1">
               {getErrorMessage("type_id")}
