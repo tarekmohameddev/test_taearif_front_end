@@ -8,6 +8,7 @@ export { whyChooseUsStructure } from "./whyChooseUs";
 export { testimonialsStructure } from "./testimonials";
 export { projectDetailsStructure } from "./projectDetails";
 export { propertyDetailStructure } from "./propertyDetail";
+export { blogDetailsStructure } from "./blogDetails";
 export { propertiesShowcaseStructure } from "./propertiesShowcase";
 export { cardStructure } from "./card";
 export { jobFormStructure } from "./jobForm";

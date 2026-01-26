@@ -250,6 +250,10 @@
       "display_name": "المدونة",
       "description": "عرض أحدث المقالات والتدوينات في تخطيط شبكي"
     },
+    "blogDetails": {
+      "display_name": "تفاصيل المدونة",
+      "description": "صفحة تفاصيل مقال مع معرض الصور والمعلومات"
+    },
     "responsiveImage": {
       "display_name": "صورة متجاوبة",
       "description": "صورة متجاوبة مع عرض مريح لجميع مقاسات الشاشات"

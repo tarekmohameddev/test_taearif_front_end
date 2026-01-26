@@ -246,6 +246,10 @@
       "display_name": "Blog Posts",
       "description": "Display latest articles and blog posts in a grid layout"
     },
+    "blogDetails": {
+      "display_name": "Blog Details",
+      "description": "Blog detail page with image gallery and information"
+    },
     "responsiveImage": {
       "display_name": "Responsive Image",
       "description": "Responsive image with comfortable width for all screen sizes"

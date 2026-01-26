@@ -531,7 +531,7 @@ export default function TenantPageWrapper({
       }
 
       // ⭐ Fallback: Return default component based on slug
-      // For project, use projectDetails1; for property, use propertyDetail2; for others, can be customized
+      // For project, use projectDetails1; for property, use propertyDetail2; for blog, use blogDetails2
       let defaultComponentName = `${slug}1`;
       let defaultComponentType = slug;
 
@@ -541,6 +541,9 @@ export default function TenantPageWrapper({
       } else if (slug === "property") {
         defaultComponentName = "propertyDetail2";
         defaultComponentType = "propertyDetail";
+      } else if (slug === "blog") {
+        defaultComponentName = "blogDetails2";
+        defaultComponentType = "blogDetails";
       }
 
       return [

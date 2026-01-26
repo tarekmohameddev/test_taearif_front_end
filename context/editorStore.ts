@@ -80,6 +80,7 @@ import { photosGridFunctions } from "./editorStoreFunctions/photosGridFunctions"
 import { videoFunctions } from "./editorStoreFunctions/videoFunctions";
 import { projectDetailsFunctions } from "./editorStoreFunctions/projectDetailsFunctions";
 import { propertyDetailFunctions as propertyDetailFunctions } from "./editorStoreFunctions/propertyDetailFunctions";
+import { blogDetailsFunctions } from "./editorStoreFunctions/blogDetailsFunctions";
 import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
@@ -374,6 +375,8 @@ interface EditorStore {
 
   // Property Detail states
   propertyDetailStates: Record<string, ComponentData>;
+  // Blog Details states
+  blogDetailsStates: Record<string, ComponentData>;
   ensurepropertyDetailVariant: (
     variantId: string,
     initial?: ComponentData,
@@ -381,6 +384,19 @@ interface EditorStore {
   getpropertyDetailData: (variantId: string) => ComponentData;
   setpropertyDetailData: (variantId: string, data: ComponentData) => void;
   updatepropertyDetailByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
+  // Blog Details functions
+  ensureBlogDetailsVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getBlogDetailsData: (variantId: string) => ComponentData;
+  setBlogDetailsData: (variantId: string, data: ComponentData) => void;
+  updateBlogDetailsByPath: (
     variantId: string,
     path: string,
     value: any,
@@ -772,6 +788,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   testimonialsStates: {},
   projectDetailsStates: {},
   propertyDetailStates: {},
+  blogDetailsStates: {},
   propertiesShowcaseStates: {},
   card4States: {},
   card5States: {},
@@ -1289,6 +1306,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return currentState.projectDetailsStates[variantId];
         case "propertyDetail":
           return currentState.propertyDetailStates[variantId];
+        case "blogDetails":
+          return currentState.blogDetailsStates[variantId];
         case "logosTicker":
           return currentState.logosTickerStates[variantId];
         case "partners":
@@ -1511,6 +1530,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           );
         case "propertyDetail":
           return propertyDetailFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
+        case "blogDetails":
+          return blogDetailsFunctions.ensureVariant(
             state,
             variantId,
             initial,
@@ -1745,6 +1770,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return projectDetailsFunctions.getData(state, variantId);
       case "propertyDetail":
         return propertyDetailFunctions.getData(state, variantId);
+      case "blogDetails":
+        return blogDetailsFunctions.getData(state, variantId);
       case "propertiesShowcase":
         return propertiesShowcaseFunctions.getData(state, variantId);
       case "card":
@@ -1862,6 +1889,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "propertyDetail":
           newState = propertyDetailFunctions.setData(state, variantId, data);
+          break;
+        case "blogDetails":
+          newState = blogDetailsFunctions.setData(state, variantId, data);
           break;
         case "propertiesShowcase":
           newState = propertiesShowcaseFunctions.setData(
@@ -2080,6 +2110,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "propertyDetail":
           newState = propertyDetailFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "blogDetails":
+          newState = blogDetailsFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -2468,6 +2506,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updatepropertyDetailByPath: (variantId, path, value) =>
     set((state) =>
       propertyDetailFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Blog Details functions using modular approach
+  ensureBlogDetailsVariant: (variantId, initial) =>
+    set((state) =>
+      blogDetailsFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getBlogDetailsData: (variantId) => {
+    const state = get();
+    return blogDetailsFunctions.getData(state, variantId);
+  },
+  setBlogDetailsData: (variantId, data) =>
+    set((state) => blogDetailsFunctions.setData(state, variantId, data)),
+  updateBlogDetailsByPath: (variantId, path, value) =>
+    set((state) =>
+      blogDetailsFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Properties Showcase specific functions
@@ -3277,6 +3331,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.data,
                       ).propertyDetailStates;
                     break;
+                  case "blogDetails":
+                    newState.blogDetailsStates =
+                      blogDetailsFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).blogDetailsStates;
+                    break;
                   case "propertiesShowcase":
                     newState.propertiesShowcaseStates =
                       propertiesShowcaseFunctions.setData(
@@ -3576,6 +3638,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.componentName,
                 comp.data,
               ).propertyDetailStates;
+              break;
+            case "blogDetails":
+              newState.blogDetailsStates = blogDetailsFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).blogDetailsStates;
               break;
             case "whyChooseUs":
               newState.whyChooseUsStates = whyChooseUsFunctions.setData(
@@ -3882,6 +3951,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         testimonialsStates: {},
         projectDetailsStates: {},
         propertyDetailStates: {},
+        blogDetailsStates: {},
         propertiesShowcaseStates: {},
         card4States: {},
         card5States: {},

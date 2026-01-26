@@ -33,6 +33,7 @@ import { footerStructure } from "@/componentsStructure/footer";
 import { testimonialsStructure } from "@/componentsStructure/testimonials";
 import { projectDetailsStructure } from "@/componentsStructure/projectDetails";
 import { propertyDetailStructure } from "@/componentsStructure/propertyDetail";
+import { blogDetailsStructure } from "@/componentsStructure/blogDetails";
 import { logosTickerStructure } from "@/componentsStructure/logosTicker";
 import { partnersStructure } from "@/componentsStructure/partners";
 import { contactMapSectionStructure } from "@/componentsStructure/contactMapSection";
@@ -593,6 +594,27 @@ export const getComponents = (
     defaultTheme: "imageText1",
     ...imageTextStructure,
   },
+  blogDetails: {
+    id: "blogDetails",
+    name: "blogDetails",
+    displayName: t("components.blogDetails.display_name"),
+    description: t("components.blogDetails.description"),
+    category: "content",
+    section: "homepage",
+    subPath: "blogDetails",
+    icon: "📰",
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "blogDetails2",
+    variants: blogDetailsStructure.variants.map((variant) => {
+      const fileName = variant.id.replace(/^blogDetails/i, "blogDetails");
+      return {
+        ...variant,
+        componentPath: `components/tenant/blogDetails/${fileName}.tsx`,
+      };
+    }),
+    ...blogDetailsStructure,
+  },
 });
 
 // قائمة جميع المكونات المتاحة (للتوافق مع الكود الموجود)
@@ -731,6 +753,27 @@ export const COMPONENTS: Record<string, any> = {
       };
     }),
     ...propertyDetailStructure,
+  },
+  blogDetails: {
+    id: "blogDetails",
+    name: "blogDetails",
+    displayName: "Blog Details",
+    description: "Blog detail page with hero layout",
+    category: "content",
+    section: "homepage",
+    subPath: "blogDetails",
+    icon: "📰",
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "blogDetails2",
+    variants: blogDetailsStructure.variants.map((variant) => {
+      const fileName = variant.id.replace(/^blogDetails/i, "blogDetails");
+      return {
+        ...variant,
+        componentPath: `components/tenant/blogDetails/${fileName}.tsx`,
+      };
+    }),
+    ...blogDetailsStructure,
   },
   propertiesShowcase: {
     id: "propertiesShowcase",

@@ -1307,6 +1307,33 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         "og:image:type": null,
         "og:image:alt": "اتصل بنا",
       },
+      blog: {
+        TitleAr: "صفحة المنشور",
+        TitleEn: "Blog Post Page",
+        DescriptionAr: "صفحة تفاصيل المنشور والمقالات",
+        DescriptionEn: "Blog post details and articles page",
+        KeywordsAr: "منشور, مقال, تفاصيل, مدونة",
+        KeywordsEn: "blog post, article, details, blog",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "صفحة المنشور",
+        "og:description": "صفحة تفاصيل المنشور والمقالات",
+        "og:keywords": "منشور, مقال, تفاصيل",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "صفحة المنشور",
+      },
     };
 
     return (
@@ -1620,6 +1647,65 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               "og:image:alt": createRequestSeoData["og:image:alt"],
             }
           : getDefaultSeoData("create-request"),
+      });
+    }
+
+    // ⭐ إضافة صفحة المنشور بشكل إجباري
+    const blogPageExists = pages.some(
+      (page) => page.slug === "blog" || page.path === "/blog",
+    );
+    if (!blogPageExists) {
+      // البحث عن بيانات SEO لصفحة blog في WebsiteLayout
+      let blogSeoData = null;
+      if (websiteLayout?.metaTags?.pages && Array.isArray(websiteLayout.metaTags.pages)) {
+        // metaTags.pages is an array with one object containing all pages as keys
+        const pagesObject = websiteLayout.metaTags.pages[0];
+        if (pagesObject && typeof pagesObject === "object") {
+          blogSeoData = pagesObject["blog"] || null;
+        }
+      }
+
+      const hasBlogSeoData =
+        blogSeoData &&
+        (blogSeoData.TitleAr ||
+          blogSeoData.TitleEn ||
+          blogSeoData.DescriptionAr ||
+          blogSeoData.DescriptionEn);
+
+      pages.push({
+        slug: "blog",
+        name: locale === "ar" ? "صفحة المنشور" : "Blog Post Page",
+        path: "/blog",
+        isStatic: true, // ⭐ علامة للصفحات الثابتة
+        seo: hasBlogSeoData
+          ? {
+              TitleAr: blogSeoData.TitleAr,
+              TitleEn: blogSeoData.TitleEn,
+              DescriptionAr: blogSeoData.DescriptionAr,
+              DescriptionEn: blogSeoData.DescriptionEn,
+              KeywordsAr: blogSeoData.KeywordsAr,
+              KeywordsEn: blogSeoData.KeywordsEn,
+              Author: blogSeoData.Author,
+              AuthorEn: blogSeoData.AuthorEn,
+              Robots: blogSeoData.Robots,
+              RobotsEn: blogSeoData.RobotsEn,
+              "og:title": blogSeoData["og:title"],
+              "og:description": blogSeoData["og:description"],
+              "og:keywords": blogSeoData["og:keywords"],
+              "og:author": blogSeoData["og:author"],
+              "og:robots": blogSeoData["og:robots"],
+              "og:url": blogSeoData["og:url"],
+              "og:image": blogSeoData["og:image"],
+              "og:type": blogSeoData["og:type"],
+              "og:locale": blogSeoData["og:locale"],
+              "og:locale:alternate": blogSeoData["og:locale:alternate"],
+              "og:site_name": blogSeoData["og:site_name"],
+              "og:image:width": blogSeoData["og:image:width"],
+              "og:image:height": blogSeoData["og:image:height"],
+              "og:image:type": blogSeoData["og:image:type"],
+              "og:image:alt": blogSeoData["og:image:alt"],
+            }
+          : getDefaultSeoData("blog"),
       });
     }
 

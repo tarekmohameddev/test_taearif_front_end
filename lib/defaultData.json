@@ -3736,6 +3736,89 @@
           }
         }
       ]
+    },
+    "blog": {
+      "slug": "blog",
+      "components": [
+        {
+          "id": "blogDetails2",
+          "type": "blogDetails",
+          "name": "Blog Details",
+          "componentName": "blogDetails2",
+          "data": {
+            "visible": true,
+            "layout": {
+              "maxWidth": "1280px",
+              "padding": {
+                "top": "0rem",
+                "bottom": "3rem"
+              },
+              "gap": "2rem"
+            },
+            "styling": {
+              "backgroundColor": "#ffffff",
+              "primaryColor": "#8b5f46",
+              "textColor": "#967152",
+              "secondaryTextColor": "#6b7280",
+              "formBackgroundColor": "#8b5f46",
+              "formTextColor": "#ffffff",
+              "formButtonBackgroundColor": "#d4b996",
+              "formButtonTextColor": "#7a5c43"
+            },
+            "content": {
+              "descriptionTitle": "وصف المقال",
+              "specsTitle": "معلومات المقال"
+            },
+            "displaySettings": {
+              "showDescription": true,
+              "showSpecs": true,
+              "showVideoUrl": true,
+              "showMap": true
+            },
+            "whatsApp": {
+              "showButton": false,
+              "buttonText": "استفسار عن طريق الواتساب",
+              "phoneNumber": ""
+            },
+            "hero": {
+              "height": "500px",
+              "overlayOpacity": 0.4
+            },
+            "gallery": {
+              "showThumbnails": true,
+              "thumbnailGridColumns": 4,
+              "thumbnailHeight": "200px"
+            },
+            "typography": {
+              "title": {
+                "fontSize": {
+                  "mobile": "2xl",
+                  "tablet": "3xl",
+                  "desktop": "4xl"
+                },
+                "fontWeight": "bold",
+                "fontFamily": "Tajawal"
+              },
+              "subtitle": {
+                "fontSize": {
+                  "mobile": "base",
+                  "tablet": "lg",
+                  "desktop": "xl"
+                },
+                "fontWeight": "normal",
+                "fontFamily": "Tajawal"
+              }
+            },
+            "blogSlug": ""
+          },
+          "position": 0,
+          "layout": {
+            "row": 0,
+            "col": 0,
+            "span": 2
+          }
+        }
+      ]
     }
   },
   "WebsiteLayout": {

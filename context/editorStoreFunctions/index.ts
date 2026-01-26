@@ -11,6 +11,7 @@ export * from "./ctaValuationFunctions";
 export * from "./testimonialsFunctions";
 export * from "./projectDetailsFunctions";
 export * from "./propertyDetailFunctions";
+export * from "./blogDetailsFunctions";
 export * from "./propertiesShowcaseFunctions";
 export * from "./card4Functions";
 export * from "./logosTickerFunctions";
