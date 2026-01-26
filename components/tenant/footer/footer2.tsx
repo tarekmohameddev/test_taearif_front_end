@@ -358,6 +358,70 @@ export default function Footer2(props: Footer2Props) {
   // Get unified text and links color
   const textAndLinksColor = mergedData.styling?.colors?.textAndLinksColor || "#ffffff";
 
+  // Get footer background color and create darker version for form elements
+  const footerBgColor = mergedData.background?.color || "#8b5f46";
+  
+  // Function to darken a hex color
+  const darkenColor = (hex: string, percent: number): string => {
+    // Remove # if present
+    const color = hex.replace('#', '');
+    
+    // Convert to RGB
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+    
+    // Darken each component
+    const newR = Math.max(0, Math.floor(r * (1 - percent / 100)));
+    const newG = Math.max(0, Math.floor(g * (1 - percent / 100)));
+    const newB = Math.max(0, Math.floor(b * (1 - percent / 100)));
+    
+    // Convert back to hex
+    const toHex = (n: number) => {
+      const hex = n.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    
+    return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+  };
+  
+  const darkerBgColor = darkenColor(footerBgColor, 15); // Darken by 15%
+
+  // Create dynamic style for placeholder color
+  useEffect(() => {
+    const styleId = 'footer2-newsletter-input-placeholder';
+    let styleElement = document.getElementById(styleId);
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    
+    // Convert hex to rgba for 70% opacity
+    const hexToRgba = (hex: string, opacity: number) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    };
+    
+    const placeholderColor = hexToRgba(textAndLinksColor, 0.7);
+    styleElement.textContent = `
+      input[type="tel"].footer2-newsletter-input::placeholder {
+        color: ${placeholderColor} !important;
+      }
+    `;
+    
+    return () => {
+      // Cleanup on unmount
+      const element = document.getElementById(styleId);
+      if (element) {
+        element.remove();
+      }
+    };
+  }, [textAndLinksColor]);
+
   return (
     <>
       <footer
@@ -519,11 +583,25 @@ export default function Footer2(props: Footer2Props) {
                   required
                   pattern="[0-9()#&+*-=.]+"
                   title="يتم قبول الأرقام وأحرف الهاتف فقط (#، - ، *، إلخ)."
-                  className="flex-1 px-4 py-3 rounded-lg bg-[#a67c5a] text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  className="flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50 footer2-newsletter-input"
+                  style={{ 
+                    color: textAndLinksColor,
+                    backgroundColor: darkerBgColor,
+                  }}
                 />
                 <button
                   type="submit"
-                  className="px-6 py-3 rounded-lg bg-[#a67c5a] text-white font-semibold hover:bg-[#9a6f4f] transition-colors whitespace-nowrap"
+                  className="px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
+                  style={{ 
+                    color: textAndLinksColor,
+                    backgroundColor: darkerBgColor,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = darkenColor(footerBgColor, 25);
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = darkerBgColor;
+                  }}
                 >
                   {replaceBaheya(
                     mergedData.content?.newsletter?.buttonText || "اشترك الآن",
