@@ -2241,16 +2241,24 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                   className="rounded-lg overflow-hidden shadow-md border-4 border-white h-[550px] relative"
                   data-purpose="map-section"
                 >
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${property.location.lat},${property.location.lng}&hl=ar&z=15&output=embed`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="موقع العقار"
-                  />
+                  <h3
+                    className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    موقع العقار
+                  </h3>
+                  <div className="w-full h-[calc(100%-3.5rem)] rounded-lg overflow-hidden">
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${property.location.lat},${property.location.lng}&hl=ar&z=15&output=embed`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="موقع العقار"
+                    />
+                  </div>
                   <div className="mt-4 text-center">
                     <a
                       href={`https://maps.google.com/?q=${property.location.lat},${property.location.lng}&entry=gps`}

@@ -1135,27 +1135,42 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                       </span>
                     </div>
                   ) : null}
+                </div>
+              </section>
+            ) : null}
 
-                  {/* Amenities */}
-                  {project.amenities && project.amenities.length > 0 ? (
-                    <div className="flex flex-col items-center justify-center col-span-2 md:col-span-3">
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {project.amenities.slice(0, 6).map((amenity, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 text-xs rounded-full"
-                            style={{
-                              backgroundColor: `${primaryColor}20`,
-                              color:
-                                mergedData.styling?.textColor || primaryColor,
-                            }}
-                          >
-                            {amenity}
-                          </span>
-                        ))}
-                      </div>
+            {/* Amenities Section */}
+            {project.amenities && project.amenities.length > 0 ? (
+              <section className="bg-transparent" data-purpose="amenities-section">
+                <h2
+                  className="text-3xl font-bold mb-8 text-right"
+                  style={{
+                    color: mergedData.styling?.textColor || primaryColor,
+                  }}
+                >
+                  مميزات المشروع
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {project.amenities.map((amenity, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-center px-6 py-4 rounded-3xl"
+                      style={{
+                        backgroundColor: `${primaryColor}20`,
+                        border: `2px solid ${primaryColor}40`,
+                      }}
+                    >
+                      <span
+                        className="font-bold text-lg text-center"
+                        style={{
+                          color:
+                            mergedData.styling?.textColor || primaryColor,
+                        }}
+                      >
+                        {amenity}
+                      </span>
                     </div>
-                  ) : null}
+                  ))}
                 </div>
               </section>
             ) : null}
@@ -1194,16 +1209,24 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
                   className="rounded-lg overflow-hidden shadow-md border-4 border-white h-[550px] relative"
                   data-purpose="map-section"
                 >
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="موقع المشروع"
-                  />
+                  <h3
+                    className="pr-4 md:pr-0 mb-4 rounded-md flex items-center md:justify-center h-10 md:h-13 text-white font-bold leading-6 text-xl"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    موقع المشروع
+                  </h3>
+                  <div className="w-full h-[calc(100%-3.5rem)] rounded-lg overflow-hidden">
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${project.location.lat},${project.location.lng}&hl=ar&z=15&output=embed`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="موقع المشروع"
+                    />
+                  </div>
                   <div className="mt-4 text-center">
                     <a
                       href={`https://maps.google.com/?q=${project.location.lat},${project.location.lng}&entry=gps`}
