@@ -364,6 +364,8 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [mainImage, setMainImage] = useState<string>("");
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
+  const [projectId, setProjectId] = useState<string | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -601,7 +603,14 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
   };
 
   const handleThumbnailClick = (imageSrc: string, index: number) => {
-    handleImageClick(imageSrc, index);
+    // تحديث الصورة الرئيسية عند النقر على الصورة المصغرة
+    const actualIndex = projectImages.findIndex((img) => img === imageSrc);
+    if (actualIndex >= 0) {
+      setMainImage(imageSrc);
+      setMainImageIndex(actualIndex);
+    }
+    // افتح الصورة في dialog عند الضغط عليها
+    handleImageClick(imageSrc, actualIndex >= 0 ? actualIndex : index);
   };
 
   const handlePreviousImage = () => {
@@ -632,6 +641,39 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
       setSelectedImageIndex(nextIndex);
       setSelectedImage(nextImage);
     }
+  };
+
+  // Image navigation functions for main image
+  const handleMainImagePrevious = () => {
+    if (projectImages.length === 0) return;
+
+    // استخدام callback للتأكد من الحصول على أحدث قيمة
+    setMainImageIndex((currentIndex) => {
+      const prevIndex =
+        currentIndex > 0 ? currentIndex - 1 : projectImages.length - 1;
+      const prevImage = projectImages[prevIndex];
+      if (prevImage && prevImage.trim() !== "") {
+        setMainImage(prevImage);
+        return prevIndex;
+      }
+      return currentIndex;
+    });
+  };
+
+  const handleMainImageNext = () => {
+    if (projectImages.length === 0) return;
+
+    // استخدام callback للتأكد من الحصول على أحدث قيمة
+    setMainImageIndex((currentIndex) => {
+      const nextIndex =
+        currentIndex < projectImages.length - 1 ? currentIndex + 1 : 0;
+      const nextImage = projectImages[nextIndex];
+      if (nextImage && nextImage.trim() !== "") {
+        setMainImage(nextImage);
+        return nextIndex;
+      }
+      return currentIndex;
+    });
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -683,20 +725,51 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
     isLiveEditor,
   ]);
 
-  // تحديث الصورة الرئيسية عند تحميل المشروع
-  useEffect(() => {
-    if (project?.image) {
-      setMainImage(project.image);
+  // صور المشروع - computed value (مع إزالة التكرارات)
+  const projectImages = (() => {
+    if (!project?.image) return [];
+    
+    const allImages = [];
+    const seen = new Set<string>(); // Track seen images to avoid duplicates
+    
+    // Add main image first
+    if (project.image.trim() !== "") {
+      allImages.push(project.image);
+      seen.add(project.image);
     }
-  }, [project]);
+    
+    // Add additional images (excluding duplicates)
+    if (project.images) {
+      project.images.forEach((img) => {
+        if (img && img.trim() !== "" && !seen.has(img)) {
+          allImages.push(img);
+          seen.add(img);
+        }
+      });
+    }
+    
+    return allImages;
+  })();
 
-  // صور المشروع - computed value
-  const projectImages =
-    project && project.image
-      ? [project.image, ...(project.images || [])].filter(
-          (img) => img && img.trim() !== "",
-        )
-      : [];
+  // تحديث الصورة الرئيسية عند تحميل المشروع (فقط عند التحميل الأول أو تغيير المشروع)
+  useEffect(() => {
+    if (project?.id && project?.image) {
+      // إذا كان هذا مشروع جديد (id مختلف)، قم بإعادة تعيين الصورة
+      if (project.id !== projectId) {
+        setProjectId(project.id);
+        setMainImage(project.image);
+        // Find the index of the main image in projectImages
+        const index = projectImages.findIndex((img) => img === project.image);
+        setMainImageIndex(index >= 0 ? index : 0);
+      } else if (!mainImage) {
+        // إذا لم تكن هناك صورة رئيسية، قم بتعيينها
+        setMainImage(project.image);
+        const index = projectImages.findIndex((img) => img === project.image);
+        setMainImageIndex(index >= 0 ? index : 0);
+      }
+    }
+  }, [project?.id, project?.image, projectImages]);
+
 
   // Show skeleton loading while tenant or project is loading
   if (tenantLoading || loadingProject) {
@@ -1382,15 +1455,49 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
           <div className="md:w-1/2 order-1 md:order-2">
             <div className="gallery w-full mx-auto px-4 md:px-6 order-1 md:order-2 relative">
               {/* الصورة الأساسية */}
-              <div className="relative h-80 md:h-80 xl:h-96 mb-6">
+              <div className="relative h-80 md:h-80 xl:h-96 mb-6 group">
                 {mainImage && project ? (
-                  <Image
-                    src={mainImage}
-                    alt={project.title || "صورة المشروع"}
-                    fill
-                    className="w-full h-full object-cover cursor-pointer rounded-lg"
-                    onClick={() => handleImageClick(mainImage, 0)}
-                  />
+                  <>
+                    <Image
+                      src={mainImage}
+                      alt={project.title || "صورة المشروع"}
+                      fill
+                      className="w-full h-full object-cover cursor-pointer rounded-lg"
+                      onClick={() => handleImageClick(mainImage, mainImageIndex)}
+                    />
+
+                    {/* Navigation arrows - show only if there's more than one image */}
+                    {projectImages.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMainImagePrevious();
+                          }}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                          aria-label="الصورة السابقة"
+                        >
+                          <ChevronLeftIcon className="w-6 h-6" />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMainImageNext();
+                          }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                          aria-label="الصورة التالية"
+                        >
+                          <ChevronRightIcon className="w-6 h-6" />
+                        </button>
+
+                        {/* Image counter */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                          {mainImageIndex + 1} / {projectImages.length}
+                        </div>
+                      </>
+                    )}
+                  </>
                 ) : (
                   <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
                     <div className="text-gray-500 text-center">
@@ -1858,27 +1965,33 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                 className="object-contain rounded-lg"
               />
 
-              {/* أسهم التنقل */}
-              <button
-                onClick={handlePreviousImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                aria-label="الصورة السابقة"
-              >
-                <ChevronLeftIcon className="w-6 h-6" />
-              </button>
+              {/* أسهم التنقل - تظهر فقط إذا كان هناك أكثر من صورة واحدة */}
+              {projectImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePreviousImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    aria-label="الصورة السابقة"
+                  >
+                    <ChevronLeftIcon className="w-6 h-6" />
+                  </button>
 
-              <button
-                onClick={handleNextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                aria-label="الصورة التالية"
-              >
-                <ChevronRightIcon className="w-6 h-6" />
-              </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    aria-label="الصورة التالية"
+                  >
+                    <ChevronRightIcon className="w-6 h-6" />
+                  </button>
+                </>
+              )}
 
               {/* عداد الصور */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                {selectedImageIndex + 1} / {projectImages.length}
-              </div>
+              {projectImages.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  {selectedImageIndex + 1} / {projectImages.length}
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

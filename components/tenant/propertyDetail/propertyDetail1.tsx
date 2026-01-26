@@ -199,6 +199,8 @@ export default function propertyDetail({
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [mainImage, setMainImage] = useState<string>("");
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
+  const [propertyId, setPropertyId] = useState<string | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -290,39 +292,64 @@ export default function propertyDetail({
     }
   };
 
-  // Image navigation functions
-  const goToPreviousSlide = () => {
-    if (property?.images && property.images.length > 0) {
-      const currentIndex = property.images.findIndex(
-        (img) => img === mainImage,
-      );
-      const previousIndex =
-        currentIndex > 0 ? currentIndex - 1 : property.images.length - 1;
-      setMainImage(property.images[previousIndex]);
+  // Image navigation functions for main image
+  const handleMainImagePrevious = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      // استخدام callback للتأكد من الحصول على أحدث قيمة
+      setMainImageIndex((currentIndex) => {
+        const previousIndex =
+          currentIndex > 0 ? currentIndex - 1 : allImages.length - 1;
+        setMainImage(allImages[previousIndex]);
+        return previousIndex;
+      });
     }
   };
 
-  const goToNextSlide = () => {
-    if (property?.images && property.images.length > 0) {
-      const currentIndex = property.images.findIndex(
-        (img) => img === mainImage,
-      );
-      const nextIndex =
-        currentIndex < property.images.length - 1 ? currentIndex + 1 : 0;
-      setMainImage(property.images[nextIndex]);
+  const handleMainImageNext = () => {
+    const allImages = getAllImages();
+    if (allImages.length > 0) {
+      // استخدام callback للتأكد من الحصول على أحدث قيمة
+      setMainImageIndex((currentIndex) => {
+        const nextIndex =
+          currentIndex < allImages.length - 1 ? currentIndex + 1 : 0;
+        setMainImage(allImages[nextIndex]);
+        return nextIndex;
+      });
     }
   };
 
   // Get all images (main images + floor planning images)
   const getAllImages = () => {
     const allImages = [];
+    const seen = new Set<string>(); // Track seen images to avoid duplicates
+    
+    // Add main image first
+    if (property?.image && property.image.trim() !== "") {
+      allImages.push(property.image);
+      seen.add(property.image);
+    }
+    
+    // Add additional images (excluding main image and duplicates)
     if (property?.images) {
-      allImages.push(...property.images);
+      property.images.forEach((img) => {
+        if (img && img.trim() !== "" && !seen.has(img)) {
+          allImages.push(img);
+          seen.add(img);
+        }
+      });
     }
+    
+    // Add floor planning images (excluding duplicates)
     if (property?.floor_planning_image) {
-      allImages.push(...property.floor_planning_image);
+      property.floor_planning_image.forEach((img) => {
+        if (img && img.trim() !== "" && !seen.has(img)) {
+          allImages.push(img);
+          seen.add(img);
+        }
+      });
     }
-    console.log("getAllImages result:", allImages);
+    
     return allImages;
   };
 
@@ -848,8 +875,15 @@ export default function propertyDetail({
   };
 
   const handleThumbnailClick = (imageSrc: string, index: number) => {
+    // تحديث الصورة الرئيسية عند النقر على الصورة المصغرة
+    const allImages = getAllImages();
+    const actualIndex = allImages.findIndex((img) => img === imageSrc);
+    if (actualIndex >= 0) {
+      setMainImage(imageSrc);
+      setMainImageIndex(actualIndex);
+    }
     // افتح الصورة في dialog عند الضغط عليها
-    handleImageClick(imageSrc, index);
+    handleImageClick(imageSrc, actualIndex >= 0 ? actualIndex : index);
   };
 
   // وظائف السحب باليد
@@ -891,21 +925,53 @@ export default function propertyDetail({
     }
   }, [tenantId, propertySlug, isLiveEditor]);
 
-  // تحديث الصورة الرئيسية عند تحميل العقار
+  // تحديث الصورة الرئيسية عند تحميل العقار (فقط عند التحميل الأول أو تغيير العقار)
   useEffect(() => {
-    if (property?.image) {
-      setMainImage(property.image);
+    if (property?.id && property?.image) {
+      // إذا كان هذا عقار جديد (id مختلف)، قم بإعادة تعيين الصورة
+      if (property.id !== propertyId) {
+        setPropertyId(property.id);
+        setMainImage(property.image);
+        // Find the index of the main image in getAllImages()
+        const allImages = getAllImages();
+        const index = allImages.findIndex((img) => img === property.image);
+        setMainImageIndex(index >= 0 ? index : 0);
+      } else if (!mainImage) {
+        // إذا لم تكن هناك صورة رئيسية، قم بتعيينها
+        setMainImage(property.image);
+        const allImages = getAllImages();
+        const index = allImages.findIndex((img) => img === property.image);
+        setMainImageIndex(index >= 0 ? index : 0);
+      }
     }
-  }, [property]);
+  }, [property?.id, property?.image]);
 
-  // صور العقار - computed value
-  const propertyImages =
-    property && property.image
-      ? [
-          property.image,
-          ...(property.images || []), // Add additional images if available
-        ].filter((img) => img && img.trim() !== "")
-      : []; // Filter out empty images
+
+  // صور العقار - computed value (مع إزالة التكرارات)
+  const propertyImages = (() => {
+    if (!property?.image) return [];
+    
+    const allImages = [];
+    const seen = new Set<string>(); // Track seen images to avoid duplicates
+    
+    // Add main image first
+    if (property.image.trim() !== "") {
+      allImages.push(property.image);
+      seen.add(property.image);
+    }
+    
+    // Add additional images (excluding duplicates)
+    if (property.images) {
+      property.images.forEach((img) => {
+        if (img && img.trim() !== "" && !seen.has(img)) {
+          allImages.push(img);
+          seen.add(img);
+        }
+      });
+    }
+    
+    return allImages;
+  })();
 
   // Show skeleton loading while tenant or property is loading
   if (tenantLoading || loadingProperty) {
@@ -1476,15 +1542,49 @@ export default function propertyDetail({
           <div className="md:w-1/2 order-1 md:order-2">
             <div className="gallery w-full mx-auto px-4 md:px-6 order-1 md:order-2 relative">
               {/* الصورة الأساسية */}
-              <div className="relative h-80 md:h-80 xl:h-96 mb-6">
+              <div className="relative h-80 md:h-80 xl:h-96 mb-6 group">
                 {mainImage && property ? (
-                  <Image
-                    src={mainImage}
-                    alt={property.title || "صورة العقار"}
-                    fill
-                    className="w-full h-full object-cover cursor-pointer rounded-lg"
-                    onClick={() => handleImageClick(mainImage, 0)}
-                  />
+                  <>
+                    <Image
+                      src={mainImage}
+                      alt={property.title || "صورة العقار"}
+                      fill
+                      className="w-full h-full object-cover cursor-pointer rounded-lg"
+                      onClick={() => handleImageClick(mainImage, mainImageIndex)}
+                    />
+
+                    {/* Navigation arrows - show only if there's more than one image */}
+                    {getAllImages().length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMainImagePrevious();
+                          }}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                          aria-label="الصورة السابقة"
+                        >
+                          <ChevronLeftIcon className="w-6 h-6" />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMainImageNext();
+                          }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                          aria-label="الصورة التالية"
+                        >
+                          <ChevronRightIcon className="w-6 h-6" />
+                        </button>
+
+                        {/* Image counter */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                          {mainImageIndex + 1} / {getAllImages().length}
+                        </div>
+                      </>
+                    )}
+                  </>
                 ) : (
                   <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
                     <div className="text-gray-500 text-center">
