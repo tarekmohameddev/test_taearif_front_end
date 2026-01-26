@@ -23,6 +23,7 @@ export * from "./propertyFilterFunctions";
 export * from "./imageTextFunctions";
 export * from "./contactUsHomePageFunctions";
 export * from "./blogsSectionsFunctions";
+export * from "./blogCardFunctions";
 export * from "./mapSectionFunctions";
 export * from "./applicationFormFunctions";
 export * from "./jobFormFunctions";

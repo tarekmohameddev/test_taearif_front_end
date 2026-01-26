@@ -246,6 +246,10 @@
       "display_name": "أقسام المدونات",
       "description": "قسم بطاقات المدونات مع فقرات وتخطيط شبكي"
     },
+    "blogPosts": {
+      "display_name": "المدونة",
+      "description": "عرض أحدث المقالات والتدوينات في تخطيط شبكي"
+    },
     "responsiveImage": {
       "display_name": "صورة متجاوبة",
       "description": "صورة متجاوبة مع عرض مريح لجميع مقاسات الشاشات"

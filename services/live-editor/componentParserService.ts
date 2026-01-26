@@ -11,17 +11,17 @@ export const parseComponentName = (
 
   const match = normalizedName?.match(/^(.*?)(\d+)$/);
 
-  if (!match) {
-    // إذا لم يكن هناك رقم، استخدم الاسم كما هو
-    return {
-      baseName: normalizedName,
-      number: "1",
-    };
+  let finalBaseName = match ? match[1] : normalizedName;
+  let finalNumber = match ? match[2] : "1";
+
+  // تحويل blogPosts إلى grid ليعمل مع ملفات الـ grid الموجودة
+  if (finalBaseName === "blogPosts") {
+    finalBaseName = "grid";
   }
 
   return {
-    baseName: match[1],
-    number: match[2],
+    baseName: finalBaseName,
+    number: finalNumber,
   };
 };
 

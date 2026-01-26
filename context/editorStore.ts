@@ -73,6 +73,7 @@ import { inputs2Functions } from "./editorStoreFunctions/inputs2Functions";
 import { imageTextFunctions } from "./editorStoreFunctions/imageTextFunctions";
 import { contactUsHomePageFunctions } from "./editorStoreFunctions/contactUsHomePageFunctions";
 import { blogsSectionsFunctions } from "./editorStoreFunctions/blogsSectionsFunctions";
+import { blogCardFunctions } from "./editorStoreFunctions/blogCardFunctions";
 import { responsiveImageFunctions } from "./editorStoreFunctions/responsiveImageFunctions";
 import { titleFunctions } from "./editorStoreFunctions/titleFunctions";
 import { photosGridFunctions } from "./editorStoreFunctions/photosGridFunctions";
@@ -593,6 +594,11 @@ interface EditorStore {
     initial?: ComponentData,
   ) => void;
   getBlogsSectionsData: (variantId: string) => ComponentData;
+  blogCardStates: Record<string, ComponentData>;
+  ensureBlogCardVariant: (variantId: string, initial?: ComponentData) => void;
+  getBlogCardData: (variantId: string) => ComponentData;
+  setBlogCardData: (variantId: string, data: ComponentData) => void;
+  updateBlogCardByPath: (variantId: string, path: string, value: any) => void;
   setBlogsSectionsData: (variantId: string, data: ComponentData) => void;
   updateBlogsSectionsByPath: (
     variantId: string,
@@ -786,6 +792,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   imageTextStates: {},
   contactUsHomePageStates: {},
   blogsSectionsStates: {},
+  blogCardStates: {},
   titleStates: {},
   responsiveImageStates: {},
   photosGridStates: {},
@@ -1316,6 +1323,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return currentState.contactUsHomePageStates[variantId];
         case "blogsSections":
           return currentState.blogsSectionsStates[variantId];
+        case "blogCard":
+          return currentState.blogCardStates[variantId];
         case "title":
           return currentState.titleStates[variantId];
         case "responsiveImage":
@@ -1568,6 +1577,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             variantId,
             initial,
           );
+        case "blogCard":
+          return blogCardFunctions.ensureVariant(state, variantId, initial);
         case "title":
           return titleFunctions.ensureVariant(state, variantId, initial);
         case "responsiveImage":
@@ -1795,6 +1806,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return contactUsHomePageFunctions.getData(state, variantId);
       case "blogsSections":
         return blogsSectionsFunctions.getData(state, variantId);
+      case "blogCard":
+        return blogCardFunctions.getData(state, variantId);
       case "title":
         return titleFunctions.getData(state, variantId);
       case "responsiveImage":
@@ -1938,6 +1951,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "blogsSections":
           newState = blogsSectionsFunctions.setData(state, variantId, data);
+          break;
+        case "blogCard":
+          newState = blogCardFunctions.setData(state, variantId, data);
           break;
         case "title":
           newState = titleFunctions.setData(state, variantId, data);
@@ -2229,6 +2245,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "blogsSections":
           newState = blogsSectionsFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "blogCard":
+          newState = blogCardFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -2768,6 +2792,20 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updateBlogsSectionsByPath: (variantId, path, value) =>
     set((state) =>
       blogsSectionsFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // BlogCard specific functions
+  ensureBlogCardVariant: (variantId, initial) =>
+    set((state) => blogCardFunctions.ensureVariant(state, variantId, initial)),
+  getBlogCardData: (variantId) => {
+    const state = get();
+    return blogCardFunctions.getData(state, variantId);
+  },
+  setBlogCardData: (variantId, data) =>
+    set((state) => blogCardFunctions.setData(state, variantId, data)),
+  updateBlogCardByPath: (variantId, path, value) =>
+    set((state) =>
+      blogCardFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Title specific functions
@@ -3400,6 +3438,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.data,
                       ).blogsSectionsStates;
                     break;
+                  case "blogCard":
+                    newState.blogCardStates = blogCardFunctions.setData(
+                      newState,
+                      comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                      comp.data,
+                    ).blogCardStates;
+                    break;
                   case "title":
                     newState.titleStates = titleFunctions.setData(
                       newState,
@@ -3647,6 +3692,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                 comp.data,
               ).blogsSectionsStates;
               break;
+            case "blogCard":
+              newState.blogCardStates = blogCardFunctions.setData(
+                newState,
+                comp.componentName,
+                comp.data,
+              ).blogCardStates;
+              break;
             case "responsiveImage":
               newState.responsiveImageStates = responsiveImageFunctions.setData(
                 newState,
@@ -3850,6 +3902,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         imageTextStates: {},
         contactUsHomePageStates: {},
         blogsSectionsStates: {},
+        blogCardStates: {},
         titleStates: {},
         responsiveImageStates: {},
         photosGridStates: {},

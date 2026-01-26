@@ -22,6 +22,7 @@ export { propertiesPageStructure } from "./propertiesPage";
 export { imageTextStructure } from "./imageText";
 export { contactUsHomePageStructure } from "./contactUsHomePage";
 export { blogsSectionsStructure } from "./blogsSections";
+export { blogCardStructure } from "./blogCard";
 export { mapSectionStructure } from "./mapSection";
 export { responsiveImageStructure } from "./responsiveImage";
 export { titleStructure } from "./title";

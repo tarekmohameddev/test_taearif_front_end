@@ -242,6 +242,10 @@
       "display_name": "Blogs Sections",
       "description": "Blog cards section with paragraphs and grid layout"
     },
+    "blogPosts": {
+      "display_name": "Blog Posts",
+      "description": "Display latest articles and blog posts in a grid layout"
+    },
     "responsiveImage": {
       "display_name": "Responsive Image",
       "description": "Responsive image with comfortable width for all screen sizes"

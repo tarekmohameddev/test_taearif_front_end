@@ -169,6 +169,10 @@ export const gridStructure: ComponentStructure = {
                   label: "Projects",
                 },
                 {
+                  value: "/api/posts",
+                  label: "Blogs",
+                },
+                {
                   value:
                     "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1",
                   label: "Latest Sales",
@@ -269,6 +273,10 @@ export const gridStructure: ComponentStructure = {
             {
               value: "/v1/tenant-website/{{tenantID}}/projects",
               label: "Projects",
+            },
+            {
+              value: "/api/posts",
+              label: "Blogs",
             },
             {
               value:
@@ -557,6 +565,10 @@ export const gridStructure: ComponentStructure = {
                 {
                   value: "/v1/tenant-website/{{tenantID}}/projects",
                   label: "Projects",
+                },
+                {
+                  value: "/api/posts",
+                  label: "Blogs",
                 },
                 {
                   value:

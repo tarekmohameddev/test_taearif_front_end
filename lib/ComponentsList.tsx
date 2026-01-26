@@ -51,6 +51,7 @@ import { inputs2Structure } from "@/componentsStructure/inputs2";
 import { imageTextStructure } from "@/componentsStructure/imageText";
 import { contactUsHomePageStructure } from "@/componentsStructure/contactUsHomePage";
 import { blogsSectionsStructure } from "@/componentsStructure/blogsSections";
+import { blogCardStructure } from "@/componentsStructure/blogCard";
 import { responsiveImageStructure } from "@/componentsStructure/responsiveImage";
 import { titleStructure } from "@/componentsStructure/title";
 import { videoStructure } from "@/componentsStructure/video";
@@ -118,6 +119,8 @@ export const getSections = (
       "inputs",
       "inputs2",
       "jobForm",
+      "blogsSections",
+      "blogCard",
     ],
   },
 });
@@ -156,6 +159,8 @@ export const SECTIONS: Record<string, SectionType> = {
       "inputs",
       "inputs2",
       "jobForm",
+      "blogsSections",
+      "blogCard",
     ],
   },
 };
@@ -434,6 +439,17 @@ export const getComponents = (
     hasStructure: true,
     defaultTheme: "blogsSections1",
     ...blogsSectionsStructure,
+  },
+  blogPosts: {
+    id: "blogPosts",
+    name: "blogPosts",
+    displayName: t("components.blogPosts.display_name"),
+    description: t("components.blogPosts.description"),
+    category: "content",
+    section: "homepage",
+    subPath: "grid",
+    icon: "📰",
+    ...gridStructure,
   },
 
   responsiveImage: {
@@ -905,6 +921,35 @@ export const COMPONENTS: Record<string, any> = {
     hasStructure: true,
     defaultTheme: "blogsSections1",
     ...blogsSectionsStructure,
+  },
+  blogCard: {
+    id: "blogCard",
+    name: "blogCard",
+    displayName: "Blog Card",
+    description: "Blog post card component",
+    category: "content",
+    section: "homepage",
+    subPath: "blogCard",
+    icon: "📰",
+    hasStore: true,
+    hasStructure: true,
+    defaultTheme: "blogCard1",
+    ...blogCardStructure,
+    variants: blogCardStructure.variants.map((variant) => ({
+      ...variant,
+      componentPath: `components/tenant/blogCard/${variant.id}.tsx`,
+    })),
+  },
+  blogPosts: {
+    id: "blogPosts",
+    name: "blogPosts",
+    displayName: "Blog Posts",
+    description: "Display latest blog posts in a grid layout",
+    category: "content",
+    section: "homepage",
+    subPath: "grid",
+    icon: "📰",
+    ...gridStructure,
   },
   responsiveImage: {
     id: "responsiveImage",

@@ -7,6 +7,7 @@ import PropertyCard2 from "@/components/tenant/cards/card2";
 import PropertyCard3 from "@/components/tenant/cards/card3";
 import Card4 from "@/components/tenant/cards/card4";
 import Card5 from "@/components/tenant/cards/card5";
+import BlogCard1 from "@/components/tenant/blogCard/blogCard1";
 import { usePropertiesStore } from "@/store/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import Pagination from "@/components/ui/pagination";
@@ -290,13 +291,19 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     tenantId: string,
     purpose?: string,
   ): string => {
+    // Blogs API doesn't need tenantId replacement
+    if (url.includes("/posts") || url.includes("/api/posts")) {
+      return url; // Blogs API is global, not tenant-specific
+    }
+
     let convertedUrl = url.replace("{{tenantID}}", tenantId);
 
     // Add purpose parameter if not already in URL
     if (
       purpose &&
       !convertedUrl.includes("purpose=") &&
-      !convertedUrl.includes("/projects")
+      !convertedUrl.includes("/projects") &&
+      !convertedUrl.includes("/posts")
     ) {
       const separator = convertedUrl.includes("?") ? "&" : "?";
       convertedUrl += `${separator}purpose=${purpose}`;
@@ -327,8 +334,27 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       if (response.data) {
         let dataToSet = [];
 
+        // Check if it's blogs API response
+        if (url.includes("/posts") || url.includes("/api/posts")) {
+          let blogsData = [];
+
+          if (response.data.data && Array.isArray(response.data.data)) {
+            blogsData = response.data.data;
+          } else if (Array.isArray(response.data)) {
+            blogsData = response.data;
+          }
+
+          // Convert blogs to property format
+          if (blogsData.length > 0) {
+            dataToSet = blogsData.map((blog: any) => {
+              return convertBlogToProperty(blog);
+            });
+          } else {
+            dataToSet = [];
+          }
+        }
         // Check if it's projects API response
-        if (url.includes("/projects")) {
+        else if (url.includes("/projects")) {
           let projectsData = [];
 
           if (response.data.projects) {
@@ -419,6 +445,83 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     };
   };
 
+  // Helper function to convert blog data to property format
+  const convertBlogToProperty = (blog: any): any => {
+    // Format published date
+    const formatPublishedDate = (date: string | null) => {
+      if (!date) return new Date().toISOString();
+      try {
+        return new Date(date).toISOString();
+      } catch {
+        return new Date().toISOString();
+      }
+    };
+
+    return {
+      id: blog.id,
+      slug: blog.slug,
+      title: blog.title,
+      district: blog.categories?.[0]?.name || "مقال",
+      price: "", // Blogs don't have prices
+      views: blog.views || 0,
+      bedrooms: 0, // Blogs don't have bedrooms
+      bathrooms: 0, // Blogs don't have bathrooms
+      area: "", // Blogs don't have area
+      type: "مقال", // Blog type
+      transactionType: "blog", // Blog transaction type
+      image: blog.thumbnail?.url || "",
+      status: blog.status === "published" ? "منشور" : "مسودة",
+      createdAt: formatPublishedDate(blog.published_at || blog.created_at),
+      description: blog.excerpt || "",
+      features: blog.categories?.map((cat: any) => cat.name) || [],
+      location: {
+        lat: 0,
+        lng: 0,
+        address: blog.categories?.[0]?.name || "مقال",
+      },
+      images: blog.thumbnail?.url ? [blog.thumbnail.url] : [],
+    };
+  };
+
+  // Helper function to convert property format back to blog format for blogCard1
+  const convertPropertyToBlog = (property: any): any => {
+    // Format date to Arabic locale
+    const formatDate = (dateString: string | null | undefined): string => {
+      if (!dateString) {
+        return new Date().toLocaleDateString("ar-SA", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("ar-SA", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      } catch {
+        return new Date().toLocaleDateString("ar-SA", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+    };
+
+    return {
+      id: property.id?.toString() || property._id?.toString() || "",
+      image: property.image || property.images?.[0] || "",
+      title: property.title || "",
+      description: property.description || property.excerpt || "",
+      readMoreUrl: property.slug
+        ? `/blog/${property.slug}`
+        : property.readMoreUrl || "#",
+      date: formatDate(property.createdAt || property.published_at || property.date),
+    };
+  };
+
   // Get purpose from current pathname
   const getPurposeFromPath = () => {
     if (pathname?.includes("/for-rent")) {
@@ -490,17 +593,19 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     pagination.last_page > 1 &&
     (filteredProperties.length > 0 || pagination.total > pagination.per_page);
 
-  // Determine if we're on projects page
+  // Determine if we're on projects page or blogs page
   const isProjectsPage = pathname?.includes("/projects");
   const isProjectsApi = mergedData.dataSource?.apiUrl?.includes("/projects");
+  const isBlogsPage = pathname?.includes("/blog");
+  const isBlogsApi = mergedData.dataSource?.apiUrl?.includes("/posts");
 
   // Always prioritize store data (filteredProperties) over API data
-  // EXCEPT when we're on projects page or using projects API
-  // In that case, use apiProperties directly since store calls /properties API
+  // EXCEPT when we're on projects page, blogs page, or using projects/blogs API
+  // In those cases, use apiProperties directly since store calls /properties API
   const properties =
     useApiData && currentTenantId
-      ? isProjectsPage || isProjectsApi
-        ? apiProperties // Use API data directly for projects
+      ? isProjectsPage || isProjectsApi || isBlogsPage || isBlogsApi
+        ? apiProperties // Use API data directly for projects and blogs
         : filteredProperties // Use store data for properties
       : useApiData
         ? apiProperties
@@ -605,9 +710,15 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       price: parsePrice(property.price),
       bathrooms: parseBathrooms(property.bathrooms),
       featured: property.featured || false,
-      // Determine if this is a project and build correct URL
+      // Determine if this is a project, blog, or property and build correct URL
       url: (() => {
         if (!property.slug) return property.url || "";
+        
+        const isBlog = 
+          property.transactionType === "blog" || 
+          property.type === "مقال" ||
+          pathname?.includes("/blog") ||
+          mergedData.dataSource?.apiUrl?.includes("/posts");
         
         const isProject = 
           property.transactionType === "project" || 
@@ -615,9 +726,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
           pathname?.includes("/projects") ||
           mergedData.dataSource?.apiUrl?.includes("/projects");
         
-        return isProject 
-          ? `/project/${property.slug}` 
-          : `/property/${property.slug}`;
+        if (isBlog) {
+          return `/blog/${property.slug}`;
+        } else if (isProject) {
+          return `/project/${property.slug}`;
+        } else {
+          return `/property/${property.slug}`;
+        }
       })(),
       units: property.units || 0, // For card4
     };
@@ -763,6 +878,22 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
               }}
             >
               {properties.map((property: any) => {
+                // Check if this is blogs API - force blogCard1 usage
+                const isBlogsApi = mergedData.dataSource?.apiUrl?.includes("/posts");
+                
+                if (isBlogsApi) {
+                  // Convert to blog format and render BlogCard1
+                  const blogData = convertPropertyToBlog(property);
+                  return (
+                    <BlogCard1
+                      key={property.id || property._id}
+                      blog={blogData}
+                      useStore={false}
+                    />
+                  );
+                }
+
+                // Existing card rendering logic for properties/projects
                 const cardSettings = mergedData.cardSettings || {};
                 const theme = cardSettings.theme || "card1";
 

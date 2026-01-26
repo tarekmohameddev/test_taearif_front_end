@@ -1,32 +1,29 @@
 import { ComponentData } from "@/lib/types";
-import { ComponentState, createDefaultData, updateDataByPath } from "./types";
+import { updateDataByPath } from "./types";
 
 // ═══════════════════════════════════════════════════════════
 // DEFAULT DATA - Define your component's data structure
 // ═══════════════════════════════════════════════════════════
 
-export const getDefaultBlogsSectionsData = (): ComponentData => ({
+export const getDefaultBlogCardData = (): ComponentData => ({
   visible: true,
 
-  // Content - Two paragraphs
-  paragraph1:
-    "نصمم رحلتك العقارية بخطى واثقة نجمع بين السلاسة في التعامل والاحترافية في الأداء، لنقدّم لك تجربة سلسة من أول استفسار حتى استلام المفتاح. نُراعي احتياجاتك، ونُرشدك نحو أفضل الخيارات بخبرة ودراية تامة.",
-  paragraph2:
-    "نمتلك فهماً عميقًا للسوق، وشغفًا بتقديم الأفضل لعملائنا. معنا، ستجد عقارك المثالي بسهولة وثقة.",
-
-  // API Settings - Always enabled, data comes from API only
-  apiSettings: {
-    enabled: true,
-    endpoint: "/api/posts",
-    limit: 10,
-    page: 1,
+  // Blog data
+  blog: {
+    id: "1",
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800",
+    title: "مقال تجريبي",
+    description: "هذا مقال تجريبي للمحرر المباشر",
+    readMoreUrl: "/blog/test-1",
+    date: new Date().toLocaleDateString("ar-SA", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
   },
 
   // Styling
   styling: {
-    backgroundColor: "#8b5f46",
-    paragraphColor: "rgba(255, 255, 255, 0.9)",
-    dividerColor: "rgba(255, 255, 255, 0.3)",
     cardBackgroundColor: "#ffffff",
     cardTitleColor: "#1f2937",
     cardTitleHoverColor: "#8b5f46",
@@ -36,21 +33,11 @@ export const getDefaultBlogsSectionsData = (): ComponentData => ({
     dateColor: "#6b7280",
   },
 
-  // Layout
-  layout: {
-    maxWidth: "1280px",
-    padding: {
-      top: "3rem",
-      bottom: "3rem",
-    },
-    gap: {
-      paragraphs: "2rem",
-      cards: "1.5rem",
-    },
-    gridColumns: {
-      mobile: 1,
-      tablet: 2,
-      desktop: 3,
+  // Responsive
+  responsive: {
+    imageHeight: {
+      mobile: "250px",
+      desktop: "280px",
     },
   },
 });
@@ -59,7 +46,7 @@ export const getDefaultBlogsSectionsData = (): ComponentData => ({
 // COMPONENT FUNCTIONS - Standard 4 functions
 // ═══════════════════════════════════════════════════════════
 
-export const blogsSectionsFunctions = {
+export const blogCardFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
    *
@@ -71,21 +58,21 @@ export const blogsSectionsFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
     // Check if variant already exists
     if (
-      state.blogsSectionsStates[variantId] &&
-      Object.keys(state.blogsSectionsStates[variantId]).length > 0
+      state.blogCardStates[variantId] &&
+      Object.keys(state.blogCardStates[variantId]).length > 0
     ) {
       return {} as any; // Already exists, skip initialization
     }
 
     // Determine default data
-    const defaultData = getDefaultBlogsSectionsData();
+    const defaultData = getDefaultBlogCardData();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
     // Return new state
     return {
-      blogsSectionsStates: { ...state.blogsSectionsStates, [variantId]: data },
+      blogCardStates: { ...state.blogCardStates, [variantId]: data },
     } as any;
   },
 
@@ -97,7 +84,7 @@ export const blogsSectionsFunctions = {
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.blogsSectionsStates[variantId] || getDefaultBlogsSectionsData(),
+    state.blogCardStates[variantId] || getDefaultBlogCardData(),
 
   /**
    * setData - Set/replace component data completely
@@ -108,7 +95,7 @@ export const blogsSectionsFunctions = {
    * @returns New state object
    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    blogsSectionsStates: { ...state.blogsSectionsStates, [variantId]: data },
+    blogCardStates: { ...state.blogCardStates, [variantId]: data },
   }),
 
   /**
@@ -116,20 +103,16 @@ export const blogsSectionsFunctions = {
    *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
-   * @param path - Dot-separated path to field (e.g., "content.title")
+   * @param path - Dot-separated path to field (e.g., "blog.title")
    * @param value - New value for the field
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.blogsSectionsStates[variantId] || getDefaultBlogsSectionsData();
+    const source = state.blogCardStates[variantId] || getDefaultBlogCardData();
     const newData = updateDataByPath(source, path, value);
 
     return {
-      blogsSectionsStates: {
-        ...state.blogsSectionsStates,
-        [variantId]: newData,
-      },
+      blogCardStates: { ...state.blogCardStates, [variantId]: newData },
     } as any;
   },
 };

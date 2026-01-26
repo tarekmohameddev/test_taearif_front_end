@@ -137,7 +137,7 @@ const ComponentsListView = ({
         !section.component?.toLowerCase().includes("photosgrid");
 
       // التصفية حسب theme
-      const isInTheme = themeBaseNames.has(section.component);
+      const isInTheme = themeBaseNames.has(section.component) || (section.component === "blogPosts" && themeBaseNames.has("blogPosts1"));
 
       return passesCurrentFilter && isInTheme;
     });
@@ -590,15 +590,25 @@ const ComponentsListView = ({
                                   className="group relative"
                                 >
                                   <DraggableDrawerItem
-                                    componentType={section.component}
+                                    componentType={section.component === "blogPosts" && variantName === "blogPosts1" ? "grid" : section.component}
                                     section={section.section}
                                     data={{
                                       label: displayLabel,
                                       description: section.description,
                                       icon: section.type,
-                                      ...(variantName
-                                        ? { variant: variantName }
-                                        : {}),
+                                      ...(variantName === "blogPosts1" && section.component === "blogPosts" 
+                                        ? { variant: "grid1" } 
+                                        : variantName 
+                                          ? { variant: variantName } 
+                                          : {}),
+                                      ...(variantName === "blogPosts1" && section.component === "blogPosts"
+                                        ? { 
+                                            dataSource: {
+                                              apiUrl: "/api/posts",
+                                              enabled: true,
+                                            }
+                                          }
+                                        : {})
                                     }}
                                   >
                                     <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
@@ -622,10 +632,28 @@ const ComponentsListView = ({
                               )
                                 ? variantName.slice(section.component.length)
                                 : "";
-                              const displayLabel =
+                              
+                              let displayLabel =
                                 variantSuffix && variantSuffix.length > 0
                                   ? `${section.name} ${variantSuffix}`
                                   : section.name;
+
+                              let componentType = section.component;
+                              let variantToUse = variantName;
+                              let customData: any = {};
+
+                              // Handle special mapping for blogPosts
+                              if (section.component === "blogPosts" && variantName === "blogPosts1") {
+                                componentType = "grid";
+                                variantToUse = "grid1";
+                                displayLabel = section.name; // Keep the original "المدونة" name
+                                customData = {
+                                  dataSource: {
+                                    apiUrl: "/api/posts",
+                                    enabled: true,
+                                  }
+                                };
+                              }
 
                               return (
                                 <motion.div
@@ -634,13 +662,14 @@ const ComponentsListView = ({
                                   className="group relative"
                                 >
                                   <DraggableDrawerItem
-                                    componentType={section.component}
+                                    componentType={componentType}
                                     section={section.section}
                                     data={{
                                       label: displayLabel,
                                       description: section.description,
                                       icon: section.type,
-                                      variant: variantName,
+                                      variant: variantToUse,
+                                      ...customData
                                     }}
                                   >
                                     <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">

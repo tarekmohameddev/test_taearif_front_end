@@ -11,6 +11,7 @@
     "applicationForm1",
     "jobForm1",
     "blogsSections1",
+    "blogCard1",
     "contactCards1",
     "contactFormSection1",
     "contactMapSection1",
@@ -39,7 +40,8 @@
     "testimonials1",
     "whyChooseUs1",
     "card2",
-    "card3"
+    "card3",
+    "blogPosts1"
   ],
   "theme2": [
     "footer2",

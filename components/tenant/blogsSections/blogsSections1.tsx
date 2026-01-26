@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultBlogsSectionsData } from "@/context/editorStoreFunctions/blogsSectionsFunctions";
+import axiosInstance from "@/lib/axiosInstance";
+import { useTenantId } from "@/hooks/useTenantId";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -23,7 +25,12 @@ interface BlogsSectionsProps {
   visible?: boolean;
   paragraph1?: string;
   paragraph2?: string;
-  cards?: Card[];
+  apiSettings?: {
+    enabled?: boolean;
+    endpoint?: string;
+    limit?: number;
+    page?: number;
+  };
   styling?: {
     backgroundColor?: string;
     paragraphColor?: string;
@@ -173,6 +180,156 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
   };
 
   // ─────────────────────────────────────────────────────────
+  // API DATA FETCHING
+  // ─────────────────────────────────────────────────────────
+  const [apiCards, setApiCards] = useState<Card[]>([]);
+  const [loadingApi, setLoadingApi] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const { tenantId: hookTenantId } = useTenantId();
+
+  // Check if we're in Live Editor
+  const isLiveEditor =
+    typeof window !== "undefined" &&
+    window.location.pathname.includes("/live-editor");
+
+  // API Response Interface
+  interface ApiPost {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt: string;
+    thumbnail?: {
+      id: number;
+      url: string;
+      type: string;
+      created_at: string;
+    };
+    published_at: string;
+  }
+
+  interface ApiResponse {
+    data: ApiPost[];
+    pagination: {
+      per_page: number;
+      current_page: number;
+      from: number;
+      to: number;
+      total: number;
+      last_page: number;
+    };
+  }
+
+  // Function to format date
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("ar-SA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  // Function to convert API data to Card format
+  const convertApiDataToCards = useCallback((apiData: ApiPost[]): Card[] => {
+    return apiData.map((post) => ({
+      id: post.id.toString(),
+      title: post.title,
+      description: post.excerpt || "",
+      image: post.thumbnail?.url || "",
+      readMoreUrl: `/blog/${post.slug || post.id}`,
+      date: formatDate(post.published_at),
+    }));
+  }, []);
+
+  // Fetch data from API - Always enabled, data comes from API only
+  const fetchBlogsFromApi = useCallback(async () => {
+    // Use mock data in Live Editor
+    if (isLiveEditor) {
+      const mockApiData: ApiPost[] = [
+        {
+          id: 1,
+          title: "مقال تجريبي 1",
+          slug: "test-1",
+          excerpt: "هذا مقال تجريبي للمحرر المباشر",
+          thumbnail: {
+            id: 1,
+            url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800",
+            type: "image",
+            created_at: new Date().toISOString(),
+          },
+          published_at: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          title: "مقال تجريبي 2",
+          slug: "test-2",
+          excerpt: "مقال تجريبي آخر للمحرر المباشر",
+          thumbnail: {
+            id: 2,
+            url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
+            type: "image",
+            created_at: new Date().toISOString(),
+          },
+          published_at: new Date().toISOString(),
+        },
+      ];
+      setApiCards(convertApiDataToCards(mockApiData));
+      setLoadingApi(false);
+      return;
+    }
+
+    try {
+      setLoadingApi(true);
+      setApiError(null);
+
+      const endpoint = mergedData.apiSettings?.endpoint || "/api/posts";
+      const limit = mergedData.apiSettings?.limit || 10;
+      const page = mergedData.apiSettings?.page || 1;
+
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        per_page: limit.toString(),
+      });
+
+      const url = `${endpoint}?${params.toString()}`;
+      const response = await axiosInstance.get<ApiResponse>(url);
+
+      if (response.data && response.data.data) {
+        const cards = convertApiDataToCards(response.data.data);
+        setApiCards(cards);
+      } else {
+        setApiError("لا توجد بيانات متاحة");
+        setApiCards([]);
+      }
+    } catch (error) {
+      console.error("BlogsSections: Error fetching blogs from API:", error);
+      setApiError("حدث خطأ في تحميل البيانات");
+      setApiCards([]);
+    } finally {
+      setLoadingApi(false);
+    }
+  }, [
+    isLiveEditor,
+    mergedData.apiSettings?.endpoint,
+    mergedData.apiSettings?.limit,
+    mergedData.apiSettings?.page,
+    convertApiDataToCards,
+  ]);
+
+  // Fetch data when component mounts or settings change - Always fetch from API
+  useEffect(() => {
+    fetchBlogsFromApi();
+  }, [fetchBlogsFromApi]);
+
+  // Cards always come from API
+  const displayCards = apiCards;
+
+  // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
@@ -239,14 +396,46 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
         ></div>
 
         {/* Cards Grid */}
-        <div
-          className="grid gap-6 md:gap-8"
-          style={{
+        {loadingApi ? (
+          <div className="grid gap-6 md:gap-8" style={{
             gridTemplateColumns: `repeat(${mergedData.layout?.gridColumns?.desktop || 3}, 1fr)`,
             gap: mergedData.layout?.gap?.cards || "1.5rem",
-          }}
-        >
-          {mergedData.cards?.map((card, index) => (
+          }}>
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse"
+              >
+                <div className="w-full h-[250px] md:h-[280px] bg-gray-200"></div>
+                <div className="p-6">
+                  <div className="h-6 bg-gray-200 rounded mb-3"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : apiError ? (
+          <div className="text-center py-12">
+            <p className="text-red-600 text-lg">{apiError}</p>
+            <button
+              onClick={fetchBlogsFromApi}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
+        ) : (
+          <div
+            className="grid gap-6 md:gap-8"
+            style={{
+              gridTemplateColumns: `repeat(${mergedData.layout?.gridColumns?.desktop || 3}, 1fr)`,
+              gap: mergedData.layout?.gap?.cards || "1.5rem",
+            }}
+          >
+            {displayCards.length > 0 ? (
+              displayCards.map((card, index) => (
             <div
               key={card.id || index}
               className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
@@ -333,8 +522,14 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 text-lg">لا توجد مقالات متاحة</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

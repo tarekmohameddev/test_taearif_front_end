@@ -135,6 +135,48 @@ export function useComponentHandlers({
 
       const defaultData = createDefaultData(normalizedComponentType, componentName);
 
+      // Merge custom data from DraggableDrawerItem (sourceData.data) with default data
+      // Custom data takes priority over default data
+      const customData = componentData.sourceData || componentData.data || {};
+      // Remove metadata fields (label, description, icon, variant) and keep only component data
+      const { label, description, icon, variant, ...componentCustomData } = customData;
+      
+      // Deep merge: defaultData first, then custom component data
+      // Handle nested objects like dataSource with proper deep merge
+      const mergedData: any = {
+        ...defaultData,
+        ...componentCustomData,
+      };
+      
+      // Deep merge for nested objects (dataSource, layout, styling, etc.)
+      if (componentCustomData.dataSource && defaultData.dataSource) {
+        mergedData.dataSource = {
+          ...defaultData.dataSource,
+          ...componentCustomData.dataSource,
+        };
+      }
+      
+      if (componentCustomData.layout && defaultData.layout) {
+        mergedData.layout = {
+          ...defaultData.layout,
+          ...componentCustomData.layout,
+        };
+      }
+      
+      if (componentCustomData.styling && defaultData.styling) {
+        mergedData.styling = {
+          ...defaultData.styling,
+          ...componentCustomData.styling,
+        };
+      }
+      
+      if (componentCustomData.cardSettings && defaultData.cardSettings) {
+        mergedData.cardSettings = {
+          ...defaultData.cardSettings,
+          ...componentCustomData.cardSettings,
+        };
+      }
+
       const newComponent = {
         id: uuidv4(),
         type: normalizedComponentType,
@@ -142,7 +184,7 @@ export function useComponentHandlers({
           componentData.type.charAt(0).toUpperCase() +
           componentData.type.slice(1),
         componentName,
-        data: defaultData,
+        data: mergedData,
         layout: {
           row: pageComponents.length,
           col: 0,
@@ -205,10 +247,7 @@ export function useComponentHandlers({
         store.ensureComponentVariant(
           newComponent.type,
           variantId, // ✅ Use componentName for halfTextHalfImage, component.id for others
-          {
-            ...defaultData,
-            ...newComponent.data,
-          }
+          mergedData // Use mergedData instead of defaultData
         );
 
         logAfter(

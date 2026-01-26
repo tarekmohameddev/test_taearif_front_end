@@ -1,11 +1,11 @@
 import { ComponentStructure } from "./types";
 
-export const blogsSectionsStructure: ComponentStructure = {
-  componentType: "blogsSections",
+export const blogCardStructure: ComponentStructure = {
+  componentType: "blogCard",
   variants: [
     {
-      id: "blogsSections1",
-      name: "Blogs Sections 1 - Cards Grid with Paragraphs",
+      id: "blogCard1",
+      name: "Blog Card 1 - Blog Post Card",
       fields: [
         // ═══════════════════════════════════════════════════════════
         // BASIC FIELDS
@@ -15,42 +15,48 @@ export const blogsSectionsStructure: ComponentStructure = {
           label: "Visible",
           type: "boolean",
         },
-
         // ═══════════════════════════════════════════════════════════
-        // CONTENT - PARAGRAPHS
-        // ═══════════════════════════════════════════════════════════
-        {
-          key: "paragraph1",
-          label: "First Paragraph",
-          type: "textarea",
-          placeholder: "Enter first paragraph text",
-        },
-        {
-          key: "paragraph2",
-          label: "Second Paragraph",
-          type: "textarea",
-          placeholder: "Enter second paragraph text",
-        },
-
-        // ═══════════════════════════════════════════════════════════
-        // API SETTINGS
+        // BLOG DATA
         // ═══════════════════════════════════════════════════════════
         {
-          key: "apiSettings",
-          label: "API Settings",
+          key: "blog",
+          label: "Blog",
           type: "object",
           fields: [
             {
-              key: "limit",
-              label: "Posts Limit",
-              type: "number",
-              placeholder: "10",
+              key: "id",
+              label: "Blog ID",
+              type: "text",
+              placeholder: "1",
             },
             {
-              key: "page",
-              label: "Page Number",
-              type: "number",
-              placeholder: "1",
+              key: "image",
+              label: "Image URL",
+              type: "image",
+            },
+            {
+              key: "title",
+              label: "Blog Title",
+              type: "text",
+              placeholder: "مقال تجريبي",
+            },
+            {
+              key: "description",
+              label: "Description",
+              type: "textarea",
+              placeholder: "هذا مقال تجريبي للمحرر المباشر",
+            },
+            {
+              key: "readMoreUrl",
+              label: "Read More URL",
+              type: "text",
+              placeholder: "/blog/test-1",
+            },
+            {
+              key: "date",
+              label: "Date",
+              type: "text",
+              placeholder: "1 يناير 2024",
             },
           ],
         },
@@ -63,21 +69,6 @@ export const blogsSectionsStructure: ComponentStructure = {
           label: "Styling",
           type: "object",
           fields: [
-            {
-              key: "backgroundColor",
-              label: "Background Color",
-              type: "color",
-            },
-            {
-              key: "paragraphColor",
-              label: "Paragraph Text Color",
-              type: "color",
-            },
-            {
-              key: "dividerColor",
-              label: "Divider Color",
-              type: "color",
-            },
             {
               key: "cardBackgroundColor",
               label: "Card Background Color",
@@ -117,79 +108,29 @@ export const blogsSectionsStructure: ComponentStructure = {
         },
 
         // ═══════════════════════════════════════════════════════════
-        // LAYOUT
+        // RESPONSIVE
         // ═══════════════════════════════════════════════════════════
         {
-          key: "layout",
-          label: "Layout",
+          key: "responsive",
+          label: "Responsive",
           type: "object",
           fields: [
             {
-              key: "maxWidth",
-              label: "Max Width",
-              type: "text",
-              placeholder: "1280px",
-            },
-            {
-              key: "padding",
-              label: "Section Padding",
-              type: "object",
-              fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
-              ],
-            },
-            {
-              key: "gap",
-              label: "Gaps",
-              type: "object",
-              fields: [
-                {
-                  key: "paragraphs",
-                  label: "Paragraphs Gap",
-                  type: "text",
-                  placeholder: "2rem",
-                },
-                {
-                  key: "cards",
-                  label: "Cards Gap",
-                  type: "text",
-                  placeholder: "1.5rem",
-                },
-              ],
-            },
-            {
-              key: "gridColumns",
-              label: "Grid Columns",
+              key: "imageHeight",
+              label: "Image Height",
               type: "object",
               fields: [
                 {
                   key: "mobile",
-                  label: "Mobile Columns",
-                  type: "number",
-                  placeholder: "1",
-                },
-                {
-                  key: "tablet",
-                  label: "Tablet Columns",
-                  type: "number",
-                  placeholder: "2",
+                  label: "Mobile",
+                  type: "text",
+                  placeholder: "250px",
                 },
                 {
                   key: "desktop",
-                  label: "Desktop Columns",
-                  type: "number",
-                  placeholder: "3",
+                  label: "Desktop",
+                  type: "text",
+                  placeholder: "280px",
                 },
               ],
             },
@@ -202,8 +143,10 @@ export const blogsSectionsStructure: ComponentStructure = {
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
-        { key: "paragraph1", label: "First Paragraph", type: "textarea" },
-        { key: "paragraph2", label: "Second Paragraph", type: "textarea" },
+        { key: "blog.title", label: "Blog Title", type: "text" },
+        { key: "blog.description", label: "Description", type: "textarea" },
+        { key: "blog.readMoreUrl", label: "Read More URL", type: "text" },
+        { key: "blog.date", label: "Date", type: "text" },
       ],
     },
   ],
