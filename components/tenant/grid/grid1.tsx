@@ -853,15 +853,19 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                 className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
                 style={{ borderBottomColor: primaryColor }}
               ></div>
-              <p className="text-gray-600">جاري تحميل العقارات...</p>
+              <p className="text-gray-600">
+                {isBlogsApi ? "جاري تحميل المنشورات..." : "جاري تحميل العقارات..."}
+              </p>
             </div>
           </div>
         ) : properties.length > 0 ? (
           <>
             <div className="mb-6">
               <p className="text-sm text-gray-600">
-                تم العثور على {properties.length} عقار
-                {properties.length !== 1 ? "ات" : ""}
+                {isBlogsApi 
+                  ? `تم العثور على ${properties.length} منشور${properties.length !== 1 ? "ات" : ""}`
+                  : `تم العثور على ${properties.length} عقار${properties.length !== 1 ? "ات" : ""}`
+                }
                 {filteredProperties.length > 0 && (
                   <span className="text-xs text-gray-500 block mt-1">
                     {search && `البحث: "${search}"`}

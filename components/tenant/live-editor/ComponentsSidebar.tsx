@@ -606,6 +606,10 @@ const ComponentsListView = ({
                                             dataSource: {
                                               apiUrl: "/api/posts",
                                               enabled: true,
+                                            },
+                                            content: {
+                                              title: "المدونة",
+                                              subtitle: "اكتشف أحدث المقالات والأخبار",
                                             }
                                           }
                                         : {})
@@ -651,6 +655,10 @@ const ComponentsListView = ({
                                   dataSource: {
                                     apiUrl: "/api/posts",
                                     enabled: true,
+                                  },
+                                  content: {
+                                    title: "المدونة",
+                                    subtitle: "اكتشف أحدث المقالات والأخبار",
                                   }
                                 };
                               }

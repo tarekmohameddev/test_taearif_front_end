@@ -148,11 +148,18 @@ export function useComponentHandlers({
         ...componentCustomData,
       };
       
-      // Deep merge for nested objects (dataSource, layout, styling, etc.)
+      // Deep merge for nested objects (dataSource, layout, styling, content, etc.)
       if (componentCustomData.dataSource && defaultData.dataSource) {
         mergedData.dataSource = {
           ...defaultData.dataSource,
           ...componentCustomData.dataSource,
+        };
+      }
+      
+      if (componentCustomData.content && defaultData.content) {
+        mergedData.content = {
+          ...defaultData.content,
+          ...componentCustomData.content,
         };
       }
       
