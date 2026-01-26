@@ -661,7 +661,9 @@ export const CustomerTable = ({
                         <div className="space-y-1">
                           {/* City */}
                           <div className="font-medium text-right">
-                            {customer.district?.city_name_ar || "غير محدد"}
+                            {typeof customer.city === "object" && customer.city !== null
+                              ? customer.city.name_ar || customer.city.name_en || "غير محدد"
+                              : customer.district?.city_name_ar || "غير محدد"}
                           </div>
                           {/* District */}
                           <div className="text-sm text-muted-foreground text-right">
