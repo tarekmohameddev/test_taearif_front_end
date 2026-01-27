@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEditorStore } from "@/context/editorStore";
 import { useEditorT } from "@/context/editorI18nStore";
+import useTenantStore from "@/context/tenantStore";
 import { EnhancedLiveEditorDragDropContext } from "@/services/live-editor/dragDrop/EnhancedLiveEditorDragDropContext";
 import {
   validateComponentPositions,
@@ -52,6 +53,10 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
   const themeChangeTimestamp = useEditorStore((s) => s.themeChangeTimestamp);
   const staticPagesData = useEditorStore((s) => s.staticPagesData);
+  
+  // Tenant store subscriptions for loading state
+  const tenantLoading = useTenantStore((s) => s.loadingTenantData);
+  const tenantData = useTenantStore((s) => s.tenantData);
 
   // Custom hooks
   const isStaticPage = useStaticPageDetection(state.slug);
@@ -300,6 +305,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         selectedComponentId={selectedComponentId}
         handleEditClick={handleEditClick}
         handleDeleteClick={handleDeleteClick}
+        tenantLoading={tenantLoading}
+        tenantData={tenantData}
       />
     ),
     [
@@ -316,6 +323,8 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
       handleEditClick,
       handleDeleteClick,
       themeChangeTimestamp,
+      tenantLoading,
+      tenantData,
     ],
   );
 

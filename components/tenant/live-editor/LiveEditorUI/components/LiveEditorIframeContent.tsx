@@ -33,6 +33,8 @@ interface LiveEditorIframeContentProps {
   selectedComponentId: string | null;
   handleEditClick: (id: string) => void;
   handleDeleteClick: (id: string) => void;
+  tenantLoading: boolean;
+  tenantData: any;
 }
 
 export function LiveEditorIframeContent({
@@ -48,6 +50,8 @@ export function LiveEditorIframeContent({
   selectedComponentId,
   handleEditClick,
   handleDeleteClick,
+  tenantLoading,
+  tenantData,
 }: LiveEditorIframeContentProps) {
   // ========== LOG COMPONENTS RENDERING ==========
   useEffect(() => {
@@ -147,7 +151,10 @@ export function LiveEditorIframeContent({
       >
         <div style={{ pointerEvents: "none" }}>
           <Suspense fallback={<SkeletonLoader componentName="header" />}>
-            {!HeaderComponent ? (
+            {/* عرض Skeleton فقط إذا كان التحميل جارياً أو لم تأت البيانات بعد */}
+            {tenantLoading || !tenantData ? (
+              <SkeletonLoader componentName="header" />
+            ) : !HeaderComponent ? (
               <StaticHeader1 overrideData={headerDataWithoutVariant} />
             ) : (
               <HeaderComponent
@@ -295,7 +302,10 @@ export function LiveEditorIframeContent({
       >
         <div style={{ pointerEvents: "none" }}>
           <Suspense fallback={<SkeletonLoader componentName="footer" />}>
-            {!FooterComponent ? (
+            {/* عرض Skeleton فقط إذا كان التحميل جارياً أو لم تأت البيانات بعد */}
+            {tenantLoading || !tenantData ? (
+              <SkeletonLoader componentName="footer" />
+            ) : !FooterComponent ? (
               <StaticFooter1 overrideData={footerDataWithoutVariant} />
             ) : (
               <FooterComponent
