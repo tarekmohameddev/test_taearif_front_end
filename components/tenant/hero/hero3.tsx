@@ -166,8 +166,27 @@ const SearchForm = React.memo(function SearchForm({
   const [type, setType] = useState("");
 
   // Default colors if not provided
-  const defaultPrimaryColor = primaryColor || "#8b5f46";
-  const defaultPrimaryColorHover = primaryColorHover || "#6b4630";
+  const defaultPrimaryColor = "#8b5f46";
+  const defaultPrimaryColorHover =  "#6b4630";
+
+  // Function to darken a hex color
+  const darkenColor = (hex: string, percent: number = 0.3): string => {
+    // Remove # if present
+    hex = hex.replace('#', '');
+    
+    // Parse RGB values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Darken by reducing RGB values
+    const newR = Math.max(0, Math.floor(r * (1 - percent)));
+    const newG = Math.max(0, Math.floor(g * (1 - percent)));
+    const newB = Math.max(0, Math.floor(b * (1 - percent)));
+    
+    // Convert back to hex
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
 
   // Fetch cities from API
   useEffect(() => {
@@ -406,12 +425,12 @@ const SearchForm = React.memo(function SearchForm({
   {/* الزر العلوي: تطبيق البحث */}
   <button
     type="submit"
-    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+      e.currentTarget.style.backgroundColor = darkenColor(defaultPrimaryColor);
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = "#8b5f46";
+      e.currentTarget.style.backgroundColor = defaultPrimaryColor;
     }}
     className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
   >
@@ -421,12 +440,12 @@ const SearchForm = React.memo(function SearchForm({
   {/* الزر السفلي: بحث متقدم */}
   <button
     type="button"
-    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+      e.currentTarget.style.backgroundColor = darkenColor(defaultPrimaryColor);
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = "#8b5f46";
+      e.currentTarget.style.backgroundColor = defaultPrimaryColor;
     }}
     className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
   >
