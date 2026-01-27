@@ -121,6 +121,23 @@ export const getDefaultHeader2Data = (): ComponentData => {
       languageButtonHoverColor: "#000000",
     },
 
+    // Sizes
+    sizes: {
+      ThemeTwo: "sizes",
+      links: {
+        ThemeTwo: "links",
+        fontSize: {
+          desktop: "18px", // text-lg = 18px
+          mobile: "18px", // text-lg = 18px
+        },
+      },
+      logo: {
+        ThemeTwo: "logo",
+        width: 96,
+        height: 80,
+      },
+    },
+
     // Responsive
     responsive: {
       ThemeTwo: "responsive",

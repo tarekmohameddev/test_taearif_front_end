@@ -697,6 +697,38 @@ export const headerStructure: ComponentStructure = {
           ],
         },
         {
+          key: "sizes",
+          label: "المقاسات",
+          type: "object",
+          fields: [
+            {
+              key: "links",
+              label: "Links",
+              type: "object",
+              fields: [
+                {
+                  key: "fontSize",
+                  label: "Font Size",
+                  type: "object",
+                  fields: [
+                    { key: "desktop", label: "Desktop", type: "text", placeholder: "18px" },
+                    { key: "mobile", label: "Mobile", type: "text", placeholder: "18px" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "logo",
+              label: "Logo",
+              type: "object",
+              fields: [
+                { key: "width", label: "Width (px)", type: "number" },
+                { key: "height", label: "Height (px)", type: "number" },
+              ],
+            },
+          ],
+        },
+        {
           key: "responsive",
           label: "Responsive",
           type: "object",

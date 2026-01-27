@@ -86,6 +86,21 @@ interface Header2Props {
     languageButtonColor?: string;
     languageButtonHoverColor?: string;
   };
+  sizes?: {
+    ThemeTwo?: string;
+    links?: {
+      ThemeTwo?: string;
+      fontSize?: {
+        desktop?: string;
+        mobile?: string;
+      };
+    };
+    logo?: {
+      ThemeTwo?: string;
+      width?: number;
+      height?: number;
+    };
+  };
   responsive?: {
     ThemeTwo?: string;
     mobileBreakpoint?: number;
@@ -342,6 +357,7 @@ export default function Header2(props: Header2Props) {
     tenantData,
     globalHeaderData,
     forceUpdate,
+    customBranding,
   ]);
 
   // Force re-render when globalHeaderData changes (for global headers)
@@ -427,7 +443,10 @@ export default function Header2(props: Header2Props) {
         <CustomDropdown
           key={link.path || `link-${index}`}
           trigger={
-            <span className={buttonClass} style={{ color: mergedData.styling?.linkColor || "#f3f4f6" }}>
+            <span className={buttonClass} style={{ 
+              color: mergedData.styling?.linkColor || "#f3f4f6",
+              fontSize: mergedData.sizes?.links?.fontSize?.desktop || "18px",
+            }}>
               {link.name}
             </span>
           }
@@ -447,6 +466,7 @@ export default function Header2(props: Header2Props) {
         className={buttonClass}
         style={{
           color: mergedData.styling?.linkColor || "#f3f4f6",
+          fontSize: mergedData.sizes?.links?.fontSize?.desktop || "18px",
         }}
         onMouseEnter={() => setIsHovered(index)}
         onMouseLeave={() => setIsHovered(null)}
@@ -529,14 +549,8 @@ export default function Header2(props: Header2Props) {
   };
 
   const getButtonClass = (link: any, index: number) => {
-    if (!pathname)
-      return `relative text-lg font-semibold transition-all before:content-[''] before:absolute before:left-[-5px] before:top-[60%] before:h-[4px] before:transform before:-translate-y-1/2 before:w-[calc(100%+10px)] before:z-[-1] before:scale-x-0 before:origin-${i18n.language === "ar" ? "right" : "left"} before:transition-all before:duration-300 before:ease-in-out`;
-
-    const isActive =
-      link.path == pathname ||
-      (pathname && pathname.startsWith(link.path) && link.path != "/");
-
-    return `relative text-lg font-semibold transition-all before:content-[''] before:absolute before:left-[-5px] before:top-[60%] before:h-[4px] before:transform before:-translate-y-1/2 before:w-[calc(100%+10px)] before:z-[-1] before:scale-x-0 before:origin-${i18n.language === "ar" ? "right" : "left"} before:transition-all before:duration-300 before:ease-in-out`;
+    const baseClass = `relative font-semibold transition-all before:content-[''] before:absolute before:left-[-5px] before:top-[60%] before:h-[4px] before:transform before:-translate-y-1/2 before:w-[calc(100%+10px)] before:z-[-1] before:scale-x-0 before:origin-${i18n.language === "ar" ? "right" : "left"} before:transition-all before:duration-300 before:ease-in-out`;
+    return baseClass;
   };
 
   const handleChangeLanguage = useCallback(() => {
@@ -597,13 +611,14 @@ export default function Header2(props: Header2Props) {
           <Link
             key={subItem.id || `mobile-sub-${level}-${idx}`}
             href={href}
-            className={`capitalize font-medium text-lg block ${
+            className={`capitalize font-medium block ${
               level > 0 ? "me-4" : ""
             } ${isActive ? "border-b-2 border-purple-500 text-gray-900" : "text-gray-900"}`}
             style={{
               color: isActive
                 ? mergedData.styling?.mobileLinkActiveColor || "#7c3aed"
                 : mergedData.styling?.mobileLinkColor || "#111827",
+              fontSize: mergedData.sizes?.links?.fontSize?.mobile || "18px",
             }}
             onClick={() => setIsMenuOpen(false)}
           >
@@ -619,13 +634,14 @@ export default function Header2(props: Header2Props) {
       <div key={link.path || link.name} className="space-y-2">
         <button
           onClick={() => setIsSubOpen(!isSubOpen)}
-          className={`flex w-full items-center justify-between capitalize font-medium text-lg ${
+          className={`flex w-full items-center justify-between capitalize font-medium ${
             isActive ? "border-b-2 border-purple-500 text-gray-900" : "text-gray-900"
           }`}
           style={{
             color: isActive
               ? mergedData.styling?.mobileLinkActiveColor || "#7c3aed"
               : mergedData.styling?.mobileLinkColor || "#111827",
+            fontSize: mergedData.sizes?.links?.fontSize?.mobile || "18px",
           }}
         >
           <span>{link.name}</span>
@@ -672,8 +688,8 @@ export default function Header2(props: Header2Props) {
           <motion.div
             className={`relative `}
             style={{
-              width: mergedData.logo?.width || 96,
-              height: mergedData.logo?.height || 80,
+              width: mergedData.sizes?.logo?.width || mergedData.logo?.width || 96,
+              height: mergedData.sizes?.logo?.height || mergedData.logo?.height || 80,
             }}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -845,7 +861,7 @@ export default function Header2(props: Header2Props) {
                   <Link
                     href={link.path || "#"}
                     key={index}
-                    className={`capitalize font-medium text-lg ${
+                    className={`capitalize font-medium ${
                       isActive
                         ? "border-b-2 border-purple-500 text-gray-900"
                         : "text-gray-900"
@@ -856,6 +872,7 @@ export default function Header2(props: Header2Props) {
                           ? mergedData.styling?.mobileLinkActiveColor ||
                             "#7c3aed"
                           : mergedData.styling?.mobileLinkColor || "#111827",
+                      fontSize: mergedData.sizes?.links?.fontSize?.mobile || "18px",
                     }}
                   >
                     {link.name}
