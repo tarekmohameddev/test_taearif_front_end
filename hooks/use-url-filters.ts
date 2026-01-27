@@ -84,7 +84,8 @@ export function useUrlFilters() {
     if (params.type_id) {
       setPropertyType(params.type_id);
     }
-    if (params.search) {
+    // Only set search if it has a value (not empty)
+    if (params.search && params.search.trim()) {
       setSearch(params.search);
     }
 
@@ -95,15 +96,27 @@ export function useUrlFilters() {
       setTransactionType("sale");
     }
 
-    // Don't fetch properties if we're on projects page
-    // Projects page uses its own API endpoint
+    // Don't fetch properties if we're on projects page or real-estate page
+    // Projects page and real-estate page use their own API endpoints
     const isProjectsPage = pathname?.includes("/projects");
+    const isRealEstatePage = pathname?.includes("/real-estate");
+    
+    // Only auto-fetch on property-specific pages (for-rent or for-sale)
+    // Don't fetch on real-estate page (uses its own API) or other pages
+    const isPropertyPage = pathname?.includes("/for-rent") || pathname?.includes("/for-sale");
 
-    // Check if any filters are present
-    const hasFilters = Object.values(params).some((value) => value !== "");
+    // Check if any filters are present (excluding empty search parameter)
+    // Only consider search as a filter if it has a value
+    const hasFilters = 
+      params.city_id !== "" ||
+      params.state_id !== "" ||
+      params.max_price !== "" ||
+      params.category_id !== "" ||
+      params.type_id !== "" ||
+      (params.search !== "" && params.search.trim() !== "");
 
-    // Auto-trigger search if filters are present AND we're not on projects page
-    if (hasFilters && !isProjectsPage) {
+    // Auto-trigger search if filters are present AND we're on a property page AND not on projects/real-estate pages
+    if (hasFilters && isPropertyPage && !isProjectsPage && !isRealEstatePage) {
       fetchProperties(1);
     }
   }, [

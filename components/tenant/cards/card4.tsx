@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultCard4Data } from "@/context/editorStoreFunctions/card4Functions";
@@ -52,6 +53,7 @@ interface Card4Props {
   visible?: boolean;
   ThemeTwo?: string;
   property?: Property;
+  itemType?: "property" | "project"; // Type of item: property or project
   styling?: {
     ThemeTwo?: string;
     cardBackgroundColor?: string;
@@ -223,6 +225,10 @@ export default function Card4(props: Card4Props) {
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "card4";
   const uniqueId = props.id || variantId;
+  
+  // Get current pathname to check if we're on real-estate page
+  const pathname = usePathname();
+  const isRealEstatePage = pathname?.includes("/real-estate");
 
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
@@ -425,6 +431,24 @@ export default function Card4(props: Card4Props) {
           className="object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 387px"
         />
+        {/* Type Badge - Only show on real-estate page */}
+        {isRealEstatePage && props.itemType && (
+          <div
+            className="absolute top-4 left-4 rounded-lg px-3 py-1.5 flex items-center gap-1.5 shadow-md z-10"
+            style={{
+              backgroundColor: styling.priceBackgroundColor || "#896042",
+            }}
+          >
+            <span
+              className="text-sm font-semibold"
+              style={{
+                color: styling.priceTextColor || "#ffffff",
+              }}
+            >
+              {props.itemType === "project" ? "مشروع" : "وحدة"}
+            </span>
+          </div>
+        )}
         {/* Featured Badge */}
         {property.featured && (
           <div

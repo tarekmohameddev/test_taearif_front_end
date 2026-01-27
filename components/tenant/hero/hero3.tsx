@@ -18,7 +18,7 @@ import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultHero3Data } from "@/context/editorStoreFunctions/heroFunctions";
 import { useUrlFilters } from "@/hooks/use-url-filters";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -145,6 +145,7 @@ const SearchForm = React.memo(function SearchForm({
 }) {
   const { navigateWithFilters } = useUrlFilters();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // City options from API
   interface CityOption {
@@ -164,6 +165,10 @@ const SearchForm = React.memo(function SearchForm({
   const [cityId, setCityId] = useState(() => searchParams?.get("city_id") || "");
   const [cityName, setCityName] = useState("");
   const [type, setType] = useState("");
+  
+  // Advanced search state
+  const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
+  const [searchText, setSearchText] = useState(() => searchParams?.get("search") || "");
 
   // Default colors if not provided
   const defaultPrimaryColor = "#8b5f46";
@@ -234,10 +239,12 @@ const SearchForm = React.memo(function SearchForm({
 
     const purposeParam = searchParams.get("purpose");
     const cityIdParam = searchParams.get("city_id");
+    const searchParam = searchParams.get("search");
 
     if (purposeParam === "rent") setStatus("للإيجار");
     else if (purposeParam === "sale") setStatus("للبيع");
     if (cityIdParam) setCityId(cityIdParam);
+    if (searchParam) setSearchText(searchParam);
   }, [searchParams]);
 
   // Find city name from cityId for display
@@ -252,17 +259,6 @@ const SearchForm = React.memo(function SearchForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Convert status to transactionType
-    let transactionType: "rent" | "sale" = "rent";
-    if (status === "للبيع") {
-      transactionType = "sale";
-    } else if (status === "للإيجار") {
-      transactionType = "rent";
-    } else {
-      // Default to rent if no status selected
-      transactionType = "rent";
-    }
 
     // Collect filters
     const filters: {
@@ -284,18 +280,50 @@ const SearchForm = React.memo(function SearchForm({
       filters.type_id = type.trim();
     }
 
+    // Add search text if provided
+    if (searchText && searchText.trim()) {
+      filters.search = searchText.trim();
+    }
+
     // Log for debugging
     console.log("🔍 Hero3 Search Form Submit:", {
       status,
-      transactionType,
       cityId,
       cityName,
       type,
+      searchText,
       filters,
     });
 
-    // Navigate to the appropriate listing page with filters
-    navigateWithFilters(transactionType, filters);
+    // If search text exists, navigate to /real-estate with all filters
+    if (searchText && searchText.trim()) {
+      const params = new URLSearchParams();
+      
+      // Add all filters to URL params
+      if (filters.city_id) params.set("city_id", filters.city_id);
+      if (filters.type_id) params.set("type_id", filters.type_id);
+      if (filters.search) params.set("search", filters.search);
+      
+      const queryString = params.toString();
+      const url = queryString ? `/real-estate?${queryString}` : "/real-estate";
+      
+      router.push(url);
+    } else {
+      // Default behavior: navigate to for-rent or for-sale
+      // Convert status to transactionType
+      let transactionType: "rent" | "sale" = "rent";
+      if (status === "للبيع") {
+        transactionType = "sale";
+      } else if (status === "للإيجار") {
+        transactionType = "rent";
+      } else {
+        // Default to rent if no status selected
+        transactionType = "rent";
+      }
+
+      // Navigate to the appropriate listing page with filters
+      navigateWithFilters(transactionType, filters);
+    }
   };
 
   if (!config?.enabled) return null;
@@ -321,7 +349,10 @@ const SearchForm = React.memo(function SearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full rounded-2xl bg-white p-4 sm:px-6 shadow-lg max-w-6xl"
+      className={cn(
+        "w-full rounded-2xl bg-white p-4 sm:px-6 shadow-lg max-w-6xl overflow-hidden transition-all duration-300 ease-in-out",
+        isAdvancedSearchOpen ? "max-h-[600px]" : "max-h-[200px]"
+      )}
       aria-label="نموذج البحث عن العقارات"
     >
       {/* Desktop Layout: all in one row */}
@@ -440,6 +471,8 @@ const SearchForm = React.memo(function SearchForm({
   {/* الزر السفلي: بحث متقدم */}
   <button
     type="button"
+    onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
+    aria-expanded={isAdvancedSearchOpen}
     style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
     onMouseEnter={(e) => {
       e.currentTarget.style.backgroundColor = darkenColor(defaultPrimaryColor);
@@ -449,12 +482,34 @@ const SearchForm = React.memo(function SearchForm({
     }}
     className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
   >
-    بحث متقدم
+    {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
   </button>
 </div>
 </div>
         </div>
       </div>
+
+      {/* Advanced Search Field - Desktop Layout */}
+      {isAdvancedSearchOpen && (
+        <div className="hidden lg:block mt-4 pt-4 border-t border-gray-200 transition-all duration-300 ease-in-out">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Search className="size-5" style={{ color: "#896042" }} />
+              <h6 className="text-sm font-medium text-gray-700">البحث</h6>
+            </div>
+            <div className="relative">
+              <Input
+                type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="ابحث عن اسم أو صفة العقار"
+                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black text-right pr-10"
+              />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tablet/Mobile Layout */}
       <div className="grid gap-4 lg:hidden">
@@ -570,6 +625,8 @@ const SearchForm = React.memo(function SearchForm({
   {/* الزر السفلي: بحث متقدم */}
   <button
     type="button"
+    onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
+    aria-expanded={isAdvancedSearchOpen}
     style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
     onMouseEnter={(e) => {
       e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
@@ -579,10 +636,32 @@ const SearchForm = React.memo(function SearchForm({
     }}
     className="h-6 px-2 rounded-b-2xl rounded-t-none text-[10px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
   >
-    بحث متقدم
+    {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
   </button>
 </div>
       </div>
+
+      {/* Advanced Search Field - Mobile/Tablet Layout */}
+      {isAdvancedSearchOpen && (
+        <div className="lg:hidden mt-4 pt-4 border-t border-gray-200 transition-all duration-300 ease-in-out">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Search className="size-5" style={{ color: "#896042" }} />
+              <h6 className="text-sm font-medium text-gray-700">البحث</h6>
+            </div>
+            <div className="relative">
+              <Input
+                type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="ابحث عن اسم أو صفة العقار"
+                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black text-right pr-10"
+              />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 });

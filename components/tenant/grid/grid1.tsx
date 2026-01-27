@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { PropertyCard } from "@/components/tenant/cards/card1";
 import PropertyCard2 from "@/components/tenant/cards/card2";
 import PropertyCard3 from "@/components/tenant/cards/card3";
@@ -43,18 +43,24 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Use props.id as unique identifier (most reliable)
   const uniqueId = props.id || variantId;
 
-  // Get current pathname
+  // Get current pathname, search params, and router
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Check if we're on real-estate page
+  const isRealEstatePage = pathname?.includes("/real-estate");
 
   // Debug: Log component mount and URL
   useEffect(() => {
     console.log("🏗️  Grid1 mounted! URL:", {
       pathname,
+      isRealEstatePage,
       windowSearch:
         typeof window !== "undefined" ? window.location.search : "N/A",
       fullURL: typeof window !== "undefined" ? window.location.href : "N/A",
     });
-  }, [pathname]);
+  }, [pathname, isRealEstatePage]);
 
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
@@ -65,6 +71,16 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   // State for API data
   const [apiProperties, setApiProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  // State for pagination from API response (for real-estate page)
+  const [apiPagination, setApiPagination] = useState({
+    total: 0,
+    per_page: 20,
+    current_page: 1,
+    last_page: 1,
+    from: 1,
+    to: 0,
+  });
 
   // Subscribe to properties store for transactionType changes
   const transactionType = usePropertiesStore((state) => state.transactionType);
@@ -322,20 +338,72 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         return;
       }
 
-      const url = convertApiUrl(
-        apiUrl || resolveDefaultUrl(),
-        currentTenantId,
-        purpose,
-      );
+      // Check if we're on real-estate page and have search parameter (even if empty)
+      const hasSearchParam = searchParams?.has("search");
+      const searchTerm = searchParams?.get("search");
+      const pageParam = searchParams?.get("page") || "1";
+      
+      let url: string;
+      
+      if (isRealEstatePage && hasSearchParam) {
+        // Use new API endpoint for real-estate search
+        const params = new URLSearchParams();
+        // Only add title parameter if search term is not empty
+        if (searchTerm && searchTerm.trim()) {
+          params.set("title", searchTerm.trim());
+        }
+        params.set("per_page", "20");
+        params.set("page", pageParam);
+        
+        url = `/v1/tenant-website/${currentTenantId}?${params.toString()}`;
+      } else {
+        // Use existing API logic
+        url = convertApiUrl(
+          apiUrl || resolveDefaultUrl(),
+          currentTenantId,
+          purpose,
+        );
+      }
 
       const response = await axiosInstance.get(url);
 
       // Handle different API response formats
       if (response.data) {
         let dataToSet = [];
+        let paginationData = null;
 
+        // Handle real-estate search API response format
+        if (isRealEstatePage && hasSearchParam && response.data.data && Array.isArray(response.data.data)) {
+          // Process mixed data (properties and projects)
+          const mixedData = response.data.data;
+          
+          dataToSet = mixedData.map((item: any) => {
+            const originalType = item.type; // Save original type before conversion
+            // If it's a project, convert to property format
+            if (item.type === "project") {
+              const converted = convertProjectToProperty(item);
+              // Preserve original type for badge display
+              return { ...converted, _itemType: originalType };
+            }
+            // If it's a property, use it directly but preserve type
+            return { ...item, _itemType: originalType };
+          });
+          
+          // Extract pagination from response
+          if (response.data.pagination) {
+            paginationData = response.data.pagination;
+            setApiPagination({
+              total: paginationData.total || 0,
+              per_page: paginationData.per_page || 20,
+              current_page: paginationData.current_page || 1,
+              last_page: paginationData.last_page || 1,
+              from: paginationData.from || 1,
+              to: paginationData.to || 0,
+            });
+          }
+        }
         // Check if it's blogs API response
-        if (url.includes("/posts") || url.includes("/api/posts")) {
+        else if (url.includes("/posts") || url.includes("/api/posts")) {
           let blogsData = [];
 
           if (response.data.data && Array.isArray(response.data.data)) {
@@ -394,6 +462,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     } catch (error) {
       // Set empty array on error
       setApiProperties([]);
+      console.error("Error fetching properties:", error);
     } finally {
       setLoading(false);
     }
@@ -545,26 +614,38 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     // Always prioritize the configured apiUrl from dataSource
     const apiUrl = mergedData.dataSource?.apiUrl;
     const useApiData = mergedData.dataSource?.enabled !== false;
+    const hasSearchParam = searchParams?.has("search");
 
-    // Always use API when enabled and apiUrl is configured
-    const shouldUseOwnApi = useApiData && currentTenantId && apiUrl;
+    // For real-estate page with search parameter (even if empty), use new API endpoint
+    // For other cases, use API when enabled and apiUrl is configured
+    const shouldUseOwnApi = 
+      (isRealEstatePage && hasSearchParam && currentTenantId) ||
+      (useApiData && currentTenantId && apiUrl);
 
     if (shouldUseOwnApi) {
       // Clear existing data before fetching new data
       setApiProperties([]);
 
-      const purpose = apiUrl.includes("/projects")
-        ? undefined
-        : getPurposeFromPath() || transactionType;
-      fetchPropertiesFromApi(apiUrl, purpose);
+      // For real-estate page with search parameter, don't pass apiUrl (will use new endpoint)
+      // For other pages, use existing logic
+      if (isRealEstatePage && hasSearchParam) {
+        fetchPropertiesFromApi(undefined, undefined);
+      } else {
+        const purpose = apiUrl?.includes("/projects")
+          ? undefined
+          : getPurposeFromPath() || transactionType;
+        fetchPropertiesFromApi(apiUrl, purpose);
+      }
     }
   }, [
     mergedData.dataSource?.apiUrl,
     mergedData.dataSource?.enabled,
     currentTenantId,
-    pathname, // Add pathname to dependencies
-    transactionType, // Add transactionType to dependencies
-    filteredProperties.length, // Add filteredProperties to dependencies
+    pathname,
+    transactionType,
+    filteredProperties.length,
+    isRealEstatePage,
+    searchParams,
   ]);
 
   // Use API data if enabled, otherwise use static data
@@ -572,26 +653,56 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   const handlePageChange = useCallback(
     (page: number) => {
-      if (page !== pagination.current_page) {
-        setCurrentPage(page);
+      // For real-estate page, update URL and refetch
+      if (isRealEstatePage && searchParams?.get("search")) {
+        const currentParams = new URLSearchParams(searchParams.toString());
+        currentParams.set("page", page.toString());
+        router.push(`${pathname}?${currentParams.toString()}`);
+        // The useEffect will handle the refetch when searchParams changes
+      } else {
+        // For other pages, use existing store logic
+        if (page !== pagination.current_page) {
+          setCurrentPage(page);
+        }
       }
     },
-    [pagination.current_page, setCurrentPage],
+    [isRealEstatePage, searchParams, router, pathname, pagination.current_page, setCurrentPage],
   );
 
   const handleNextPage = useCallback(() => {
-    goToNextPage();
-  }, [goToNextPage]);
+    if (isRealEstatePage && searchParams?.get("search")) {
+      const currentPage = parseInt(searchParams.get("page") || "1", 10);
+      const nextPage = currentPage + 1;
+      if (nextPage <= apiPagination.last_page) {
+        handlePageChange(nextPage);
+      }
+    } else {
+      goToNextPage();
+    }
+  }, [isRealEstatePage, searchParams, apiPagination.last_page, handlePageChange, goToNextPage]);
 
   const handlePreviousPage = useCallback(() => {
-    goToPreviousPage();
-  }, [goToPreviousPage]);
+    if (isRealEstatePage && searchParams?.get("search")) {
+      const currentPage = parseInt(searchParams.get("page") || "1", 10);
+      const previousPage = currentPage - 1;
+      if (previousPage >= 1) {
+        handlePageChange(previousPage);
+      }
+    } else {
+      goToPreviousPage();
+    }
+  }, [isRealEstatePage, searchParams, handlePageChange, goToPreviousPage]);
+
+  // Determine which pagination to use
+  const activePagination = isRealEstatePage && searchParams?.get("search") 
+    ? apiPagination 
+    : pagination;
 
   const shouldRenderPagination =
     useApiData &&
     currentTenantId &&
-    pagination.last_page > 1 &&
-    (filteredProperties.length > 0 || pagination.total > pagination.per_page);
+    activePagination.last_page > 1 &&
+    (filteredProperties.length > 0 || apiProperties.length > 0 || activePagination.total > activePagination.per_page);
 
   // Determine if we're on projects page or blogs page
   const isProjectsPage = pathname?.includes("/projects");
@@ -600,12 +711,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const isBlogsApi = mergedData.dataSource?.apiUrl?.includes("/posts");
 
   // Always prioritize store data (filteredProperties) over API data
-  // EXCEPT when we're on projects page, blogs page, or using projects/blogs API
+  // EXCEPT when we're on projects page, blogs page, real-estate page with search parameter, or using projects/blogs API
   // In those cases, use apiProperties directly since store calls /properties API
+  const hasSearchParam = searchParams?.has("search");
   const properties =
     useApiData && currentTenantId
-      ? isProjectsPage || isProjectsApi || isBlogsPage || isBlogsApi
-        ? apiProperties // Use API data directly for projects and blogs
+      ? isProjectsPage || isProjectsApi || isBlogsPage || isBlogsApi || (isRealEstatePage && hasSearchParam)
+        ? apiProperties // Use API data directly for projects, blogs, and real-estate search
         : filteredProperties // Use store data for properties
       : useApiData
         ? apiProperties
@@ -735,6 +847,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         }
       })(),
       units: property.units || 0, // For card4
+      // Preserve _itemType for badge display
+      _itemType: property._itemType,
     };
   };
 
@@ -905,10 +1019,18 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                 if (theme === "card4") {
                   const convertedProperty =
                     convertPropertyForCard4And5(property);
+                  
+                  // Get item type from property (for real-estate page badge)
+                  // Check _itemType first (preserved from API), then check transactionType or type
+                  const itemType = (property as any)._itemType || 
+                    ((property as any).transactionType === "project" ? "project" : "property") ||
+                    ((property as any).type === "project" || (property as any).type === "مشروع" ? "project" : "property");
+                  
                   return (
                     <Card4
                       key={property.id || property._id}
                       property={convertedProperty}
+                      itemType={itemType}
                       useStore={false}
                     />
                   );
@@ -948,17 +1070,17 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
             {shouldRenderPagination && (
               <div className="mt-8">
                 <Pagination
-                  currentPage={pagination.current_page || 1}
-                  totalPages={pagination.last_page || 1}
+                  currentPage={activePagination.current_page || 1}
+                  totalPages={activePagination.last_page || 1}
                   onPageChange={handlePageChange}
                   onNextPage={handleNextPage}
                   onPreviousPage={handlePreviousPage}
-                  totalItems={pagination.total || properties.length}
+                  totalItems={activePagination.total || properties.length}
                   itemsPerPage={
-                    pagination.per_page || Math.max(properties.length, 1)
+                    activePagination.per_page || Math.max(properties.length, 1)
                   }
-                  showingFrom={pagination.from || 0}
-                  showingTo={pagination.to || properties.length}
+                  showingFrom={activePagination.from || 0}
+                  showingTo={activePagination.to || properties.length}
                 />
               </div>
             )}
