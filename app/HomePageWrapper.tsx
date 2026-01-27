@@ -1,5 +1,7 @@
 "use client";
 
+import PixelScripts from "@/components/tracking/PixelScripts";
+
 import {
   Suspense,
   lazy,
@@ -530,6 +532,7 @@ export default function HomePageWrapper({
   return (
     <GTMProvider>
       <GA4Provider tenantId={tenantId} domainType={domainType}>
+        <PixelScripts tenantId={tenantId} />
         <I18nProvider>
           <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header from globalComponentsData */}

@@ -45,6 +45,7 @@ import {
 } from "@/lib/multiLevelPages";
 import { getDefaultComponentForStaticPage } from "@/components/tenant/live-editor/effects/utils/staticPageHelpers";
 import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
+import PixelScripts from "@/components/tracking/PixelScripts";
 
 // ⭐ Cache للـ header components
 const headerComponentsCache = new Map<string, any>();
@@ -729,6 +730,7 @@ export default function TenantPageWrapper({
   if (loadingTenantData || !tenantData) {
     return (
       <I18nProvider>
+        <PixelScripts tenantId={tenantId} />
         <div className="min-h-screen flex flex-col" dir="rtl">
           {/* Header Skeleton */}
           <StaticHeaderSkeleton1 />
@@ -807,6 +809,7 @@ export default function TenantPageWrapper({
   return (
     <GTMProvider>
       <GA4Provider tenantId={tenantId} domainType={domainType}>
+        <PixelScripts tenantId={tenantId} />
         <I18nProvider>
           <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header with i18n support */}
