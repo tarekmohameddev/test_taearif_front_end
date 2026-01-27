@@ -3271,6 +3271,163 @@
       "apiEndpoints": {
         "fetchData": "/api/posts/[slug]"
       }
+    },
+    "real-estate": {
+      "slug": "real-estate",
+      "components": [
+        {
+          "id": "hero4-real-estate",
+          "type": "hero",
+          "name": "Hero",
+          "componentName": "hero4",
+          "data": {
+            "visible": true,
+            "title": "العقارات والمشاريع",
+            "backgroundImage": "https://dalel-lovat.vercel.app/images/hero.webp",
+            "barType": "propertyFilter",
+            "contact": false,
+            "background": {
+              "image": "https://dalel-lovat.vercel.app/images/hero.webp",
+              "alt": "صورة خلفية للعقارات والمشاريع",
+              "overlay": {
+                "enabled": true,
+                "opacity": "0.45",
+                "color": "#000000"
+              },
+              "type": "solid",
+              "opacity": "0.8",
+              "blur": true,
+              "colors": {
+                "from": "#ffffff",
+                "to": "#ffffff"
+              }
+            },
+            "content": {
+              "title": "اكتشف أفضل العقارات والمشاريع",
+              "subtitle": "نقدم لك أفضل الخيارات العقارية والمشاريع الاستثمارية مع ضمان الجودة والموثوقية",
+              "alignment": "center",
+              "maxWidth": "5xl",
+              "font": {
+                "title": {
+                  "family": "Tajawal",
+                  "size": {
+                    "desktop": "5xl",
+                    "tablet": "4xl",
+                    "mobile": "2xl"
+                  },
+                  "weight": "extrabold",
+                  "color": "#ffffff",
+                  "lineHeight": "1.25"
+                },
+                "subtitle": {
+                  "family": "Tajawal",
+                  "size": {
+                    "desktop": "2xl",
+                    "tablet": "2xl",
+                    "mobile": "2xl"
+                  },
+                  "weight": "normal",
+                  "color": "rgba(255, 255, 255, 0.85)"
+                }
+              },
+              "paddingTop": "200px"
+            },
+            "animations": {
+              "title": {
+                "enabled": true,
+                "type": "fade-up",
+                "duration": 600,
+                "delay": 200
+              },
+              "subtitle": {
+                "enabled": true,
+                "type": "fade-up",
+                "duration": 600,
+                "delay": 400
+              },
+              "searchForm": {
+                "enabled": true,
+                "type": "fade-up",
+                "duration": 600,
+                "delay": 600
+              }
+            }
+          },
+          "position": 0,
+          "layout": {
+            "row": 0,
+            "col": 0,
+            "span": 2
+          }
+        },
+        {
+          "id": "grid1-real-estate",
+          "type": "grid",
+          "name": "Grid",
+          "componentName": "grid1",
+          "data": {
+            "visible": true,
+            "content": {
+              "title": "العقارات والمشاريع",
+              "subtitle": "اكتشف أفضل العقارات والمشاريع المتاحة",
+              "emptyMessage": "لم يتم العثور على نتائج."
+            },
+            "styling": {
+              "bgColor": "#ffffff",
+              "textColor": "#374151",
+              "titleColor": "#111827",
+              "subtitleColor": "#6b7280",
+              "gridGap": "1.5rem",
+              "maxWidth": "1600px"
+            },
+            "layout": {
+              "columns": {
+                "mobile": 1,
+                "tablet": 2,
+                "desktop": 3,
+                "large": 4
+              },
+              "padding": {
+                "top": "2rem",
+                "bottom": "2rem",
+                "horizontal": "1rem"
+              }
+            },
+            "dataSource": {
+              "apiUrl": "/v1/tenant-website/{{tenantID}}/properties",
+              "enabled": true,
+              "cache": {
+                "enabled": true,
+                "duration": 30
+              }
+            },
+            "cardSettings": {
+              "theme": "card4",
+              "showImage": true,
+              "showPrice": true,
+              "showDetails": true,
+              "showViews": true,
+              "showStatus": true,
+              "cardStyle": {
+                "borderRadius": "rounded-xl",
+                "shadow": "lg",
+                "hoverEffect": "scale"
+              },
+              "imageSettings": {
+                "aspectRatio": "16/10",
+                "objectFit": "cover"
+              }
+            }
+          },
+          "position": 1,
+          "layout": {
+            "row": 1,
+            "col": 0,
+            "span": 2
+          }
+        }
+      ],
+      "apiEndpoints": {}
     }
   }
 }

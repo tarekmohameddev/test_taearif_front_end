@@ -1195,6 +1195,33 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
         "og:image:type": null,
         "og:image:alt": "للبيع",
       },
+      "real-estate": {
+        TitleAr: "العقارات والمشاريع",
+        TitleEn: "Real Estate & Projects",
+        DescriptionAr: "اكتشف أفضل العقارات والمشاريع الاستثمارية المتاحة في المنطقة",
+        DescriptionEn: "Discover the best available properties and investment projects in the area",
+        KeywordsAr: "عقارات, مشاريع, استثمار, عقار للبيع, عقار للإيجار, مشاريع عقارية",
+        KeywordsEn: "real estate, projects, investment, property for sale, property for rent, real estate projects",
+        Author: "الموقع",
+        AuthorEn: "Website",
+        Robots: "index, follow",
+        RobotsEn: "index, follow",
+        "og:title": "العقارات والمشاريع",
+        "og:description": "اكتشف أفضل العقارات والمشاريع الاستثمارية المتاحة",
+        "og:keywords": "عقارات, مشاريع, استثمار",
+        "og:author": "الموقع",
+        "og:robots": "index, follow",
+        "og:url": "",
+        "og:image": "",
+        "og:type": "website",
+        "og:locale": "ar",
+        "og:locale:alternate": "en",
+        "og:site_name": "الموقع",
+        "og:image:width": null,
+        "og:image:height": null,
+        "og:image:type": null,
+        "og:image:alt": "العقارات والمشاريع",
+      },
       projects: {
         TitleAr: "المشاريع",
         TitleEn: "Projects",
@@ -1706,6 +1733,65 @@ function EditorNavBar({ showArrowTooltip }: { showArrowTooltip: boolean }) {
               "og:image:alt": blogSeoData["og:image:alt"],
             }
           : getDefaultSeoData("blog"),
+      });
+    }
+
+    // ⭐ إضافة صفحة العقارات والمشاريع بشكل إجباري
+    const realEstatePageExists = pages.some(
+      (page) => page.slug === "real-estate" || page.path === "/real-estate",
+    );
+    if (!realEstatePageExists) {
+      // البحث عن بيانات SEO لصفحة real-estate في WebsiteLayout
+      let realEstateSeoData = null;
+      if (websiteLayout?.metaTags?.pages && Array.isArray(websiteLayout.metaTags.pages)) {
+        // metaTags.pages is an array with one object containing all pages as keys
+        const pagesObject = websiteLayout.metaTags.pages[0];
+        if (pagesObject && typeof pagesObject === "object") {
+          realEstateSeoData = pagesObject["real-estate"] || null;
+        }
+      }
+
+      const hasRealEstateSeoData =
+        realEstateSeoData &&
+        (realEstateSeoData.TitleAr ||
+          realEstateSeoData.TitleEn ||
+          realEstateSeoData.DescriptionAr ||
+          realEstateSeoData.DescriptionEn);
+
+      pages.push({
+        slug: "real-estate",
+        name: locale === "ar" ? "العقارات والمشاريع" : "Real Estate & Projects",
+        path: "/real-estate",
+        isStatic: true, // ⭐ علامة للصفحات الثابتة
+        seo: hasRealEstateSeoData
+          ? {
+              TitleAr: realEstateSeoData.TitleAr,
+              TitleEn: realEstateSeoData.TitleEn,
+              DescriptionAr: realEstateSeoData.DescriptionAr,
+              DescriptionEn: realEstateSeoData.DescriptionEn,
+              KeywordsAr: realEstateSeoData.KeywordsAr,
+              KeywordsEn: realEstateSeoData.KeywordsEn,
+              Author: realEstateSeoData.Author,
+              AuthorEn: realEstateSeoData.AuthorEn,
+              Robots: realEstateSeoData.Robots,
+              RobotsEn: realEstateSeoData.RobotsEn,
+              "og:title": realEstateSeoData["og:title"],
+              "og:description": realEstateSeoData["og:description"],
+              "og:keywords": realEstateSeoData["og:keywords"],
+              "og:author": realEstateSeoData["og:author"],
+              "og:robots": realEstateSeoData["og:robots"],
+              "og:url": realEstateSeoData["og:url"],
+              "og:image": realEstateSeoData["og:image"],
+              "og:type": realEstateSeoData["og:type"],
+              "og:locale": realEstateSeoData["og:locale"],
+              "og:locale:alternate": realEstateSeoData["og:locale:alternate"],
+              "og:site_name": realEstateSeoData["og:site_name"],
+              "og:image:width": realEstateSeoData["og:image:width"],
+              "og:image:height": realEstateSeoData["og:image:height"],
+              "og:image:type": realEstateSeoData["og:image:type"],
+              "og:image:alt": realEstateSeoData["og:image:alt"],
+            }
+          : getDefaultSeoData("real-estate"),
       });
     }
 

@@ -4074,6 +4074,33 @@
             "og:image:height": null,
             "og:image:type": null,
             "og:image:alt": "إنشاء طلب عقار"
+          },
+          "real-estate": {
+            "TitleAr": "العقارات والمشاريع",
+            "TitleEn": "Real Estate & Projects",
+            "DescriptionAr": "اكتشف أفضل العقارات والمشاريع الاستثمارية المتاحة في المنطقة",
+            "DescriptionEn": "Discover the best available properties and investment projects in the area",
+            "KeywordsAr": "عقارات, مشاريع, استثمار, عقار للبيع, عقار للإيجار, مشاريع عقارية",
+            "KeywordsEn": "real estate, projects, investment, property for sale, property for rent, real estate projects",
+            "Author": "الموقع",
+            "AuthorEn": "Website",
+            "Robots": "index, follow",
+            "RobotsEn": "index, follow",
+            "og:title": "العقارات والمشاريع",
+            "og:description": "اكتشف أفضل العقارات والمشاريع الاستثمارية المتاحة",
+            "og:keywords": "عقارات, مشاريع, استثمار",
+            "og:author": "الموقع",
+            "og:robots": "index, follow",
+            "og:url": "",
+            "og:image": "",
+            "og:type": "website",
+            "og:locale": "ar",
+            "og:locale:alternate": "en",
+            "og:site_name": "الموقع",
+            "og:image:width": null,
+            "og:image:height": null,
+            "og:image:type": null,
+            "og:image:alt": "العقارات والمشاريع"
           }
         }
       ]

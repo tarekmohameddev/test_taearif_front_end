@@ -80,9 +80,6 @@ export default function PropertyFilter({
   const uniqueId = id || variantId;
 
   // Subscribe to editor store updates for this propertyFilter variant
-  const ensureComponentVariant = useEditorStore(
-    (s) => s.ensureComponentVariant,
-  );
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const propertyFilterStates = useEditorStore((s) => s.propertyFilterStates);
 
@@ -174,6 +171,10 @@ export default function PropertyFilter({
 
   useEffect(() => {
     if (useStore) {
+      // ⭐ CRITICAL: Use getState() directly to avoid dependency issues
+      // ensureComponentVariant is stable but including it in deps can cause loops
+      const store = useEditorStore.getState();
+      
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
@@ -188,16 +189,12 @@ export default function PropertyFilter({
               ...content,
               ...props,
             };
-      ensureComponentVariant("propertyFilter", uniqueId, initialData);
+      store.ensureComponentVariant("propertyFilter", uniqueId, initialData);
     }
-  }, [
-    uniqueId,
-    useStore,
-    ensureComponentVariant,
-    tenantComponentData,
-    content,
-    props,
-  ]);
+    // ⭐ CRITICAL: Only depend on uniqueId and useStore
+    // Don't include ensureComponentVariant, tenantComponentData, content, or props to prevent infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uniqueId, useStore]);
 
   // Get default data
   const defaultData = getDefaultPropertyFilterData();

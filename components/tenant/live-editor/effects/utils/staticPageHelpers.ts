@@ -565,6 +565,68 @@ export function getDefaultComponentForStaticPage(slug: string) {
       position: 0,
       layout: { row: 0, col: 0, span: 2 },
     },
+    "real-estate": {
+      id: "grid1-real-estate",
+      type: "grid",
+      name: "Grid",
+      componentName: "grid1",
+      data: {
+        visible: true,
+        content: {
+          title: "العقارات والمشاريع",
+          subtitle: "اكتشف أفضل العقارات والمشاريع المتاحة",
+          emptyMessage: "لم يتم العثور على نتائج.",
+        },
+        styling: {
+          bgColor: "#ffffff",
+          textColor: "#374151",
+          titleColor: "#111827",
+          subtitleColor: "#6b7280",
+          gridGap: "1.5rem",
+          maxWidth: "1600px",
+        },
+        layout: {
+          columns: {
+            mobile: 1,
+            tablet: 2,
+            desktop: 3,
+            large: 4,
+          },
+          padding: {
+            top: "2rem",
+            bottom: "2rem",
+            horizontal: "1rem",
+          },
+        },
+        dataSource: {
+          apiUrl: "/v1/tenant-website/{{tenantID}}/properties",
+          enabled: true,
+          cache: {
+            enabled: true,
+            duration: 30,
+          },
+        },
+        cardSettings: {
+          theme: "card1",
+          showImage: true,
+          showPrice: true,
+          showDetails: true,
+          showViews: true,
+          showStatus: true,
+          cardStyle: {
+            borderRadius: "rounded-xl",
+            shadow: "lg",
+            hoverEffect: "scale",
+          },
+          imageSettings: {
+            aspectRatio: "16/10",
+            objectFit: "cover",
+          },
+        },
+      },
+      position: 0,
+      layout: { row: 0, col: 0, span: 2 },
+    },
     // يمكن إضافة صفحات ثابتة أخرى لاحقاً
     // products: { ... },
     // checkout: { ... },
