@@ -5,6 +5,55 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 // DEFAULT DATA - Define your component's data structure
 // ═══════════════════════════════════════════════════════════
 
+export const getDefaultBlogDetails1Data = (): ComponentData => ({
+  visible: true,
+
+  // Layout configuration
+  layout: {
+    maxWidth: "1280px",
+    padding: {
+      top: "0rem",
+      bottom: "3rem",
+    },
+    gap: "2rem",
+  },
+
+  // Styling
+  styling: {
+    backgroundColor: "#ffffff",
+    primaryColor: "#059669", // emerald-600 default (same as propertyDetail1)
+    textColor: "#374151",
+    secondaryTextColor: "#6b7280",
+  },
+
+  // Content - نصوص قابلة للتعديل
+  content: {
+    descriptionTitle: "محتوى المقال",
+  },
+
+  // Display settings - ما الحقول التي تظهر
+  displaySettings: {
+    showDescription: true,
+    showAuthor: true,
+    showCategories: true,
+    showPublishedDate: true,
+  },
+
+  // WhatsApp settings - إعدادات الواتساب
+  whatsApp: {
+    showButton: false, // مخفي بشكل افتراضي
+    buttonText: "استفسار عن طريق الواتساب",
+    phoneNumber: "",
+  },
+
+  // Gallery settings
+  gallery: {
+    showThumbnails: true,
+    thumbnailGridColumns: 4,
+    thumbnailHeight: "200px",
+  },
+});
+
 export const getDefaultBlogDetails2Data = (): ComponentData => ({
   visible: true,
 
@@ -109,8 +158,11 @@ export const blogDetailsFunctions = {
       return {} as any; // Already exists, skip initialization
     }
 
-    // Determine default data
-    const defaultData = getDefaultBlogDetails2Data();
+    // Determine default data based on variant
+    const defaultData =
+      variantId === "blogDetails1"
+        ? getDefaultBlogDetails1Data()
+        : getDefaultBlogDetails2Data();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
@@ -131,8 +183,15 @@ export const blogDetailsFunctions = {
    * @param variantId - Unique component ID
    * @returns Component data or default data if not found
    */
-  getData: (state: any, variantId: string) =>
-    state.blogDetailsStates[variantId] || getDefaultBlogDetails2Data(),
+  getData: (state: any, variantId: string) => {
+    const stored = state.blogDetailsStates[variantId];
+    if (stored) return stored;
+
+    // Return appropriate default based on variant
+    return variantId === "blogDetails1"
+      ? getDefaultBlogDetails1Data()
+      : getDefaultBlogDetails2Data();
+  },
 
   /**
    * setData - Set/replace component data completely
@@ -156,8 +215,11 @@ export const blogDetailsFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.blogDetailsStates[variantId] || getDefaultBlogDetails2Data();
+    const defaultData =
+      variantId === "blogDetails1"
+        ? getDefaultBlogDetails1Data()
+        : getDefaultBlogDetails2Data();
+    const source = state.blogDetailsStates[variantId] || defaultData;
     const newData = updateDataByPath(source, path, value);
 
     return {

@@ -3602,6 +3602,63 @@
       "apiEndpoints": {
         "fetchData": "/api/properties/[slug]"
       }
+    },
+    "blog": {
+      "slug": "blog",
+      "components": [
+        {
+          "id": "blogDetails1",
+          "type": "blogDetails",
+          "name": "Blog Details",
+          "componentName": "blogDetails1",
+          "data": {
+            "visible": true,
+            "blogSlug": "",
+            "layout": {
+              "maxWidth": "1280px",
+              "padding": {
+                "top": "3rem",
+                "bottom": "3rem"
+              },
+              "gap": "2rem"
+            },
+            "styling": {
+              "backgroundColor": "#ffffff",
+              "primaryColor": "#059669",
+              "textColor": "#374151",
+              "secondaryTextColor": "#6b7280"
+            },
+            "content": {
+              "descriptionTitle": "محتوى المقال"
+            },
+            "displaySettings": {
+              "showDescription": true,
+              "showAuthor": true,
+              "showCategories": true,
+              "showPublishedDate": true
+            },
+            "gallery": {
+              "showThumbnails": true,
+              "thumbnailGridColumns": 4,
+              "thumbnailHeight": "200px"
+            },
+            "whatsApp": {
+              "showButton": false,
+              "buttonText": "استفسار عن طريق الواتساب",
+              "phoneNumber": ""
+            }
+          },
+          "position": 0,
+          "layout": {
+            "row": 0,
+            "col": 0,
+            "span": 2
+          }
+        }
+      ],
+      "apiEndpoints": {
+        "fetchData": "/api/posts/[slug]"
+      }
     }
   }
 }
