@@ -401,20 +401,39 @@ const SearchForm = React.memo(function SearchForm({
 
         {/* Apply Button */}
         <div className="flex flex-col gap-2">
-          <div className="h-6"></div>
-          <button
-            type="submit"
-            style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#8b5f46";
-            }}
-            className="h-12 px-6 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
-          >
-            تطبيق البحث
-          </button>
+          <div className="flex   flex-col w-full">
+          <div className="flex flex-col items-center w-full">
+  {/* الزر العلوي: تطبيق البحث */}
+  <button
+    type="submit"
+    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = "#8b5f46";
+    }}
+    className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
+  >
+    تطبيق البحث
+  </button>
+
+  {/* الزر السفلي: بحث متقدم */}
+  <button
+    type="button"
+    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = "#8b5f46";
+    }}
+    className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
+  >
+    بحث متقدم
+  </button>
+</div>
+</div>
         </div>
       </div>
 
@@ -513,19 +532,37 @@ const SearchForm = React.memo(function SearchForm({
         </div>
 
         {/* Apply Button */}
-        <button
-          type="submit"
-          style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#8b5f46";
-          }}
-          className="h-12 px-6 rounded-2xl font-medium text-white transition-colors w-full"
-        >
-          تطبيق البحث
-        </button>
+        <div className="flex flex-col items-center w-full">
+  {/* الزر العلوي: تطبيق البحث */}
+  <button
+    type="submit"
+    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = "#8b5f46";
+    }}
+    className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
+  >
+    تطبيق البحث
+  </button>
+
+  {/* الزر السفلي: بحث متقدم */}
+  <button
+    type="button"
+    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = "#8b5f46";
+    }}
+    className="h-6 px-2 rounded-b-2xl rounded-t-none text-[10px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
+  >
+    بحث متقدم
+  </button>
+</div>
       </div>
     </form>
   );
