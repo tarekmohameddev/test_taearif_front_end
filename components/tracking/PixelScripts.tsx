@@ -41,8 +41,8 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
           case "tiktok":
             return (
               <Script
-                key={pixel._id}
-                id={`tiktok-pixel-${pixel._id}`}
+                key={pixel._id || `${pixel.provider}-${pixel.externalId}`}
+                id={`tiktok-pixel-${pixel._id || pixel.externalId}`}
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
                   __html: `
@@ -50,17 +50,18 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
                       w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t.align=2,ttq.push([t].concat(Array.prototype.slice.call(e,0)))};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq.methods[i],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
                     
                       ttq.load('${pixel.externalId}');
-                      ttq.page();
+                      ttq.ready(function(){ttq.page();});
                     }(window, document, 'ttq');
                   `,
                 }}
               />
             );
           case "meta":
+            const metaKey = pixel._id || `${pixel.provider}-${pixel.externalId}`;
             return (
-              <Fragment key={pixel._id}>
+              <Fragment key={metaKey}>
                 <Script
-                  id={`meta-pixel-${pixel._id}`}
+                  id={`meta-pixel-${metaKey}`}
                   strategy="afterInteractive"
                   dangerouslySetInnerHTML={{
                     __html: `
@@ -91,8 +92,8 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
           case "snapchat":
             return (
               <Script
-                key={pixel._id}
-                id={`snapchat-pixel-${pixel._id}`}
+                key={pixel._id || `${pixel.provider}-${pixel.externalId}`}
+                id={`snapchat-pixel-${pixel._id || pixel.externalId}`}
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
                   __html: `
