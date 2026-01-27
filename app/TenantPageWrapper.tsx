@@ -725,8 +725,8 @@ export default function TenantPageWrapper({
     }
   };
 
-  // إذا كان التحميل جارياً، أظهر skeleton loading
-  if (loadingTenantData) {
+  // إذا كان التحميل جارياً أو لم تأت البيانات بعد، أظهر skeleton loading فقط
+  if (loadingTenantData || !tenantData) {
     return (
       <I18nProvider>
         <div className="min-h-screen flex flex-col" dir="rtl">
@@ -735,6 +735,9 @@ export default function TenantPageWrapper({
 
           {/* Page-specific Skeleton Content */}
           {renderSkeletonContent()}
+          
+          {/* Footer Skeleton */}
+          <SkeletonLoader componentName="footer" />
         </div>
       </I18nProvider>
     );
@@ -810,6 +813,11 @@ export default function TenantPageWrapper({
             <div className="relative">
               <Suspense fallback={<SkeletonLoader componentName="header" />}>
                 {(() => {
+                  // ⭐ CRITICAL: لا تعرض Header إلا بعد التأكد من وجود tenantData
+                  if (!tenantData || !globalHeaderData) {
+                    return <SkeletonLoader componentName="header" />;
+                  }
+
                   // Map variant names to component names
                   const componentMap: Record<string, string> = {
                     StaticHeader1: "StaticHeader1",
@@ -828,7 +836,7 @@ export default function TenantPageWrapper({
 
                   if (!HeaderComponent) {
                     return (
-                      <StaticHeader1 overrideData={globalHeaderData || {}} />
+                      <StaticHeader1 overrideData={globalHeaderData} />
                     );
                   }
 
@@ -909,6 +917,11 @@ export default function TenantPageWrapper({
             {/* Footer with i18n support */}
             <Suspense fallback={<SkeletonLoader componentName="footer" />}>
               {(() => {
+                // ⭐ CRITICAL: لا تعرض Footer إلا بعد التأكد من وجود tenantData
+                if (!tenantData || !globalFooterData) {
+                  return <SkeletonLoader componentName="footer" />;
+                }
+
                 const footerDataWithoutVariant = globalFooterData
                   ? (() => {
                       const { variant: _variant, ...data } = globalFooterData;

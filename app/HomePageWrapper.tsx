@@ -487,7 +487,8 @@ export default function HomePageWrapper({
     );
   };
 
-  if (shouldShowLoading || !componentsList) {
+  // ⭐ CRITICAL: لا تعرض المكونات إلا بعد التأكد التام من وجود tenantData
+  if (shouldShowLoading || !componentsList || !tenantData) {
     return (
       <I18nProvider>
         <div className="min-h-screen flex flex-col" dir="rtl">
@@ -496,6 +497,9 @@ export default function HomePageWrapper({
 
           {/* Page-specific Skeleton Content */}
           {renderSkeletonContent()}
+          
+          {/* Footer Skeleton */}
+          <SkeletonLoader componentName="footer" />
         </div>
       </I18nProvider>
     );
@@ -532,6 +536,11 @@ export default function HomePageWrapper({
             <div className="relative">
               <Suspense fallback={<SkeletonLoader componentName="header" />}>
                 {(() => {
+                  // ⭐ CRITICAL: لا تعرض Header إلا بعد التأكد من وجود tenantData
+                  if (!tenantData || !globalHeaderData) {
+                    return <SkeletonLoader componentName="header" />;
+                  }
+
                   // Map variant names to component names
                   const componentMap: Record<string, string> = {
                     StaticHeader1: "StaticHeader1",
@@ -563,7 +572,7 @@ export default function HomePageWrapper({
                       "[HomePageWrapper] HeaderComponent is null, falling back to StaticHeader1",
                     );
                     return (
-                      <StaticHeader1 overrideData={globalHeaderData || {}} />
+                      <StaticHeader1 overrideData={globalHeaderData} />
                     );
                   }
 
@@ -640,6 +649,11 @@ export default function HomePageWrapper({
             {/* Footer from globalComponentsData */}
             <Suspense fallback={<SkeletonLoader componentName="footer" />}>
               {(() => {
+                // ⭐ CRITICAL: لا تعرض Footer إلا بعد التأكد من وجود tenantData
+                if (!tenantData || !globalFooterData) {
+                  return <SkeletonLoader componentName="footer" />;
+                }
+
                 const footerDataWithoutVariant = globalFooterData
                   ? (() => {
                       const { variant: _variant, ...data } = globalFooterData;
