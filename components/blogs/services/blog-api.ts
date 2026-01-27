@@ -125,8 +125,7 @@ export async function deleteBlog(id: number): Promise<{ message: string }> {
 
 /**
  * Get blog statistics
- * Note: This endpoint may need to be created on backend
- * For now, we'll calculate from posts list
+ * Calculates stats from posts list and categories
  * @returns Promise with stats
  */
 export async function getBlogStats(): Promise<{
@@ -134,32 +133,23 @@ export async function getBlogStats(): Promise<{
   total_views: number;
   total_categories: number;
 }> {
-  // This might need a separate endpoint like GET /posts/stats
-  // For now, we'll fetch all posts and calculate
-  // Or use a dedicated stats endpoint if available
-  try {
-    // Try dedicated stats endpoint first
-    const response = await axiosInstance.get("/posts/stats");
-    return response.data;
-  } catch (error) {
-    // Fallback: calculate from posts list
-    const postsResponse = await getBlogsList(1, 1000); // Get all posts
-    const total_blogs = postsResponse.pagination.total;
-    const total_views = postsResponse.data.reduce(
-      (sum, post) => sum + (post.views || 0),
-      0
-    );
-    
-    // Get categories count
-    const categoriesResponse = await axiosInstance.get("/categories");
-    const total_categories = categoriesResponse.data.data?.length || 0;
+  // Calculate from posts list and categories
+  const postsResponse = await getBlogsList(1, 1000); // Get all posts
+  const total_blogs = postsResponse.pagination.total;
+  const total_views = postsResponse.data.reduce(
+    (sum, post) => sum + (post.views || 0),
+    0
+  );
+  
+  // Get categories count
+  const categoriesResponse = await axiosInstance.get("/categories");
+  const total_categories = categoriesResponse.data.data?.length || 0;
 
-    return {
-      total_blogs,
-      total_views,
-      total_categories,
-    };
-  }
+  return {
+    total_blogs,
+    total_views,
+    total_categories,
+  };
 }
 
 // Export all functions as default object
