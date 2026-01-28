@@ -4,4 +4,6 @@ export { ComponentCard } from "./ComponentCard";
 export { EmptyState } from "./EmptyState";
 export { ProjectDisplayCard } from "./ProjectDisplayCard";
 export { UncreatedProjectsCard } from "./UncreatedProjectsCard";
+export { CompletedProjectsCard } from "./CompletedProjectsCard";
+export { UnderConstructionProjectsCard } from "./UnderConstructionProjectsCard";
 export { CategoriesList } from "./CategoriesList";

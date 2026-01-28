@@ -5,6 +5,8 @@ import { CategoryHeader } from "./CategoryHeader";
 import { ComponentCard } from "./ComponentCard";
 import { ProjectDisplayCard } from "./ProjectDisplayCard";
 import { UncreatedProjectsCard } from "./UncreatedProjectsCard";
+import { CompletedProjectsCard } from "./CompletedProjectsCard";
+import { UnderConstructionProjectsCard } from "./UnderConstructionProjectsCard";
 import { CategorySectionProps } from "../types";
 import { categoryExpansionVariants, listItem } from "../constants";
 import { getVariantsForSection, shouldShowEmptyCategory } from "../utils";
@@ -57,6 +59,8 @@ export function CategorySection({
                 <>
                   <ProjectDisplayCard activeTab={activeTab} />
                   <UncreatedProjectsCard activeTab={activeTab} />
+                  <CompletedProjectsCard activeTab={activeTab} />
+                  <UnderConstructionProjectsCard activeTab={activeTab} />
                 </>
               )}
 
