@@ -12,6 +12,7 @@ import {
   ImageIcon,
   MapPin,
   Video,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +38,7 @@ import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
 import { uploadMultipleFiles } from "@/utils/uploadMultiple";
+import { mediaApi } from "@/components/blogs/services/media-api";
 
 // دالة رفع الفيديوهات
 const uploadVideos = async (files: File[]) => {
@@ -110,6 +112,7 @@ export default function EditProjectPage(): JSX.Element {
   const plansInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const videosInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [newProject, setNewProject] = useState({
@@ -136,6 +139,8 @@ export default function EditProjectPage(): JSX.Element {
   const [galleryImages, setGalleryImages] = useState<ProjectImage[]>([]);
   const [video, setVideo] = useState<File | null>(null);
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
 
@@ -475,6 +480,35 @@ export default function EditProjectPage(): JSX.Element {
     setVideoPreview(null);
   };
 
+  const handlePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    if (file.type !== "application/pdf") {
+      toast.error("يجب أن يكون الملف بصيغة PDF فقط");
+      return;
+    }
+
+    // Check file size (max 50MB)
+    const maxSizeInBytes = 50 * 1024 * 1024; // 50 MB
+    if (file.size > maxSizeInBytes) {
+      toast.error("يجب أن يكون حجم الملف أقل من 50 ميجابايت");
+      return;
+    }
+
+    setPdfFile(file);
+    setPdfUrl(URL.createObjectURL(file));
+  };
+
+  const removePdf = () => {
+    setPdfFile(null);
+    setPdfUrl(null);
+    if (pdfInputRef.current) {
+      pdfInputRef.current.value = "";
+    }
+  };
+
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
     if (!newProject.name) {
@@ -597,6 +631,22 @@ export default function EditProjectPage(): JSX.Element {
         videoPath = videoPreview;
       }
 
+      // رفع ملف PDF إذا تم اختيار ملف جديد
+      let brochurePath = null;
+      if (pdfFile) {
+        try {
+          toast.loading("جاري رفع ملف PDF...", { id: "upload-pdf" });
+          // POST /media - رفع ملف PDF
+          const pdfResponse = await mediaApi.uploadMedia(pdfFile);
+          brochurePath = pdfResponse.data.url || pdfResponse.data.path;
+          toast.success("تم رفع ملف PDF بنجاح", { id: "upload-pdf" });
+        } catch (error) {
+          console.error("Failed to upload PDF:", error);
+          toast.error("فشل في رفع ملف PDF. يرجى المحاولة مرة أخرى.", { id: "upload-pdf" });
+          throw error;
+        }
+      }
+
       const publishedValue = status === "منشور" ? 1 : 0;
 
       const projectData = {
@@ -639,6 +689,7 @@ export default function EditProjectPage(): JSX.Element {
         gallery_images: galleryPaths,
         floorplan_images: floorplanPaths,
         video_url: videoPath,
+        brochure: brochurePath,
         specifications: [
           { key: "Bedrooms", label: "Number of Bedrooms", value: "3" },
           { key: "Bathrooms", label: "Number of Bathrooms", value: "2" },
@@ -1413,6 +1464,69 @@ export default function EditProjectPage(): JSX.Element {
                         ميجابايت والحد الأقصى للطول هو 5 دقائق.
                       </p>
                     </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Project PDF Upload */}
+            <Card>
+              <CardHeader>
+                <CardTitle>ملف PDF للمشروع</CardTitle>
+                <CardDescription>
+                  قم بتحميل ملف PDF يحتوي على معلومات إضافية عن المشروع
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="border rounded-md p-2 flex-1 w-full">
+                    <div className="flex items-center justify-center h-48 bg-muted rounded-md relative">
+                      {pdfFile ? (
+                        <>
+                          <div className="flex flex-col items-center gap-2">
+                            <FileText className="h-16 w-16 text-muted-foreground" />
+                            <p className="text-sm font-medium text-center max-w-xs truncate">
+                              {pdfFile.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {(pdfFile.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2 h-8 w-8"
+                            onClick={removePdf}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <FileText className="h-12 w-12 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4 w-full md:w-1/3">
+                    <input
+                      ref={pdfInputRef}
+                      type="file"
+                      accept="application/pdf"
+                      className="hidden"
+                      onChange={handlePdfUpload}
+                    />
+                    <Button
+                      variant="outline"
+                      className="h-12 w-full"
+                      onClick={() => pdfInputRef.current?.click()}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Upload className="h-5 w-5" />
+                        <span>رفع ملف PDF</span>
+                      </div>
+                    </Button>
+                    <p className="text-sm text-muted-foreground">
+                      يمكنك رفع ملف PDF. الحد الأقصى لحجم الملف هو 50 ميجابايت.
+                    </p>
                   </div>
                 </div>
               </CardContent>
