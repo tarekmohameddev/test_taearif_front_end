@@ -83,6 +83,7 @@ interface Footer2Props {
         text?: string;
         phoneNumber?: string;
         message?: string;
+        buttonColor?: string;
         ThemeTwo?: string;
       };
       ThemeTwo?: string;
@@ -705,13 +706,29 @@ export default function Footer2(props: Footer2Props) {
                   className="mt-4 px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap inline-flex items-center justify-center gap-2"
                   style={{ 
                     color: textAndLinksColor,
-                    backgroundColor: darkerBgColor,
+                    backgroundColor: mergedData.content?.socialMedia?.whatsappInquiry?.buttonColor || darkerBgColor,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = darkenColor(footerBgColor, 25);
+                    const baseColor = mergedData.content?.socialMedia?.whatsappInquiry?.buttonColor || darkerBgColor;
+                    // Darken color by 10% on hover
+                    const hex = baseColor.replace('#', '');
+                    if (hex.length === 6) {
+                      const r = parseInt(hex.substring(0, 2), 16);
+                      const g = parseInt(hex.substring(2, 4), 16);
+                      const b = parseInt(hex.substring(4, 6), 16);
+                      const newR = Math.max(0, Math.floor(r * 0.9));
+                      const newG = Math.max(0, Math.floor(g * 0.9));
+                      const newB = Math.max(0, Math.floor(b * 0.9));
+                      const toHex = (n: number) => {
+                        const hex = n.toString(16);
+                        return hex.length === 1 ? '0' + hex : hex;
+                      };
+                      e.currentTarget.style.backgroundColor = `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = darkerBgColor;
+                    const baseColor = mergedData.content?.socialMedia?.whatsappInquiry?.buttonColor || darkerBgColor;
+                    e.currentTarget.style.backgroundColor = baseColor;
                   }}
                 >
                   <svg

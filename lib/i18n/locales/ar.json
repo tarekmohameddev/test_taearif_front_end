@@ -3122,6 +3122,7 @@
       "hover_color": "لون التمرير",
       "whatsapp_inquiry_button": "زر استفسار الواتساب",
       "button_text": "نص الزر",
+      "button_color": "لون الزر",
       "phone_number": "رقم الهاتف",
       "default_message": "الرسالة الافتراضية",
       "footer_bottom": "أسفل التذييل",

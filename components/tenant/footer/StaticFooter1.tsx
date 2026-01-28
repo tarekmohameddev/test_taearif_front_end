@@ -89,6 +89,7 @@ type FooterData = {
         text: string;
         phoneNumber: string;
         message: string;
+        buttonColor?: string;
       };
     };
   };
@@ -205,6 +206,7 @@ const getDefaultFooterData = (): FooterData => ({
         text: "استفسر عن طريق الواتساب",
         phoneNumber: "",
         message: "مرحباً، أريد الاستفسار عن",
+        buttonColor: "#10b981",
       },
     },
   },
@@ -749,10 +751,32 @@ export default function StaticFooter({
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold text-white transition-colors hover:bg-emerald-700 whitespace-nowrap"
+                      className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold text-white transition-colors whitespace-nowrap"
                       style={{
-                        backgroundColor: mergedData.styling.colors.accent || "#10b981",
+                        backgroundColor: mergedData.content.socialMedia.whatsappInquiry?.buttonColor || mergedData.styling.colors.accent || "#10b981",
                         transition: mergedData.styling.effects.hoverTransition,
+                      }}
+                      onMouseEnter={(e) => {
+                        const baseColor = mergedData.content.socialMedia.whatsappInquiry?.buttonColor || mergedData.styling.colors.accent || "#10b981";
+                        // Darken color by 10% on hover
+                        const hex = baseColor.replace('#', '');
+                        if (hex.length === 6) {
+                          const r = parseInt(hex.substring(0, 2), 16);
+                          const g = parseInt(hex.substring(2, 4), 16);
+                          const b = parseInt(hex.substring(4, 6), 16);
+                          const newR = Math.max(0, Math.floor(r * 0.9));
+                          const newG = Math.max(0, Math.floor(g * 0.9));
+                          const newB = Math.max(0, Math.floor(b * 0.9));
+                          const toHex = (n: number) => {
+                            const hex = n.toString(16);
+                            return hex.length === 1 ? '0' + hex : hex;
+                          };
+                          e.currentTarget.style.backgroundColor = `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        const baseColor = mergedData.content.socialMedia.whatsappInquiry?.buttonColor || mergedData.styling.colors.accent || "#10b981";
+                        e.currentTarget.style.backgroundColor = baseColor;
                       }}
                     >
                       <svg

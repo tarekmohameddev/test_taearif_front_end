@@ -880,6 +880,7 @@ export function translateLabel(
     "WhatsApp Inquiry Button":
       "components_structure.footer_specific.whatsapp_inquiry_button",
     "Button Text": "components_structure.footer_specific.button_text",
+    "Button Color": "components_structure.footer_specific.button_color",
     "Phone Number": "components_structure.footer_specific.phone_number",
     "Default Message": "components_structure.footer_specific.default_message",
     "Footer Bottom": "components_structure.footer_specific.footer_bottom",
