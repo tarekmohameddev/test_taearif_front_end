@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CategoryHeader } from "./CategoryHeader";
 import { ComponentCard } from "./ComponentCard";
 import { ProjectDisplayCard } from "./ProjectDisplayCard";
+import { UncreatedProjectsCard } from "./UncreatedProjectsCard";
 import { CategorySectionProps } from "../types";
 import { categoryExpansionVariants, listItem } from "../constants";
 import { getVariantsForSection, shouldShowEmptyCategory } from "../utils";
@@ -51,9 +52,12 @@ export function CategorySection({
             className="overflow-hidden"
           >
             <div className="grid grid-cols-2 gap-2 pt-2">
-              {/* Project Display Card - Special case */}
+              {/* Project Display Cards - Special cases */}
               {category === "projectDisplay" && (
-                <ProjectDisplayCard activeTab={activeTab} />
+                <>
+                  <ProjectDisplayCard activeTab={activeTab} />
+                  <UncreatedProjectsCard activeTab={activeTab} />
+                </>
               )}
 
               {/* Regular Components */}
