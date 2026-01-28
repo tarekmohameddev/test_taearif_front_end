@@ -195,94 +195,118 @@ export function LiveEditorIframeContent({
         }}
       >
         {/* عرض المكونات - محسن بانيميشن وتفاعلات */}
-        {backendDataState.componentsWithMergedData.map(
-          (component: any, index: number) => {
-            return (
+        {/* ⭐ عرض Skeleton أثناء التحميل بدلاً من البيانات الافتراضية */}
+        {tenantLoading || !tenantData ? (
+          // عرض Skeleton لكل مكون أثناء التحميل
+          backendDataState.componentsWithMergedData.length > 0 ? (
+            backendDataState.componentsWithMergedData.map((component: any, index: number) => (
               <motion.div
-                key={component.id}
+                key={`skeleton-${component.id}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                layout
-                className={`relative ${
-                  component.layout?.span === 2
-                    ? selectedDevice === "phone"
-                      ? "w-full"
-                      : "w-full"
-                    : "w-full"
-                }`}
+                className="relative w-full"
               >
-                <LiveEditorDraggableComponent
-                  id={component.id}
-                  componentType={component.componentName}
-                  depth={1}
-                  index={index}
-                  zoneCompound="root"
-                  isLoading={false}
-                  isSelected={selectedComponentId === component.id}
-                  label={component.componentName}
-                  onEditClick={() => handleEditClick(component.id)}
-                  onDeleteClick={() => handleDeleteClick(component.id)}
-                  inDroppableZone={true}
-                  autoDragAxis="both"
-                >
-                  {(ref: any) => (
-                    <div
-                      ref={ref}
-                      className={`relative ${
-                        selectedDevice === "phone"
-                          ? "text-sm"
-                          : selectedDevice === "tablet"
-                            ? "text-base"
-                            : "text-base"
-                      }`}
-                    >
-                      {(() => {
-                        // ========== LOG COMPONENT RENDER ==========
-                        logDuring(
-                          "IFRAME_CONTENT",
-                          "RENDERING_COMPONENT",
-                          {
-                            componentId: component.id,
-                            componentName: component.componentName,
-                            componentType: component.type,
-                            hasMergedData: !!(component.mergedData && Object.keys(component.mergedData).length > 0),
-                            mergedDataKeys: component.mergedData ? Object.keys(component.mergedData) : [],
-                            key: `${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`,
-                          },
-                          {
-                            componentId: component.id,
-                            componentName: component.componentName,
-                            componentType: component.type,
-                          }
-                        );
-
-                        return (
-                          <CachedComponent
-                            key={`${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`}
-                            componentName={component.componentName}
-                            section={state.slug}
-                            componentId={component.id}
-                            data={
-                              {
-                                ...component.mergedData, // ✅ استخدام البيانات من useState
-                                id: component.id,
-                                useStore: true,
-                                variant: component.id, // ✅ Use id from database (matches the key in heroStates)
-                                deviceType: selectedDevice,
-                                forceUpdate: component.forceUpdate,
-                              } as any
-                            }
-                          />
-                        );
-                      })()}
-                    </div>
-                  )}
-                </LiveEditorDraggableComponent>
+                <SkeletonLoader componentName={component.componentName} />
               </motion.div>
-            );
-          },
+            ))
+          ) : (
+            // عرض skeleton افتراضي إذا لم تكن هناك مكونات
+            <div className="w-full space-y-4">
+              <SkeletonLoader componentName="hero1" />
+            </div>
+          )
+        ) : (
+          // عرض المكونات الفعلية بعد انتهاء التحميل
+          backendDataState.componentsWithMergedData.map(
+            (component: any, index: number) => {
+              return (
+                <motion.div
+                  key={component.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  layout
+                  className={`relative ${
+                    component.layout?.span === 2
+                      ? selectedDevice === "phone"
+                        ? "w-full"
+                        : "w-full"
+                      : "w-full"
+                  }`}
+                >
+                  <LiveEditorDraggableComponent
+                    id={component.id}
+                    componentType={component.componentName}
+                    depth={1}
+                    index={index}
+                    zoneCompound="root"
+                    isLoading={false}
+                    isSelected={selectedComponentId === component.id}
+                    label={component.componentName}
+                    onEditClick={() => handleEditClick(component.id)}
+                    onDeleteClick={() => handleDeleteClick(component.id)}
+                    inDroppableZone={true}
+                    autoDragAxis="both"
+                  >
+                    {(ref: any) => (
+                      <div
+                        ref={ref}
+                        className={`relative ${
+                          selectedDevice === "phone"
+                            ? "text-sm"
+                            : selectedDevice === "tablet"
+                              ? "text-base"
+                              : "text-base"
+                        }`}
+                      >
+                        {(() => {
+                          // ========== LOG COMPONENT RENDER ==========
+                          logDuring(
+                            "IFRAME_CONTENT",
+                            "RENDERING_COMPONENT",
+                            {
+                              componentId: component.id,
+                              componentName: component.componentName,
+                              componentType: component.type,
+                              hasMergedData: !!(component.mergedData && Object.keys(component.mergedData).length > 0),
+                              mergedDataKeys: component.mergedData ? Object.keys(component.mergedData) : [],
+                              key: `${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`,
+                            },
+                            {
+                              componentId: component.id,
+                              componentName: component.componentName,
+                              componentType: component.type,
+                            }
+                          );
+
+                          return (
+                            <CachedComponent
+                              key={`${component.id}-${component.componentName}-${component.forceUpdate || 0}-${selectedDevice}`}
+                              componentName={component.componentName}
+                              section={state.slug}
+                              componentId={component.id}
+                              data={
+                                {
+                                  ...component.mergedData, // ✅ استخدام البيانات من useState
+                                  id: component.id,
+                                  useStore: true,
+                                  variant: component.id, // ✅ Use id from database (matches the key in heroStates)
+                                  deviceType: selectedDevice,
+                                  forceUpdate: component.forceUpdate,
+                                } as any
+                              }
+                            />
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </LiveEditorDraggableComponent>
+                </motion.div>
+              );
+            },
+          )
         )}
       </LiveEditorDropZone>
 
