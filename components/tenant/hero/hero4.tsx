@@ -164,13 +164,16 @@ export default function Hero4(props: Hero4Props = {}) {
 
     return (
       <div className="bg-white rounded-2xl shadow-2xl p-5">
-        <form onSubmit={handleSubmit} className="flex gap-3">
+        <form onSubmit={handleSubmit} className="flex gap-3 items-center">
+          <label className="text-right text-[#8b5f46] font-medium text-[16px] leading-tight max-w-[150px]">
+            ابحث بأسم او صفة<br /> المشروع او العقار
+          </label>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="ابحث عن عقار..."
-            className="flex-1 px-4 py-3 rounded-lg bg-[#f5f0e8] border border-transparent focus:border-[#8b5f46] focus:outline-none text-right text-[#8b5f46] placeholder:text-[#8b5f46]/60"
+            placeholder="ابحث عن..."
+            className="flex-1 px-4 py-3 rounded-lg bg-[#ddd7ce] border border-transparent focus:border-[#8b5f46] focus:outline-none text-right  text-[#704d39] placeholder:font-bold placeholder:text-[#8b5f46]/60"
           />
           <button
             type="submit"
