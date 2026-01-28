@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { CardThemeSelector } from "../../../CardThemeSelector";
-import { ColorFieldRenderer } from "../FieldRenderers";
 
 interface ObjectFieldRendererProps {
   def: FieldDefinition;
@@ -91,61 +90,6 @@ export function ObjectFieldRenderer({
             </div>
           )}
 
-          {/* Background controls - show conditional color pickers when the object is background */}
-          {def.key === "background" && (
-            <div className="space-y-4">
-              {/* Background Mode selector */}
-              {objDef.fields.find((f: any) => f.key === "type") && (
-                <div>
-                  {renderField(
-                    objDef.fields.find((f: any) => f.key === "type"),
-                    normalizedPath,
-                  )}
-                </div>
-              )}
-
-              {/* Conditional colors for solid/gradient */}
-              {getValueByPath(`${normalizedPath}.type`) === "solid" && (
-                <div>
-                  <ColorFieldRenderer
-                    label="Color"
-                    path={`${normalizedPath}.colors.from`}
-                    value={getValueByPath(`${normalizedPath}.colors.from`)}
-                    updateValue={updateValue}
-                  />
-                </div>
-              )}
-
-              {getValueByPath(`${normalizedPath}.type`) === "gradient" && (
-                <div className="space-y-4">
-                  <ColorFieldRenderer
-                    label="From"
-                    path={`${normalizedPath}.colors.from`}
-                    value={getValueByPath(`${normalizedPath}.colors.from`)}
-                    updateValue={updateValue}
-                  />
-                  <ColorFieldRenderer
-                    label="To"
-                    path={`${normalizedPath}.colors.to`}
-                    value={getValueByPath(`${normalizedPath}.colors.to`)}
-                    updateValue={updateValue}
-                  />
-                </div>
-              )}
-
-              {/* Show custom CSS value only when type is custom */}
-              {getValueByPath(`${normalizedPath}.type`) === "custom" &&
-                objDef.fields.find((f: any) => f.key === "value") && (
-                  <div>
-                    {renderField(
-                      objDef.fields.find((f: any) => f.key === "value"),
-                      normalizedPath,
-                    )}
-                  </div>
-                )}
-            </div>
-          )}
-
           {/* Enhanced Menu Items Support - Special handling for menu objects */}
           {def.key === "menu" && (
             <div className="space-y-6">
@@ -181,20 +125,10 @@ export function ObjectFieldRenderer({
             </div>
           )}
 
-          {/* Render remaining child fields except ones we handled above */}
+          {/* Render remaining child fields */}
           {objDef.fields
             .filter((f: any) => {
               if (def.key === "card") return true; // handled separately but still render card subfields
-              if (def.key === "background") {
-                // Skip fields that are rendered by the custom background block
-                if (f.key === "type" || f.key === "colors") return false;
-                // Render value only when custom
-                if (
-                  f.key === "value" &&
-                  getValueByPath(`${normalizedPath}.type`) !== "custom"
-                )
-                  return false;
-              }
               return true;
             })
             .map((f: any) => (

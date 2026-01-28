@@ -15,7 +15,6 @@ export const headerStructure: ComponentStructure = {
       id: "header1",
       name: "Header 1 - Modern",
       fields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         {
           key: "position",
           label: "Position",
@@ -409,7 +408,6 @@ export const headerStructure: ComponentStructure = {
         },
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "logo.image", label: "Logo Image", type: "image" },
         { key: "logo.text", label: "Logo Text", type: "text" },
         {
@@ -501,11 +499,6 @@ export const headerStructure: ComponentStructure = {
       name: "Header 2 - Nav Theme",
       fields: [
         {
-          key: "visible",
-          label: "Visible",
-          type: "boolean",
-        },
-        {
           key: "position",
           label: "Position",
           type: "object",
@@ -546,8 +539,6 @@ export const headerStructure: ComponentStructure = {
             { key: "image", label: "Logo Image URL", type: "image" },
             { key: "alt", label: "Alt Text", type: "text" },
             { key: "url", label: "Logo URL", type: "text" },
-            { key: "width", label: "Width (px)", type: "number" },
-            { key: "height", label: "Height (px)", type: "number" },
           ],
         },
         {
@@ -787,7 +778,6 @@ export const headerStructure: ComponentStructure = {
         },
       ],
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "logo.image", label: "Logo Image", type: "image" },
         { key: "logo.alt", label: "Company Name", type: "text" },
         {

@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
-import { ColorFieldRenderer } from "../FieldRenderers";
 
 interface BackgroundFieldRendererProps {
   backgroundField: FieldDefinition;
@@ -40,44 +39,11 @@ export function BackgroundFieldRenderer({
           </span>
         </label>
 
-        {renderField(
-          backgroundField.fields.find((f: any) => f.key === "type"),
-          "background",
-        )}
-
-        {getValueByPath("background.type") === "solid" && (
-          <ColorFieldRenderer
-            label="Color"
-            path="background.colors.from"
-            value={getValueByPath("background.colors.from")}
-            updateValue={updateValue}
-          />
-        )}
-
-        {getValueByPath("background.type") === "gradient" && (
-          <div className="space-y-4 mt-4">
-            <ColorFieldRenderer
-              label="From"
-              path="background.colors.from"
-              value={getValueByPath("background.colors.from")}
-              updateValue={updateValue}
-            />
-            <ColorFieldRenderer
-              label="To"
-              path="background.colors.to"
-              value={getValueByPath("background.colors.to")}
-              updateValue={updateValue}
-            />
+        {(backgroundField as any).fields?.map((field: FieldDefinition) => (
+          <div key={field.key} className="mt-4">
+            {renderField(field, "background")}
           </div>
-        )}
-
-        {backgroundField.fields
-          .filter((f: any) => f.key !== "type" && f.key !== "colors")
-          .map((field: FieldDefinition) => (
-            <div key={field.key} className="mt-4">
-              {renderField(field, "background")}
-            </div>
-          ))}
+        ))}
       </div>
     </div>
   );
@@ -124,49 +90,13 @@ export function SimpleBackgroundFieldRenderer({
           <span className="font-bold text-slate-800">Background</span>
         </label>
 
-        {/* Background Mode */}
-        {fields.find((f) => f.key === "background.type") && (
-          <div className="mb-4">
-            {renderField(
-              fields.find((f) => f.key === "background.type")!,
-              undefined,
-            )}
-          </div>
-        )}
-
-        {/* Conditional colors for solid/gradient */}
-        {getValueByPath("background.type") === "solid" && (
-          <div className="mt-2">
-            <ColorFieldRenderer
-              label="Color"
-              path="background.colors.from"
-              value={
-                (getValueByPath("background.colors.from") as any) || "#ffffff"
-              }
-              updateValue={updateValue}
-            />
-          </div>
-        )}
-        {getValueByPath("background.type") === "gradient" && (
-          <div className="space-y-4 mt-2">
-            <ColorFieldRenderer
-              label="From"
-              path="background.colors.from"
-              value={
-                (getValueByPath("background.colors.from") as any) || "#ffffff"
-              }
-              updateValue={updateValue}
-            />
-            <ColorFieldRenderer
-              label="To"
-              path="background.colors.to"
-              value={
-                (getValueByPath("background.colors.to") as any) || "#000000"
-              }
-              updateValue={updateValue}
-            />
-          </div>
-        )}
+        {fields
+          .filter((f) => f.key?.startsWith("background."))
+          .map((field) => (
+            <div key={field.key} className="mb-4">
+              {renderField(field, undefined)}
+            </div>
+          ))}
       </div>
     </div>
   );
