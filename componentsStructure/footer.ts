@@ -206,6 +206,17 @@ export const footerStructure: ComponentStructure = {
                     { key: "color", label: "Hover Color", type: "color" },
                   ],
                 },
+                {
+                  key: "whatsappInquiry",
+                  label: "WhatsApp Inquiry Button",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    { key: "text", label: "Button Text", type: "text" },
+                    { key: "phoneNumber", label: "Phone Number", type: "text" },
+                    { key: "message", label: "Default Message", type: "text" },
+                  ],
+                },
               ],
             },
           ],
