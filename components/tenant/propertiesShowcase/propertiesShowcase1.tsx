@@ -438,16 +438,20 @@ function ProjectCard({ property }: { property: Property }) {
   };
 
   // Check if title is longer than 20 characters
+  // NOTE: titleFontSize يعمل للجميع (عقارات ومشاريع) إذا كان العنوان > 20 حرف
+  // titleMaxWidth يعمل فقط للمشاريع لأنها تحتوي على status بجانب العنوان
+  // إذا تم جعل الـ Status يظهر في العقارات أيضاً، يجب إرجاع titleMaxWidth ليكون دائماً موجود (بدون الشرط isProject)
+  const isProject = property.url?.includes('/project/');
   const isLongTitle = property.title && property.title.length > 20;
   const titleFontSize = isLongTitle ? "text-base" : "text-xl";
-  const titleMaxWidth = isLongTitle
+  const titleMaxWidth = isLongTitle && isProject
     ? "max-w-full lg:max-w-[200px]"
     : "max-w-full";
 
   const CardContent = (
-    <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
+    <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer h-full flex flex-col">
       {/* Image Section */}
-      <div className="relative w-full h-[337px]">
+      <div className="relative w-full h-[337px] flex-shrink-0">
         <Image
           src={property.image}
           alt={property.title}
@@ -465,7 +469,7 @@ function ProjectCard({ property }: { property: Property }) {
       </div>
 
       {/* Content Section */}
-      <div className="p-4 space-y-4">
+      <div className="p-4 pb-2 space-y-4 flex-1 flex flex-col">
         {/* Title and Status */}
         <div className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-4">
@@ -539,8 +543,8 @@ function ProjectCard({ property }: { property: Property }) {
           </div>
         </div>
 
-        {/* Price Section */}
-        <div className="bg-[#896042] rounded-lg px-4 py-3 text-center">
+        {/* Price Section - في نهاية الـ Card مع مسافة بسيطة */}
+        <div className="bg-[#896042] rounded-lg px-4 py-3 text-center mt-auto mb-2">
           <div className="text-white text-base font-medium">
             {typeof property.price === 'object' && 'min' in property.price && 'max' in property.price
               ? `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`
@@ -553,7 +557,7 @@ function ProjectCard({ property }: { property: Property }) {
 
   // Always wrap in Link since we now always have a URL
   return (
-    <Link href={property.url || `#`} className="block">
+    <Link href={property.url || `#`} className="block h-full">
       {CardContent}
     </Link>
   );
@@ -966,7 +970,9 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
             }}
           >
             {properties.map((property: Property, index: number) => (
-              <ProjectCard key={property.id || index} property={property} />
+              <div key={property.id || index} className="h-full">
+                <ProjectCard property={property} />
+              </div>
             ))}
           </div>
         ) : (
