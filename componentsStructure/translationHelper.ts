@@ -877,6 +877,11 @@ export function translateLabel(
     "Platform Name": "components_structure.footer_specific.platform_name",
     Icon: "components_structure.footer_specific.icon",
     "Hover Color": "components_structure.footer_specific.hover_color",
+    "WhatsApp Inquiry Button":
+      "components_structure.footer_specific.whatsapp_inquiry_button",
+    "Button Text": "components_structure.footer_specific.button_text",
+    "Phone Number": "components_structure.footer_specific.phone_number",
+    "Default Message": "components_structure.footer_specific.default_message",
     "Footer Bottom": "components_structure.footer_specific.footer_bottom",
     "Copyright Text": "components_structure.footer_specific.copyright_text",
     "Legal Links": "components_structure.footer_specific.legal_links",
