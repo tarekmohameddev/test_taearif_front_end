@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Mail } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultHero4Data } from "@/context/editorStoreFunctions/heroFunctions";
@@ -26,8 +27,10 @@ export default function Hero4(props: Hero4Props = {}) {
   const uniqueId = props.id || variantId;
 
   // ─────────────────────────────────────────────────────────
-  // 2. CONNECT TO STORES
+  // 2. CONNECT TO STORES AND ROUTING
   // ─────────────────────────────────────────────────────────
+  const pathname = usePathname();
+  const router = useRouter();
   const ensureComponentVariant = useEditorStore(
     (s) => s.ensureComponentVariant,
   );
@@ -136,6 +139,51 @@ export default function Hero4(props: Hero4Props = {}) {
   }
 
   // ─────────────────────────────────────────────────────────
+  // 6.5. PAGE DETECTION AND SEARCH FORM
+  // ─────────────────────────────────────────────────────────
+  const isRealEstatePage =
+    pathname?.includes("/real-estate") ||
+    pathname?.includes("/live-editor/real-estate");
+
+  // Simple Search Form Component for real-estate pages
+  const SimpleSearchForm = () => {
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (searchTerm.trim()) {
+        // الحفاظ على locale في الـ URL
+        const basePath = pathname?.includes("/live-editor/")
+          ? "/ar/live-editor/real-estate"
+          : "/ar/real-estate";
+        router.push(
+          `${basePath}?search=${encodeURIComponent(searchTerm.trim())}`,
+        );
+      }
+    };
+
+    return (
+      <div className="bg-white rounded-2xl shadow-2xl p-5">
+        <form onSubmit={handleSubmit} className="flex gap-3">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="ابحث عن عقار..."
+            className="flex-1 px-4 py-3 rounded-lg bg-[#f5f0e8] border border-transparent focus:border-[#8b5f46] focus:outline-none text-right text-[#8b5f46] placeholder:text-[#8b5f46]/60"
+          />
+          <button
+            type="submit"
+            className="px-8 py-3 bg-[#8b5f46] text-white rounded-lg hover:bg-[#6b4630] transition-colors font-medium whitespace-nowrap"
+          >
+            بحث
+          </button>
+        </form>
+      </div>
+    );
+  };
+
+  // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
   return (
@@ -182,12 +230,15 @@ export default function Hero4(props: Hero4Props = {}) {
         className={`absolute top-0   ${
           mergedData.barType === "contact" || mergedData.contact
             ? "max-w-6xl mt-[13rem]"
-            : mergedData.barType === "propertyFilter"
+            : mergedData.barType === "propertyFilter" || isRealEstatePage
               ? "max-w-[1000px] mt-[15rem]"
               : "max-w-7xl mt-[16rem]"
         }  z-[10] w-full  px-4 sm:px-6 lg:px-8`}
       >
-        {mergedData.barType === "propertyFilter" ? (
+        {isRealEstatePage ? (
+          // Simple Search Form for real-estate pages
+          <SimpleSearchForm />
+        ) : mergedData.barType === "propertyFilter" ? (
           // Property Filter
           <div className="bg-white rounded-2xl shadow-2xl  py-1">
             <PropertyFilter2

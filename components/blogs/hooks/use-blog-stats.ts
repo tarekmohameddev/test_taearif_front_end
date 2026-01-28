@@ -18,8 +18,10 @@
 import { useState, useEffect } from "react";
 import { blogApi } from "../services/blog-api";
 import type { BlogStats } from "../types/blog.types";
+import useAuthStore from "@/context/AuthContext";
 
 export function useBlogStats() {
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const [stats, setStats] = useState<BlogStats>({
     total_blogs: 0,
     total_views: 0,
@@ -49,8 +51,13 @@ export function useBlogStats() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     fetchStats();
-  }, []);
+  }, [authLoading, userData?.token]); // Include token and authLoading in dependencies
 
   return {
     stats,

@@ -17,8 +17,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { blogApi } from "../services/blog-api";
 import type { BlogListItem, Pagination } from "../types/blog.types";
+import useAuthStore from "@/context/AuthContext";
 
 export function useBlogsList(initialPage: number = 1, perPage: number = 15) {
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const [blogs, setBlogs] = useState<BlogListItem[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,8 +50,13 @@ export function useBlogsList(initialPage: number = 1, perPage: number = 15) {
   );
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     fetchBlogs(initialPage);
-  }, []); // Only run on mount
+  }, [authLoading, userData?.token, fetchBlogs, initialPage]); // Include token and authLoading in dependencies
 
   return {
     blogs,

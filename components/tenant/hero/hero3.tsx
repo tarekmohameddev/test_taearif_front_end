@@ -351,103 +351,126 @@ const SearchForm = React.memo(function SearchForm({
       onSubmit={handleSubmit}
       className={cn(
         "w-full rounded-2xl bg-white p-4 sm:px-6 shadow-lg max-w-6xl overflow-hidden transition-all duration-300 ease-in-out",
-        isAdvancedSearchOpen ? "max-h-[600px]" : "max-h-[200px]"
+        isAdvancedSearchOpen ? "max-h-[200px]" : "max-h-[200px]"
       )}
       aria-label="نموذج البحث عن العقارات"
     >
       {/* Desktop Layout: all in one row */}
       <div className="hidden lg:flex items-end gap-4">
-        {/* Property Type - Always visible */}
-        <div className="flex flex-col gap-2 flex-1">
-          <div className="flex items-center gap-2">
-            <Home className="size-5" style={{ color: "#896042" }} />
-            <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
-          </div>
-          <Select value={type} onValueChange={setType}>
-            <SelectTrigger 
-              className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-              style={{ color: "black" }}
-            >
-              <SelectValue placeholder={type || "الكل"} />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {typeOptions.map((option: string) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {!isAdvancedSearchOpen && (
+          <>
+            {/* Property Type */}
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="flex items-center gap-2">
+                <Home className="size-5" style={{ color: "#896042" }} />
+                <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
+              </div>
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger 
+                  className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black" }}
+                >
+                  <SelectValue placeholder={type || "الكل"} />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {typeOptions.map((option: string) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        {/* City - Always visible */}
-        <div className="flex flex-col gap-2 flex-1">
-          <div className="flex items-center gap-2">
-            <MapPin className="size-5" style={{ color: "#896042" }} />
-            <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
-          </div>
-          <Select
-            value={cityId}
-            onValueChange={(value) => {
-              setCityId(value);
-              const city = cityOptions.find((c) => c.id.toString() === value);
-              if (city) setCityName(city.name);
-            }}
-          >
-            <SelectTrigger 
-              className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-              style={{ color: "black" }}
-            >
-              <SelectValue
-                placeholder={
-                  cityLoading
-                    ? "جاري التحميل..."
-                    : cityName || "اختر المدينة"
-                }
+            {/* City */}
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="flex items-center gap-2">
+                <MapPin className="size-5" style={{ color: "#896042" }} />
+                <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
+              </div>
+              <Select
+                value={cityId}
+                onValueChange={(value) => {
+                  setCityId(value);
+                  const city = cityOptions.find((c) => c.id.toString() === value);
+                  if (city) setCityName(city.name);
+                }}
+              >
+                <SelectTrigger 
+                  className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black" }}
+                >
+                  <SelectValue
+                    placeholder={
+                      cityLoading
+                        ? "جاري التحميل..."
+                        : cityName || "اختر المدينة"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {cityLoading ? (
+                    <SelectItem value="loading" disabled>
+                      جاري التحميل...
+                    </SelectItem>
+                  ) : cityOptions.length === 0 ? (
+                    <SelectItem value="no-cities" disabled>
+                      لا توجد مدن
+                    </SelectItem>
+                  ) : (
+                    cityOptions.map((city) => (
+                      <SelectItem key={city.id} value={city.id.toString()}>
+                        {city.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Property Status */}
+            <div className="flex flex-col gap-2 flex-1">
+              <div className="flex items-center gap-2">
+                <Tag className="size-5" style={{ color: "#896042" }} />
+                <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
+              </div>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger 
+                  className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black" }}
+                >
+                  <SelectValue placeholder={status || "بيع / ايجار"} />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {statusOptions.map((option: string) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
+
+        {isAdvancedSearchOpen && (
+          <div className="flex flex-col gap-2 flex-1">
+            <div className="flex items-center gap-2">
+              <Search className="size-5" style={{ color: "#896042" }} />
+              <h6 className="text-sm font-medium text-gray-700">البحث</h6>
+            </div>
+            <div className="relative">
+              <Input
+                type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="ابحث عن اسم أو صفة العقار"
+                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black text-right pr-10"
               />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {cityLoading ? (
-                <SelectItem value="loading" disabled>
-                  جاري التحميل...
-                </SelectItem>
-              ) : cityOptions.length === 0 ? (
-                <SelectItem value="no-cities" disabled>
-                  لا توجد مدن
-                </SelectItem>
-              ) : (
-                cityOptions.map((city) => (
-                  <SelectItem key={city.id} value={city.id.toString()}>
-                    {city.name}
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Property Status - Always visible */}
-        <div className="flex flex-col gap-2 flex-1">
-          <div className="flex items-center gap-2">
-            <Tag className="size-5" style={{ color: "#896042" }} />
-            <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
+            </div>
           </div>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger 
-              className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-              style={{ color: "black" }}
-            >
-              <SelectValue placeholder={status || "بيع / ايجار"} />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {statusOptions.map((option: string) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        )}
 
         {/* Apply Button */}
         <div className="flex flex-col gap-2">
@@ -489,9 +512,105 @@ const SearchForm = React.memo(function SearchForm({
         </div>
       </div>
 
-      {/* Advanced Search Field - Desktop Layout */}
-      {isAdvancedSearchOpen && (
-        <div className="hidden lg:block mt-4 pt-4 border-t border-gray-200 transition-all duration-300 ease-in-out">
+      {/* Tablet/Mobile Layout */}
+      <div className="grid gap-4 lg:hidden">
+        {!isAdvancedSearchOpen && (
+          <>
+            {/* Property Type */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Home className="size-5" style={{ color: "#896042" }} />
+                <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
+              </div>
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger 
+                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black" }}
+                >
+                  <SelectValue placeholder={type || "الكل"} />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {typeOptions.map((option: string) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* City */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <MapPin className="size-5" style={{ color: "#896042" }} />
+                <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
+              </div>
+              <Select
+                value={cityId}
+                onValueChange={(value) => {
+                  setCityId(value);
+                  const city = cityOptions.find((c) => c.id.toString() === value);
+                  if (city) setCityName(city.name);
+                }}
+              >
+                <SelectTrigger 
+                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black" }}
+                >
+                  <SelectValue
+                    placeholder={
+                      cityLoading
+                        ? "جاري التحميل..."
+                        : cityName || "اختر المدينة"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {cityLoading ? (
+                    <SelectItem value="loading" disabled>
+                      جاري التحميل...
+                    </SelectItem>
+                  ) : cityOptions.length === 0 ? (
+                    <SelectItem value="no-cities" disabled>
+                      لا توجد مدن
+                    </SelectItem>
+                  ) : (
+                    cityOptions.map((city) => (
+                      <SelectItem key={city.id} value={city.id.toString()}>
+                        {city.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Property Status */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Tag className="size-5" style={{ color: "#896042" }} />
+                <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
+              </div>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger 
+                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black" }}
+                >
+                  <SelectValue placeholder={status || "بيع / ايجار"} />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {statusOptions.map((option: string) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
+
+        {isAdvancedSearchOpen && (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Search className="size-5" style={{ color: "#896042" }} />
@@ -508,102 +627,7 @@ const SearchForm = React.memo(function SearchForm({
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Tablet/Mobile Layout */}
-      <div className="grid gap-4 lg:hidden">
-        {/* Property Type - Always visible */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Home className="size-5" style={{ color: "#896042" }} />
-            <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
-          </div>
-          <Select value={type} onValueChange={setType}>
-            <SelectTrigger 
-              className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-              style={{ color: "black" }}
-            >
-              <SelectValue placeholder={type || "الكل"} />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {typeOptions.map((option: string) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* City - Always visible */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <MapPin className="size-5" style={{ color: "#896042" }} />
-            <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
-          </div>
-          <Select
-            value={cityId}
-            onValueChange={(value) => {
-              setCityId(value);
-              const city = cityOptions.find((c) => c.id.toString() === value);
-              if (city) setCityName(city.name);
-            }}
-          >
-            <SelectTrigger 
-              className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-              style={{ color: "black" }}
-            >
-              <SelectValue
-                placeholder={
-                  cityLoading
-                    ? "جاري التحميل..."
-                    : cityName || "اختر المدينة"
-                }
-              />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {cityLoading ? (
-                <SelectItem value="loading" disabled>
-                  جاري التحميل...
-                </SelectItem>
-              ) : cityOptions.length === 0 ? (
-                <SelectItem value="no-cities" disabled>
-                  لا توجد مدن
-                </SelectItem>
-              ) : (
-                cityOptions.map((city) => (
-                  <SelectItem key={city.id} value={city.id.toString()}>
-                    {city.name}
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Property Status - Always visible */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Tag className="size-5" style={{ color: "#896042" }} />
-            <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
-          </div>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger 
-              className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-              style={{ color: "black" }}
-            >
-              <SelectValue placeholder={status || "بيع / ايجار"} />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {statusOptions.map((option: string) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        )}
 
         {/* Apply Button */}
         <div className="flex flex-col items-center w-full">
@@ -640,28 +664,6 @@ const SearchForm = React.memo(function SearchForm({
   </button>
 </div>
       </div>
-
-      {/* Advanced Search Field - Mobile/Tablet Layout */}
-      {isAdvancedSearchOpen && (
-        <div className="lg:hidden mt-4 pt-4 border-t border-gray-200 transition-all duration-300 ease-in-out">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Search className="size-5" style={{ color: "#896042" }} />
-              <h6 className="text-sm font-medium text-gray-700">البحث</h6>
-            </div>
-            <div className="relative">
-              <Input
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="ابحث عن اسم أو صفة العقار"
-                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black text-right pr-10"
-              />
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
-            </div>
-          </div>
-        </div>
-      )}
     </form>
   );
 });
