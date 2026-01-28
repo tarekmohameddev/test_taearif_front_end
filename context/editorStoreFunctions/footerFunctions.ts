@@ -67,6 +67,12 @@ export const getDefaultFooterData = (): ComponentData => ({
         { name: "تويتر", icon: "Twitter", url: "#", color: "#1DA1F2" },
         { name: "فيسبوك", icon: "Facebook", url: "#", color: "#1877F2" },
       ],
+      whatsappInquiry: {
+        enabled: true,
+        text: "استفسر عن طريق الواتساب",
+        phoneNumber: "",
+        message: "مرحباً، أريد الاستفسار عن",
+      },
     },
   },
   footerBottom: {

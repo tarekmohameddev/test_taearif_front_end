@@ -292,6 +292,39 @@ export const useDatabaseLoadingEffect = ({
         console.log("✅ Default inputs2 data initialized in editorStore");
       }
 
+      // Initialize default hero4 data in editorStore if no hero4 components exist
+      // Check if any hero component has barType === "contact" or contactForm exists
+      const hasHero4InStore = Object.keys(editorStore.heroStates || {}).some(
+        (key) => {
+          const heroData = editorStore.heroStates[key];
+          return (
+            heroData &&
+            (heroData.barType === "contact" ||
+              heroData.contact === true ||
+              heroData.contactForm ||
+              heroData.contactInfo ||
+              heroData.socialMedia)
+          );
+        },
+      );
+
+      if (!hasHero4InStore) {
+        console.log(
+          "🔍 No hero4 data in editorStore, initializing default hero4 data",
+        );
+        const {
+          getDefaultHero4Data,
+        } = require("@/context/editorStoreFunctions/heroFunctions");
+        const defaultHero4Data = getDefaultHero4Data();
+
+        editorStore.ensureComponentVariant(
+          "hero",
+          "hero4-default",
+          defaultHero4Data,
+        );
+        console.log("✅ Default hero4 data initialized in editorStore");
+      }
+
       setInitialized(true);
     }
   }, [

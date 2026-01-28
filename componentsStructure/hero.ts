@@ -981,6 +981,188 @@ export const heroStructure: ComponentStructure = {
           ],
         },
         {
+          key: "contactForm",
+          label: "Contact Form",
+          type: "object",
+          fields: [
+            {
+              key: "fields",
+              label: "Form Fields",
+              type: "object",
+              fields: [
+                {
+                  key: "fullName",
+                  label: "Full Name Field",
+                  type: "object",
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
+                    { key: "placeholder", label: "Placeholder", type: "text" },
+                  ],
+                },
+                {
+                  key: "whatsapp",
+                  label: "WhatsApp Field",
+                  type: "object",
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
+                    { key: "placeholder", label: "Placeholder", type: "text" },
+                  ],
+                },
+                {
+                  key: "email",
+                  label: "Email Field",
+                  type: "object",
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
+                    { key: "placeholder", label: "Placeholder", type: "text" },
+                  ],
+                },
+                {
+                  key: "subject",
+                  label: "Subject Field",
+                  type: "object",
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
+                    { key: "placeholder", label: "Placeholder", type: "text" },
+                  ],
+                },
+                {
+                  key: "message",
+                  label: "Message Field",
+                  type: "object",
+                  fields: [
+                    { key: "label", label: "Label", type: "text" },
+                    { key: "placeholder", label: "Placeholder", type: "text" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "submitButton",
+              label: "Submit Button",
+              type: "object",
+              fields: [
+                { key: "text", label: "Button Text", type: "text" },
+              ],
+            },
+          ],
+          condition: {
+            field: "barType",
+            value: "contact",
+          },
+        },
+        {
+          key: "contactInfo",
+          label: "Contact Information",
+          type: "object",
+          fields: [
+            { key: "contactText", label: "Contact Text", type: "text" },
+            {
+              key: "whatsappNumbers",
+              label: "WhatsApp Numbers",
+              type: "array",
+              of: [
+                {
+                  key: "number",
+                  label: "Phone Number",
+                  type: "text",
+                },
+                {
+                  key: "link",
+                  label: "WhatsApp Link",
+                  type: "text",
+                },
+              ],
+            },
+            {
+              key: "email",
+              label: "Email",
+              type: "object",
+              fields: [
+                { key: "address", label: "Email Address", type: "text" },
+                { key: "link", label: "Email Link", type: "text" },
+              ],
+            },
+            {
+              key: "location",
+              label: "Location",
+              type: "object",
+              fields: [
+                { key: "text", label: "Location Text", type: "text" },
+                { key: "link", label: "Location Link", type: "text" },
+              ],
+            },
+          ],
+          condition: {
+            field: "barType",
+            value: "contact",
+          },
+        },
+        {
+          key: "socialMedia",
+          label: "Social Media",
+          type: "object",
+          fields: [
+            { key: "title", label: "Social Media Title", type: "text" },
+            {
+              key: "platforms",
+              label: "Social Media Platforms",
+              type: "object",
+              fields: [
+                {
+                  key: "snapchat",
+                  label: "Snapchat",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    { key: "url", label: "Snapchat URL", type: "text" },
+                  ],
+                },
+                {
+                  key: "twitter",
+                  label: "X/Twitter",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    { key: "url", label: "Twitter URL", type: "text" },
+                  ],
+                },
+                {
+                  key: "instagram",
+                  label: "Instagram",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    { key: "url", label: "Instagram URL", type: "text" },
+                  ],
+                },
+                {
+                  key: "youtube",
+                  label: "YouTube",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    { key: "url", label: "YouTube URL", type: "text" },
+                  ],
+                },
+                {
+                  key: "facebook",
+                  label: "Facebook",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    { key: "url", label: "Facebook URL", type: "text" },
+                  ],
+                },
+              ],
+            },
+          ],
+          condition: {
+            field: "barType",
+            value: "contact",
+          },
+        },
+        {
           key: "animations",
           label: "Animations",
           type: "object",

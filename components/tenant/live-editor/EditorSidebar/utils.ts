@@ -12,6 +12,7 @@ import {
 } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
 import { getDefaultInputs2Data } from "@/context/editorStoreFunctions/inputs2Functions";
 import { getDefaultTitleData } from "@/context/editorStoreFunctions/titleFunctions";
+import { getDefaultHero4Data } from "@/context/editorStoreFunctions/heroFunctions";
 import { logSidebar } from "@/lib/debugLogger";
 
 // دالة لإنشاء البيانات الافتراضية لكل نوع مكون
@@ -698,6 +699,18 @@ export const createDefaultData = (
 
     case "inputs2":
       return getDefaultInputs2Data();
+
+    case "hero":
+      // Check componentName to determine which hero variant default data to use
+      if (componentName === "hero4") {
+        return getDefaultHero4Data();
+      }
+      // For other hero variants, return a basic default structure
+      return {
+        visible: true,
+        title: "Hero Title",
+        backgroundImage: "",
+      };
 
     case "title":
       return getDefaultTitleData();

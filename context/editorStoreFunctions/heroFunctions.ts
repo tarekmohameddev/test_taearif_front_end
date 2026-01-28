@@ -339,6 +339,79 @@ export const getDefaultHero4Data = (): ComponentData => ({
       delay: 200,
     },
   },
+  contactForm: {
+    fields: {
+      fullName: {
+        label: "الاسم الكامل",
+        placeholder: "الاسم الكامل",
+      },
+      whatsapp: {
+        label: "رقم الواتساب",
+        placeholder: "رقم الواتساب",
+      },
+      email: {
+        label: "البريد الالكتروني",
+        placeholder: "البريد الالكتروني",
+      },
+      subject: {
+        label: "الموضوع",
+        placeholder: "موضوع الرسالة",
+      },
+      message: {
+        label: "محتوى الرسالة",
+        placeholder: "محتوى الرسالة",
+      },
+    },
+    submitButton: {
+      text: "إرسال",
+    },
+  },
+  contactInfo: {
+    contactText: "أو تواصل معنا مباشرة عبر:",
+    whatsappNumbers: [
+      {
+        number: "0542120011",
+        link: "https://api.whatsapp.com/send?phone=966542120011",
+      },
+      {
+        number: "0543332538",
+        link: "https://api.whatsapp.com/send/?phone=966543332538&text&type=phone_number&app_absent=0",
+      },
+    ],
+    email: {
+      address: "contact@baheya.co",
+      link: "mailto:contact@baheya.co",
+    },
+    location: {
+      text: "المملكة العربية السعودية - الرياض",
+      link: "#",
+    },
+  },
+  socialMedia: {
+    title: "لا تنسى متابعتنا على مواقع التواصل الاجتماعي",
+    platforms: {
+      snapchat: {
+        enabled: true,
+        url: "https://www.snapchat.com/add/baheyarealstate?share_id=CH-Am1w1NlU&locale=ar-AE",
+      },
+      twitter: {
+        enabled: true,
+        url: "https://x.com/bahiarealstate?t=U_Fm4pDkJj73HPkY_mHDWQ&s=08",
+      },
+      instagram: {
+        enabled: true,
+        url: "https://www.instagram.com/baheyarealestat?igsh=enA3cW1tbjRjbHU4",
+      },
+      youtube: {
+        enabled: true,
+        url: "https://youtube.com/channel/UCVru6ldyQvpyuxl1lkd_oUQ?si=v6LprF-hXxagAhrp",
+      },
+      facebook: {
+        enabled: true,
+        url: "https://www.facebook.com/share/1C974jrjRc/",
+      },
+    },
+  },
 });
 
 export const heroFunctions = {

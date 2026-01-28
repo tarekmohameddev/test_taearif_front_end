@@ -85,6 +85,7 @@ import { createDefaultData } from "./editorStoreFunctions/types";
 import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
 import { getDefaultInputs2Data } from "./editorStoreFunctions/inputs2Functions";
+import { getDefaultHero4Data } from "./editorStoreFunctions/heroFunctions";
 import defaultData from "@/lib/defaultData.json";
 import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
 import {
@@ -3555,11 +3556,43 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       });
 
       if (!hasInputs2InDatabase) {
+        console.log(
+          "🔍 No inputs2 components found in database, initializing default inputs2 data",
+        );
         const defaultInputs2Data = getDefaultInputs2Data();
         newState.inputs2States = {
           ...newState.inputs2States,
           "inputs2-default": defaultInputs2Data,
         };
+        console.log(
+          "✅ Default inputs2 data initialized in editorStore:",
+          newState.inputs2States,
+        );
+      }
+
+      // Initialize default hero4 data if no hero4 components exist in database
+      const hasHero4InDatabase = Object.values(
+        tenantData.componentSettings || {},
+      ).some((pageSettings: any) => {
+        if (!pageSettings || typeof pageSettings !== "object") return false;
+        return Object.values(pageSettings).some(
+          (comp: any) => comp.type === "hero" && comp.componentName === "hero4",
+        );
+      });
+
+      if (!hasHero4InDatabase) {
+        console.log(
+          "🔍 No hero4 components found in database, initializing default hero4 data",
+        );
+        const defaultHero4Data = getDefaultHero4Data();
+        newState.heroStates = {
+          ...newState.heroStates,
+          "hero4-default": defaultHero4Data,
+        };
+        console.log(
+          "✅ Default hero4 data initialized in editorStore:",
+          newState.heroStates,
+        );
       }
 
       return newState;
