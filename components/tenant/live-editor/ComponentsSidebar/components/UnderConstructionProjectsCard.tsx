@@ -24,7 +24,7 @@ export function UnderConstructionProjectsCard({ activeTab }: UnderConstructionPr
           icon: "🏗️",
           variant: "grid1",
           dataSource: {
-            apiUrl: "/v1/tenant-website/kkkkk/projects",
+            apiUrl: "https://bigrises.com/api/v1/tenant-website/kkkkk/projects?status=0",
             enabled: true,
           },
           content: {
