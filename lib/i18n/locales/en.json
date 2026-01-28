@@ -3709,6 +3709,9 @@
     },
     "page": {
       "display_name": "Pages"
+    },
+    "projectDisplay": {
+      "display_name": "Project Display"
     }
   }
 }

@@ -965,7 +965,11 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                 style={{ borderBottomColor: primaryColor }}
               ></div>
               <p className="text-gray-600">
-                {isBlogsApi ? "جاري تحميل المنشورات..." : "جاري تحميل العقارات..."}
+                {isBlogsApi 
+                  ? "جاري تحميل المنشورات..." 
+                  : isProjectsApi
+                  ? "جاري تحميل المشاريع..."
+                  : "جاري تحميل العقارات..."}
               </p>
             </div>
           </div>
@@ -975,6 +979,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
               <p className="text-sm text-gray-600">
                 {isBlogsApi 
                   ? `تم العثور على ${properties.length} منشور${properties.length !== 1 ? "ات" : ""}`
+                  : isProjectsApi
+                  ? `تم العثور على ${properties.length} مشروع${properties.length !== 1 ? "" : ""}`
                   : `تم العثور على ${properties.length} عقار${properties.length !== 1 ? "ات" : ""}`
                 }
                 {filteredProperties.length > 0 && (

@@ -9,6 +9,7 @@ import {
 import { DraggableDrawerItem } from "@/services/live-editor/dragDrop";
 import { getComponents, getAllComponentsTranslated, getComponentsByCategoryTranslated, ComponentType } from "@/lib/ComponentsList";
 import themesComponentsList from "@/lib/themes/themesComponentsList.json";
+import { CategoriesList } from "./ComponentsSidebar/components/CategoriesList";
 import { BrandingSettings } from "@/components/tenant/live-editor/EditorSidebar/components/BrandingSettings";
 import { ModernColorPicker } from "@/components/tenant/live-editor/EditorSidebar/components/ModernColorPicker";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -158,11 +159,17 @@ const ComponentsListView = ({
     
     // ترتيب مخصص للتصنيفات
     const categoryOrder = [
-      "marketing",    // الأول - التسويق
-      "banner",      // الثاني - البانرات
-      "ecommerce",   // الثالث - التجارة الإلكترونية
-      "content",     // الرابع - المحتوى
+      "marketing",      // الأول - التسويق
+      "banner",         // الثاني - البانرات
+      "ecommerce",      // الثالث - التجارة الإلكترونية
+      "content",        // الرابع - المحتوى
+      "projectDisplay", // الخامس - عرض المشاريع
     ];
+    
+    // إضافة فئة "عرض المشاريع" في الثيم الأول فقط حتى لو كانت فارغة
+    if (activeTab === "theme1" && !categoriesArray.includes("projectDisplay")) {
+      categoriesArray.push("projectDisplay");
+    }
     
     // ترتيب التصنيفات: أولاً حسب الترتيب المخصص، ثم الباقي أبجدياً
     const sorted = categoriesArray.sort((a, b) => {
@@ -186,7 +193,7 @@ const ComponentsListView = ({
     });
     
     return sorted;
-  }, [displaySections, t]);
+  }, [displaySections, t, activeTab]);
 
   // تهيئة جميع التصنيفات كمفتوحة افتراضياً
   useEffect(() => {
@@ -205,12 +212,13 @@ const ComponentsListView = ({
         const component = allComponents.find((comp) => comp.name === section.component);
         return component?.category === category;
       });
-      if (categoryComponents.length > 0) {
+      // إضافة القسم حتى لو كان فارغاً في الثيم الأول (للقسم الجديد "عرض المشاريع")
+      if (categoryComponents.length > 0 || (category === "projectDisplay" && activeTab === "theme1")) {
         grouped[category] = categoryComponents;
       }
     });
     return grouped;
-  }, [allCategories, displaySections, t]);
+  }, [allCategories, displaySections, t, activeTab]);
 
   // Toggle category expansion
   const toggleCategory = (category: string) => {
@@ -470,260 +478,14 @@ const ComponentsListView = ({
         </div>
 
         {/* Components by Categories */}
-        <motion.div
-          variants={listContainer}
-          initial="hidden"
-          animate="show"
-          className="space-y-3"
-        >
-          {Object.keys(componentsByCategory).length > 0 ? (
-            Object.entries(componentsByCategory).map(([category, sections]) => {
-              const isCategoryExpanded = expandedCategories.has(category);
-              
-              // Filter sections by search term (already filtered in displaySections, but double-check)
-              const filteredSections = sections.filter(
-                (section) =>
-                  section.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  section.description.toLowerCase().includes(searchTerm.toLowerCase()),
-              );
-
-              if (filteredSections.length === 0) return null;
-
-              return (
-                <motion.div
-                  key={category}
-                  variants={listItem}
-                  className="space-y-2"
-                >
-                  {/* Category Header - Clickable */}
-                  <button
-                    onClick={() => toggleCategory(category)}
-                    className="w-full pb-2 pt-1 flex items-center justify-between hover:bg-gray-50 rounded-md px-1 transition-colors duration-150"
-                  >
-                    <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                      {t(`categories.${category}.display_name`) || category}
-                    </h3>
-                    <motion.svg
-                      className="w-4 h-4 text-gray-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      animate={{ rotate: isCategoryExpanded ? 90 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </motion.svg>
-                  </button>
-                  <div className="mt-1 h-px bg-gray-200"></div>
-
-                  {/* Components Grid - Collapsible */}
-                  <AnimatePresence initial={false}>
-                    {isCategoryExpanded && (
-                      <motion.div
-                        initial="collapsed"
-                        animate="open"
-                        exit="collapsed"
-                        variants={{
-                          open: {
-                            height: "auto",
-                            opacity: 1,
-                            transition: {
-                              height: {
-                                duration: 0.3,
-                                ease: "easeInOut",
-                              },
-                              opacity: {
-                                duration: 0.2,
-                                delay: 0.1,
-                              },
-                            },
-                          },
-                          collapsed: {
-                            height: 0,
-                            opacity: 0,
-                            transition: {
-                              height: {
-                                duration: 0.3,
-                                ease: "easeInOut",
-                              },
-                              opacity: {
-                                duration: 0.2,
-                              },
-                            },
-                          },
-                        }}
-                        className="overflow-hidden"
-                      >
-                        <div className="grid grid-cols-2 gap-2 pt-2">
-                          {filteredSections.map((section) => {
-                            const themeComponentNames =
-                              (themesComponentsList[activeTab] as string[]) || [];
-                            const variantsForSection = themeComponentNames.filter(
-                              (name) => getBaseComponentName(name) === section.component,
-                            );
-
-                            if (variantsForSection.length <= 1) {
-                              const variantName =
-                                variantsForSection.length === 1
-                                  ? variantsForSection[0]
-                                  : undefined;
-
-                              const variantSuffix =
-                                variantName &&
-                                variantName.startsWith(section.component)
-                                  ? variantName.slice(section.component.length)
-                                  : "";
-                              const displayLabel =
-                                variantSuffix && variantSuffix.length > 0
-                                  ? `${section.name} ${variantSuffix}`
-                                  : section.name;
-
-                              return (
-                                <motion.div
-                                  key={`${section.type}-${variantName || "default"}`}
-                                  variants={listItem}
-                                  className="group relative"
-                                >
-                                  <DraggableDrawerItem
-                                    componentType={section.component === "blogPosts" && variantName === "blogPosts1" ? "grid" : section.component}
-                                    section={section.section}
-                                    data={{
-                                      label: displayLabel,
-                                      description: section.description,
-                                      icon: section.type,
-                                      ...(variantName === "blogPosts1" && section.component === "blogPosts" 
-                                        ? { variant: "grid1" } 
-                                        : variantName 
-                                          ? { variant: variantName } 
-                                          : {}),
-                                      ...(variantName === "blogPosts1" && section.component === "blogPosts"
-                                        ? { 
-                                            dataSource: {
-                                              apiUrl: "/api/posts",
-                                              enabled: true,
-                                            },
-                                            content: {
-                                              title: "المدونة",
-                                              subtitle: "اكتشف أحدث المقالات والأخبار",
-                                            }
-                                          }
-                                        : {})
-                                    }}
-                                  >
-                                    <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
-                                      <div className="flex flex-col items-center justify-center text-center space-y-1">
-                                        <div className="text-xl">
-                                          {getSectionIconTranslated(section.type, t)}
-                                        </div>
-                                        <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
-                                          {displayLabel}
-                                        </h3>
-                                      </div>
-                                    </div>
-                                  </DraggableDrawerItem>
-                                </motion.div>
-                              );
-                            }
-
-                            return variantsForSection.map((variantName) => {
-                              const variantSuffix = variantName.startsWith(
-                                section.component,
-                              )
-                                ? variantName.slice(section.component.length)
-                                : "";
-                              
-                              let displayLabel =
-                                variantSuffix && variantSuffix.length > 0
-                                  ? `${section.name} ${variantSuffix}`
-                                  : section.name;
-
-                              let componentType = section.component;
-                              let variantToUse = variantName;
-                              let customData: any = {};
-
-                              // Handle special mapping for blogPosts
-                              if (section.component === "blogPosts" && variantName === "blogPosts1") {
-                                componentType = "grid";
-                                variantToUse = "grid1";
-                                displayLabel = section.name; // Keep the original "المدونة" name
-                                customData = {
-                                  dataSource: {
-                                    apiUrl: "/api/posts",
-                                    enabled: true,
-                                  },
-                                  content: {
-                                    title: "المدونة",
-                                    subtitle: "اكتشف أحدث المقالات والأخبار",
-                                  }
-                                };
-                              }
-
-                              return (
-                                <motion.div
-                                  key={`${section.type}-${variantName}`}
-                                  variants={listItem}
-                                  className="group relative"
-                                >
-                                  <DraggableDrawerItem
-                                    componentType={componentType}
-                                    section={section.section}
-                                    data={{
-                                      label: displayLabel,
-                                      description: section.description,
-                                      icon: section.type,
-                                      variant: variantToUse,
-                                      ...customData
-                                    }}
-                                  >
-                                    <div className="p-2 border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 cursor-grab active:cursor-grabbing">
-                                      <div className="flex flex-col items-center justify-center text-center space-y-1">
-                                        <div className="text-xl">
-                                          {getSectionIconTranslated(section.type, t)}
-                                        </div>
-                                        <h3 className="font-medium text-gray-900 text-[11px] leading-tight">
-                                          {displayLabel}
-                                        </h3>
-                                      </div>
-                                    </div>
-                                  </DraggableDrawerItem>
-                                </motion.div>
-                              );
-                            });
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })
-          ) : (
-            <motion.div
-              variants={listItem}
-              className="text-center py-8 text-gray-500"
-            >
-              <svg
-                className="w-12 h-12 mx-auto mb-3 text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <p>{t("live_editor.no_components_found")}</p>
-            </motion.div>
-          )}
-        </motion.div>
+        <CategoriesList
+          componentsByCategory={componentsByCategory}
+          expandedCategories={expandedCategories}
+          toggleCategory={toggleCategory}
+          searchTerm={searchTerm}
+          activeTab={activeTab}
+          t={t}
+        />
       </div>
     </div>
   );
