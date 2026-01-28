@@ -601,15 +601,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     return undefined;
   };
 
-  // Update transactionType in store when pathname changes
-  useEffect(() => {
-    const purpose = getPurposeFromPath();
-    if (purpose && purpose !== transactionType) {
-      setTransactionType(purpose as "rent" | "sale");
-    }
-  }, [pathname, transactionType, setTransactionType]);
+  // Note: transactionType is no longer auto-updated from pathname
+  // It will only be set when user explicitly selects from dropdown in propertyFilter2
 
-  // Fetch properties on component mount and when API URL, pathname, or transactionType changes
+  // Fetch properties on component mount and when API URL or pathname changes
+  // Note: Removed transactionType, filteredProperties.length, and searchParams from dependencies
+  // to prevent automatic API calls when filters change. API will only be called on mount,
+  // pathname change, or when user explicitly clicks search button.
   useEffect(() => {
     // Always prioritize the configured apiUrl from dataSource
     const apiUrl = mergedData.dataSource?.apiUrl;
@@ -642,10 +640,9 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     mergedData.dataSource?.enabled,
     currentTenantId,
     pathname,
-    transactionType,
-    filteredProperties.length,
     isRealEstatePage,
-    searchParams,
+    // Removed: transactionType, filteredProperties.length, searchParams
+    // These caused automatic API calls when filters changed
   ]);
 
   // Use API data if enabled, otherwise use static data

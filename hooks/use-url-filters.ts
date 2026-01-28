@@ -89,36 +89,15 @@ export function useUrlFilters() {
       setSearch(params.search);
     }
 
-    // Determine transaction type from pathname
-    if (pathname?.includes("/for-rent")) {
-      setTransactionType("rent");
-    } else if (pathname?.includes("/for-sale")) {
-      setTransactionType("sale");
-    }
+    // Note: transactionType is no longer auto-set from URL/pathname
+    // It will only be set when user explicitly selects from dropdown
 
     // Don't fetch properties if we're on projects page or real-estate page
     // Projects page and real-estate page use their own API endpoints
     const isProjectsPage = pathname?.includes("/projects");
     const isRealEstatePage = pathname?.includes("/real-estate");
     
-    // Only auto-fetch on property-specific pages (for-rent or for-sale)
-    // Don't fetch on real-estate page (uses its own API) or other pages
-    const isPropertyPage = pathname?.includes("/for-rent") || pathname?.includes("/for-sale");
-
-    // Check if any filters are present (excluding empty search parameter)
-    // Only consider search as a filter if it has a value
-    const hasFilters = 
-      params.city_id !== "" ||
-      params.state_id !== "" ||
-      params.max_price !== "" ||
-      params.category_id !== "" ||
-      params.type_id !== "" ||
-      (params.search !== "" && params.search.trim() !== "");
-
-    // Auto-trigger search if filters are present AND we're on a property page AND not on projects/real-estate pages
-    if (hasFilters && isPropertyPage && !isProjectsPage && !isRealEstatePage) {
-      fetchProperties(1);
-    }
+    // Note: Auto-fetching has been removed - properties will only be fetched when user clicks search button
   }, [
     searchParams,
     pathname,
@@ -128,8 +107,6 @@ export function useUrlFilters() {
     setCategoryId,
     setPropertyType,
     setSearch,
-    setTransactionType,
-    fetchProperties,
   ]);
 
   /**

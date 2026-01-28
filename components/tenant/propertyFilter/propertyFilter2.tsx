@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,6 +101,11 @@ export default function PropertyFilter2({
     setPrice,
     setTransactionType,
   } = usePropertiesStore();
+
+  // Router and pathname hooks
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
@@ -721,6 +727,36 @@ export default function PropertyFilter2({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Navigate to correct page if transactionType doesn't match pathname
+    const currentPath = pathname || "";
+    const shouldBeRent = transactionType === "rent";
+    const shouldBeSale = transactionType === "sale";
+    const isOnRentPage = currentPath.includes("/for-rent");
+    const isOnSalePage = currentPath.includes("/for-sale");
+    
+    // Build search params with all current filters
+    const searchParams = new URLSearchParams();
+    searchParams.set("purpose", transactionType || "rent");
+    
+    // Add all filters from store
+    if (categoryId) searchParams.set("category_id", categoryId);
+    if (cityId) searchParams.set("city_id", cityId);
+    if (district) searchParams.set("state_id", district);
+    if (price) searchParams.set("max_price", price);
+    if (search) searchParams.set("search", search);
+    if (propertyType) searchParams.set("type_id", propertyType);
+    
+    if (shouldBeRent && !isOnRentPage) {
+      // Navigate to for-rent with filters
+      router.push(`/for-rent?${searchParams.toString()}`);
+      return;
+    } else if (shouldBeSale && !isOnSalePage) {
+      // Navigate to for-sale with filters
+      router.push(`/for-sale?${searchParams.toString()}`);
+      return;
+    }
+    
     // جلب البيانات من API عند الضغط على submit
     const { fetchProperties } = usePropertiesStore.getState();
     fetchProperties(1);
@@ -742,14 +778,29 @@ export default function PropertyFilter2({
   ];
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  // Sync selectedStatus with transactionType from store/URL
+  // Sync selectedStatus with purpose parameter from URL or pathname (for display only)
+  // Note: transactionType in store is NOT auto-updated - only updated when user selects from dropdown
   useEffect(() => {
-    if (transactionType === "sale") {
-      setSelectedStatus("للبيع");
-    } else if (transactionType === "rent") {
-      setSelectedStatus("للإيجار");
+    const purposeParam = searchParams?.get("purpose");
+    let newStatus = "";
+
+    if (purposeParam === "sale") {
+      newStatus = "للبيع";
+    } else if (purposeParam === "rent") {
+      newStatus = "للإيجار";
+    } else {
+      // If no purpose in URL, check pathname as fallback
+      if (pathname?.includes("/for-sale")) {
+        newStatus = "للبيع";
+      } else if (pathname?.includes("/for-rent")) {
+        newStatus = "للإيجار";
+      }
     }
-  }, [transactionType]);
+
+    if (newStatus) {
+      setSelectedStatus(newStatus);
+    }
+  }, [searchParams, pathname]);
 
   return (
     <div className={` ${className || ""} max-w-[1600px] mx-auto`}>
@@ -1028,11 +1079,14 @@ export default function PropertyFilter2({
                     role="option"
                     onClick={() => {
                       setSelectedStatus(option.value);
-                      if (option.value === "للبيع") {
-                        setTransactionType("sale");
-                      } else if (option.value === "للإيجار") {
-                        setTransactionType("rent");
+                      const newTransactionType = option.value === "للبيع" ? "sale" : option.value === "للإيجار" ? "rent" : "";
+                      
+                      if (newTransactionType) {
+                        // Update transactionType in store only
+                        // URL will be updated only when user clicks search button
+                        setTransactionType(newTransactionType);
                       }
+                      
                       setIsStatusOpen(false);
                     }}
                   >

@@ -573,7 +573,7 @@ export default function blogDetails2(props: blogDetails2Props) {
         style={{ height: mergedData.hero?.height || "500px" }}
       >
         <Image
-          src="/images/placeholders/projectDetails2/hero.jpg"
+          src={blog?.thumbnail?.url || "/images/placeholders/blog/hero.jpg"}
           alt={blog?.title || "صورة خلفية"}
           fill
           priority
@@ -744,12 +744,12 @@ export default function blogDetails2(props: blogDetails2Props) {
                 >
                   {mergedData.content?.descriptionTitle || "محتوى المقال"}
                 </h2>
-                <p
+                <div
                   className="leading-relaxed text-right text-lg whitespace-pre-line"
                   style={{ color: textColor }}
                 >
                   <div dangerouslySetInnerHTML={{ __html: blog.content || "لا يوجد محتوى متاح لهذا المقال" }} />
-                </p>
+                </div>
               </section>
             )}
 
@@ -758,99 +758,6 @@ export default function blogDetails2(props: blogDetails2Props) {
             {/* No FAQs for blogs - removed */}
             {/* No project link for blogs - removed */}
 
-            {/* Contact Form - COMMENTED OUT */}
-            {/* {mergedData.displaySettings?.showContactForm !== false && (
-              <section
-                className="text-white p-8 rounded-lg h-fit"
-                data-purpose="contact-form"
-                style={{
-                  backgroundColor: formBackgroundColor,
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                }}
-              >
-                <h2
-                  className="text-2xl font-bold mb-2 text-right"
-                  style={{ color: formTextColor }}
-                >
-                  {mergedData.content?.contactFormTitle ||
-                    "استفسر عن هذا العقار"}
-                </h2>
-                <p
-                  className="text-sm mb-6 text-right"
-                  style={{ color: formTextColor, opacity: 0.8 }}
-                >
-                  {mergedData.content?.contactFormDescription ||
-                    "استفسر عن المنزل واملأ البيانات لهذا العقار"}
-                </p>
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <input
-                        className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                        placeholder="اسم العميل"
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <input
-                        className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                        placeholder="رقم الهاتف"
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <input
-                        className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                        placeholder="البريد الإلكتروني"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <textarea
-                      className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                      placeholder="الرسالة"
-                      rows={4}
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                    ></textarea>
-                  </div>
-                  {formError && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                      {formError}
-                    </div>
-                  )}
-                  {formSuccess && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                      تم إرسال استفسارك بنجاح! سنتواصل معك قريباً.
-                    </div>
-                  )}
-                  <button
-                    className="w-full font-bold py-3 rounded transition-colors shadow-md text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    type="submit"
-                    disabled={formLoading}
-                    style={{
-                      backgroundColor: formButtonBackgroundColor,
-                      color: formButtonTextColor,
-                    }}
-                  >
-                    {formLoading
-                      ? "جاري الإرسال..."
-                      : mergedData.content?.submitButtonText || "أرسل استفسارك"}
-                  </button>
-                </form>
-              </section>
-            )} */}
           </div>
           {/* END Content Column */}
         </div>
