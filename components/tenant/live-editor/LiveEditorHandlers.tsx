@@ -13,6 +13,11 @@ import {
   logComponentChange,
   logUserAction,
 } from "@/lib/debugLogger";
+import {
+  logBefore,
+  logAfter,
+  logBeforeAfter,
+} from "@/lib/fileLogger";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 
@@ -71,12 +76,114 @@ export function useLiveEditorHandlers(state: any) {
 
   const confirmDelete = () => {
     if (state.componentToDelete) {
+      const componentToDeleteId = state.componentToDelete;
+      const store = useEditorStore.getState();
+      const currentPage = store.currentPage || slug;
+      
+      // Find component to delete for logging
+      const componentToDelete = state.pageComponents.find(
+        (c: any) => c.id === componentToDeleteId,
+      );
+
+      // ========== LOG BEFORE ==========
+      logBefore(
+        "COMPONENT_DELETE",
+        "DELETE_COMPONENT_START",
+        {
+          componentToDelete: componentToDelete
+            ? {
+                id: componentToDelete.id,
+                type: componentToDelete.type,
+                componentName: componentToDelete.componentName,
+              }
+            : { id: componentToDeleteId },
+          currentPageComponentsCount: state.pageComponents.length,
+          currentPage,
+          storePageComponentsCount:
+            store.pageComponentsByPage[currentPage]?.length || 0,
+        },
+        {
+          componentId: componentToDeleteId,
+          componentName: componentToDelete?.componentName,
+          componentType: componentToDelete?.type,
+        },
+      );
+
       setPageComponents((currentComponents: any[]) => {
         // حذف المكون وتطبيق منطق التوسع التلقائي
         const filteredComponents = currentComponents.filter(
-          (c) => c.id !== state.componentToDelete,
+          (c) => c.id !== componentToDeleteId,
         );
-        return applyAutoExpandLogic(filteredComponents);
+        const newComponents = applyAutoExpandLogic(filteredComponents);
+
+        // ⭐ CRITICAL: Update pageComponentsByPage in the store SYNCHRONOUSLY
+        // This prevents conflicts with useStoreSyncEffect
+        // We must update the store immediately, not in setTimeout
+        const storeAfter = useEditorStore.getState();
+        const currentPageAfter = storeAfter.currentPage || slug;
+        storeAfter.forceUpdatePageComponents(currentPageAfter, newComponents);
+
+        // ========== LOG AFTER ==========
+        // Use setTimeout only for logging to avoid blocking
+        setTimeout(() => {
+          const finalStore = useEditorStore.getState();
+          logAfter(
+            "COMPONENT_DELETE",
+            "DELETE_COMPONENT_COMPLETE",
+            {
+              deletedComponentId: componentToDeleteId,
+              newComponentsCount: newComponents.length,
+              currentPage: currentPageAfter,
+              storePageComponentsCount:
+                finalStore.pageComponentsByPage[currentPageAfter]?.length || 0,
+            },
+            {
+              componentId: componentToDeleteId,
+              componentName: componentToDelete?.componentName,
+              componentType: componentToDelete?.type,
+            },
+          );
+
+          // ========== LOG BEFORE/AFTER ==========
+          logBeforeAfter(
+            "DELETE_COMPONENT",
+            {
+              pageComponentsBefore: currentComponents.map((c: any) => ({
+                id: c.id,
+                type: c.type,
+                componentName: c.componentName,
+              })),
+              pageComponentsByPageBefore:
+                store.pageComponentsByPage[currentPage]?.map((c: any) => ({
+                  id: c.id,
+                  type: c.type,
+                  componentName: c.componentName,
+                })) || [],
+            },
+            {
+              pageComponentsAfter: newComponents.map((c: any) => ({
+                id: c.id,
+                type: c.type,
+                componentName: c.componentName,
+              })),
+              pageComponentsByPageAfter:
+                finalStore.pageComponentsByPage[currentPageAfter]?.map(
+                  (c: any) => ({
+                    id: c.id,
+                    type: c.type,
+                    componentName: c.componentName,
+                  }),
+                ) || [],
+            },
+            {
+              componentId: componentToDeleteId,
+              componentName: componentToDelete?.componentName,
+              componentType: componentToDelete?.type,
+            },
+          );
+        }, 0);
+
+        return newComponents;
       });
     }
     setDeleteDialogOpen(false);
