@@ -422,7 +422,8 @@ export default function PropertyFilter2({
 
   // Get colors for dropdown
   const dropdownTextColor = getColor("dropdown.textColor", "#1f2937");
-  const dropdownHoverBgColor = getColor("dropdown.hoverBgColor", "#f3f4f6");
+  // Force light gray hover color for dropdown items
+  const dropdownHoverBgColor = "#e5e7eb";
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
