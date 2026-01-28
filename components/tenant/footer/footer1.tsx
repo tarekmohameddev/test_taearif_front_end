@@ -11,7 +11,7 @@ import {
   Instagram,
   Linkedin,
 } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaYoutube, FaSnapchat, FaTiktok } from "react-icons/fa";
 import { useEffect, useState, useMemo } from "react";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
@@ -487,6 +487,9 @@ export default function Footer(props: FooterProps = {}) {
       Instagram: Instagram,
       Twitter: Twitter,
       Facebook: Facebook,
+      Youtube: FaYoutube,
+      Snapchat: FaSnapchat,
+      Tiktok: FaTiktok,
     };
     return iconMap[iconName] || MapPin;
   };
