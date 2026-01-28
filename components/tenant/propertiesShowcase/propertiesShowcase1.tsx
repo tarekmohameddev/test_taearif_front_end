@@ -861,6 +861,49 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   const properties = allProperties.slice(0, 3);
 
   // ─────────────────────────────────────────────────────────
+  // 6.5. DETERMINE ROUTE BASED ON DATA TYPE
+  // ─────────────────────────────────────────────────────────
+  const getRoutePath = (): string => {
+    // First, check API URL to determine type
+    const apiUrl = mergedData.dataSource?.apiUrl || "";
+    
+    // Check if it's projects
+    if (apiUrl.includes("/projects")) {
+      return "/projects";
+    }
+    
+    // Check if it's sale
+    if (apiUrl.includes("purpose=sale")) {
+      return "/for-sale";
+    }
+    
+    // Check if it's rent
+    if (apiUrl.includes("purpose=rent")) {
+      return "/for-rent";
+    }
+    
+    // Fallback: check actual properties data
+    if (properties.length > 0) {
+      // Check if first property is a project
+      if (properties[0].url?.includes("/project/")) {
+        return "/projects";
+      }
+      // Check status to determine rent/sale
+      if (properties[0].status === "للبيع") {
+        return "/for-sale";
+      }
+      if (properties[0].status === "للإيجار") {
+        return "/for-rent";
+      }
+    }
+    
+    // Default to rent
+    return "/for-rent";
+  };
+
+  const routePath = getRoutePath();
+
+  // ─────────────────────────────────────────────────────────
   // 7. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
@@ -913,7 +956,8 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
               }}
             ></div>
           </div>
-          <button
+          <Link
+            href={routePath}
             className="flex items-center gap-2 font-medium transition-colors duration-300 text-md md:text-xl"
             style={{
               color: mergedData.styling?.viewAllButtonColor || "#8b5f46",
@@ -942,7 +986,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
                 d="M15.75 19.5L8.25 12l7.5-7.5"
               />
             </svg>
-          </button>
+          </Link>
         </div>
 
         {/* Properties Grid */}
@@ -1007,7 +1051,8 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
 
         {/* Load More Button */}
         <div className="flex justify-center mt-12">
-          <button
+          <Link
+            href={routePath}
             className="px-5 py-3 border-2 font-medium rounded-2xl transition-all duration-300 hover:scale-110"
             style={{
               borderColor: mergedData.styling?.loadMoreButtonColor || "#8b5f46",
@@ -1027,7 +1072,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
             }}
           >
             {mergedData.content?.loadMoreButtonText || "تحميل المزيد"}
-          </button>
+          </Link>
         </div>
       </div>
     </section>
