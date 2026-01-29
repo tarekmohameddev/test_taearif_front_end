@@ -280,10 +280,6 @@
     "contactUsHomePage": {
       "display_name": "نموذج الاتصال - الصفحة الرئيسية",
       "description": "نموذج اتصال كامل مع خلفية صورة وحقول متعددة للتواصل"
-    },
-    "inputs": {
-      "display_name": "نظام النماذج الديناميكي",
-      "description": "نظام نماذج متقدم مع بطاقات ديناميكية وحقول وتحقق من الصحة وتكامل API"
     }
   },
   "components_old": {
@@ -580,19 +576,16 @@
     "basic": {
       "visible": "مرئي",
       "layout": "التخطيط",
-      "container": "الحاوية",
       "padding": "الحشو",
       "vertical": "عمودي",
       "horizontal": "أفقي",
       "grid_layout": "تخطيط الشبكة",
       "columns": "الأعمدة",
-      "gap": "الفجوة",
       "direction": "الاتجاه",
       "text_width": "عرض النص (%)",
       "image_width": "عرض الصورة (%)",
       "gap_between_sections": "الفجوة بين الأقسام",
       "minimum_height": "الحد الأدنى للارتفاع",
-      "position": "الموضع",
       "type": "النوع",
       "static": "ثابت",
       "sticky": "لاصق",
