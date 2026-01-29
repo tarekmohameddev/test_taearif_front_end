@@ -151,166 +151,7 @@ export const propertiesShowcaseStructure: ComponentStructure = {
           ],
         },
 
-        // ═══════════════════════════════════════════════════════════
-        // PROPERTIES - ARRAY OF OBJECTS
-        // ═══════════════════════════════════════════════════════════
-        {
-          key: "properties",
-          label: "Properties",
-          type: "array",
-          addLabel: "Add Property",
-          itemLabel: "Property",
-          of: [
-            {
-              key: "id",
-              label: "Property ID",
-              type: "text",
-              placeholder: "1",
-            },
-            {
-              key: "image",
-              label: "Image URL",
-              type: "image",
-            },
-            {
-              key: "title",
-              label: "Property Title",
-              type: "text",
-              placeholder: "مشروع سكني فاخر",
-            },
-            {
-              key: "city",
-              label: "City",
-              type: "text",
-              placeholder: "الرياض",
-            },
-            {
-              key: "district",
-              label: "District",
-              type: "text",
-              placeholder: "حي النرجس",
-            },
-            {
-              key: "status",
-              label: "Status",
-              type: "text",
-              placeholder: "للبيع",
-            },
-            {
-              key: "area",
-              label: "Area",
-              type: "object",
-              fields: [
-                {
-                  key: "min",
-                  label: "Min Area",
-                  type: "number",
-                  placeholder: "150",
-                },
-                {
-                  key: "max",
-                  label: "Max Area",
-                  type: "number",
-                  placeholder: "300",
-                },
-              ],
-            },
-            {
-              key: "rooms",
-              label: "Rooms",
-              type: "object",
-              fields: [
-                {
-                  key: "min",
-                  label: "Min Rooms",
-                  type: "number",
-                  placeholder: "3",
-                },
-                {
-                  key: "max",
-                  label: "Max Rooms",
-                  type: "number",
-                  placeholder: "5",
-                },
-              ],
-            },
-            {
-              key: "units",
-              label: "Units",
-              type: "number",
-              placeholder: "50",
-            },
-            {
-              key: "floors",
-              label: "Floors",
-              type: "object",
-              fields: [
-                {
-                  key: "min",
-                  label: "Min Floors",
-                  type: "number",
-                  placeholder: "3",
-                },
-                {
-                  key: "max",
-                  label: "Max Floors",
-                  type: "number",
-                  placeholder: "5",
-                },
-              ],
-            },
-            {
-              key: "price",
-              label: "Price",
-              type: "object",
-              fields: [
-                {
-                  key: "min",
-                  label: "Min Price",
-                  type: "number",
-                  placeholder: "500000",
-                },
-                {
-                  key: "max",
-                  label: "Max Price",
-                  type: "number",
-                  placeholder: "1500000",
-                },
-              ],
-            },
-            {
-              key: "bathrooms",
-              label: "Bathrooms",
-              type: "object",
-              fields: [
-                {
-                  key: "min",
-                  label: "Min Bathrooms",
-                  type: "number",
-                  placeholder: "2",
-                },
-                {
-                  key: "max",
-                  label: "Max Bathrooms",
-                  type: "number",
-                  placeholder: "4",
-                },
-              ],
-            },
-            {
-              key: "featured",
-              label: "Featured",
-              type: "boolean",
-            },
-            {
-              key: "url",
-              label: "URL",
-              type: "text",
-              placeholder: "#",
-            },
-          ],
-        },
-
+        
         // ═══════════════════════════════════════════════════════════
         // STYLING
         // ═══════════════════════════════════════════════════════════
@@ -456,9 +297,44 @@ export const propertiesShowcaseStructure: ComponentStructure = {
       // SIMPLE FIELDS - For basic/simple editing mode
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
-        { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.title", label: "Title", type: "text" },
-        { key: "properties", label: "Properties", type: "array" },
+        {
+          key: "dataSource",
+          label: "Data Source",
+          type: "object",
+          fields: [
+            {
+              key: "apiUrl",
+              label: "API URL",
+              type: "select",
+              placeholder:
+                "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
+              options: [
+                {
+                  value:
+                    "/v1/tenant-website/{tenantId}/properties?purpose=rent&latest=1&limit=10",
+                  label: "Latest Rentals",
+                },
+                {
+                  value:
+                    "/v1/tenant-website/{tenantId}/properties?purpose=sale&latest=1&limit=10",
+                  label: "Latest Sales",
+                },
+                {
+                  value:
+                    "/v1/tenant-website/{tenantId}/projects?featured=1&limit=10",
+                  label: "Latest Projects",
+                },
+              ],
+            },
+            {
+              key: "enabled",
+              label: "Use API Data",
+              type: "boolean",
+            },
+          ],
+        },
+
       ],
     },
   ],
