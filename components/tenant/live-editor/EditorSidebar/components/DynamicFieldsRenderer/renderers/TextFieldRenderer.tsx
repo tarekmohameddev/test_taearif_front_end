@@ -60,7 +60,7 @@ export const TextFieldRenderer: React.FC<TextFieldRendererProps> = ({
           }`}
         />
         {value && value.length > 0 && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className={`absolute ${isRTL ? 'left-4' : 'right-4'} top-1/2 transform -translate-y-1/2`}>
             <svg
               className="w-4 h-4 text-green-500"
               fill="currentColor"
