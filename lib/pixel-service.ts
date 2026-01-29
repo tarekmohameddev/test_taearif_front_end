@@ -104,7 +104,6 @@ export async function fetchTenantPixels(tenantId: string): Promise<PixelData[]> 
                     _id: pixel._id || `${pixel.provider}-${pixel.externalId}`,
                 }));
             
-            console.log(`✅ Loaded ${activePixels.length} active pixel(s) for tenant:`, tenantId);
             return activePixels;
         }
 
@@ -122,12 +121,10 @@ export async function fetchTenantPixels(tenantId: string): Promise<PixelData[]> 
 
         throw new Error("Invalid response format: missing data array");
     } catch (error) {
-        console.error("❌ Failed to fetch pixels from API:", error);
         
         // In development, you might want to use mock data as fallback
         // In production, return empty array to avoid showing incorrect pixels
         if (process.env.NODE_ENV === "development") {
-            console.warn("⚠️ Using mock data as fallback in development mode");
             const activePixels = MOCK_PIXELS.data.filter(
                 (pixel) => pixel.settings.loadOnStorefront
             );

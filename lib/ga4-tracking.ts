@@ -80,10 +80,6 @@ export function trackPageView(tenantId: string, pagePath: string): void {
     tenant_id: tenantId, // ← This is what your backend looks for!
   });
 
-  console.log("📊 Page view tracked:", {
-    path: pagePath,
-    tenant_id: tenantId,
-  });
 }
 
 /**

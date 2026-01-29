@@ -247,11 +247,6 @@ const loadComponent = (section: string, componentName: string) => {
   }
   const fullPath = `${subPath}/${fileName}`;
 
-  if (process.env.NODE_ENV === "development") {
-    console.log(
-      `[Component Loader] Loading component: ${componentName} from path: ${fullPath}`,
-    );
-  }
 
   const component = lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch((error) => {
@@ -290,13 +285,7 @@ export default function TenantPageWrapper({
   dynamicSlug,
   domainType = "subdomain",
 }: TenantPageWrapperProps) {
-  console.log("🚀 TenantPageWrapper - Component rendered:", {
-    tenantId,
-    slug,
-    dynamicSlug,
-    domainType,
-    timestamp: new Date().toISOString(),
-  });
+
 
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
@@ -305,54 +294,20 @@ export default function TenantPageWrapper({
   const staticPagesData = useEditorStore((s) => s.staticPagesData);
   const getStaticPageData = useEditorStore((s) => s.getStaticPageData);
 
-  console.log("🔍 TenantPageWrapper - Store state:", {
-    hasTenantData: !!tenantData,
-    tenantDataUsername: tenantData?.username,
-    loadingTenantData,
-    tenantDataKeys: tenantData ? Object.keys(tenantData) : [],
-  });
+
 
   // Set tenantId in store when component mounts
   useEffect(() => {
-    console.log("🔍 TenantPageWrapper - Setting tenantId in store:", {
-      tenantId,
-      domainType,
-    });
     if (tenantId) {
       setTenantId(tenantId);
-      console.log("✅ TenantPageWrapper - tenantId set in store:", tenantId);
-    } else {
-      console.log("❌ TenantPageWrapper - No tenantId provided");
     }
   }, [tenantId, setTenantId, domainType]);
 
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
-    console.log("🔍 TenantPageWrapper - Data loading check:", {
-      tenantId,
-      hasTenantData: !!tenantData,
-      loadingTenantData,
-      tenantDataKeys: tenantData ? Object.keys(tenantData) : [],
-      shouldFetch: tenantId && !tenantData && !loadingTenantData,
-    });
 
     if (tenantId && !tenantData && !loadingTenantData) {
-      console.log("✅ TenantPageWrapper - Conditions met, starting data load");
-      console.log("🚀 TenantPageWrapper - Calling fetchTenantData API for:", tenantId);
       fetchTenantData(tenantId);
-    } else {
-      if (!tenantId) {
-        console.log("❌ TenantPageWrapper - No tenantId, skipping data load");
-      } else if (tenantData) {
-        console.log("✅ TenantPageWrapper - tenantData already exists, skipping load:", {
-          hasComponentSettings: !!tenantData.componentSettings,
-          componentSettingsKeys: tenantData.componentSettings
-            ? Object.keys(tenantData.componentSettings)
-            : [],
-        });
-      } else if (loadingTenantData) {
-        console.log("⏳ TenantPageWrapper - Already loading tenant data, skipping");
-      }
     }
   }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
@@ -462,17 +417,6 @@ export default function TenantPageWrapper({
 
   // Get components from staticPagesData, componentSettings, or default components
   const componentsList = useMemo(() => {
-    // 🔍 Debug: Track when this runs and what data is available
-    if (process.env.NODE_ENV === "development" && tenantId) {
-      console.log("🔄 componentsList COMPUTING:", {
-        slug,
-        tenantId,
-        hasTenantData: !!tenantData,
-        hasComponentSettings: !!tenantData?.componentSettings,
-        hasPageInSettings: !!tenantData?.componentSettings?.[slug],
-        settingsKeys: tenantData?.componentSettings ? Object.keys(tenantData.componentSettings) : [],
-      });
-    }
 
     // ⭐ Priority 1: Check multi-level pages (like "project", "property") with dynamicSlug
     if (isMultiLevelPage(slug) && dynamicSlug) {
@@ -764,35 +708,12 @@ export default function TenantPageWrapper({
       tenantData?.StaticPages?.[slug] || // Exists in tenant static pages
       tenantData?.componentSettings?.[slug]; // Exists in component settings
     
-    console.log("🔍 TenantPageWrapper - Checking page existence:", {
-      slug,
-      tenantId,
-      hasTenantData: !!tenantData,
-      componentsListLength: componentsList.length,
-      hasStaticPageData: !!getStaticPageData(slug),
-      hasTenantStaticPages: !!tenantData?.StaticPages?.[slug],
-      hasComponentSettings: !!tenantData?.componentSettings?.[slug],
-      hasPageData,
-    });
     
     if (!hasPageData) {
-      console.log("❌ TenantPageWrapper - Page not found in tenant data:", {
-        slug,
-        tenantId,
-        componentsList: componentsList.length,
-        hasStaticPageData: !!getStaticPageData(slug),
-        hasTenantStaticPages: !!tenantData?.StaticPages?.[slug],
-        hasComponentSettings: !!tenantData?.componentSettings?.[slug],
-      });
       notFound();
     }
   } else if (tenantId && !loadingTenantData && !tenantData) {
     // Data should have been loaded but it's not there - this means API failed or returned empty
-    console.warn("⚠️ TenantPageWrapper - tenantId exists but no tenantData loaded:", {
-      tenantId,
-      loadingTenantData,
-      hasTenantData: !!tenantData,
-    });
   }
 
   // Filter out header and footer components since they are now global

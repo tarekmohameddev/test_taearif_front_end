@@ -244,13 +244,6 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     }
   }, [tenantId, fetchTenantData]);
 
-  // Set tenantId in properties store when it changes
-  useEffect(() => {
-    if (currentTenantId) {
-      setTenantId(currentTenantId);
-    }
-  }, [currentTenantId, setTenantId]);
-
   // Note: URL parameters are automatically applied by useUrlFilters hook
   // The hook uses useEffect internally to watch searchParams changes
 
@@ -280,72 +273,149 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   };
 
   // ⭐ DEBUG: Log data sources (optional - remove in production)
-  if (props.useStore && process.env.NODE_ENV === "development") {
-    console.group("🔍 Grid Data Sources");
-    console.log("1️⃣ Default Data:", defaultData);
-    console.log("2️⃣ Props:", props);
-    console.log("3️⃣ Tenant Component Data:", tenantComponentData);
-    console.log("4️⃣ Current Store Data:", currentStoreData);
-    console.log("🔍 Is Store Data Default?", isStoreDataDefault);
-    console.log("🔍 Has Tenant Data?", hasTenantData);
-    console.log("🔀 Merged Data:", mergedData);
-    console.log("Final Title:", mergedData.content?.title);
-    console.groupEnd();
-  }
 
-  // Resolve default API URL based on current page
-  const resolveDefaultUrl = () => {
-    if (pathname?.includes("/projects")) {
-      return "/v1/tenant-website/{{tenantID}}/projects";
+  // Set tenantId in properties store when it changes
+  // BUT: Don't set it if grid1 has configured apiUrl (grid1 fetches data directly)
+  useEffect(() => {
+    if (currentTenantId) {
+      const hasConfiguredApiUrl = !!mergedData.dataSource?.apiUrl && mergedData.dataSource.apiUrl.trim();
+      if (!hasConfiguredApiUrl) {
+        // Only set tenantId in store if grid1 doesn't have configured apiUrl
+        // This prevents store from fetching data when grid1 handles it directly
+        console.log("🔧 [Grid1] setTenantId في store (grid1 لا يحتوي على apiUrl محدد)");
+        setTenantId(currentTenantId);
+      } else {
+        console.log("⏭️ [Grid1] تخطي setTenantId في store (grid1 لديه apiUrl محدد ويجلب البيانات مباشرة)");
+      }
     }
-    return "/v1/tenant-website/{{tenantID}}/properties";
-  };
+  }, [currentTenantId, setTenantId, mergedData.dataSource?.apiUrl]);
 
-  // Function to convert API URL format
-  const convertApiUrl = (
-    url: string,
-    tenantId: string,
-    purpose?: string,
-  ): string => {
-    // Blogs API doesn't need tenantId replacement
-    if (url.includes("/posts") || url.includes("/api/posts")) {
-      return url; // Blogs API is global, not tenant-specific
+  // Configure API URL based on dataSource or pathname
+  const configuredApiUrl = (() => {
+    const rawUrl = mergedData.dataSource?.apiUrl;
+    
+    // الحالة الأولى: apiUrl موجود - استخدامه كما هو
+    if (rawUrl && rawUrl.trim()) {
+      // شرط خاص: إذا كانت الصفحة تحتوي على "real-estate" و apiUrl هو "/v1/tenant-website/{{tenantID}}/properties"
+      if (pathname?.includes("/real-estate") && rawUrl.trim() === "/v1/tenant-website/{{tenantID}}/properties") {
+        const modifiedUrl = "/v1/tenant-website/{{tenantID}}?title=";
+        console.log("🟣 [Grid1] الحالة الخاصة (real-estate): تعديل apiUrl من properties إلى title:", modifiedUrl);
+        return modifiedUrl;
+      }
+      console.log("🔵 [Grid1] الحالة الأولى: apiUrl موجود - استخدامه كما هو:", rawUrl);
+      return rawUrl;
     }
-
-    let convertedUrl = url.replace("{{tenantID}}", tenantId);
-
-    // Add purpose parameter if not already in URL
-    if (
-      purpose &&
-      !convertedUrl.includes("purpose=") &&
-      !convertedUrl.includes("/projects") &&
-      !convertedUrl.includes("/posts")
-    ) {
-      const separator = convertedUrl.includes("?") ? "&" : "?";
-      convertedUrl += `${separator}purpose=${purpose}`;
+    
+    // الحالة الثانية: apiUrl غير موجود - إنشاءه بناءً على pathname
+    if (pathname?.includes("/for-sale")) {
+      const url = "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1";
+      console.log("🟢 [Grid1] الحالة الثانية (for-sale): apiUrl غير موجود - إنشاءه من pathname:", url);
+      return url;
     }
+    if (pathname?.includes("/for-rent")) {
+      const url = "/v1/tenant-website/{{tenantID}}/properties?page=1&purpose=rent";
+      console.log("🟡 [Grid1] الحالة الثانية (for-rent): apiUrl غير موجود - إنشاءه من pathname:", url);
+      return url;
+    }
+    
+    // القيمة الافتراضية
+    const defaultUrl = "/v1/tenant-website/{{tenantID}}/properties";
+    console.log("⚪ [Grid1] الحالة الافتراضية: apiUrl غير موجود - استخدام القيمة الافتراضية:", defaultUrl);
+    return defaultUrl;
+  })();
 
-    return convertedUrl;
+  // Function to add searchParams to URL and replace tenantID
+  const addSearchParamsToUrl = (url: string, tenantId: string): string => {
+    console.log("📝 [Grid1] addSearchParamsToUrl - المدخلات:", { url, tenantId, pathname });
+    
+    // استبدال {{tenantID}}
+    let finalUrl = url.replace("{{tenantID}}", tenantId);
+    console.log("🔄 [Grid1] بعد استبدال {{tenantID}}:", finalUrl);
+    
+    // استخراج params الموجودة في url
+    const urlParams = new URLSearchParams();
+    const urlParts = finalUrl.split("?");
+    const baseUrl = urlParts[0];
+    
+    if (urlParts[1]) {
+      // إضافة params الموجودة في url
+      const existingParams = new URLSearchParams(urlParts[1]);
+      existingParams.forEach((value, key) => {
+        urlParams.set(key, value);
+      });
+      console.log("📋 [Grid1] Params الموجودة في URL:", Object.fromEntries(existingParams));
+    }
+    
+    // حالة خاصة: إذا كان URL يحتوي على "?title=" (من real-estate page)
+    // يجب إضافة قيمة search من store إلى param title
+    if (url.includes("?title=") || urlParams.has("title")) {
+      if (search && search.trim()) {
+        urlParams.set("title", search.trim());
+        console.log("🔍 [Grid1] إضافة search من store إلى param title:", search.trim());
+      } else {
+        console.log("⚠️ [Grid1] search من store غير موجود أو فارغ - title param سيبقى فارغاً");
+      }
+    }
+    
+    // إضافة/تحديث params من searchParams أولاً
+    if (searchParams) {
+      const searchParamsObj: Record<string, string> = {};
+      searchParams.forEach((value, key) => {
+        // تخطي param "title" إذا كان موجوداً في URL (لأننا أضفناه من store)
+        if (!(url.includes("?title=") || urlParams.has("title")) || key !== "title") {
+          urlParams.set(key, value);
+          searchParamsObj[key] = value;
+        }
+      });
+      console.log("➕ [Grid1] Params من searchParams:", searchParamsObj);
+    } else {
+      console.log("⚠️ [Grid1] searchParams غير موجود");
+    }
+    
+    // إضافة/تحديث params من pathname (الأولوية النهائية لـ pathname)
+    if (pathname?.includes("/for-sale")) {
+      urlParams.set("purpose", "sale");
+      if (!urlParams.has("latest")) {
+        urlParams.set("latest", "1");
+      }
+      console.log("🟢 [Grid1] إضافة/تحديث params من pathname (/for-sale) - الأولوية النهائية: purpose=sale, latest=1");
+    } else if (pathname?.includes("/for-rent")) {
+      urlParams.set("purpose", "rent");
+      if (!urlParams.has("page")) {
+        urlParams.set("page", "1");
+      }
+      console.log("🟡 [Grid1] إضافة/تحديث params من pathname (/for-rent) - الأولوية النهائية: purpose=rent, page=1");
+    }
+    
+    // بناء URL النهائي
+    const queryString = urlParams.toString();
+    const finalUrlWithParams = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+    console.log("✅ [Grid1] URL النهائي بعد إضافة params:", finalUrlWithParams);
+    return finalUrlWithParams;
   };
 
   // Function to fetch properties from API
-  const fetchPropertiesFromApi = async (apiUrl?: string, purpose?: string) => {
+  const fetchPropertiesFromApi = async (apiUrl: string) => {
+    console.log("🚀 [Grid1] fetchPropertiesFromApi - بدء الجلب:", { apiUrl, currentTenantId });
     try {
       setLoading(true);
 
       if (!currentTenantId) {
+        console.log("❌ [Grid1] fetchPropertiesFromApi - currentTenantId غير موجود، إيقاف الجلب");
         setLoading(false);
         return;
       }
 
-      // Use ONLY the configured apiUrl (no hidden/alternative endpoints)
-      const url = convertApiUrl(
-        apiUrl || resolveDefaultUrl(),
-        currentTenantId,
-        purpose,
-      );
+      // Add searchParams to URL and replace tenantID
+      const url = addSearchParamsToUrl(apiUrl, currentTenantId);
+      console.log("🌐 [Grid1] fetchPropertiesFromApi - جلب البيانات من:", url);
 
       const response = await axiosInstance.get(url);
+      console.log("📦 [Grid1] fetchPropertiesFromApi - تم استلام الاستجابة:", {
+        hasData: !!response.data,
+        dataType: Array.isArray(response.data) ? "array" : typeof response.data,
+        dataKeys: response.data ? Object.keys(response.data) : [],
+      });
 
       // Handle different API response formats
       if (response.data) {
@@ -354,13 +424,16 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
         // Handle response format where items are under `data`
         if (response.data.data && Array.isArray(response.data.data)) {
+          console.log("📊 [Grid1] الحالة: response.data.data (مصفوفة مختلطة)");
           // Process mixed data (properties and projects)
           const mixedData = response.data.data;
+          console.log("🔀 [Grid1] عدد العناصر المختلطة:", mixedData.length);
           
           dataToSet = mixedData.map((item: any) => {
             const originalType = item.type; // Save original type before conversion
             // If it's a project, convert to property format
             if (item.type === "project") {
+              console.log("🏗️ [Grid1] تحويل project إلى property format");
               const converted = convertProjectToProperty(item);
               // Preserve original type for badge display
               return { ...converted, _itemType: originalType };
@@ -372,6 +445,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
           // Extract pagination from response
           if (response.data.pagination) {
             paginationData = response.data.pagination;
+            console.log("📄 [Grid1] Pagination data:", paginationData);
             setApiPagination({
               total: paginationData.total || 0,
               per_page: paginationData.per_page || 20,
@@ -384,12 +458,15 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         }
         // Check if it's blogs API response
         else if (url.includes("/posts") || url.includes("/api/posts")) {
+          console.log("📝 [Grid1] الحالة: blogs API response");
           let blogsData = [];
 
           if (response.data.data && Array.isArray(response.data.data)) {
             blogsData = response.data.data;
+            console.log("📚 [Grid1] blogs من response.data.data:", blogsData.length);
           } else if (Array.isArray(response.data)) {
             blogsData = response.data;
+            console.log("📚 [Grid1] blogs من response.data مباشرة:", blogsData.length);
           }
 
           // Convert blogs to property format
@@ -397,20 +474,26 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
             dataToSet = blogsData.map((blog: any) => {
               return convertBlogToProperty(blog);
             });
+            console.log("✅ [Grid1] تم تحويل", blogsData.length, "blog إلى property format");
           } else {
             dataToSet = [];
+            console.log("⚠️ [Grid1] لا توجد blogs للتحويل");
           }
         }
         // Check if it's projects API response
         else if (url.includes("/projects")) {
+          console.log("🏗️ [Grid1] الحالة: projects API response");
           let projectsData = [];
 
           if (response.data.projects) {
             projectsData = response.data.projects;
+            console.log("🏢 [Grid1] projects من response.data.projects:", projectsData.length);
           } else if (Array.isArray(response.data)) {
             projectsData = response.data;
+            console.log("🏢 [Grid1] projects من response.data مباشرة:", projectsData.length);
           } else if (response.data.data && Array.isArray(response.data.data)) {
             projectsData = response.data.data;
+            console.log("🏢 [Grid1] projects من response.data.data:", projectsData.length);
           }
 
           // Convert projects to property format
@@ -418,32 +501,43 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
             dataToSet = projectsData.map((project: any) => {
               return convertProjectToProperty(project);
             });
+            console.log("✅ [Grid1] تم تحويل", projectsData.length, "project إلى property format");
           } else {
             dataToSet = [];
+            console.log("⚠️ [Grid1] لا توجد projects للتحويل");
           }
         }
         // Check if it's properties API response
         else if (response.data.properties) {
+          console.log("🏠 [Grid1] الحالة: properties API response");
           dataToSet = response.data.properties;
+          console.log("✅ [Grid1] عدد properties:", dataToSet.length);
         }
         // Handle direct array response
         else if (Array.isArray(response.data)) {
+          console.log("📋 [Grid1] الحالة: direct array response");
           dataToSet = response.data;
+          console.log("✅ [Grid1] عدد العناصر في المصفوفة المباشرة:", dataToSet.length);
         }
         // Handle pagination wrapper
         else if (response.data.data && Array.isArray(response.data.data)) {
+          console.log("📦 [Grid1] الحالة: pagination wrapper");
           dataToSet = response.data.data;
+          console.log("✅ [Grid1] عدد العناصر من pagination wrapper:", dataToSet.length);
         }
 
+        console.log("💾 [Grid1] حفظ", dataToSet.length, "عنصر في apiProperties");
         setApiProperties(dataToSet);
       } else {
+        console.log("⚠️ [Grid1] response.data غير موجود - حفظ مصفوفة فارغة");
         setApiProperties([]);
       }
     } catch (error) {
       // Set empty array on error
+      console.error("❌ [Grid1] خطأ في fetchPropertiesFromApi:", error);
       setApiProperties([]);
-      console.error("Error fetching properties:", error);
     } finally {
+      console.log("🏁 [Grid1] fetchPropertiesFromApi - انتهى (setLoading(false))");
       setLoading(false);
     }
   };
@@ -571,62 +665,44 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     };
   };
 
-  // Get purpose from current pathname
-  const getPurposeFromPath = () => {
-    if (pathname?.includes("/for-rent")) {
-      return "rent";
-    } else if (pathname?.includes("/for-sale")) {
-      return "sale";
-    }
-    return undefined;
-  };
-
-  // Note: transactionType is no longer auto-updated from pathname
-  // It will only be set when user explicitly selects from dropdown in propertyFilter2
-
-  // Fetch properties on component mount and when API URL or pathname changes
-  // Note: Removed transactionType, filteredProperties.length, and searchParams from dependencies
-  // to prevent automatic API calls when filters change. API will only be called on mount,
-  // pathname change, or when user explicitly clicks search button.
+  // Fetch properties on component mount and when API URL, pathname, or searchParams change
   useEffect(() => {
-    // Always prioritize the configured apiUrl from dataSource
-    const apiUrl = mergedData.dataSource?.apiUrl;
+    console.log("🔄 [Grid1] useEffect - فحص الشروط:", {
+      configuredApiUrl,
+      useApiData: mergedData.dataSource?.enabled !== false,
+      currentTenantId,
+      pathname,
+      hasSearchParams: !!searchParams,
+    });
+
+    const apiUrl = configuredApiUrl;
     const useApiData = mergedData.dataSource?.enabled !== false;
 
-    const isPropertiesApiUrl = !!apiUrl && apiUrl.includes("/properties");
-
-    // If apiUrl targets `/properties`, rely on the properties store.
-    // Otherwise (projects/blogs/mixed endpoint), fetch directly from apiUrl.
-    const shouldFetchDirectlyFromApiUrl =
-      useApiData && currentTenantId && !!apiUrl && !isPropertiesApiUrl;
-
-    if (shouldFetchDirectlyFromApiUrl) {
+    if (useApiData && currentTenantId && apiUrl) {
+      console.log("✅ [Grid1] useEffect - جميع الشروط متوفرة، بدء الجلب");
       // Clear existing data before fetching new data
       setApiProperties([]);
-
-      const purpose = apiUrl?.includes("/projects")
-        ? undefined
-        : apiUrl?.includes("/properties")
-          ? getPurposeFromPath() || transactionType
-          : undefined;
-
-      fetchPropertiesFromApi(apiUrl, purpose);
+      fetchPropertiesFromApi(apiUrl);
+    } else {
+      console.log("⏸️ [Grid1] useEffect - الشروط غير متوفرة:", {
+        useApiData,
+        hasCurrentTenantId: !!currentTenantId,
+        hasApiUrl: !!apiUrl,
+      });
     }
   }, [
     mergedData.dataSource?.apiUrl,
     mergedData.dataSource?.enabled,
     currentTenantId,
     pathname,
-    isRealEstatePage,
-    // Removed: transactionType, filteredProperties.length, searchParams
-    // These caused automatic API calls when filters changed
+    searchParams,
   ]);
 
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
 
-  const isPropertiesApiUrl = !!mergedData.dataSource?.apiUrl &&
-    mergedData.dataSource.apiUrl.includes("/properties");
+  const isPropertiesApiUrl = !!configuredApiUrl &&
+    configuredApiUrl.includes("/properties");
 
   const shouldPaginateViaUrl =
     !isPropertiesApiUrl && isRealEstatePage && !!searchParams?.get("search");
@@ -634,7 +710,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const handlePageChange = useCallback(
     (page: number) => {
       // For real-estate page when NOT using `/properties`, use URL pagination.
-      if (shouldPaginateViaUrl) {
+      if (shouldPaginateViaUrl && searchParams) {
         const currentParams = new URLSearchParams(searchParams.toString());
         currentParams.set("page", page.toString());
         router.push(`${pathname}?${currentParams.toString()}`);
@@ -650,7 +726,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   );
 
   const handleNextPage = useCallback(() => {
-    if (shouldPaginateViaUrl) {
+    if (shouldPaginateViaUrl && searchParams) {
       const currentPage = parseInt(searchParams.get("page") || "1", 10);
       const nextPage = currentPage + 1;
       if (nextPage <= apiPagination.last_page) {
@@ -662,7 +738,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   }, [shouldPaginateViaUrl, searchParams, apiPagination.last_page, handlePageChange, goToNextPage]);
 
   const handlePreviousPage = useCallback(() => {
-    if (shouldPaginateViaUrl) {
+    if (shouldPaginateViaUrl && searchParams) {
       const currentPage = parseInt(searchParams.get("page") || "1", 10);
       const previousPage = currentPage - 1;
       if (previousPage >= 1) {
@@ -684,22 +760,43 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
 
   // Determine if we're on projects page or blogs page
   const isProjectsPage = pathname?.includes("/projects");
-  const isProjectsApi = mergedData.dataSource?.apiUrl?.includes("/projects");
+  const isProjectsApi = configuredApiUrl?.includes("/projects");
   const isBlogsPage = pathname?.includes("/blog");
-  const isBlogsApi = mergedData.dataSource?.apiUrl?.includes("/posts");
+  const isBlogsApi = configuredApiUrl?.includes("/posts");
 
-  // Always prioritize store data (filteredProperties) over API data
-  // EXCEPT when we're on projects page, blogs page, real-estate page with search parameter, or using projects/blogs API
-  // In those cases, use apiProperties directly since store calls /properties API
+  // Use apiProperties when grid1 fetches data directly from API
+  // When grid1 has apiUrl configured, it fetches data directly and should use apiProperties
+  // Otherwise use filteredProperties from store or static data
   const hasSearchParam = searchParams?.has("search");
-  const properties =
-    useApiData && currentTenantId
-      ? isProjectsPage || isProjectsApi || isBlogsPage || isBlogsApi || shouldPaginateViaUrl
-        ? apiProperties // Use API data directly for projects/blogs/mixed endpoint
-        : filteredProperties // Use store data for properties
-      : useApiData
-        ? apiProperties
-        : mergedData.items || mergedData.properties || [];
+  const hasConfiguredApiUrl = !!mergedData.dataSource?.apiUrl && mergedData.dataSource.apiUrl.trim();
+  
+  let properties;
+  if (useApiData && currentTenantId) {
+    if (hasConfiguredApiUrl || isProjectsPage || isProjectsApi || isBlogsPage || isBlogsApi || shouldPaginateViaUrl) {
+      properties = apiProperties; // Use apiProperties when grid1 has configured apiUrl or for projects/blogs
+      console.log("📊 [Grid1] استخدام apiProperties:", {
+        count: apiProperties.length,
+        hasConfiguredApiUrl,
+        isProjectsPage,
+        isProjectsApi,
+        isBlogsPage,
+        isBlogsApi,
+        shouldPaginateViaUrl,
+      });
+    } else {
+      properties = filteredProperties; // Use store data when grid1 doesn't have configured apiUrl
+      console.log("📊 [Grid1] استخدام filteredProperties من store:", {
+        count: filteredProperties.length,
+        hasConfiguredApiUrl,
+      });
+    }
+  } else if (useApiData) {
+    properties = apiProperties;
+    console.log("📊 [Grid1] استخدام apiProperties (useApiData فقط):", { count: apiProperties.length });
+  } else {
+    properties = mergedData.items || mergedData.properties || [];
+    console.log("📊 [Grid1] استخدام static data:", { count: properties.length });
+  }
 
   // Helper function to convert property from grid format to card4/card5 format
   const convertPropertyForCard4And5 = (property: any) => {
@@ -808,13 +905,13 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
           property.transactionType === "blog" || 
           property.type === "مقال" ||
           pathname?.includes("/blog") ||
-          mergedData.dataSource?.apiUrl?.includes("/posts");
+          configuredApiUrl?.includes("/posts");
         
         const isProject = 
           property.transactionType === "project" || 
           property.type === "مشروع" ||
           pathname?.includes("/projects") ||
-          mergedData.dataSource?.apiUrl?.includes("/projects");
+          configuredApiUrl?.includes("/projects");
         
         if (isBlog) {
           return `/blog/${property.slug}`;
@@ -977,7 +1074,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
             >
               {properties.map((property: any) => {
                 // Check if this is blogs API - force blogCard1 usage
-                const isBlogsApi = mergedData.dataSource?.apiUrl?.includes("/posts");
+                const isBlogsApi = configuredApiUrl?.includes("/posts");
                 
                 if (isBlogsApi) {
                   // Convert to blog format and render BlogCard1

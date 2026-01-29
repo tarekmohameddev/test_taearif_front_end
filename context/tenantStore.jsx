@@ -275,73 +275,32 @@ const useTenantStore = create((set) => ({
     })),
 
   fetchTenantData: async (websiteName) => {
-    console.log("🔍 tenantStore.fetchTenantData - Called with:", {
-      websiteName,
-      timestamp: new Date().toISOString(),
-    });
-
     const state = useTenantStore.getState();
-
-    console.log("🔍 tenantStore.fetchTenantData - Current state:", {
-      loadingTenantData: state.loadingTenantData,
-      hasTenantData: !!state.tenantData,
-      tenantDataUsername: state.tenantData?.username,
-      lastFetchedWebsite: state.lastFetchedWebsite,
-      usernameMatches: state.tenantData?.username === websiteName,
-      lastFetchedMatches: state.lastFetchedWebsite === websiteName,
-    });
 
     // Prevent duplicate requests - تحقق من أن البيانات موجودة ونفس الـ username
     if (
       state.loadingTenantData ||
       (state.tenantData && state.tenantData.username === websiteName)
     ) {
-      console.log("❌ tenantStore.fetchTenantData - Skipping (duplicate prevention):", {
-        reason: state.loadingTenantData
-          ? "Already loading"
-          : "Tenant data exists with same username",
-        loadingTenantData: state.loadingTenantData,
-        existingUsername: state.tenantData?.username,
-        requestedWebsiteName: websiteName,
-      });
       return;
     }
 
     // منع الـ duplicate calls إذا كان نفس الـ websiteName
     if (state.lastFetchedWebsite === websiteName) {
-      console.log("❌ tenantStore.fetchTenantData - Skipping (already fetched):", {
-        lastFetchedWebsite: state.lastFetchedWebsite,
-        requestedWebsiteName: websiteName,
-      });
       return;
     }
 
-    console.log("✅ tenantStore.fetchTenantData - Conditions met, making API call");
     set({ loadingTenantData: true, error: null });
     try {
       // إرسال websiteName كـ tenantId للـ API
       // في حالة Custom Domain: websiteName = "hey.com"
       // في حالة Subdomain: websiteName = "tenant1"
-      console.log("🚀 tenantStore.fetchTenantData - API Request:", {
-        url: "/v1/tenant-website/getTenant",
-        method: "POST",
-        body: { websiteName },
-      });
 
       const response = await axiosInstance.post(
         "/v1/tenant-website/getTenant",
         { websiteName },
       );
 
-      console.log("✅ tenantStore.fetchTenantData - API Response:", {
-        status: response.status,
-        hasData: !!response.data,
-        dataKeys: response.data ? Object.keys(response.data) : [],
-        hasComponentSettings: !!response.data?.componentSettings,
-        componentSettingsKeys: response.data?.componentSettings
-          ? Object.keys(response.data.componentSettings)
-          : [],
-      });
       if (response.status === 404) {
         throw new Error("Tenant not found");
       } else if (response.status === 204) {
@@ -350,17 +309,8 @@ const useTenantStore = create((set) => ({
 
       const data = response.data || {}; // If response is empty, use an empty object
 
-      console.log("🔍 tenantStore.fetchTenantData - Processing response data:", {
-        hasData: !!data,
-        dataKeys: data ? Object.keys(data) : [],
-        dataSize: data ? Object.keys(data).length : 0,
-      });
-
       // تحقق من أن البيانات ليست فارغة
       if (!data || Object.keys(data).length === 0) {
-        console.warn("⚠️ tenantStore.fetchTenantData - Empty data, using defaults:", {
-          websiteName,
-        });
         // بدلاً من رمي خطأ، استخدم بيانات افتراضية
         const defaultData = {
           username: websiteName,
@@ -383,7 +333,6 @@ const useTenantStore = create((set) => ({
           loadingTenantData: false,
           lastFetchedWebsite: websiteName,
         });
-        console.log("✅ tenantStore.fetchTenantData - Default data set");
         return;
       }
 
@@ -458,15 +407,6 @@ const useTenantStore = create((set) => ({
 
       }
 
-      console.log("✅ tenantStore.fetchTenantData - Setting tenantData in store:", {
-        username: data.username,
-        hasComponentSettings: !!data.componentSettings,
-        componentSettingsKeys: data.componentSettings
-          ? Object.keys(data.componentSettings)
-          : [],
-        hasStaticPages: !!data.StaticPages,
-        staticPagesKeys: data.StaticPages ? Object.keys(data.StaticPages) : [],
-      });
 
       set({
         tenantData: data,
@@ -474,13 +414,7 @@ const useTenantStore = create((set) => ({
         lastFetchedWebsite: websiteName,
       });
 
-      console.log("✅ tenantStore.fetchTenantData - Store updated successfully");
     } catch (error) {
-      console.error("❌ tenantStore.fetchTenantData - Error:", {
-        error: error.message,
-        errorStack: error.stack,
-        websiteName,
-      });
       set({ error: error.message, loadingTenantData: false });
     }
   },
