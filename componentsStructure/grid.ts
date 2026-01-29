@@ -150,49 +150,50 @@ export const gridStructure: ComponentStructure = {
           ],
         },
         {
-          key: "dataSource",
-          label: "Data Source",
-          type: "object",
-          fields: [
+          key: "dataSource.apiUrl",
+          label: "API URL",
+          type: "select",
+          defaultValue: "/v1/tenant-website/{{tenantID}}/properties",
+          options: [
             {
-              key: "apiUrl",
-              label: "API URL",
-              type: "select",
-              defaultValue: "/v1/tenant-website/{{tenantID}}/properties",
-              options: [
-                {
-                  value: "/v1/tenant-website/{{tenantID}}/properties",
-                  label: "All Properties",
-                },
-                {
-                  value: "/v1/tenant-website/{{tenantID}}/projects",
-                  label: "Projects",
-                },
-                {
-                  value: "/api/posts",
-                  label: "Blogs",
-                },
-                {
-                  value:
-                    "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1",
-                  label: "Latest Sales",
-                },
-                {
-                  value:
-                    "/v1/tenant-website/{{tenantID}}/properties?purpose=rent",
-                  label: "Rentals",
-                },
-              ],
-              description: "API endpoint to fetch data",
+              value: "/v1/tenant-website/{{tenantID}}/properties",
+              label: "كل الوحدات",
             },
             {
-              key: "enabled",
-              label: "Use API Data",
-              type: "boolean",
-              defaultValue: true,
-              description: "Whether to fetch data from API or use static data",
+              value: "/v1/tenant-website/{{tenantID}}/projects",
+              label: "المشاريع",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=0",
+              label: "المشاريع قيد الإنشاء",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=1",
+              label: "المشاريع مكتملة",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=2",
+              label: "المشاريع لم تنشأ",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}",
+              label: "المشاريع والوحدات معا",
+            },
+            {
+              value: "/api/posts",
+              label: "المقالات",
+            },
+            {
+              value:
+                "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1",
+              label: "وحدات للبيع",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/properties?purpose=rent",
+              label: "وحدات للإيجار",
             },
           ],
+          description: "API endpoint to fetch data",
         },
         {
           key: "layout",
@@ -268,24 +269,40 @@ export const gridStructure: ComponentStructure = {
           options: [
             {
               value: "/v1/tenant-website/{{tenantID}}/properties",
-              label: "All Properties",
+              label: "كل الوحدات",
             },
             {
               value: "/v1/tenant-website/{{tenantID}}/projects",
-              label: "Projects",
+              label: "المشاريع",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=0",
+              label: "المشاريع قيد الإنشاء",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=1",
+              label: "المشاريع مكتملة",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=2",
+              label: "المشاريع لم تنشأ",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}",
+              label: "المشاريع والوحدات معا",
             },
             {
               value: "/api/posts",
-              label: "Blogs",
+              label: "المقالات",
             },
             {
               value:
                 "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1",
-              label: "Latest Sales",
+              label: "وحدات للبيع",
             },
             {
               value: "/v1/tenant-website/{{tenantID}}/properties?purpose=rent",
-              label: "Rentals",
+              label: "وحدات للإيجار",
             },
           ],
           description: "API endpoint to fetch data",
@@ -548,70 +565,50 @@ export const gridStructure: ComponentStructure = {
           ],
         },
         {
-          key: "dataSource",
-          label: "Data Source",
-          type: "object",
-          fields: [
+          key: "dataSource.apiUrl",
+          label: "API URL",
+          type: "select",
+          defaultValue: "/v1/tenant-website/{{tenantID}}/properties",
+          options: [
             {
-              key: "apiUrl",
-              label: "API URL",
-              type: "select",
-              defaultValue: "/v1/tenant-website/{{tenantID}}/properties",
-              options: [
-                {
-                  value: "/v1/tenant-website/{{tenantID}}/properties",
-                  label: "All Properties",
-                },
-                {
-                  value: "/v1/tenant-website/{{tenantID}}/projects",
-                  label: "Projects",
-                },
-                {
-                  value: "/api/posts",
-                  label: "Blogs",
-                },
-                {
-                  value:
-                    "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1",
-                  label: "Latest Sales",
-                },
-                {
-                  value:
-                    "/v1/tenant-website/{{tenantID}}/properties?purpose=rent",
-                  label: "Rentals",
-                },
-              ],
-              description: "API endpoint to fetch data",
+              value: "/v1/tenant-website/{{tenantID}}/properties",
+              label: "كل الوحدات",
             },
             {
-              key: "enabled",
-              label: "Use API Data",
-              type: "boolean",
-              defaultValue: true,
-              description: "Whether to fetch data from API or use static data",
+              value: "/v1/tenant-website/{{tenantID}}/projects",
+              label: "المشاريع",
             },
             {
-              key: "cache",
-              label: "Cache Settings",
-              type: "object",
-              fields: [
-                {
-                  key: "enabled",
-                  label: "Enable Cache",
-                  type: "boolean",
-                  defaultValue: true,
-                  description: "Whether to cache API responses",
-                },
-                {
-                  key: "duration",
-                  label: "Cache Duration (minutes)",
-                  type: "number",
-                  defaultValue: 30,
-                  description: "How long to cache the data in minutes",
-                },
-              ],
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=0",
+              label: "المشاريع قيد الإنشاء",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=1",
+              label: "المشاريع مكتملة",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/projects?status=2",
+              label: "المشاريع لم تنشأ",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}",
+              label: "المشاريع والوحدات معا",
+            },
+            {
+              value: "/api/posts",
+              label: "المقالات",
+            },
+            {
+              value:
+                "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1",
+              label: "وحدات للبيع",
+            },
+            {
+              value: "/v1/tenant-website/{{tenantID}}/properties?purpose=rent",
+              label: "وحدات للإيجار",
             },
           ],
+          description: "API endpoint to fetch data",
         },
         {
           key: "content",
