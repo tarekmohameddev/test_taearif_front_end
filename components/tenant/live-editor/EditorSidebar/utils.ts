@@ -13,6 +13,7 @@ import {
 import { getDefaultInputs2Data } from "@/context/editorStoreFunctions/inputs2Functions";
 import { getDefaultTitleData } from "@/context/editorStoreFunctions/titleFunctions";
 import { getDefaultHero4Data } from "@/context/editorStoreFunctions/heroFunctions";
+import { getDefaultSideBySide7Data } from "@/context/editorStoreFunctions/sideBySideFunctions";
 import { logSidebar } from "@/lib/debugLogger";
 
 // دالة لإنشاء البيانات الافتراضية لكل نوع مكون
@@ -710,6 +711,19 @@ export const createDefaultData = (
         visible: true,
         title: "Hero Title",
         backgroundImage: "",
+      };
+
+    case "sideBySide":
+      // Check componentName to determine which sideBySide variant default data to use
+      if (componentName === "sideBySide7") {
+        return getDefaultSideBySide7Data();
+      }
+      // For other sideBySide variants, return a basic default structure
+      return {
+        visible: true,
+        content: {
+          title: "Side By Side Title",
+        },
       };
 
     case "title":

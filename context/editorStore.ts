@@ -88,6 +88,7 @@ import { getDefaultHeaderData } from "./editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "./editorStoreFunctions/footerFunctions";
 import { getDefaultInputs2Data } from "./editorStoreFunctions/inputs2Functions";
 import { getDefaultHero4Data } from "./editorStoreFunctions/heroFunctions";
+import { getDefaultSideBySide7Data } from "./editorStoreFunctions/sideBySideFunctions";
 import defaultData from "@/lib/defaultData.json";
 import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
 import {
@@ -3657,6 +3658,31 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         console.log(
           "✅ Default hero4 data initialized in editorStore:",
           newState.heroStates,
+        );
+      }
+
+      // Initialize default sideBySide7 data if no sideBySide7 components exist in database
+      const hasSideBySide7InDatabase = Object.values(
+        tenantData.componentSettings || {},
+      ).some((pageSettings: any) => {
+        if (!pageSettings || typeof pageSettings !== "object") return false;
+        return Object.values(pageSettings).some(
+          (comp: any) => comp.type === "sideBySide" && comp.componentName === "sideBySide7",
+        );
+      });
+
+      if (!hasSideBySide7InDatabase) {
+        console.log(
+          "🔍 No sideBySide7 components found in database, initializing default sideBySide7 data",
+        );
+        const defaultSideBySide7Data = getDefaultSideBySide7Data();
+        newState.sideBySideStates = {
+          ...newState.sideBySideStates,
+          "sideBySide7-default": defaultSideBySide7Data,
+        };
+        console.log(
+          "✅ Default sideBySide7 data initialized in editorStore:",
+          newState.sideBySideStates,
         );
       }
 
