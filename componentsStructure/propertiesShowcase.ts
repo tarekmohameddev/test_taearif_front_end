@@ -7,14 +7,6 @@ export const propertiesShowcaseStructure: ComponentStructure = {
       id: "propertiesShowcase1",
       name: "Properties Showcase 1 - Grid Layout",
       fields: [
-        // ═══════════════════════════════════════════════════════════
-        // BASIC FIELDS
-        // ═══════════════════════════════════════════════════════════
-        {
-          key: "visible",
-          label: "Visible",
-          type: "boolean",
-        }, // ═══════════════════════════════════════════════════════════
         // LAYOUT CONFIGURATION
         // ═══════════════════════════════════════════════════════════
         {

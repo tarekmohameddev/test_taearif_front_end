@@ -311,48 +311,12 @@ export const BooleanFieldRenderer: React.FC<{
     >
       <div className="flex items-center justify-between">
         <label className="flex items-center space-x-3">
-          <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${
-              value
-                ? "bg-gradient-to-br from-green-500 to-emerald-600"
-                : "bg-gradient-to-br from-slate-400 to-slate-500"
-            }`}
-          >
-            {value ? (
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            )}
-          </div>
           <span className="text-sm font-semibold text-slate-700">{label}</span>
         </label>
         <button
           type="button"
           onClick={() => updateValue(path, !value)}
+          dir={"ltr"}
           className={`relative inline-flex h-8 w-16 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${
             value
               ? "bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg shadow-green-500/25"
