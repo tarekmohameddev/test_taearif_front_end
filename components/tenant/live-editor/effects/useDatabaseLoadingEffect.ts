@@ -325,33 +325,6 @@ export const useDatabaseLoadingEffect = ({
         console.log("✅ Default hero4 data initialized in editorStore");
       }
 
-      // Initialize default sideBySide7 data in editorStore if no sideBySide7 components exist
-      const hasSideBySide7InStore = Object.values(editorStore.pageComponentsByPage || {}).some(
-        (pageComponents: any[]) => {
-          if (!Array.isArray(pageComponents)) return false;
-          return pageComponents.some(
-            (comp: any) => comp.type === "sideBySide" && comp.componentName === "sideBySide7",
-          );
-        },
-      );
-
-      if (!hasSideBySide7InStore) {
-        console.log(
-          "🔍 No sideBySide7 data in editorStore, initializing default sideBySide7 data",
-        );
-        const {
-          getDefaultSideBySide7Data,
-        } = require("@/context/editorStoreFunctions/sideBySideFunctions");
-        const defaultSideBySide7Data = getDefaultSideBySide7Data();
-
-        editorStore.ensureComponentVariant(
-          "sideBySide",
-          "sideBySide7-default",
-          defaultSideBySide7Data,
-        );
-        console.log("✅ Default sideBySide7 data initialized in editorStore");
-      }
-
       setInitialized(true);
     }
   }, [
