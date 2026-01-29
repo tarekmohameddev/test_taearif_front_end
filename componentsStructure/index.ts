@@ -1,6 +1,7 @@
 export { heroStructure } from "./hero";
 export { headerStructure } from "./header";
 export { halfTextHalfImageStructure } from "./halfTextHalfImage";
+export { sideBySideStructure } from "./sideBySide";
 export { propertySliderStructure } from "./propertySlider";
 export { ctaValuationStructure } from "./ctaValuation";
 export { stepsSectionStructure } from "./stepsSection";

@@ -6,6 +6,7 @@ import { COMPONENTS } from "@/lib/ComponentsList";
 import { heroStructure } from "@/componentsStructure/hero";
 import { headerStructure } from "@/componentsStructure/header";
 import { halfTextHalfImageStructure } from "@/componentsStructure/halfTextHalfImage";
+import { sideBySideStructure } from "@/componentsStructure/sideBySide";
 import { propertySliderStructure } from "@/componentsStructure/propertySlider";
 import { ctaValuationStructure } from "@/componentsStructure/ctaValuation";
 import { stepsSectionStructure } from "@/componentsStructure/stepsSection";
@@ -49,6 +50,7 @@ import { heroFunctions } from "./editorStoreFunctions/heroFunctions";
 import { headerFunctions } from "./editorStoreFunctions/headerFunctions";
 import { footerFunctions } from "./editorStoreFunctions/footerFunctions";
 import { halfTextHalfImageFunctions } from "./editorStoreFunctions/halfTextHalfImageFunctions";
+import { sideBySideFunctions } from "./editorStoreFunctions/sideBySideFunctions";
 import { propertySliderFunctions } from "./editorStoreFunctions/propertySliderFunctions";
 import { ctaValuationFunctions } from "./editorStoreFunctions/ctaValuationFunctions";
 import { stepsSectionFunctions } from "./editorStoreFunctions/stepsSectionFunctions";
@@ -300,6 +302,20 @@ interface EditorStore {
   gethalfTextHalfImageData: (variantId: string) => ComponentData;
   sethalfTextHalfImageData: (variantId: string, data: ComponentData) => void;
   updatehalfTextHalfImageByPath: (
+    variantId: string,
+    path: string,
+    value: any,
+  ) => void;
+
+  // Side By Side states
+  sideBySideStates: Record<string, ComponentData>;
+  ensureSideBySideVariant: (
+    variantId: string,
+    initial?: ComponentData,
+  ) => void;
+  getSideBySideData: (variantId: string) => ComponentData;
+  setSideBySideData: (variantId: string, data: ComponentData) => void;
+  updateSideBySideByPath: (
     variantId: string,
     path: string,
     value: any,
@@ -783,6 +799,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   headerStates: {},
   footerStates: {},
   halfTextHalfImageStates: {},
+  sideBySideStates: {},
   propertySliderStates: {},
   ctaValuationStates: {},
   stepsSectionStates: {},
@@ -1295,6 +1312,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           return currentState.footerStates[variantId];
         case "halfTextHalfImage":
           return currentState.halfTextHalfImageStates[variantId];
+        case "sideBySide":
+          return currentState.sideBySideStates[variantId];
         case "propertySlider":
           return currentState.propertySliderStates[variantId];
         case "ctaValuation":
@@ -1511,6 +1530,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
             variantId,
             initial,
           );
+        case "sideBySide":
+          return sideBySideFunctions.ensureVariant(
+            state,
+            variantId,
+            initial,
+          );
         case "propertySlider":
           return propertySliderFunctions.ensureVariant(
             state,
@@ -1699,6 +1724,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           case "halfTextHalfImage":
             updatedData = newState.halfTextHalfImageStates[variantId];
             break;
+          case "sideBySide":
+            updatedData = newState.sideBySideStates[variantId];
+            break;
           case "propertySlider":
             updatedData = newState.propertySliderStates[variantId];
             break;
@@ -1759,6 +1787,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         return footerFunctions.getData(state, variantId);
       case "halfTextHalfImage":
         return halfTextHalfImageFunctions.getData(state, variantId);
+      case "sideBySide":
+        return sideBySideFunctions.getData(state, variantId);
       case "propertySlider":
         return propertySliderFunctions.getData(state, variantId);
       case "ctaValuation":
@@ -1872,6 +1902,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "halfTextHalfImage":
           newState = halfTextHalfImageFunctions.setData(state, variantId, data);
+          break;
+        case "sideBySide":
+          newState = sideBySideFunctions.setData(state, variantId, data);
           break;
         case "propertySlider":
           newState = propertySliderFunctions.setData(state, variantId, data);
@@ -2063,6 +2096,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
           break;
         case "halfTextHalfImage":
           newState = halfTextHalfImageFunctions.updateByPath(
+            state,
+            variantId,
+            path,
+            value,
+          );
+          break;
+        case "sideBySide":
+          newState = sideBySideFunctions.updateByPath(
             state,
             variantId,
             path,
@@ -2411,6 +2452,22 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   updatehalfTextHalfImageByPath: (variantId, path, value) =>
     set((state) =>
       halfTextHalfImageFunctions.updateByPath(state, variantId, path, value),
+    ),
+
+  // Side By Side functions using modular approach
+  ensureSideBySideVariant: (variantId, initial) =>
+    set((state) =>
+      sideBySideFunctions.ensureVariant(state, variantId, initial),
+    ),
+  getSideBySideData: (variantId) => {
+    const state = get();
+    return sideBySideFunctions.getData(state, variantId);
+  },
+  setSideBySideData: (variantId, data) =>
+    set((state) => sideBySideFunctions.setData(state, variantId, data)),
+  updateSideBySideByPath: (variantId, path, value) =>
+    set((state) =>
+      sideBySideFunctions.updateByPath(state, variantId, path, value),
     ),
 
   // Property Slider functions using modular approach
@@ -3284,6 +3341,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
                         comp.data,
                       ).halfTextHalfImageStates;
                     break;
+                  case "sideBySide":
+                    newState.sideBySideStates =
+                      sideBySideFunctions.setData(
+                        newState,
+                        comp.id, // ✅ استخدام comp.id بدلاً من comp.componentName
+                        comp.data,
+                      ).sideBySideStates;
+                    break;
                   case "propertySlider":
                     newState.propertySliderStates =
                       propertySliderFunctions.setData(
@@ -3978,6 +4043,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         headerStates: {},
         footerStates: {},
         halfTextHalfImageStates: {},
+        sideBySideStates: {},
         propertySliderStates: {},
         ctaValuationStates: {},
         stepsSectionStates: {},

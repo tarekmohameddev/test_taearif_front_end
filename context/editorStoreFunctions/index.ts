@@ -5,6 +5,7 @@ export * from "./headerFunctions";
 export * from "./header2Functions";
 export * from "./footerFunctions";
 export * from "./halfTextHalfImageFunctions";
+export * from "./sideBySideFunctions";
 export * from "./propertySliderFunctions";
 export * from "./stepsSectionFunctions";
 export * from "./ctaValuationFunctions";

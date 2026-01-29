@@ -26,6 +26,7 @@ import { useEditorT } from "@/context/editorI18nStore";
 import { headerStructure } from "@/componentsStructure/header";
 import { propertiesShowcaseStructure } from "@/componentsStructure/propertiesShowcase";
 import { halfTextHalfImageStructure } from "@/componentsStructure/halfTextHalfImage";
+import { sideBySideStructure } from "@/componentsStructure/sideBySide";
 import { propertySliderStructure } from "@/componentsStructure/propertySlider";
 import { ctaValuationStructure } from "@/componentsStructure/ctaValuation";
 import { stepsSectionStructure } from "@/componentsStructure/stepsSection";
@@ -98,6 +99,7 @@ export const getSections = (
       "header",
       "hero",
       "halfTextHalfImage",
+      "sideBySide",
       "propertySlider",
       "ctaValuation",
       "stepsSection",
@@ -139,6 +141,7 @@ export const SECTIONS: Record<string, SectionType> = {
       "header",
       "hero",
       "halfTextHalfImage",
+      "sideBySide",
       "propertySlider",
       "ctaValuation",
       "stepsSection",
@@ -203,6 +206,17 @@ export const getComponents = (
     subPath: "halfTextHalfImage",
     icon: "🖼️",
     ...halfTextHalfImageStructure,
+  },
+  sideBySide: {
+    id: "sideBySide",
+    name: "sideBySide",
+    displayName: t("components.sideBySide.display_name"),
+    description: t("components.sideBySide.description"),
+    category: "content",
+    section: "homepage",
+    subPath: "sideBySide",
+    icon: "🖼️",
+    ...sideBySideStructure,
   },
   propertySlider: {
     id: "propertySlider",
@@ -653,6 +667,17 @@ export const COMPONENTS: Record<string, any> = {
     subPath: "halfTextHalfImage",
     icon: "🖼️",
     ...halfTextHalfImageStructure,
+  },
+  sideBySide: {
+    id: "sideBySide",
+    name: "sideBySide",
+    displayName: "Side By Side",
+    description: "Section with text content and image side by side",
+    category: "content",
+    section: "homepage",
+    subPath: "sideBySide",
+    icon: "🖼️",
+    ...sideBySideStructure,
   },
   propertySlider: {
     id: "propertySlider",

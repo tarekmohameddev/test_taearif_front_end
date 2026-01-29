@@ -30,17 +30,6 @@ const nextConfig = {
       'react-hot-toast',
       'zustand',
     ],
-    // ⬅️ Turbopack settings - فقط في development
-    ...(process.env.NODE_ENV === "development" && {
-      turbo: {
-        rules: {
-          '*.svg': {
-            loaders: ['@svgr/webpack'],
-            as: '*.js',
-          },
-        },
-      },
-    }),
   },
   // تحسينات للأداء
   compiler: {
@@ -137,11 +126,6 @@ const nextConfig = {
 
     return config;
   },
-  
-  // ⬅️ Turbopack - فقط في DEVELOPMENT
-  ...(process.env.NODE_ENV === "development" && { 
-    turbopack: {} 
-  }),
 };
 
 mergeConfig(nextConfig, userConfig);
