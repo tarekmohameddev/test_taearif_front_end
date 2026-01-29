@@ -1,7 +1,7 @@
 import React from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { ImageFieldRenderer } from "../../FieldRenderers";
-import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorT, useEditorLocale } from "@/context/editorI18nStore";
 
 interface TextFieldRendererProps {
   def: FieldDefinition;
@@ -17,6 +17,8 @@ export const TextFieldRenderer: React.FC<TextFieldRendererProps> = ({
   updateValue,
 }) => {
   const t = useEditorT();
+  const { locale } = useEditorLocale();
+  const isRTL = locale === "ar";
 
   // Handle image fields separately
   if (def.type === "image") {
@@ -31,11 +33,11 @@ export const TextFieldRenderer: React.FC<TextFieldRendererProps> = ({
   }
 
   return (
-    <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
+    <div 
+      className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <label className="flex items-center space-x-3 mb-3">
-        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-          <span className="text-white text-xs font-bold">T</span>
-        </div>
         <div className="flex-1">
           <span className="text-sm font-semibold text-slate-700">
             {def.label}

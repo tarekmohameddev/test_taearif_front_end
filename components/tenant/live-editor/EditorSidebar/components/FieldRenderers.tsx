@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { FieldRendererProps } from "../types";
-import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorT, useEditorLocale } from "@/context/editorI18nStore";
 import axiosInstance from "@/lib/axiosInstance";
 
 // مكون عرض حقل اللون
@@ -317,8 +317,13 @@ export const BooleanFieldRenderer: React.FC<{
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
   const t = useEditorT();
+  const { locale } = useEditorLocale();
+  const isRTL = locale === "ar";
   return (
-    <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
+    <div 
+      className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <div className="flex items-center justify-between">
         <label className="flex items-center space-x-3">
           <div
@@ -392,8 +397,13 @@ export const NumberFieldRenderer: React.FC<{
   updateValue: (path: string, value: any) => void;
 }> = ({ label, path, value, updateValue }) => {
   const t = useEditorT();
+  const { locale } = useEditorLocale();
+  const isRTL = locale === "ar";
   return (
-    <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
+    <div 
+      className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <label className="flex items-center space-x-3 mb-3">
         <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
           <span className="text-white text-xs font-bold">#</span>

@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
-import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorT, useEditorLocale } from "@/context/editorI18nStore";
 import { ColorFieldRenderer } from "../../FieldRenderers";
 import useTenantStore from "@/context/tenantStore";
 
@@ -16,6 +16,8 @@ export const ColorFieldRendererWithToggle: React.FC<
   ColorFieldRendererWithToggleProps
 > = ({ def, normalizedPath, value, updateValue, getValueByPath }) => {
   const t = useEditorT();
+  const { locale } = useEditorLocale();
+  const isRTL = locale === "ar";
   const { tenantData } = useTenantStore();
 
   // Only show useDefaultColor toggle if the field definition explicitly has useDefaultColor property
@@ -70,7 +72,10 @@ export const ColorFieldRendererWithToggle: React.FC<
   }
 
   return (
-    <div className="space-y-4 ">
+    <div 
+      className="space-y-4"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       {/* Use Default Color Toggle */}
       <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
         <div className="flex items-center justify-between mb-3">

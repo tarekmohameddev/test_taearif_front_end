@@ -1,6 +1,6 @@
 import React from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
-import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorT, useEditorLocale } from "@/context/editorI18nStore";
 
 interface TextareaFieldRendererProps {
   def: FieldDefinition;
@@ -16,25 +16,15 @@ export const TextareaFieldRenderer: React.FC<TextareaFieldRendererProps> = ({
   updateValue,
 }) => {
   const t = useEditorT();
+  const { locale } = useEditorLocale();
+  const isRTL = locale === "ar";
 
   return (
-    <div className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300">
+    <div 
+      className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <label className="flex items-center space-x-3 mb-3">
-        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
-          <svg
-            className="w-4 h-4 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h7"
-            />
-          </svg>
-        </div>
         <div className="flex-1">
           <span className="text-sm font-semibold text-slate-700">
             {def.label}

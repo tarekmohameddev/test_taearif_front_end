@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { CardThemeSelector } from "../../../CardThemeSelector";
+import { useEditorLocale } from "@/context/editorI18nStore";
 
 interface ObjectFieldRendererProps {
   def: FieldDefinition;
@@ -20,6 +21,8 @@ export function ObjectFieldRenderer({
   getValueByPath,
   renderField,
 }: ObjectFieldRendererProps) {
+  const { locale } = useEditorLocale();
+  const isRTL = locale === "ar";
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const objDef = def as any;
   const key = normalizedPath;
@@ -27,28 +30,16 @@ export function ObjectFieldRenderer({
   const toggle = () => setExpanded((s) => ({ ...s, [key]: !isOpen }));
 
   return (
-    <div className="group bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+    <div 
+      className="group bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <button
         type="button"
         onClick={toggle}
         className="w-full flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-blue-50 hover:to-indigo-50 transition-all duration-200"
       >
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-          </div>
           <span className="font-bold text-slate-800">{def.label}</span>
         </div>
         <div className="flex items-center space-x-3">
