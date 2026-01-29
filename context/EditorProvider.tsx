@@ -93,6 +93,20 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       },
     };
 
+    // Remove any Theme*Backup keys from WebsiteLayout before sending
+    // إزالة أي مفاتيح Theme*Backup من WebsiteLayout قبل الإرسال
+    if (payload.WebsiteLayout && typeof payload.WebsiteLayout === "object") {
+      const cleanedWebsiteLayout: any = {};
+      Object.entries(payload.WebsiteLayout).forEach(([key, value]) => {
+        // Skip keys that match Theme*Backup pattern (Theme1Backup, Theme2Backup, etc.)
+        // تجاهل المفاتيح التي تطابق نمط Theme*Backup
+        if (!key.match(/^Theme\d+Backup$/)) {
+          cleanedWebsiteLayout[key] = value;
+        }
+      });
+      payload.WebsiteLayout = cleanedWebsiteLayout;
+    }
+
     // Collect all theme backups from ThemesBackup field (NEW: separate field)
     // Exclude the current theme (it's already in pages and globalComponentsData)
     const themesBackup: Record<string, any> = {};
