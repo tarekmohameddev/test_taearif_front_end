@@ -8,6 +8,7 @@ import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultHero4Data } from "@/context/editorStoreFunctions/heroFunctions";
 import PropertyFilter2 from "@/components/tenant/propertyFilter/propertyFilter2";
+import { usePropertiesStore } from "@/store/propertiesStore";
 
 interface Hero4Props {
   title?: string;
@@ -148,17 +149,27 @@ export default function Hero4(props: Hero4Props = {}) {
   // Simple Search Form Component for real-estate pages
   const SimpleSearchForm = () => {
     const [searchTerm, setSearchTerm] = useState("");
+    const setSearch = usePropertiesStore((state) => state.setSearch);
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      if (searchTerm.trim()) {
-        // الحفاظ على locale في الـ URL
-        const basePath = pathname?.includes("/live-editor/")
-          ? "/ar/live-editor/real-estate"
-          : "/ar/real-estate";
+      // تحديث state البحث في store
+      const searchValue = searchTerm.trim();
+      setSearch(searchValue);
+      
+      // الحفاظ على locale في الـ URL
+      const basePath = pathname?.includes("/live-editor/")
+        ? "/ar/live-editor/real-estate"
+        : "/ar/real-estate";
+      
+      // إذا كان هناك نص بحث، أضفه كـ param
+      // إذا كان فارغاً، انتقل بدون param search
+      if (searchValue) {
         router.push(
-          `${basePath}?search=${encodeURIComponent(searchTerm.trim())}`,
+          `${basePath}?search=${encodeURIComponent(searchValue)}`,
         );
+      } else {
+        router.push(basePath);
       }
     };
 
