@@ -192,30 +192,36 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
     typeof window !== "undefined" &&
     window.location.pathname.includes("/live-editor");
 
-  // API Response Interface
+  // API Response Interface (matching backend API structure)
   interface ApiPost {
     id: number;
     title: string;
     slug: string;
-    excerpt: string;
-    thumbnail?: {
+    excerpt: string | null;
+    status: string;
+    thumbnail: {
       id: number;
-      url: string;
+      url: string | null;
       type: string;
       created_at: string;
-    };
-    published_at: string;
+    } | null;
+    categories: Array<{
+      id: number;
+      name: string;
+      slug: string;
+    }>;
+    published_at: string | null;
   }
 
   interface ApiResponse {
-    data: ApiPost[];
+    posts: ApiPost[];
     pagination: {
+      total: number;
       per_page: number;
       current_page: number;
-      from: number;
-      to: number;
-      total: number;
       last_page: number;
+      from: number | null;
+      to: number | null;
     };
   }
 
@@ -241,7 +247,7 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
       description: post.excerpt || "",
       image: post.thumbnail?.url || "",
       readMoreUrl: `/blog/${post.slug || post.id}`,
-      date: formatDate(post.published_at),
+      date: post.published_at ? formatDate(post.published_at) : "",
     }));
   }, []);
 
@@ -255,12 +261,14 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
           title: "مقال تجريبي 1",
           slug: "test-1",
           excerpt: "هذا مقال تجريبي للمحرر المباشر",
+          status: "published",
           thumbnail: {
             id: 1,
             url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800",
             type: "image",
             created_at: new Date().toISOString(),
           },
+          categories: [],
           published_at: new Date().toISOString(),
         },
         {
@@ -268,12 +276,29 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
           title: "مقال تجريبي 2",
           slug: "test-2",
           excerpt: "مقال تجريبي آخر للمحرر المباشر",
+          status: "published",
           thumbnail: {
             id: 2,
             url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
             type: "image",
             created_at: new Date().toISOString(),
           },
+          categories: [],
+          published_at: new Date().toISOString(),
+        },
+                {
+          id: 3,
+          title: "مقال تجريبي 3",
+          slug: "test-3",
+          excerpt: "مقال تجريبي آخر للمحرر المباشر",
+          status: "published",
+          thumbnail: {
+            id: 3,
+            url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
+            type: "image",
+            created_at: new Date().toISOString(),
+          },
+          categories: [],
           published_at: new Date().toISOString(),
         },
       ];
@@ -282,11 +307,18 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
       return;
     }
 
+    // Check if tenantId is available
+    if (!hookTenantId) {
+      setApiError("لا يمكن تحميل البيانات: معرف المستأجر غير متوفر");
+      setLoadingApi(false);
+      return;
+    }
+
     try {
       setLoadingApi(true);
       setApiError(null);
 
-      const endpoint = mergedData.apiSettings?.endpoint || "/api/posts";
+      // Use the correct public endpoint (no auth required)
       const limit = mergedData.apiSettings?.limit || 10;
       const page = mergedData.apiSettings?.page || 1;
 
@@ -296,11 +328,14 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
         per_page: limit.toString(),
       });
 
-      const url = `${endpoint}?${params.toString()}`;
+      // Use the public tenant-website API endpoint
+      const url = `/api/v1/tenant-website/${hookTenantId}/posts?${params.toString()}`;
+      
+      // Make request without auth (axiosInstance may add token, but backend ignores it for this endpoint)
       const response = await axiosInstance.get<ApiResponse>(url);
 
-      if (response.data && response.data.data) {
-        const cards = convertApiDataToCards(response.data.data);
+      if (response.data && response.data.posts && Array.isArray(response.data.posts)) {
+        const cards = convertApiDataToCards(response.data.posts);
         setApiCards(cards);
       } else {
         setApiError("لا توجد بيانات متاحة");
@@ -315,7 +350,7 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
     }
   }, [
     isLiveEditor,
-    mergedData.apiSettings?.endpoint,
+    hookTenantId,
     mergedData.apiSettings?.limit,
     mergedData.apiSettings?.page,
     convertApiDataToCards,
