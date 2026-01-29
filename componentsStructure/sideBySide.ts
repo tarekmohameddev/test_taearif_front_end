@@ -1037,6 +1037,180 @@ export const sideBySideStructure: ComponentStructure = {
       ],
     },
     {
+      id: "sideBySide4",
+      name: "Side By Side 4 - ThemeTwo",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "layout",
+          label: "Layout Settings",
+          type: "object",
+          fields: [
+            {
+              key: "direction",
+              label: "Direction",
+              type: "select",
+              options: [
+                { value: "rtl", label: "Right to Left" },
+                { value: "ltr", label: "Left to Right" },
+              ],
+            },
+            {
+              key: "minHeight",
+              label: "Minimum Height",
+              type: "text",
+            },
+          ],
+        },
+        {
+          key: "spacing",
+          label: "Spacing",
+          type: "object",
+          fields: [
+            {
+              key: "padding",
+              label: "Padding",
+              type: "object",
+              fields: [
+                { key: "top", label: "Top", type: "number" },
+                { key: "bottom", label: "Bottom", type: "number" },
+                { key: "left", label: "Left", type: "number" },
+                { key: "right", label: "Right", type: "number" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            { key: "title", label: "Title", type: "text" },
+            {
+              key: "paragraphs",
+              label: "Paragraphs",
+              type: "array",
+              addLabel: "Add Paragraph",
+              itemLabel: "Paragraph",
+              of: [{ key: "text", label: "Text", type: "text" }],
+            },
+            {
+              key: "button",
+              label: "Button",
+              type: "object",
+              fields: [
+                { key: "text", label: "Button Text", type: "text" },
+                { key: "url", label: "Button URL", type: "text" },
+                { key: "enabled", label: "Show Button", type: "boolean" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "textBackground",
+              label: "Text Background",
+              type: "object",
+              fields: [
+                { key: "color", label: "Background Color", type: "color" },
+              ],
+            },
+            {
+              key: "divider",
+              label: "Divider",
+              type: "object",
+              fields: [
+                { key: "color", label: "Color", type: "color" },
+                { key: "width", label: "Width", type: "text" },
+                { key: "height", label: "Height", type: "text" },
+              ],
+            },
+            {
+              key: "button",
+              label: "Button Styling",
+              type: "object",
+              fields: [
+                {
+                  key: "backgroundColor",
+                  label: "Background Color",
+                  type: "color",
+                },
+                {
+                  key: "hoverBackgroundColor",
+                  label: "Hover Background Color",
+                  type: "color",
+                },
+                { key: "textColor", label: "Text Color", type: "color" },
+                { key: "borderRadius", label: "Border Radius", type: "text" },
+              ],
+            },
+            {
+              key: "textColors",
+              label: "Text Colors",
+              type: "object",
+              fields: [
+                { key: "title", label: "Title Color", type: "color" },
+                { key: "paragraph", label: "Paragraph Color", type: "color" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "image",
+          label: "Image",
+          type: "object",
+          fields: [
+            { key: "visible", label: "Show Image", type: "boolean" },
+            { key: "src", label: "Image Source", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+          ],
+        },
+        {
+          key: "responsive",
+          label: "Responsive",
+          type: "object",
+          fields: [
+            {
+              key: "mobile",
+              label: "Mobile",
+              type: "object",
+              fields: [
+                { key: "textOrder", label: "Text Order", type: "number" },
+                { key: "imageOrder", label: "Image Order", type: "number" },
+                { key: "textWidth", label: "Text Width", type: "text" },
+                { key: "imageWidth", label: "Image Width", type: "text" },
+                { key: "imageHeight", label: "Image Height", type: "text" },
+              ],
+            },
+            {
+              key: "desktop",
+              label: "Desktop",
+              type: "object",
+              fields: [
+                { key: "textOrder", label: "Text Order", type: "number" },
+                { key: "imageOrder", label: "Image Order", type: "number" },
+                { key: "textWidth", label: "Text Width", type: "text" },
+                { key: "imageWidth", label: "Image Width", type: "text" },
+                { key: "imageHeight", label: "Image Height", type: "text" },
+              ],
+            },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "content.title", label: "Title", type: "text" },
+        { key: "content.paragraphs", label: "Paragraphs", type: "array" },
+        { key: "content.button.text", label: "Button Text", type: "text" },
+        { key: "image.src", label: "Image", type: "image" },
+        { key: "image.alt", label: "Image Alt Text", type: "text" },
+      ],
+    },
+    {
       id: "sideBySide5",
       name: "Side By Side 5 - ThemeTwo",
       fields: [
@@ -1104,7 +1278,6 @@ export const sideBySideStructure: ComponentStructure = {
               addLabel: "Add Item",
               itemLabel: "Item",
               of: [
-                { key: "id", label: "ID", type: "text" },
                 { key: "text", label: "Text", type: "text" },
               ],
             },

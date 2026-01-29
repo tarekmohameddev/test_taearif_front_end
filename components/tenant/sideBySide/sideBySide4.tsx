@@ -2,45 +2,96 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
-import { getDefaultSideBySide5Data } from "@/context/editorStoreFunctions/sideBySideFunctions";
+import { getDefaultSideBySide4Data } from "@/context/editorStoreFunctions/sideBySideFunctions";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
 // ═══════════════════════════════════════════════════════════
-interface SideBySide5Props {
+interface SideBySide4Props {
   visible?: boolean;
   ThemeTwo?: string;
   layout?: {
-    direction?: string;
-    maxWidth?: string;
-    gap?: string;
+    ThemeTwo?: string;
+    direction?: "rtl" | "ltr";
+    minHeight?: string;
   };
   spacing?: {
+    ThemeTwo?: string;
     padding?: {
-      top?: string;
-      bottom?: string;
-      left?: string;
-      right?: string;
+      ThemeTwo?: string;
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
     };
   };
   content?: {
-    description?: string;
-    items?: Array<{
+    ThemeTwo?: string;
+    title?: string;
+    paragraphs?: Array<{
+      ThemeTwo?: string;
       text?: string;
     }>;
+    button?: {
+      ThemeTwo?: string;
+      text?: string;
+      url?: string;
+      enabled?: boolean;
+    };
   };
   styling?: {
-    backgroundColor?: string;
-    textColor?: string;
-    dividerColor?: string;
-    iconColor?: string;
+    ThemeTwo?: string;
+    textBackground?: {
+      ThemeTwo?: string;
+      color?: string;
+    };
+    divider?: {
+      ThemeTwo?: string;
+      color?: string;
+      width?: string;
+      height?: string;
+    };
+    button?: {
+      ThemeTwo?: string;
+      backgroundColor?: string;
+      hoverBackgroundColor?: string;
+      textColor?: string;
+      borderRadius?: string;
+    };
+    textColors?: {
+      ThemeTwo?: string;
+      title?: string;
+      paragraph?: string;
+    };
   };
   image?: {
+    ThemeTwo?: string;
+    visible?: boolean;
     src?: string;
     alt?: string;
-    visible?: boolean;
+  };
+  responsive?: {
+    ThemeTwo?: string;
+    mobile?: {
+      ThemeTwo?: string;
+      textOrder?: number;
+      imageOrder?: number;
+      textWidth?: string;
+      imageWidth?: string;
+      imageHeight?: string;
+    };
+    desktop?: {
+      ThemeTwo?: string;
+      textOrder?: number;
+      imageOrder?: number;
+      textWidth?: string;
+      imageWidth?: string;
+      imageHeight?: string;
+    };
   };
   // Editor props
   variant?: string;
@@ -51,11 +102,11 @@ interface SideBySide5Props {
 // ═══════════════════════════════════════════════════════════
 // COMPONENT
 // ═══════════════════════════════════════════════════════════
-export default function SideBySide5(props: SideBySide5Props) {
+export default function SideBySide4(props: SideBySide4Props) {
   // ─────────────────────────────────────────────────────────
   // 1. EXTRACT UNIQUE ID
   // ─────────────────────────────────────────────────────────
-  const variantId = props.variant || "sideBySide5";
+  const variantId = props.variant || "sideBySide4";
   const uniqueId = props.id || variantId;
 
   // ─────────────────────────────────────────────────────────
@@ -72,6 +123,7 @@ export default function SideBySide5(props: SideBySide5Props) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
+  const router = useRouter();
 
   // ─────────────────────────────────────────────────────────
   // 3. FETCH TENANT DATA
@@ -150,12 +202,12 @@ export default function SideBySide5(props: SideBySide5Props) {
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
           ? {
-              ...getDefaultSideBySide5Data(),
+              ...getDefaultSideBySide4Data(),
               ...tenantComponentData, // Database data takes priority
               ...props,
             }
           : {
-              ...getDefaultSideBySide5Data(),
+              ...getDefaultSideBySide4Data(),
               ...props,
             };
 
@@ -174,16 +226,16 @@ export default function SideBySide5(props: SideBySide5Props) {
   // 6. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
   // Get default data
-  const defaultData = getDefaultSideBySide5Data();
+  const defaultData = getDefaultSideBySide4Data();
 
   // Check if tenantComponentData exists
   const hasTenantData =
     tenantComponentData &&
     Object.keys(tenantComponentData).length > 0;
 
-  // Check if currentStoreData is just default data (by comparing a key field like content.description)
+  // Check if currentStoreData is just default data (by comparing a key field like content.title)
   const isStoreDataDefault =
-    currentStoreData?.content?.description === defaultData?.content?.description;
+    currentStoreData?.content?.title === defaultData?.content?.title;
 
   // Merge data with correct priority
   const mergedData = {
@@ -204,7 +256,7 @@ export default function SideBySide5(props: SideBySide5Props) {
     typeof window !== "undefined" &&
     (window as any).__DEBUG_COMPONENT_DATA__
   ) {
-    console.group("🔍 SideBySide5 Data Sources");
+    console.group("🔍 SideBySide4 Data Sources");
     console.log("1️⃣ Default Data:", defaultData);
     console.log("2️⃣ Props:", props);
     console.log("3️⃣ Tenant Component Data:", tenantComponentData);
@@ -212,7 +264,7 @@ export default function SideBySide5(props: SideBySide5Props) {
     console.log("🔍 Is Store Data Default?", isStoreDataDefault);
     console.log("🔍 Has Tenant Data?", hasTenantData);
     console.log("🔀 Merged Data:", mergedData);
-    console.log("Final Description:", mergedData.content?.description);
+    console.log("Final Title:", mergedData.content?.title);
     console.groupEnd();
   }
 
@@ -226,107 +278,137 @@ export default function SideBySide5(props: SideBySide5Props) {
   // ─────────────────────────────────────────────────────────
   // 8. RENDER
   // ─────────────────────────────────────────────────────────
+  const textBackgroundColor =
+    mergedData.styling?.textBackground?.color || "#e4bfa1";
+  const dividerColor = mergedData.styling?.divider?.color || "#8b5f46";
+  const dividerWidth = mergedData.styling?.divider?.width || "96px";
+  const dividerHeight = mergedData.styling?.divider?.height || "2px";
+  const buttonBgColor =
+    mergedData.styling?.button?.backgroundColor || "#8b5f46";
+  const buttonHoverBgColor =
+    mergedData.styling?.button?.hoverBackgroundColor || "#6b4630";
+  const buttonTextColor = mergedData.styling?.button?.textColor || "#ffffff";
+  const buttonBorderRadius = mergedData.styling?.button?.borderRadius || "8px";
+  const titleColor = mergedData.styling?.textColors?.title || "#1f2937";
+  const paragraphColor = mergedData.styling?.textColors?.paragraph || "#374151";
+
+  const mobileTextOrder = mergedData.responsive?.mobile?.textOrder || 2;
+  const mobileImageOrder = mergedData.responsive?.mobile?.imageOrder || 1;
+  const mobileTextWidth = mergedData.responsive?.mobile?.textWidth || "w-full";
+  const mobileImageWidth =
+    mergedData.responsive?.mobile?.imageWidth || "w-full";
+  const mobileImageHeight =
+    mergedData.responsive?.mobile?.imageHeight || "h-[200px]";
+
+  const desktopTextOrder = mergedData.responsive?.desktop?.textOrder || 1;
+  const desktopImageOrder = mergedData.responsive?.desktop?.imageOrder || 2;
+  const desktopTextWidth =
+    mergedData.responsive?.desktop?.textWidth || "md:w-[60%]";
+  const desktopImageWidth =
+    mergedData.responsive?.desktop?.imageWidth || "md:w-[40%]";
+  const desktopImageHeight =
+    mergedData.responsive?.desktop?.imageHeight || "md:h-auto";
+
+  const minHeight = mergedData.layout?.minHeight || "350px";
+  const direction = mergedData.layout?.direction || "rtl";
+
   return (
     <section
-      className="w-full flex items-center justify-center py-12 md:py-16"
-      style={{
-        backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
-        paddingTop: mergedData.spacing?.padding?.top || "3rem",
-        paddingBottom: mergedData.spacing?.padding?.bottom || "4rem",
-        paddingLeft: mergedData.spacing?.padding?.left || "1rem",
-        paddingRight: mergedData.spacing?.padding?.right || "1rem",
-      }}
+      className="relative w-full flex flex-col-reverse md:flex-row"
+      style={{ minHeight }}
+      dir={direction}
     >
+      {/* Left Side - Text Content */}
       <div
-        className="w-full mx-auto px-4 md:px-6 lg:px-8"
-        style={{
-          maxWidth: mergedData.layout?.maxWidth || "1152px",
-        }}
+        className={`${mobileTextWidth} ${desktopTextWidth} flex flex-col justify-center items-start px-6 md:px-12 py-4 md:py-6 text-right`}
+        style={{ backgroundColor: textBackgroundColor }}
       >
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-          {/* Left Side - Text Content */}
-          <div className="w-full md:w-[50%] order-2 md:order-2 flex flex-col justify-center text-right">
-            {/* Main Paragraph */}
-            <div className="mb-6">
-              <p
-                className="text-base md:text-lg leading-relaxed"
-                style={{
-                  color: mergedData.styling?.textColor || "#5c3e2a",
-                }}
-              >
-                {mergedData.content?.description ||
-                  "ندير عنك كل شيء… من الإعلان حتى التوقيع. في باهية، نوفّر لك مستأجرًا موثوقًا ونتولى إدارة عملية التأجير بالكامل، من التسويق والتواصل، حتى إعداد العقود واستلام الدفعات. كل ذلك باحترافية، شفافية، وتجربة تُبقيك مطمئنًا دائمًا"}
-              </p>
-            </div>
+        <div className="w-full">
+          {/* Heading */}
+          <h3
+            className="text-xl md:text-2xl lg:text-3xl font-bold mb-3"
+            style={{ color: titleColor }}
+          >
+            {mergedData.content?.title || "ابنِ طريقك... ولا تنتظر أن تُمنح"}
+          </h3>
 
-            {/* Divider */}
-            <div
-              className="w-24 h-[2px] mb-6"
-              style={{
-                backgroundColor: mergedData.styling?.dividerColor || "#5c3e2a",
-              }}
-            ></div>
+          {/* Divider */}
+          <div
+            className="mb-4"
+            style={{
+              width: dividerWidth,
+              height: dividerHeight,
+              backgroundColor: dividerColor,
+            }}
+          />
 
-            {/* Bulleted List with Checkmarks */}
-            <ul className="space-y-4">
-              {(mergedData.content?.items || []).map((item, index) => {
-                // Generate unique ID for each item (not from database)
-                // Using index + text content hash for stable but unique key
-                const textHash = item.text?.slice(0, 20).replace(/\s+/g, '-').toLowerCase() || 'item';
-                const itemId = `sidebyside5-item-${index}-${textHash}`;
-                return (
-                <li
-                  key={itemId}
-                  className="flex items-start gap-3 text-right"
-                >
-                  <span className="flex-shrink-0 mt-1">
-                    <svg
-                      aria-hidden="true"
-                      className="w-5 h-5"
-                      style={{
-                        color: mergedData.styling?.iconColor || "#5c3e2a",
-                      }}
-                      viewBox="0 0 512 512"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
-                      ></path>
-                    </svg>
-                  </span>
-                  <span
-                    className="text-base md:text-lg"
-                    style={{
-                      color: mergedData.styling?.textColor || "#5c3e2a",
-                    }}
-                  >
-                    {item.text || ""}
-                  </span>
-                </li>
-                );
-              })}
-            </ul>
+          {/* Paragraph Text */}
+          <div
+            className="text-sm md:text-base leading-relaxed mb-4 space-y-2"
+            style={{ color: paragraphColor }}
+          >
+            {mergedData.content?.paragraphs?.map((paragraph, index) => (
+              <p key={index}>{paragraph.text}</p>
+            )) || (
+              <>
+                <p>
+                  لا أحد يعرف ثمن النعيم الذي تريد الوصول إليه غيرك. ليس في
+                  الوعود ولا في التمنّي، بل في خطواتك، في عزمك، في سكونك حين
+                  يتخلّى عنك كل شيء إلا إيمانك بما تستحق.
+                </p>
+                <p>
+                  لا أحد سيأتي ليكملك. كل ما تبحث عنه، يبدأ حين تتوقف عن تقليد
+                  من سبقوك، وتبدأ في كتابة فصلك الأول بيدك، بصوتك، بخوفك حتى.
+                </p>
+                <p>
+                  اختر أن تنهض، لا لأنك مجبر، بل لأنك تستحق أن ترى ما خلف
+                  الجدار.
+                </p>
+              </>
+            )}
           </div>
 
-          {/* Right Side - Image (Cityscape) */}
-          {(mergedData.image?.visible ?? true) && (
-            <div className="w-full md:w-[50%] order-1 md:order-1 relative h-[300px] md:h-[500px] rounded-xl overflow-hidden">
-              <Image
-                src={
-                  mergedData.image?.src ||
-                  "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=2000"
-                }
-                alt={mergedData.image?.alt || "منظر المدينة"}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
+          {/* Button */}
+          {mergedData.content?.button?.enabled !== false && (
+            <Link
+              href={mergedData.content?.button?.url || "/projects"}
+              className="inline-block text-white font-medium px-6 py-2 rounded-lg transition-colors duration-300 text-base"
+              style={{
+                backgroundColor: buttonBgColor,
+                color: buttonTextColor,
+                borderRadius: buttonBorderRadius,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = buttonHoverBgColor;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = buttonBgColor;
+              }}
+            >
+              {mergedData.content?.button?.text || "اكتشف عقارك الآن"}
+            </Link>
           )}
         </div>
       </div>
+
+      {/* Right Side - Image (Cityscape) */}
+      {mergedData.image?.visible !== false && (
+        <div
+          className={`relative ${mobileImageWidth} ${desktopImageWidth} ${mobileImageHeight} ${desktopImageHeight}`}
+        >
+          <Image
+            src={
+              mergedData.image?.src ||
+              "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2000"
+            }
+            alt={mergedData.image?.alt || "منظر المدينة"}
+            fill
+            className="object-cover"
+            priority
+            sizes="(max-width: 768px) 100vw, 40vw"
+          />
+        </div>
+      )}
     </section>
   );
 }

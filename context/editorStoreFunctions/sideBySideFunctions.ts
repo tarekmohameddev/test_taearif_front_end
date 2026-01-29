@@ -230,6 +230,84 @@ export const getDefaultSideBySide2Data = (): ComponentData => ({
   },
 });
 
+// Default sideBySide4 data structure (ThemeTwo - same as halfTextHalfImage4)
+export const getDefaultSideBySide4Data = (): ComponentData => ({
+  visible: true,
+
+  layout: {
+    direction: "rtl",
+    minHeight: "350px",
+  },
+  spacing: {
+    padding: {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+  },
+  content: {
+    title: "ابنِ طريقك... ولا تنتظر أن تُمنح",
+    paragraphs: [
+      {
+        text: "لا أحد يعرف ثمن النعيم الذي تريد الوصول إليه غيرك. ليس في الوعود ولا في التمنّي، بل في خطواتك، في عزمك، في سكونك حين يتخلّى عنك كل شيء إلا إيمانك بما تستحق.",
+      },
+      {
+        text: "لا أحد سيأتي ليكملك. كل ما تبحث عنه، يبدأ حين تتوقف عن تقليد من سبقوك، وتبدأ في كتابة فصلك الأول بيدك، بصوتك، بخوفك حتى.",
+      },
+      {
+        text: "اختر أن تنهض، لا لأنك مجبر، بل لأنك تستحق أن ترى ما خلف الجدار.",
+      },
+    ],
+    button: {
+      text: "اكتشف عقارك الآن",
+      url: "/projects",
+      enabled: true,
+    },
+  },
+  styling: {
+    textBackground: {
+      color: "#e4bfa1",
+    },
+    divider: {
+      color: "#8b5f46",
+      width: "96px",
+      height: "2px",
+    },
+    button: {
+      backgroundColor: "#8b5f46",
+      hoverBackgroundColor: "#6b4630",
+      textColor: "#ffffff",
+      borderRadius: "8px",
+    },
+    textColors: {
+      title: "#1f2937",
+      paragraph: "#374151",
+    },
+  },
+  image: {
+    src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=2000",
+    alt: "منظر المدينة",
+    visible: true,
+  },
+  responsive: {
+    mobile: {
+      textOrder: 2,
+      imageOrder: 1,
+      textWidth: "w-full",
+      imageWidth: "w-full",
+      imageHeight: "h-[200px]",
+    },
+    desktop: {
+      textOrder: 1,
+      imageOrder: 2,
+      textWidth: "md:w-[60%]",
+      imageWidth: "md:w-[40%]",
+      imageHeight: "md:h-auto",
+    },
+  },
+});
+
 // Default sideBySide6 data structure (ThemeTwo - same as halfTextHalfImage6)
 export const getDefaultSideBySide6Data = (): ComponentData => ({
   visible: true,
@@ -284,15 +362,12 @@ export const getDefaultSideBySide5Data = (): ComponentData => ({
       "ندير عنك كل شيء… من الإعلان حتى التوقيع. في باهية، نوفّر لك مستأجرًا موثوقًا ونتولى إدارة عملية التأجير بالكامل، من التسويق والتواصل، حتى إعداد العقود واستلام الدفعات. كل ذلك باحترافية، شفافية، وتجربة تُبقيك مطمئنًا دائمًا",
     items: [
       {
-        id: "1",
         text: "وقتك أغلى... دعنا ندير عقارك بكفاءة.",
       },
       {
-        id: "2",
         text: "نبحث، نُقيّم، ونضمن الأفضل لك.",
       },
       {
-        id: "3",
         text: "راحة بالك هي أولويتنا.",
       },
     ],
@@ -447,6 +522,11 @@ export const sideBySideFunctions = {
     ) {
       defaultData = getDefaultSideBySide2Data();
     } else if (
+      actualVariantId === "sideBySide4" ||
+      actualVariantId.includes("sideBySide4")
+    ) {
+      defaultData = getDefaultSideBySide4Data();
+    } else if (
       actualVariantId === "sideBySide5" ||
       actualVariantId.includes("sideBySide5")
     ) {
@@ -497,6 +577,12 @@ export const sideBySideFunctions = {
       actualVariantId.includes("sideBySide2")
     ) {
       return state.sideBySideStates[variantId] || getDefaultSideBySide2Data();
+    }
+    if (
+      actualVariantId === "sideBySide4" ||
+      actualVariantId.includes("sideBySide4")
+    ) {
+      return state.sideBySideStates[variantId] || getDefaultSideBySide4Data();
     }
     if (
       actualVariantId === "sideBySide5" ||
@@ -573,6 +659,11 @@ export const sideBySideFunctions = {
       actualVariantId.includes("sideBySide2")
     ) {
       defaultData = getDefaultSideBySide2Data();
+    } else if (
+      actualVariantId === "sideBySide4" ||
+      actualVariantId.includes("sideBySide4")
+    ) {
+      defaultData = getDefaultSideBySide4Data();
     } else if (
       actualVariantId === "sideBySide5" ||
       actualVariantId.includes("sideBySide5")
