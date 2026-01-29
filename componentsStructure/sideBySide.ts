@@ -1080,32 +1080,32 @@ export const sideBySideStructure: ComponentStructure = {
             },
           ],
         },
-        {
-          key: "content",
-          label: "Content",
-          type: "object",
-          fields: [
-            { key: "title", label: "Title", type: "text" },
-            {
-              key: "paragraphs",
-              label: "Paragraphs",
-              type: "array",
-              addLabel: "Add Paragraph",
-              itemLabel: "Paragraph",
-              of: [{ key: "text", label: "Text", type: "text" }],
-            },
-            {
-              key: "button",
-              label: "Button",
-              type: "object",
-              fields: [
-                { key: "text", label: "Button Text", type: "text" },
-                { key: "url", label: "Button URL", type: "text" },
-                { key: "enabled", label: "Show Button", type: "boolean" },
-              ],
-            },
-          ],
-        },
+          {
+            key: "content",
+            label: "Content",
+            type: "object",
+            fields: [
+              { key: "title", label: "Title", type: "text" },
+              {
+                key: "paragraphs",
+                label: "Paragraphs",
+                type: "array",
+                addLabel: "Add Paragraph",
+                itemLabel: "Paragraph",
+                of: [{ key: "text", label: "Text", type: "text" }],
+              },
+              {
+                key: "button",
+                label: "Button",
+                type: "object",
+                fields: [
+                  { key: "text", label: "Button Text", type: "text" },
+                  { key: "url", label: "Button URL", type: "text" },
+                  { key: "enabled", label: "Show Button", type: "boolean" },
+                ],
+              },
+            ],
+          },
         {
           key: "styling",
           label: "Styling",
@@ -1204,7 +1204,32 @@ export const sideBySideStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.title", label: "Title", type: "text" },
-        { key: "content.paragraphs", label: "Paragraphs", type: "array" },
+          {
+            key: "content",
+            label: "Content",
+            type: "object",
+            fields: [
+              { key: "title", label: "Title", type: "text" },
+              {
+                key: "paragraphs",
+                label: "Paragraphs",
+                type: "array",
+                addLabel: "Add Paragraph",
+                itemLabel: "Paragraph",
+                of: [{ key: "text", label: "Text", type: "text" }],
+              },
+              {
+                key: "button",
+                label: "Button",
+                type: "object",
+                fields: [
+                  { key: "text", label: "Button Text", type: "text" },
+                  { key: "url", label: "Button URL", type: "text" },
+                  { key: "enabled", label: "Show Button", type: "boolean" },
+                ],
+              },
+            ],
+          },
         { key: "content.button.text", label: "Button Text", type: "text" },
         { key: "image.src", label: "Image", type: "image" },
         { key: "image.alt", label: "Image Alt Text", type: "text" },
@@ -1324,7 +1349,28 @@ export const sideBySideStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "content.description", label: "Description", type: "text" },
-        { key: "content.items", label: "Items", type: "array" },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            {
+              key: "description",
+              label: "Description",
+              type: "text",
+            },
+            {
+              key: "items",
+              label: "Items List",
+              type: "array",
+              addLabel: "Add Item",
+              itemLabel: "Item",
+              of: [
+                { key: "text", label: "Text", type: "text" },
+              ],
+            },
+          ],
+        },
         { key: "image.src", label: "Image", type: "image" },
         { key: "image.alt", label: "Image Alt Text", type: "text" },
       ],
