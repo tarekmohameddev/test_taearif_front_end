@@ -824,7 +824,6 @@ export const heroStructure: ComponentStructure = {
           type: "text",
           placeholder: "عن تعاريف العقارية",
         },
-
         {
           key: "barType",
           label: "Floating Bar Type",
