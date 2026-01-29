@@ -153,6 +153,12 @@
       "default_title": "خدمات موثوقة تستحق ثقتك",
       "default_image_alt": "صورة"
     },
+    "sideBySide": {
+      "display_name": "نصف ونصف",
+      "description": "قسم يحتوي على محتوى نصي وصورة جنباً إلى جنب",
+      "default_title": "خدمات موثوقة تستحق ثقتك",
+      "default_image_alt": "صورة"
+    },
     "propertySlider": {
       "display_name": "سلايدر العقارات",
       "description": "قسم سلايدر يعرض بطاقات العقارات بتنسيق منزلق"

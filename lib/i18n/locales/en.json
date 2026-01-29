@@ -153,6 +153,12 @@
       "default_title": "Trusted Services You Can Rely On",
       "default_image_alt": "Image"
     },
+    "sideBySide": {
+      "display_name": "Side By Side",
+      "description": "Section with text content and image side by side",
+      "default_title": "Trusted Services You Can Rely On",
+      "default_image_alt": "Image"
+    },
     "propertySlider": {
       "display_name": "Property Slider",
       "description": "Carousel section displaying property cards in a slider format"
