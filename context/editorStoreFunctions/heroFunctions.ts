@@ -304,6 +304,17 @@ export const getDefaultHero4Data = (): ComponentData => ({
   backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
   barType: "default", // "default" | "contact" | "propertyFilter"
   contact: false,
+  defaultBarConfig: {
+    questionText: "هل لديك استفسار؟",
+    whatsapp: {
+      number: "0542120011",
+      link: "https://wa.link/0ysvug",
+    },
+    email: {
+      address: "contact@baheya.co",
+      link: "mailto:contact@baheya.co",
+    },
+  },
   background: {
     image: "https://dalel-lovat.vercel.app/images/hero.webp",
     alt: "صورة خلفية",

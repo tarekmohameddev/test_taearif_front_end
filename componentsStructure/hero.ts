@@ -908,6 +908,41 @@ export const heroStructure: ComponentStructure = {
           },
         },
         {
+          key: "defaultBarConfig",
+          label: "Default Bar Configuration",
+          type: "object",
+          fields: [
+            {
+              key: "questionText",
+              label: "Question Text",
+              type: "text",
+              placeholder: "هل لديك استفسار؟",
+            },
+            {
+              key: "whatsapp",
+              label: "WhatsApp Button",
+              type: "object",
+              fields: [
+                { key: "number", label: "Phone Number", type: "text" },
+                { key: "link", label: "WhatsApp Link", type: "text" },
+              ],
+            },
+            {
+              key: "email",
+              label: "Email Button",
+              type: "object",
+              fields: [
+                { key: "address", label: "Email Address", type: "text" },
+                { key: "link", label: "Email Link", type: "text" },
+              ],
+            },
+          ],
+          condition: {
+            field: "barType",
+            value: "default",
+          },
+        },
+        {
           key: "background",
           label: "Background",
           type: "object",
