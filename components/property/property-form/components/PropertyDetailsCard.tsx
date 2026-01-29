@@ -504,7 +504,7 @@ export default function PropertyDetailsCard({
                 <h3 className="text-lg font-semibold text-right">مرافق الوحدة</h3>
 
                 {/* قائمة المرافق المضافة */}
-                {selectedFacilities.length > 0 && (
+                {Array.isArray(selectedFacilities) && selectedFacilities.length > 0 && (
                   <div className="space-y-3">
                     <h4 className="text-md font-medium text-right">
                       المرافق المضافة:
@@ -585,7 +585,7 @@ export default function PropertyDetailsCard({
                 <div className="flex flex-wrap gap-2">
                   {facilitiesList.map((facility) => {
                     const currentValue = Number(formData[facility.key]) || 0;
-                    const isSelected = selectedFacilities.includes(facility.key);
+                    const isSelected = Array.isArray(selectedFacilities) && selectedFacilities.includes(facility.key);
 
                     return (
                       <Badge

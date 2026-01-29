@@ -19,7 +19,8 @@ export const useSelectedFacilities = (
       })
       .map((facility) => facility.key);
 
-    setSelectedFacilities(activeFacilities);
+    // Ensure we always set an array
+    setSelectedFacilities(Array.isArray(activeFacilities) ? activeFacilities : []);
   }, [
     formData.bedrooms,
     formData.bathrooms,

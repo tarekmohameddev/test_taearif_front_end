@@ -51,7 +51,11 @@ export const usePropertyFormStore = create<PropertyFormStore>((set, get) => {
     },
     
     setSelectedFacilities: (facilities) => {
-      set({ selectedFacilities: facilities });
+      // Ensure facilities is always an array
+      const facilitiesArray = typeof facilities === 'function' 
+        ? facilities(get().selectedFacilities || [])
+        : facilities;
+      set({ selectedFacilities: Array.isArray(facilitiesArray) ? facilitiesArray : [] });
     },
     
     setCategories: (categories) => {
