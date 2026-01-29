@@ -1037,6 +1037,126 @@ export const sideBySideStructure: ComponentStructure = {
       ],
     },
     {
+      id: "sideBySide5",
+      name: "Side By Side 5 - ThemeTwo",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "layout",
+          label: "Layout Settings",
+          type: "object",
+          fields: [
+            {
+              key: "direction",
+              label: "Direction",
+              type: "select",
+              options: [
+                { value: "rtl", label: "Right to Left" },
+                { value: "ltr", label: "Left to Right" },
+              ],
+            },
+            {
+              key: "maxWidth",
+              label: "Max Width",
+              type: "text",
+              placeholder: "1152px",
+            },
+            {
+              key: "gap",
+              label: "Gap",
+              type: "text",
+              placeholder: "gap-6 md:gap-8",
+            },
+          ],
+        },
+        {
+          key: "spacing",
+          label: "Spacing",
+          type: "object",
+          fields: [
+            {
+              key: "padding",
+              label: "Padding",
+              type: "object",
+              fields: [
+                { key: "top", label: "Top", type: "text" },
+                { key: "bottom", label: "Bottom", type: "text" },
+                { key: "left", label: "Left", type: "text" },
+                { key: "right", label: "Right", type: "text" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            {
+              key: "description",
+              label: "Description",
+              type: "text",
+            },
+            {
+              key: "items",
+              label: "Items List",
+              type: "array",
+              addLabel: "Add Item",
+              itemLabel: "Item",
+              of: [
+                { key: "id", label: "ID", type: "text" },
+                { key: "text", label: "Text", type: "text" },
+              ],
+            },
+          ],
+        },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "backgroundColor",
+              label: "Background Color",
+              type: "color",
+            },
+            {
+              key: "textColor",
+              label: "Text Color",
+              type: "color",
+            },
+            {
+              key: "dividerColor",
+              label: "Divider Color",
+              type: "color",
+            },
+            {
+              key: "iconColor",
+              label: "Icon Color",
+              type: "color",
+            },
+          ],
+        },
+        {
+          key: "image",
+          label: "Image",
+          type: "object",
+          fields: [
+            { key: "visible", label: "Show Image", type: "boolean" },
+            { key: "src", label: "Image Source", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "content.description", label: "Description", type: "text" },
+        { key: "content.items", label: "Items", type: "array" },
+        { key: "image.src", label: "Image", type: "image" },
+        { key: "image.alt", label: "Image Alt Text", type: "text" },
+      ],
+    },
+    {
       id: "sideBySide6",
       name: "Side By Side 6 - ThemeTwo",
       fields: [

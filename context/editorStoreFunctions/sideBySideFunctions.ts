@@ -262,6 +262,54 @@ export const getDefaultSideBySide6Data = (): ComponentData => ({
   },
 });
 
+// Default sideBySide5 data structure (ThemeTwo - same as halfTextHalfImage5)
+export const getDefaultSideBySide5Data = (): ComponentData => ({
+  visible: true,
+
+  layout: {
+    direction: "rtl",
+    maxWidth: "1152px",
+    gap: "gap-6 md:gap-8",
+  },
+  spacing: {
+    padding: {
+      top: "3rem",
+      bottom: "4rem",
+      left: "1rem",
+      right: "1rem",
+    },
+  },
+  content: {
+    description:
+      "ندير عنك كل شيء… من الإعلان حتى التوقيع. في باهية، نوفّر لك مستأجرًا موثوقًا ونتولى إدارة عملية التأجير بالكامل، من التسويق والتواصل، حتى إعداد العقود واستلام الدفعات. كل ذلك باحترافية، شفافية، وتجربة تُبقيك مطمئنًا دائمًا",
+    items: [
+      {
+        id: "1",
+        text: "وقتك أغلى... دعنا ندير عقارك بكفاءة.",
+      },
+      {
+        id: "2",
+        text: "نبحث، نُقيّم، ونضمن الأفضل لك.",
+      },
+      {
+        id: "3",
+        text: "راحة بالك هي أولويتنا.",
+      },
+    ],
+  },
+  styling: {
+    backgroundColor: "#f5f0e8",
+    textColor: "#5c3e2a",
+    dividerColor: "#5c3e2a",
+    iconColor: "#5c3e2a",
+  },
+  image: {
+    visible: true,
+    src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=2000",
+    alt: "منظر المدينة",
+  },
+});
+
 // Default sideBySide7 data structure (ThemeTwo - same as halfTextHalfImage7)
 export const getDefaultSideBySide7Data = (): ComponentData => ({
   visible: true,
@@ -399,6 +447,11 @@ export const sideBySideFunctions = {
     ) {
       defaultData = getDefaultSideBySide2Data();
     } else if (
+      actualVariantId === "sideBySide5" ||
+      actualVariantId.includes("sideBySide5")
+    ) {
+      defaultData = getDefaultSideBySide5Data();
+    } else if (
       actualVariantId === "sideBySide6" ||
       actualVariantId.includes("sideBySide6")
     ) {
@@ -444,6 +497,12 @@ export const sideBySideFunctions = {
       actualVariantId.includes("sideBySide2")
     ) {
       return state.sideBySideStates[variantId] || getDefaultSideBySide2Data();
+    }
+    if (
+      actualVariantId === "sideBySide5" ||
+      actualVariantId.includes("sideBySide5")
+    ) {
+      return state.sideBySideStates[variantId] || getDefaultSideBySide5Data();
     }
     if (
       actualVariantId === "sideBySide6" ||
@@ -514,6 +573,11 @@ export const sideBySideFunctions = {
       actualVariantId.includes("sideBySide2")
     ) {
       defaultData = getDefaultSideBySide2Data();
+    } else if (
+      actualVariantId === "sideBySide5" ||
+      actualVariantId.includes("sideBySide5")
+    ) {
+      defaultData = getDefaultSideBySide5Data();
     } else if (
       actualVariantId === "sideBySide6" ||
       actualVariantId.includes("sideBySide6")
