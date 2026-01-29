@@ -529,6 +529,7 @@
     "variant": "المتغير",
     "debug_info": "معلومات التصحيح",
     "fields_count": "عدد الحقول",
+    "fields": "حقول",
     "mode": "الوضع",
     "pick_color": "اختر اللون",
     "transparent": "شفاف",
@@ -846,7 +847,15 @@
       "hero_overlay": "تراكب البطل",
       "hero_height": "ارتفاع البطل",
       "hero_alignment": "محاذاة البطل",
-      "hero_animation": "رسوم البطل المتحركة"
+      "hero_animation": "رسوم البطل المتحركة",
+      "default_bar_configuration": "إعدادات الشريط الافتراضي",
+      "question_text": "نص السؤال",
+      "whatsapp_button": "زر الواتساب",
+      "phone_number": "رقم الهاتف",
+      "whatsapp_link": "رابط الواتساب",
+      "email_button": "زر البريد الإلكتروني",
+      "email_address": "عنوان البريد الإلكتروني",
+      "email_link": "رابط البريد الإلكتروني"
     },
     "testimonials": {
       "testimonials": "الشهادات",

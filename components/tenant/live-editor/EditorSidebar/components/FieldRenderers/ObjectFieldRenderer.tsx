@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { CardThemeSelector } from "../../../CardThemeSelector";
-import { useEditorLocale } from "@/context/editorI18nStore";
+import { useEditorLocale, useEditorT } from "@/context/editorI18nStore";
 
 interface ObjectFieldRendererProps {
   def: FieldDefinition;
@@ -22,6 +22,7 @@ export function ObjectFieldRenderer({
   renderField,
 }: ObjectFieldRendererProps) {
   const { locale } = useEditorLocale();
+  const t = useEditorT();
   const isRTL = locale === "ar";
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const objDef = def as any;
@@ -44,7 +45,7 @@ export function ObjectFieldRenderer({
         </div>
         <div className="flex items-center space-x-3">
           <span className="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded-full">
-            {objDef.fields?.length || 0} fields
+            {objDef.fields?.length || 0} {t("editor_sidebar.fields")}
           </span>
           <div
             className={`transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"}`}

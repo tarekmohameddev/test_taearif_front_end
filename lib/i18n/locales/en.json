@@ -519,6 +519,7 @@
     "variant": "Variant",
     "debug_info": "Debug Info",
     "fields_count": "Fields Count",
+    "fields": "fields",
     "mode": "Mode",
     "pick_color": "Pick color",
     "transparent": "transparent",
@@ -831,7 +832,15 @@
       "hero_overlay": "Hero Overlay",
       "hero_height": "Hero Height",
       "hero_alignment": "Hero Alignment",
-      "hero_animation": "Hero Animation"
+      "hero_animation": "Hero Animation",
+      "default_bar_configuration": "Default Bar Configuration",
+      "question_text": "Question Text",
+      "whatsapp_button": "WhatsApp Button",
+      "phone_number": "Phone Number",
+      "whatsapp_link": "WhatsApp Link",
+      "email_button": "Email Button",
+      "email_address": "Email Address",
+      "email_link": "Email Link"
     },
     "testimonials": {
       "testimonials": "Testimonials",
