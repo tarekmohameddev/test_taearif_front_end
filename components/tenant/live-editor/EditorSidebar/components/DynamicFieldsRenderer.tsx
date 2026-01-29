@@ -12,20 +12,12 @@ import {
 import {
   ArrayFieldRenderer,
   ObjectFieldRenderer,
-  BackgroundFieldRenderer,
-  SimpleBackgroundFieldRenderer,
 } from "./FieldRenderers/index";
 
 // Hooks
 import { useVariantInitialization } from "./DynamicFieldsRenderer/hooks/useVariantInitialization";
 import { useValueHelpers } from "./DynamicFieldsRenderer/hooks/useValueHelpers";
 import { useIconHelpers } from "./DynamicFieldsRenderer/hooks/useIconHelpers";
-
-// Utils
-import {
-  hasGradientPair,
-  getBackgroundMode,
-} from "./DynamicFieldsRenderer/utils/fieldHelpers";
 
 // Renderers
 import { TextFieldRenderer } from "./DynamicFieldsRenderer/renderers/TextFieldRenderer";
@@ -59,13 +51,6 @@ export function DynamicFieldsRenderer({
 
   // Get icon helpers
   const { getIconComponent, isReactIcon } = useIconHelpers();
-
-  // Check for gradient pair
-  const hasGradient = hasGradientPair(fields);
-  const backgroundMode: string = getBackgroundMode(
-    getValueByPath("settings.backgroundMode"),
-    hasGradient,
-  );
 
   const renderField = (def: FieldDefinition, basePath?: string) => {
     if (!def) {
@@ -201,40 +186,13 @@ export function DynamicFieldsRenderer({
     return null;
   };
 
-  const backgroundField = fields.find((f) => f.key === "background") as any;
-
+  // عرض جميع الحقول بالترتيب الموجود في المصفوفة فقط
+  // بدون أي معالجة خاصة أو تصفية
   return (
     <div className="space-y-4">
-      {backgroundField && (
-        <BackgroundFieldRenderer
-          backgroundField={backgroundField}
-          getValueByPath={getValueByPath}
-          updateValue={updateValue}
-          renderField={renderField}
-        />
-      )}
-
-      {/* Simple mode support: when background fields are flattened (background.type, background.colors.from/to) */}
-      {!backgroundField && (
-        <SimpleBackgroundFieldRenderer
-          fields={fields}
-          getValueByPath={getValueByPath}
-          updateValue={updateValue}
-          renderField={renderField}
-        />
-      )}
-
-      {fields
-        .filter(
-          (f) =>
-            f.key !== "background" &&
-            f.key !== "background.type" &&
-            f.key !== "background.colors.from" &&
-            f.key !== "background.colors.to",
-        )
-        .map((f, i) => (
-          <div key={i}>{renderField(f)}</div>
-        ))}
+      {fields.map((f, i) => (
+        <div key={i}>{renderField(f)}</div>
+      ))}
     </div>
   );
 }

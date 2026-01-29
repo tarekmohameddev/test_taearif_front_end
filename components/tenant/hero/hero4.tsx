@@ -215,8 +215,8 @@ export default function Hero4(props: Hero4Props = {}) {
         {/* Background Image */}
         <Image
           src={
+            mergedData.background?.backgroundImage ||
             mergedData.backgroundImage ||
-            mergedData.background?.image ||
             "https://dalel-lovat.vercel.app/images/hero.webp"
           }
           alt="صورة خلفية"

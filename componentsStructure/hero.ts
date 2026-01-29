@@ -824,11 +824,7 @@ export const heroStructure: ComponentStructure = {
           type: "text",
           placeholder: "عن تعاريف العقارية",
         },
-        {
-          key: "backgroundImage",
-          label: "Background Image",
-          type: "image",
-        },
+
         {
           key: "barType",
           label: "Floating Bar Type",
@@ -917,7 +913,11 @@ export const heroStructure: ComponentStructure = {
           label: "Background",
           type: "object",
           fields: [
-            { key: "image", label: "Image URL", type: "image" },
+            {
+              key: "backgroundImage",
+              label: "Background Image",
+              type: "image",
+            },
             { key: "alt", label: "Alt Text", type: "text" },
             {
               key: "overlay",
