@@ -560,23 +560,74 @@ const CompactBrandingSettings = () => {
 
   const handleColorChange = useCallback(
     (colorType: "primary" | "secondary" | "accent", value: string) => {
-      setBrandingData((prev) => ({
-        ...prev,
+      if (isInitializing.current) return;
+      
+      // Update local state
+      setBrandingData((prev) => {
+        const newData = {
+          ...prev,
+          colors: {
+            ...prev.colors,
+            [colorType]: value,
+          },
+        };
+        return newData;
+      });
+
+      // Update WebsiteLayout.branding directly
+      // تحديث WebsiteLayout.branding مباشرة
+      const currentWebsiteLayout = WebsiteLayout || { metaTags: { pages: [] } };
+      const currentBranding = currentWebsiteLayout.branding || {
+        colors: { primary: "", secondary: "", accent: "" },
+        mainBgColor: "",
+      };
+
+      const updatedBranding = {
+        ...currentBranding,
         colors: {
-          ...prev.colors,
+          ...currentBranding.colors,
           [colorType]: value,
         },
-      }));
+      };
+
+      setWebsiteLayout({
+        ...currentWebsiteLayout,
+        branding: updatedBranding,
+      });
     },
-    [],
+    [WebsiteLayout, setWebsiteLayout],
   );
 
   const handleMainBgColorChange = useCallback((value: string) => {
-    setBrandingData((prev) => ({
-      ...prev,
+    if (isInitializing.current) return;
+    
+    // Update local state
+    setBrandingData((prev) => {
+      const newData = {
+        ...prev,
+        mainBgColor: value,
+      };
+      return newData;
+    });
+
+    // Update WebsiteLayout.branding directly
+    // تحديث WebsiteLayout.branding مباشرة
+    const currentWebsiteLayout = WebsiteLayout || { metaTags: { pages: [] } };
+    const currentBranding = currentWebsiteLayout.branding || {
+      colors: { primary: "", secondary: "", accent: "" },
+      mainBgColor: "",
+    };
+
+    const updatedBranding = {
+      ...currentBranding,
       mainBgColor: value,
-    }));
-  }, []);
+    };
+
+    setWebsiteLayout({
+      ...currentWebsiteLayout,
+      branding: updatedBranding,
+    });
+  }, [WebsiteLayout, setWebsiteLayout]);
 
   return (
     <div className="space-y-4">

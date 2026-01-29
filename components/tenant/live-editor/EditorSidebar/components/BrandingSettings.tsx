@@ -86,6 +86,9 @@ export function BrandingSettings() {
   const handleColorChange = useCallback(
     (colorType: "primary" | "secondary" | "accent", value: string) => {
       console.log(`🎨 Color changed: ${colorType} = ${value}`);
+      if (isInitializing.current) return;
+      
+      // Update local state
       setBrandingData((prev) => {
         const newData = {
           ...prev,
@@ -97,12 +100,37 @@ export function BrandingSettings() {
         console.log("📝 New brandingData:", newData);
         return newData;
       });
+
+      // Update WebsiteLayout.branding directly
+      // تحديث WebsiteLayout.branding مباشرة
+      const currentWebsiteLayout = WebsiteLayout || { metaTags: { pages: [] } };
+      const currentBranding = currentWebsiteLayout.branding || {
+        colors: { primary: "", secondary: "", accent: "" },
+        mainBgColor: "",
+      };
+
+      const updatedBranding = {
+        ...currentBranding,
+        colors: {
+          ...currentBranding.colors,
+          [colorType]: value,
+        },
+      };
+
+      setWebsiteLayout({
+        ...currentWebsiteLayout,
+        branding: updatedBranding,
+      });
+      console.log("✅ WebsiteLayout.branding updated:", updatedBranding);
     },
-    [],
+    [WebsiteLayout, setWebsiteLayout],
   );
 
   const handleMainBgColorChange = useCallback((value: string) => {
     console.log(`🎨 MainBgColor changed: ${value}`);
+    if (isInitializing.current) return;
+    
+    // Update local state
     setBrandingData((prev) => {
       const newData = {
         ...prev,
@@ -111,7 +139,26 @@ export function BrandingSettings() {
       console.log("📝 New brandingData:", newData);
       return newData;
     });
-  }, []);
+
+    // Update WebsiteLayout.branding directly
+    // تحديث WebsiteLayout.branding مباشرة
+    const currentWebsiteLayout = WebsiteLayout || { metaTags: { pages: [] } };
+    const currentBranding = currentWebsiteLayout.branding || {
+      colors: { primary: "", secondary: "", accent: "" },
+      mainBgColor: "",
+    };
+
+    const updatedBranding = {
+      ...currentBranding,
+      mainBgColor: value,
+    };
+
+    setWebsiteLayout({
+      ...currentWebsiteLayout,
+      branding: updatedBranding,
+    });
+    console.log("✅ WebsiteLayout.branding updated:", updatedBranding);
+  }, [WebsiteLayout, setWebsiteLayout]);
 
   const handleSave = () => {
     const updatedWebsiteLayout = {

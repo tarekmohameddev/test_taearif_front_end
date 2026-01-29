@@ -34,10 +34,11 @@ export const useSaveHandler = ({
 }: UseSaveHandlerProps) => {
   const handleBrandingSave = () => {
     const store = useEditorStore.getState();
-    // Get the latest tempData (which should be updated by BrandingSettings)
-    const brandingData = store.tempData || {};
+    // Get branding data directly from WebsiteLayout (which is updated in real-time)
+    // الحصول على بيانات الـ branding مباشرة من WebsiteLayout (التي يتم تحديثها في الوقت الفعلي)
+    const brandingData = store.WebsiteLayout?.branding || {};
 
-    console.log("🔍 Current tempData:", brandingData);
+    console.log("🔍 Current WebsiteLayout.branding:", brandingData);
     console.log("🔍 Current brandingData structure:", {
       hasColors: !!brandingData.colors,
       primary: brandingData.colors?.primary,
@@ -56,7 +57,8 @@ export const useSaveHandler = ({
       mainBgColor: brandingData.mainBgColor || "",
     };
 
-    // Update WebsiteLayout with branding data
+    // Update WebsiteLayout with branding data (ensure it's saved)
+    // تحديث WebsiteLayout ببيانات الـ branding (للتأكد من الحفظ)
     const updatedWebsiteLayout = {
       ...(store.WebsiteLayout || {}),
       metaTags: store.WebsiteLayout?.metaTags || { pages: [] },
