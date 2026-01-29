@@ -919,13 +919,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       }}
     >
       <div
-        className="mx-auto px-4"
-        style={{
-          maxWidth:
-            mergedData.layout?.maxWidth ||
-            mergedData.styling?.maxWidth ||
-            "1600px",
-        }}
+        className="mx-auto px-20 "
+
       >
         {/* Section Title */}
         {mergedData.content?.title && (
@@ -996,6 +991,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               style={{
                 gap: mergedData.styling?.gridGap || "24px",
+              
               }}
             >
               {properties.map((property: any) => {
