@@ -295,13 +295,12 @@ const SearchForm = React.memo(function SearchForm({
       filters,
     });
 
-    // If search text exists, navigate to /real-estate with all filters
+    // If search text exists, navigate to /real-estate with search only
+    // Advanced search should only send search parameter, no filters or purpose
     if (searchText && searchText.trim()) {
       const params = new URLSearchParams();
       
-      // Add all filters to URL params
-      if (filters.city_id) params.set("city_id", filters.city_id);
-      if (filters.type_id) params.set("type_id", filters.type_id);
+      // Only add search parameter for advanced search
       if (filters.search) params.set("search", filters.search);
       
       const queryString = params.toString();
