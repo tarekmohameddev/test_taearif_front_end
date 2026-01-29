@@ -57,10 +57,10 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
   return (
     <div className="p-6 border-t border-slate-200/60 bg-gradient-to-r from-slate-50 to-white">
       {view === "edit-component" && (
-        <div className="space-y-3">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleSave}
-            className="group w-full relative overflow-hidden px-6 py-4 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+            className="group flex-1 relative overflow-hidden px-6 py-4 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="relative flex items-center justify-center space-x-3">
@@ -82,7 +82,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
           </button>
           <button
             onClick={handleCancel}
-            className="w-full px-6 py-3 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-all duration-200"
+            className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-all duration-200"
           >
             {t("common.cancel")}
           </button>
@@ -114,10 +114,10 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
       )}
       {view === "branding-settings" && (
         <>
-          <div className="space-y-3">
+          <div className="flex items-center gap-3">
             <button
               onClick={handleSave}
-              className="group w-full relative overflow-hidden px-6 py-4 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+              className="group flex-1 relative overflow-hidden px-6 py-4 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative flex items-center justify-center space-x-3">
@@ -142,7 +142,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = ({
                 setTempData({});
                 onClose();
               }}
-              className="w-full px-6 py-3 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-all duration-200"
+              className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-all duration-200"
             >
               {t("common.cancel")}
             </button>
