@@ -4,11 +4,8 @@ import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const BlogDetailPage = dynamic(
-  () =>
-    import("@/components/blogs/blog-detail-page").then(
-      (mod) => mod.BlogDetailPage
-    ),
+const BlogForm = dynamic(
+  () => import("@/components/blogs/blog-form").then((mod) => mod.BlogForm),
   {
     loading: () => (
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -19,9 +16,9 @@ const BlogDetailPage = dynamic(
   }
 );
 
-export default function BlogDetailRoute() {
+export default function EditBlogPage() {
   const params = useParams();
-  const id = params?.id as string;
+  const slug = params?.slug as string;
   
-  return <BlogDetailPage blogId={id} />;
+  return <BlogForm mode="edit" blogId={slug} />;
 }

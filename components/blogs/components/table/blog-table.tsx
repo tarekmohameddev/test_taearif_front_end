@@ -46,9 +46,9 @@ interface BlogTableProps {
   loading: boolean;
   pagination: PaginationType | null;
   onPageChange: (page: number) => void;
-  onEdit: (id: number) => void;
+  onEdit: (blog: { id: number; slug: string }) => void;
   onDelete: (id: number) => void;
-  onView: (id: number) => void;
+  onView: (blog: { id: number; slug: string }) => void;
 }
 
 export function BlogTable({
@@ -79,9 +79,9 @@ export function BlogTable({
               <BlogTableRow
                 key={blog.id}
                 blog={blog}
-                onEdit={() => onEdit(blog.id)}
+                onEdit={() => onEdit({ id: blog.id, slug: blog.slug })}
                 onDelete={() => onDelete(blog.id)}
-                onView={() => onView(blog.id)}
+                onView={() => onView({ id: blog.id, slug: blog.slug })}
               />
             ))}
           </TableBody>

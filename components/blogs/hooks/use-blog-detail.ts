@@ -37,7 +37,7 @@ export function useBlogDetail(blogId: number | string) {
   const fetchBlog = useCallback(async () => {
     if (!blogId) {
       if (isMountedRef.current) {
-        setError("معرف المقال مطلوب");
+        setError("معرف المقال أو الرابط اللطيف مطلوب");
         setLoading(false);
       }
       return;
@@ -62,8 +62,13 @@ export function useBlogDetail(blogId: number | string) {
         setError(null);
       }
       
-      // GET /posts/{id} - جلب تفاصيل مقال
-      const response = await blogApi.getBlogById(Number(blogId));
+      // Check if blogId is a number (ID) or string (slug)
+      // If it's a number or can be converted to number, use getBlogById
+      // Otherwise, use getBlogBySlug
+      const isNumeric = !isNaN(Number(blogId)) && !isNaN(parseFloat(String(blogId)));
+      const response = isNumeric 
+        ? await blogApi.getBlogById(Number(blogId))
+        : await blogApi.getBlogBySlug(String(blogId));
       
       // Double check: make sure we're still fetching the same blogId and component is mounted
       if (isMountedRef.current && currentBlogIdRef.current === blogId) {

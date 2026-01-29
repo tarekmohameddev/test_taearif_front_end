@@ -54,7 +54,9 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
   const [deleting, setDeleting] = useState(false);
 
   const handleEdit = () => {
-    router.push(`/dashboard/blogs/edit/${blogId}`);
+    if (blog) {
+      router.push(`/dashboard/blogs/edit/${blog.slug}`);
+    }
   };
 
   const handleDeleteClick = () => {
@@ -62,10 +64,12 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
   };
 
   const handleDeleteConfirm = async () => {
+    if (!blog) return;
+    
     setDeleting(true);
     try {
       // DELETE /posts/{id} - حذف مقال
-      await blogApi.deleteBlog(Number(blogId));
+      await blogApi.deleteBlog(blog.id);
       toast.success("تم حذف المقال بنجاح");
       setDeleteDialogOpen(false);
       router.push("/dashboard/blogs");

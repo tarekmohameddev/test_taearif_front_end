@@ -37,7 +37,7 @@ import { BlogLoadingState } from "./components/shared/blog-loading-state";
 
 interface BlogFormProps {
   mode: "create" | "edit";
-  blogId?: number;
+  blogId?: number | string;
 }
 
 export function BlogForm({ mode, blogId }: BlogFormProps) {

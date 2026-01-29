@@ -46,12 +46,12 @@ export function BlogCategoryDetailPage({
   );
   const categoryName = category?.name || "تصنيف غير معروف";
 
-  const handleEdit = (id: number) => {
-    router.push(`/dashboard/blogs/edit/${id}`);
+  const handleEdit = (blog: { id: number; slug: string }) => {
+    router.push(`/dashboard/blogs/edit/${blog.slug}`);
   };
 
-  const handleView = (id: number) => {
-    router.push(`/dashboard/blogs/${id}`);
+  const handleView = (blog: { id: number; slug: string }) => {
+    router.push(`/dashboard/blogs/${blog.slug}`);
   };
 
   const handleDelete = async (id: number) => {

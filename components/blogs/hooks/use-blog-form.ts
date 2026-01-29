@@ -38,7 +38,7 @@ const initialFormData: BlogFormData = {
   media_ids: [],
 };
 
-export function useBlogForm(mode: "create" | "edit", blogId?: number) {
+export function useBlogForm(mode: "create" | "edit", blogId?: number | string) {
   const router = useRouter();
   const [formData, setFormData] = useState<BlogFormData>(initialFormData);
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -57,8 +57,13 @@ export function useBlogForm(mode: "create" | "edit", blogId?: number) {
   useEffect(() => {
     if (mode === "edit" && blogId) {
       setLoadingBlog(true);
-      blogApi
-        .getBlogById(blogId)
+      // Check if blogId is a number (ID) or string (slug)
+      const isNumeric = !isNaN(Number(blogId)) && !isNaN(parseFloat(String(blogId)));
+      const fetchPromise = isNumeric 
+        ? blogApi.getBlogById(Number(blogId))
+        : blogApi.getBlogBySlug(String(blogId));
+      
+      fetchPromise
         .then((response) => {
           const blog = response.data;
           setFormData({
@@ -163,15 +168,25 @@ export function useBlogForm(mode: "create" | "edit", blogId?: number) {
       if (mode === "create") {
         toast.loading("جاري إنشاء المقال...", { id: "create-blog" });
         // POST /posts - إنشاء مقال جديد
-        await blogApi.createBlog(finalFormData);
+        const response = await blogApi.createBlog(finalFormData);
         toast.success("تم إنشاء المقال بنجاح", { id: "create-blog" });
-        router.push("/dashboard/blogs");
+        router.push(`/dashboard/blogs/${response.data.slug}`);
       } else if (mode === "edit" && blogId) {
         toast.loading("جاري تحديث المقال...", { id: "update-blog" });
+        // Get blog ID - if blogId is slug, we need to fetch the blog first to get the ID
+        let actualBlogId: number;
+        if (typeof blogId === "string" && isNaN(Number(blogId))) {
+          // blogId is a slug, fetch blog to get ID
+          const blogResponse = await blogApi.getBlogBySlug(blogId);
+          actualBlogId = blogResponse.data.id;
+        } else {
+          actualBlogId = Number(blogId);
+        }
+        
         // PUT /posts/{id} - تحديث مقال
-        await blogApi.updateBlog(blogId, finalFormData);
+        const response = await blogApi.updateBlog(actualBlogId, finalFormData);
         toast.success("تم تحديث المقال بنجاح", { id: "update-blog" });
-        router.push(`/dashboard/blogs/${blogId}`);
+        router.push(`/dashboard/blogs/${response.data.slug}`);
       }
     } catch (err: any) {
       console.error("Error submitting form:", err);

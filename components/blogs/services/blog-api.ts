@@ -85,6 +85,17 @@ export async function getBlogById(id: number): Promise<BlogDetailResponse> {
 }
 
 /**
+ * Get single post by slug
+ * @param slug - Post slug
+ * @returns Promise with post data
+ */
+export async function getBlogBySlug(slug: string): Promise<BlogDetailResponse> {
+  // GET /posts/{slug}
+  const response = await axiosInstance.get(`/posts/${slug}`);
+  return response.data;
+}
+
+/**
  * Create new post
  * @param data - Post form data
  * @returns Promise with created post
@@ -157,6 +168,7 @@ export const blogApi = {
   getBlogsList,
   getBlogsByCategory,
   getBlogById,
+  getBlogBySlug,
   createBlog,
   updateBlog,
   deleteBlog,
