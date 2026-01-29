@@ -338,32 +338,12 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         return;
       }
 
-      // Check if we're on real-estate page and have search parameter (even if empty)
-      const hasSearchParam = searchParams?.has("search");
-      const searchTerm = searchParams?.get("search");
-      const pageParam = searchParams?.get("page") || "1";
-      
-      let url: string;
-      
-      if (isRealEstatePage && hasSearchParam) {
-        // Use new API endpoint for real-estate search
-        const params = new URLSearchParams();
-        // Only add title parameter if search term is not empty
-        if (searchTerm && searchTerm.trim()) {
-          params.set("title", searchTerm.trim());
-        }
-        params.set("per_page", "20");
-        params.set("page", pageParam);
-        
-        url = `/v1/tenant-website/${currentTenantId}?${params.toString()}`;
-      } else {
-        // Use existing API logic
-        url = convertApiUrl(
-          apiUrl || resolveDefaultUrl(),
-          currentTenantId,
-          purpose,
-        );
-      }
+      // Use ONLY the configured apiUrl (no hidden/alternative endpoints)
+      const url = convertApiUrl(
+        apiUrl || resolveDefaultUrl(),
+        currentTenantId,
+        purpose,
+      );
 
       const response = await axiosInstance.get(url);
 
@@ -372,8 +352,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         let dataToSet = [];
         let paginationData = null;
 
-        // Handle real-estate search API response format
-        if (isRealEstatePage && hasSearchParam && response.data.data && Array.isArray(response.data.data)) {
+        // Handle response format where items are under `data`
+        if (response.data.data && Array.isArray(response.data.data)) {
           // Process mixed data (properties and projects)
           const mixedData = response.data.data;
           
@@ -612,28 +592,25 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     // Always prioritize the configured apiUrl from dataSource
     const apiUrl = mergedData.dataSource?.apiUrl;
     const useApiData = mergedData.dataSource?.enabled !== false;
-    const hasSearchParam = searchParams?.has("search");
 
-    // For real-estate page with search parameter (even if empty), use new API endpoint
-    // For other cases, use API when enabled and apiUrl is configured
-    const shouldUseOwnApi = 
-      (isRealEstatePage && hasSearchParam && currentTenantId) ||
-      (useApiData && currentTenantId && apiUrl);
+    const isPropertiesApiUrl = !!apiUrl && apiUrl.includes("/properties");
 
-    if (shouldUseOwnApi) {
+    // If apiUrl targets `/properties`, rely on the properties store.
+    // Otherwise (projects/blogs/mixed endpoint), fetch directly from apiUrl.
+    const shouldFetchDirectlyFromApiUrl =
+      useApiData && currentTenantId && !!apiUrl && !isPropertiesApiUrl;
+
+    if (shouldFetchDirectlyFromApiUrl) {
       // Clear existing data before fetching new data
       setApiProperties([]);
 
-      // For real-estate page with search parameter, don't pass apiUrl (will use new endpoint)
-      // For other pages, use existing logic
-      if (isRealEstatePage && hasSearchParam) {
-        fetchPropertiesFromApi(undefined, undefined);
-      } else {
-        const purpose = apiUrl?.includes("/projects")
-          ? undefined
-          : getPurposeFromPath() || transactionType;
-        fetchPropertiesFromApi(apiUrl, purpose);
-      }
+      const purpose = apiUrl?.includes("/projects")
+        ? undefined
+        : apiUrl?.includes("/properties")
+          ? getPurposeFromPath() || transactionType
+          : undefined;
+
+      fetchPropertiesFromApi(apiUrl, purpose);
     }
   }, [
     mergedData.dataSource?.apiUrl,
@@ -648,10 +625,16 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   // Use API data if enabled, otherwise use static data
   const useApiData = mergedData.dataSource?.enabled !== false;
 
+  const isPropertiesApiUrl = !!mergedData.dataSource?.apiUrl &&
+    mergedData.dataSource.apiUrl.includes("/properties");
+
+  const shouldPaginateViaUrl =
+    !isPropertiesApiUrl && isRealEstatePage && !!searchParams?.get("search");
+
   const handlePageChange = useCallback(
     (page: number) => {
-      // For real-estate page, update URL and refetch
-      if (isRealEstatePage && searchParams?.get("search")) {
+      // For real-estate page when NOT using `/properties`, use URL pagination.
+      if (shouldPaginateViaUrl) {
         const currentParams = new URLSearchParams(searchParams.toString());
         currentParams.set("page", page.toString());
         router.push(`${pathname}?${currentParams.toString()}`);
@@ -663,11 +646,11 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
         }
       }
     },
-    [isRealEstatePage, searchParams, router, pathname, pagination.current_page, setCurrentPage],
+    [shouldPaginateViaUrl, searchParams, router, pathname, pagination.current_page, setCurrentPage],
   );
 
   const handleNextPage = useCallback(() => {
-    if (isRealEstatePage && searchParams?.get("search")) {
+    if (shouldPaginateViaUrl) {
       const currentPage = parseInt(searchParams.get("page") || "1", 10);
       const nextPage = currentPage + 1;
       if (nextPage <= apiPagination.last_page) {
@@ -676,10 +659,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     } else {
       goToNextPage();
     }
-  }, [isRealEstatePage, searchParams, apiPagination.last_page, handlePageChange, goToNextPage]);
+  }, [shouldPaginateViaUrl, searchParams, apiPagination.last_page, handlePageChange, goToNextPage]);
 
   const handlePreviousPage = useCallback(() => {
-    if (isRealEstatePage && searchParams?.get("search")) {
+    if (shouldPaginateViaUrl) {
       const currentPage = parseInt(searchParams.get("page") || "1", 10);
       const previousPage = currentPage - 1;
       if (previousPage >= 1) {
@@ -688,12 +671,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     } else {
       goToPreviousPage();
     }
-  }, [isRealEstatePage, searchParams, handlePageChange, goToPreviousPage]);
+  }, [shouldPaginateViaUrl, searchParams, handlePageChange, goToPreviousPage]);
 
   // Determine which pagination to use
-  const activePagination = isRealEstatePage && searchParams?.get("search") 
-    ? apiPagination 
-    : pagination;
+  const activePagination = shouldPaginateViaUrl ? apiPagination : pagination;
 
   const shouldRenderPagination =
     useApiData &&
@@ -713,8 +694,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   const hasSearchParam = searchParams?.has("search");
   const properties =
     useApiData && currentTenantId
-      ? isProjectsPage || isProjectsApi || isBlogsPage || isBlogsApi || (isRealEstatePage && hasSearchParam)
-        ? apiProperties // Use API data directly for projects, blogs, and real-estate search
+      ? isProjectsPage || isProjectsApi || isBlogsPage || isBlogsApi || shouldPaginateViaUrl
+        ? apiProperties // Use API data directly for projects/blogs/mixed endpoint
         : filteredProperties // Use store data for properties
       : useApiData
         ? apiProperties
