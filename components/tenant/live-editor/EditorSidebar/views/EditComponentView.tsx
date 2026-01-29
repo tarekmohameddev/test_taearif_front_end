@@ -1,6 +1,6 @@
 import React from "react";
 import { ComponentInstance } from "@/lib/types";
-import { useEditorT } from "@/context/editorI18nStore";
+import { useEditorT, useEditorLocale } from "@/context/editorI18nStore";
 import { ThemeSelector } from "../../ThemeSelector";
 import { ResetConfirmDialog } from "../../ResetConfirmDialog";
 import { AdvancedSimpleSwitcher } from "../components/AdvancedSimpleSwitcher";
@@ -55,6 +55,9 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
   handleInputChange,
 }) => {
   const t = useEditorT();
+  const { locale } = useEditorLocale();
+  const isRTL = locale === "ar";
+  const [mode, setMode] = React.useState<"simple" | "advanced">("simple");
 
   const getComponentName = () => {
     // Handle global components
@@ -419,14 +422,35 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
-            <span className="text-white text-sm">✏️</span>
-          </div>
+      <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="flex items-center justify-between">
           <h4 className="text-lg font-bold text-slate-800">
             {t("editor_sidebar.content_settings")}
           </h4>
+          <div className="flex bg-slate-100 rounded-2xl p-2 shadow-inner">
+            <button
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+                mode === "simple"
+                  ? "bg-white text-blue-600 shadow-lg transform scale-105 border-2 border-blue-200"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+              onClick={() => setMode("simple")}
+              type="button"
+            >
+              {t("editor_sidebar.simple")}
+            </button>
+            <button
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+                mode === "advanced"
+                  ? "bg-white text-purple-600 shadow-lg transform scale-105 border-2 border-purple-200"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+              onClick={() => setMode("advanced")}
+              type="button"
+            >
+                {t("editor_sidebar.advanced")}
+            </button>
+          </div>
         </div>
 
         {/* تخصيص حسب نوع المكون: استخدام AdvancedSimpleSwitcher لجميع المكونات المدعومة */}
@@ -437,6 +461,8 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
             componentId={selectedComponent.id}
             onUpdateByPath={handleUpdateByPath}
             currentData={tempData}
+            mode={mode}
+            setMode={setMode}
           />
         ) : (
           // المكوّنات الأخرى تستخدم البنية العامة الحالية

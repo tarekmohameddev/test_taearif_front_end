@@ -39,6 +39,8 @@ export interface AdvancedSimpleSwitcherProps {
   componentId?: string;
   onUpdateByPath?: (path: string, value: any) => void;
   currentData?: any;
+  mode?: "simple" | "advanced";
+  setMode?: (mode: "simple" | "advanced") => void;
 }
 
 export interface DynamicFieldsRendererProps {

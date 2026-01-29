@@ -13,9 +13,13 @@ export function AdvancedSimpleSwitcher({
   componentId,
   onUpdateByPath,
   currentData,
+  mode: externalMode,
+  setMode: externalSetMode,
 }: AdvancedSimpleSwitcherProps) {
   const t = useEditorT();
-  const [mode, setMode] = useState<"simple" | "advanced">("simple");
+  const [internalMode, setInternalMode] = useState<"simple" | "advanced">("simple");
+  const mode = externalMode ?? internalMode;
+  const setMode = externalSetMode ?? setInternalMode;
   const [structure, setStructure] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -319,33 +323,35 @@ export function AdvancedSimpleSwitcher({
         </div>
       )}
 
-      {/* Mode Switcher */}
-      <div className="flex items-center justify-center">
-        <div className="flex bg-slate-100 rounded-2xl p-2 shadow-inner">
-          <button
-            className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-              mode === "simple"
-                ? "bg-white text-blue-600 shadow-lg transform scale-105 border-2 border-blue-200"
-                : "text-slate-500 hover:text-slate-700"
-            }`}
-            onClick={() => setMode("simple")}
-            type="button"
-          >
-            {t("editor_sidebar.simple")}
-          </button>
-          <button
-            className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-              mode === "advanced"
-                ? "bg-white text-purple-600 shadow-lg transform scale-105 border-2 border-purple-200"
-                : "text-slate-500 hover:text-slate-700"
-            }`}
-            onClick={() => setMode("advanced")}
-            type="button"
-          >
-            {t("editor_sidebar.advanced")}
-          </button>
+      {/* Mode Switcher - Only show if mode is not controlled externally */}
+      {!externalMode && (
+        <div className="flex items-center justify-center">
+          <div className="flex bg-slate-100 rounded-2xl p-2 shadow-inner">
+            <button
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
+                mode === "simple"
+                  ? "bg-white text-blue-600 shadow-lg transform scale-105 border-2 border-blue-200"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+              onClick={() => setMode("simple")}
+              type="button"
+            >
+              {t("editor_sidebar.simple")}
+            </button>
+            <button
+              className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
+                mode === "advanced"
+                  ? "bg-white text-purple-600 shadow-lg transform scale-105 border-2 border-purple-200"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+              onClick={() => setMode("advanced")}
+              type="button"
+            >
+              {t("editor_sidebar.advanced")}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Component Info */}
       {/* مخفية فقط , ممكن استخدامها في المستقبل */}
