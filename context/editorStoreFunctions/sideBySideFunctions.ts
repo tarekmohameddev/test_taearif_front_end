@@ -120,6 +120,45 @@ export const getDefaultSideBySideData = (): ComponentData => ({
   },
 });
 
+// Default sideBySide3 data structure (same as halfTextHalfImage3)
+export const getDefaultSideBySide3Data = (): ComponentData => ({
+  visible: true,
+  layout: {
+    direction: "rtl",
+    maxWidth: "1600px",
+    gap: {
+      x: "md:gap-x-[30px] lg:gap-x-[74px]",
+      y: "gap-[12px]",
+    },
+    minHeight: "369px",
+  },
+  spacing: {
+    padding: {
+      x: "px-4",
+      y: "py-[24px]",
+      lgY: "lg:py-[52px]",
+    },
+  },
+  // Legacy props for backward compatibility
+  title: "رسالتنا",
+  description:
+    "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
+  imageSrc: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
+  imageAlt: "Choose Us",
+  imagePosition: "left",
+  // New structure for editor compatibility - MUST match the legacy props
+  content: {
+    title: "رسالتنا",
+    description:
+      "نحن في الشركة العقارية العقاري نطمح لأن نكون الرائدين في قطاع العقارات في منطقة القصيم، وأن نقدم حلولًا عقارية متكاملة ومتطورة للعملاء، مع التركيز على توفير فرص استثمارية مميزة. نسعى لبناء علاقات طويلة الأمد مع عملائنا من خلال تقديم خدمات عالية الجودة، ونسعى دائمًا إلى تحسين وتحقيق تطلعاتهم. رؤيتنا هي أن نكون الخيار الأول للعملاء الباحثين عن الاستشارات العقارية الموثوقة والحلول المتقدمة، مما يجعلنا الشريك المثالي لهم في عالم العقارات",
+    imagePosition: "left",
+  },
+  image: {
+    src: "https://dalel-lovat.vercel.app//images/aboutUs-page/message.webp",
+    alt: "Choose Us",
+  },
+});
+
 // Default sideBySide2 data structure (with stats - same as halfTextHalfImage2)
 export const getDefaultSideBySide2Data = (): ComponentData => ({
   visible: true,
@@ -522,6 +561,11 @@ export const sideBySideFunctions = {
     ) {
       defaultData = getDefaultSideBySide2Data();
     } else if (
+      actualVariantId === "sideBySide3" ||
+      actualVariantId.includes("sideBySide3")
+    ) {
+      defaultData = getDefaultSideBySide3Data();
+    } else if (
       actualVariantId === "sideBySide4" ||
       actualVariantId.includes("sideBySide4")
     ) {
@@ -577,6 +621,12 @@ export const sideBySideFunctions = {
       actualVariantId.includes("sideBySide2")
     ) {
       return state.sideBySideStates[variantId] || getDefaultSideBySide2Data();
+    }
+    if (
+      actualVariantId === "sideBySide3" ||
+      actualVariantId.includes("sideBySide3")
+    ) {
+      return state.sideBySideStates[variantId] || getDefaultSideBySide3Data();
     }
     if (
       actualVariantId === "sideBySide4" ||
@@ -659,6 +709,11 @@ export const sideBySideFunctions = {
       actualVariantId.includes("sideBySide2")
     ) {
       defaultData = getDefaultSideBySide2Data();
+    } else if (
+      actualVariantId === "sideBySide3" ||
+      actualVariantId.includes("sideBySide3")
+    ) {
+      defaultData = getDefaultSideBySide3Data();
     } else if (
       actualVariantId === "sideBySide4" ||
       actualVariantId.includes("sideBySide4")

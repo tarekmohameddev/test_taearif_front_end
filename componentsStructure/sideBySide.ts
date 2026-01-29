@@ -1037,6 +1037,392 @@ export const sideBySideStructure: ComponentStructure = {
       ],
     },
     {
+      id: "sideBySide3",
+      name: "Side By Side 3 - Trusted Partner",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "layout",
+          label: "Layout Settings",
+          type: "object",
+          fields: [
+            {
+              key: "direction",
+              label: "Direction",
+              type: "select",
+              options: [
+                { value: "rtl", label: "Right to Left" },
+                { value: "ltr", label: "Left to Right" },
+              ],
+            },
+            {
+              key: "maxWidth",
+              label: "Max Width",
+              type: "text",
+              placeholder: "1600px",
+            },
+            {
+              key: "gap",
+              label: "Gap",
+              type: "object",
+              fields: [
+                {
+                  key: "x",
+                  label: "Horizontal Gap",
+                  type: "text",
+                  placeholder: "gap-x-16",
+                },
+                {
+                  key: "y",
+                  label: "Vertical Gap",
+                  type: "text",
+                  placeholder: "gap-y-16",
+                },
+              ],
+            },
+            {
+              key: "minHeight",
+              label: "Minimum Height",
+              type: "text",
+              placeholder: "md:min-h-[369px]",
+            },
+          ],
+        },
+        {
+          key: "spacing",
+          label: "Spacing",
+          type: "object",
+          fields: [
+            {
+              key: "padding",
+              label: "Padding",
+              type: "object",
+              fields: [
+                {
+                  key: "x",
+                  label: "Horizontal",
+                  type: "text",
+                  placeholder: "px-4",
+                },
+                {
+                  key: "y",
+                  label: "Vertical",
+                  type: "text",
+                  placeholder: "pt-12 pb-6",
+                },
+                {
+                  key: "lgY",
+                  label: "Large Vertical",
+                  type: "text",
+                  placeholder: "lg:pt-26 lg:pb-13",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            { key: "eyebrow", label: "Eyebrow Text", type: "text" },
+            { key: "title", label: "Title", type: "text" },
+            { key: "description", label: "Description", type: "text" },
+            {
+              key: "imagePosition",
+              label: "Image Position",
+              type: "select",
+              options: [
+                { value: "left", label: "Left" },
+                { value: "right", label: "Right" },
+              ],
+            },
+            {
+              key: "button",
+              label: "Button",
+              type: "object",
+              fields: [
+                { key: "text", label: "Button Text", type: "text" },
+                { key: "enabled", label: "Show Button", type: "boolean" },
+                {
+                  key: "style",
+                  label: "Button Style",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "width",
+                      label: "Width",
+                      type: "text",
+                      placeholder: "w-[119px] md:w-[148px]",
+                    },
+                    {
+                      key: "height",
+                      label: "Height",
+                      type: "text",
+                      placeholder: "h-[46px] md:h-[52px]",
+                    },
+                    {
+                      key: "backgroundColor",
+                      label: "Background Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary",
+                    },
+                    {
+                      key: "textColor",
+                      label: "Text Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary",
+                    },
+                    {
+                      key: "borderRadius",
+                      label: "Border Radius",
+                      type: "text",
+                      placeholder: "rounded-[10px]",
+                    },
+                    {
+                      key: "hoverBackgroundColor",
+                      label: "Hover Background Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary",
+                    },
+                    {
+                      key: "hoverTextColor",
+                      label: "Hover Text Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "font",
+              label: "Font Settings",
+              type: "object",
+              fields: [
+                {
+                  key: "eyebrow",
+                  label: "Eyebrow Font",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "text",
+                      placeholder: "text-xs md:text-base xl:text-lg",
+                    },
+                    {
+                      key: "weight",
+                      label: "Weight",
+                      type: "text",
+                      placeholder: "font-normal",
+                    },
+                    { key: "color", label: "Color", type: "color" },
+                    {
+                      key: "lineHeight",
+                      label: "Line Height",
+                      type: "text",
+                      placeholder: "leading-[22.5px]",
+                    },
+                  ],
+                },
+                {
+                  key: "title",
+                  label: "Title Font",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "text",
+                      placeholder: "section-title-large",
+                    },
+                    {
+                      key: "weight",
+                      label: "Weight",
+                      type: "text",
+                      placeholder: "font-normal",
+                    },
+                    {
+                      key: "color",
+                      label: "Color",
+                      type: "color",
+                      useDefaultColor: true,
+                      globalColorType: "primary",
+                    },
+                    {
+                      key: "lineHeight",
+                      label: "Line Height",
+                      type: "text",
+                      placeholder: "lg:leading-[64px]",
+                    },
+                  ],
+                },
+                {
+                  key: "description",
+                  label: "Description Font",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "text",
+                      placeholder: "text-sm md:text-sm xl:text-xl",
+                    },
+                    {
+                      key: "weight",
+                      label: "Weight",
+                      type: "text",
+                      placeholder: "font-normal",
+                    },
+                    { key: "color", label: "Color", type: "color" },
+                    {
+                      key: "lineHeight",
+                      label: "Line Height",
+                      type: "text",
+                      placeholder: "leading-[35px]",
+                    },
+                  ],
+                },
+                {
+                  key: "button",
+                  label: "Button Font",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "size",
+                      label: "Size",
+                      type: "text",
+                      placeholder: "text-sm md:text-base xl:text-xl",
+                    },
+                    {
+                      key: "weight",
+                      label: "Weight",
+                      type: "text",
+                      placeholder: "font-normal",
+                    },
+                    { key: "color", label: "Color", type: "color" },
+                    {
+                      key: "lineHeight",
+                      label: "Line Height",
+                      type: "text",
+                      placeholder: "leading-[22.5px]",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "image",
+          label: "Image Settings",
+          type: "object",
+          fields: [
+            { key: "visible", label: "Show Image", type: "boolean" },
+            { key: "src", label: "Image URL", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+            {
+              key: "width",
+              label: "Width",
+              type: "text",
+              placeholder: "w-full md:w-[47.2%]",
+            },
+            {
+              key: "aspectRatio",
+              label: "Aspect Ratio",
+              type: "text",
+              placeholder: "aspect-[800/500]",
+            },
+            {
+              key: "background",
+              label: "Background Block",
+              type: "object",
+              fields: [
+                {
+                  key: "enabled",
+                  label: "Show Background Block",
+                  type: "boolean",
+                },
+                { key: "color", label: "Background Color", type: "color" },
+                {
+                  key: "width",
+                  label: "Width",
+                  type: "text",
+                  placeholder: "w-[54%] md:w-1/2",
+                },
+                {
+                  key: "borderRadius",
+                  label: "Border Radius",
+                  type: "text",
+                  placeholder: "rounded-[5px]",
+                },
+                {
+                  key: "position",
+                  label: "Position",
+                  type: "text",
+                  placeholder: "absolute top-0 left-0",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          key: "animations",
+          label: "Animations",
+          type: "object",
+          fields: [
+            {
+              key: "text",
+              label: "Text Animation",
+              type: "object",
+              fields: [
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                { key: "type", label: "Type", type: "text" },
+                { key: "duration", label: "Duration (ms)", type: "number" },
+                { key: "delay", label: "Delay (ms)", type: "number" },
+              ],
+            },
+            {
+              key: "image",
+              label: "Image Animation",
+              type: "object",
+              fields: [
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                { key: "type", label: "Type", type: "text" },
+                { key: "duration", label: "Duration (ms)", type: "number" },
+                { key: "delay", label: "Delay (ms)", type: "number" },
+              ],
+            },
+            {
+              key: "button",
+              label: "Button Animation",
+              type: "object",
+              fields: [
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                { key: "type", label: "Type", type: "text" },
+                { key: "duration", label: "Duration (ms)", type: "number" },
+                { key: "delay", label: "Delay (ms)", type: "number" },
+              ],
+            },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "content.eyebrow", label: "Eyebrow Text", type: "text" },
+        { key: "content.title", label: "Title", type: "text" },
+        { key: "content.description", label: "Description", type: "text" },
+        { key: "content.button.text", label: "Button Text", type: "text" },
+        { key: "image.src", label: "Image", type: "image" },
+        { key: "image.alt", label: "Image Alt Text", type: "text" },
+      ],
+    },
+    {
       id: "sideBySide4",
       name: "Side By Side 4 - ThemeTwo",
       fields: [
