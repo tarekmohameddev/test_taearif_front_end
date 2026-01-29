@@ -19,6 +19,7 @@ import {
   logError,
 } from "@/lib/fileLogger";
 import { findThemeForComponent } from "@/lib/themes/themeComponentLookup";
+import { shouldBypassThemePurchaseCheck } from "@/lib/utils/domainCheck";
 
 import type { Theme } from "@/components/settings/themes/types";
 
@@ -99,7 +100,9 @@ export function useComponentHandlers({
       if (themeId && themes.length > 0) {
         // البحث عن الثيم في themes array
         const theme = themes.find((t) => t.id === themeId);
-        if (theme && !theme.has_access && process.env.NODE_ENV !== "development") {
+        // Bypass check for development mode or mandhoor.com domain
+        const shouldBypass = process.env.NODE_ENV === "development" || shouldBypassThemePurchaseCheck();
+        if (theme && !theme.has_access && !shouldBypass) {
           // منع الإضافة وإظهار PremiumDialog
           logDuring(
             "COMPONENT_ADD",

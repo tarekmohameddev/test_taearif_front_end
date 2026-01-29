@@ -26,6 +26,7 @@ import {
 import { ThemeNumber } from "@/services/live-editor/themeChangeService";
 import { useThemes } from "@/hooks/useThemes";
 import { setActiveTheme } from "@/services/theme/themeService";
+import { shouldBypassThemePurchaseCheck } from "@/lib/utils/domainCheck";
 import type { Theme } from "@/components/settings/themes/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -150,7 +151,9 @@ export function ThemeChangeDialog({
     }
   };
 
-  const selectedThemeCanUse = selectedTheme ? canUseTheme(selectedTheme) : false;
+  // Check if we should bypass theme purchase check (development or mandhoor.com)
+  const shouldBypass = process.env.NODE_ENV === "development" || shouldBypassThemePurchaseCheck();
+  const selectedThemeCanUse = selectedTheme ? (canUseTheme(selectedTheme) || shouldBypass) : false;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -387,15 +390,15 @@ export function ThemeChangeDialog({
           </Button>
           {selectedTheme && (
             <Button
-              onClick={selectedThemeCanUse || process.env.NODE_ENV === "development" ? handleApply : handlePurchase}
+              onClick={selectedThemeCanUse ? handleApply : handlePurchase}
               disabled={isResetting}
               className={`gap-2 ${
-                (selectedThemeCanUse || process.env.NODE_ENV === "development")
+                selectedThemeCanUse
                   ? "bg-indigo-600 hover:bg-indigo-700"
                   : "bg-orange-600 hover:bg-orange-700"
               }`}
             >
-              {(selectedThemeCanUse || process.env.NODE_ENV === "development") ? (
+              {selectedThemeCanUse ? (
                 <>
                   <Palette className="w-4 h-4" />
                   {isRTL ? "تطبيق الثيم" : "Apply Theme"}

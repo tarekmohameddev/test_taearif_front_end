@@ -16,6 +16,7 @@ import { COMPONENTS } from "@/lib/ComponentsList";
 import { useEditorT } from "@/context/editorI18nStore";
 import { useThemes } from "@/hooks/useThemes";
 import { findThemeForComponent } from "@/lib/themes/themeComponentLookup";
+import { shouldBypassThemePurchaseCheck } from "@/lib/utils/domainCheck";
 import { PremiumDialog } from "./PremiumDialog";
 import type { Theme } from "@/components/settings/themes/types";
 
@@ -98,7 +99,9 @@ export function ThemeSelector({
     const themeId = findThemeForComponent(selectedTheme);
     if (themeId && themes.length > 0) {
       const theme = themes.find((t: Theme) => t.id === themeId);
-      if (theme && !theme.has_access && process.env.NODE_ENV !== "development") {
+      // Bypass check for development mode or mandhoor.com domain
+      const shouldBypass = process.env.NODE_ENV === "development" || shouldBypassThemePurchaseCheck();
+      if (theme && !theme.has_access && !shouldBypass) {
         // إغلاق ThemeSelector dialog أولاً
         setIsOpen(false);
         // منع التطبيق وإظهار PremiumDialog
