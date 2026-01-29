@@ -1188,7 +1188,6 @@ export const sideBySideStructure: ComponentStructure = {
               addLabel: "Add Feature",
               itemLabel: "Feature",
               of: [
-                { key: "id", label: "ID", type: "text" },
                 { key: "title", label: "Title", type: "text" },
                 { key: "description", label: "Description", type: "text" },
                 {
@@ -1482,7 +1481,6 @@ export const sideBySideStructure: ComponentStructure = {
               addLabel: "Add Feature",
               itemLabel: "Feature",
               of: [
-                { key: "id", label: "ID", type: "text" },
                 { key: "title", label: "Title", type: "text" },
                 { key: "description", label: "Description", type: "text" },
                 {

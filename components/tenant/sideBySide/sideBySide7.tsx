@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
@@ -258,7 +258,32 @@ export default function SideBySide7(props: SideBySide7Props) {
   }
 
   // ─────────────────────────────────────────────────────────
-  // 8. RENDER
+  // 8. GENERATE RANDOM IDS FOR FEATURES
+  // ─────────────────────────────────────────────────────────
+  // Function to generate random ID
+  const generateRandomId = (): string => {
+    return `feature_${Math.random().toString(36).substring(2, 15)}_${Date.now()}`;
+  };
+
+  // Type for feature
+  type FeatureType = {
+    id?: string;
+    title?: string;
+    description?: string;
+    icon?: string;
+  };
+
+  // Generate features with random IDs
+  const featuresWithRandomIds = useMemo(() => {
+    const features: FeatureType[] = mergedData.content?.features || [];
+    return features.map((feature: FeatureType) => ({
+      ...feature,
+      id: generateRandomId(), // Always generate random ID, ignore database ID
+    }));
+  }, [mergedData.content?.features]);
+
+  // ─────────────────────────────────────────────────────────
+  // 9. RENDER
   // ─────────────────────────────────────────────────────────
   // Function to get icon component based on type or name
   const getFeatureIcon = (
@@ -373,7 +398,7 @@ export default function SideBySide7(props: SideBySide7Props) {
 
               {/* Icon Boxes */}
               <div className="space-y-6 md:space-y-8">
-                {(mergedData.content?.features || []).map(
+                {featuresWithRandomIds.map(
                   (
                     feature: {
                       id?: string;
