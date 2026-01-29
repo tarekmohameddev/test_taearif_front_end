@@ -492,75 +492,50 @@ export function getDefaultComponentForStaticPage(slug: string) {
       layout: { row: 0, col: 0, span: 2 },
     },
     blog: {
-      id: "blogDetails2",
-      type: "blogDetails",
-      name: "Blog Details",
-      componentName: "blogDetails2",
+      id: "blogsSections1",
+      type: "blogsSections",
+      name: "Blog List",
+      componentName: "blogsSections1",
       data: {
         visible: true,
+        paragraph1:
+          "نصمم رحلتك العقارية بخطى واثقة نجمع بين السلاسة في التعامل والاحترافية في الأداء، لنقدّم لك تجربة سلسة من أول استفسار حتى استلام المفتاح. نُراعي احتياجاتك، ونُرشدك نحو أفضل الخيارات بخبرة ودراية تامة.",
+        paragraph2:
+          "نمتلك فهماً عميقًا للسوق، وشغفًا بتقديم الأفضل لعملائنا. معنا، ستجد عقارك المثالي بسهولة وثقة.",
+        apiSettings: {
+          enabled: true,
+          endpoint: "/api/v1/tenant-website/{tenantId}/posts",
+          limit: 10,
+          page: 1,
+        },
+        styling: {
+          backgroundColor: "#8b5f46",
+          paragraphColor: "rgba(255, 255, 255, 0.9)",
+          dividerColor: "rgba(255, 255, 255, 0.3)",
+          cardBackgroundColor: "#ffffff",
+          cardTitleColor: "#1f2937",
+          cardTitleHoverColor: "#8b5f46",
+          cardDescriptionColor: "#4b5563",
+          readMoreColor: "#8b5f46",
+          readMoreHoverColor: "#6b4630",
+          dateColor: "#6b7280",
+        },
         layout: {
           maxWidth: "1280px",
           padding: {
-            top: "0rem",
+            top: "3rem",
             bottom: "3rem",
           },
-          gap: "2rem",
-        },
-        styling: {
-          backgroundColor: "#ffffff",
-          primaryColor: "#8b5f46",
-          textColor: "#967152",
-          secondaryTextColor: "#6b7280",
-          formBackgroundColor: "#8b5f46",
-          formTextColor: "#ffffff",
-          formButtonBackgroundColor: "#d4b996",
-          formButtonTextColor: "#7a5c43",
-        },
-        content: {
-          descriptionTitle: "وصف المقال",
-          specsTitle: "معلومات المقال",
-        },
-        displaySettings: {
-          showDescription: true,
-          showSpecs: true,
-          showVideoUrl: true,
-          showMap: true,
-        },
-        whatsApp: {
-          showButton: false,
-          buttonText: "استفسار عن طريق الواتساب",
-          phoneNumber: "",
-        },
-        hero: {
-          height: "500px",
-          overlayOpacity: 0.4,
-        },
-        gallery: {
-          showThumbnails: true,
-          thumbnailGridColumns: 4,
-          thumbnailHeight: "200px",
-        },
-        typography: {
-          title: {
-            fontSize: {
-              mobile: "2xl",
-              tablet: "3xl",
-              desktop: "4xl",
-            },
-            fontWeight: "bold",
-            fontFamily: "Tajawal",
+          gap: {
+            paragraphs: "2rem",
+            cards: "1.5rem",
           },
-          subtitle: {
-            fontSize: {
-              mobile: "base",
-              tablet: "lg",
-              desktop: "xl",
-            },
-            fontWeight: "normal",
-            fontFamily: "Tajawal",
+          gridColumns: {
+            mobile: 1,
+            tablet: 2,
+            desktop: 3,
           },
         },
-        blogSlug: "",
       },
       position: 0,
       layout: { row: 0, col: 0, span: 2 },

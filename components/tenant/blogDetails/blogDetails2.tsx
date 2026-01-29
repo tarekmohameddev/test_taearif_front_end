@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultBlogDetails2Data } from "@/context/editorStoreFunctions/blogDetailsFunctions";
@@ -319,7 +319,7 @@ export default function blogDetails2(props: blogDetails2Props) {
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
 
   // جلب بيانات المدونة
-  const fetchBlog = async () => {
+  const fetchBlog = useCallback(async () => {
     // ⭐ NEW: Use mock data in Live Editor
     if (isLiveEditor) {
       setBlog(mockBlog);
@@ -329,14 +329,21 @@ export default function blogDetails2(props: blogDetails2Props) {
       return;
     }
 
+    // Check if tenantId is available
+    if (!finalTenantId) {
+      setBlogError("لا يمكن تحميل البيانات: معرف المستأجر غير متوفر");
+      setLoadingBlog(false);
+      return;
+    }
+
     try {
       setLoadingBlog(true);
       setBlogError(null);
 
-      // Always use /api/posts/{slug} - no tenant ID needed
-      const response = await axiosInstance.get(
-        `/api/posts/${props.blogSlug}`,
-      );
+      // Use the public tenant-website API endpoint (no auth required)
+      const url = `/api/v1/tenant-website/${finalTenantId}/posts/${props.blogSlug}`;
+      
+      const response = await axiosInstance.get(url);
 
       // Handle API response format: response.data.data
       if (response.data && response.data.data) {
@@ -348,12 +355,17 @@ export default function blogDetails2(props: blogDetails2Props) {
       } else {
         setBlogError("المقال غير موجود");
       }
-    } catch (error) {
-      setBlogError("حدث خطأ في تحميل بيانات المقال");
+    } catch (error: any) {
+      console.error("BlogDetails2: Error fetching blog from API:", error);
+      setBlogError(
+        error.response?.status === 404
+          ? "المقال غير موجود"
+          : "حدث خطأ في تحميل بيانات المقال"
+      );
     } finally {
       setLoadingBlog(false);
     }
-  };
+  }, [isLiveEditor, finalTenantId, props.blogSlug]);
 
   // Get all images (thumbnail + media)
   const getAllImages = () => {
@@ -444,16 +456,8 @@ export default function blogDetails2(props: blogDetails2Props) {
 
   // جلب بيانات المدونة عند تحميل المكون
   useEffect(() => {
-    // ⭐ NEW: In Live Editor, always use mock data
-    if (isLiveEditor) {
-      fetchBlog();
-      return;
-    }
-
-    if (props.blogSlug) {
-      fetchBlog();
-    }
-  }, [props.blogSlug, isLiveEditor]);
+    fetchBlog();
+  }, [fetchBlog]);
 
   // تحديث الصورة الرئيسية عند تحميل المدونة
   useEffect(() => {
