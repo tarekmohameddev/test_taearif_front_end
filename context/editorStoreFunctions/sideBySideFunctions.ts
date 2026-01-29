@@ -262,6 +262,76 @@ export const getDefaultSideBySide6Data = (): ComponentData => ({
   },
 });
 
+// Default sideBySide7 data structure (ThemeTwo - same as halfTextHalfImage7)
+export const getDefaultSideBySide7Data = (): ComponentData => ({
+  visible: true,
+
+  layout: {
+    direction: "rtl",
+    maxWidth: "1350px",
+  },
+  spacing: {
+    padding: {
+      top: "3rem",
+      bottom: "4rem",
+      left: "1rem",
+      right: "1rem",
+    },
+  },
+  content: {
+    title: "خدمات موثوقة تستحق ثقتك",
+    features: [
+      {
+        id: "1",
+        title: "الشفافية",
+        description:
+          "نلتزم بالوضوح في جميع تعاملاتنا. نؤمن بأن الشفافية تبني الثقة، ولهذا نحرص على تزويدك بكل التفاصيل بصدق ومصداقية، دون مفاجآت أو معلومات مخفية.",
+        icon: "transparency",
+      },
+      {
+        id: "2",
+        title: "الالتزام",
+        description:
+          "نعمل من أجلك بكل إخلاص واحترافية. فريقنا ملتزم بتقديم أفضل الحلول العقارية، ويقف إلى جانبك خطوة بخطوة حتى تحقق هدفك، سواء بالشراء أو الاستثمار",
+        icon: "commitment",
+      },
+      {
+        id: "3",
+        title: "الابتكار",
+        description:
+          "نواكب المستقبل بخدمات ذكية. نستخدم أحدث الأدوات والمنصات لتوفير تجربة عقارية سلسة وسهلة، تجمع بين السرعة، الدقة، والراحة.",
+        icon: "innovation",
+      },
+    ],
+  },
+  styling: {
+    backgroundColor: "#f5f0e8",
+    titleColor: "#000000",
+    dividerColor: "#8b5f46",
+    featureTitleColor: "#8b5f46",
+    featureDescriptionColor: "#8b5f46",
+    iconBackgroundColor: "#d4a574",
+    iconColor: "#896042",
+  },
+  image: {
+    src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",
+    alt: "صورة",
+    visible: true,
+  },
+  responsive: {
+    mobile: {
+      imageOrder: 1,
+      textOrder: 2,
+      imageHeight: "h-[300px]",
+    },
+    desktop: {
+      imageOrder: 2,
+      textOrder: 1,
+      imageHeight: "md:min-h-[500px]",
+    },
+  },
+});
+
 export const sideBySideFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
@@ -286,6 +356,8 @@ export const sideBySideFunctions = {
       defaultData = getDefaultSideBySide2Data();
     } else if (variantId === "sideBySide6" || variantId.includes("sideBySide6")) {
       defaultData = getDefaultSideBySide6Data();
+    } else if (variantId === "sideBySide7" || variantId.includes("sideBySide7")) {
+      defaultData = getDefaultSideBySide7Data();
     } else {
       defaultData = getDefaultSideBySideData();
     }
@@ -313,6 +385,9 @@ export const sideBySideFunctions = {
     }
     if (variantId === "sideBySide6" || variantId.includes("sideBySide6")) {
       return state.sideBySideStates[variantId] || getDefaultSideBySide6Data();
+    }
+    if (variantId === "sideBySide7" || variantId.includes("sideBySide7")) {
+      return state.sideBySideStates[variantId] || getDefaultSideBySide7Data();
     }
     return state.sideBySideStates[variantId] || getDefaultSideBySideData();
   },
@@ -361,6 +436,8 @@ export const sideBySideFunctions = {
       defaultData = getDefaultSideBySide2Data();
     } else if (variantId === "sideBySide6" || variantId.includes("sideBySide6")) {
       defaultData = getDefaultSideBySide6Data();
+    } else if (variantId === "sideBySide7" || variantId.includes("sideBySide7")) {
+      defaultData = getDefaultSideBySide7Data();
     } else {
       defaultData = getDefaultSideBySideData();
     }
