@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
+import { useEditorT, useEditorLocale } from "@/context/editorI18nStore";
 
 interface ArrayFieldRendererProps {
   def: FieldDefinition;
@@ -19,6 +20,8 @@ export function ArrayFieldRenderer({
   getValueByPath,
   renderField,
 }: ArrayFieldRendererProps) {
+  const t = useEditorT();
+  const { locale } = useEditorLocale();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [nestedExpanded, setNestedExpanded] = useState<Record<string, boolean>>(
@@ -68,7 +71,7 @@ export function ArrayFieldRenderer({
             onClick={addItem}
             className="px-3 py-1.5 text-xs rounded-lg bg-slate-100 hover:bg-blue-100 border border-transparent hover:border-blue-300 transition-all duration-200"
           >
-            Add
+            {locale === "ar" ? t("live_editor.add") : "Add"}
           </button>
         </div>
         {items.map((it, idx) => (
@@ -84,7 +87,7 @@ export function ArrayFieldRenderer({
               onClick={() => removeItem(idx)}
               className="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600"
             >
-              Remove
+              {locale === "ar" ? t("live_editor.remove") : "Remove"}
             </button>
           </div>
         ))}
@@ -224,7 +227,7 @@ export function ArrayFieldRenderer({
 
     const base = candidate
       ? String(candidate).trim()
-      : `${arrDef.itemLabel || "Item"} ${idx + 1}`;
+      : `${arrDef.itemLabel || (locale === "ar" ? t("live_editor.item") : "Item")} ${idx + 1}`;
 
     // Truncate long titles
     return base.length > 50 ? base.substring(0, 47) + "..." : base;
@@ -242,7 +245,7 @@ export function ArrayFieldRenderer({
           <h5 className="font-medium text-slate-700 text-sm">{field.label}</h5>
           <div className="flex items-center space-x-2">
             <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-              {nestedItems.length} items
+              {nestedItems.length} {locale === "ar" ? t("live_editor.items") : "items"}
             </span>
             <button
               type="button"
@@ -267,7 +270,7 @@ export function ArrayFieldRenderer({
               }}
               className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
-              Add {field.itemLabel || "Item"}
+              {locale === "ar" ? t("live_editor.add") : "Add"} {field.itemLabel || (locale === "ar" ? t("live_editor.item") : "Item")}
             </button>
           </div>
         </div>
@@ -295,8 +298,8 @@ export function ArrayFieldRenderer({
                   }`}
                   title={
                     nestedExpanded[`${itemPath}.${field.key}.${nestedIdx}`]
-                      ? "Collapse"
-                      : "Expand"
+                      ? (locale === "ar" ? t("live_editor.collapse") : "Collapse")
+                      : (locale === "ar" ? t("live_editor.expand") : "Expand")
                   }
                 >
                   <svg
@@ -324,7 +327,7 @@ export function ArrayFieldRenderer({
                       : "text-orange-700"
                   }`}
                 >
-                  {field.itemLabel || "Item"} {nestedIdx + 1}
+                  {field.itemLabel || (locale === "ar" ? t("live_editor.item") : "Item")} {nestedIdx + 1}
                 </span>
               </div>
               <button
@@ -342,7 +345,7 @@ export function ArrayFieldRenderer({
                     : "text-orange-600 hover:text-orange-800"
                 }`}
               >
-                Remove
+                {locale === "ar" ? t("live_editor.remove") : "Remove"}
               </button>
             </div>
 
@@ -385,20 +388,22 @@ export function ArrayFieldRenderer({
     const parts: string[] = [];
 
     if (item?.type) {
-      parts.push(`Type: ${item.type}`);
+      parts.push(`${locale === "ar" ? t("live_editor.type") : "Type"}: ${item.type}`);
     }
 
     if (item?.submenu && Array.isArray(item.submenu)) {
       const totalSubItems = item.submenu.reduce((total: number, sub: any) => {
         return total + (Array.isArray(sub.items) ? sub.items.length : 0);
       }, 0);
+      const submenuText = locale === "ar" ? t("live_editor.submenu") : "submenu";
+      const itemsText = locale === "ar" ? t("live_editor.items") : "items";
       parts.push(
-        `${item.submenu.length} submenu${item.submenu.length !== 1 ? "s" : ""} (${totalSubItems} items)`,
+        `${item.submenu.length} ${submenuText}${item.submenu.length !== 1 && locale !== "ar" ? "s" : ""} (${totalSubItems} ${itemsText})`,
       );
     }
 
     if (item?.url) {
-      parts.push(`URL: ${item.url}`);
+      parts.push(`${locale === "ar" ? t("live_editor.url") : "URL"}: ${item.url}`);
     }
 
     return parts.join(" • ");
@@ -425,7 +430,7 @@ export function ArrayFieldRenderer({
             f.key.includes("name") ||
             f.key.includes("text")
           ) {
-            errors.push(`${f.label || f.key} is required`);
+            errors.push(`${f.label || f.key} ${locale === "ar" ? t("live_editor.is_required") : "is required"}`);
           }
         }
       }
@@ -450,30 +455,9 @@ export function ArrayFieldRenderer({
         }`}
       >
         <div className="flex items-center space-x-3">
-          <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-              allCollapsed
-                ? "bg-gradient-to-br from-orange-500 to-red-600"
-                : "bg-gradient-to-br from-amber-500 to-orange-600"
-            }`}
-          >
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 10h16M4 14h16M4 18h16"
-              />
-            </svg>
-          </div>
           <div>
             <span
-              className={`font-bold transition-all duration-300 ${
+              className={`font-bold transition-all duration-300  ${
                 allCollapsed ? "text-orange-800" : "text-slate-800"
               }`}
             >
@@ -484,7 +468,7 @@ export function ArrayFieldRenderer({
                 allCollapsed ? "text-orange-600" : "text-slate-500"
               }`}
             >
-              {items.length} items
+              {items.length} {locale === "ar" ? t("live_editor.items") : "items"}
             </p>
           </div>
         </div>
@@ -494,14 +478,14 @@ export function ArrayFieldRenderer({
             onClick={expandAll}
             className="px-3 py-2 text-xs rounded-lg bg-slate-100 hover:bg-blue-100 border border-transparent hover:border-blue-300 transition-all duration-200"
           >
-            Expand All
+            {locale === "ar" ? t("live_editor.expand_all") : "Expand All"}
           </button>
           <button
             type="button"
             onClick={collapseAll}
             className="px-3 py-2 text-xs rounded-lg bg-slate-100 hover:bg-purple-100 border border-transparent hover:border-purple-300 transition-all duration-200"
           >
-            Collapse All
+            {locale === "ar" ? t("live_editor.collapse_all") : "Collapse All"}
           </button>
           <button
             type="button"
@@ -512,7 +496,9 @@ export function ArrayFieldRenderer({
                 : "bg-slate-100 hover:bg-orange-100 border-transparent hover:border-orange-300 text-slate-700"
             }`}
           >
-            {allCollapsed ? "Expand" : "Collapse"}
+            {allCollapsed 
+              ? (locale === "ar" ? t("live_editor.expand") : "Expand")
+              : (locale === "ar" ? t("live_editor.collapse") : "Collapse")}
           </button>
           <button
             onClick={addItem}
@@ -533,7 +519,7 @@ export function ArrayFieldRenderer({
                   d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
               </svg>
-              <span className="text-sm">{arrDef.addLabel || "Add"}</span>
+              <span className="text-sm">{arrDef.addLabel || (locale === "ar" ? t("live_editor.add") : "Add")}</span>
             </div>
           </button>
         </div>
@@ -693,8 +679,8 @@ export function ArrayFieldRenderer({
                                   : "bg-indigo-100 text-indigo-800"
                               }`}
                             >
-                              {item.submenu.length} submenu
-                              {item.submenu.length !== 1 ? "s" : ""}
+                              {item.submenu.length} {locale === "ar" ? t("live_editor.submenu") : "submenu"}
+                              {item.submenu.length !== 1 && locale !== "ar" ? "s" : ""}
                             </span>
                           )}
                       </div>
@@ -723,7 +709,7 @@ export function ArrayFieldRenderer({
                         ? "bg-orange-100 hover:bg-orange-200 hover:border-orange-300"
                         : "bg-slate-100 hover:bg-blue-100 hover:border-blue-300"
                     }`}
-                    title="Move Up"
+                    title={locale === "ar" ? t("live_editor.move_up") : "Move Up"}
                   >
                     <svg
                       className={`w-3 h-3 transition-all duration-200 ${
@@ -754,7 +740,7 @@ export function ArrayFieldRenderer({
                         ? "bg-orange-100 hover:bg-orange-200 hover:border-orange-300"
                         : "bg-slate-100 hover:bg-blue-100 hover:border-blue-300"
                     }`}
-                    title="Move Down"
+                    title={locale === "ar" ? t("live_editor.move_down") : "Move Down"}
                   >
                     <svg
                       className={`w-3 h-3 transition-all duration-200 ${
@@ -784,7 +770,7 @@ export function ArrayFieldRenderer({
                         ? "bg-orange-100 hover:bg-orange-200 hover:border-orange-300"
                         : "bg-slate-100 hover:bg-green-100 hover:border-green-300"
                     }`}
-                    title="Duplicate Item"
+                    title={locale === "ar" ? t("live_editor.duplicate_item") : "Duplicate Item"}
                   >
                     <svg
                       className={`w-3 h-3 transition-all duration-200 ${
@@ -814,7 +800,7 @@ export function ArrayFieldRenderer({
                         ? "bg-orange-100 hover:bg-orange-200 hover:border-orange-300"
                         : "bg-slate-100 hover:bg-yellow-100 hover:border-yellow-300"
                     }`}
-                    title="Clear Item"
+                    title={locale === "ar" ? t("live_editor.clear_item") : "Clear Item"}
                   >
                     <svg
                       className={`w-3 h-3 transition-all duration-200 ${
@@ -847,7 +833,7 @@ export function ArrayFieldRenderer({
                         ? "bg-orange-50 hover:bg-orange-100 border-orange-200 hover:border-orange-300 text-orange-600"
                         : "bg-red-50 hover:bg-red-100 border-red-200 hover:border-red-300 text-red-600"
                     }`}
-                    title="Delete Item"
+                    title={locale === "ar" ? t("live_editor.delete_item") : "Delete Item"}
                   >
                     <svg
                       className={`w-3 h-3 transition-all duration-200 ${
@@ -952,7 +938,9 @@ export function ArrayFieldRenderer({
                 allCollapsed ? "text-orange-700" : "text-slate-700"
               }`}
             >
-              No {arrDef.itemLabel || "items"} yet
+              {locale === "ar" 
+                ? `لا توجد ${arrDef.itemLabel || t("live_editor.items")} بعد`
+                : `No ${arrDef.itemLabel || "items"} yet`}
             </h3>
             <p
               className={`text-sm mb-4 max-w-sm mx-auto transition-all duration-200 ${
@@ -960,8 +948,10 @@ export function ArrayFieldRenderer({
               }`}
             >
               {arrDef.itemLabel
-                ? `Add your first ${arrDef.itemLabel.toLowerCase()} to get started`
-                : "Click the Add button to create your first item"}
+                ? (locale === "ar" 
+                    ? `أضف أول ${arrDef.itemLabel.toLowerCase()} للبدء`
+                    : `Add your first ${arrDef.itemLabel.toLowerCase()} to get started`)
+                : (locale === "ar" ? t("live_editor.click_add_to_create") : "Click the Add button to create your first item")}
             </p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center">
               <button
@@ -972,7 +962,7 @@ export function ArrayFieldRenderer({
                     : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
                 }`}
               >
-                Add {arrDef.itemLabel || "Item"}
+                {locale === "ar" ? t("live_editor.add") : "Add"} {arrDef.itemLabel || (locale === "ar" ? t("live_editor.item") : "Item")}
               </button>
               {arrDef.of &&
                 Array.isArray(arrDef.of) &&
@@ -991,7 +981,7 @@ export function ArrayFieldRenderer({
                         : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                     }`}
                   >
-                    Add 3 {arrDef.itemLabel || "Items"}
+                    {locale === "ar" ? t("live_editor.add_3_items") : `Add 3 ${arrDef.itemLabel || "Items"}`}
                   </button>
                 )}
             </div>
