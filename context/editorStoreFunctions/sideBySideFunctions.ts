@@ -332,6 +332,38 @@ export const getDefaultSideBySide7Data = (): ComponentData => ({
   },
 });
 
+// ═══════════════════════════════════════════════════════════
+// HELPER FUNCTION: Get componentName from pageComponentsByPage
+// ═══════════════════════════════════════════════════════════
+/**
+ * Helper function to get componentName from pageComponentsByPage
+ * This is needed when variantId is a UUID and we need to determine the variant type
+ * 
+ * @param state - Current editorStore state
+ * @param variantId - Unique component ID (UUID)
+ * @returns componentName (e.g., "sideBySide6") or null if not found
+ */
+const getComponentNameFromPageComponents = (
+  state: any,
+  variantId: string,
+): string | null => {
+  // Search through all pages in pageComponentsByPage
+  for (const [pageSlug, pageComponents] of Object.entries(
+    state.pageComponentsByPage || {},
+  )) {
+    if (Array.isArray(pageComponents)) {
+      const component = pageComponents.find(
+        (comp: any) =>
+          comp.type === "sideBySide" && comp.id === variantId,
+      );
+      if (component?.componentName) {
+        return component.componentName;
+      }
+    }
+  }
+  return null;
+};
+
 export const sideBySideFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
@@ -350,13 +382,31 @@ export const sideBySideFunctions = {
       return {} as any; // Already exists, skip initialization
     }
 
-    // Determine default data based on variantId
+    // ⭐ FIX: Get componentName from pageComponentsByPage if variantId is UUID
+    let actualVariantId = variantId;
+    if (!variantId.includes("sideBySide")) {
+      const componentName = getComponentNameFromPageComponents(state, variantId);
+      if (componentName) {
+        actualVariantId = componentName;
+      }
+    }
+
+    // Determine default data based on actualVariantId
     let defaultData: ComponentData;
-    if (variantId === "sideBySide2" || variantId.includes("sideBySide2")) {
+    if (
+      actualVariantId === "sideBySide2" ||
+      actualVariantId.includes("sideBySide2")
+    ) {
       defaultData = getDefaultSideBySide2Data();
-    } else if (variantId === "sideBySide6" || variantId.includes("sideBySide6")) {
+    } else if (
+      actualVariantId === "sideBySide6" ||
+      actualVariantId.includes("sideBySide6")
+    ) {
       defaultData = getDefaultSideBySide6Data();
-    } else if (variantId === "sideBySide7" || variantId.includes("sideBySide7")) {
+    } else if (
+      actualVariantId === "sideBySide7" ||
+      actualVariantId.includes("sideBySide7")
+    ) {
       defaultData = getDefaultSideBySide7Data();
     } else {
       defaultData = getDefaultSideBySideData();
@@ -379,14 +429,32 @@ export const sideBySideFunctions = {
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) => {
-    // Determine default data based on variantId
-    if (variantId === "sideBySide2" || variantId.includes("sideBySide2")) {
+    // ⭐ FIX: Get componentName from pageComponentsByPage if variantId is UUID
+    let actualVariantId = variantId;
+    if (!variantId.includes("sideBySide")) {
+      const componentName = getComponentNameFromPageComponents(state, variantId);
+      if (componentName) {
+        actualVariantId = componentName;
+      }
+    }
+
+    // Determine default data based on actualVariantId
+    if (
+      actualVariantId === "sideBySide2" ||
+      actualVariantId.includes("sideBySide2")
+    ) {
       return state.sideBySideStates[variantId] || getDefaultSideBySide2Data();
     }
-    if (variantId === "sideBySide6" || variantId.includes("sideBySide6")) {
+    if (
+      actualVariantId === "sideBySide6" ||
+      actualVariantId.includes("sideBySide6")
+    ) {
       return state.sideBySideStates[variantId] || getDefaultSideBySide6Data();
     }
-    if (variantId === "sideBySide7" || variantId.includes("sideBySide7")) {
+    if (
+      actualVariantId === "sideBySide7" ||
+      actualVariantId.includes("sideBySide7")
+    ) {
       return state.sideBySideStates[variantId] || getDefaultSideBySide7Data();
     }
     return state.sideBySideStates[variantId] || getDefaultSideBySideData();
@@ -430,13 +498,31 @@ export const sideBySideFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    // Determine default data based on variantId
+    // ⭐ FIX: Get componentName from pageComponentsByPage if variantId is UUID
+    let actualVariantId = variantId;
+    if (!variantId.includes("sideBySide")) {
+      const componentName = getComponentNameFromPageComponents(state, variantId);
+      if (componentName) {
+        actualVariantId = componentName;
+      }
+    }
+
+    // Determine default data based on actualVariantId
     let defaultData: ComponentData;
-    if (variantId === "sideBySide2" || variantId.includes("sideBySide2")) {
+    if (
+      actualVariantId === "sideBySide2" ||
+      actualVariantId.includes("sideBySide2")
+    ) {
       defaultData = getDefaultSideBySide2Data();
-    } else if (variantId === "sideBySide6" || variantId.includes("sideBySide6")) {
+    } else if (
+      actualVariantId === "sideBySide6" ||
+      actualVariantId.includes("sideBySide6")
+    ) {
       defaultData = getDefaultSideBySide6Data();
-    } else if (variantId === "sideBySide7" || variantId.includes("sideBySide7")) {
+    } else if (
+      actualVariantId === "sideBySide7" ||
+      actualVariantId.includes("sideBySide7")
+    ) {
       defaultData = getDefaultSideBySide7Data();
     } else {
       defaultData = getDefaultSideBySideData();
