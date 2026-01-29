@@ -200,26 +200,14 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
   return (
     <div className="space-y-8">
       {/* Theme Selector */}
-      <div className="group relative p-6 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 rounded-2xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-all duration-300">
+      <div 
+        className="group relative p-6 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 rounded-2xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-all duration-300"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div className="relative">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
-                  />
-                </svg>
-              </div>
               <h4 className="text-lg font-bold text-slate-800">
                 {t("editor_sidebar.component_theme")}
               </h4>
@@ -228,10 +216,7 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
               {getComponentName()}
             </span>
           </div>
-          <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-            {t("editor_sidebar.switch_visual_styles")}
-          </p>
-          <div className="space-y-4">
+          <div className="flex items-center gap-3">
             {/* Special handling for global-header and global-footer */}
             {selectedComponent.id === "global-header" ? (
               <ThemeSelector
@@ -315,7 +300,7 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                     // Silently handle error
                   }
                 }}
-                className="w-full"
+                className="flex-1"
               />
             ) : selectedComponent.id === "global-footer" ? (
               <ThemeSelector
@@ -391,7 +376,7 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                     // Silently handle error
                   }
                 }}
-                className="w-full"
+                className="flex-1"
               />
             ) : (
               <ThemeSelector
@@ -402,22 +387,20 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
                     onComponentThemeChange(selectedComponent.id, newTheme);
                   }
                 }}
-                className="w-full"
+                className="flex-1"
               />
             )}
 
-            <div className="pt-2 border-t border-purple-200/50">
-              <ResetConfirmDialog
-                componentType={selectedComponent.type}
-                componentName={selectedComponent.componentName}
-                onConfirmReset={() => {
-                  if (onComponentReset && selectedComponent) {
-                    onComponentReset(selectedComponent.id);
-                  }
-                }}
-                className="w-full"
-              />
-            </div>
+            <ResetConfirmDialog
+              componentType={selectedComponent.type}
+              componentName={selectedComponent.componentName}
+              onConfirmReset={() => {
+                if (onComponentReset && selectedComponent) {
+                  onComponentReset(selectedComponent.id);
+                }
+              }}
+              className="flex-1"
+            />
           </div>
         </div>
       </div>
