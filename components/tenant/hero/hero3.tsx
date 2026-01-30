@@ -137,8 +137,10 @@ interface HeroProps {
 // Search Form Component - Memoized to prevent unnecessary re-renders
 const SearchForm = React.memo(function SearchForm({
   config,
+  savedConfig,
 }: {
   config: any;
+  savedConfig?: any; // Saved data from heroStates/pageComponentsByPage (not tempData)
 }) {
   const { navigateWithFilters } = useUrlFilters();
   const searchParams = useSearchParams();
@@ -148,8 +150,14 @@ const SearchForm = React.memo(function SearchForm({
   // This hook automatically detects if we're in live editor and uses the appropriate store
   const brandingColors = useBrandingColors();
   
+  // ✅ FIX: Use savedConfig (from heroStates/pageComponentsByPage) instead of config (which may include tempData)
+  // This makes it behave like "height" field - changes only appear after "Save Changes"
+  // Priority: savedConfig (saved data) > config (mergedData)
+  const sourceConfig = savedConfig || config;
+  
   // Helper function to get color based on useDefaultColor and globalColorType
   const getButtonColor = (): string => {
+    
     // ColorFieldRendererWithToggle saves data in this structure:
     // When useDefaultColor = true:
     //   - buttons.color.useDefaultColor = true
@@ -159,26 +167,14 @@ const SearchForm = React.memo(function SearchForm({
     //   - buttons.color = "#hexcolor" (direct string)
     //   - buttons.color.useDefaultColor = false (stored at buttons.color.useDefaultColor)
     
-    const colorField = config?.buttons?.color;
+    const colorField = sourceConfig?.buttons?.color;
     
-    // Get useDefaultColor and globalColorType from the color field
-    // They are stored at buttons.color.useDefaultColor and buttons.color.globalColorType
-    // Check both in the object itself and at the path level
-    let useDefaultColorValue: boolean | undefined;
-    let globalColorTypeValue: string | undefined;
-    
-    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
-      useDefaultColorValue = colorField.useDefaultColor;
-      globalColorTypeValue = colorField.globalColorType;
-    }
-    
-    // Also check at the path level (ColorFieldRendererWithToggle stores them separately)
-    if (useDefaultColorValue === undefined) {
-      useDefaultColorValue = config?.buttons?.color?.useDefaultColor;
-    }
-    if (globalColorTypeValue === undefined) {
-      globalColorTypeValue = config?.buttons?.color?.globalColorType;
-    }
+    // ✅ FIX: Read useDefaultColor from path FIRST, before checking colorField type
+    // When useDefaultColor = false, colorField is a string, so we can't read useDefaultColor from it
+    // But useDefaultColor is stored at buttons.color.useDefaultColor (separate path)
+    // Use sourceConfig (savedConfig or config) to read from saved state first
+    const useDefaultColorValue = sourceConfig?.buttons?.color?.useDefaultColor;
+    const globalColorTypeValue = sourceConfig?.buttons?.color?.globalColorType;
     
     // Check useDefaultColor value (default is true if not specified)
     const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
@@ -192,8 +188,8 @@ const SearchForm = React.memo(function SearchForm({
       return brandingColor;
     }
     
-    // If useDefaultColor is false, try to get custom color
-    // The color is stored as a string directly at buttons.color
+    // ✅ FIX: If useDefaultColor is false, colorField should be a string
+    // Read it directly (it's stored as string at buttons.color)
     if (
       colorField &&
       typeof colorField === "string" &&
@@ -203,7 +199,7 @@ const SearchForm = React.memo(function SearchForm({
       return colorField.trim();
     }
     
-    // If colorField is an object, check for value property
+    // If colorField is an object (shouldn't happen when useDefaultColor = false, but handle it)
     if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
       if (
         colorField.value &&
@@ -837,10 +833,24 @@ function Hero3(props: HeroProps) {
   // ─────────────────────────────────────────────────────────
   const mergedData = useMemo(() => ({
     ...getDefaultHero3Data(), // 1. Defaults (lowest priority)
-    ...storeData, // 2. Store state
-    ...currentStoreData, // 3. Current store data
+    ...storeData, // 2. Store state (from heroStates - saved data)
+    ...currentStoreData, // 3. Current store data (from pageComponentsByPage - saved data)
     ...props, // 4. Props (highest priority)
+    // Note: tempData is NOT included here - this makes it behave like "height" field
   }), [storeData, currentStoreData, props]);
+  
+  // ✅ FIX: Get saved searchForm data (from heroStates/pageComponentsByPage, not tempData)
+  // This ensures changes only appear after "Save Changes" button is pressed
+  const savedSearchForm = useMemo(() => {
+    // Priority: storeData > currentStoreData > mergedData.searchForm
+    if (storeData?.searchForm) {
+      return storeData.searchForm;
+    }
+    if (currentStoreData?.searchForm) {
+      return currentStoreData.searchForm;
+    }
+    return mergedData.searchForm;
+  }, [storeData, currentStoreData, mergedData.searchForm]);
 
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
@@ -1049,6 +1059,7 @@ function Hero3(props: HeroProps) {
               <div className="w-full pointer-events-auto flex items-center justify-center">
                 <SearchForm
                   config={mergedData.searchForm}
+                  savedConfig={savedSearchForm}
                 />
               </div>
             )}
@@ -1083,6 +1094,7 @@ function Hero3(props: HeroProps) {
               <div className="w-full px-4 pointer-events-auto">
                 <SearchForm
                   config={mergedData.searchForm}
+                  savedConfig={savedSearchForm}
                 />
               </div>
             )}

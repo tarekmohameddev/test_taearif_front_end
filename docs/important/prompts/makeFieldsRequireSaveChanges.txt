@@ -1,0 +1,371 @@
+# PROMPT: Make Component Fields Require "Save Changes" Button
+
+## 🎯 Objective
+
+This prompt explains how to make all component fields behave like the "height" field - where changes are saved to `tempData` but only appear in the iframe after clicking "Save Changes" button, not immediately.
+
+**Use this prompt with a component name to apply this behavior to all fields in that component.**
+
+---
+
+## 📋 Problem Statement
+
+### Current Behavior (Inconsistent):
+- **Some fields** (like "Search Buttons" color): Changes appear **immediately** in iframe
+- **Other fields** (like "height"): Changes only appear **after "Save Changes"** button
+
+### Desired Behavior (Consistent):
+- **All fields** should require "Save Changes" button before appearing in iframe
+- Changes are saved to `tempData` during editing
+- Changes are transferred to `heroStates` / `pageComponentsByPage` only after "Save Changes"
+
+---
+
+## 🔍 Root Cause Analysis
+
+### Why Some Fields Appear Immediately:
+
+1. **Component reads from `tempData` directly:**
+   ```typescript
+   // ❌ BAD: Reads from tempData (appears immediately)
+   const colorField = config?.buttons?.color; // config comes from mergedData which may include tempData
+   ```
+
+2. **Component reads from `mergedData` which includes `tempData`:**
+   ```typescript
+   // ❌ BAD: mergedData may include tempData
+   const mergedData = {
+     ...defaultData,
+     ...tempData,  // This causes immediate updates
+     ...storeData,
+     ...props
+   };
+   ```
+
+### Why "Height" Field Requires Save:
+
+1. **Component reads from `heroStates` and `pageComponentsByPage`:**
+   ```typescript
+   // ✅ GOOD: Reads from saved states only
+   const storeData = heroStates[uniqueId];
+   const currentStoreData = getComponentData("hero", uniqueId);
+   
+   const mergedData = {
+     ...defaultData,
+     ...storeData,        // From heroStates (saved data)
+     ...currentStoreData, // From pageComponentsByPage (saved data)
+     ...props
+     // Note: tempData is NOT included
+   };
+   ```
+
+---
+
+## 📋 Implementation Steps
+
+### Step 1: Identify the Component
+
+**Component Name:** `{COMPONENT_NAME}` (e.g., "hero", "halfTextHalfImage", etc.)
+
+**Component File:** `components/tenant/{COMPONENT_NAME}/{COMPONENT_NAME}1.tsx` (or appropriate variant)
+
+---
+
+### Step 2: Check Current Data Merging
+
+Find where the component merges data. Look for:
+
+```typescript
+const mergedData = useMemo(() => ({
+  ...getDefault{Component}Data(),
+  ...storeData,
+  ...currentStoreData,
+  ...props,
+}), [storeData, currentStoreData, props]);
+```
+
+**✅ GOOD:** If `tempData` is NOT included in `mergedData`, skip to Step 4.
+
+**❌ BAD:** If `tempData` is included or if sub-components read from `tempData`, continue to Step 3.
+
+---
+
+### Step 3: Fix Sub-Components That Read from tempData
+
+If your component has sub-components (like `SearchForm` in `hero3`), they may be reading from `tempData` indirectly.
+
+#### 3.1. Identify Sub-Components
+
+Look for memoized components or separate components that receive `config` or `mergedData`:
+
+```typescript
+const SubComponent = React.memo(function SubComponent({
+  config,
+}: {
+  config: any;
+}) {
+  // This config may come from mergedData which includes tempData
+  const fieldValue = config?.someField;
+});
+```
+
+#### 3.2. Create Saved Data Source
+
+In the main component, create a saved data source (from `heroStates` / `pageComponentsByPage`):
+
+```typescript
+// In main component (e.g., Hero3)
+const storeData = {componentType}States[uniqueId];
+const currentStoreData = getComponentData("{componentType}", uniqueId);
+
+// ✅ Create saved data for sub-component
+const savedSubComponentData = useMemo(() => {
+  // Priority: storeData > currentStoreData > mergedData
+  if (storeData?.subComponentField) {
+    return storeData.subComponentField;
+  }
+  if (currentStoreData?.subComponentField) {
+    return currentStoreData.subComponentField;
+  }
+  return mergedData.subComponentField;
+}, [storeData, currentStoreData, mergedData.subComponentField]);
+```
+
+#### 3.3. Pass Saved Data to Sub-Component
+
+```typescript
+<SubComponent
+  config={mergedData.subComponentField}
+  savedConfig={savedSubComponentData}  // ✅ Pass saved data
+/>
+```
+
+#### 3.4. Update Sub-Component to Use Saved Data
+
+```typescript
+const SubComponent = React.memo(function SubComponent({
+  config,
+  savedConfig,  // ✅ Add savedConfig prop
+}: {
+  config: any;
+  savedConfig?: any;  // Saved data from heroStates/pageComponentsByPage
+}) {
+  // ✅ Use savedConfig first (from saved states), fallback to config
+  const sourceConfig = savedConfig || config;
+  
+  // Now use sourceConfig instead of config
+  const fieldValue = sourceConfig?.someField;
+});
+```
+
+---
+
+### Step 4: Verify Data Flow
+
+#### 4.1. Check Data Sources
+
+Ensure component reads from:
+- ✅ `{componentType}States[uniqueId]` (saved data)
+- ✅ `getComponentData("{componentType}", uniqueId)` (saved data)
+- ❌ NOT from `tempData` directly
+
+#### 4.2. Check mergedData
+
+Ensure `mergedData` does NOT include `tempData`:
+
+```typescript
+// ✅ GOOD
+const mergedData = useMemo(() => ({
+  ...getDefault{Component}Data(),
+  ...storeData,        // From {componentType}States (saved)
+  ...currentStoreData, // From getComponentData (saved)
+  ...props,
+  // tempData is NOT included
+}), [storeData, currentStoreData, props]);
+```
+
+#### 4.3. Check Sub-Components
+
+If component has sub-components:
+- ✅ They receive `savedConfig` prop
+- ✅ They use `savedConfig` instead of `config`
+- ✅ `savedConfig` comes from `storeData` / `currentStoreData`
+
+---
+
+## 📝 Complete Example: Hero3 Search Buttons
+
+### Before (Appears Immediately):
+
+```typescript
+// ❌ BAD: SearchForm reads from config which may include tempData
+const SearchForm = React.memo(function SearchForm({
+  config,
+}: {
+  config: any;
+}) {
+  const colorField = config?.buttons?.color; // May come from tempData
+  // ...
+});
+
+// In Hero3 component:
+<SearchForm config={mergedData.searchForm} />
+```
+
+### After (Requires Save Changes):
+
+```typescript
+// ✅ GOOD: SearchForm reads from savedConfig (saved data only)
+const SearchForm = React.memo(function SearchForm({
+  config,
+  savedConfig,  // ✅ Added savedConfig prop
+}: {
+  config: any;
+  savedConfig?: any;
+}) {
+  // ✅ Use savedConfig first (from saved states)
+  const sourceConfig = savedConfig || config;
+  const colorField = sourceConfig?.buttons?.color;
+  // ...
+});
+
+// In Hero3 component:
+// ✅ Create saved data source
+const savedSearchForm = useMemo(() => {
+  if (storeData?.searchForm) return storeData.searchForm;
+  if (currentStoreData?.searchForm) return currentStoreData.searchForm;
+  return mergedData.searchForm;
+}, [storeData, currentStoreData, mergedData.searchForm]);
+
+// ✅ Pass savedConfig to sub-component
+<SearchForm
+  config={mergedData.searchForm}
+  savedConfig={savedSearchForm}  // ✅ Pass saved data
+/>
+```
+
+---
+
+## 🔧 Template for Any Component
+
+### Template Code:
+
+```typescript
+// In {ComponentName} component file
+
+// 1. Get saved data from store
+const storeData = {componentType}States[uniqueId];
+const currentStoreData = getComponentData("{componentType}", uniqueId);
+
+// 2. Merge data (DO NOT include tempData)
+const mergedData = useMemo(() => ({
+  ...getDefault{Component}Data(),
+  ...storeData,        // From {componentType}States (saved)
+  ...currentStoreData, // From getComponentData (saved)
+  ...props,
+  // ✅ tempData is NOT included
+}), [storeData, currentStoreData, props]);
+
+// 3. If component has sub-components, create saved data sources
+const savedSubComponentData = useMemo(() => {
+  if (storeData?.subComponentField) return storeData.subComponentField;
+  if (currentStoreData?.subComponentField) return currentStoreData.subComponentField;
+  return mergedData.subComponentField;
+}, [storeData, currentStoreData, mergedData.subComponentField]);
+
+// 4. Pass saved data to sub-components
+<SubComponent
+  config={mergedData.subComponentField}
+  savedConfig={savedSubComponentData}  // ✅ Pass saved data
+/>
+
+// 5. In sub-component, use savedConfig
+const SubComponent = ({ config, savedConfig }) => {
+  const sourceConfig = savedConfig || config;  // ✅ Use saved data first
+  // Use sourceConfig instead of config
+};
+```
+
+---
+
+## ✅ Checklist
+
+After applying this prompt to a component:
+
+- [ ] Component reads from `{componentType}States[uniqueId]` and `getComponentData()`
+- [ ] `mergedData` does NOT include `tempData`
+- [ ] All sub-components receive `savedConfig` prop
+- [ ] Sub-components use `savedConfig` instead of `config`
+- [ ] Changes are saved to `tempData` during editing
+- [ ] Changes only appear in iframe after "Save Changes" button
+- [ ] Behavior matches "height" field (requires Save Changes)
+
+---
+
+## 🎯 Expected Result
+
+After applying this prompt:
+
+1. ✅ All fields in the component require "Save Changes" button
+2. ✅ Changes are saved to `tempData` during editing
+3. ✅ Changes are transferred to `{componentType}States` / `pageComponentsByPage` on Save
+4. ✅ Changes appear in iframe only after "Save Changes"
+5. ✅ Consistent behavior across all fields (like "height" field)
+
+---
+
+## 📚 Key Concepts
+
+### Data Flow:
+
+```
+User edits field
+    ↓
+updateByPath() → tempData (temporary storage)
+    ↓
+User clicks "Save Changes"
+    ↓
+tempData → {componentType}States[uniqueId] (saved)
+tempData → pageComponentsByPage[currentPage] (saved)
+    ↓
+Component reads from {componentType}States (saved data)
+    ↓
+Changes appear in iframe
+```
+
+### State Hierarchy:
+
+1. **tempData**: Temporary changes (not visible in iframe)
+2. **{componentType}States**: Saved component state (visible in iframe)
+3. **pageComponentsByPage**: Saved page-level state (visible in iframe)
+
+### Component Should Read From:
+
+- ✅ `{componentType}States[uniqueId]` (saved)
+- ✅ `getComponentData("{componentType}", uniqueId)` (saved)
+- ❌ NOT from `tempData` (temporary)
+
+---
+
+## 🚀 Usage
+
+**To apply this to a component:**
+
+1. Replace `{COMPONENT_NAME}` with component name (e.g., "hero", "halfTextHalfImage")
+2. Replace `{componentType}` with component type (e.g., "hero", "halfTextHalfImage")
+3. Replace `{ComponentName}` with PascalCase component name (e.g., "Hero", "HalfTextHalfImage")
+4. Follow all steps in order
+5. Test that changes require "Save Changes" button
+
+---
+
+## 📝 Notes
+
+- This ensures **consistent behavior** across all fields
+- All fields will behave like "height" field (require Save Changes)
+- Changes are still saved to `tempData` for undo/redo functionality
+- Only the **display** in iframe is delayed until Save Changes
+
+---
+
+**Created to make all component fields require "Save Changes" button, ensuring consistent behavior like the "height" field.**
