@@ -635,6 +635,7 @@ export const footerStructure: ComponentStructure = {
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 { key: "title", label: "Title", type: "text" },
                 { key: "description", label: "Description", type: "text" },
+                { key: "formEnabled", label: "Show Form", type: "boolean" },
                 { key: "placeholder", label: "Placeholder", type: "text" },
                 { key: "buttonText", label: "Button Text", type: "text" },
               ],
@@ -664,7 +665,23 @@ export const footerStructure: ComponentStructure = {
                   itemLabel: "Platform",
                   of: [
                     { key: "name", label: "Platform Name", type: "text" },
+                    {
+                      key: "icon",
+                      label: "Icon",
+                      type: "select",
+                      options: [
+                        { label: "واتساب", value: "FaWhatsapp" },
+                        { label: "لينكد إن", value: "Linkedin" },
+                        { label: "إنستغرام", value: "Instagram" },
+                        { label: "تويتر", value: "Twitter" },
+                        { label: "فيسبوك", value: "Facebook" },
+                        { label: "سناب شات", value: "Snapchat" },
+                        { label: "تيك توك", value: "Tiktok" },
+                        { label: "يوتيوب", value: "Youtube" },
+                      ],
+                    },
                     { key: "url", label: "URL", type: "text" },
+                    { key: "color", label: "Hover Color", type: "color" },
                   ],
                 },
                 {

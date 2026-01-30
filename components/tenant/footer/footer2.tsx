@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
-import { MapPin } from "lucide-react";
+import { MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { FaWhatsapp, FaYoutube, FaSnapchat, FaTiktok } from "react-icons/fa";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultFooter2Data } from "@/context/editorStoreFunctions/footerFunctions";
@@ -430,6 +431,26 @@ export default function Footer2(props: Footer2Props) {
     };
   }, [textAndLinksColor]);
 
+  // Function to get icon component based on icon name or platform name (for backward compatibility)
+  const getIconComponent = (iconName?: string, platformName?: string) => {
+    const iconMap: { [key: string]: any } = {
+      // Icon names (new format)
+      FaWhatsapp: FaWhatsapp,
+      Linkedin: Linkedin,
+      Instagram: Instagram,
+      Twitter: Twitter,
+      Facebook: Facebook,
+      Youtube: FaYoutube,
+      Snapchat: FaSnapchat,
+      Tiktok: FaTiktok,
+      // Platform names (old format - fallback)
+      "YouTube": FaYoutube,
+      "X (Twitter)": Twitter,
+      "TikTok": FaTiktok,
+    };
+    return iconMap[iconName || platformName || ""] || MapPin;
+  };
+
   return (
     <>
       <footer
@@ -558,16 +579,20 @@ export default function Footer2(props: Footer2Props) {
                     "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
                 )}
               </p>
-            </div>
+            </div>  
 
+
+          <div className="flex flex-col lg:flex-col items-center justify-center">
             {/* Left Section - Newsletter */}
+            {mergedData.content?.newsletter?.enabled && (
+
             <div className="w-full lg:w-1/2 xl:w-3/5 ">
               <h5 className="text-xl font-bold mb-4" style={{ color: textAndLinksColor }}>
                 {replaceBaheya(
                   mergedData.content?.newsletter?.title ||
                     "اشترك في النشرة البريدية",
                 )}
-              </h5>
+              </h5> 
               <p className="text-base leading-relaxed mb-6" style={{ color: textAndLinksColor, opacity: 0.9 }}>
                 {replaceBaheya(
                   mergedData.content?.newsletter?.description ||
@@ -576,125 +601,80 @@ export default function Footer2(props: Footer2Props) {
               </p>
 
               {/* Newsletter Form */}
-            {mergedData.content?.newsletter?.enabled && (
-              <form
-                onSubmit={handleNewsletterSubmit}
-                className="flex flex-col sm:flex-row gap-3 mb-8"
-              >
-                <input
-                  type="tel"
-                  value={whatsappNumber}
-                  onChange={(e) => setWhatsappNumber(e.target.value)}
-                  placeholder={replaceBaheya(
-                    mergedData.content?.newsletter?.placeholder ||
-                      "رقم الواتساب",
-                  )}
-                  required
-                  pattern="[0-9()#&+*-=.]+"
-                  title="يتم قبول الأرقام وأحرف الهاتف فقط (#، - ، *، إلخ)."
-                  className="flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50 footer2-newsletter-input"
-                  style={{ 
-                    color: textAndLinksColor,
-                    backgroundColor: darkerBgColor,
-                  }}
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
-                  style={{ 
-                    color: textAndLinksColor,
-                    backgroundColor: darkerBgColor,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = darkenColor(footerBgColor, 25);
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = darkerBgColor;
-                  }}
+              {mergedData.content?.newsletter?.formEnabled && (
+                <form
+                  onSubmit={handleNewsletterSubmit}
+                  className="flex flex-col sm:flex-row gap-3 mb-8"
                 >
-                  {replaceBaheya(
-                    mergedData.content?.newsletter?.buttonText || "اشترك الآن",
-                  )}
-                </button>
-              </form>
+                  <input
+                    type="tel"
+                    value={whatsappNumber}
+                    onChange={(e) => setWhatsappNumber(e.target.value)}
+                    placeholder={replaceBaheya(
+                      mergedData.content?.newsletter?.placeholder ||
+                        "رقم الواتساب",
+                    )}
+                    required
+                    pattern="[0-9()#&+*-=.]+"
+                    title="يتم قبول الأرقام وأحرف الهاتف فقط (#، - ، *، إلخ)."
+                    className="flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50 footer2-newsletter-input"
+                    style={{ 
+                      color: textAndLinksColor,
+                      backgroundColor: darkerBgColor,
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    className="px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
+                    style={{ 
+                      color: textAndLinksColor,
+                      backgroundColor: darkerBgColor,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = darkenColor(footerBgColor, 25);
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = darkerBgColor;
+                    }}
+                  >
+                    {replaceBaheya(
+                      mergedData.content?.newsletter?.buttonText || "اشترك الآن",
+                    )}
+                  </button>
+                </form>
+              )}
+              </div>
 )}
               {/* Social Media Icons */}
-              <div className="flex items-center gap-4">
-                {mergedData.content?.socialMedia?.platforms?.map(
-                  (platform: any, index: number) => (
-                    <a
-                      key={index}
-                      href={platform.url || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition-opacity"
-                      aria-label={platform.name}
-                      style={{ color: textAndLinksColor }}
-                    >
-                      {platform.name === "Facebook" && (
-                        <svg
-                          aria-hidden="true"
-                          className="w-6 h-6 fill-current"
-                          viewBox="0 0 512 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"></path>
-                        </svg>
-                      )}
-                      {platform.name === "YouTube" && (
-                        <svg
-                          aria-hidden="true"
-                          className="w-6 h-6 fill-current"
-                          viewBox="0 0 576 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path>
-                        </svg>
-                      )}
-                      {platform.name === "Instagram" && (
-                        <svg
-                          aria-hidden="true"
-                          className="w-6 h-6 fill-current"
-                          viewBox="0 0 448 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path>
-                        </svg>
-                      )}
-                      {platform.name === "X (Twitter)" && (
-                        <svg
-                          aria-hidden="true"
-                          className="w-6 h-6 fill-current"
-                          viewBox="0 0 512 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"></path>
-                        </svg>
-                      )}
-                      {platform.name === "Snapchat" && (
-                        <svg
-                          aria-hidden="true"
-                          className="w-6 h-6 fill-current"
-                          viewBox="0 0 496 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm169.5 338.9c-3.5 8.1-18.1 14-44.8 18.2-1.4 1.9-2.5 9.8-4.3 15.9-1.1 3.7-3.7 5.9-8.1 5.9h-.2c-6.2 0-12.8-2.9-25.8-2.9-17.6 0-23.7 4-37.4 13.7-14.5 10.3-28.4 19.1-49.2 18.2-21 1.6-38.6-11.2-48.5-18.2-13.8-9.7-19.8-13.7-37.4-13.7-12.5 0-20.4 3.1-25.8 3.1-5.4 0-7.5-3.3-8.3-6-1.8-6.1-2.9-14.1-4.3-16-13.8-2.1-44.8-7.5-45.5-21.4-.2-3.6 2.3-6.8 5.9-7.4 46.3-7.6 67.1-55.1 68-57.1 0-.1.1-.2.2-.3 2.5-5 3-9.2 1.6-12.5-3.4-7.9-17.9-10.7-24-13.2-15.8-6.2-18-13.4-17-18.3 1.6-8.5 14.4-13.8 21.9-10.3 5.9 2.8 11.2 4.2 15.7 4.2 3.3 0 5.5-.8 6.6-1.4-1.4-23.9-4.7-58 3.8-77.1C183.1 100 230.7 96 244.7 96c.6 0 6.1-.1 6.7-.1 34.7 0 68 17.8 84.3 54.3 8.5 19.1 5.2 53.1 3.8 77.1 1.1.6 2.9 1.3 5.7 1.4 4.3-.2 9.2-1.6 14.7-4.2 4-1.9 9.6-1.6 13.6 0 6.3 2.3 10.3 6.8 10.4 11.9.1 6.5-5.7 12.1-17.2 16.6-1.4.6-3.1 1.1-4.9 1.7-6.5 2.1-16.4 5.2-19 11.5-1.4 3.3-.8 7.5 1.6 12.5.1.1.1.2.2.3.9 2 21.7 49.5 68 57.1 4 1 7.1 5.5 4.9 10.8z"></path>
-                        </svg>
-                      )}
-                      {platform.name === "TikTok" && (
-                        <svg
-                          aria-hidden="true"
-                          className="w-6 h-6 fill-current"
-                          viewBox="0 0 448 512"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31v89.49a74.62,74.62,0,1,0,52.23,71.18V0h88a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"></path>
-                        </svg>
-                      )}
-                    </a>
-                  ),
-                )}
-              </div>
+              {mergedData.content?.socialMedia?.enabled && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 pt-4">
+                    {mergedData.content?.socialMedia?.platforms?.map(
+                      (platform: any, index: number) => {
+                        const IconComponent = getIconComponent(platform.icon, platform.name);
+                        return (
+                          <a
+                            key={index}
+                            href={platform.url || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-emerald-600"
+                            aria-label={platform.name}
+                            style={
+                              {
+                                transition: mergedData.styling?.effects?.hoverTransition || "0.3s",
+                                "--hover-color": platform.color,
+                              } as React.CSSProperties
+                            }
+                          >
+                            <IconComponent className="size-5" />
+                          </a>
+                        );
+                      },
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* WhatsApp Inquiry Button */}
               {mergedData.content?.socialMedia?.whatsappInquiry?.enabled && (
@@ -746,7 +726,7 @@ export default function Footer2(props: Footer2Props) {
                 </a>
               )}
             </div>
-          </div>
+            </div>
 
           {/* Bottom Section - Copyright and Links */}
           <div className="border-t border-white/20 pt-8">

@@ -155,6 +155,7 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       title: "اشترك في النشرة البريدية",
       description:
         "كن أول من يتلقى آخر العروض، والأخبار العقارية، ونصائح الاستثمار من فريق تعاريف العقارية. املأ خانة رقم الواتساب وسنوافيك بكل جديد",
+      formEnabled: true,
       placeholder: "رقم الواتساب",
       buttonText: "اشترك الآن",
     },
@@ -167,26 +168,14 @@ export const getDefaultFooter2Data = (): ComponentData => ({
     socialMedia: {
       enabled: true,
       platforms: [
-        {
-          name: "Facebook",
-          url: "#",
-        },
-        {
-          name: "YouTube",
-          url: "#",
-        },
-        {
-          name: "Instagram",
-          url: "#",
-        },
-        {
-          name: "X (Twitter)",
-          url: "#",
-        },
-        {
-          name: "Snapchat",
-          url: "#",
-        },
+        { name: "واتساب", icon: "FaWhatsapp", url: "#", color: "#25D366" },
+        { name: "لينكد إن", icon: "Linkedin", url: "#", color: "#0077B5" },
+        { name: "إنستغرام", icon: "Instagram", url: "#", color: "#E4405F" },
+        { name: "تويتر", icon: "Twitter", url: "#", color: "#1DA1F2" },
+        { name: "فيسبوك", icon: "Facebook", url: "#", color: "#1877F2" },
+        { name: "يوتيوب", icon: "Youtube", url: "#", color: "#FF0000" },
+        { name: "سناب شات", icon: "Snapchat", url: "#", color: "#FFFC00" },
+        { name: "تيك توك", icon: "Tiktok", url: "#", color: "#000000" },
       ],
       whatsappInquiry: {
         enabled: true,
