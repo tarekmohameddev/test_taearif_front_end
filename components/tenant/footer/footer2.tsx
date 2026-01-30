@@ -601,7 +601,7 @@ export default function Footer2(props: Footer2Props) {
               </p>
 
               {/* Newsletter Form */}
-              {mergedData.content?.newsletter?.formEnabled && (
+              {(mergedData.content?.newsletter?.formEnabled ?? true) && (
                 <form
                   onSubmit={handleNewsletterSubmit}
                   className="flex flex-col sm:flex-row gap-3 mb-8"
