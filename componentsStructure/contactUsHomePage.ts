@@ -36,19 +36,27 @@ export const contactUsHomePageStructure: ComponentStructure = {
             },
             {
               key: "overlay",
-              label: "Overlay",
+              label: "الطبقة البنية (Overlay)",
               type: "object",
               fields: [
                 {
                   key: "enabled",
-                  label: "Enabled",
+                  label: "تفعيل الطبقة",
                   type: "boolean",
                 },
                 {
                   key: "color",
-                  label: "Overlay Color",
+                  label: "لون الطبقة البنية",
                   type: "color",
-                  placeholder: "rgba(139, 95, 70, 0.8)",
+                  placeholder: "rgb(139, 95, 70)",
+                },
+                {
+                  key: "opacity",
+                  label: "نسبة الشفافية (0-1)",
+                  type: "number",
+                  placeholder: "0.8",
+                  min: 0,
+                  max: 1,
                 },
               ],
             },

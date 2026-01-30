@@ -2788,6 +2788,7 @@ export function translateLabel(
     "Add Legal Link": "components_structure.footer.add_legal_link",
     "Legal Link": "components_structure.footer.legal_link",
     "Styling": "components_structure.footer.styling",
+    "Height (px)": "components_structure.imageText_specific.height_px",
     "Primary Text Color": "components_structure.footer.primary_text_color",
     "Secondary Text Color": "components_structure.footer.secondary_text_color",
     "Muted Text Color": "components_structure.footer.muted_text_color",

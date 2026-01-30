@@ -49,6 +49,19 @@ export const imageTextStructure: ComponentStructure = {
           type: "number",
           placeholder: "0.3",
         },
+        {
+          key: "styling",
+          label: "Styling",
+          type: "object",
+          fields: [
+            {
+              key: "height",
+              label: "Height (px)",
+              type: "number",
+              placeholder: "500",
+            },
+          ],
+        },
       ],
 
       // ═══════════════════════════════════════════════════════════
@@ -61,6 +74,7 @@ export const imageTextStructure: ComponentStructure = {
         { key: "paragraph", label: "Paragraph", type: "textarea" },
         { key: "blockquote", label: "Blockquote", type: "textarea" },
         { key: "overlayOpacity", label: "Overlay Opacity", type: "number" },
+        { key: "styling.height", label: "Height (px)", type: "number" },
       ],
     },
   ],

@@ -19,6 +19,7 @@ interface ImageTextProps {
   paragraph?: string;
   blockquote?: string;
   overlayOpacity?: number;
+  height?: number;
 
   // Editor props (always include these)
   variant?: string;
@@ -155,7 +156,12 @@ export default function ImageText1(props: ImageTextProps = {}) {
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
   return (
-    <section className="relative w-full h-[500px] flex items-center justify-center overflow-hidden">
+    <section
+      className="relative w-full flex items-center justify-center overflow-hidden"
+      style={{
+        height: `${mergedData.styling?.height || 500}px`,
+      }}
+    >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image

@@ -15,7 +15,8 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
     alt: "خلفية",
     overlay: {
       enabled: true,
-      color: "rgba(139, 95, 70, 0.8)",
+      color: "rgb(139, 95, 70)",
+      opacity: 0.8,
     },
   },
 

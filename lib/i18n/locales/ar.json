@@ -3770,6 +3770,10 @@
       "tablet_breakpoint": "نقطة توقف التابلت",
       "desktop_breakpoint": "نقطة توقف سطح المكتب"
     },
+    "imageText_specific": {
+      "styling": "التنسيق",
+      "height_px": "الارتفاع (بكسل)"
+    },
     "title": {
       "title": "العنوان",
       "title_1": "العنوان 1 - عنوان مركزي",

@@ -418,7 +418,11 @@ export default function ContactUsHomePage1(props: ContactUsHomePageProps) {
                   style={{
                     backgroundColor:
                       mergedData.background.overlay.color ||
-                      "rgba(139, 95, 70, 0.8)",
+                      "rgb(139, 95, 70)",
+                    opacity:
+                      mergedData.background.overlay.opacity !== undefined
+                        ? mergedData.background.overlay.opacity
+                        : 0.8,
                   }}
                 ></div>
               )}

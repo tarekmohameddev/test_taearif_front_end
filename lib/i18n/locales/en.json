@@ -3740,6 +3740,10 @@
       "tablet_breakpoint": "Tablet Breakpoint",
       "desktop_breakpoint": "Desktop Breakpoint"
     },
+    "imageText_specific": {
+      "styling": "Styling",
+      "height_px": "Height (px)"
+    },
     "title": {
       "title": "Title",
       "title_1": "Title 1 - Centered Heading",
