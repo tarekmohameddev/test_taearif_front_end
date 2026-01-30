@@ -457,7 +457,7 @@ export default function Footer2(props: Footer2Props) {
         className="relative z-10 bg-[#8b5f46] pt-16 md:pt-20 lg:pt-24 pb-8"
         style={{ backgroundColor: mergedData.background?.color || "#8b5f46" }}
       >
-        <div className="container mx-auto px-4 max-w-6xl" style={{ color: textAndLinksColor }}>
+        <div className="container mx-auto px-4 max-w-[1400px]" style={{ color: textAndLinksColor }}>
           {/* Main Content Section */}
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-8 mb-12">
             {/* Right Section - Company Info */}
@@ -586,7 +586,7 @@ export default function Footer2(props: Footer2Props) {
             {/* Left Section - Newsletter */}
             {mergedData.content?.newsletter?.enabled && (
 
-            <div className="w-full lg:w-1/2 xl:w-3/5 ">
+            <div className="w-full lg:w-1/2 xl:w-4/5 ">
               <h5 className="text-xl font-bold mb-4" style={{ color: textAndLinksColor }}>
                 {replaceBaheya(
                   mergedData.content?.newsletter?.title ||
