@@ -576,6 +576,7 @@ export default function Footer2(props: Footer2Props) {
               </p>
 
               {/* Newsletter Form */}
+            {mergedData.content?.newsletter?.enabled && (
               <form
                 onSubmit={handleNewsletterSubmit}
                 className="flex flex-col sm:flex-row gap-3 mb-8"
@@ -616,7 +617,7 @@ export default function Footer2(props: Footer2Props) {
                   )}
                 </button>
               </form>
-
+)}
               {/* Social Media Icons */}
               <div className="flex items-center gap-4">
                 {mergedData.content?.socialMedia?.platforms?.map(
