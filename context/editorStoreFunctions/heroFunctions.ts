@@ -280,6 +280,7 @@ export const getDefaultHero3Data = (): ComponentData => ({
         globalColorType: "primary", // primary أو secondary أو accent
         // color value is not stored when useDefaultColor = true
       },
+      advancedButtonEnabled: true, // إظهار زر البحث المتقدم بشكل افتراضي
     },
   },
   animations: {

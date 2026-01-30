@@ -777,6 +777,12 @@ export const heroStructure: ComponentStructure = {
                   globalColorType: "primary",
                   description: "لون أزرار 'تطبيق البحث' و 'بحث متقدم'. يمكنك استخدام Primary/Secondary Color من إعدادات التاجر أو لون مخصص.",
                 },
+                {
+                  key: "advancedButtonEnabled",
+                  label: "إظهار زر البحث المتقدم",
+                  type: "boolean",
+                  defaultValue: true,
+                },
               ],
             },
           ],

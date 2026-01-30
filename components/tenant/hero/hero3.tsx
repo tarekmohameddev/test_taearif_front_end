@@ -107,6 +107,13 @@ interface HeroProps {
       tablet?: string;
       mobile?: string;
     };
+    buttons?: {
+      color?: {
+        useDefaultColor?: boolean;
+        globalColorType?: string;
+      } | string;
+      advancedButtonEnabled?: boolean;
+    };
   };
   animations?: {
     title?: {
@@ -232,6 +239,11 @@ const SearchForm = React.memo(function SearchForm({
   // Get button color using the helper function
   const buttonColor = getButtonColor();
   const buttonColorHover = getDarkerColor(buttonColor, 20);
+  
+  // Get advanced button enabled state (default: true if not specified)
+  const advancedButtonEnabled = sourceConfig?.buttons?.advancedButtonEnabled !== undefined 
+    ? sourceConfig.buttons.advancedButtonEnabled 
+    : true;
 
   // City options from API
   interface CityOption {
@@ -555,21 +567,23 @@ const SearchForm = React.memo(function SearchForm({
   </button>
 
   {/* الزر السفلي: بحث متقدم */}
-  <button
-    type="button"
-    onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
-    aria-expanded={isAdvancedSearchOpen}
-    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColorHover;
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColor;
-    }}
-    className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
-  >
-    {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
-  </button>
+  {advancedButtonEnabled && (
+    <button
+      type="button"
+      onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
+      aria-expanded={isAdvancedSearchOpen}
+      style={{ backgroundColor: buttonColor, color: "#ffffff" }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = buttonColorHover;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = buttonColor;
+      }}
+      className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
+    >
+      {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
+    </button>
+  )}
 </div>
 </div>
         </div>
@@ -710,21 +724,23 @@ const SearchForm = React.memo(function SearchForm({
   </button>
 
   {/* الزر السفلي: بحث متقدم */}
-  <button
-    type="button"
-    onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
-    aria-expanded={isAdvancedSearchOpen}
-    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColorHover;
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColor;
-    }}
-    className="h-6 px-2 rounded-b-2xl rounded-t-none text-[10px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
-  >
-    {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
-  </button>
+  {advancedButtonEnabled && (
+    <button
+      type="button"
+      onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
+      aria-expanded={isAdvancedSearchOpen}
+      style={{ backgroundColor: buttonColor, color: "#ffffff" }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = buttonColorHover;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = buttonColor;
+      }}
+      className="h-6 px-2 rounded-b-2xl rounded-t-none text-[10px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
+    >
+      {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
+    </button>
+  )}
 </div>
       </div>
     </form>
