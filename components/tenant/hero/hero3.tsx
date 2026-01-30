@@ -19,6 +19,7 @@ import { useEditorStore } from "@/context/editorStore";
 import { getDefaultHero3Data } from "@/context/editorStoreFunctions/heroFunctions";
 import { useUrlFilters } from "@/hooks/use-url-filters";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useBrandingColors } from "@/hooks/useBrandingColors";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -143,28 +144,9 @@ const SearchForm = React.memo(function SearchForm({
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  // Get tenant data from store
-  const { tenantData } = useTenantStore();
-  
-  // Get branding colors from WebsiteLayout (fallback to original color)
-  // Original default color = #8b5f46
-  const brandingColors = {
-    primary:
-      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
-      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
-        ? tenantData.WebsiteLayout.branding.colors.primary
-        : "#8b5f46", // Original default color (fallback)
-    secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
-      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
-        ? tenantData.WebsiteLayout.branding.colors.secondary
-        : "#8b5f46", // fallback to original color
-    accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
-      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
-        ? tenantData.WebsiteLayout.branding.colors.accent
-        : "#8b5f46", // fallback to original color
-  };
+  // Get branding colors from the correct source (editorStore in live editor, tenantStore in normal view)
+  // This hook automatically detects if we're in live editor and uses the appropriate store
+  const brandingColors = useBrandingColors();
   
   // Helper function to get color based on useDefaultColor and globalColorType
   const getButtonColor = (): string => {
