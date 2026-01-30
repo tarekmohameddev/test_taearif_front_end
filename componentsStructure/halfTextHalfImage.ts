@@ -8,11 +8,6 @@ export const halfTextHalfImageStructure: ComponentStructure = {
       name: "Half Text Half Image 1 - Modern",
       fields: [
         {
-          key: "visible",
-          label: "Visible",
-          type: "boolean",
-        },
-        {
           key: "layout",
           label: "Layout Settings",
           type: "object",

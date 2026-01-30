@@ -90,6 +90,7 @@ export const ColorFieldRendererWithToggle: React.FC<
             onClick={() =>
               updateValue(useDefaultColorPath, !useDefaultColorValue)
             }
+            dir={"ltr"}
             className={`relative inline-flex h-8 w-16 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${
               useDefaultColorValue
                 ? "bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg shadow-green-500/25"

@@ -764,6 +764,21 @@ export const heroStructure: ComponentStructure = {
                 { key: "mobile", label: "Mobile", type: "text" },
               ],
             },
+            {
+              key: "buttons",
+              label: "Search Buttons",
+              type: "object",
+              fields: [
+                {
+                  key: "color",
+                  label: "Button Color",
+                  type: "color",
+                  useDefaultColor: true,
+                  globalColorType: "primary",
+                  description: "لون أزرار 'تطبيق البحث' و 'بحث متقدم'. يمكنك استخدام Primary/Secondary Color من إعدادات التاجر أو لون مخصص.",
+                },
+              ],
+            },
           ],
         },
         {

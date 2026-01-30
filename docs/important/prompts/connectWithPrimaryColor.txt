@@ -510,4 +510,404 @@ style={{ filter: primaryColorFilter }}
 
 ---
 
+## 🎨 نظام متقدم: التحكم في الألوان من EditorSidebar
+
+### 📌 نظرة عامة
+
+هذا النظام يسمح للمستخدمين بالتحكم في ألوان المكونات من خلال EditorSidebar، مع إمكانية اختيار:
+- **Primary Color** من إعدادات التاجر
+- **Secondary Color** من إعدادات التاجر
+- **Accent Color** من إعدادات التاجر
+- **لون مخصص** (Custom Color)
+
+يستخدم هذا النظام `ColorFieldRendererWithToggle` الذي يظهر تلقائياً في EditorSidebar عند إضافة حقل `color` مع `useDefaultColor: true`.
+
+---
+
+### 📋 الخطوات المطلوبة
+
+#### الخطوة 1: إضافة الحقل في Component Structure
+
+في ملف `componentsStructure/{componentType}.ts`، أضف حقل `color` مع `useDefaultColor` و `globalColorType`:
+
+```typescript
+{
+  key: "buttons",
+  label: "Search Buttons",
+  type: "object",
+  fields: [
+    {
+      key: "color",
+      label: "Button Color",
+      type: "color",
+      useDefaultColor: true,        // ✅ هذا يجعل ColorFieldRendererWithToggle يظهر
+      globalColorType: "primary",    // ✅ القيمة الافتراضية (primary/secondary/accent)
+      description: "لون الأزرار. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
+    },
+  ],
+}
+```
+
+**ملاحظات مهمة:**
+- `useDefaultColor: true` يجعل `ColorFieldRendererWithToggle` يظهر تلقائياً
+- `globalColorType: "primary"` هو القيمة الافتراضية (يمكن أن يكون `"primary"` أو `"secondary"` أو `"accent"`)
+
+---
+
+#### الخطوة 2: إضافة البيانات الافتراضية
+
+في ملف `context/editorStoreFunctions/{componentType}Functions.ts`، أضف البيانات الافتراضية:
+
+```typescript
+buttons: {
+  color: {
+    useDefaultColor: true,      // استخدام اللون الافتراضي من إعدادات التاجر
+    globalColorType: "primary", // primary أو secondary أو accent
+    // color value is not stored when useDefaultColor = true
+  },
+},
+```
+
+---
+
+#### الخطوة 3: إضافة الكود في المكون React
+
+في ملف المكون (مثل `components/tenant/{componentType}/{componentType}1.tsx`):
+
+##### 3.1. الحصول على Branding Colors
+
+```typescript
+// Get tenant data from store
+const { tenantData } = useTenantStore();
+
+// Get branding colors from WebsiteLayout (fallback to original color)
+const brandingColors = {
+  primary:
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#8b5f46", // Original default color (fallback)
+  secondary:
+    tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+    tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.secondary
+      : "#8b5f46", // fallback to original color
+  accent:
+    tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+    tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.accent
+      : "#8b5f46", // fallback to original color
+};
+```
+
+##### 3.2. دالة getColor Helper
+
+```typescript
+// Helper function to get color based on useDefaultColor and globalColorType
+const getButtonColor = (): string => {
+  // ColorFieldRendererWithToggle saves data in this structure:
+  // When useDefaultColor = true:
+  //   - buttons.color.useDefaultColor = true
+  //   - buttons.color.globalColorType = "primary" | "secondary" | "accent"
+  //   - buttons.color might be undefined or the object itself
+  // When useDefaultColor = false:
+  //   - buttons.color = "#hexcolor" (direct string)
+  //   - buttons.color.useDefaultColor = false (stored at buttons.color.useDefaultColor)
+  
+  const colorField = config?.buttons?.color;
+  
+  // Get useDefaultColor and globalColorType from the color field
+  // They are stored at buttons.color.useDefaultColor and buttons.color.globalColorType
+  // Check both in the object itself and at the path level
+  let useDefaultColorValue: boolean | undefined;
+  let globalColorTypeValue: string | undefined;
+  
+  if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+    useDefaultColorValue = colorField.useDefaultColor;
+    globalColorTypeValue = colorField.globalColorType;
+  }
+  
+  // Also check at the path level (ColorFieldRendererWithToggle stores them separately)
+  if (useDefaultColorValue === undefined) {
+    useDefaultColorValue = config?.buttons?.color?.useDefaultColor;
+  }
+  if (globalColorTypeValue === undefined) {
+    globalColorTypeValue = config?.buttons?.color?.globalColorType;
+  }
+  
+  // Check useDefaultColor value (default is true if not specified)
+  const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+  
+  // If useDefaultColor is true, use branding color from WebsiteLayout
+  if (useDefaultColor) {
+    const globalColorType = globalColorTypeValue || "primary";
+    const brandingColor =
+      brandingColors[globalColorType as keyof typeof brandingColors] ||
+      brandingColors.primary;
+    return brandingColor;
+  }
+  
+  // If useDefaultColor is false, try to get custom color
+  // The color is stored as a string directly at buttons.color
+  if (
+    colorField &&
+    typeof colorField === "string" &&
+    colorField.trim() !== "" &&
+    colorField.startsWith("#")
+  ) {
+    return colorField.trim();
+  }
+  
+  // If colorField is an object, check for value property
+  if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+    if (
+      colorField.value &&
+      typeof colorField.value === "string" &&
+      colorField.value.trim() !== "" &&
+      colorField.value.startsWith("#")
+    ) {
+      return colorField.value.trim();
+    }
+  }
+  
+  // Final fallback: use primary branding color
+  return brandingColors.primary;
+};
+```
+
+##### 3.3. استخدام اللون في JSX
+
+```typescript
+// Get button color using the helper function
+const buttonColor = getButtonColor();
+const buttonColorHover = getDarkerColor(buttonColor, 20);
+
+// Use in JSX
+<button
+  type="submit"
+  style={{ backgroundColor: buttonColor, color: "#ffffff" }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = buttonColorHover;
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = buttonColor;
+  }}
+  className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors"
+>
+  تطبيق البحث
+</button>
+```
+
+---
+
+### 🔍 بنية البيانات المحفوظة
+
+#### عندما `useDefaultColor = true`:
+
+```typescript
+{
+  buttons: {
+    color: {
+      useDefaultColor: true,
+      globalColorType: "primary" | "secondary" | "accent",
+      // color value is not stored
+    }
+  }
+}
+```
+
+#### عندما `useDefaultColor = false`:
+
+```typescript
+{
+  buttons: {
+    color: "#FF5733", // Custom hex color (direct string)
+    // useDefaultColor is stored separately at buttons.color.useDefaultColor = false
+  }
+}
+```
+
+---
+
+### 📝 مثال كامل: Hero3 Search Buttons
+
+#### 1. Component Structure (`componentsStructure/hero.ts`):
+
+```typescript
+{
+  key: "searchForm",
+  label: "Search Form",
+  type: "object",
+  fields: [
+    // ... other fields ...
+    {
+      key: "buttons",
+      label: "Search Buttons",
+      type: "object",
+      fields: [
+        {
+          key: "color",
+          label: "Button Color",
+          type: "color",
+          useDefaultColor: true,
+          globalColorType: "primary",
+          description: "لون أزرار 'تطبيق البحث' و 'بحث متقدم'.",
+        },
+      ],
+    },
+  ],
+}
+```
+
+#### 2. Default Data (`context/editorStoreFunctions/heroFunctions.ts`):
+
+```typescript
+searchForm: {
+  // ... other fields ...
+  buttons: {
+    color: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
+  },
+}
+```
+
+#### 3. Component (`components/tenant/hero/hero3.tsx`):
+
+```typescript
+const SearchForm = React.memo(function SearchForm({ config }: { config: any }) {
+  const { tenantData } = useTenantStore();
+  
+  const brandingColors = {
+    primary: tenantData?.WebsiteLayout?.branding?.colors?.primary || "#8b5f46",
+    secondary: tenantData?.WebsiteLayout?.branding?.colors?.secondary || "#8b5f46",
+    accent: tenantData?.WebsiteLayout?.branding?.colors?.accent || "#8b5f46",
+  };
+  
+  const getButtonColor = (): string => {
+    const colorField = config?.buttons?.color;
+    
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+    
+    if (useDefaultColorValue === undefined) {
+      useDefaultColorValue = config?.buttons?.color?.useDefaultColor;
+    }
+    if (globalColorTypeValue === undefined) {
+      globalColorTypeValue = config?.buttons?.color?.globalColorType;
+    }
+    
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    
+    if (useDefaultColor) {
+      const globalColorType = globalColorTypeValue || "primary";
+      return brandingColors[globalColorType as keyof typeof brandingColors] || brandingColors.primary;
+    }
+    
+    if (colorField && typeof colorField === "string" && colorField.trim() !== "" && colorField.startsWith("#")) {
+      return colorField.trim();
+    }
+    
+    return brandingColors.primary;
+  };
+  
+  const buttonColor = getButtonColor();
+  const buttonColorHover = getDarkerColor(buttonColor, 20);
+  
+  return (
+    <form>
+      <button
+        type="submit"
+        style={{ backgroundColor: buttonColor, color: "#ffffff" }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = buttonColorHover;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = buttonColor;
+        }}
+      >
+        تطبيق البحث
+      </button>
+    </form>
+  );
+});
+```
+
+---
+
+### ✅ Checklist للتطبيق
+
+- [ ] تم إضافة حقل `color` في Component Structure مع `useDefaultColor: true` و `globalColorType`
+- [ ] تم إضافة البيانات الافتراضية في Functions file
+- [ ] تم إضافة `brandingColors` object في المكون
+- [ ] تم إضافة دالة `getColor` helper
+- [ ] تم استخدام اللون في JSX مع `getColor()`
+- [ ] تم اختبار Primary Color
+- [ ] تم اختبار Secondary Color
+- [ ] تم اختبار Accent Color
+- [ ] تم اختبار Custom Color
+- [ ] تم التحقق من أن Fallback يعمل بشكل صحيح
+
+---
+
+### 🎯 النتيجة النهائية
+
+بعد تطبيق هذا النظام:
+
+1. ✅ سيظهر `ColorFieldRendererWithToggle` تلقائياً في EditorSidebar
+2. ✅ المستخدم يمكنه اختيار Primary/Secondary/Accent Color من إعدادات التاجر
+3. ✅ المستخدم يمكنه اختيار لون مخصص
+4. ✅ التغييرات تظهر فوراً في Live Editor
+5. ✅ البيانات تُحفظ في Database بشكل صحيح
+
+---
+
+### 📚 مرجع سريع
+
+```typescript
+// 1. Component Structure
+{
+  key: "color",
+  type: "color",
+  useDefaultColor: true,
+  globalColorType: "primary",
+}
+
+// 2. Default Data
+color: {
+  useDefaultColor: true,
+  globalColorType: "primary",
+}
+
+// 3. Get Branding Colors
+const brandingColors = {
+  primary: tenantData?.WebsiteLayout?.branding?.colors?.primary || "#fallback",
+  secondary: tenantData?.WebsiteLayout?.branding?.colors?.secondary || "#fallback",
+  accent: tenantData?.WebsiteLayout?.branding?.colors?.accent || "#fallback",
+};
+
+// 4. Get Color Helper
+const getColor = () => {
+  const useDefaultColor = config?.color?.useDefaultColor ?? true;
+  if (useDefaultColor) {
+    const globalColorType = config?.color?.globalColorType || "primary";
+    return brandingColors[globalColorType] || brandingColors.primary;
+  }
+  return config?.color || brandingColors.primary;
+};
+
+// 5. Use in JSX
+style={{ backgroundColor: getColor() }}
+```
+
+---
+
 **تم إنشاء هذا Prompt لاستخدامه مع أي ملف React/TypeScript لتحويل الألوان الخضراء و emerald إلى primaryColor ديناميكي.**
+
+**تم إضافة نظام التحكم في الألوان من EditorSidebar مع دعم Primary/Secondary/Accent Color واللون المخصص.**

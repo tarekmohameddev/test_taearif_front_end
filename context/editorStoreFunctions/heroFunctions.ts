@@ -274,6 +274,13 @@ export const getDefaultHero3Data = (): ComponentData => ({
       tablet: "lg",
       mobile: "md",
     },
+    buttons: {
+      color: {
+        useDefaultColor: true, // استخدام اللون الافتراضي من إعدادات التاجر
+        globalColorType: "primary", // primary أو secondary أو accent
+        // color value is not stored when useDefaultColor = true
+      },
+    },
   },
   animations: {
     title: {

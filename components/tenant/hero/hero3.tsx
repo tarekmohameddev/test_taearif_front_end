@@ -136,16 +136,124 @@ interface HeroProps {
 // Search Form Component - Memoized to prevent unnecessary re-renders
 const SearchForm = React.memo(function SearchForm({
   config,
-  primaryColor,
-  primaryColorHover,
 }: {
   config: any;
-  primaryColor?: string;
-  primaryColorHover?: string;
 }) {
   const { navigateWithFilters } = useUrlFilters();
   const searchParams = useSearchParams();
   const router = useRouter();
+  
+  // Get tenant data from store
+  const { tenantData } = useTenantStore();
+  
+  // Get branding colors from WebsiteLayout (fallback to original color)
+  // Original default color = #8b5f46
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#8b5f46", // Original default color (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#8b5f46", // fallback to original color
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#8b5f46", // fallback to original color
+  };
+  
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getButtonColor = (): string => {
+    // ColorFieldRendererWithToggle saves data in this structure:
+    // When useDefaultColor = true:
+    //   - buttons.color.useDefaultColor = true
+    //   - buttons.color.globalColorType = "primary" | "secondary" | "accent"
+    //   - buttons.color might be undefined or the object itself
+    // When useDefaultColor = false:
+    //   - buttons.color = "#hexcolor" (direct string)
+    //   - buttons.color.useDefaultColor = false (stored at buttons.color.useDefaultColor)
+    
+    const colorField = config?.buttons?.color;
+    
+    // Get useDefaultColor and globalColorType from the color field
+    // They are stored at buttons.color.useDefaultColor and buttons.color.globalColorType
+    // Check both in the object itself and at the path level
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+    
+    // Also check at the path level (ColorFieldRendererWithToggle stores them separately)
+    if (useDefaultColorValue === undefined) {
+      useDefaultColorValue = config?.buttons?.color?.useDefaultColor;
+    }
+    if (globalColorTypeValue === undefined) {
+      globalColorTypeValue = config?.buttons?.color?.globalColorType;
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = globalColorTypeValue || "primary";
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        brandingColors.primary;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    // The color is stored as a string directly at buttons.color
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+    
+    // Final fallback: use primary branding color
+    return brandingColors.primary;
+  };
+  
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    // Original hover color = #6b4630 (fallback)
+    if (!hex || !hex.startsWith('#')) return "#6b4630";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#6b4630";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+  
+  // Get button color using the helper function
+  const buttonColor = getButtonColor();
+  const buttonColorHover = getDarkerColor(buttonColor, 20);
 
   // City options from API
   interface CityOption {
@@ -170,28 +278,6 @@ const SearchForm = React.memo(function SearchForm({
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState(() => searchParams?.get("search") || "");
 
-  // Default colors if not provided
-  const defaultPrimaryColor = "#8b5f46";
-  const defaultPrimaryColorHover =  "#6b4630";
-
-  // Function to darken a hex color
-  const darkenColor = (hex: string, percent: number = 0.3): string => {
-    // Remove # if present
-    hex = hex.replace('#', '');
-    
-    // Parse RGB values
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    
-    // Darken by reducing RGB values
-    const newR = Math.max(0, Math.floor(r * (1 - percent)));
-    const newG = Math.max(0, Math.floor(g * (1 - percent)));
-    const newB = Math.max(0, Math.floor(b * (1 - percent)));
-    
-    // Convert back to hex
-    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
-  };
 
   // Fetch cities from API
   useEffect(() => {
@@ -478,12 +564,12 @@ const SearchForm = React.memo(function SearchForm({
   {/* الزر العلوي: تطبيق البحث */}
   <button
     type="submit"
-    style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = darkenColor(defaultPrimaryColor);
+      e.currentTarget.style.backgroundColor = buttonColorHover;
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+      e.currentTarget.style.backgroundColor = buttonColor;
     }}
     className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
   >
@@ -495,12 +581,12 @@ const SearchForm = React.memo(function SearchForm({
     type="button"
     onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
     aria-expanded={isAdvancedSearchOpen}
-    style={{ backgroundColor: defaultPrimaryColor, color: "#ffffff" }}
+    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = darkenColor(defaultPrimaryColor);
+      e.currentTarget.style.backgroundColor = buttonColorHover;
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = defaultPrimaryColor;
+      e.currentTarget.style.backgroundColor = buttonColor;
     }}
     className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
   >
@@ -633,12 +719,12 @@ const SearchForm = React.memo(function SearchForm({
   {/* الزر العلوي: تطبيق البحث */}
   <button
     type="submit"
-    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+      e.currentTarget.style.backgroundColor = buttonColorHover;
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = "#8b5f46";
+      e.currentTarget.style.backgroundColor = buttonColor;
     }}
     className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
   >
@@ -650,12 +736,12 @@ const SearchForm = React.memo(function SearchForm({
     type="button"
     onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
     aria-expanded={isAdvancedSearchOpen}
-    style={{ backgroundColor: "#8b5f46", color: "#ffffff" }}
+    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = defaultPrimaryColorHover;
+      e.currentTarget.style.backgroundColor = buttonColorHover;
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = "#8b5f46";
+      e.currentTarget.style.backgroundColor = buttonColor;
     }}
     className="h-6 px-2 rounded-b-2xl rounded-t-none text-[10px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
   >
@@ -872,9 +958,7 @@ function Hero3(props: HeroProps) {
     return `${baseUrl}/${videoId}?${params.toString()}`;
   };
 
-  // Default primary color
-  const primaryColor = "#059669"; // emerald-600
-  const primaryColorHover = "#047857"; // emerald-700
+  // Note: primaryColor is now handled inside SearchForm component
 
   // Generate unique ID for style tag to avoid conflicts
   const styleId = `hero3-height-${uniqueId.replace(/[^a-zA-Z0-9]/g, '-')}`;
@@ -983,8 +1067,6 @@ function Hero3(props: HeroProps) {
               <div className="w-full pointer-events-auto flex items-center justify-center">
                 <SearchForm
                   config={mergedData.searchForm}
-                  primaryColor={primaryColor}
-                  primaryColorHover={primaryColorHover}
                 />
               </div>
             )}
@@ -1019,8 +1101,6 @@ function Hero3(props: HeroProps) {
               <div className="w-full px-4 pointer-events-auto">
                 <SearchForm
                   config={mergedData.searchForm}
-                  primaryColor={primaryColor}
-                  primaryColorHover={primaryColorHover}
                 />
               </div>
             )}
