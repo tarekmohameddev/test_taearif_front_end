@@ -111,6 +111,7 @@ interface Footer2Props {
       accent?: string;
       border?: string;
       textAndLinksColor?: string;
+      socialMediaIconsColor?: string;
       ThemeTwo?: string;
     };
     typography?: {
@@ -366,6 +367,7 @@ export default function Footer2(props: Footer2Props) {
 
   // Get unified text and links color
   const textAndLinksColor = mergedData.styling?.colors?.textAndLinksColor || "#ffffff";
+  const socialMediaIconsColor = mergedData.styling?.colors?.socialMediaIconsColor || textAndLinksColor;
 
   // Get footer background color and create darker version for form elements
   const footerBgColor = mergedData.background?.color || "#8b5f46";
@@ -658,14 +660,22 @@ export default function Footer2(props: Footer2Props) {
                             href={platform.url || "#"}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-emerald-600"
+                            className="grid size-10 place-items-center rounded-full transition-colors"
                             aria-label={platform.name}
                             style={
                               {
+                                backgroundColor: darkerBgColor,
+                                color: socialMediaIconsColor,
                                 transition: mergedData.styling?.effects?.hoverTransition || "0.3s",
                                 "--hover-color": platform.color,
                               } as React.CSSProperties
                             }
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = darkenColor(footerBgColor, 25);
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = darkerBgColor;
+                            }}
                           >
                             <IconComponent className="size-5" />
                           </a>

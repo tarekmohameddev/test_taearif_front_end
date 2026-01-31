@@ -747,6 +747,11 @@ export const footerStructure: ComponentStructure = {
                   label: "Border Color",
                   type: "color",
                 },
+                {
+                  key: "socialMediaIconsColor",
+                  label: "Social Media Icons Color",
+                  type: "color",
+                },
 
               ],
             },
