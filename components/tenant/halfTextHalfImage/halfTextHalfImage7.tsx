@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
@@ -220,17 +220,35 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     currentStoreData?.content?.title === defaultData?.content?.title;
 
   // Merge data with correct priority
-  const mergedData = {
-    ...defaultData, // 1. Defaults (lowest priority)
-    ...props, // 2. Props from parent component
-    // If tenantComponentData exists, use it (it's from Database)
-    ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
-    // Use currentStoreData only if it's not just default data
-    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
-    ...(hasTenantData && isStoreDataDefault
-      ? {}
-      : currentStoreData), // 4. Current store data (highest priority if not default)
-  };
+  // According to makeFieldsRequireSaveChanges.txt:
+  // Component should read from halfTextHalfImageStates[uniqueId] (storeData) and getComponentData() (currentStoreData)
+  // NOT from tempData (which is temporary and not visible until Save Changes)
+  // ✅ GOOD: mergedData does NOT include tempData - only reads from saved states
+  const mergedData = useMemo(
+    () => ({
+      ...defaultData, // 1. Defaults (lowest priority)
+      ...props, // 2. Props from parent component
+      // If tenantComponentData exists, use it (it's from Database)
+      ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+      // Skip store data if tenant data exists (tenant data is source of truth)
+      // Only use store data if no tenant data exists
+      ...(hasTenantData
+        ? {} // Skip store data if tenant data exists
+        : {
+            ...storeData, // 4a. Store data from halfTextHalfImageStates (saved data)
+            ...currentStoreData, // 4b. Current store data from getComponentData (saved data)
+          }),
+      // ✅ tempData is NOT included - changes only appear after "Save Changes"
+    }),
+    [
+      defaultData,
+      props,
+      hasTenantData,
+      tenantComponentData,
+      storeData,
+      currentStoreData,
+    ],
+  );
 
   // ⭐ DEBUG: Log data sources (optional - remove in production)
   if (

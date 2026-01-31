@@ -53,11 +53,30 @@ interface HalfTextHalfImage6Props {
 // COMPONENT
 // ═══════════════════════════════════════════════════════════
 export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
+  console.log("🚀🚀🚀 HalfTextHalfImage6 RENDER START 🚀🚀🚀");
+  console.log("📥 PROPS RECEIVED:", {
+    props,
+    propsKeys: Object.keys(props),
+    propsVariant: props.variant,
+    propsId: props.id,
+    propsUseStore: props.useStore,
+    propsData: props,
+  });
+
   // ─────────────────────────────────────────────────────────
   // 1. EXTRACT UNIQUE ID
   // ─────────────────────────────────────────────────────────
   const variantId = props.variant || "halfTextHalfImage6";
   const uniqueId = props.id || variantId;
+  
+  console.log("🆔 ID EXTRACTION:", {
+    variantId,
+    uniqueId,
+    propsVariant: props.variant,
+    propsId: props.id,
+    finalVariantId: variantId,
+    finalUniqueId: uniqueId,
+  });
 
   // ─────────────────────────────────────────────────────────
   // 2. CONNECT TO STORES
@@ -73,6 +92,15 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
   const tenantData = useTenantStore((s) => s.tenantData);
   const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
+  
+  console.log("🏪 STORE DATA:", {
+    tenantId,
+    tenantDataExists: !!tenantData,
+    tenantDataKeys: tenantData ? Object.keys(tenantData) : [],
+    componentSettingsExists: !!tenantData?.componentSettings,
+    componentSettingsKeys: tenantData?.componentSettings ? Object.keys(tenantData.componentSettings) : [],
+    halfTextHalfImageStatesKeys: Object.keys(halfTextHalfImageStates || {}),
+  });
 
   // ─────────────────────────────────────────────────────────
   // 3. FETCH TENANT DATA
@@ -92,25 +120,85 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
   const currentStoreData = props.useStore
     ? getComponentData("halfTextHalfImage", uniqueId) || {}
     : {};
+  
+  console.log("💾 STORE DATA RETRIEVAL:", {
+    useStore: props.useStore,
+    uniqueId,
+    storeData,
+    storeDataKeys: Object.keys(storeData),
+    currentStoreData,
+    currentStoreDataKeys: Object.keys(currentStoreData),
+    currentStoreDataContent: currentStoreData?.content,
+    currentStoreDataTitle: currentStoreData?.content?.title,
+    allStatesKeys: Object.keys(halfTextHalfImageStates || {}),
+  });
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {
+    console.log("🔍🔍🔍 getTenantComponentData CALLED 🔍🔍🔍");
+    console.log("🔍 SEARCH PARAMETERS:", {
+      propsId: props.id,
+      uniqueId,
+      variantId,
+      tenantDataExists: !!tenantData,
+      componentSettingsExists: !!tenantData?.componentSettings,
+    });
+    
     if (!tenantData?.componentSettings) {
+      console.log("❌ NO componentSettings in tenantData");
       return {};
     }
+    
+    console.log("📋 componentSettings STRUCTURE:", {
+      componentSettingsType: typeof tenantData.componentSettings,
+      isArray: Array.isArray(tenantData.componentSettings),
+      componentSettingsKeys: Object.keys(tenantData.componentSettings),
+      componentSettingsLength: Array.isArray(tenantData.componentSettings) 
+        ? tenantData.componentSettings.length 
+        : Object.keys(tenantData.componentSettings).length,
+    });
+    
     // Search through all pages for this component variant
     for (const [pageSlug, pageComponents] of Object.entries(
       tenantData.componentSettings,
     )) {
+      console.log(`📄 SEARCHING PAGE: ${pageSlug}`, {
+        pageSlug,
+        pageComponentsType: typeof pageComponents,
+        pageComponentsIsArray: Array.isArray(pageComponents),
+        pageComponentsLength: Array.isArray(pageComponents) 
+          ? pageComponents.length 
+          : pageComponents && typeof pageComponents === "object"
+          ? Object.keys(pageComponents).length
+          : 0,
+      });
+      
       // Check if pageComponents is an object (not array)
       if (
         typeof pageComponents === "object" &&
         !Array.isArray(pageComponents)
       ) {
+        console.log(`📦 PAGE ${pageSlug} IS OBJECT FORMAT`);
         // Search through all components in this page
         for (const [componentId, component] of Object.entries(
           pageComponents as any,
         )) {
+          console.log(`  🔎 CHECKING COMPONENT: ${componentId}`, {
+            componentId,
+            componentType: (component as any)?.type,
+            componentIdProp: (component as any)?.id,
+            componentName: (component as any)?.componentName,
+            propsId: props.id,
+            uniqueId,
+            matchesType: (component as any)?.type === "halfTextHalfImage",
+            matchesId1: componentId === props.id,
+            matchesId2: (component as any)?.id === props.id,
+            matchesId3: (component as any)?.id === uniqueId,
+            componentData: (component as any)?.data,
+            componentDataContent: (component as any)?.data?.content,
+            componentDataTitle: (component as any)?.data?.content?.title,
+          });
+          
           // Check if this is the exact component we're looking for by ID
           // Use componentId === props.id (most reliable identifier)
           if (
@@ -119,34 +207,92 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
               (component as any).id === props.id ||
               (component as any).id === uniqueId)
           ) {
+            console.log(`✅✅✅ FOUND MATCH IN OBJECT FORMAT: ${componentId} ✅✅✅`, {
+              componentId,
+              component,
+              componentData: (component as any).data,
+              componentDataContent: (component as any).data?.content,
+              componentDataTitle: (component as any).data?.content?.title,
+              componentDataParagraph: (component as any).data?.content?.paragraph,
+            });
             return (component as any).data;
           }
         }
       }
       // Also handle array format
       if (Array.isArray(pageComponents)) {
+        console.log(`📋 PAGE ${pageSlug} IS ARRAY FORMAT`, {
+          arrayLength: pageComponents.length,
+        });
         for (const component of pageComponents) {
+          console.log(`  🔎 CHECKING ARRAY COMPONENT:`, {
+            componentId: (component as any)?.id,
+            componentType: (component as any)?.type,
+            componentName: (component as any)?.componentName,
+            propsId: props.id,
+            uniqueId,
+            matchesType: (component as any)?.type === "halfTextHalfImage",
+            matchesId1: (component as any)?.id === props.id,
+            matchesId2: (component as any)?.id === uniqueId,
+            componentData: (component as any)?.data,
+            componentDataContent: (component as any)?.data?.content,
+            componentDataTitle: (component as any)?.data?.content?.title,
+          });
+          
           // Search by id (most reliable identifier)
           if (
             (component as any).type === "halfTextHalfImage" &&
             ((component as any).id === props.id ||
               (component as any).id === uniqueId)
           ) {
+            console.log(`✅✅✅ FOUND MATCH IN ARRAY FORMAT ✅✅✅`, {
+              componentId: (component as any)?.id,
+              component,
+              componentData: (component as any).data,
+              componentDataContent: (component as any).data?.content,
+              componentDataTitle: (component as any).data?.content?.title,
+              componentDataParagraph: (component as any).data?.content?.paragraph,
+            });
             return (component as any).data;
           }
         }
       }
     }
+    
+    console.log("❌❌❌ NO MATCH FOUND IN getTenantComponentData ❌❌❌");
     return {};
   };
 
   const tenantComponentData = getTenantComponentData();
+  
+  console.log("📊 TENANT COMPONENT DATA RESULT:", {
+    tenantComponentData,
+    tenantComponentDataKeys: Object.keys(tenantComponentData || {}),
+    tenantComponentDataExists: !!tenantComponentData && Object.keys(tenantComponentData).length > 0,
+    tenantComponentDataContent: tenantComponentData?.content,
+    tenantComponentDataTitle: tenantComponentData?.content?.title,
+    tenantComponentDataParagraph: tenantComponentData?.content?.paragraph,
+    tenantComponentDataTitleUnderlined: tenantComponentData?.content?.titleUnderlined,
+  });
 
   // ─────────────────────────────────────────────────────────
   // 5. INITIALIZE IN STORE (on mount)
   // ─────────────────────────────────────────────────────────
   useEffect(() => {
+    console.log("🔄 useEffect INITIALIZE IN STORE TRIGGERED", {
+      useStore: props.useStore,
+      uniqueId,
+      tenantComponentDataExists: !!tenantComponentData && Object.keys(tenantComponentData).length > 0,
+    });
+    
     if (props.useStore) {
+      const defaultData = getDefaultHalfTextHalfImage6Data();
+      console.log("📦 DEFAULT DATA:", {
+        defaultData,
+        defaultDataContent: defaultData?.content,
+        defaultDataTitle: defaultData?.content?.title,
+      });
+      
       // ✅ Use database data if available
       const initialData =
         tenantComponentData && Object.keys(tenantComponentData).length > 0
@@ -160,8 +306,18 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
               ...props,
             };
 
+      console.log("💾 INITIAL DATA FOR STORE:", {
+        initialData,
+        initialDataContent: initialData?.content,
+        initialDataTitle: initialData?.content?.title,
+        initialDataParagraph: initialData?.content?.paragraph,
+        initialDataTitleUnderlined: initialData?.content?.titleUnderlined,
+        hasTenantData: tenantComponentData && Object.keys(tenantComponentData).length > 0,
+      });
+
       // Initialize in store
       ensureComponentVariant("halfTextHalfImage", uniqueId, initialData);
+      console.log("✅ STORE INITIALIZED with uniqueId:", uniqueId);
     }
   }, [
     uniqueId,
@@ -176,15 +332,40 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
   // ─────────────────────────────────────────────────────────
   // Get default data
   const defaultData = getDefaultHalfTextHalfImage6Data();
+  
+  console.log("📊 DEFAULT DATA:", {
+    defaultData,
+    defaultDataContent: defaultData?.content,
+    defaultDataTitle: defaultData?.content?.title,
+    defaultDataParagraph: defaultData?.content?.paragraph,
+    defaultDataTitleUnderlined: defaultData?.content?.titleUnderlined,
+  });
 
   // Check if tenantComponentData exists
   const hasTenantData =
     tenantComponentData &&
     Object.keys(tenantComponentData).length > 0;
+  
+  console.log("🔍 TENANT DATA CHECK:", {
+    hasTenantData,
+    tenantComponentData,
+    tenantComponentDataKeys: Object.keys(tenantComponentData || {}),
+    tenantComponentDataContent: tenantComponentData?.content,
+    tenantComponentDataTitle: tenantComponentData?.content?.title,
+  });
 
   // Check if currentStoreData is just default data (by comparing a key field like content.title)
   const isStoreDataDefault =
     currentStoreData?.content?.title === defaultData?.content?.title;
+  
+  console.log("🔍 STORE DATA CHECK:", {
+    currentStoreData,
+    currentStoreDataContent: currentStoreData?.content,
+    currentStoreDataTitle: currentStoreData?.content?.title,
+    defaultDataTitle: defaultData?.content?.title,
+    isStoreDataDefault,
+    comparison: `${currentStoreData?.content?.title} === ${defaultData?.content?.title}`,
+  });
 
   // Merge data with correct priority
   const mergedData = {
@@ -192,12 +373,27 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     ...props, // 2. Props from parent component
     // If tenantComponentData exists, use it (it's from Database)
     ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
-    // Use currentStoreData only if it's not just default data
-    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
-    ...(hasTenantData && isStoreDataDefault
-      ? {}
-      : currentStoreData), // 4. Current store data (highest priority if not default)
+    // Skip store data if tenant data exists (tenant data is source of truth)
+    // Only use store data if no tenant data exists
+    ...(hasTenantData
+      ? {} // Skip store data if tenant data exists
+      : currentStoreData), // 4. Current store data (only if no tenant data)
   };
+  
+  console.log("🔀 MERGED DATA RESULT:", {
+    mergedData,
+    mergedDataContent: mergedData?.content,
+    mergedDataTitle: mergedData?.content?.title,
+    mergedDataParagraph: mergedData?.content?.paragraph,
+    mergedDataTitleUnderlined: mergedData?.content?.titleUnderlined,
+    mergeSteps: {
+      step1_defaultData: defaultData?.content?.title,
+      step2_props: props?.content?.title,
+      step3_tenantData: hasTenantData ? tenantComponentData?.content?.title : "SKIPPED",
+      step4_storeData: hasTenantData && isStoreDataDefault ? "SKIPPED (is default)" : currentStoreData?.content?.title,
+      final: mergedData?.content?.title,
+    },
+  });
 
   // ⭐ DEBUG: Log data sources (optional - remove in production)
   if (
@@ -220,13 +416,28 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
   // ─────────────────────────────────────────────────────────
   // 7. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
+  console.log("👁️ VISIBILITY CHECK:", {
+    visible: mergedData.visible,
+    willRender: !!mergedData.visible,
+  });
+  
   if (!mergedData.visible) {
+    console.log("❌ COMPONENT NOT VISIBLE - RETURNING NULL");
     return null;
   }
 
   // ─────────────────────────────────────────────────────────
   // 8. RENDER
   // ─────────────────────────────────────────────────────────
+  console.log("🎨 RENDERING COMPONENT:", {
+    mergedDataContent: mergedData?.content,
+    mergedDataTitle: mergedData?.content?.title,
+    mergedDataTitleUnderlined: mergedData?.content?.titleUnderlined,
+    mergedDataParagraph: mergedData?.content?.paragraph,
+    finalTitleDisplay: `${mergedData.content?.titleUnderlined || "خبراء في"}${mergedData.content?.title?.replace(mergedData.content?.titleUnderlined || "", "") || ""}`,
+    finalParagraphDisplay: mergedData.content?.paragraph || "نقدّم لك خدمات احترافية...",
+  });
+  
   return (
     <section
       className="w-full flex items-center justify-center"
@@ -271,12 +482,24 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
                 }}
               >
                 <span className="">
-                  {mergedData.content?.titleUnderlined || "خبراء في"}
+                  {(() => {
+                    const titleUnderlined = mergedData.content?.titleUnderlined || "خبراء في";
+                    console.log("📝 RENDERING TITLE UNDERLINED:", titleUnderlined);
+                    return titleUnderlined;
+                  })()}
                 </span>
-                {mergedData.content?.title?.replace(
-                  mergedData.content?.titleUnderlined || "",
-                  "",
-                )}
+                {(() => {
+                  const title = mergedData.content?.title?.replace(
+                    mergedData.content?.titleUnderlined || "",
+                    "",
+                  ) || "";
+                  console.log("📝 RENDERING TITLE:", {
+                    originalTitle: mergedData.content?.title,
+                    titleUnderlined: mergedData.content?.titleUnderlined,
+                    replacedTitle: title,
+                  });
+                  return title;
+                })()}
               </h3>
               <div
                 className="w-24 h-[2px] mb-4 ml-auto"
@@ -293,8 +516,15 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
                   color: mergedData.styling?.paragraphColor || "#000000",
                 }}
               >
-                {mergedData.content?.paragraph ||
-                  "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم."}
+                {(() => {
+                  const paragraph = mergedData.content?.paragraph ||
+                    "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم.";
+                  console.log("📝 RENDERING PARAGRAPH:", {
+                    paragraphFromData: mergedData.content?.paragraph,
+                    finalParagraph: paragraph,
+                  });
+                  return paragraph;
+                })()}
               </p>
             </div>
           </div>
@@ -302,4 +532,6 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
       </div>
     </section>
   );
+  
+  console.log("🏁🏁🏁 HalfTextHalfImage6 RENDER END 🏁🏁🏁");
 }

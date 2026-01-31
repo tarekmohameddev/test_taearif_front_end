@@ -812,7 +812,7 @@ export default function TenantPageWrapper({
                         <SkeletonLoader componentName={comp.componentName} />
                       }
                     >
-                      <Cmp {...(comp.data as any)} useStore variant={comp.id} />
+                      <Cmp {...(comp.data as any)} useStore variant={comp.componentName} id={comp.id} />
                     </Suspense>
                   );
 

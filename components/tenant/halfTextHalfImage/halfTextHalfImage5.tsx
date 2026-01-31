@@ -187,16 +187,22 @@ export default function HalfTextHalfImage5(props: HalfTextHalfImage5Props) {
     currentStoreData?.content?.description === defaultData?.content?.description;
 
   // Merge data with correct priority
+  // According to fix_halftexthalfimage_data_priority_issue plan:
+  // When tenantComponentData exists, use it directly and skip store data
+  // Only use store data if no tenant data exists
   const mergedData = {
     ...defaultData, // 1. Defaults (lowest priority)
     ...props, // 2. Props from parent component
     // If tenantComponentData exists, use it (it's from Database)
     ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
-    // Use currentStoreData only if it's not just default data
-    // (meaning it has been updated by user) or if tenantComponentData doesn't exist
-    ...(hasTenantData && isStoreDataDefault
-      ? {}
-      : currentStoreData), // 4. Current store data (highest priority if not default)
+    // Skip store data if tenant data exists (tenant data is source of truth)
+    // Only use store data if no tenant data exists
+    ...(hasTenantData
+      ? {} // Skip store data if tenant data exists
+      : {
+          ...storeData, // 4a. Store data from halfTextHalfImageStates (saved data)
+          ...currentStoreData, // 4b. Current store data from getComponentData (saved data)
+        }),
   };
 
   // ⭐ DEBUG: Log data sources (optional - remove in production)
