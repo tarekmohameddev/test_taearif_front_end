@@ -32,6 +32,7 @@ export const getDefaultFooterData = (): ComponentData => ({
   content: {
     companyInfo: {
       enabled: true,
+      showCompanyName: true,
       name: "الشركة العقارية",
       description:
         "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
@@ -151,6 +152,7 @@ export const getDefaultFooter2Data = (): ComponentData => ({
   content: {
     companyInfo: {
       enabled: true,
+      showCompanyName: true,
       name: "تعاريف العقارية",
       description:
         "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",

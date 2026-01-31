@@ -51,6 +51,7 @@ interface Footer2Props {
     ThemeTwo?: string;
     companyInfo?: {
       enabled?: boolean;
+      showCompanyName?: boolean;
       name?: string;
       description?: string;
       tagline?: string;
@@ -312,6 +313,11 @@ export default function Footer2(props: Footer2Props) {
       }
     }
 
+    // Ensure showCompanyName defaults to true if not set
+    if (baseData.content?.companyInfo && baseData.content.companyInfo.showCompanyName === undefined) {
+      baseData.content.companyInfo.showCompanyName = true;
+    }
+
     return baseData;
   }, [
     isGlobalFooter,
@@ -500,7 +506,8 @@ export default function Footer2(props: Footer2Props) {
                     </div>
                   </Link>
                 )}
-                {(customBranding?.footer?.name || mergedData.content?.companyInfo?.name || tenantData?.branding?.name || tenantData?.websiteName) && (
+                {(mergedData.content?.companyInfo?.showCompanyName ?? true) && 
+                 (customBranding?.footer?.name || mergedData.content?.companyInfo?.name || tenantData?.branding?.name || tenantData?.websiteName) && (
                   <div>
                     <h3 className="text-lg font-bold" style={{ color: textAndLinksColor }}>
                       {replaceBaheya(

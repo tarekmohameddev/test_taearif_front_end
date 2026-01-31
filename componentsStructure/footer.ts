@@ -133,6 +133,7 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
+                { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
                 { key: "name", label: "Company Name", type: "text" },
                 { key: "description", label: "Description", type: "text" },
                 { key: "tagline", label: "Tagline", type: "text" },
@@ -425,6 +426,7 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
+                { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
                 { key: "name", label: "Company Name", type: "text" },
                 { key: "description", label: "Description", type: "text" },
                 { key: "tagline", label: "Tagline", type: "text" },
@@ -652,6 +654,7 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
+                { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
                 { key: "name", label: "Company Name", type: "text" },
                 { key: "description", label: "Description", type: "text" },
                 { key: "tagline", label: "Tagline", type: "text" },

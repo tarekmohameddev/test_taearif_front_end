@@ -48,6 +48,7 @@ type FooterData = {
   content: {
     companyInfo: {
       enabled: boolean;
+      showCompanyName?: boolean;
       name: string;
       description: string;
       tagline: string;
@@ -360,6 +361,11 @@ export default function Footer(props: FooterProps = {}) {
           };
         }
       });
+      
+      // Ensure showCompanyName defaults to true if not set
+      if (result.content.companyInfo && result.content.companyInfo.showCompanyName === undefined) {
+        result.content.companyInfo.showCompanyName = true;
+      }
     }
 
     if (result.styling) {
@@ -625,23 +631,25 @@ export default function Footer(props: FooterProps = {}) {
                   );
                 })()}
 
-                <div>
-                  <h3
-                    className={`text-lg font-${mergedData.styling.typography.titleWeight} text-white`}
-                    style={{
-                      fontSize: `var(--${mergedData.styling.typography.titleSize})`,
-                    }}
-                  >
-                    {customBranding?.footer?.name ||
-                      mergedData.content.companyInfo.name ||
-                      tenantData?.branding?.name ||
-                      tenantData?.websiteName ||
-                      ""}
-                  </h3>
-                  <p className="text-sm text-white/80">
-                    {mergedData.content.companyInfo.tagline}
-                  </p>
-                </div>
+                {(mergedData.content.companyInfo.showCompanyName ?? true) && (
+                  <div>
+                    <h3
+                      className={`text-lg font-${mergedData.styling.typography.titleWeight} text-white`}
+                      style={{
+                        fontSize: `var(--${mergedData.styling.typography.titleSize})`,
+                      }}
+                    >
+                      {customBranding?.footer?.name ||
+                        mergedData.content.companyInfo.name ||
+                        tenantData?.branding?.name ||
+                        tenantData?.websiteName ||
+                        ""}
+                    </h3>
+                    <p className="text-sm text-white/80">
+                      {mergedData.content.companyInfo.tagline}
+                    </p>
+                  </div>
+                )}
               </div>
               <h4
                 className={`text-xl font-${mergedData.styling.typography.titleWeight}`}
