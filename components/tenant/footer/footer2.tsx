@@ -131,6 +131,7 @@ interface Footer2Props {
       hoverTransition?: string;
       shadow?: string;
       borderRadius?: string;
+      logoRounded?: boolean;
       ThemeTwo?: string;
     };
   };
@@ -478,7 +479,7 @@ export default function Footer2(props: Footer2Props) {
                       )}
                       width={100}
                       height={100}
-                      className="rounded-full object-contain"
+                      className={(mergedData.styling?.effects?.logoRounded !== false ? "rounded-full " : "") + "object-contain"}
                     />
                   </div>
                 ) : (

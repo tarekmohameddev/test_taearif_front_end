@@ -107,6 +107,7 @@ export const getDefaultFooterData = (): ComponentData => ({
       hoverTransition: "0.3s",
       shadow: "none",
       borderRadius: "none",
+      logoRounded: true,
     },
   },
 });
@@ -220,6 +221,7 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       hoverTransition: "0.3s",
       shadow: "none",
       borderRadius: "lg",
+      logoRounded: true,
     },
   },
 });

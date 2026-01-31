@@ -367,6 +367,11 @@ export const footerStructure: ComponentStructure = {
                   type: "text",
                   placeholder: "none",
                 },
+                {
+                  key: "logoRounded",
+                  label: "Logo Rounded (Circular)",
+                  type: "boolean",
+                },
               ],
             },
           ],
@@ -833,6 +838,11 @@ export const footerStructure: ComponentStructure = {
                   label: "Border Radius",
                   type: "text",
                   placeholder: "lg",
+                },
+                {
+                  key: "logoRounded",
+                  label: "Logo Rounded (Circular)",
+                  type: "boolean",
                 },
               ],
             },

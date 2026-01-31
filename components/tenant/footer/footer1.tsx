@@ -112,6 +112,7 @@ type FooterData = {
       hoverTransition: string;
       shadow: string;
       borderRadius: string;
+      logoRounded?: boolean;
     };
   };
 };
@@ -561,6 +562,9 @@ export default function Footer(props: FooterProps = {}) {
               <div className="flex items-center gap-3">
                 {/* Logic for determining the logo source with strict priority */}
                 {(() => {
+                  const logoRounded = mergedData.styling?.effects?.logoRounded !== false;
+                  const logoClassName = logoRounded ? "rounded-full object-contain" : "object-contain";
+                  
                   // 1. Custom Branding (Highest Priority)
                   const brandingLogo = customBranding?.footer?.logo;
                   if (brandingLogo) {
@@ -571,7 +575,7 @@ export default function Footer(props: FooterProps = {}) {
                           alt={customBranding?.footer?.name || mergedData.content.companyInfo.name || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
                           width={100}
                           height={100}
-                          className="rounded-full object-contain"
+                          className={logoClassName}
                         />
                       </div>
                      );
@@ -587,7 +591,7 @@ export default function Footer(props: FooterProps = {}) {
                           alt={mergedData.content.companyInfo.name || tenantData?.branding?.name || "Logo"}
                           width={100}
                           height={100}
-                          className="rounded-full object-contain"
+                          className={logoClassName}
                         />
                       </div>
                      );
@@ -603,7 +607,7 @@ export default function Footer(props: FooterProps = {}) {
                           alt={tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
                           width={100}
                           height={100}
-                          className="rounded-full object-contain"
+                          className={logoClassName}
                         />
                       </div>
                      );
