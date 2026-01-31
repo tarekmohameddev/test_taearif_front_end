@@ -25,6 +25,7 @@ import { TextareaFieldRenderer } from "./DynamicFieldsRenderer/renderers/Textare
 import { SelectFieldRenderer } from "./DynamicFieldsRenderer/renderers/SelectFieldRenderer";
 import { ColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/ColorFieldRendererWithToggle";
 import { BackgroundColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/BackgroundColorFieldRendererWithToggle";
+import { BackgroundColorObjectRenderer } from "./DynamicFieldsRenderer/renderers/BackgroundColorObjectRenderer";
 
 export function DynamicFieldsRenderer({
   fields,
@@ -150,9 +151,10 @@ export function DynamicFieldsRenderer({
         );
       case "color": {
         // Check if this is a background color field with useMainBgColor
+        // Use BackgroundColorObjectRenderer to display as object field
         if (def.useMainBgColor !== undefined) {
           return (
-            <BackgroundColorFieldRendererWithToggle
+            <BackgroundColorObjectRenderer
               def={def}
               normalizedPath={normalizedPath}
               value={value}

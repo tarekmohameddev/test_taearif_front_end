@@ -1017,7 +1017,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   const getBackgroundColor = (): string => {
     const backgroundColorField = mergedData.styling?.backgroundColor;
     
-    // BackgroundColorFieldRendererWithToggle saves data in this structure:
+    // BackgroundColorObjectRenderer saves data in this structure:
     // When useMainBgColor = true:
     //   - styling.backgroundColor.useMainBgColor = true
     // When useMainBgColor = false:
