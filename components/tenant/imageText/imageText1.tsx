@@ -159,7 +159,7 @@ export default function ImageText1(props: ImageTextProps = {}) {
     <section
       className="relative w-full flex items-center justify-center overflow-hidden"
       style={{
-        height: `${mergedData.styling?.height || 500}px`,
+        height: `${mergedData.styling?.height ?? 500}px`,
       }}
     >
       {/* Background Image */}
