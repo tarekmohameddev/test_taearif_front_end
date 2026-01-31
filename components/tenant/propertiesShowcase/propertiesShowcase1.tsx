@@ -9,6 +9,7 @@ import { getDefaultPropertiesShowcaseData } from "@/context/editorStoreFunctions
 import { cn } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
+import { useBrandingColors } from "@/hooks/useBrandingColors";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -347,14 +348,14 @@ const convertApiProjectToShowcaseFormat = (project: any): Property => {
 };
 
 // SVG Icons
-const AreaIcon = () => (
+const AreaIcon = ({ color }: { color: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     height="24"
     width="24"
-    className="text-[#896042]"
+    style={{ color }}
   >
     <path
       fill="currentColor"
@@ -364,14 +365,14 @@ const AreaIcon = () => (
   </svg>
 );
 
-const BedIcon = () => (
+const BedIcon = ({ color }: { color: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     height="24"
     width="24"
-    className="text-[#896042]"
+    style={{ color }}
   >
     <path
       fill="currentColor"
@@ -381,14 +382,14 @@ const BedIcon = () => (
   </svg>
 );
 
-const BuildingIcon = () => (
+const BuildingIcon = ({ color }: { color: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     height="24"
     width="24"
-    className="text-[#896042]"
+    style={{ color }}
   >
     <path
       fill="currentColor"
@@ -398,14 +399,14 @@ const BuildingIcon = () => (
   </svg>
 );
 
-const StairsIcon = () => (
+const StairsIcon = ({ color }: { color: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     height="24"
     width="24"
-    className="text-[#896042]"
+    style={{ color }}
   >
     <path
       fill="currentColor"
@@ -428,7 +429,15 @@ const StarIcon = () => (
 );
 
 // Project Card Component
-function ProjectCard({ property }: { property: Property }) {
+function ProjectCard({ 
+  property, 
+  iconsColor, 
+  priceBackgroundColor 
+}: { 
+  property: Property;
+  iconsColor: string;
+  priceBackgroundColor: string;
+}) {
   const formatNumber = (num: number) => {
     return num.toLocaleString("en-US");
   };
@@ -500,8 +509,8 @@ function ProjectCard({ property }: { property: Property }) {
           {/* Area */}
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <AreaIcon />
-              <span className="text-[#896042] text-sm font-medium">
+              <AreaIcon color={iconsColor} />
+              <span className="text-sm font-medium" style={{ color: iconsColor }}>
                 {formatNumber(property.area.min)} -{" "}
                 {formatNumber(property.area.max)} م²
               </span>
@@ -512,8 +521,8 @@ function ProjectCard({ property }: { property: Property }) {
           {/* Rooms */}
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <BedIcon />
-              <span className="text-[#896042] text-sm font-medium">
+              <BedIcon color={iconsColor} />
+              <span className="text-sm font-medium" style={{ color: iconsColor }}>
                 {property.rooms.min} - {property.rooms.max}
               </span>
             </div>
@@ -523,8 +532,8 @@ function ProjectCard({ property }: { property: Property }) {
           {/* Units */}
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <BuildingIcon />
-              <span className="text-[#896042] text-sm font-medium">
+              <BuildingIcon color={iconsColor} />
+              <span className="text-sm font-medium" style={{ color: iconsColor }}>
                 {property.units}
               </span>
             </div>
@@ -534,8 +543,8 @@ function ProjectCard({ property }: { property: Property }) {
           {/* Floors */}
           <div className="flex flex-col items-center text-center col-start-2">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <StairsIcon />
-              <span className="text-[#896042] text-sm font-medium">
+              <StairsIcon color={iconsColor} />
+              <span className="text-sm font-medium" style={{ color: iconsColor }}>
                 {property.floors.min} - {property.floors.max}
               </span>
             </div>
@@ -544,7 +553,10 @@ function ProjectCard({ property }: { property: Property }) {
         </div>
 
         {/* Price Section - في نهاية الـ Card مع مسافة بسيطة */}
-        <div className="bg-[#896042] rounded-lg px-4 py-3 text-center mt-auto mb-2">
+        <div 
+          className="rounded-lg px-4 py-3 text-center mt-auto mb-2"
+          style={{ backgroundColor: priceBackgroundColor }}
+        >
           <div className="text-white text-base font-medium">
             {typeof property.price === 'object' && 'min' in property.price && 'max' in property.price
               ? `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`
@@ -904,6 +916,94 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   const routePath = getRoutePath();
 
   // ─────────────────────────────────────────────────────────
+  // 6.6. COLOR HELPERS
+  // ─────────────────────────────────────────────────────────
+  const brandingColors = useBrandingColors();
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (fieldPath: string, defaultColor: string = "#8b5f46"): string => {
+    const colorField = (mergedData.styling as any)?.[fieldPath];
+    
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+    
+    // Also check at the path level
+    if (useDefaultColorValue === undefined) {
+      useDefaultColorValue = (mergedData.styling as any)?.[fieldPath]?.useDefaultColor;
+    }
+    if (globalColorTypeValue === undefined) {
+      globalColorTypeValue = (mergedData.styling as any)?.[fieldPath]?.globalColorType;
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = globalColorTypeValue || "primary";
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        brandingColors.primary;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+    
+    // Final fallback: use provided default color or primary branding color
+    return defaultColor || brandingColors.primary;
+  };
+
+  // Helper function to create darker color for hover states
+  const getDarkerColor = (hex: string, amount: number = 20): string => {
+    if (!hex || !hex.startsWith('#')) return "#6b4630";
+    const cleanHex = hex.replace('#', '');
+    if (cleanHex.length !== 6) return "#6b4630";
+    
+    const r = Math.max(0, Math.min(255, parseInt(cleanHex.substr(0, 2), 16) - amount));
+    const g = Math.max(0, Math.min(255, parseInt(cleanHex.substr(2, 2), 16) - amount));
+    const b = Math.max(0, Math.min(255, parseInt(cleanHex.substr(4, 2), 16) - amount));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  // Get all colors using getColor function
+  const dividerColor = getColor("dividerColor", "#8b5f46");
+  const viewAllButtonColor = getColor("viewAllButtonColor", "#8b5f46");
+  const viewAllButtonHoverColor = mergedData.styling?.viewAllButtonHoverColor || getDarkerColor(viewAllButtonColor, 20);
+  const loadMoreButtonColor = getColor("loadMoreButtonColor", "#8b5f46");
+  const loadMoreButtonTextColor = getColor("loadMoreButtonTextColor", "#8b5f46");
+  const loadMoreButtonHoverColor = mergedData.styling?.loadMoreButtonHoverColor || loadMoreButtonColor;
+  const loadMoreButtonHoverTextColor = mergedData.styling?.loadMoreButtonHoverTextColor || "#ffffff";
+  const priceBackgroundColor = getColor("priceBackgroundColor", "#8b5f46");
+  const iconsColor = getColor("iconsColor", "#8b5f46");
+
+  // ─────────────────────────────────────────────────────────
   // 7. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
@@ -952,7 +1052,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
             <div
               className="w-24 h-[2px] mb-4 ml-auto"
               style={{
-                backgroundColor: mergedData.styling?.dividerColor || "#8b5f46",
+                backgroundColor: dividerColor,
               }}
             ></div>
           </div>
@@ -960,15 +1060,13 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
             href={routePath}
             className="flex items-center gap-2 font-medium transition-colors duration-300 text-md md:text-xl"
             style={{
-              color: mergedData.styling?.viewAllButtonColor || "#8b5f46",
+              color: viewAllButtonColor,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color =
-                mergedData.styling?.viewAllButtonHoverColor || "#6b4630";
+              e.currentTarget.style.color = viewAllButtonHoverColor;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color =
-                mergedData.styling?.viewAllButtonColor || "#8b5f46";
+              e.currentTarget.style.color = viewAllButtonColor;
             }}
           >
             <span>{mergedData.content?.viewAllButtonText || "عرض الكل"}</span>
@@ -996,8 +1094,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
               <div
                 className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
                 style={{
-                  borderBottomColor:
-                    mergedData.styling?.loadMoreButtonColor || "#8b5f46",
+                  borderBottomColor: loadMoreButtonColor,
                 }}
               ></div>
               <p className="text-gray-600">جاري تحميل العقارات...</p>
@@ -1015,7 +1112,11 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
           >
             {properties.map((property: Property, index: number) => (
               <div key={property.id || index} className="h-full">
-                <ProjectCard property={property} />
+                <ProjectCard 
+                  property={property} 
+                  iconsColor={iconsColor}
+                  priceBackgroundColor={priceBackgroundColor}
+                />
               </div>
             ))}
           </div>
@@ -1055,20 +1156,17 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
             href={routePath}
             className="px-5 py-3 border-2 font-medium rounded-2xl transition-all duration-300 hover:scale-110"
             style={{
-              borderColor: mergedData.styling?.loadMoreButtonColor || "#8b5f46",
+              borderColor: loadMoreButtonColor,
               backgroundColor: "transparent",
-              color: mergedData.styling?.loadMoreButtonTextColor || "#8b5f46",
+              color: loadMoreButtonTextColor,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor =
-                mergedData.styling?.loadMoreButtonHoverColor || "#8b5f46";
-              e.currentTarget.style.color =
-                mergedData.styling?.loadMoreButtonHoverTextColor || "#ffffff";
+              e.currentTarget.style.backgroundColor = loadMoreButtonHoverColor;
+              e.currentTarget.style.color = loadMoreButtonHoverTextColor;
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color =
-                mergedData.styling?.loadMoreButtonTextColor || "#8b5f46";
+              e.currentTarget.style.color = loadMoreButtonTextColor;
             }}
           >
             {mergedData.content?.loadMoreButtonText || "تحميل المزيد"}

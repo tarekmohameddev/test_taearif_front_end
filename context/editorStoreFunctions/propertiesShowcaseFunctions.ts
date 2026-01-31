@@ -151,13 +151,33 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
     ThemeTwo: "styling",
     backgroundColor: "#efe5dc",
     titleColor: "#1f2937",
-    dividerColor: "#8b5f46",
-    viewAllButtonColor: "#8b5f46",
+    dividerColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
+    viewAllButtonColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
     viewAllButtonHoverColor: "#6b4630",
-    loadMoreButtonColor: "#8b5f46",
+    loadMoreButtonColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
     loadMoreButtonHoverColor: "#8b5f46",
-    loadMoreButtonTextColor: "#8b5f46",
+    loadMoreButtonTextColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
     loadMoreButtonHoverTextColor: "#ffffff",
+    priceBackgroundColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
+    iconsColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
   },
 
   // Typography
