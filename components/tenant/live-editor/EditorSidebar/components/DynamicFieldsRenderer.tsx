@@ -26,6 +26,7 @@ import { SelectFieldRenderer } from "./DynamicFieldsRenderer/renderers/SelectFie
 import { ColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/ColorFieldRendererWithToggle";
 import { BackgroundColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/BackgroundColorFieldRendererWithToggle";
 import { BackgroundColorObjectRenderer } from "./DynamicFieldsRenderer/renderers/BackgroundColorObjectRenderer";
+import { ColorObjectRenderer } from "./DynamicFieldsRenderer/renderers/ColorObjectRenderer";
 
 export function DynamicFieldsRenderer({
   fields,
@@ -163,14 +164,26 @@ export function DynamicFieldsRenderer({
             />
           );
         }
-        // Otherwise use the regular ColorFieldRendererWithToggle
+        // Check if this is a color field with useDefaultColor
+        // Use ColorObjectRenderer to display as object field (same UI as BackgroundColorObjectRenderer)
+        if (def.useDefaultColor !== undefined) {
+          return (
+            <ColorObjectRenderer
+              def={def}
+              normalizedPath={normalizedPath}
+              value={value}
+              updateValue={updateValue}
+              getValueByPath={getValueByPath}
+            />
+          );
+        }
+        // Otherwise use the regular ColorFieldRenderer (no toggle, no object UI)
         return (
-          <ColorFieldRendererWithToggle
-            def={def}
-            normalizedPath={normalizedPath}
-            value={value}
+          <ColorFieldRenderer
+            label={def.label}
+            path={normalizedPath}
+            value={typeof value === "string" ? value : ""}
             updateValue={updateValue}
-            getValueByPath={getValueByPath}
           />
         );
       }
