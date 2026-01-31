@@ -149,7 +149,9 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
   // Styling
   styling: {
     ThemeTwo: "styling",
-    backgroundColor: "#efe5dc",
+    backgroundColor: {
+      useMainBgColor: true,
+    },
     titleColor: "#1f2937",
     dividerColor: {
       useDefaultColor: true,

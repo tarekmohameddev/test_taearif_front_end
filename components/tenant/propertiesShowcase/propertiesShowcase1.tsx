@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
 import { useBrandingColors } from "@/hooks/useBrandingColors";
+import { useIsLiveEditor } from "@/hooks/useIsLiveEditor";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -919,6 +920,15 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // 6.6. COLOR HELPERS
   // ─────────────────────────────────────────────────────────
   const brandingColors = useBrandingColors();
+  
+  // Get mainBgColor from branding (similar to useBrandingColors)
+  const isLiveEditor = useIsLiveEditor();
+  const editorWebsiteLayout = useEditorStore((s) => s.WebsiteLayout);
+  const tenantDataFromStore = useTenantStore((s) => s.tenantData);
+  
+  const mainBgColor = isLiveEditor
+    ? editorWebsiteLayout?.branding?.mainBgColor?.trim() || "#efe5dc"
+    : tenantDataFromStore?.WebsiteLayout?.branding?.mainBgColor?.trim() || "#efe5dc";
 
   // Helper function to get color based on useDefaultColor and globalColorType
   const getColor = (fieldPath: string, defaultColor: string = "#8b5f46"): string => {
@@ -1003,6 +1013,48 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   const priceBackgroundColor = getColor("priceBackgroundColor", "#8b5f46");
   const iconsColor = getColor("iconsColor", "#8b5f46");
 
+  // Helper function to get background color based on useMainBgColor
+  const getBackgroundColor = (): string => {
+    const backgroundColorField = mergedData.styling?.backgroundColor;
+    
+    // BackgroundColorFieldRendererWithToggle saves data in this structure:
+    // When useMainBgColor = true:
+    //   - styling.backgroundColor.useMainBgColor = true
+    // When useMainBgColor = false:
+    //   - styling.backgroundColor.useMainBgColor = false
+    //   - styling.backgroundColor.value = "#hexcolor" (custom color)
+    
+    // إذا كان backgroundColorField ليس object، استخدم default
+    if (!backgroundColorField || typeof backgroundColorField !== "object" || Array.isArray(backgroundColorField)) {
+      return mainBgColor || "#efe5dc";
+    }
+    
+    // قراءة useMainBgColor (default: true)
+    const useMainBgColor = backgroundColorField.useMainBgColor !== undefined 
+      ? backgroundColorField.useMainBgColor 
+      : true;
+    
+    // إذا كان useMainBgColor = true، استخدم mainBgColor
+    if (useMainBgColor) {
+      return mainBgColor;
+    }
+    
+    // إذا كان useMainBgColor = false، استخدم اللون المخصص من value
+    if (
+      backgroundColorField.value &&
+      typeof backgroundColorField.value === "string" &&
+      backgroundColorField.value.trim() !== "" &&
+      backgroundColorField.value.startsWith("#")
+    ) {
+      return backgroundColorField.value.trim();
+    }
+    
+    // Fallback
+    return mainBgColor || "#efe5dc";
+  };
+
+  const backgroundColor = getBackgroundColor();
+
   // ─────────────────────────────────────────────────────────
   // 7. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
@@ -1022,7 +1074,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
     <section
       className=""
       style={{
-        backgroundColor: mergedData.styling?.backgroundColor || "#efe5dc",
+        backgroundColor: backgroundColor,
         paddingTop: mergedData.layout?.padding?.top || "3rem",
         paddingBottom: mergedData.layout?.padding?.bottom || "3rem",
       }}

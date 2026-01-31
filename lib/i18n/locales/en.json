@@ -538,7 +538,14 @@
     "select_option": "Select an option",
     "current_value_debug": "Current value: {value}",
     "options_debug": "Options: {options}",
-    "path_debug": "Path: {path}"
+    "path_debug": "Path: {path}",
+    "use_default_color": "Use Default Color",
+    "using_branding_color": "Using branding color from general settings",
+    "using_custom_color": "Using custom color",
+    "branding_color_type": "Branding Color Type",
+    "current_color": "Current Color",
+    "use_main_background_color": "Use Main Background Color",
+    "using_main_background_color": "Using main background color from general settings"
   },
   "components_structure": {
     "basic": {

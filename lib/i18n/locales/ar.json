@@ -570,7 +570,9 @@
     "using_branding_color": "استخدام لون العلامة التجارية من الإعدادات العامة",
     "using_custom_color": "استخدام لون مخصص",
     "branding_color_type": "نوع لون العلامة التجارية",
-    "current_color": "اللون الحالي"
+    "current_color": "اللون الحالي",
+    "use_main_background_color": "استخدام لون الخلفية الرئيسي",
+    "using_main_background_color": "استخدام لون الخلفية الرئيسي من الإعدادات العامة"
   },
   "components_structure": {
     "basic": {

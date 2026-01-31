@@ -164,6 +164,8 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               key: "backgroundColor",
               label: "Background Color",
               type: "color",
+              useMainBgColor: true,
+              description: "لون خلفية المكون. يمكنك استخدام Main Background Color من إعدادات التاجر أو لون مخصص.",
             },
             {
               key: "titleColor",

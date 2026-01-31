@@ -31,6 +31,8 @@ export interface FieldDefinitionBase {
   // For color fields: use default branding colors or custom color
   useDefaultColor?: boolean; // default: true - use branding colors from WebsiteLayout
   globalColorType?: "primary" | "secondary" | "accent"; // which branding color to use (primary, secondary, or accent)
+  // For background color fields: use mainBgColor from branding or custom color
+  useMainBgColor?: boolean; // default: true - use mainBgColor from WebsiteLayout.branding.mainBgColor
 }
 
 export interface ObjectFieldDefinition extends FieldDefinitionBase {
