@@ -374,6 +374,32 @@ export const footerStructure: ComponentStructure = {
                 },
               ],
             },
+            {
+              key: "المقاسات",
+              label: "المقاسات",
+              type: "object",
+              fields: [
+                {
+                  key: "logo",
+                  label: "Logo",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "width",
+                      label: "Width (px)",
+                      type: "number",
+                      placeholder: "100",
+                    },
+                    {
+                      key: "height",
+                      label: "Height (px)",
+                      type: "number",
+                      placeholder: "100",
+                    },
+                  ],
+                },
+              ],
+            },
           ],
         },
       ],
@@ -843,6 +869,32 @@ export const footerStructure: ComponentStructure = {
                   key: "logoRounded",
                   label: "Logo Rounded (Circular)",
                   type: "boolean",
+                },
+              ],
+            },
+            {
+              key: "المقاسات",
+              label: "المقاسات",
+              type: "object",
+              fields: [
+                {
+                  key: "logo",
+                  label: "Logo",
+                  type: "object",
+                  fields: [
+                    {
+                      key: "width",
+                      label: "Width (px)",
+                      type: "number",
+                      placeholder: "100",
+                    },
+                    {
+                      key: "height",
+                      label: "Height (px)",
+                      type: "number",
+                      placeholder: "100",
+                    },
+                  ],
                 },
               ],
             },

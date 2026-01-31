@@ -109,6 +109,12 @@ export const getDefaultFooterData = (): ComponentData => ({
       borderRadius: "none",
       logoRounded: true,
     },
+    المقاسات: {
+      logo: {
+        width: 100,
+        height: 100,
+      },
+    },
   },
 });
 
@@ -222,6 +228,12 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       shadow: "none",
       borderRadius: "lg",
       logoRounded: true,
+    },
+    المقاسات: {
+      logo: {
+        width: 100,
+        height: 100,
+      },
     },
   },
 });

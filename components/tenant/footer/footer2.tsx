@@ -477,14 +477,20 @@ export default function Footer2(props: Footer2Props) {
                           tenantData?.websiteName ||
                           "Baheya Real Estate",
                       )}
-                      width={100}
-                      height={100}
+                      width={mergedData.styling?.المقاسات?.logo?.width ?? 100}
+                      height={mergedData.styling?.المقاسات?.logo?.height ?? 100}
                       className={(mergedData.styling?.effects?.logoRounded !== false ? "rounded-full " : "") + "object-contain"}
                     />
                   </div>
                 ) : (
                   <Link href="/" className="block">
-                    <div className="relative w-48 h-32">
+                    <div 
+                      className="relative"
+                      style={{
+                        width: mergedData.styling?.المقاسات?.logo?.width ?? 192,
+                        height: mergedData.styling?.المقاسات?.logo?.height ?? 128,
+                      }}
+                    >
                       <Image
                         src="/images/main/logo.png"
                         alt="تعاريف العقارية"

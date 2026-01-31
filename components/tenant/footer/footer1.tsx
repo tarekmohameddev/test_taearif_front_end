@@ -565,6 +565,10 @@ export default function Footer(props: FooterProps = {}) {
                   const logoRounded = mergedData.styling?.effects?.logoRounded !== false;
                   const logoClassName = logoRounded ? "rounded-full object-contain" : "object-contain";
                   
+                  // Get logo dimensions from المقاسات or use defaults
+                  const logoWidth = mergedData.styling?.المقاسات?.logo?.width ?? 100;
+                  const logoHeight = mergedData.styling?.المقاسات?.logo?.height ?? 100;
+
                   // 1. Custom Branding (Highest Priority)
                   const brandingLogo = customBranding?.footer?.logo;
                   if (brandingLogo) {
@@ -573,8 +577,8 @@ export default function Footer(props: FooterProps = {}) {
                         <Image
                           src={brandingLogo}
                           alt={customBranding?.footer?.name || mergedData.content.companyInfo.name || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
-                          width={100}
-                          height={100}
+                          width={logoWidth}
+                          height={logoHeight}
                           className={logoClassName}
                         />
                       </div>
@@ -589,8 +593,8 @@ export default function Footer(props: FooterProps = {}) {
                         <Image
                           src={contentLogo}
                           alt={mergedData.content.companyInfo.name || tenantData?.branding?.name || "Logo"}
-                          width={100}
-                          height={100}
+                          width={logoWidth}
+                          height={logoHeight}
                           className={logoClassName}
                         />
                       </div>
@@ -605,8 +609,8 @@ export default function Footer(props: FooterProps = {}) {
                          <Image
                           src={tenantLogo}
                           alt={tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
-                          width={100}
-                          height={100}
+                          width={logoWidth}
+                          height={logoHeight}
                           className={logoClassName}
                         />
                       </div>
