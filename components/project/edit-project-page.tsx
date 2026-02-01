@@ -92,7 +92,7 @@ const MapComponent = dynamic(() => import("@/components/map-component"), {
 
 type ProjectImage = {
   id: string;
-  file: File;
+  file: File | null;
   url: string;
 };
 
@@ -237,7 +237,8 @@ export default function EditProjectPage(): JSX.Element {
           setThumbnailImage({
             id: "existing-thumbnail",
             url: projectData.featured_image,
-            file: new File([], "thumbnail.jpg"),
+            // لا تنشئ ملف فارغ - استخدم null للصور الموجودة مسبقاً
+            file: null as any,
           });
         }
 
@@ -249,7 +250,8 @@ export default function EditProjectPage(): JSX.Element {
             projectData.gallery.map((img, index) => ({
               id: `existing-gallery-${index}`,
               url: img,
-              file: new File([], img.split("/").pop() || "image.jpg"),
+              // لا تنشئ ملف فارغ - استخدم null للصور الموجودة مسبقاً
+              file: null as any,
             })),
           );
         }
@@ -262,7 +264,8 @@ export default function EditProjectPage(): JSX.Element {
             projectData.floorplan_images.map((img, index) => ({
               id: `existing-plan-${index}`,
               url: img,
-              file: new File([], img.split("/").pop() || "plan.jpg"),
+              // لا تنشئ ملف فارغ - استخدم null للصور الموجودة مسبقاً
+              file: null as any,
             })),
           );
         }
@@ -553,18 +556,23 @@ export default function EditProjectPage(): JSX.Element {
 
       let featuredImagePath = "";
       if (thumbnailImage) {
-        if (
-          !thumbnailImage.url.startsWith(
-            process.env.NEXT_PUBLIC_Backend_URLWithOutApi,
-          )
-        ) {
+        const isExistingImage = thumbnailImage.url.startsWith(
+          process.env.NEXT_PUBLIC_Backend_URLWithOutApi,
+        );
+        
+        if (isExistingImage) {
+          // الصورة موجودة مسبقاً - استخدم الـ URL
+          featuredImagePath = thumbnailImage.url;
+        } else if (thumbnailImage.file && thumbnailImage.file.size > 0) {
+          // ملف جديد صالح - ارفعه
           const uploadResult = await uploadSingleFile(
             thumbnailImage.file,
             "project",
           );
           featuredImagePath = uploadResult.path;
         } else {
-          featuredImagePath = thumbnailImage.url;
+          // لا يوجد ملف صالح - استخدم الـ URL الموجود (إن وجد)
+          featuredImagePath = thumbnailImage.url || "";
         }
       }
 
@@ -580,15 +588,22 @@ export default function EditProjectPage(): JSX.Element {
           !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
       );
       if (newPlanImages.length > 0) {
-        const files = newPlanImages.map((image) => image.file);
-        const uploadResults = await uploadMultipleFiles(files, "project");
-        if (uploadResults && Array.isArray(uploadResults)) {
-          floorplanPaths = [
-            ...floorplanPaths,
-            ...uploadResults.map((file) => file.path),
-          ];
-          toast.success("تم رفع صور المخططات بنجاح");
+        // تصفية الملفات null والتحقق من وجود ملفات صالحة
+        const files = newPlanImages
+          .map((image) => image.file)
+          .filter((file): file is File => file !== null && file.size > 0);
+        if (files.length > 0) {
+          // رفع الملفات الصالحة فقط
+          const uploadResults = await uploadMultipleFiles(files, "project");
+          if (uploadResults && Array.isArray(uploadResults)) {
+            floorplanPaths = [
+              ...floorplanPaths,
+              ...uploadResults.map((file) => file.path),
+            ];
+            toast.success("تم رفع صور المخططات بنجاح");
+          }
         }
+        // إذا لم تكن هناك ملفات صالحة، سيتم استخدام الـ URLs الموجودة من floorplanPaths
       }
 
       // رفع صور المعرض الجديدة فقط
@@ -603,15 +618,22 @@ export default function EditProjectPage(): JSX.Element {
           !img.url.startsWith(process.env.NEXT_PUBLIC_Backend_URLWithOutApi),
       );
       if (newGalleryImages.length > 0) {
-        const files = newGalleryImages.map((image) => image.file);
-        const uploadResults = await uploadMultipleFiles(files, "project");
-        if (uploadResults && Array.isArray(uploadResults)) {
-          galleryPaths = [
-            ...galleryPaths,
-            ...uploadResults.map((file) => file.path),
-          ];
-          toast.success("تم رفع صور المعرض بنجاح");
+        // تصفية الملفات null والتحقق من وجود ملفات صالحة
+        const files = newGalleryImages
+          .map((image) => image.file)
+          .filter((file): file is File => file !== null && file.size > 0);
+        if (files.length > 0) {
+          // رفع الملفات الصالحة فقط
+          const uploadResults = await uploadMultipleFiles(files, "project");
+          if (uploadResults && Array.isArray(uploadResults)) {
+            galleryPaths = [
+              ...galleryPaths,
+              ...uploadResults.map((file) => file.path),
+            ];
+            toast.success("تم رفع صور المعرض بنجاح");
+          }
         }
+        // إذا لم تكن هناك ملفات صالحة، سيتم استخدام الـ URLs الموجودة من galleryPaths
       }
 
       // رفع الفيديو
@@ -1291,7 +1313,7 @@ export default function EditProjectPage(): JSX.Element {
                           <X className="h-3 w-3" />
                         </Button>
                         <p className="text-xs text-center mt-2 truncate">
-                          {image.file.name}
+                          {image.file?.name || image.url.split("/").pop() || "صورة"}
                         </p>
                       </div>
                     ))}
@@ -1360,7 +1382,7 @@ export default function EditProjectPage(): JSX.Element {
                           <X className="h-3 w-3" />
                         </Button>
                         <p className="text-xs text-center mt-2 truncate">
-                          {image.file.name}
+                          {image.file?.name || image.url.split("/").pop() || "صورة"}
                         </p>
                       </div>
                     ))}
