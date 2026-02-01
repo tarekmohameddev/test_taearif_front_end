@@ -625,6 +625,8 @@
       "right_position": "اليمين",
       "top": "الأعلى",
       "bottom": "الأسفل",
+      "left": "اليسار",
+      "right": "اليمين",
       "center": "الوسط",
       "add": "إضافة",
       "add_step": "إضافة خطوة",
@@ -3228,6 +3230,7 @@
       "phone_2": "الهاتف 2",
       "email": "البريد الإلكتروني",
       "social_media": "وسائل التواصل الاجتماعي",
+      "social_media_position": "موضع وسائل التواصل الاجتماعي",
       "platforms": "المنصات",
       "platform_name": "اسم المنصة",
       "icon": "الأيقونة",
@@ -3267,7 +3270,12 @@
       "show_quick_links": "إظهار الروابط السريعة",
       "show_contact_info": "إظهار معلومات الاتصال",
       "show_social_media": "إظهار وسائل التواصل الاجتماعي",
-      "show_footer_bottom": "إظهار أسفل التذييل"
+      "show_footer_bottom": "إظهار أسفل التذييل",
+      "top": "أعلى",
+      "bottom": "أسفل",
+      "right": "يمين",
+      "left": "يسار",
+      "right_side": "في الجانب الأيمن (أسفل أرقام التواصل)"
     },
     "half_text_half_image_specific": {
       "half_text_half_image_1_modern": "نصف نص نصف صورة 1 - حديث",
@@ -3285,6 +3293,7 @@
       "bottom": "أسفل",
       "left": "يسار",
       "right": "يمين",
+      "right_side": "في الجانب الأيمن (أسفل أرقام التواصل)",
       "margin": "الهامش",
       "content": "المحتوى",
       "eyebrow_text": "نص الحاجب",

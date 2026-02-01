@@ -601,6 +601,8 @@
       "right_position": "Right",
       "top": "Top",
       "bottom": "Bottom",
+      "left": "Left",
+      "right": "Right",
       "center": "Center",
       "add": "Add",
       "add_step": "Add Step",
@@ -3203,6 +3205,7 @@
       "phone_2": "Phone 2",
       "email": "Email",
       "social_media": "Social Media",
+      "social_media_position": "Social Media Position",
       "platforms": "Platforms",
       "platform_name": "Platform Name",
       "icon": "Icon",
@@ -3242,7 +3245,12 @@
       "show_quick_links": "Show Quick Links",
       "show_contact_info": "Show Contact Info",
       "show_social_media": "Show Social Media",
-      "show_footer_bottom": "Show Footer Bottom"
+      "show_footer_bottom": "Show Footer Bottom",
+      "top": "Top",
+      "bottom": "Bottom",
+      "right": "Right",
+      "left": "Left",
+      "right_side": "In the right side (below contact numbers)"
     },
     "half_text_half_image_specific": {
       "half_text_half_image_1_modern": "Half Text Half Image 1 - Modern",
@@ -3260,6 +3268,7 @@
       "bottom": "Bottom",
       "left": "Left",
       "right": "Right",
+      "right_side": "In the right side (below contact numbers)",
       "margin": "Margin",
       "content": "Content",
       "eyebrow_text": "Eyebrow Text",

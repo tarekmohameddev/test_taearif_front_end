@@ -692,6 +692,18 @@ export const footerStructure: ComponentStructure = {
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 {
+                  key: "position",
+                  label: "Social Media Position",
+                  type: "select",
+                  options: [
+                    { label: "Top", value: "top" },
+                    { label: "Bottom", value: "bottom" },
+                    { label: "Right", value: "right" },
+                    { label: "Left", value: "left" },
+                    { label: "In the right side (below contact numbers)", value: "right_side" },
+                  ],
+                },
+                {
                   key: "platforms",
                   label: "Platforms",
                   type: "array",
