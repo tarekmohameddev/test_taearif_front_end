@@ -242,22 +242,24 @@ export default function SideBySide6(props: SideBySide6Props) {
           maxWidth: mergedData.layout?.maxWidth || "1280px",
         }}
       >
-        <div className="bg-white rounded-2xl overflow-hidden">
+        <div className=" rounded-2xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Left Side - Image (40% من العرض) */}
             {(mergedData.image?.visible ?? true) && (
-              <div className="relative w-full md:w-[40%] h-[300px] md:h-[500px] order-1 md:order-2 rounded-2xl overflow-hidden">
-                <Image
-                  src={
-                    mergedData.image?.src ||
-                    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000"
-                  }
-                  alt={mergedData.image?.alt || "صورة"}
-                  fill
-                  className="object-cover rounded-2xl"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                />
+              <div 
+                className="relative w-full md:w-[40%] h-[300px] md:h-[500px] order-1 md:order-2 rounded-2xl overflow-hidden bg-transparent"
+                style={{ backgroundColor: 'transparent' }}
+              >
+                {mergedData.image?.src ? (
+                  <Image
+                    src={mergedData.image.src}
+                    alt={mergedData.image?.alt || "صورة"}
+                    fill
+                    className="object-cover rounded-2xl"
+                    priority
+                    sizes="(max-width: 768px) 100vw, 40vw"
+                  />
+                ) : null}
               </div>
             )}
 
