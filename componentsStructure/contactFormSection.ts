@@ -130,6 +130,12 @@ export const contactFormSectionStructure: ComponentStructure = {
               ],
             },
             {
+              key: "socialLinksEnabled",
+              label: "إظهار روابط التواصل الاجتماعي",
+              type: "boolean",
+              defaultValue: true,
+            },
+            {
               key: "socialLinks",
               label: "Social Links",
               type: "array",

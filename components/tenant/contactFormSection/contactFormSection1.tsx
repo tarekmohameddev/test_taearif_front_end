@@ -420,6 +420,8 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
 
   // Use merged data with proper fallbacks
   const title = mergedData.content?.title || defaultData.content.title;
+  // Check if social links are enabled (default: true)
+  const socialLinksEnabled = mergedData.content?.socialLinksEnabled !== false;
   // Ensure socialLinks is always an array
   const socialLinks = Array.isArray(mergedData.content?.socialLinks)
     ? mergedData.content.socialLinks
@@ -480,65 +482,74 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
       dir="rtl"
     >
       <div
-        className={`flex ${layout?.grid?.columns?.mobile || "flex-col"} ${layout?.grid?.columns?.desktop || "md:flex-row"} w-full justify-between ${layout?.grid?.gap || "gap-[16px]"}`}
+        className={`flex ${socialLinksEnabled ? (layout?.grid?.columns?.mobile || "flex-col") : "flex-col"} ${socialLinksEnabled ? (layout?.grid?.columns?.desktop || "md:flex-row") : "md:flex-row"} w-full ${socialLinksEnabled ? "justify-between" : "justify-center"} ${layout?.grid?.gap || "gap-[16px]"}`}
       >
-        <div
-          className={`details ${styling?.layout?.detailsWidth || "w-full md:w-[35%]"} flex flex-col items-start justify-center ${styling?.layout?.gap || "gap-[16px] md:gap-[10px]"}`}
-        >
-          <div className="flex flex-col gap-[2px]">
-            <h4
-              className={`${styling?.title?.size || "text-[15px] md:text-[24px]"} ${styling?.title?.color || "text-custom-maincolor"} ${styling?.title?.weight || "font-normal"} xs:text-[20px] mb-[24px]`}
-            >
-              {title}
-            </h4>
-            <div className="flex flex-col items-start gap-[8px] md:gap-[24px]">
-              {socialLinks.map((link: any, index: number) => {
-                // Get icon color for this specific link
-                const linkIconColor =
-                  link.icon?.color &&
-                  typeof link.icon.color === "string" &&
-                  link.icon.color.startsWith("#")
-                    ? link.icon.color
-                    : link.icon?.useDefaultColor === false &&
-                        link.icon?.value &&
-                        typeof link.icon.value === "string" &&
-                        link.icon.value.startsWith("#")
-                      ? link.icon.value
-                      : getColor("icon.color", brandingColors.primary);
+        {socialLinksEnabled && (
+          <div
+            className={`details ${styling?.layout?.detailsWidth || "w-full md:w-[35%]"} flex flex-col items-start justify-center ${styling?.layout?.gap || "gap-[16px] md:gap-[10px]"}`}
+          >
+            <div className="flex flex-col gap-[2px]">
+              <h4
+                className={`${styling?.title?.size || "text-[15px] md:text-[24px]"} ${styling?.title?.color || "text-custom-maincolor"} ${styling?.title?.weight || "font-normal"} xs:text-[20px] mb-[24px]`}
+              >
+                {title}
+              </h4>
+              <div className="flex flex-col items-start gap-[8px] md:gap-[24px]">
+                {socialLinks.map((link: any, index: number) => {
+                  // Get icon color for this specific link
+                  const linkIconColor =
+                    link.icon?.color &&
+                    typeof link.icon.color === "string" &&
+                    link.icon.color.startsWith("#")
+                      ? link.icon.color
+                      : link.icon?.useDefaultColor === false &&
+                          link.icon?.value &&
+                          typeof link.icon.value === "string" &&
+                          link.icon.value.startsWith("#")
+                        ? link.icon.value
+                        : getColor("icon.color", brandingColors.primary);
 
-                // Get text color for this specific link
-                const linkTextColor =
-                  link.textStyle?.color &&
-                  typeof link.textStyle.color === "string" &&
-                  link.textStyle.color.startsWith("#")
-                    ? link.textStyle.color
-                    : link.textStyle?.useDefaultColor === false &&
-                        link.textStyle?.value &&
-                        typeof link.textStyle.value === "string" &&
-                        link.textStyle.value.startsWith("#")
-                      ? link.textStyle.value
-                      : getColor("textStyle.color", brandingColors.secondary);
+                  // Get text color for this specific link
+                  const linkTextColor =
+                    link.textStyle?.color &&
+                    typeof link.textStyle.color === "string" &&
+                    link.textStyle.color.startsWith("#")
+                      ? link.textStyle.color
+                      : link.textStyle?.useDefaultColor === false &&
+                          link.textStyle?.value &&
+                          typeof link.textStyle.value === "string" &&
+                          link.textStyle.value.startsWith("#")
+                        ? link.textStyle.value
+                        : getColor("textStyle.color", brandingColors.secondary);
 
-                return (
-                  <SocialLink
-                    key={index}
-                    {...link}
-                    icon={{
-                      ...link.icon,
-                      color: linkIconColor,
-                    }}
-                    textStyle={{
-                      ...link.textStyle,
-                      color: linkTextColor,
-                    }}
-                  />
-                );
-              })}
+                  return (
+                    <SocialLink
+                      key={index}
+                      {...link}
+                      icon={{
+                        ...link.icon,
+                        color: linkIconColor,
+                      }}
+                      textStyle={{
+                        ...link.textStyle,
+                        color: linkTextColor,
+                      }}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-        <div className={`${styling?.layout?.formWidth || "w-full md:w-[50%]"}`}>
+        )}
+        <div className={`${socialLinksEnabled ? (styling?.layout?.formWidth || "w-full md:w-[50%]") : "w-full md:w-[60%] max-w-[600px]"} ${!socialLinksEnabled ? "mx-auto" : ""}`}>
           <div className="Toastify"></div>
+          {!socialLinksEnabled && (
+            <h4
+              className={`${styling?.title?.size || "text-[15px] md:text-[24px]"} ${styling?.title?.color || "text-custom-maincolor"} ${styling?.title?.weight || "font-normal"} xs:text-[20px] mb-[24px] text-center`}
+            >
+              راسلنا الآن
+            </h4>
+          )}
           <form className="flex flex-col gap-[12px] md:gap-[24px]">
             {formFields.map((field: any, index: number) => {
               if (field.type === "textarea") {
@@ -576,7 +587,7 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
               type="submit"
               className={
                 submitButton.style?.className ||
-                "rounded-[6px] w-full text-[14px] md:text-[20px] hover:scale-105 transition duration-300 py-2 md:py-1"
+                "rounded-[6px] w-full text-[14px] md:text-[20px] hover:scale-105 transition duration-300 py-3 md:py-3 min-h-[44px] md:min-h-[50px]"
               }
               style={{
                 backgroundColor: submitButtonBgColor,

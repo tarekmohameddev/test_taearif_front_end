@@ -22,6 +22,7 @@ export const getDefaultContactFormSectionData = (): ComponentData => ({
   },
   content: {
     title: "زوروا صفحتنا على",
+    socialLinksEnabled: true,
     socialLinks: [
       {
         href: "https://facebook.com",
