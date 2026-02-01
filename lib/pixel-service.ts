@@ -6,7 +6,7 @@ export interface PixelSettings {
 export interface PixelData {
     _id?: string; // Optional - will be generated if not provided
     tenantid?: string; // From API response
-    provider: "tiktok" | "meta" | "snapchat" | string;
+    provider: "tiktok" | "meta" | "snapchat" | "gtm" | string;
     externalId: string;
     settings: PixelSettings;
 }
@@ -42,6 +42,15 @@ const MOCK_PIXELS: PixelResponse = {
             _id: "7041d5ff7ad330a338b0e228",
             provider: "snapchat",
             externalId: "84729103-5162-4821-9382-192837465012", // Example mock ID
+            settings: {
+                loadOnStorefront: true,
+                consentMode: false,
+            },
+        },
+        {
+            _id: "7041d5ff7ad330a338b0e229",
+            provider: "gtm",
+            externalId: "GTM-XXXXXXX", // Example mock GTM Container ID
             settings: {
                 loadOnStorefront: true,
                 consentMode: false,

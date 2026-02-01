@@ -32,6 +32,8 @@ export const getPlatformDisplayName = (platform: string): string => {
       return "Snapchat";
     case "tiktok":
       return "TikTok";
+    case "gtm":
+      return "Google Tag Manager";
     default:
       return platform;
   }
@@ -45,6 +47,8 @@ export const getPlatformIcon = (platform: string): string => {
       return "S";
     case "tiktok":
       return "T";
+    case "gtm":
+      return "G";
     default:
       return platform.charAt(0).toUpperCase();
   }
@@ -58,6 +62,8 @@ export const getPlatformExamples = (platform: string): string => {
       return "SC-4455667788";
     case "tiktok":
       return "ABC123DEF456GHI789JKL";
+    case "gtm":
+      return "GTM-XXXXXXX";
     default:
       return "";
   }
@@ -71,6 +77,8 @@ export const getPlatformDescription = (platform: string): string => {
       return "Snapchat Pixel: معرف مخصص من Snapchat. انسخه من إعدادات Snapchat Ads Manager.";
     case "tiktok":
       return "TikTok Pixel: معرف مكون من 20-25 حرف وأرقام كبيرة. يمكنك العثور عليه في TikTok Events Manager.";
+    case "gtm":
+      return "Google Tag Manager: معرف الحاوية (Container ID) بصيغة GTM-XXXXXXX. يمكنك العثور عليه في Google Tag Manager Dashboard.";
     default:
       return "";
   }
@@ -106,6 +114,12 @@ export const validatePixelForm = (
       errors.pixel_id = "Snapchat Pixel يجب أن يكون 3 أحرف على الأقل";
       return { isValid: false, errors };
     }
+  } else if (data.platform === "gtm") {
+    if (!/^GTM-[A-Z0-9]+$/i.test(data.pixel_id)) {
+      errors.pixel_id =
+        "Google Tag Manager Container ID يجب أن يبدأ بـ GTM- متبوعاً بأحرف وأرقام (مثال: GTM-XXXXXXX)";
+      return { isValid: false, errors };
+    }
   }
 
   return { isValid: true, errors: {} };
@@ -120,6 +134,7 @@ export const getAvailablePlatforms = (
     { value: "facebook", label: "Facebook" },
     { value: "tiktok", label: "TikTok" },
     { value: "snapchat", label: "Snapchat" },
+    { value: "gtm", label: "Google Tag Manager" },
   ];
 
   const usedPlatforms = new Set(pixels.map((pixel) => pixel.platform));
