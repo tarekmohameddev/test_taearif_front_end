@@ -753,38 +753,40 @@ export default function Footer2(props: Footer2Props) {
             </div>
 
           {/* Bottom Section - Copyright and Links */}
-          <div className="border-t border-white/20 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-base text-center md:text-right" style={{ color: textAndLinksColor, opacity: 0.9 }}>
-                {(() => {
-                  const copyright =
-                    mergedData.footerBottom?.copyright ||
-                    `جميع الحقوق محفوظة لشركة تعاريف العقارية 2025© | صمم من طرف وكالة سهيل`;
-                  // إزالة " | صمم من طرف وكالة سهيل" تلقائياً إذا كان موجوداً
-                  let cleaned = copyright.replace(
-                    /\s*\|\s*صمم من طرف وكالة سهيل\s*/g,
-                    "",
-                  );
-                  // استبدال "باهية" بـ "تعاريف" تلقائياً
-                  return replaceBaheya(cleaned);
-                })()}
-              </p>
-              <div className="flex items-center gap-6">
-                {mergedData.footerBottom?.legalLinks?.filter((link: any) => link.url).map(
-                  (link: any, index: number) => (
-                    <Link
-                      key={index}
-                      href={link.url || "#"}
-                      className="text-base hover:underline"
-                      style={{ color: textAndLinksColor }}
-                    >
-                      {replaceBaheya(link.text)}
-                    </Link>
-                  ),
-                )}
+          {(mergedData.footerBottom?.enabled !== false && mergedData.footerBottom) && (
+            <div className="border-t border-white/20 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-base text-center md:text-right" style={{ color: textAndLinksColor, opacity: 0.9 }}>
+                  {(() => {
+                    const copyright =
+                      mergedData.footerBottom?.copyright ||
+                      `جميع الحقوق محفوظة لشركة تعاريف العقارية 2025©`;
+                    // إزالة " | صمم من طرف وكالة سهيل" تلقائياً إذا كان موجوداً
+                    let cleaned = copyright.replace(
+                      /\s*\|\s*صمم من طرف وكالة سهيل\s*/g,
+                      "",
+                    );
+                    // استبدال "باهية" بـ "تعاريف" تلقائياً
+                    return replaceBaheya(cleaned);
+                  })()}
+                </p>
+                <div className="flex items-center gap-6">
+                  {mergedData.footerBottom?.legalLinks?.filter((link: any) => link.url).map(
+                    (link: any, index: number) => (
+                      <Link
+                        key={index}
+                        href={link.url || "#"}
+                        className="text-base hover:underline"
+                        style={{ color: textAndLinksColor }}
+                      >
+                        {replaceBaheya(link.text)}
+                      </Link>
+                    ),
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </footer>
     </>
