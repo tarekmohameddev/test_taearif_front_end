@@ -6,6 +6,8 @@ import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorT } from "@/context/editorI18nStore";
 import { getDefaultHalfTextHalfImage7Data } from "@/context/editorStoreFunctions/halfTextHalfImageFunctions";
+import { useBrandingColors } from "@/hooks/useBrandingColors";
+import { useIsLiveEditor } from "@/hooks/useIsLiveEditor";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";
@@ -220,7 +222,8 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     currentStoreData?.content?.title === defaultData?.content?.title;
 
   // Merge data with correct priority
-  // According to makeFieldsRequireSaveChanges.txt:
+  // According to fixCaching.txt and makeFieldsRequireSaveChanges.txt:
+  // Priority: Default → Props → Database (tenantComponentData) → Store (if not default or if no tenant data)
   // Component should read from halfTextHalfImageStates[uniqueId] (storeData) and getComponentData() (currentStoreData)
   // NOT from tempData (which is temporary and not visible until Save Changes)
   // ✅ GOOD: mergedData does NOT include tempData - only reads from saved states
@@ -230,10 +233,10 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
       ...props, // 2. Props from parent component
       // If tenantComponentData exists, use it (it's from Database)
       ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
-      // Skip store data if tenant data exists (tenant data is source of truth)
-      // Only use store data if no tenant data exists
-      ...(hasTenantData
-        ? {} // Skip store data if tenant data exists
+      // Use currentStoreData only if it's not just default data
+      // (meaning it has been updated by user) or if tenantComponentData doesn't exist
+      ...(hasTenantData && isStoreDataDefault
+        ? {} // Skip store data if tenant data exists and store data is default
         : {
             ...storeData, // 4a. Store data from halfTextHalfImageStates (saved data)
             ...currentStoreData, // 4b. Current store data from getComponentData (saved data)
@@ -245,6 +248,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
       props,
       hasTenantData,
       tenantComponentData,
+      isStoreDataDefault,
       storeData,
       currentStoreData,
     ],
@@ -269,14 +273,135 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
   }
 
   // ─────────────────────────────────────────────────────────
-  // 7. EARLY RETURN IF NOT VISIBLE
+  // 7. COLOR HELPERS
+  // ─────────────────────────────────────────────────────────
+  const brandingColors = useBrandingColors();
+  
+  // Get mainBgColor from branding (similar to useBrandingColors)
+  const isLiveEditor = useIsLiveEditor();
+  const editorWebsiteLayout = useEditorStore((s) => s.WebsiteLayout);
+  const tenantDataFromStore = useTenantStore((s) => s.tenantData);
+  
+  const mainBgColor = isLiveEditor
+    ? editorWebsiteLayout?.branding?.mainBgColor?.trim() || "#f5f0e8"
+    : tenantDataFromStore?.WebsiteLayout?.branding?.mainBgColor?.trim() || "#f5f0e8";
+
+  // Helper function to get color based on useDefaultColor and globalColorType
+  const getColor = (fieldPath: string, defaultColor: string = "#8b5f46"): string => {
+    const colorField = (mergedData.styling as any)?.[fieldPath];
+    
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+    
+    // Also check at the path level
+    if (useDefaultColorValue === undefined) {
+      useDefaultColorValue = (mergedData.styling as any)?.[fieldPath]?.useDefaultColor;
+    }
+    if (globalColorTypeValue === undefined) {
+      globalColorTypeValue = (mergedData.styling as any)?.[fieldPath]?.globalColorType;
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = globalColorTypeValue || "primary";
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        brandingColors.primary;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+    
+    // Final fallback: use provided default color or primary branding color
+    return defaultColor || brandingColors.primary;
+  };
+
+  // Helper function to get background color based on useMainBgColor
+  const getBackgroundColor = (): string => {
+    const backgroundColorField = mergedData.styling?.backgroundColor;
+    
+    // BackgroundColorObjectRenderer saves data in this structure:
+    // When useMainBgColor = true:
+    //   - styling.backgroundColor.useMainBgColor = true
+    // When useMainBgColor = false:
+    //   - styling.backgroundColor.useMainBgColor = false
+    //   - styling.backgroundColor.value = "#hexcolor" (custom color)
+    
+    // إذا كان backgroundColorField ليس object، استخدم default
+    if (!backgroundColorField || typeof backgroundColorField !== "object" || Array.isArray(backgroundColorField)) {
+      return mainBgColor || "#f5f0e8";
+    }
+    
+    // قراءة useMainBgColor (default: true)
+    const useMainBgColor = backgroundColorField.useMainBgColor !== undefined 
+      ? backgroundColorField.useMainBgColor 
+      : true;
+    
+    // إذا كان useMainBgColor = true، استخدم mainBgColor
+    if (useMainBgColor) {
+      return mainBgColor;
+    }
+    
+    // إذا كان useMainBgColor = false، استخدم اللون المخصص من value
+    if (
+      backgroundColorField.value &&
+      typeof backgroundColorField.value === "string" &&
+      backgroundColorField.value.trim() !== "" &&
+      backgroundColorField.value.startsWith("#")
+    ) {
+      return backgroundColorField.value.trim();
+    }
+    
+    // Fallback
+    return mainBgColor || "#f5f0e8";
+  };
+
+  // Get all colors using helper functions
+  const backgroundColor = getBackgroundColor();
+  const dividerColor = getColor("dividerColor", "#8b5f46");
+  const featureTitleColor = getColor("featureTitleColor", "#8b5f46");
+  const featureDescriptionColor = getColor("featureDescriptionColor", "#8b5f46");
+  const iconBackgroundColor = getColor("iconBackgroundColor", "#d4a574");
+  const iconColor = getColor("iconColor", "#896042");
+
+  // ─────────────────────────────────────────────────────────
+  // 8. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
     return null;
   }
 
   // ─────────────────────────────────────────────────────────
-  // 8. RENDER
+  // 9. RENDER
   // ─────────────────────────────────────────────────────────
   // Function to get icon component based on type or name
   const getFeatureIcon = (
@@ -320,7 +445,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
     <section
       className="w-full flex items-center justify-center py-12 md:py-16"
       style={{
-        backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
+        backgroundColor: backgroundColor,
         paddingTop: mergedData.spacing?.padding?.top || "3rem",
         paddingBottom: mergedData.spacing?.padding?.bottom || "4rem",
         paddingLeft: mergedData.spacing?.padding?.left || "1rem",
@@ -383,8 +508,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                 <div
                   className="w-24 h-[2px] mb-4 ml-auto"
                   style={{
-                    backgroundColor:
-                      mergedData.styling?.dividerColor || "#8b5f46",
+                    backgroundColor: dividerColor,
                   }}
                 ></div>
               </div>
@@ -408,16 +532,12 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                       <div
                         className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
                         style={{
-                          backgroundColor:
-                            mergedData.styling?.iconBackgroundColor ||
-                            "#d4a574",
+                          backgroundColor: iconBackgroundColor,
                         }}
                       >
                         {(() => {
                           const iconName = feature.icon || "Shield";
                           const IconComponent = getFeatureIcon(iconName);
-                          const iconColor =
-                            mergedData.styling?.iconColor || "#896042";
 
                           // Check if it's a React Icon (from react-icons) by checking the icon name pattern
                           const isReactIcon =
@@ -468,9 +588,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                         <h4
                           className="text-lg md:text-xl font-bold mb-2"
                           style={{
-                            color:
-                              mergedData.styling?.featureTitleColor ||
-                              "#8b5f46",
+                            color: featureTitleColor,
                           }}
                         >
                           {feature.title || ""}
@@ -478,9 +596,7 @@ export default function HalfTextHalfImage7(props: HalfTextHalfImage7Props) {
                         <p
                           className="text-sm md:text-base leading-relaxed"
                           style={{
-                            color:
-                              mergedData.styling?.featureDescriptionColor ||
-                              "#8b5f46",
+                            color: featureDescriptionColor,
                           }}
                         >
                           {feature.description || ""}

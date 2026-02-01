@@ -469,13 +469,30 @@ export const getDefaultHalfTextHalfImage7Data = (): ComponentData => ({
     ],
   },
   styling: {
-    backgroundColor: "#f5f0e8",
+    backgroundColor: {
+      useMainBgColor: true,
+    },
     titleColor: "#000000",
-    dividerColor: "#8b5f46",
-    featureTitleColor: "#8b5f46",
-    featureDescriptionColor: "#8b5f46",
-    iconBackgroundColor: "#d4a574",
-    iconColor: "#896042",
+    dividerColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
+    featureTitleColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
+    featureDescriptionColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
+    iconBackgroundColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
+    iconColor: {
+      useDefaultColor: true,
+      globalColorType: "primary",
+    },
   },
   image: {
     src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",

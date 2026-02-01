@@ -894,7 +894,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="name"
                       placeholder="سكاي لاين ريزيدنس"
-                      value={newProject.name}
+                      value={newProject.name ?? ""}
                       onChange={handleInputChange}
                       className={formErrors.name ? "border-red-500" : ""}
                     />
@@ -907,7 +907,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="location"
                       placeholder="وسط المدينة"
-                      value={newProject.location}
+                      value={newProject.location ?? ""}
                       onChange={handleInputChange}
                       className={formErrors.location ? "border-red-500" : ""}
                     />
@@ -926,7 +926,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="minprice"
                       placeholder="مثال: 750000"
-                      value={newProject.minprice}
+                      value={newProject.minprice ?? ""}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -935,7 +935,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="maxprice"
                       placeholder="مثال: 1200000"
-                      value={newProject.maxprice}
+                      value={newProject.maxprice ?? ""}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -959,7 +959,7 @@ export default function EditProjectPage(): JSX.Element {
                       onValueChange={(value) =>
                         handleSelectChange("complete_status", value)
                       }
-                      value={newProject.complete_status}
+                      value={newProject.complete_status ?? undefined}
                     >
                       <SelectTrigger
                         id="status"
@@ -988,7 +988,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="completion_date"
                       placeholder="2025"
-                      value={newProject.completion_date}
+                      value={newProject.completion_date ?? ""}
                       onChange={handleInputChange}
                       className={
                         formErrors.completion_date ? "border-red-500" : ""
@@ -1005,7 +1005,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="developer"
                       placeholder="مجموعة التطوير الحضري"
-                      value={newProject.developer}
+                      value={newProject.developer ?? ""}
                       onChange={handleInputChange}
                       className={formErrors.developer ? "border-red-500" : ""}
                     />
@@ -1126,7 +1126,7 @@ export default function EditProjectPage(): JSX.Element {
                     id="description"
                     placeholder="شقق فاخرة عالية الارتفاع مع إطلالات بانورامية على المدينة"
                     rows={3}
-                    value={newProject.description}
+                    value={newProject.description ?? ""}
                     onChange={handleInputChange}
                     className={formErrors.description ? "border-red-500" : ""}
                   />
@@ -1163,7 +1163,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="latitude"
                       placeholder="25.276987"
-                      value={newProject.latitude.toString()}
+                      value={newProject.latitude?.toString() ?? ""}
                       onChange={handleCoordinateChange}
                       className={formErrors.coordinates ? "border-red-500" : ""}
                     />
@@ -1173,7 +1173,7 @@ export default function EditProjectPage(): JSX.Element {
                     <Input
                       id="longitude"
                       placeholder="55.296249"
-                      value={newProject.longitude.toString()}
+                      value={newProject.longitude?.toString() ?? ""}
                       onChange={handleCoordinateChange}
                       className={formErrors.coordinates ? "border-red-500" : ""}
                     />

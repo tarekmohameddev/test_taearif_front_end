@@ -358,6 +358,24 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
       ...(hasTenantData && isStoreDataDefault
         ? {}
         : currentStoreData?.form || {}),
+      // Ensure fields is always an array - prioritize in order: store > tenant > props > default
+      fields: (() => {
+        const storeFields = currentStoreData?.form?.fields;
+        const tenantFields = tenantComponentData?.form?.fields;
+        const propsFields = props.form?.fields;
+        
+        // Priority: store > tenant > props > default (only if array)
+        if (Array.isArray(storeFields) && !(hasTenantData && isStoreDataDefault)) {
+          return storeFields;
+        }
+        if (Array.isArray(tenantFields) && hasTenantData) {
+          return tenantFields;
+        }
+        if (Array.isArray(propsFields)) {
+          return propsFields;
+        }
+        return defaultData.form.fields;
+      })(),
     },
     layout: {
       ...defaultData.layout,
@@ -402,9 +420,18 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
 
   // Use merged data with proper fallbacks
   const title = mergedData.content?.title || defaultData.content.title;
-  const socialLinks =
-    mergedData.content?.socialLinks || defaultData.content.socialLinks;
-  const formFields = mergedData.form?.fields || defaultData.form.fields;
+  // Ensure socialLinks is always an array
+  const socialLinks = Array.isArray(mergedData.content?.socialLinks)
+    ? mergedData.content.socialLinks
+    : Array.isArray(defaultData.content?.socialLinks)
+      ? defaultData.content.socialLinks
+      : [];
+  // Ensure formFields is always an array
+  const formFields = Array.isArray(mergedData.form?.fields)
+    ? mergedData.form.fields
+    : Array.isArray(defaultData.form?.fields)
+      ? defaultData.form.fields
+      : [];
   const submitButton =
     mergedData.form?.submitButton || defaultData.form.submitButton;
   const layout = mergedData.layout || defaultData.layout;

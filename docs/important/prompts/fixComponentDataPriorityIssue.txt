@@ -1,0 +1,308 @@
+# PROMPT: Fix Component Data Priority Issue
+
+## 🎯 Objective
+
+This prompt explains how to fix data priority issues in components where components display incorrect data on the client-side because they're not correctly prioritizing `tenantComponentData` (from API) over `storeData` (from Zustand store).
+
+**Use this prompt with a component file to fix data priority and ensure correct data display.**
+
+---
+
+## 📋 Problem Statement
+
+### Current Behavior (Incorrect):
+- Components display wrong data on client-side
+- All instances of the same component type show the same incorrect data
+- `tenantComponentData` from API exists but is not being used
+- `storeData` is being used even when `tenantComponentData` exists
+
+### Desired Behavior (Correct):
+- Each component instance displays its correct data from API
+- `tenantComponentData` is prioritized over `storeData` when it exists
+- Components correctly identify themselves using `id` prop
+
+---
+
+## 🔍 Root Cause Analysis
+
+### Why Components Display Wrong Data:
+
+1. **TenantPageWrapper doesn't pass `id` prop:**
+   ```typescript
+   // ❌ BAD: Missing id prop
+   <Cmp {...(comp.data as any)} useStore variant={comp.id} />
+   ```
+
+2. **Component uses wrong identifier:**
+   - `props.id` is `undefined` because it's not passed
+   - Component falls back to `variantId` which may be incorrect
+   - `getTenantComponentData()` can't find the correct component data
+
+3. **Merge logic doesn't prioritize tenantComponentData:**
+   ```typescript
+   // ❌ BAD: Uses storeData even when tenantComponentData exists
+   ...(hasTenantData && isStoreDataDefault
+     ? {}
+     : currentStoreData), // Still uses storeData if not default
+   ```
+
+---
+
+## 📋 Implementation Steps
+
+### Step 1: Check TenantPageWrapper.tsx
+
+**File**: `app/TenantPageWrapper.tsx` (around line 815)
+
+**Check if it passes both `variant` and `id`:**
+
+```typescript
+// ✅ GOOD: Passes both variant and id
+<Cmp {...(comp.data as any)} useStore variant={comp.componentName} id={comp.id} />
+
+// ❌ BAD: Missing id prop
+<Cmp {...(comp.data as any)} useStore variant={comp.id} />
+```
+
+**If missing `id` prop, fix it:**
+```typescript
+// Change from:
+<Cmp {...(comp.data as any)} useStore variant={comp.id} />
+
+// To:
+<Cmp {...(comp.data as any)} useStore variant={comp.componentName} id={comp.id} />
+```
+
+**Reason:**
+- `variant` should be `componentName` (e.g., "halfTextHalfImage6") not `comp.id`
+- `id` should be `comp.id` for correct search in tenantData
+
+---
+
+### Step 2: Check Component Data Retrieval
+
+**In the component file, check how `storeData` and `currentStoreData` are retrieved:**
+
+```typescript
+// ✅ GOOD: Correct order
+const storeData = props.useStore
+  ? {componentType}States[uniqueId] || {}
+  : {};
+const currentStoreData = props.useStore
+  ? getComponentData("{componentType}", uniqueId) || {}
+  : {};
+
+// ❌ BAD: Wrong order (swapped)
+const storeData = props.useStore
+  ? getComponentData("{componentType}", uniqueId) || {}
+  : {};
+const currentStoreData = props.useStore
+  ? {componentType}States[uniqueId] || {}
+  : {};
+```
+
+**If order is wrong, fix it:**
+- `storeData` should come from `{componentType}States[uniqueId]`
+- `currentStoreData` should come from `getComponentData("{componentType}", uniqueId)`
+
+---
+
+### Step 3: Fix Merge Logic
+
+**Find the `mergedData` object in the component:**
+
+```typescript
+// ❌ BAD: Current logic (doesn't prioritize tenantComponentData)
+const mergedData = {
+  ...defaultData,
+  ...props,
+  ...(hasTenantData ? tenantComponentData : {}),
+  ...(hasTenantData && isStoreDataDefault
+    ? {}
+    : currentStoreData), // Still uses storeData if not default
+};
+```
+
+**Replace with improved logic:**
+
+```typescript
+// ✅ GOOD: Improved logic (prioritizes tenantComponentData)
+const mergedData = {
+  ...defaultData, // 1. Defaults (lowest priority)
+  ...props, // 2. Props from parent component
+  // If tenantComponentData exists, use it (it's from Database)
+  ...(hasTenantData ? tenantComponentData : {}), // 3. Backend data (tenant data)
+  // Skip store data if tenant data exists (tenant data is source of truth)
+  // Only use store data if no tenant data exists
+  ...(hasTenantData
+    ? {} // Skip store data if tenant data exists
+    : {
+        ...storeData, // 4a. Store data from {componentType}States (saved data)
+        ...currentStoreData, // 4b. Current store data from getComponentData (saved data)
+      }),
+};
+```
+
+**Key Changes:**
+1. Remove `isStoreDataDefault` check - always skip store data if tenant data exists
+2. Add `storeData` to mergedData when no tenant data exists
+3. Ensure both `storeData` and `currentStoreData` are included when no tenant data
+
+---
+
+### Step 4: Verify getTenantComponentData Function
+
+**Check that `getTenantComponentData()` searches by `props.id`:**
+
+```typescript
+// ✅ GOOD: Searches by props.id (most reliable)
+const getTenantComponentData = () => {
+  // ...
+  if (
+    (component as any).type === "{componentType}" &&
+    (componentId === props.id ||
+      (component as any).id === props.id ||
+      (component as any).id === uniqueId)
+  ) {
+    return (component as any).data;
+  }
+  // ...
+};
+```
+
+**Ensure it checks:**
+- `componentId === props.id` (most reliable)
+- `(component as any).id === props.id`
+- `(component as any).id === uniqueId` (fallback)
+
+---
+
+## 📝 Complete Example
+
+### Before (Incorrect):
+
+```typescript
+// TenantPageWrapper.tsx
+<Cmp {...(comp.data as any)} useStore variant={comp.id} />
+
+// Component file
+const storeData = props.useStore
+  ? getComponentData("halfTextHalfImage", uniqueId) || {}
+  : {};
+const currentStoreData = props.useStore
+  ? halfTextHalfImageStates[uniqueId] || {}
+  : {};
+
+const mergedData = {
+  ...defaultData,
+  ...props,
+  ...(hasTenantData ? tenantComponentData : {}),
+  ...(hasTenantData && isStoreDataDefault
+    ? {}
+    : currentStoreData),
+};
+```
+
+### After (Correct):
+
+```typescript
+// TenantPageWrapper.tsx
+<Cmp {...(comp.data as any)} useStore variant={comp.componentName} id={comp.id} />
+
+// Component file
+const storeData = props.useStore
+  ? halfTextHalfImageStates[uniqueId] || {}
+  : {};
+const currentStoreData = props.useStore
+  ? getComponentData("halfTextHalfImage", uniqueId) || {}
+  : {};
+
+const mergedData = {
+  ...defaultData,
+  ...props,
+  ...(hasTenantData ? tenantComponentData : {}),
+  ...(hasTenantData
+    ? {} // Skip store data if tenant data exists
+    : {
+        ...storeData,
+        ...currentStoreData,
+      }),
+};
+```
+
+---
+
+## ✅ Checklist
+
+After applying this prompt to a component:
+
+- [ ] `TenantPageWrapper.tsx` passes both `variant={comp.componentName}` and `id={comp.id}`
+- [ ] `storeData` comes from `{componentType}States[uniqueId]`
+- [ ] `currentStoreData` comes from `getComponentData("{componentType}", uniqueId)`
+- [ ] `mergedData` skips store data completely when `hasTenantData` is true
+- [ ] `mergedData` includes both `storeData` and `currentStoreData` when no tenant data exists
+- [ ] `getTenantComponentData()` searches by `props.id` first
+- [ ] Each component instance displays its correct data from API
+- [ ] No duplicate data across component instances
+
+---
+
+## 🎯 Expected Result
+
+After applying this prompt:
+
+1. ✅ Each component instance displays its correct data from API
+2. ✅ No duplicate data across component instances
+3. ✅ `tenantComponentData` is used directly when available
+4. ✅ `storeData` is only used when no tenant data exists
+5. ✅ Components correctly identify themselves using `id` prop
+
+---
+
+## 📚 Key Concepts
+
+### Data Priority Order:
+
+1. **defaultData**: Lowest priority (fallback values)
+2. **props**: From parent component
+3. **tenantComponentData**: From API (Database) - **Highest priority when exists**
+4. **storeData**: From Zustand store (only when no tenant data)
+
+### Component Identification:
+
+- **`variant`**: Component type/name (e.g., "halfTextHalfImage6")
+- **`id`**: Unique instance identifier (e.g., "1", UUID)
+- **`uniqueId`**: `props.id || variantId` (fallback to variant if no id)
+
+### When to Use Each Data Source:
+
+- **Use `tenantComponentData`**: Always when it exists (from API)
+- **Use `storeData`**: Only when no tenant data exists
+- **Never mix**: Don't use store data if tenant data exists
+
+---
+
+## 🚀 Usage
+
+**To apply this to a component:**
+
+1. Replace `{componentType}` with component type (e.g., "halfTextHalfImage", "hero")
+2. Replace `{ComponentName}` with PascalCase component name (e.g., "HalfTextHalfImage", "Hero")
+3. Check `TenantPageWrapper.tsx` first
+4. Fix data retrieval order if needed
+5. Update merge logic to prioritize `tenantComponentData`
+6. Verify `getTenantComponentData()` searches by `props.id`
+7. Test with multiple component instances on the same page
+
+---
+
+## 📝 Notes
+
+- This ensures **correct data display** for each component instance
+- `tenantComponentData` from API is the **source of truth**
+- Store data is only used as fallback when no tenant data exists
+- All component instances should display their own unique data
+
+---
+
+**Created to fix data priority issues in components, ensuring each instance displays its correct data from API.**
