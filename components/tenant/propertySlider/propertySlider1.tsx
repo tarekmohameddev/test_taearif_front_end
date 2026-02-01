@@ -156,6 +156,22 @@ const convertProjectToProperty = (project: any): Property => {
     }
   };
 
+  // Helper function to convert completeStatus from number to readable text
+  const getCompleteStatusText = (status: number | string | undefined | null): string => {
+    if (status === undefined || status === null) return "قيد الإنشاء";
+    const statusNum = typeof status === "string" ? parseInt(status, 10) : status;
+    switch (statusNum) {
+      case 0:
+        return "قيد الإنشاء";
+      case 1:
+        return "منتهي";
+      case 2:
+        return "لم ينشأ بعد";
+      default:
+        return "قيد الإنشاء";
+    }
+  };
+
   return {
     id: project.id,
     slug: project.slug,
@@ -169,7 +185,7 @@ const convertProjectToProperty = (project: any): Property => {
     type: "مشروع", // Project type
     transactionType: "project", // Project transaction type
     image: project.image || project.images?.[0] || "",
-    status: project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء",
+    status: getCompleteStatusText(project.completeStatus),
     createdAt: formatCompletionDate(project.completionDate),
     description: project.description || "",
     features: project.amenities || [],

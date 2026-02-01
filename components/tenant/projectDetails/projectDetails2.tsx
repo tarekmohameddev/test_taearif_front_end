@@ -26,6 +26,7 @@ interface Project {
   developer?: string;
   units?: number;
   completionDate?: string;
+  completeStatus?: number | string; // Can be number (0/1) or string
   minPrice?: string;
   maxPrice?: string;
   price?: string;
@@ -275,6 +276,22 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
     ...(hasTenantData && isStoreDataDefault
       ? {}
       : currentStoreData), // 4. Current store data (highest priority if not default)
+  };
+
+  // Helper function to convert completeStatus from number to readable text
+  const getCompleteStatusText = (status: number | string | undefined | null): string => {
+    if (status === undefined || status === null) return "قيد الإنشاء";
+    const statusNum = typeof status === "string" ? parseInt(status, 10) : status;
+    switch (statusNum) {
+      case 0:
+        return "قيد الإنشاء";
+      case 1:
+        return "منتهي";
+      case 2:
+        return "لم ينشأ بعد";
+      default:
+        return "قيد الإنشاء";
+    }
   };
 
   // Get primary color
@@ -546,13 +563,24 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         `/v1/tenant-website/${finalTenantId}/projects/${props.projectSlug}`,
       );
 
+      let projectData = null;
       if (response.data && response.data.project) {
-        setProject(response.data.project);
+        projectData = response.data.project;
       } else if (response.data) {
-        setProject(response.data);
+        projectData = response.data;
       } else {
         setProjectError("المشروع غير موجود");
+        return;
       }
+
+      // Normalize completeStatus: convert number to string if needed
+      if (projectData.completeStatus !== undefined && projectData.completeStatus !== null) {
+        if (typeof projectData.completeStatus === 'number') {
+          projectData.completeStatus = String(projectData.completeStatus);
+        }
+      }
+
+      setProject(projectData);
     } catch (error) {
       console.error("ProjectDetails2: Error fetching project:", error);
       setProjectError("حدث خطأ في تحميل بيانات المشروع");

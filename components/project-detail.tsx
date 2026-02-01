@@ -219,6 +219,22 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
   const primaryColorHover = getDarkerColor(primaryColor, 20);
   const primaryColorFilter = hexToFilter(primaryColor);
 
+  // Helper function to convert completeStatus from number to readable text
+  const getCompleteStatusText = (status: number | string | undefined | null): string => {
+    if (status === undefined || status === null) return "قيد الإنشاء";
+    const statusNum = typeof status === "string" ? parseInt(status, 10) : status;
+    switch (statusNum) {
+      case 0:
+        return "قيد الإنشاء";
+      case 1:
+        return "منتهي";
+      case 2:
+        return "لم ينشأ بعد";
+      default:
+        return "قيد الإنشاء";
+    }
+  };
+
   // Project data state
   const [project, setProject] = useState<Project | null>(null);
   const [loadingProject, setLoadingProject] = useState(true);
@@ -864,8 +880,9 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                 ) : null}
 
                 {/* حالة الإكمال */}
-                {project.completeStatus &&
-                project.completeStatus.trim() !== "" ? (
+                {project.completeStatus !== undefined &&
+                project.completeStatus !== null &&
+                String(project.completeStatus).trim() !== "" ? (
                   <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                     <div className="flex flex-row gap-x-2">
                       <WrenchIcon
@@ -880,7 +897,7 @@ export default function ProjectDetail({ projectSlug }: ProjectDetailProps) {
                       </p>
                     </div>
                     <p className="font-bold leading-4 text-xs xs:text-sm md:text-base text-gray-600">
-                      {project.completeStatus === "1" ? "مكتمل" : "قيد الإنشاء"}
+                      {getCompleteStatusText(project.completeStatus)}
                     </p>
                   </div>
                 ) : null}

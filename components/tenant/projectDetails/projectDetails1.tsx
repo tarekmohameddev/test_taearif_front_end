@@ -317,6 +317,22 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
       ? tenantData.WebsiteLayout.branding.colors.primary
       : "#059669"); // emerald-600 default
 
+  // Helper function to convert completeStatus from number to readable text
+  const getCompleteStatusText = (status: number | string | undefined | null): string => {
+    if (status === undefined || status === null) return "قيد الإنشاء";
+    const statusNum = typeof status === "string" ? parseInt(status, 10) : status;
+    switch (statusNum) {
+      case 0:
+        return "قيد الإنشاء";
+      case 1:
+        return "منتهي";
+      case 2:
+        return "لم ينشأ بعد";
+      default:
+        return "قيد الإنشاء";
+    }
+  };
+
   // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
@@ -1103,8 +1119,9 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
 
                 {/* Complete Status */}
                 {mergedData.displaySettings?.showCompleteStatus &&
-                  project.completeStatus &&
-                  project.completeStatus.trim() !== "" && (
+                  project.completeStatus !== undefined &&
+                  project.completeStatus !== null &&
+                  String(project.completeStatus).trim() !== "" && (
                     <div className="items-center flex flex-row gap-x-2 md:gap-x-6">
                       <div className="flex flex-row gap-x-2">
                         <WrenchIcon
@@ -1122,9 +1139,7 @@ export default function ProjectDetails1(props: ProjectDetailsProps) {
                         className="font-bold leading-4 text-xs xs:text-sm md:text-base"
                         style={{ color: mergedData.styling?.textColor }}
                       >
-                        {project.completeStatus === "1"
-                          ? "مكتمل"
-                          : "قيد الإنشاء"}
+                        {getCompleteStatusText(project.completeStatus)}
                       </p>
                     </div>
                   )}
