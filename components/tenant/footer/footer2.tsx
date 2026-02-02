@@ -261,15 +261,17 @@ export default function Footer2(props: Footer2Props) {
     const baseData = isGlobalFooter
       ? {
           ...getDefaultFooter2Data(), // 1. Defaults (lowest priority)
-          ...globalFooterData, // 2. Global footer data
-          ...props, // 3. Props
+          ...tenantComponentData, // 2. Database data
+          ...globalFooterData, // 3. Global footer data
+          ...props, // 4. Props
           ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
         }
       : {
           ...getDefaultFooter2Data(), // 1. Defaults (lowest priority)
-          ...storeData, // 2. Store state
-          ...currentStoreData, // 3. Current store data
-          ...props, // 4. Props
+          ...tenantComponentData, // 2. Database data
+          ...storeData, // 3. Store state
+          ...currentStoreData, // 4. Current store data
+          ...props, // 5. Props
           ...(props.overrideData || {}), // ⭐ NEW: overrideData (highest priority)
         };
 
@@ -318,6 +320,7 @@ export default function Footer2(props: Footer2Props) {
       baseData.content.companyInfo.showCompanyName = true;
     }
 
+
     return baseData;
   }, [
     isGlobalFooter,
@@ -325,6 +328,7 @@ export default function Footer2(props: Footer2Props) {
     props,
     storeData,
     currentStoreData,
+    tenantComponentData,
     forceUpdate,
     tenantData,
   ]);
@@ -376,9 +380,98 @@ export default function Footer2(props: Footer2Props) {
   const textAndLinksColor = mergedData.styling?.colors?.textAndLinksColor || "#ffffff";
   const socialMediaIconsColor = mergedData.styling?.colors?.socialMediaIconsColor || textAndLinksColor;
 
-  // Get footer background color and create darker version for form elements
-  const footerBgColor = mergedData.background?.color || "#8b5f46";
-  
+  // Get branding colors from WebsiteLayout (fallback to brown #8b5f46)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#8b5f46", // Brown fallback
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#8b5f46", // Brown fallback
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#8b5f46", // Brown fallback
+  };
+
+  // Helper function to get background color based on useDefaultColor and globalColorType
+  const getBackgroundColor = (): string => {
+    const colorField = mergedData?.background?.color;
+
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+
+    // Check useDefaultColor value (default is false for custom color)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : false;
+
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      const brandingColor = brandingColors[globalColorType] || brandingColors.primary;
+      return brandingColor;
+    }
+
+    // If useDefaultColor is false, try to get custom color
+    // The color is stored as a string directly at background.color
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+
+    // Final fallback: use brown color (default custom color)
+    return "#8b5f46";
+  };
+
+  // Function to get background style based on background type
+  const getBackgroundStyle = (): React.CSSProperties => {
+    const { background } = mergedData;
+    const bgType = background?.type || "color";
+
+    if (bgType === "image" && background?.image) {
+      // Image background - return empty style, image will be rendered separately
+      return {};
+    } else if (bgType === "color") {
+      // Color background - use getBackgroundColor() to support branding colors
+      return { backgroundColor: getBackgroundColor() };
+    } else if (bgType === "none") {
+      // No background
+      return {};
+    }
+    
+    // Default fallback - use color
+    return { backgroundColor: getBackgroundColor() };
+  };
+
+  // Get footer background color for form elements (only when type is "color")
+  const footerBgColor = getBackgroundColor();
+
   // Function to darken a hex color
   const darkenColor = (hex: string, percent: number): string => {
     // Remove # if present
@@ -560,13 +653,41 @@ export default function Footer2(props: Footer2Props) {
     );
   };
 
+  // Get background style and type
+  const backgroundStyle = getBackgroundStyle();
+  const bgType = mergedData.background?.type || "color";
+
   return (
     <>
       <footer
-        className="relative z-10 bg-[#8b5f46] pt-16 md:pt-20 lg:pt-24 pb-8"
-        style={{ backgroundColor: mergedData.background?.color || "#8b5f46" }}
+        className="relative z-10 pt-16 md:pt-20 lg:pt-24 pb-8"
+        style={backgroundStyle}
       >
-        <div className="container mx-auto px-4 max-w-[1400px]" style={{ color: textAndLinksColor }}>
+        {/* Background Image - Only show when type is "image" */}
+        {bgType === "image" && mergedData.background?.image && (
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={mergedData.background.image}
+              alt={mergedData.background.alt || "Footer background"}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={false}
+            />
+            {/* Overlay - Only show when enabled and type is "image" */}
+            {mergedData.background?.overlay?.enabled && (
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundColor: mergedData.background.overlay.color,
+                  opacity: mergedData.background.overlay.opacity || "0.7",
+                  mixBlendMode: mergedData.background.overlay.blendMode as any || "multiply",
+                }}
+              />
+            )}
+          </div>
+        )}
+        <div className="container mx-auto px-4 max-w-[1400px] relative z-10" style={{ color: textAndLinksColor }}>
           {/* Main Content Section */}
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-8 mb-12">
             {/* Right Section - Company Info */}

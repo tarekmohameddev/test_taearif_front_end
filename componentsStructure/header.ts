@@ -522,7 +522,14 @@ export const headerStructure: ComponentStructure = {
           label: "Background",
           type: "object",
           fields: [
-            { key: "color", label: "Background Color", type: "color" },
+            {
+              key: "color",
+              label: "Background Color",
+              type: "color",
+              useDefaultColor: false, // Default is custom color (brown #8b5f46)
+              globalColorType: "primary", // Will be used if user switches to default color
+              description: "لون خلفية الهيدر. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
+            },
             {
               key: "opacity",
               label: "Opacity (0-1)",

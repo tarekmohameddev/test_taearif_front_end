@@ -21,7 +21,10 @@ export const getDefaultHeader2Data = (): ComponentData => {
     // Background
     background: {
       ThemeTwo: "background",
-      color: "#8b5f46",
+      // Default is custom color (brown #8b5f46)
+      // When useDefaultColor = false, ColorObjectRenderer saves color as string directly
+      // When useDefaultColor = true, it saves as object with useDefaultColor and globalColorType
+      color: "#8b5f46", // Custom color (default)
       opacity: 1,
     },
 

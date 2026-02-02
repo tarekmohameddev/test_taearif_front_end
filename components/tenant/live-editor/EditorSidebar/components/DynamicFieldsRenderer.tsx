@@ -94,7 +94,32 @@ export function DynamicFieldsRenderer({
 
     // دعم الـ conditional rendering
     if (def.condition) {
-      const conditionFieldValue = getValueByPath(def.condition.field);
+      // Build the full path for the condition field
+      // If basePath exists, we need to find the parent path and append condition.field
+      let conditionPath: string;
+      if (basePath) {
+        // Check if condition.field is already a full path
+        if (def.condition.field.includes('.')) {
+          conditionPath = def.condition.field;
+        } else {
+          // Extract parent path from basePath
+          // For example: if basePath is "background.image", parent is "background"
+          // Then conditionPath becomes "background.type"
+          const pathParts = basePath.split('.');
+          // Remove the last part (current field) to get parent path
+          const parentPath = pathParts.slice(0, -1).join('.');
+          if (parentPath) {
+            conditionPath = `${parentPath}.${def.condition.field}`;
+          } else {
+            // If no parent path, use basePath directly
+            conditionPath = `${basePath}.${def.condition.field}`;
+          }
+        }
+      } else {
+        conditionPath = def.condition.field;
+      }
+      
+      const conditionFieldValue = getValueByPath(conditionPath);
       if (conditionFieldValue !== def.condition.value) {
         return null; // لا تعرض الحقل إذا لم تتحقق الشروط
       }

@@ -461,16 +461,85 @@ export default function Footer(props: FooterProps = {}) {
     return null;
   }
 
+  // Get branding colors from WebsiteLayout (fallback to original color)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#1f2937", // Original default color (fallback)
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#1f2937", // fallback to original color
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#1f2937", // fallback to original color
+  };
+
+  // Helper function to get background color based on useDefaultColor and globalColorType
+  const getBackgroundColor = (): string => {
+    const colorField = mergedData?.background?.color;
+
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+
+    // Check useDefaultColor value (default is false for custom color)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : false;
+
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      const brandingColor = brandingColors[globalColorType] || brandingColors.primary;
+      return brandingColor;
+    }
+
+    // If useDefaultColor is false, try to get custom color
+    // The color is stored as a string directly at background.color
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+
+    // Final fallback: use original default color
+    return mergedData.background?.color || "#1f2937";
+  };
+
   const getBackgroundStyle = () => {
     const { background } = mergedData;
+    const bgType = background?.type || "color";
 
-    if (background.type === "image" && background.image) {
+    if (bgType === "image" && background.image) {
+      // Image background - return empty style, image will be rendered separately
       return {};
-    } else if (background.type === "color" && background.color) {
-      return { backgroundColor: background.color };
-    } else if (background.type === "gradient" && background.gradient.enabled) {
-      const { direction, startColor, endColor, middleColor } =
-        background.gradient;
+    } else if (bgType === "gradient" && background.gradient?.enabled) {
+      // Gradient background
+      const { direction, startColor, endColor, middleColor } = background.gradient;
       if (middleColor) {
         return {
           background: `linear-gradient(${direction}, ${startColor}, ${middleColor}, ${endColor})`,
@@ -479,8 +548,16 @@ export default function Footer(props: FooterProps = {}) {
       return {
         background: `linear-gradient(${direction}, ${startColor}, ${endColor})`,
       };
+    } else if (bgType === "color") {
+      // Color background - use getBackgroundColor() to support branding colors
+      return { backgroundColor: getBackgroundColor() };
+    } else if (bgType === "none") {
+      // No background
+      return {};
     }
-    return {};
+    
+    // Default fallback
+    return { backgroundColor: getBackgroundColor() };
   };
 
   const getOverlayStyle = () => {
@@ -508,20 +585,18 @@ export default function Footer(props: FooterProps = {}) {
     return iconMap[iconName] || MapPin;
   };
 
+  // Get background style and type
+  const backgroundStyle = getBackgroundStyle();
+  const bgType = mergedData.background?.type || "color";
+
   return (
     <footer
       className="relative w-full"
-      style={{
-        ...getBackgroundStyle(),
-        backgroundColor:
-          mergedData.background?.color ||
-          mergedData.styling?.bgColor ||
-          undefined,
-      }}
+      style={backgroundStyle}
     >
       {/* صورة الخلفية */}
-      {mergedData.background.type === "image" &&
-        mergedData.background.image && (
+      {bgType === "image" &&
+        mergedData.background?.image && (
           <div className="absolute inset-0">
             <Image
               src={mergedData.background.image}

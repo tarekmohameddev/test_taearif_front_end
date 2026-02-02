@@ -911,3 +911,493 @@ style={{ backgroundColor: getColor() }}
 **تم إنشاء هذا Prompt لاستخدامه مع أي ملف React/TypeScript لتحويل الألوان الخضراء و emerald إلى primaryColor ديناميكي.**
 
 **تم إضافة نظام التحكم في الألوان من EditorSidebar مع دعم Primary/Secondary/Accent Color واللون المخصص.**
+
+---
+
+# PROMPT: Connect Component Color Field to Global Branding Colors with Custom Color as Default
+
+## 🎯 Objective
+
+This prompt explains how to connect any color field in a component (e.g., background color, button color, text color) to global branding colors (Primary/Secondary/Accent) from `WebsiteLayout.branding.colors`, while allowing users to use a custom color as the default value.
+
+The system uses `ColorObjectRenderer` which automatically appears in EditorSidebar when a color field has `useDefaultColor` property, providing a toggle between global branding colors and custom colors.
+
+---
+
+## 📋 Required Steps
+
+### Step 1: Add Color Field in Component Structure
+
+In `componentsStructure/{componentType}.ts`, add or modify a color field with `useDefaultColor` and `globalColorType` properties:
+
+**Example: Background Color in Header**
+
+```typescript
+{
+  key: "background",
+  label: "Background",
+  type: "object",
+  fields: [
+    {
+      key: "color",
+      label: "Background Color",
+      type: "color",
+      useDefaultColor: false, // Default is custom color (e.g., brown #8b5f46)
+      globalColorType: "primary", // Will be used if user switches to default color
+      description: "Background color of the header. You can use Primary/Secondary/Accent Color from merchant settings or a custom color.",
+    },
+    {
+      key: "opacity",
+      label: "Opacity (0-1)",
+      type: "text",
+      placeholder: "1",
+    },
+  ],
+}
+```
+
+**Important Notes:**
+- `useDefaultColor: false` means the default value is a custom color (stored as a string directly)
+- `useDefaultColor: true` means the default value uses branding color from merchant settings
+- `globalColorType: "primary"` is the default branding color type (can be `"primary"`, `"secondary"`, or `"accent"`)
+- `ColorObjectRenderer` automatically appears in EditorSidebar when `useDefaultColor` is defined
+
+---
+
+### Step 2: Update Default Data in Functions File
+
+In `context/editorStoreFunctions/{componentType}Functions.ts`, update the default data structure:
+
+**When Default is Custom Color (useDefaultColor: false):**
+
+```typescript
+// Background
+background: {
+  ThemeTwo: "background",
+  // Default is custom color (brown #8b5f46)
+  // When useDefaultColor = false, ColorObjectRenderer saves color as string directly
+  // When useDefaultColor = true, it saves as object with useDefaultColor and globalColorType
+  color: "#8b5f46", // Custom color (default)
+  opacity: 1,
+},
+```
+
+**When Default is Branding Color (useDefaultColor: true):**
+
+```typescript
+// Background
+background: {
+  ThemeTwo: "background",
+  color: {
+    useDefaultColor: true, // Use branding color from merchant settings
+    globalColorType: "primary", // primary, secondary, or accent
+    // color value is not stored when useDefaultColor = true
+  },
+  opacity: 1,
+},
+```
+
+**Data Structure Explanation:**
+- When `useDefaultColor = false`: Color is stored as a string directly at `background.color` (e.g., `"#8b5f46"`)
+- When `useDefaultColor = true`: Color is stored as an object with `useDefaultColor` and `globalColorType` properties
+
+---
+
+### Step 3: Add Helper Function in React Component
+
+In the component file (e.g., `components/tenant/{componentType}/{componentType}1.tsx`), add the following:
+
+#### 3.1. Get Branding Colors from Store
+
+```typescript
+// Get tenant data from store (if not already imported)
+import useTenantStore from "@/context/tenantStore";
+
+// Inside the component, get tenant data
+const { tenantData } = useTenantStore();
+
+// Get branding colors from WebsiteLayout (fallback to original/default color)
+const brandingColors = {
+  primary:
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.primary
+      : "#8b5f46", // Original default color (fallback)
+  secondary:
+    tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+    tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.secondary
+      : "#8b5f46", // Fallback to original color
+  accent:
+    tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+    tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+      ? tenantData.WebsiteLayout.branding.colors.accent
+      : "#8b5f46", // Fallback to original color
+};
+```
+
+**Important:** Replace `"#8b5f46"` with your component's original default color.
+
+#### 3.2. Create Color Helper Function
+
+```typescript
+// Helper function to get color based on useDefaultColor and globalColorType
+const getBackgroundColor = (): string => {
+  // ColorObjectRenderer saves data in this structure:
+  // When useDefaultColor = true:
+  //   - background.color.useDefaultColor = true
+  //   - background.color.globalColorType = "primary" | "secondary" | "accent"
+  //   - background.color might be undefined or the object itself
+  // When useDefaultColor = false:
+  //   - background.color = "#hexcolor" (direct string)
+  //   - background.color.useDefaultColor = false (stored at background.color.useDefaultColor)
+  
+  const colorField = mergedData?.background?.color;
+  
+  // Get useDefaultColor and globalColorType from the color field
+  let useDefaultColorValue: boolean | undefined;
+  let globalColorTypeValue: string | undefined;
+  
+  if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+    useDefaultColorValue = colorField.useDefaultColor;
+    globalColorTypeValue = colorField.globalColorType;
+  }
+  
+  // Also check at the path level (ColorObjectRenderer stores them separately)
+  if (useDefaultColorValue === undefined) {
+    useDefaultColorValue = mergedData?.background?.color?.useDefaultColor;
+  }
+  if (globalColorTypeValue === undefined) {
+    globalColorTypeValue = mergedData?.background?.color?.globalColorType;
+  }
+  
+  // Check useDefaultColor value
+  // Default depends on your component structure:
+  // - If default is custom color: default to false
+  // - If default is branding color: default to true
+  const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : false;
+  
+  // If useDefaultColor is true, use branding color from WebsiteLayout
+  if (useDefaultColor) {
+    const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+    const brandingColor = brandingColors[globalColorType] || brandingColors.primary;
+    return brandingColor;
+  }
+  
+  // If useDefaultColor is false, try to get custom color
+  // The color is stored as a string directly at background.color
+  if (
+    colorField &&
+    typeof colorField === "string" &&
+    colorField.trim() !== "" &&
+    colorField.startsWith("#")
+  ) {
+    return colorField.trim();
+  }
+  
+  // If colorField is an object, check for value property
+  if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+    if (
+      colorField.value &&
+      typeof colorField.value === "string" &&
+      colorField.value.trim() !== "" &&
+      colorField.value.startsWith("#")
+    ) {
+      return colorField.value.trim();
+    }
+  }
+  
+  // Final fallback: use original default color
+  return "#8b5f46"; // Replace with your component's original default color
+};
+```
+
+**Important Notes:**
+- Replace `mergedData?.background?.color` with your actual data path (e.g., `config?.buttons?.color`)
+- Replace `"#8b5f46"` with your component's original default color
+- The default value for `useDefaultColor` should match your component structure (`false` for custom color default, `true` for branding color default)
+
+#### 3.3. Use Color in JSX
+
+```typescript
+// Get background color using the helper function
+const bgColor = getBackgroundColor();
+
+// Use in JSX
+<nav
+  className="fixed top-0 left-0 right-0 z-50 transition-colors duration-500"
+  style={{
+    backgroundColor: bgColor,
+    opacity: mergedData.background?.opacity || 1,
+    zIndex: mergedData.position?.zIndex || 50,
+  }}
+>
+  {/* Component content */}
+</nav>
+```
+
+---
+
+## 📝 Complete Example: Header2 Background Color
+
+### 1. Component Structure (`componentsStructure/header.ts`):
+
+```typescript
+{
+  id: "header2",
+  name: "Header 2 - Nav Theme",
+  fields: [
+    {
+      key: "background",
+      label: "Background",
+      type: "object",
+      fields: [
+        {
+          key: "color",
+          label: "Background Color",
+          type: "color",
+          useDefaultColor: false, // Default is custom color (brown #8b5f46)
+          globalColorType: "primary", // Will be used if user switches to default color
+          description: "Background color of the header. You can use Primary/Secondary/Accent Color from merchant settings or a custom color.",
+        },
+        {
+          key: "opacity",
+          label: "Opacity (0-1)",
+          type: "text",
+          placeholder: "1",
+        },
+      ],
+    },
+    // ... other fields ...
+  ],
+}
+```
+
+### 2. Default Data (`context/editorStoreFunctions/header2Functions.ts`):
+
+```typescript
+export const getDefaultHeader2Data = (): ComponentData => {
+  const data = {
+    visible: true,
+    ThemeTwo: "header2",
+    
+    // Background
+    background: {
+      ThemeTwo: "background",
+      // Default is custom color (brown #8b5f46)
+      // When useDefaultColor = false, ColorObjectRenderer saves color as string directly
+      // When useDefaultColor = true, it saves as object with useDefaultColor and globalColorType
+      color: "#8b5f46", // Custom color (default)
+      opacity: 1,
+    },
+    
+    // ... other fields ...
+  };
+  
+  return data;
+};
+```
+
+### 3. Component (`components/tenant/header/header2.tsx`):
+
+```typescript
+"use client";
+
+import useTenantStore from "@/context/tenantStore";
+// ... other imports ...
+
+export default function Header2(props: Header2Props) {
+  // ... component setup code ...
+  
+  // Get tenant data from store
+  const { tenantData } = useTenantStore();
+  
+  // Get branding colors from WebsiteLayout (fallback to brown #8b5f46)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#8b5f46", // Brown fallback
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#8b5f46", // Brown fallback
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#8b5f46", // Brown fallback
+  };
+
+  // Helper function to get background color based on useDefaultColor and globalColorType
+  const getBackgroundColor = (): string => {
+    const colorField = mergedData?.background?.color;
+
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+
+    // Check useDefaultColor value (default is false for custom color)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : false;
+
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      const brandingColor = brandingColors[globalColorType] || brandingColors.primary;
+      return brandingColor;
+    }
+
+    // If useDefaultColor is false, try to get custom color
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+
+    // Final fallback: use brown color (default custom color)
+    return "#8b5f46";
+  };
+
+  const bgColor = getBackgroundColor();
+  const positionType = mergedData.position?.type || "fixed";
+  const zIndex = mergedData.position?.zIndex || 50;
+
+  return (
+    <nav
+      className={`${positionType} top-0 left-0 right-0 z-${zIndex} transition-colors duration-500`}
+      style={{
+        backgroundColor: bgColor,
+        opacity: mergedData.background?.opacity || 1,
+        zIndex: zIndex,
+      }}
+    >
+      {/* Component content */}
+    </nav>
+  );
+}
+```
+
+---
+
+## 🔍 Data Structure Explanation
+
+### When `useDefaultColor = false` (Custom Color Default):
+
+```typescript
+{
+  background: {
+    color: "#8b5f46", // Custom hex color (direct string)
+    // useDefaultColor is stored separately at background.color.useDefaultColor = false
+  }
+}
+```
+
+### When `useDefaultColor = true` (Branding Color Default):
+
+```typescript
+{
+  background: {
+    color: {
+      useDefaultColor: true,
+      globalColorType: "primary" | "secondary" | "accent",
+      // color value is not stored when useDefaultColor = true
+    }
+  }
+}
+```
+
+---
+
+## ✅ Checklist for Implementation
+
+- [ ] Added color field in Component Structure with `useDefaultColor` and `globalColorType`
+- [ ] Updated default data in Functions file (string for custom, object for branding)
+- [ ] Added `brandingColors` object in React component
+- [ ] Added `getColor` helper function
+- [ ] Used color in JSX with `getColor()`
+- [ ] Tested Primary Color selection
+- [ ] Tested Secondary Color selection
+- [ ] Tested Accent Color selection
+- [ ] Tested Custom Color selection
+- [ ] Verified fallback works correctly when branding colors are not available
+- [ ] Verified default value matches component structure
+
+---
+
+## 🎯 Final Result
+
+After applying this prompt to any component:
+
+1. ✅ `ColorObjectRenderer` automatically appears in EditorSidebar
+2. ✅ Users can choose Primary/Secondary/Accent Color from merchant settings
+3. ✅ Users can choose a custom color
+4. ✅ Default value is the original component color (custom color)
+5. ✅ Changes appear immediately in Live Editor
+6. ✅ Data is saved correctly in Database
+
+---
+
+## 📚 Quick Reference
+
+```typescript
+// 1. Component Structure
+{
+  key: "color",
+  type: "color",
+  useDefaultColor: false, // false for custom default, true for branding default
+  globalColorType: "primary",
+}
+
+// 2. Default Data (Custom Color Default)
+color: "#8b5f46", // Direct string
+
+// 3. Default Data (Branding Color Default)
+color: {
+  useDefaultColor: true,
+  globalColorType: "primary",
+}
+
+// 4. Get Branding Colors
+const brandingColors = {
+  primary: tenantData?.WebsiteLayout?.branding?.colors?.primary || "#fallback",
+  secondary: tenantData?.WebsiteLayout?.branding?.colors?.secondary || "#fallback",
+  accent: tenantData?.WebsiteLayout?.branding?.colors?.accent || "#fallback",
+};
+
+// 5. Get Color Helper
+const getColor = () => {
+  const useDefaultColor = mergedData?.color?.useDefaultColor ?? false;
+  if (useDefaultColor) {
+    const globalColorType = mergedData?.color?.globalColorType || "primary";
+    return brandingColors[globalColorType] || brandingColors.primary;
+  }
+  return typeof mergedData?.color === "string" ? mergedData.color : "#fallback";
+};
+
+// 6. Use in JSX
+style={{ backgroundColor: getColor() }}
+```
+
+---
+
+## ⚠️ Important Notes
+
+1. **Default Value:** Choose `useDefaultColor: false` if default is custom color, `true` if default is branding color
+2. **Fallback Color:** Always use the original component color as fallback in `brandingColors`
+3. **Data Structure:** When `useDefaultColor = false`, color is stored as string; when `true`, it's stored as object
+4. **Path Matching:** Make sure the helper function checks the correct data path (e.g., `mergedData?.background?.color`)
+5. **Testing:** Test all color options (Primary, Secondary, Accent, Custom) in EditorSidebar
+
+---
+
+**This prompt can be used with any component to connect color fields to global branding colors while maintaining custom color as default.**

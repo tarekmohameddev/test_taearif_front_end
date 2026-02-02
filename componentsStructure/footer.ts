@@ -23,13 +23,41 @@ export const footerStructure: ComponentStructure = {
                 { label: "None", value: "none" },
               ],
             },
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "alt", label: "Alt Text", type: "text" },
-            { key: "color", label: "Background Color", type: "color" },
+            {
+              key: "image",
+              label: "Image URL",
+              type: "image",
+              condition: {
+                field: "type",
+                value: "image",
+              },
+            },
+            {
+              key: "alt",
+              label: "Alt Text",
+              type: "text",
+              condition: {
+                field: "type",
+                value: "image",
+              },
+            },
+            {
+              key: "color",
+              label: "Background Color",
+              type: "color",
+              condition: {
+                field: "type",
+                value: "color",
+              },
+            },
             {
               key: "gradient",
               label: "Gradient",
               type: "object",
+              condition: {
+                field: "type",
+                value: "gradient",
+              },
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 {
@@ -60,6 +88,10 @@ export const footerStructure: ComponentStructure = {
               key: "overlay",
               label: "Overlay",
               type: "object",
+              condition: {
+                field: "type",
+                value: "image", // Overlay appears with image (can be extended to gradient if needed)
+              },
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 {
@@ -544,13 +576,44 @@ export const footerStructure: ComponentStructure = {
                 { label: "None", value: "none" },
               ],
             },
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "alt", label: "Alt Text", type: "text" },
-            { key: "color", label: "Background Color", type: "color" },
+            {
+              key: "image",
+              label: "Image URL",
+              type: "image",
+              condition: {
+                field: "type",
+                value: "image",
+              },
+            },
+            {
+              key: "alt",
+              label: "Alt Text",
+              type: "text",
+              condition: {
+                field: "type",
+                value: "image",
+              },
+            },
+            {
+              key: "color",
+              label: "Background Color",
+              type: "color",
+              useDefaultColor: false, // Default is custom color (brown #8b5f46)
+              globalColorType: "primary", // Will be used if user switches to default color
+              description: "Background color of the footer. You can use Primary/Secondary/Accent Color from merchant settings or a custom color.",
+              condition: {
+                field: "type",
+                value: "color",
+              },
+            },
             {
               key: "gradient",
               label: "Gradient",
               type: "object",
+              condition: {
+                field: "type",
+                value: "gradient",
+              },
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 {
@@ -581,6 +644,10 @@ export const footerStructure: ComponentStructure = {
               key: "overlay",
               label: "Overlay",
               type: "object",
+              condition: {
+                field: "type",
+                value: "image", // Overlay appears with image (can be extended to gradient if needed)
+              },
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 {

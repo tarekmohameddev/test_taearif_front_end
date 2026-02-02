@@ -684,7 +684,77 @@ export default function Header2(props: Header2Props) {
     );
   };
 
-  const bgColor = mergedData.background?.color || "#8b5f46";
+  // Get branding colors from WebsiteLayout (fallback to brown #8b5f46)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#8b5f46", // Brown fallback
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#8b5f46", // Brown fallback
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#8b5f46", // Brown fallback
+  };
+
+  // Helper function to get background color based on useDefaultColor and globalColorType
+  const getBackgroundColor = (): string => {
+    const colorField = mergedData?.background?.color;
+
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+
+    // Check useDefaultColor value (default is false if color is string, true if object)
+    // Since default is custom color (brown), we default to false
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : false;
+
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      const brandingColor = brandingColors[globalColorType] || brandingColors.primary;
+      return brandingColor;
+    }
+
+    // If useDefaultColor is false, try to get custom color
+    // The color is stored as a string directly at background.color
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+
+    // Final fallback: use brown color (default custom color)
+    return "#8b5f46";
+  };
+
+  const bgColor = getBackgroundColor();
   const positionType = mergedData.position?.type || "fixed";
   const zIndex = mergedData.position?.zIndex || 50;
 
