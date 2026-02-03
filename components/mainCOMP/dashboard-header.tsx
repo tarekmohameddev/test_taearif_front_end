@@ -210,10 +210,21 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               </MobileSidebar>
             </div>
           )}
+          
+          {/* اللوجو في البداية للديسكتوب */}
+          <Link href="/" className="hidden md:flex items-center gap-2 font-semibold">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={141}
+              height={100}
+              className=""
+            />
+          </Link>
         </div>
 
-        {/* اللوجو في المنتصف */}
-        <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2 font-semibold">
+        {/* اللوجو في المنتصف للجوال فقط */}
+        <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2 font-semibold md:hidden">
           <Image
             src="/logo.png"
             alt="Logo"
