@@ -1,0 +1,8 @@
+2026-02-03 19:39:29 - Added new "الموارد" column in footer between "الروابط" and "عنواننا" with links to مركز التحديثات and مركز المساعدة
+components/landing/homepage/components/Footer.tsx
+
+2026-02-03 19:40:21 - Merged مركز التحديثات and مركز المساعدة links into existing "الروابط" column, removed separate column
+components/landing/homepage/components/Footer.tsx
+
+2026-02-03 19:43:37 - Split links into 2 columns: first column with "الروابط" title (الصفحة الرئيسية، الباقات، نبذة عنا، سياسة الخصوصية), second column without title (مركز التحديثات، مركز المساعدة)
+components/landing/homepage/components/Footer.tsx

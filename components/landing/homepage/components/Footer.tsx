@@ -7,7 +7,7 @@ const Footer = () => {
   return (
     <footer className="bg-white text-gray-900 pt-8 transform animate-slideUp ">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 ">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 ">
           {/* Logo Column */}
           <div className="hidden md:block">
             <Image
@@ -19,7 +19,7 @@ const Footer = () => {
             />
           </div>
           <div></div>
-          {/* Links Column */}
+          {/* Links Column 1 - مع عنوان */}
           <div>
             <h4 className="text-lg font-semibold mb-4 text-gray-900">
               الروابط
@@ -60,32 +60,30 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Help & Support Column */}
-          {/* <div>
-            <h4 className="text-lg font-semibold mb-4 text-gray-900">المساعدة والدعم</h4>
+          {/* Links Column 2 - بدون عنوان */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4 text-gray-900 invisible">
+              &nbsp;
+            </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                  الأسئلة الشائعة
-                </a>
+                <Link
+                  href="/updates"
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                >
+                  مركز التحديثات
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                  المدونة
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                  اتصل بنا
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                  الدعم
-                </a>
+                <Link
+                  href="/support-center"
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                >
+                  مركز المساعدة
+                </Link>
               </li>
             </ul>
-          </div> */}
+          </div>
 
           {/* Contact Column */}
           <div>
