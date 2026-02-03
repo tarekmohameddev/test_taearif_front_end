@@ -489,7 +489,7 @@ IF file path contains "app/dashboard/crm/[id]" OR view single
 IF file path contains "app/dashboard/settings"
   → docs/updates/dashboard/settings/
 
-IF file path contains "app/taearif" OR landing pages
+IF file path contains "app/taearif" OR "components/Taearif" OR "components/landing" OR "app/updates" OR "app/solutions" OR "app/about-us" OR "app/landing" OR landing pages related
   → docs/updates/TaearifLandingPages/
 
 IF file path contains "app/tenant" OR tenant website
@@ -502,10 +502,42 @@ IF file path contains "app/tenant" OR tenant website
 ### **File Naming Convention:**
 
 ```typescript
-// Format: YYYY-MM-DD_HH-MM-SS.txt
-// Example: 2025-01-15_14-30-45.txt
+// Format: [PageName or Path].txt
+// Extract page name from file path or use path structure
 
-const fileName = `${new Date().toISOString().split('T')[0]}_${new Date().toTimeString().split(' ')[0].replace(/:/g, '-')}.txt`;
+// Examples:
+// components/TaearifUpdatesPage.tsx → TaearifUpdatesPage.txt
+// app/dashboard/crm/create/page.tsx → crm-create.txt
+// app/dashboard/settings/page.tsx → settings.txt
+// components/buildings/building-form.jsx → building-form.txt
+
+// Rules:
+// 1. If file is a page component (page.tsx, page.jsx):
+//    - Use parent folder name: "crm-create", "settings", "buildings-add"
+// 2. If file is a component:
+//    - Use component name: "TaearifUpdatesPage", "building-form"
+// 3. Replace slashes with hyphens: "dashboard/crm/create" → "dashboard-crm-create"
+// 4. Remove file extensions: ".tsx", ".jsx", ".ts"
+// 5. Use kebab-case (lowercase with hyphens)
+
+function getFileName(filePath: string): string {
+  // Extract component/page name from path
+  const parts = filePath.split('/');
+  const fileName = parts[parts.length - 1].replace(/\.(tsx|jsx|ts|js)$/, '');
+  
+  // If it's a page.tsx/jsx, use parent folder
+  if (fileName === 'page') {
+    const parentFolder = parts[parts.length - 2];
+    const grandParent = parts[parts.length - 3];
+    if (grandParent) {
+      return `${grandParent}-${parentFolder}`;
+    }
+    return parentFolder;
+  }
+  
+  // For components, use component name
+  return fileName;
+}
 ```
 
 ### **File Content Template:**
@@ -513,21 +545,32 @@ const fileName = `${new Date().toISOString().split('T')[0]}_${new Date().toTimeS
 ```markdown
 [YYYY-MM-DD HH:MM:SS] - [Brief description of update/changes]
 [File paths modified: file1.tsx, file2.ts, etc.]
+
+[Next update on new lines...]
 ```
 
 **IMPORTANT RULES:**
-- ✅ ALWAYS include date and time in first line: `YYYY-MM-DD HH:MM:SS`
-- ✅ ALWAYS write update description in first line after date/time
-- ✅ ALWAYS list modified files in second line
-- ✅ MAXIMUM 2 lines only (date + description, then files)
-- ❌ NEVER exceed 2 lines
-- ❌ NEVER use multiple paragraphs or sections
+- ✅ ALWAYS append to existing file (if exists) or create new file
+- ✅ ALWAYS include date and time: `YYYY-MM-DD HH:MM:SS`
+- ✅ ALWAYS write update description after date/time
+- ✅ ALWAYS list modified files on second line
+- ✅ Each update is 2 lines (date + description, then files)
+- ✅ Add blank line between updates for readability
+- ✅ File accumulates all updates for that page/component
+- ❌ NEVER overwrite existing file content
+- ❌ NEVER delete previous updates
 ```
 
-**Example:**
+**Example File Content:**
 ```markdown
 2025-01-15 14:30:45 - Updated building form validation and added new fields
 app/dashboard/buildings/add/page.tsx, components/buildings/building-form.jsx
+
+2025-01-16 10:20:30 - Fixed form submission bug and improved error handling
+app/dashboard/buildings/add/page.tsx
+
+2025-01-17 15:45:12 - Added new building type field to form
+components/buildings/building-form.jsx
 ```
 
 ### **Implementation Steps:**
@@ -547,18 +590,26 @@ app/dashboard/buildings/add/page.tsx, components/buildings/building-form.jsx
    - If NOT exists: Create full folder structure recursively
    - Example: If path is "dashboard/crm/create", create all nested folders
    
-4. GENERATE update file:
-   - Create file with timestamp: YYYY-MM-DD_HH-MM-SS.txt
-   - Write update log using template above (MAXIMUM 2 lines only)
+4. GENERATE file name from page/component:
+   - Extract page/component name from file path
+   - Use getFileName() function logic above
+   - Example: "components/TaearifUpdatesPage.tsx" → "TaearifUpdatesPage.txt"
+   - Example: "app/dashboard/crm/create/page.tsx" → "crm-create.txt"
+   
+5. APPEND to update file (or create if not exists):
+   - Check if file exists: docs/updates/{determined-path}/{pageName}.txt
+   - If exists: Append new update (add blank line + 2 new lines)
+   - If not exists: Create new file with update
    - Line 1: Date/Time (YYYY-MM-DD HH:MM:SS) + brief description
    - Line 2: List of modified file paths (comma-separated)
-   - NEVER exceed 2 lines
+   - Add blank line after previous update (if file exists)
    
-5. SAVE file:
-   - Save to: docs/updates/{determined-path}/{timestamp}.txt
+6. SAVE file:
+   - Save/Append to: docs/updates/{determined-path}/{pageName}.txt
    
-6. MENTION in completion:
-   - Always mention: "Update logged in docs/updates/{path}/{filename}.txt"
+7. MENTION in completion:
+   - Always mention: "Update logged in docs/updates/{path}/{pageName}.txt"
+   - If file already existed, mention: "Update appended to existing log file"
 ```
 
 ### **Examples:**
@@ -566,22 +617,31 @@ app/dashboard/buildings/add/page.tsx, components/buildings/building-form.jsx
 **Example 1: Dashboard CRM Create Page**
 ```
 Modified: app/dashboard/crm/create/page.tsx
-Update Log: docs/updates/dashboard/crm/create/2025-01-15_14-30-45.txt
+Update Log: docs/updates/dashboard/crm/create/crm-create.txt
+(File accumulates all updates for this page)
 ```
 
 **Example 2: Settings Page**
 ```
 Modified: app/dashboard/settings/page.tsx
-Update Log: docs/updates/dashboard/settings/2025-01-15_14-30-45.txt
+Update Log: docs/updates/dashboard/settings/settings.txt
+(File accumulates all updates for this page)
 ```
 
-**Example 3: Multiple Files in Same Area**
+**Example 3: Component File**
+```
+Modified: components/TaearifUpdatesPage.tsx
+Update Log: docs/updates/TaearifLandingPages/TaearifUpdatesPage.txt
+(File accumulates all updates for this component)
+```
+
+**Example 4: Multiple Files in Same Area**
 ```
 Modified: 
   - app/dashboard/crm/edit/page.tsx
   - components/crm/edit-form.tsx
-Update Log: docs/updates/dashboard/crm/edit/2025-01-15_14-30-45.txt
-(Include all files in single log)
+Update Log: docs/updates/dashboard/crm/edit/crm-edit.txt
+(Include all files in single log entry, file accumulates all updates)
 ```
 
 ### **Folder Creation Rules:**

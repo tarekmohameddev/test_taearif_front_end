@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
-import HomePageWrapper from "../HomePageWrapper";
 import TaearifUpdatesPage from "../../components/TaearifUpdatesPage";
+import HomePageWrapper from "../HomePageWrapper";
 
 // إبقاء الصفحة dynamic لتتمكن من التحقق من tenantId
 export const dynamic = "force-dynamic";

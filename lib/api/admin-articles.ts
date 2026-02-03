@@ -1,4 +1,4 @@
-import axiosInstance from "@/lib/axiosInstance";
+import publicApiInstance from "@/lib/publicApiInstance";
 
 // Types based on API documentation
 export interface AdminArticleCategory {
@@ -89,7 +89,7 @@ export interface CategoryArticlesResponse {
  */
 export async function getAdminArticleCategories(): Promise<AdminArticleCategory[]> {
   try {
-    const response = await axiosInstance.get<ApiResponse<CategoriesResponse>>(
+    const response = await publicApiInstance.get<ApiResponse<CategoriesResponse>>(
       "/public/admin-article-categories"
     );
 
@@ -135,7 +135,7 @@ export async function getCategoryArticles(
       queryString ? `?${queryString}` : ""
     }`;
 
-    const response = await axiosInstance.get<ApiResponse<CategoryArticlesResponse>>(url);
+    const response = await publicApiInstance.get<ApiResponse<CategoryArticlesResponse>>(url);
 
     if (response.data.status === "success" && response.data.data) {
       return {
@@ -189,7 +189,7 @@ export async function getAllAdminArticles(options?: {
     const queryString = params.toString();
     const url = `/public/admin-articles${queryString ? `?${queryString}` : ""}`;
 
-    const response = await axiosInstance.get<ApiResponse<ArticlesResponse>>(url);
+    const response = await publicApiInstance.get<ApiResponse<ArticlesResponse>>(url);
 
     if (response.data.status === "success" && response.data.data?.articles) {
       return {
@@ -213,7 +213,7 @@ export async function getAdminArticleBySlug(
   slug: string
 ): Promise<AdminArticle> {
   try {
-    const response = await axiosInstance.get<ApiResponse<ArticleResponse>>(
+    const response = await publicApiInstance.get<ApiResponse<ArticleResponse>>(
       `/public/admin-articles/${slug}`
     );
 
