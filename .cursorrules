@@ -106,6 +106,18 @@ docs/important/
 
 ---
 
+### **🔵 TIER 4: CODE QUALITY & REFACTORING**
+
+```
+docs/important/prompts/CLEANcode/
+├── REFACTOR_COMPONENT_PROMPT.md      ← Component refactoring system
+└── CURSOR_AI_REFACTOR_PROMPT.txt     ← Refactoring guidelines
+```
+
+**RULE:** **MANDATORY** - When refactoring large components, ALWAYS follow `REFACTOR_COMPONENT_PROMPT.md` system.
+
+---
+
 ## 🚨 CRITICAL RULES - NEVER BREAK
 
 ### **1. COMPONENT SYSTEM RULES**
@@ -194,6 +206,52 @@ docs/important/
 
 ---
 
+### **5. COMPONENT REFACTORING RULES**
+
+```typescript
+// ✅ ALWAYS follow REFACTOR_COMPONENT_PROMPT.md when refactoring large components
+// ✅ ALWAYS split files exceeding 200 lines
+// ✅ ALWAYS organize into: components/, hooks/, services/, utils/, types/, store/
+// ✅ ALWAYS preserve business logic exactly (NO changes to functionality)
+// ✅ ALWAYS maintain same props interface and component name
+// ✅ ALWAYS create index.ts files for clean imports
+
+// ❌ NEVER modify business logic during refactoring
+// ❌ NEVER change component behavior or UI appearance
+// ❌ NEVER create files larger than 200 lines
+// ❌ NEVER skip the organized folder structure
+// ❌ NEVER refactor without following REFACTOR_COMPONENT_PROMPT.md
+```
+
+**REFERENCE:** `docs/important/prompts/CLEANcode/REFACTOR_COMPONENT_PROMPT.md`
+
+**MANDATORY STRUCTURE:**
+```
+component-name/
+├── page.tsx (or index.tsx)          # Main component entry point
+├── components/                       # UI sub-components
+│   ├── Component1.tsx
+│   ├── Component2.tsx
+│   └── index.ts
+├── hooks/                           # Custom hooks
+│   ├── useHook1.ts
+│   ├── useHook2.ts
+│   └── index.ts
+├── services/                        # API calls and external services
+│   └── api.ts
+├── utils/                           # Helper functions and utilities
+│   ├── helpers.ts
+│   └── constants.ts
+├── types/                           # TypeScript types and interfaces
+│   └── types.ts
+└── store/                           # State management (if applicable)
+    └── store.ts
+```
+
+**FILE SIZE LIMIT:** Each file must NOT exceed 200 lines of code.
+
+---
+
 ## 🔍 BEFORE MAKING CHANGES - CHECKLIST
 
 ```
@@ -240,6 +298,18 @@ docs/important/
 6. Update: Docs if patterns changed
 ```
 
+### **Refactoring Large Component:**
+```
+1. Read: @docs/important/prompts/CLEANcode/REFACTOR_COMPONENT_PROMPT.md
+2. Analyze: Component structure and identify logical groupings
+3. Create: Organized folder structure (components/, hooks/, services/, utils/, types/, store/)
+4. Extract: Code into appropriate files (max 200 lines per file)
+5. Preserve: ALL business logic exactly (NO functionality changes)
+6. Update: Imports in main component
+7. Verify: All files under 200 lines, functionality unchanged
+8. Test: Component works exactly as before
+```
+
 ---
 
 ## 📋 COMMON TASKS - QUICK REFERENCE
@@ -281,6 +351,19 @@ STEP 4: Test in EditorSidebar
 STEP 5: Verify saves/loads correctly
 ```
 
+### **Task: Refactor Large Component**
+```
+STEP 1: Read @docs/important/prompts/CLEANcode/REFACTOR_COMPONENT_PROMPT.md
+STEP 2: Analyze component and identify logical groupings
+STEP 3: Create folder structure (components/, hooks/, services/, utils/, types/, store/)
+STEP 4: Extract code into files (max 200 lines each)
+STEP 5: Preserve ALL business logic (NO functionality changes)
+STEP 6: Update imports and exports
+STEP 7: Verify all files under 200 lines
+STEP 8: Test component works exactly as before
+STEP 9: Show new folder structure and file line counts
+```
+
 ---
 
 ## 🎯 CONTEXT AWARENESS
@@ -310,6 +393,18 @@ STEP 5: Verify saves/loads correctly
 3. Plan changes maintaining conventions
 4. Implement changes
 5. Update docs if needed
+6. Create update log in docs/updates/ (MANDATORY)
+```
+
+### **When User Says "refactor component X" or component exceeds 200 lines:**
+```
+1. Reference: @docs/important/prompts/CLEANcode/REFACTOR_COMPONENT_PROMPT.md
+2. Analyze: Component structure and size
+3. Create: Organized folder structure
+4. Extract: Code into appropriate files (max 200 lines)
+5. Preserve: ALL business logic exactly
+6. Verify: No functionality changes, all files under 200 lines
+7. Report: New structure and file line counts
 ```
 
 ---
@@ -346,8 +441,175 @@ STEP 5: Verify saves/loads correctly
    - Update diagrams if needed
    - Add "Last Updated" date
 
-5. ALWAYS mention doc updates in completion message
+5. CREATE update log in docs/updates/ (MANDATORY - see UPDATE DOCUMENTATION PROTOCOL)
+
+6. ALWAYS mention doc updates AND update log location in completion message
 ```
+
+---
+
+## 📝 UPDATE DOCUMENTATION PROTOCOL
+
+### **MANDATORY: Document All Changes in Update Files**
+
+**RULE:** After ANY modification or update to code, ALWAYS create/update a `.txt` file in the appropriate `docs/updates/` folder.
+
+### **Folder Structure:**
+
+```
+docs/updates/
+├── dashboard/
+│   ├── crm/
+│   │   ├── create/
+│   │   ├── edit/
+│   │   ├── ViewAll/
+│   │   └── viewSingle/
+│   └── settings/
+├── TaearifLandingPages/
+└── tenantWebsite/
+```
+
+### **Path Detection Rules:**
+
+```typescript
+// Determine update folder based on file path:
+
+IF file path contains "app/dashboard/crm/create" OR "components/buildings" (create-related)
+  → docs/updates/dashboard/crm/create/
+
+IF file path contains "app/dashboard/crm/edit" OR edit-related
+  → docs/updates/dashboard/crm/edit/
+
+IF file path contains "app/dashboard/crm" (list/view all)
+  → docs/updates/dashboard/crm/ViewAll/
+
+IF file path contains "app/dashboard/crm/[id]" OR view single
+  → docs/updates/dashboard/crm/viewSingle/
+
+IF file path contains "app/dashboard/settings"
+  → docs/updates/dashboard/settings/
+
+IF file path contains "app/taearif" OR landing pages
+  → docs/updates/TaearifLandingPages/
+
+IF file path contains "app/tenant" OR tenant website
+  → docs/updates/tenantWebsite/
+
+// For nested paths like "app/dashboard/crm/create/..."
+// Create full path: docs/updates/dashboard/crm/create/
+```
+
+### **File Naming Convention:**
+
+```typescript
+// Format: YYYY-MM-DD_HH-MM-SS.txt
+// Example: 2025-01-15_14-30-45.txt
+
+const fileName = `${new Date().toISOString().split('T')[0]}_${new Date().toTimeString().split(' ')[0].replace(/:/g, '-')}.txt`;
+```
+
+### **File Content Template:**
+
+```markdown
+[YYYY-MM-DD HH:MM:SS] - [Brief description of update/changes]
+[File paths modified: file1.tsx, file2.ts, etc.]
+```
+
+**IMPORTANT RULES:**
+- ✅ ALWAYS include date and time in first line: `YYYY-MM-DD HH:MM:SS`
+- ✅ ALWAYS write update description in first line after date/time
+- ✅ ALWAYS list modified files in second line
+- ✅ MAXIMUM 2 lines only (date + description, then files)
+- ❌ NEVER exceed 2 lines
+- ❌ NEVER use multiple paragraphs or sections
+```
+
+**Example:**
+```markdown
+2025-01-15 14:30:45 - Updated building form validation and added new fields
+app/dashboard/buildings/add/page.tsx, components/buildings/building-form.jsx
+```
+
+### **Implementation Steps:**
+
+```typescript
+// AI CHECKLIST - After ANY code modification:
+
+1. IDENTIFY modified files:
+   - Get all file paths that were changed
+   
+2. DETERMINE update folder:
+   - Analyze file paths to find matching folder
+   - Use path detection rules above
+   
+3. CREATE folder if missing:
+   - Check if folder exists: docs/updates/{determined-path}/
+   - If NOT exists: Create full folder structure recursively
+   - Example: If path is "dashboard/crm/create", create all nested folders
+   
+4. GENERATE update file:
+   - Create file with timestamp: YYYY-MM-DD_HH-MM-SS.txt
+   - Write update log using template above (MAXIMUM 2 lines only)
+   - Line 1: Date/Time (YYYY-MM-DD HH:MM:SS) + brief description
+   - Line 2: List of modified file paths (comma-separated)
+   - NEVER exceed 2 lines
+   
+5. SAVE file:
+   - Save to: docs/updates/{determined-path}/{timestamp}.txt
+   
+6. MENTION in completion:
+   - Always mention: "Update logged in docs/updates/{path}/{filename}.txt"
+```
+
+### **Examples:**
+
+**Example 1: Dashboard CRM Create Page**
+```
+Modified: app/dashboard/crm/create/page.tsx
+Update Log: docs/updates/dashboard/crm/create/2025-01-15_14-30-45.txt
+```
+
+**Example 2: Settings Page**
+```
+Modified: app/dashboard/settings/page.tsx
+Update Log: docs/updates/dashboard/settings/2025-01-15_14-30-45.txt
+```
+
+**Example 3: Multiple Files in Same Area**
+```
+Modified: 
+  - app/dashboard/crm/edit/page.tsx
+  - components/crm/edit-form.tsx
+Update Log: docs/updates/dashboard/crm/edit/2025-01-15_14-30-45.txt
+(Include all files in single log)
+```
+
+### **Folder Creation Rules:**
+
+```typescript
+// ✅ ALWAYS create full folder path if missing
+// ✅ ALWAYS create nested folders recursively
+// ✅ ALWAYS use forward slashes (/) in paths
+// ✅ NEVER skip folder creation
+// ✅ NEVER create duplicate folders
+
+// Example: If path is "dashboard/crm/create"
+// Create: docs/updates/dashboard/crm/create/ (all levels)
+```
+
+### **Special Cases:**
+
+```typescript
+// If file path doesn't match any known pattern:
+// → Use closest match or create new folder structure
+// → Document in update log which pattern was used
+
+// If multiple files from different areas:
+// → Create separate update logs for each area
+// → Or create in most relevant folder and list all files
+```
+
+**REFERENCE:** This protocol ensures all changes are tracked and documented for future reference.
 
 ---
 
@@ -478,6 +740,7 @@ context/editorStoreFunctions/contactCardsFunctions.ts  ← Extended functions
 ```
 Component Creation:  docs/important/components/ADD_NEW_COMPONENT.md
 Component Repair:    docs/important/components/FIX_COMPONENT_PROMPT.md
+Component Refactor:  docs/important/prompts/CLEANcode/REFACTOR_COMPONENT_PROMPT.md
 Architecture:        docs/important/liveEditor/COMPONENT_ARCHITECTURE.md
 State Management:    docs/important/liveEditor/STATE_MANAGEMENT.md
 Integration:         docs/important/liveEditor/context/COMPONENT_INTEGRATION.md
@@ -540,9 +803,11 @@ Before saying "done" on any task:
 □ No TypeScript/linter errors
 □ No console errors
 □ Documentation updated (if needed)
+□ Update log created in docs/updates/ (MANDATORY)
 □ Tested thoroughly
 □ All integration points verified
 □ User informed of any doc updates
+□ User informed of update log location
 ```
 
 ---

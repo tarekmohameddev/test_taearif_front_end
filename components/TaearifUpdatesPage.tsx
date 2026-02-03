@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import {
   Zap,
   ArrowDown,
@@ -17,12 +19,91 @@ import {
   MapPin,
   Facebook,
   Instagram,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
 } from "lucide-react";
 import SharedHeader from "./shared/SharedHeader";
 import { trackPageView } from "@/lib/gtm";
+import {
+  getAdminArticleCategories,
+  getAllAdminArticles,
+  getCategoryArticles,
+  type AdminArticleCategory,
+  type AdminArticleListItem,
+} from "@/lib/api/admin-articles";
 
 export default function TaearifUpdatesPage() {
   const router = useRouter();
+  const [categories, setCategories] = useState<AdminArticleCategory[]>([]);
+  const [articles, setArticles] = useState<AdminArticleListItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<any>(null);
+
+  // Fetch categories
+  const fetchCategories = useCallback(async () => {
+    try {
+      const cats = await getAdminArticleCategories();
+      setCategories(cats);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  }, []);
+
+  // Fetch articles
+  const fetchArticles = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      let result;
+      if (selectedCategory) {
+        result = await getCategoryArticles(selectedCategory, {
+          page: currentPage,
+          per_page: 12,
+          search: searchQuery || undefined,
+          order_by: "published_at",
+          order_dir: "desc",
+        });
+        setArticles(result.articles);
+        setPagination(result.pagination);
+      } else {
+        result = await getAllAdminArticles({
+          page: currentPage,
+          per_page: 12,
+          search: searchQuery || undefined,
+          order_by: "published_at",
+          order_dir: "desc",
+        });
+        setArticles(result.articles);
+        setPagination(result.pagination);
+      }
+    } catch (err: any) {
+      console.error("Error fetching articles:", err);
+      setError(err.message || "حدث خطأ في تحميل التحديثات");
+      setArticles([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategory, currentPage, searchQuery]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    fetchArticles();
+  }, [fetchArticles]);
+
+  useEffect(() => {
+    // Reset to page 1 when category or search changes
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
 
   useEffect(() => {
     // Track page view
@@ -48,6 +129,16 @@ export default function TaearifUpdatesPage() {
       animatedElements.forEach((el) => observer.unobserve(el));
     };
   }, []);
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("ar-SA", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+  };
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden" dir="rtl">
@@ -112,91 +203,169 @@ export default function TaearifUpdatesPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Update Card 1 */}
-            <div className="relative bg-white rounded-2xl p-8 border border-gray-200 hover:transform hover:-translate-y-2 transition-all duration-300 shadow-sm overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-black to-gray-600"></div>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center ml-4">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <div className="font-bold text-lg">ديسمبر 2024</div>
-                  <div className="text-sm text-green-600 font-medium">
-                    متاح الآن
-                  </div>
-                </div>
-              </div>
-              <h3 className="font-bold text-xl mb-3">تحسين واجهة المستخدم</h3>
-              <p className="text-gray-600 mb-4">
-                واجهة أسرع وأسهل في الاستخدام مع تصميم محدث
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                  UI/UX
-                </span>
-                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                  تحسين الأداء
-                </span>
-              </div>
+          {/* Filters Section */}
+          <div className="mb-8 space-y-4">
+            {/* Search */}
+            <div className="relative max-w-md mx-auto">
+              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="ابحث في التحديثات..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pr-12 pl-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
             </div>
 
-            {/* Update Card 2 */}
-            <div className="relative bg-white rounded-2xl p-8 border border-gray-200 hover:transform hover:-translate-y-2 transition-all duration-300 shadow-sm overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-black to-gray-600"></div>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center ml-4">
-                  <MessageCircle className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <div className="font-bold text-lg">نوفمبر 2024</div>
-                  <div className="text-sm text-blue-600 font-medium">
-                    متاح الآن
-                  </div>
-                </div>
+            {/* Categories */}
+            {categories.length > 0 && (
+              <div className="flex flex-wrap gap-2 justify-center">
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    !selectedCategory
+                      ? "bg-black text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  الكل
+                </button>
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.slug)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      selectedCategory === category.slug
+                        ? "bg-black text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {category.name}
+                    {category.articles_count !== undefined && (
+                      <span className="mr-1">({category.articles_count})</span>
+                    )}
+                  </button>
+                ))}
               </div>
-              <h3 className="font-bold text-xl mb-3">ردود واتساب الذكية</h3>
-              <p className="text-gray-600 mb-4">
-                ردود آلية أكثر ذكاءً وتفاعلاً مع العملاء
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                  واتساب
-                </span>
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                  ذكاء اصطناعي
-                </span>
-              </div>
-            </div>
-
-            {/* Update Card 3 */}
-            <div className="relative bg-white rounded-2xl p-8 border border-gray-200 hover:transform hover:-translate-y-2 transition-all duration-300 shadow-sm overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-black to-gray-600"></div>
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center ml-4">
-                  <Database className="h-6 w-6 text-purple-600" />
-                </div>
-                <div>
-                  <div className="font-bold text-lg">أكتوبر 2024</div>
-                  <div className="text-sm text-purple-600 font-medium">
-                    متاح الآن
-                  </div>
-                </div>
-              </div>
-              <h3 className="font-bold text-xl mb-3">تحسين قاعدة البيانات</h3>
-              <p className="text-gray-600 mb-4">
-                أداء أسرع وموثوقية أعلى في حفظ البيانات
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
-                  قاعدة البيانات
-                </span>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
-                  الأداء
-                </span>
-              </div>
-            </div>
+            )}
           </div>
+
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <div className="text-center py-20">
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={fetchArticles}
+                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                إعادة المحاولة
+              </button>
+            </div>
+          )}
+
+          {/* Articles Grid */}
+          {!loading && !error && (
+            <>
+              {articles.length === 0 ? (
+                <div className="text-center py-20">
+                  <p className="text-gray-600 text-lg">
+                    لا توجد تحديثات متاحة حالياً
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {articles.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/updates/${article.slug}`}
+                      className="relative bg-white rounded-2xl border border-gray-200 hover:transform hover:-translate-y-2 transition-all duration-300 shadow-sm overflow-hidden group"
+                    >
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-black to-gray-600"></div>
+                      
+                      {/* Article Image */}
+                      {article.main_image && (
+                        <div className="relative w-full h-48 overflow-hidden">
+                          <Image
+                            src={article.main_image}
+                            alt={article.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+
+                      <div className="p-6">
+                        <div className="flex items-center mb-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-black to-gray-600 rounded-xl flex items-center justify-center ml-4">
+                            <CheckCircle className="h-6 w-6 text-white" />
+                          </div>
+                          <div>
+                            <div className="font-bold text-sm">
+                              {formatDate(article.published_at)}
+                            </div>
+                            {article.category && (
+                              <div className="text-xs text-gray-500">
+                                {article.category.name}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <h3 className="font-bold text-xl mb-3 group-hover:text-gray-600 transition-colors">
+                          {article.title}
+                        </h3>
+                        {article.excerpt && (
+                          <p className="text-gray-600 mb-4 line-clamp-3">
+                            {article.excerpt}
+                          </p>
+                        )}
+                        {article.category && (
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                              {article.category.name}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {pagination && pagination.last_page > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-12">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <span className="px-4 py-2 text-gray-700">
+                    صفحة {pagination.current_page} من {pagination.last_page}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) =>
+                        Math.min(pagination.last_page, p + 1)
+                      )
+                    }
+                    disabled={currentPage === pagination.last_page}
+                    className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
 
