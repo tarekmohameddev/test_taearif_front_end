@@ -27,16 +27,20 @@ Rank File                                                                 Charac
 
 
 
-$results = Get-ChildItem -Path "components" -Recurse -File | ForEach-Object { 
-    $content = Get-Content $_.FullName -Raw -ErrorAction SilentlyContinue
-    if ($content) {
-        [PSCustomObject]@{
-            Rank = 0
-            File = $_.FullName.Replace((Get-Location).Path + '\', '')
-            Characters = $content.Length
-            Lines = ($content -split "`n").Count
-            SizeKB = [math]::Round($content.Length / 1KB, 2)
+$results = Get-ChildItem -Path "." -Recurse -File | ForEach-Object { 
+    try {
+        $content = [System.IO.File]::ReadAllText($_.FullName)
+        if ($content) {
+            [PSCustomObject]@{
+                Rank = 0
+                File = $_.FullName.Replace((Get-Location).Path + '\', '')
+                Characters = $content.Length
+                Lines = ($content -split "`n").Count
+                SizeKB = [math]::Round($content.Length / 1KB, 2)
+            }
         }
+    } catch {
+        # Skip files that can't be read
     }
 } | Sort-Object -Property Characters -Descending | Select-Object -First 20
 
@@ -46,4 +50,4 @@ $results | ForEach-Object {
     $_
 } | Format-Table -Property Rank, File, Characters, Lines, SizeKB -AutoSize | Out-File -FilePath "top20_largest_files.txt" -Encoding UTF8
 
-Write-Host "تم حفظ النتائج في ملف: top20_largest_files.txt" -ForegroundColor Green
+Write-Host "تم حفظ النتائج في ملف: top20_largest_files2.txt" -ForegroundColor Green

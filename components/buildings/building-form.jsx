@@ -228,7 +228,7 @@ export default function BuildingForm({ mode = "add" }) {
 
   if (loading && mode === "edit") {
     return (
-      <div className="flex min-h-screen bg-white">
+      <div className="flex min-h-screen bg-white items-center justify-center">
           <div className="p-6 flex items-center justify-center">
             <div className="flex items-center space-x-2">
               <Loader2 className="w-6 h-6 animate-spin text-black" />
@@ -240,8 +240,8 @@ export default function BuildingForm({ mode = "add" }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
-        <div className="p-6 bg-white">
+    <div className="flex min-h-screen bg-white items-center justify-center">
+        <div className="p-6 bg-white w-full max-w-[1100px]">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-4">
@@ -268,7 +268,7 @@ export default function BuildingForm({ mode = "add" }) {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+          <form onSubmit={handleSubmit} className="max-w-[1100px] mx-auto">
             <div className="space-y-8">
               {/* Basic Information */}
               <Card className="border border-gray-200">
