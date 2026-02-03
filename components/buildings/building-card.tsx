@@ -541,7 +541,13 @@ export default function BuildingCard({
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      const subdomain = building.user.username;
+                      const subdomain = building.user?.username;
+                      
+                      if (!subdomain) {
+                        toast.error("لا يمكن فتح رابط العقار: اسم المستخدم غير متوفر");
+                        return;
+                      }
+                      
                       const propertySlug = property.slug || property.id;
 
                       // تحديد الدومين حسب البيئة
@@ -577,13 +583,21 @@ export default function BuildingCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Avatar className="w-6 h-6">
-                <AvatarImage src="" />
+                <AvatarImage src={building.user?.photo || ""} />
                 <AvatarFallback className="text-xs">
-                  {building.user.first_name.charAt(0)}
+                  {building.user?.first_name?.charAt(0)?.toUpperCase() || 
+                   building.user?.username?.charAt(0)?.toUpperCase() || 
+                   "?"}
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm text-gray-600">
-                {building.user.first_name} {building.user.last_name}
+                {building.user?.first_name || ""} {building.user?.last_name || ""}
+                {!building.user?.first_name && !building.user?.last_name && building.user?.username && (
+                  <span>{building.user.username}</span>
+                )}
+                {!building.user?.first_name && !building.user?.last_name && !building.user?.username && (
+                  <span className="text-gray-400">غير محدد</span>
+                )}
               </span>
             </div>
             <span className="text-xs text-gray-500">

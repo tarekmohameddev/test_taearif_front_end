@@ -85,9 +85,24 @@ export default function BuildingsManagementPage() {
           rentedProperties,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching buildings:", error);
-      toast.error("فشل في تحميل بيانات العمارات");
+      
+      // Handle 401 Unauthorized - redirect to login
+      if (error.response?.status === 401) {
+        toast.error("انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى");
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          router.push("/dashboard/login");
+        }, 2000);
+        return;
+      }
+      
+      // Handle other errors
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          "فشل في تحميل بيانات العمارات";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

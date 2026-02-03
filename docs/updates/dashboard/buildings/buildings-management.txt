@@ -1,0 +1,2 @@
+2026-02-03 18:31:00 - Fixed TypeError: Added optional chaining for building.user properties and improved 401 error handling
+components/buildings/building-card.tsx, components/buildings/buildings-management-page.tsx
