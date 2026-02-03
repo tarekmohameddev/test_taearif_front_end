@@ -1,0 +1,4 @@
+2025-01-17 15:30:00
+Update Type: Feature
+إضافة قسم مركز التحديثات في homepage الخاص بـ taearif - قسم جديد بين "ما قاله مستخدمينا عنا" و "لماذا تعاريف" يحتوي على 3 cards للتحديثات الأخيرة مع زر "عرض الكل" يذهب لصفحة مركز التحديثات
+components/landing/homepage/components/UpdatesSection.tsx, components/landing/homepage/TaearifLandingPage.tsx

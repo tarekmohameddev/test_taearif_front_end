@@ -10,6 +10,7 @@ import PricingSection from "./components/PricingSection";
 import ClientsSection from "./components/ClientsSection";
 import FeaturesSectionWordPress from "./components/FeaturesSectionWordPress";
 import TestimonialsSection from "./components/TestimonialsSection";
+import UpdatesSection from "./components/UpdatesSection";
 import WhyUsSection from "./components/WhyUsSection";
 import MobileAppSection from "./components/MobileAppSection";
 import Footer from "./components/Footer";
@@ -50,6 +51,9 @@ export default function TaearifLandingPage() {
       </section>
       <section id="testimonials">
         <TestimonialsSection />
+      </section>
+      <section id="updates">
+        <UpdatesSection />
       </section>
       <section id="about">
         <WhyUsSection />
