@@ -2,3 +2,8 @@
 Update Type: Enhancement
 Removed validation for GTM pixel field - GTM pixel can now accept any value without format validation
 components/pixels/pixel-helpers.ts
+
+2026-02-03 19:17:32
+Update Type: Bug Fix
+Fixed hydration error by replacing nested <p> tags with <div> tags inside AlertDialogDescription component
+components/pixels/delete-pixel-dialog.tsx

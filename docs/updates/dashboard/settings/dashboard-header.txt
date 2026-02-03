@@ -1,2 +1,17 @@
 2026-02-03 19:07:38 - Merged "احصل على مساعدة" button with Support Center link in elegant dropdown menu with icons and descriptions
 components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 19:19:34 - Changed "احصل على مساعدة" button to black color and removed WhatsApp icon
+components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 19:20:50 - Added "احصل على مساعدة" button next to subscription plan button in mobile view
+components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 19:21:46 - Changed hover effect on "احصل على مساعدة" button to use scale-95% instead of changing text color
+components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 19:22:36 - Ensured hover effect only changes scale, no color changes (added explicit hover color overrides)
+components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 19:25:14 - Hid "احصل على مساعدة" button from top navbar on mobile, only shows next to subscription button
+components/mainCOMP/dashboard-header.tsx
