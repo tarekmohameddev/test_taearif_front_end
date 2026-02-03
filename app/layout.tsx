@@ -22,6 +22,7 @@ export default async function RootLayout({
     "/", // الصفحة الرئيسية
     "/solutions",
     "/updates",
+    "/support-center",
     "/landing",
     "/about-us",
   ];
@@ -50,6 +51,7 @@ export default async function RootLayout({
     "/about-us",
     "/solutions",
     "/updates",
+    "/support-center",
     "/landing",
   ];
 
