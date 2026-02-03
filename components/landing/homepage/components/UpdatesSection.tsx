@@ -7,6 +7,51 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Sparkles, Loader2 } from "lucide-react";
 import { getAllAdminArticles, type AdminArticleListItem } from "@/lib/api/admin-articles";
 
+// Dummy data for development
+const DUMMY_ARTICLES: AdminArticleListItem[] = [
+  {
+    id: 1,
+    title: "إطلاق ميزة إدارة العقارات المتقدمة",
+    slug: "advanced-property-management",
+    excerpt: "نفخر بإطلاق ميزة جديدة لإدارة العقارات بشكل أكثر احترافية وكفاءة",
+    main_image: null,
+    published_at: new Date().toISOString(),
+    category: {
+      id: 1,
+      name: "مميزات جديدة",
+      slug: "new-features",
+    },
+  },
+  {
+    id: 2,
+    title: "تحسينات على نظام CRM",
+    slug: "crm-improvements",
+    excerpt: "تم تحسين نظام إدارة العملاء ليكون أسرع وأكثر سهولة في الاستخدام",
+    main_image: null,
+    published_at: new Date(Date.now() - 86400000).toISOString(),
+    category: {
+      id: 2,
+      name: "تحسينات",
+      slug: "improvements",
+    },
+  },
+  {
+    id: 3,
+    title: "إصلاح مشكلة في نظام التقارير",
+    slug: "reports-fix",
+    excerpt: "تم إصلاح مشكلة في عرض التقارير الإحصائية",
+    main_image: null,
+    published_at: new Date(Date.now() - 172800000).toISOString(),
+    category: {
+      id: 3,
+      name: "إصلاحات",
+      slug: "fixes",
+    },
+  },
+];
+
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export default function UpdatesSection() {
   const [articles, setArticles] = useState<AdminArticleListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,11 +89,22 @@ export default function UpdatesSection() {
           order_by: "published_at",
           order_dir: "desc",
         });
-        setArticles(result.articles.slice(0, 3));
+        const fetchedArticles = result.articles.slice(0, 3);
+        
+        // Use dummy data in development if no articles found
+        if (fetchedArticles.length === 0 && isDevelopment) {
+          setArticles(DUMMY_ARTICLES.slice(0, 3));
+        } else {
+          setArticles(fetchedArticles);
+        }
       } catch (error) {
         console.error("Error fetching latest articles:", error);
-        // Fallback to empty array on error
-        setArticles([]);
+        // Fallback to dummy data in development on error
+        if (isDevelopment) {
+          setArticles(DUMMY_ARTICLES.slice(0, 3));
+        } else {
+          setArticles([]);
+        }
       } finally {
         setLoading(false);
       }
@@ -137,30 +193,24 @@ export default function UpdatesSection() {
                 >
                   <Link
                     href={`/updates/${article.slug}`}
-                    className="block h-full bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                    className="block h-full bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:scale-105 transition-transform duration-300"
                   >
                     {/* Image Container */}
                     <div className="relative w-full h-64 overflow-hidden bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200">
                       {article.main_image ? (
-                        <>
-                          <Image
-                            src={article.main_image}
-                            alt={article.title}
-                            fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        </>
+                        <Image
+                          src={article.main_image}
+                          alt={article.title}
+                          fill
+                          className="object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-50 via-cyan-50 to-blue-50">
-                          <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                          <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-lg">
                             <Sparkles className="h-12 w-12 text-white" />
                           </div>
                         </div>
                       )}
-                      
-                      {/* Shine Effect */}
-                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                       
                       {/* Category Badge */}
                       {article.category && (
@@ -170,9 +220,6 @@ export default function UpdatesSection() {
                           </span>
                         </div>
                       )}
-
-                      {/* Top Gradient Border */}
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-cyan-500 to-blue-500"></div>
                     </div>
 
                     {/* Content */}
@@ -186,7 +233,7 @@ export default function UpdatesSection() {
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-cyan-600 transition-all duration-300 line-clamp-2 leading-tight">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 leading-tight">
                         {article.title}
                       </h3>
 
@@ -198,17 +245,13 @@ export default function UpdatesSection() {
                       )}
 
                       {/* Read More Link */}
-                      <div className="flex items-center gap-2 text-purple-600 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
+                      <div className="flex items-center gap-2 text-purple-600 font-semibold text-sm">
                         <span>اقرأ المزيد</span>
-                        <div className="p-1.5 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors duration-300">
-                          <ArrowLeft className="h-4 w-4 group-hover:translate-x-[-4px] transition-transform duration-300" />
+                        <div className="p-1.5 bg-purple-50 rounded-lg">
+                          <ArrowLeft className="h-4 w-4" />
                         </div>
                       </div>
                     </div>
-
-                    {/* Hover Effect Border & Shadow */}
-                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-purple-200 rounded-2xl transition-all duration-300 pointer-events-none"></div>
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 via-cyan-500 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300 pointer-events-none"></div>
                   </Link>
                 </motion.div>
               ))
@@ -226,15 +269,15 @@ export default function UpdatesSection() {
         >
           <Link
             href="/updates"
-            className="relative inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-black via-gray-900 to-black text-white rounded-2xl font-bold text-lg shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 group overflow-hidden"
+            className="relative inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-black via-gray-900 to-black text-white rounded-2xl font-bold text-lg shadow-2xl hover:shadow-black/30 transition-all duration-300 hover:scale-105 group overflow-hidden"
           >
-            {/* Animated background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-cyan-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {/* Animated background - stays black on hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-800 via-black to-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
             {/* Button content */}
             <span className="relative z-10">عرض الكل</span>
-            <div className="relative z-10 p-1.5 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors duration-300">
-              <ArrowLeft className="h-5 w-5 group-hover:translate-x-[-6px] transition-transform duration-300" />
+            <div className="relative z-10 p-1.5 bg-white/10 rounded-lg">
+              <ArrowLeft className="h-5 w-5" />
             </div>
             
             {/* Shine effect */}
