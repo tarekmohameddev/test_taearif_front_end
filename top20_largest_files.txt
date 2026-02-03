@@ -27,7 +27,7 @@ Rank File                                                                 Charac
 
 
 
-$results = Get-ChildItem -Path "." -Recurse -File | ForEach-Object { 
+$results = Get-ChildItem -Path "components\customers-hub" -Recurse -File | ForEach-Object { 
     try {
         $content = [System.IO.File]::ReadAllText($_.FullName)
         if ($content) {
@@ -48,6 +48,6 @@ $rank = 1
 $results | ForEach-Object {
     $_.Rank = $rank++
     $_
-} | Format-Table -Property Rank, File, Characters, Lines, SizeKB -AutoSize | Out-File -FilePath "top20_largest_files.txt" -Encoding UTF8
+} | Format-Table -Property Rank, File, Characters, Lines, SizeKB -AutoSize | Out-File -FilePath "top20_largest_files2.txt" -Encoding UTF8
 
 Write-Host "تم حفظ النتائج في ملف: top20_largest_files2.txt" -ForegroundColor Green

@@ -1,0 +1,9 @@
+2026-02-03 21:55:08
+Update Type: Refactor
+Converted all dialogs in customers-hub to use CustomDialog component instead of shadcn Dialog
+components/customers-hub/dialogs/AddCustomerDialog.tsx, components/customers-hub/export/ExportDialog.tsx, components/customers-hub/actions/ScheduleAppointmentDialog.tsx, components/customers-hub/bulk/BulkActionsBar.tsx, components/customers-hub/assignment/AssignmentBar.tsx, components/customers-hub/charts/InteractiveCharts.tsx, components/customComponents/CustomDialog.tsx
+
+2026-02-03 21:57:22
+Update Type: Refactor
+Converted KeyboardShortcuts dialog to use CustomDialog component
+components/customers-hub/keyboard/KeyboardShortcuts.tsx

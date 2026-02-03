@@ -1,0 +1,25 @@
+﻿
+Rank File                                                           Characters Lines SizeKB
+---- ----                                                           ---------- ----- ------
+   1 components\customers-hub\actions\ActionsPage.tsx                    60397  1524  58.98
+   2 components\customers-hub\detail\CustomerDetailPageSimple.tsx        39818  1111  38.88
+   3 components\customers-hub\requests\RequestsCenterPage.tsx            39660  1034  38.73
+   4 components\customers-hub\requests\RequestDetailPage.tsx             39450   917  38.53
+   5 components\customers-hub\actions\IncomingActionsCard.tsx            31616   811  30.88
+   6 components\customers-hub\page\CustomersMap.tsx                      21479   598  20.98
+   7 components\customers-hub\analytics\KSAComplianceKPIs.tsx            19681   462  19.22
+   8 components\customers-hub\notifications\NotificationsCenter.tsx      19265   486  18.81
+   9 components\customers-hub\assignment\AssignmentPanel.tsx             19064   485  18.62
+  10 components\customers-hub\bulk\BulkActionsBar.tsx                    17611   530   17.2
+  11 components\customers-hub\detail\RemindersTab.tsx                    17291   436  16.89
+  12 components\customers-hub\detail\ActivitiesTab.tsx                   17030   454  16.63
+  13 components\customers-hub\detail\CommunicationHub.tsx                15942   391  15.57
+  14 components\customers-hub\detail\PropertyComparison.tsx              14822   404  14.47
+  15 components\customers-hub\charts\InteractiveCharts.tsx               14282   344  13.95
+  16 components\customers-hub\filters\AdvancedFilters.tsx                13978   363  13.65
+  17 components\customers-hub\detail\FinancialTab.tsx                    13232   360  12.92
+  18 components\customers-hub\filters\SavedFilters.tsx                   13125   392  12.82
+  19 components\customers-hub\analytics\AnalyticsDashboard.tsx           12915   302  12.61
+  20 components\customers-hub\detail\AppointmentsTab.tsx                 12015   307  11.73
+
+

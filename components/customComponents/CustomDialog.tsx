@@ -177,6 +177,24 @@ export function CustomDialogDescription({
   );
 }
 
+interface CustomDialogFooterProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function CustomDialogFooter({
+  children,
+  className = "",
+}: CustomDialogFooterProps) {
+  return (
+    <div
+      className={`border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-end gap-2 flex-shrink-0 ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 // Close button component
 export function CustomDialogClose({
   onClose,

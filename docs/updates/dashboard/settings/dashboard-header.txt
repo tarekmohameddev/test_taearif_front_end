@@ -18,3 +18,13 @@ components/mainCOMP/dashboard-header.tsx
 
 2026-02-03 19:31:05 - Centered logo in dashboard header using absolute positioning
 components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 21:17:24
+Update Type: Enhancement
+Modified logo position in dashboard header: centered on mobile only, positioned at start on desktop/tablet
+components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 21:50:55
+Update Type: Bug Fix
+Removed duplicate menu button from DashboardSidebar on mobile - now only one menu button exists in the header
+components/mainCOMP/DashboardSidebar.tsx

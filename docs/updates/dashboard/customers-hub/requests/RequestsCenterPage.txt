@@ -1,0 +1,4 @@
+2025-01-20 12:00:00
+Update Type: Enhancement
+Updated TabsList to show 2 columns on mobile only, keeping 4 columns on desktop
+components/customers-hub/requests/RequestsCenterPage.tsx
