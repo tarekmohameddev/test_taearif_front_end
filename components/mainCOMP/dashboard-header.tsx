@@ -198,7 +198,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   return (
     <header className="sticky top-0 z-30 bg-background flex flex-col gap-6">
       {/* الـ navbar الأول مع المحتوى الحالي */}
-      <div className="h-16 items-center justify-between px-4 md:px-6 md:border-b flex">
+      <div className="h-16 items-center justify-between px-4 md:px-6 md:border-b flex relative">
         <div className="flex items-center gap-4">
           {/* زر القائمة للجوال */}
           {useAuthStore.getState().UserIslogged && (
@@ -210,18 +210,20 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               </MobileSidebar>
             </div>
           )}
+        </div>
 
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={141}
-              height={100}
-              className=""
-            />
-          </Link>
+        {/* اللوجو في المنتصف */}
+        <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2 font-semibold">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={141}
+            height={100}
+            className=""
+          />
+        </Link>
 
-          {/* <div className="hidden md:flex items-center gap-1 mr-6">
+        {/* <div className="hidden md:flex items-center gap-1 mr-6">
             
             <TooltipProvider>
               <Tooltip>
@@ -249,9 +251,6 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
               </Tooltip>
             </TooltipProvider>
           </div> */}
-
-          {children}
-        </div>
 
         {/* أزرار تسجيل الدخول والمستخدم */}
         <div className="flex items-center gap-2">

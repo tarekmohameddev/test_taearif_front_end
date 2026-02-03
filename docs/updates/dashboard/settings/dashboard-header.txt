@@ -15,3 +15,6 @@ components/mainCOMP/dashboard-header.tsx
 
 2026-02-03 19:25:14 - Hid "احصل على مساعدة" button from top navbar on mobile, only shows next to subscription button
 components/mainCOMP/dashboard-header.tsx
+
+2026-02-03 19:31:05 - Centered logo in dashboard header using absolute positioning
+components/mainCOMP/dashboard-header.tsx
