@@ -37,7 +37,7 @@ export default function ArticleDetailPage({
       <Navbar />
 
       {/* Article Header */}
-      <section className="pb-12 bg-gradient-to-br from-white via-gray-50/50 to-white pt-[200px]">
+      <section className="pb-12 bg-gradient-to-br from-white via-gray-50/50 to-white pt-[150px]">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             {article.category && (
