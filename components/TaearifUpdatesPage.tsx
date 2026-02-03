@@ -27,6 +27,114 @@ import {
   type AdminArticleListItem,
 } from "@/lib/api/admin-articles";
 
+// Dummy data for development
+const DUMMY_CATEGORIES: AdminArticleCategory[] = [
+  {
+    id: 1,
+    name: "مميزات جديدة",
+    slug: "new-features",
+    description: "أحدث المميزات والإضافات",
+    articles_count: 5,
+  },
+  {
+    id: 2,
+    name: "تحسينات",
+    slug: "improvements",
+    description: "تحسينات على المميزات الموجودة",
+    articles_count: 8,
+  },
+  {
+    id: 3,
+    name: "إصلاحات",
+    slug: "fixes",
+    description: "إصلاح الأخطاء والمشاكل",
+    articles_count: 3,
+  },
+];
+
+const DUMMY_ARTICLES: AdminArticleListItem[] = [
+  {
+    id: 1,
+    title: "إطلاق ميزة إدارة العقارات المتقدمة",
+    slug: "advanced-property-management",
+    excerpt: "نفخر بإطلاق ميزة جديدة لإدارة العقارات بشكل أكثر احترافية وكفاءة",
+    main_image: null,
+    published_at: new Date().toISOString(),
+    category: {
+      id: 1,
+      name: "مميزات جديدة",
+      slug: "new-features",
+    },
+  },
+  {
+    id: 2,
+    title: "تحسينات على نظام CRM",
+    slug: "crm-improvements",
+    excerpt: "تم تحسين نظام إدارة العملاء ليكون أسرع وأكثر سهولة في الاستخدام",
+    main_image: null,
+    published_at: new Date(Date.now() - 86400000).toISOString(),
+    category: {
+      id: 2,
+      name: "تحسينات",
+      slug: "improvements",
+    },
+  },
+  {
+    id: 3,
+    title: "إصلاح مشكلة في نظام التقارير",
+    slug: "reports-fix",
+    excerpt: "تم إصلاح مشكلة في عرض التقارير الإحصائية",
+    main_image: null,
+    published_at: new Date(Date.now() - 172800000).toISOString(),
+    category: {
+      id: 3,
+      name: "إصلاحات",
+      slug: "fixes",
+    },
+  },
+  {
+    id: 4,
+    title: "ميزة جديدة: إشعارات واتساب",
+    slug: "whatsapp-notifications",
+    excerpt: "أضفنا ميزة إرسال إشعارات تلقائية عبر واتساب للعملاء",
+    main_image: null,
+    published_at: new Date(Date.now() - 259200000).toISOString(),
+    category: {
+      id: 1,
+      name: "مميزات جديدة",
+      slug: "new-features",
+    },
+  },
+  {
+    id: 5,
+    title: "تحسين واجهة المستخدم",
+    slug: "ui-improvements",
+    excerpt: "تم تحديث واجهة المستخدم لتكون أكثر جمالاً وسهولة",
+    main_image: null,
+    published_at: new Date(Date.now() - 345600000).toISOString(),
+    category: {
+      id: 2,
+      name: "تحسينات",
+      slug: "improvements",
+    },
+  },
+  {
+    id: 6,
+    title: "إصلاح مشكلة في التصدير",
+    slug: "export-fix",
+    excerpt: "تم إصلاح مشكلة في تصدير البيانات إلى Excel",
+    main_image: null,
+    published_at: new Date(Date.now() - 432000000).toISOString(),
+    category: {
+      id: 3,
+      name: "إصلاحات",
+      slug: "fixes",
+    },
+  },
+];
+
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export default function TaearifUpdatesPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<AdminArticleCategory[]>([]);
@@ -41,10 +149,19 @@ export default function TaearifUpdatesPage() {
   // Fetch categories
   const fetchCategories = useCallback(async () => {
     try {
+      if (isDevelopment) {
+        // Use dummy data in development
+        setCategories(DUMMY_CATEGORIES);
+        return;
+      }
       const cats = await getAdminArticleCategories();
       setCategories(cats);
     } catch (err) {
       console.error("Error fetching categories:", err);
+      // Fallback to dummy data in development if API fails
+      if (isDevelopment) {
+        setCategories(DUMMY_CATEGORIES);
+      }
     }
   }, []);
 
@@ -53,6 +170,46 @@ export default function TaearifUpdatesPage() {
     try {
       setLoading(true);
       setError(null);
+
+      if (isDevelopment) {
+        // Use dummy data in development
+        let filteredArticles = [...DUMMY_ARTICLES];
+
+        // Filter by category if selected
+        if (selectedCategory) {
+          filteredArticles = filteredArticles.filter(
+            (article) => article.category?.slug === selectedCategory
+          );
+        }
+
+        // Filter by search query
+        if (searchQuery) {
+          const query = searchQuery.toLowerCase();
+          filteredArticles = filteredArticles.filter(
+            (article) =>
+              article.title.toLowerCase().includes(query) ||
+              article.excerpt?.toLowerCase().includes(query)
+          );
+        }
+
+        // Pagination
+        const perPage = 12;
+        const startIndex = (currentPage - 1) * perPage;
+        const endIndex = startIndex + perPage;
+        const paginatedArticles = filteredArticles.slice(startIndex, endIndex);
+
+        setArticles(paginatedArticles);
+        setPagination({
+          per_page: perPage,
+          current_page: currentPage,
+          from: startIndex + 1,
+          to: Math.min(endIndex, filteredArticles.length),
+          total: filteredArticles.length,
+          last_page: Math.ceil(filteredArticles.length / perPage),
+        });
+        setLoading(false);
+        return;
+      }
 
       let result;
       if (selectedCategory) {
@@ -78,8 +235,21 @@ export default function TaearifUpdatesPage() {
       }
     } catch (err: any) {
       console.error("Error fetching articles:", err);
-      setError(err.message || "حدث خطأ في تحميل التحديثات");
-      setArticles([]);
+      // Fallback to dummy data in development if API fails
+      if (isDevelopment) {
+        setArticles(DUMMY_ARTICLES);
+        setPagination({
+          per_page: 12,
+          current_page: 1,
+          from: 1,
+          to: DUMMY_ARTICLES.length,
+          total: DUMMY_ARTICLES.length,
+          last_page: 1,
+        });
+      } else {
+        setError(err.message || "حدث خطأ في تحميل التحديثات");
+        setArticles([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -271,11 +441,11 @@ export default function TaearifUpdatesPage() {
                       )}
 
                       <div className="p-6">
-                        <div className="flex items-center mb-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-black to-gray-600 rounded-xl flex items-center justify-center ml-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-black to-gray-600 rounded-xl flex items-center justify-center">
                             <CheckCircle className="h-6 w-6 text-white" />
                           </div>
-                          <div>
+                          <div className="text-left">
                             <div className="font-bold text-sm">
                               {formatDate(article.published_at)}
                             </div>

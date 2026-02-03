@@ -1,0 +1,14 @@
+2026-02-03 18:18:40 - Added dummy data support for article detail pages in development mode
+app/updates/[slug]/page.tsx
+
+2026-02-03 18:21:00 - Replaced SharedHeader and custom Footer with Navbar and Footer from homepage in ArticleDetailPage
+components/ArticleDetailPage.tsx
+
+2026-02-03 18:22:31 - Moved "العودة إلى التحديثات" button to the left side using mr-auto
+components/ArticleDetailPage.tsx
+
+2026-02-03 18:24:24 - Moved "العودة إلى التحديثات" button to the end of the row using flex justify-end
+components/ArticleDetailPage.tsx
+
+2026-02-03 18:25:32 - Combined category badge and "العودة إلى التحديثات" button in the same row using flex justify-between
+components/ArticleDetailPage.tsx
