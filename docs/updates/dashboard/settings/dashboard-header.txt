@@ -1,0 +1,2 @@
+2026-02-03 19:07:38 - Merged "احصل على مساعدة" button with Support Center link in elegant dropdown menu with icons and descriptions
+components/mainCOMP/dashboard-header.tsx

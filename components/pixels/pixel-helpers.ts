@@ -114,13 +114,8 @@ export const validatePixelForm = (
       errors.pixel_id = "Snapchat Pixel يجب أن يكون 3 أحرف على الأقل";
       return { isValid: false, errors };
     }
-  } else if (data.platform === "gtm") {
-    if (!/^GTM-[A-Z0-9]+$/i.test(data.pixel_id)) {
-      errors.pixel_id =
-        "Google Tag Manager Container ID يجب أن يبدأ بـ GTM- متبوعاً بأحرف وأرقام (مثال: GTM-XXXXXXX)";
-      return { isValid: false, errors };
-    }
   }
+  // GTM validation removed - no format validation required
 
   return { isValid: true, errors: {} };
 };

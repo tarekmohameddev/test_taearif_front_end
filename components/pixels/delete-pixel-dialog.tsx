@@ -40,22 +40,22 @@ export function DeletePixelDialog({
           </AlertDialogTitle>
           <AlertDialogDescription className="text-right">
             <div className="space-y-3">
-              <p className="font-semibold text-lg">
+              <div className="font-semibold text-lg">
                 هل أنت متأكد من حذف هذا Pixel؟
-              </p>
+              </div>
               <div className="bg-destructive/10 p-3 rounded-lg border border-destructive/20">
-                <p className="text-sm">
+                <div className="text-sm">
                   <span className="font-medium">المنصة:</span> {pixel.platform}
-                </p>
-                <p className="text-sm">
+                </div>
+                <div className="text-sm">
                   <span className="font-medium">معرف Pixel:</span>{" "}
                   {pixel.pixel_id}
-                </p>
+                </div>
               </div>
-              <p className="text-destructive font-medium">
+              <div className="text-destructive font-medium">
                 ⚠️ هذا الإجراء لا يمكن التراجع عنه. سيتم حذف Pixel نهائياً من
                 النظام.
-              </p>
+              </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

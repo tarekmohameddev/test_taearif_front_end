@@ -1,0 +1,4 @@
+2026-02-03 19:02:26
+Update Type: Enhancement
+Removed validation for GTM pixel field - GTM pixel can now accept any value without format validation
+components/pixels/pixel-helpers.ts
