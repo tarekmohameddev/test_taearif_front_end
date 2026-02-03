@@ -1,0 +1,25 @@
+﻿
+Rank File                                                                  Characters Lines SizeKB
+---- ----                                                                  ---------- ----- ------
+   1 components\property\properties-management-page.tsx                        152486  3638 148.91
+   2 components\rental-management\services\rental-applications-service.tsx     143604  3882 140.24
+   3 components\tenant\propertyDetail\propertyDetail1.tsx                      124910  2931 121.98
+   4 components\rental-management\dashboard-stats.tsx                          121806  2830 118.95
+   5 components\rental-management\owners-page.tsx                              103035  2400 100.62
+   6 components\tenant\propertyDetail\propertyDetail2.tsx                       98045  2337  95.75
+   7 components\tenant\projectDetails\projectDetails1.tsx                       89064  2086  86.98
+   8 components\project-detail.tsx                                              79431  1808  77.57
+   9 components\reports\platform-reports-page.tsx                               78147  1831  76.32
+  10 components\rental-management\rental-details-dialog.tsx                     77748  1793  75.93
+  11 components\property-reservations-page.tsx                                  76115  1991  74.33
+  12 components\purchase-management\services\purchase-flow-service.tsx          74633  2118  72.88
+  13 components\tenant\inputs\inputs2.tsx                                       73733  2132     72
+  14 components\property\incomplete-properties-management-page.tsx              66984  1764  65.41
+  15 components\tenant\inputs\inputs1.tsx                                       64504  1905  62.99
+  16 components\crm\new-deal-form.tsx                                           64246  1564  62.74
+  17 components\rental-management\payment-collection-dialog.tsx                 63469  1600  61.98
+  18 components\project\edit-project-page.tsx                                   62157  1595   60.7
+  19 components\settings-page.tsx                                               59505  1345  58.11
+  20 components\tenant\projectDetails\projectDetails2.tsx                       58841  1538  57.46
+
+

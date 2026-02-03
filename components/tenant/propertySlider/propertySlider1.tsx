@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
@@ -268,7 +268,10 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     return {};
   };
 
-  const tenantComponentData = getTenantComponentData();
+  const tenantComponentData = useMemo(
+    () => getTenantComponentData(),
+    [tenantData, props.id, variantId]
+  );
 
   // Fetch properties/projects from API
   const fetchProperties = async (apiUrl?: string) => {
@@ -364,7 +367,6 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     props.useStore,
     ensureComponentVariant,
     tenantComponentData,
-    props,
   ]);
 
   // Helper function to create darker color for hover states

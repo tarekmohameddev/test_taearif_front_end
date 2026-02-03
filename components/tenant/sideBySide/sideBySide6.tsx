@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
@@ -140,7 +140,10 @@ export default function SideBySide6(props: SideBySide6Props) {
     return {};
   };
 
-  const tenantComponentData = getTenantComponentData();
+  const tenantComponentData = useMemo(
+    () => getTenantComponentData(),
+    [tenantData, props.id, uniqueId]
+  );
 
   // ─────────────────────────────────────────────────────────
   // 5. INITIALIZE IN STORE (on mount)
@@ -168,7 +171,6 @@ export default function SideBySide6(props: SideBySide6Props) {
     props.useStore,
     ensureComponentVariant,
     tenantComponentData,
-    props,
   ]);
 
   // ─────────────────────────────────────────────────────────

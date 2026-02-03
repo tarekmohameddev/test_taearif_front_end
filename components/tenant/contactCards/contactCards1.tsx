@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultContactCardsData } from "@/context/editorStoreFunctions/contactCardsFunctions";
@@ -185,7 +185,10 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
     return {};
   };
 
-  const tenantComponentData = getTenantComponentData();
+  const tenantComponentData = useMemo(
+    () => getTenantComponentData(),
+    [tenantData, id, uniqueId]
+  );
 
   useEffect(() => {
     if (useStore) {
@@ -204,7 +207,7 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
 
       ensureComponentVariant("contactCards", uniqueId, initialData);
     }
-  }, [uniqueId, useStore, ensureComponentVariant, tenantComponentData, props]);
+  }, [uniqueId, useStore, ensureComponentVariant, tenantComponentData]);
 
   // Get branding colors from WebsiteLayout (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669

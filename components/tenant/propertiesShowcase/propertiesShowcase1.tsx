@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useTenantStore from "@/context/tenantStore";
@@ -790,7 +790,10 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
     return {};
   };
 
-  const tenantComponentData = getTenantComponentData();
+  const tenantComponentData = useMemo(
+    () => getTenantComponentData(),
+    [tenantData, props.id, uniqueId]
+  );
 
   useEffect(() => {
     if (props.useStore) {
@@ -815,7 +818,6 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
     props.useStore,
     ensureComponentVariant,
     tenantComponentData,
-    props,
   ]);
 
   // ─────────────────────────────────────────────────────────
