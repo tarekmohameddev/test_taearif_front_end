@@ -543,7 +543,9 @@ function getFileName(filePath: string): string {
 ### **File Content Template:**
 
 ```markdown
-[YYYY-MM-DD HH:MM:SS] - [Brief description of update/changes]
+[YYYY-MM-DD HH:MM:SS]
+[Update Type: Bug Fix / Feature / Enhancement / Update / Refactor]
+[Brief description of update/changes]
 [File paths modified: file1.tsx, file2.ts, etc.]
 
 [Next update on new lines...]
@@ -552,9 +554,10 @@ function getFileName(filePath: string): string {
 **IMPORTANT RULES:**
 - ✅ ALWAYS append to existing file (if exists) or create new file
 - ✅ ALWAYS include date and time: `YYYY-MM-DD HH:MM:SS`
-- ✅ ALWAYS write update description after date/time
-- ✅ ALWAYS list modified files on second line
-- ✅ Each update is 2 lines (date + description, then files)
+- ✅ ALWAYS specify update type on second line (Bug Fix, Feature, Enhancement, Update, Refactor)
+- ✅ ALWAYS write update description on third line
+- ✅ ALWAYS list modified files on fourth line
+- ✅ Each update is 4 lines (date, type, description, files)
 - ✅ Add blank line between updates for readability
 - ✅ File accumulates all updates for that page/component
 - ❌ NEVER overwrite existing file content
@@ -563,13 +566,19 @@ function getFileName(filePath: string): string {
 
 **Example File Content:**
 ```markdown
-2025-01-15 14:30:45 - Updated building form validation and added new fields
+2025-01-15 14:30:45
+Update Type: Enhancement
+Updated building form validation and added new fields
 app/dashboard/buildings/add/page.tsx, components/buildings/building-form.jsx
 
-2025-01-16 10:20:30 - Fixed form submission bug and improved error handling
+2025-01-16 10:20:30
+Update Type: Bug Fix
+Fixed form submission bug and improved error handling
 app/dashboard/buildings/add/page.tsx
 
-2025-01-17 15:45:12 - Added new building type field to form
+2025-01-17 15:45:12
+Update Type: Feature
+Added new building type field to form
 components/buildings/building-form.jsx
 ```
 
@@ -598,10 +607,12 @@ components/buildings/building-form.jsx
    
 5. APPEND to update file (or create if not exists):
    - Check if file exists: docs/updates/{determined-path}/{pageName}.txt
-   - If exists: Append new update (add blank line + 2 new lines)
+   - If exists: Append new update (add blank line + 4 new lines)
    - If not exists: Create new file with update
-   - Line 1: Date/Time (YYYY-MM-DD HH:MM:SS) + brief description
-   - Line 2: List of modified file paths (comma-separated)
+   - Line 1: Date/Time (YYYY-MM-DD HH:MM:SS)
+   - Line 2: Update Type (Bug Fix / Feature / Enhancement / Update / Refactor)
+   - Line 3: Brief description of update/changes
+   - Line 4: List of modified file paths (comma-separated)
    - Add blank line after previous update (if file exists)
    
 6. SAVE file:
