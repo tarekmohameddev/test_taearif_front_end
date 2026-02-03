@@ -1,0 +1,26 @@
+Refactor and reorganize this component into a clean, modular structure. DO NOT modify any business logic, functionality, or UI behavior - only reorganize the code structure.
+
+Component Path: [PASTE_PATH_HERE]
+
+Requirements:
+1. Split into organized folders: components/, hooks/, services/, utils/, types/
+2. Each file must NOT exceed 200 lines
+3. Extract UI components to components/
+4. Extract custom hooks to hooks/
+5. Extract API calls to services/
+6. Extract utility functions to utils/
+7. Extract TypeScript types to types/
+8. Create index.ts files for clean exports
+9. Main component should be clean and under 200 lines
+10. Maintain exact same functionality - NO logic changes
+
+Structure:
+component-name/
+├── page.tsx (main component)
+├── components/ (UI sub-components)
+├── hooks/ (custom hooks)
+├── services/ (API calls)
+├── utils/ (helper functions)
+└── types/ (TypeScript types)
+
+Output: Show new structure, file list with line counts, confirm no logic changes.

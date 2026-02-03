@@ -199,13 +199,15 @@ export default function BlogCard1(props: BlogCard1Props) {
               }
             }
           `}</style>
-          <Image
-            src={blog.image || ""}
-            alt={blog.title || ""}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+          {blog.image && blog.image.trim() !== "" ? (
+            <Image
+              src={blog.image}
+              alt={blog.title || ""}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : null}
         </div>
       </Link>
 
