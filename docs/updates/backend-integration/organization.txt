@@ -1,0 +1,4 @@
+2026-02-04 19:00:00
+Update Type: Organization
+Reorganized backend integration documentation into structured folders: api/ (requests, list, analytics, pipeline, detail), database/, guides/. Created rules.md as central reference document (128 lines, comprehensive but concise). Rules document specifies mandatory guidelines for connecting API specs with existing database schemas while ensuring zero conflicts with legacy systems.
+docs/backend-integration/rules.md, docs/backend-integration/README.md, docs/backend-integration/api/, docs/backend-integration/database/, docs/backend-integration/guides/

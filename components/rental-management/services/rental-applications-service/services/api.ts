@@ -7,6 +7,7 @@ interface FetchRentalsParams {
   sortBy: string;
   sortOrder: string;
   contractStatusFilter: string;
+  paymentStatusFilter: string;
   buildingFilter: string;
   unitFilter: string;
   projectFilter: string;
@@ -40,6 +41,7 @@ export const fetchRentalsAPI = async (
     sortBy,
     sortOrder,
     contractStatusFilter,
+    paymentStatusFilter,
     buildingFilter,
     unitFilter,
     projectFilter,
@@ -67,6 +69,10 @@ export const fetchRentalsAPI = async (
 
   if (contractStatusFilter && contractStatusFilter !== "all") {
     queryParams.status = contractStatusFilter;
+  }
+
+  if (paymentStatusFilter && paymentStatusFilter !== "all") {
+    queryParams.payment_status = paymentStatusFilter;
   }
 
   if (buildingFilter && buildingFilter !== "all") {

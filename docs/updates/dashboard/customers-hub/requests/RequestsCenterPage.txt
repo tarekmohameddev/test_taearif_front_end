@@ -2,3 +2,33 @@
 Update Type: Enhancement
 Updated TabsList to show 2 columns on mobile only, keeping 4 columns on desktop
 components/customers-hub/requests/RequestsCenterPage.tsx
+
+2026-02-04 17:27:14
+Update Type: Documentation
+Created comprehensive backend API integration specification document for Requests Center page
+docs/backend-integration/customers-hub-requests-api-specification.md
+
+2026-02-04 17:30:00
+Update Type: Update
+Updated all API endpoints to use v2 prefix (/api/v2/)
+docs/backend-integration/customers-hub-requests-api-specification.md
+
+2026-02-04 17:35:00
+Update Type: Enhancement
+Updated default sorting to be latest created first (createdAt desc) when sortBy is not provided
+docs/backend-integration/customers-hub-requests-api-specification.md
+
+2026-02-04 17:40:00
+Update Type: Refactor
+Reduced endpoints from 7+ to 4 by merging stats with list, action operations into single endpoint, and bulk operations into single endpoint - all using request body for action type
+docs/backend-integration/customers-hub-requests-api-specification.md
+
+2026-02-04 17:50:00
+Update Type: Enhancement
+Added comprehensive performance optimization section (Section 9) for handling 50M+ actions and 20M+ customers - includes database indexing, query optimization, read replicas, parallel execution, strict timeouts, and NO caching policy
+docs/backend-integration/customers-hub-requests-api-specification.md
+
+2026-02-04 18:00:00
+Update Type: Documentation
+Created comprehensive backend API integration specification document for Request Detail Page - includes stats cards, filters (dropdown and tabs), related actions grid, AI matching properties grid, and all action operations
+docs/backend-integration/customers-hub-request-detail-api-specification.md

@@ -1,0 +1,9 @@
+2025-01-17 18:00:00
+Update Type: Feature
+Created comprehensive backend API specification for Customers Hub Customer Detail page with 8 consolidated endpoints, customer info card, tasks section with add/edit/delete, properties section with 3 categories, customer requests section, and mandatory performance optimizations for millions of records without caching
+docs/backend-integration/customers-hub-detail-api-specification.md
+
+2025-01-17 20:30:00
+Update Type: Enhancement
+Consolidated all read operations into single GET endpoint that returns all customer data (customer info + tasks + properties + preferences) in one request. Updated write operations to use proper RESTful methods: PUT for updates, POST for creates, DELETE for deletes. All endpoints now follow RESTful conventions.
+docs/backend-integration/customers-hub-detail-api-specification.md

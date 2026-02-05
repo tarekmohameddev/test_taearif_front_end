@@ -1,0 +1,4 @@
+2026-02-04 17:56:49
+Update Type: Feature
+Created comprehensive backend API integration specification for customers-hub/list page with all components, filters, views (table/grid/map), bulk actions, export, and extreme performance optimizations for 50M+ requests and 20M+ customers without caching
+docs/backend-integration/customers-hub-list-api-specification.md

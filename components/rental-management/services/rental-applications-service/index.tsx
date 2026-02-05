@@ -20,7 +20,7 @@ import { RentalWhatsAppDialog } from "../../rental-whatsapp-dialog";
 import { RenewalDialog } from "../../rental-renewal-dialog";
 import type { RentalApplicationsServiceProps } from "./types/types";
 import { useRentalApplications } from "./hooks/useRentalApplications";
-import { useRentalFilters } from "./hooks/useRentalFilters";
+import { useRentalFiltersState } from "./hooks/useRentalFiltersState";
 import { useRenewalDialog } from "./hooks/useRenewalDialog";
 import { useStatusChangeDialog } from "./hooks/useStatusChangeDialog";
 import {
@@ -76,29 +76,43 @@ export function RentalApplicationsService({
     lastProcessedOpenAddDialogCounter,
   } = rentalApplications;
 
+  // Use the new filters hook (like Properties)
+  const filterHooks = useRentalFiltersState();
   const {
-    contractSearchTerm,
+    localSearchTerm,
+    setLocalSearchTerm,
     contractStatusFilter,
+    setContractStatusFilter,
     paymentStatusFilter,
+    setPaymentStatusFilter,
     rentalMethodFilter,
+    setRentalMethodFilter,
     buildingFilter,
+    setBuildingFilter,
     dateFilter,
+    setDateFilter,
     fromDate,
+    setFromDate,
     toDate,
+    setToDate,
     contractStartDateFilter,
+    setContractStartDateFilter,
     contractStartFromDate,
+    setContractStartFromDate,
     contractStartToDate,
+    setContractStartToDate,
     contractEndDateFilter,
+    setContractEndDateFilter,
     contractEndFromDate,
+    setContractEndFromDate,
     contractEndToDate,
-  } = rentalApplications;
-
-  const { filterOptions } = useRentalFilters();
+    setContractEndToDate,
+    filterOptions,
+    newFilters,
+  } = filterHooks;
 
   const {
     tableMaxWidth,
-    localSearchTerm,
-    setLocalSearchTerm,
     fetchRentals,
   } = useRentalApplications({
     collectionsPeriod,
@@ -109,6 +123,7 @@ export function RentalApplicationsService({
     paymentsDueToDate,
     rentalApplications,
     setRentalApplications,
+    newFilters,
   });
 
   const {
@@ -296,20 +311,32 @@ export function RentalApplicationsService({
         localSearchTerm={localSearchTerm}
         setLocalSearchTerm={setLocalSearchTerm}
         contractStatusFilter={contractStatusFilter}
+        setContractStatusFilter={setContractStatusFilter}
         paymentStatusFilter={paymentStatusFilter}
+        setPaymentStatusFilter={setPaymentStatusFilter}
         rentalMethodFilter={rentalMethodFilter}
+        setRentalMethodFilter={setRentalMethodFilter}
         buildingFilter={buildingFilter}
+        setBuildingFilter={setBuildingFilter}
         dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
         fromDate={fromDate}
+        setFromDate={setFromDate}
         toDate={toDate}
+        setToDate={setToDate}
         contractStartDateFilter={contractStartDateFilter}
+        setContractStartDateFilter={setContractStartDateFilter}
         contractStartFromDate={contractStartFromDate}
+        setContractStartFromDate={setContractStartFromDate}
         contractStartToDate={contractStartToDate}
+        setContractStartToDate={setContractStartToDate}
         contractEndDateFilter={contractEndDateFilter}
+        setContractEndDateFilter={setContractEndDateFilter}
         contractEndFromDate={contractEndFromDate}
+        setContractEndFromDate={setContractEndFromDate}
         contractEndToDate={contractEndToDate}
+        setContractEndToDate={setContractEndToDate}
         filterOptions={filterOptions}
-        setRentalApplications={setRentalApplications}
       />
 
       <RentalsTable

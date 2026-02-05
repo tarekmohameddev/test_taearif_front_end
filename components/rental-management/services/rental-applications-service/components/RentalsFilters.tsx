@@ -16,40 +16,64 @@ interface RentalsFiltersProps {
   localSearchTerm: string;
   setLocalSearchTerm: (value: string) => void;
   contractStatusFilter: string;
+  setContractStatusFilter: (value: string) => void;
   paymentStatusFilter: string;
+  setPaymentStatusFilter: (value: string) => void;
   rentalMethodFilter: string;
+  setRentalMethodFilter: (value: string) => void;
   buildingFilter: string;
+  setBuildingFilter: (value: string) => void;
   dateFilter: string;
+  setDateFilter: (value: string) => void;
   fromDate: string;
+  setFromDate: (value: string) => void;
   toDate: string;
+  setToDate: (value: string) => void;
   contractStartDateFilter: string;
+  setContractStartDateFilter: (value: string) => void;
   contractStartFromDate: string;
+  setContractStartFromDate: (value: string) => void;
   contractStartToDate: string;
+  setContractStartToDate: (value: string) => void;
   contractEndDateFilter: string;
+  setContractEndDateFilter: (value: string) => void;
   contractEndFromDate: string;
+  setContractEndFromDate: (value: string) => void;
   contractEndToDate: string;
+  setContractEndToDate: (value: string) => void;
   filterOptions: FilterOptions;
-  setRentalApplications: (updates: any) => void;
 }
 
 export function RentalsFilters({
   localSearchTerm,
   setLocalSearchTerm,
   contractStatusFilter,
+  setContractStatusFilter,
   paymentStatusFilter,
+  setPaymentStatusFilter,
   rentalMethodFilter,
+  setRentalMethodFilter,
   buildingFilter,
+  setBuildingFilter,
   dateFilter,
+  setDateFilter,
   fromDate,
+  setFromDate,
   toDate,
+  setToDate,
   contractStartDateFilter,
+  setContractStartDateFilter,
   contractStartFromDate,
+  setContractStartFromDate,
   contractStartToDate,
+  setContractStartToDate,
   contractEndDateFilter,
+  setContractEndDateFilter,
   contractEndFromDate,
+  setContractEndFromDate,
   contractEndToDate,
+  setContractEndToDate,
   filterOptions,
-  setRentalApplications,
 }: RentalsFiltersProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
@@ -70,9 +94,7 @@ export function RentalsFilters({
         <Label htmlFor="contract-status">حالة الإيجار</Label>
         <Select
           value={contractStatusFilter}
-          onValueChange={(value) =>
-            setRentalApplications({ contractStatusFilter: value })
-          }
+          onValueChange={setContractStatusFilter}
         >
           <SelectTrigger>
             <SelectValue placeholder="اختر حالة الإيجار" />
@@ -91,9 +113,7 @@ export function RentalsFilters({
         <Label htmlFor="payment-status">حالة الدفع</Label>
         <Select
           value={paymentStatusFilter}
-          onValueChange={(value) =>
-            setRentalApplications({ paymentStatusFilter: value })
-          }
+          onValueChange={setPaymentStatusFilter}
         >
           <SelectTrigger>
             <SelectValue placeholder="اختر حالة الدفع" />
@@ -112,9 +132,7 @@ export function RentalsFilters({
         <Label htmlFor="rental-method">طريقة الإيجار</Label>
         <Select
           value={rentalMethodFilter}
-          onValueChange={(value) =>
-            setRentalApplications({ rentalMethodFilter: value })
-          }
+          onValueChange={setRentalMethodFilter}
         >
           <SelectTrigger>
             <SelectValue placeholder="اختر طريقة الإيجار" />
@@ -133,9 +151,7 @@ export function RentalsFilters({
         <Label htmlFor="building">العمارة</Label>
         <Select
           value={buildingFilter}
-          onValueChange={(value) =>
-            setRentalApplications({ buildingFilter: value })
-          }
+          onValueChange={setBuildingFilter}
         >
           <SelectTrigger>
             <SelectValue placeholder="اختر العمارة" />
@@ -154,9 +170,7 @@ export function RentalsFilters({
         <Label htmlFor="date">التاريخ</Label>
         <Select
           value={dateFilter}
-          onValueChange={(value) =>
-            setRentalApplications({ dateFilter: value })
-          }
+          onValueChange={setDateFilter}
         >
           <SelectTrigger>
             <SelectValue placeholder="اختر التاريخ" />
@@ -177,9 +191,7 @@ export function RentalsFilters({
               id="from-date"
               type="date"
               value={fromDate}
-              onChange={(e) =>
-                setRentalApplications({ fromDate: e.target.value })
-              }
+              onChange={(e) => setFromDate(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -188,9 +200,7 @@ export function RentalsFilters({
               id="to-date"
               type="date"
               value={toDate}
-              onChange={(e) =>
-                setRentalApplications({ toDate: e.target.value })
-              }
+              onChange={(e) => setToDate(e.target.value)}
             />
           </div>
         </>
@@ -199,9 +209,7 @@ export function RentalsFilters({
         <Label htmlFor="contract-start-date-filter">تاريخ بداية العقد</Label>
         <Select
           value={contractStartDateFilter || "all"}
-          onValueChange={(value) =>
-            setRentalApplications({ contractStartDateFilter: value })
-          }
+          onValueChange={setContractStartDateFilter}
         >
           <SelectTrigger>
             <SelectValue placeholder="اختر التاريخ" />
@@ -223,11 +231,7 @@ export function RentalsFilters({
               id="contract-start-from-date"
               type="date"
               value={contractStartFromDate || ""}
-              onChange={(e) =>
-                setRentalApplications({
-                  contractStartFromDate: e.target.value,
-                })
-              }
+              onChange={(e) => setContractStartFromDate(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -236,9 +240,7 @@ export function RentalsFilters({
               id="contract-start-to-date"
               type="date"
               value={contractStartToDate || ""}
-              onChange={(e) =>
-                setRentalApplications({ contractStartToDate: e.target.value })
-              }
+              onChange={(e) => setContractStartToDate(e.target.value)}
             />
           </div>
         </>
@@ -247,9 +249,7 @@ export function RentalsFilters({
         <Label htmlFor="contract-end-date-filter">تاريخ نهاية العقد</Label>
         <Select
           value={contractEndDateFilter || "all"}
-          onValueChange={(value) =>
-            setRentalApplications({ contractEndDateFilter: value })
-          }
+          onValueChange={setContractEndDateFilter}
         >
           <SelectTrigger>
             <SelectValue placeholder="اختر التاريخ" />
@@ -271,9 +271,7 @@ export function RentalsFilters({
               id="contract-end-from-date"
               type="date"
               value={contractEndFromDate || ""}
-              onChange={(e) =>
-                setRentalApplications({ contractEndFromDate: e.target.value })
-              }
+              onChange={(e) => setContractEndFromDate(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -282,9 +280,7 @@ export function RentalsFilters({
               id="contract-end-to-date"
               type="date"
               value={contractEndToDate || ""}
-              onChange={(e) =>
-                setRentalApplications({ contractEndToDate: e.target.value })
-              }
+              onChange={(e) => setContractEndToDate(e.target.value)}
             />
           </div>
         </>

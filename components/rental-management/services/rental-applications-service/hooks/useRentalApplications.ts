@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { fetchRentalsAPI } from "../services/api";
 import type { RentalData } from "../types/types";
@@ -12,6 +12,7 @@ interface UseRentalApplicationsProps {
   paymentsDueToDate: string;
   rentalApplications: any;
   setRentalApplications: (updates: any) => void;
+  newFilters: Record<string, any>;
 }
 
 export const useRentalApplications = ({
@@ -23,39 +24,15 @@ export const useRentalApplications = ({
   paymentsDueToDate,
   rentalApplications,
   setRentalApplications,
+  newFilters,
 }: UseRentalApplicationsProps) => {
   const { userData } = useAuthStore();
   const [tableMaxWidth, setTableMaxWidth] = useState<number | null>(null);
+  const prevFiltersRef = useRef<string>("");
 
   const {
-    contractSearchTerm,
-    contractStatusFilter,
-    paymentStatusFilter,
-    rentalMethodFilter,
-    buildingFilter,
-    unitFilter,
-    projectFilter,
-    dateFilter,
-    fromDate,
-    toDate,
-    contractCreatedFromDate,
-    contractCreatedToDate,
-    filterByYear,
-    sortBy,
-    sortOrder,
-    perPage,
-    contractStartDateFilter,
-    contractStartFromDate,
-    contractStartToDate,
-    contractEndDateFilter,
-    contractEndFromDate,
-    contractEndToDate,
     isInitialized,
   } = rentalApplications;
-
-  const [localSearchTerm, setLocalSearchTerm] = useState<string>(
-    contractSearchTerm || "",
-  );
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -76,19 +53,6 @@ export const useRentalApplications = ({
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (localSearchTerm !== contractSearchTerm) {
-        setRentalApplications({ contractSearchTerm: localSearchTerm });
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [localSearchTerm, contractSearchTerm, setRentalApplications]);
-
-  useEffect(() => {
-    setLocalSearchTerm(contractSearchTerm || "");
-  }, [contractSearchTerm]);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -148,42 +112,51 @@ export const useRentalApplications = ({
     try {
       setRentalApplications({ loading: true, error: null });
 
-      const response = await fetchRentalsAPI({
+      // Extract filter values from newFilters object with defaults
+      const apiParams = {
         page,
-        perPage: perPage || 20,
-        sortBy: sortBy || "created_at",
-        sortOrder: sortOrder || "desc",
-        contractStatusFilter: contractStatusFilter || "",
-        buildingFilter: buildingFilter || "",
-        unitFilter: unitFilter || "",
-        projectFilter: projectFilter || "",
-        rentalMethodFilter: rentalMethodFilter || "",
-        contractSearchTerm: contractSearchTerm || "",
-        filterByYear: filterByYear || "",
-        fromDate: fromDate || "",
-        toDate: toDate || "",
-        contractCreatedFromDate: contractCreatedFromDate || "",
-        contractCreatedToDate: contractCreatedToDate || "",
-        contractStartDateFilter: contractStartDateFilter || "",
-        contractStartFromDate: contractStartFromDate || "",
-        contractStartToDate: contractStartToDate || "",
-        contractEndDateFilter: contractEndDateFilter || "",
-        contractEndFromDate: contractEndFromDate || "",
-        contractEndToDate: contractEndToDate || "",
+        perPage: newFilters.perPage || 20,
+        sortBy: newFilters.sortBy || "created_at",
+        sortOrder: newFilters.sortOrder || "desc",
+        contractStatusFilter: newFilters.contractStatusFilter || "",
+        paymentStatusFilter: newFilters.paymentStatusFilter || "", // Add paymentStatusFilter
+        buildingFilter: newFilters.buildingFilter || "",
+        unitFilter: newFilters.unitFilter || "",
+        projectFilter: newFilters.projectFilter || "",
+        rentalMethodFilter: newFilters.rentalMethodFilter || "",
+        contractSearchTerm: newFilters.contractSearchTerm || "",
+        filterByYear: newFilters.filterByYear || "",
+        fromDate: newFilters.fromDate || "",
+        toDate: newFilters.toDate || "",
+        contractCreatedFromDate: newFilters.contractCreatedFromDate || "",
+        contractCreatedToDate: newFilters.contractCreatedToDate || "",
+        contractStartDateFilter: newFilters.contractStartDateFilter || "",
+        contractStartFromDate: newFilters.contractStartFromDate || "",
+        contractStartToDate: newFilters.contractStartToDate || "",
+        contractEndDateFilter: newFilters.contractEndDateFilter || "",
+        contractEndFromDate: newFilters.contractEndFromDate || "",
+        contractEndToDate: newFilters.contractEndToDate || "",
         collectionsPeriod,
         collectionsFromDate,
         collectionsToDate,
         paymentsDuePeriod,
         paymentsDueFromDate,
         paymentsDueToDate,
+      };
+
+      console.log("📡 API Request with filters:", {
+        newFilters,
+        apiParams,
       });
+
+      const response = await fetchRentalsAPI(apiParams);
 
       if (response.status) {
         setRentalApplications({
           rentals: response.data || [],
           pagination: (response as any).pagination || {
             current_page: page,
-            per_page: perPage || 20,
+            per_page: newFilters.perPage || 20,
             total: 0,
             last_page: 1,
           },
@@ -205,6 +178,7 @@ export const useRentalApplications = ({
     }
   }, [isInitialized, userData?.token]);
 
+  // Fetch when collections/payments periods change
   useEffect(() => {
     if (userData?.token && isInitialized) {
       fetchRentals(1);
@@ -216,41 +190,29 @@ export const useRentalApplications = ({
     paymentsDuePeriod,
     paymentsDueFromDate,
     paymentsDueToDate,
+    isInitialized,
+    userData?.token,
   ]);
 
+  // Fetch when filters change (like Properties)
+  // Use JSON.stringify to properly detect object changes
   useEffect(() => {
-    if (userData?.token && isInitialized) {
+    if (!userData?.token || !isInitialized) {
+      return;
+    }
+
+    const currentFiltersString = JSON.stringify(newFilters);
+    
+    // Only fetch if filters actually changed
+    if (prevFiltersRef.current !== currentFiltersString) {
+      prevFiltersRef.current = currentFiltersString;
+      console.log("🔄 Filters changed, fetching rentals with filters:", newFilters);
       fetchRentals(1);
     }
-  }, [
-    contractSearchTerm,
-    contractStatusFilter,
-    paymentStatusFilter,
-    rentalMethodFilter,
-    buildingFilter,
-    unitFilter,
-    projectFilter,
-    dateFilter,
-    fromDate,
-    toDate,
-    contractCreatedFromDate,
-    contractCreatedToDate,
-    filterByYear,
-    sortBy,
-    sortOrder,
-    perPage,
-    contractStartDateFilter,
-    contractStartFromDate,
-    contractStartToDate,
-    contractEndDateFilter,
-    contractEndFromDate,
-    contractEndToDate,
-  ]);
+  }, [newFilters, isInitialized, userData?.token]);
 
   return {
     tableMaxWidth,
-    localSearchTerm,
-    setLocalSearchTerm,
     fetchRentals,
   };
 };
