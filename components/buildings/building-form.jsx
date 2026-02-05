@@ -11,6 +11,8 @@ import {
   Building2,
   FileText,
   Droplets,
+  Zap,
+  Plus,
   Save,
   ArrowLeft,
 } from "lucide-react";
@@ -39,7 +41,8 @@ export default function BuildingForm({ mode = "add" }) {
   const [formData, setFormData] = useState({
     name: "",
     deed_number: "",
-    water_meter_number: "",
+    water_meter_numbers: [],
+    electricity_meter_numbers: [],
     image: "",
     deed_image: "",
   });
@@ -70,10 +73,21 @@ export default function BuildingForm({ mode = "add" }) {
 
       if (response.data.status === "success") {
         const building = response.data.data;
+        
+        // استخراج عدادات المياه والكهرباء من مصفوفة meters
+        const waterMeters = (building.meters || [])
+          .filter((meter) => meter.meter_type === "water")
+          .map((meter) => meter.meter_number);
+        
+        const electricityMeters = (building.meters || [])
+          .filter((meter) => meter.meter_type === "electricity")
+          .map((meter) => meter.meter_number);
+
         setFormData({
           name: building.name || "",
           deed_number: building.deed_number || "",
-          water_meter_number: building.water_meter_number || "",
+          water_meter_numbers: waterMeters,
+          electricity_meter_numbers: electricityMeters,
         });
 
         // تعيين الصور الموجودة مسبقاً للعرض
@@ -184,10 +198,20 @@ export default function BuildingForm({ mode = "add" }) {
       }
 
       // Prepare submit data
+      // تصفية القيم الفارغة من المصفوفات
+      const waterMeters = formData.water_meter_numbers
+        .map((num) => num.trim())
+        .filter((num) => num.length > 0);
+      
+      const electricityMeters = formData.electricity_meter_numbers
+        .map((num) => num.trim())
+        .filter((num) => num.length > 0);
+
       const submitData = {
         name: formData.name.trim(),
         deed_number: formData.deed_number.trim() || null,
-        water_meter_number: formData.water_meter_number.trim() || null,
+        water_meter_numbers: waterMeters,
+        electricity_meter_numbers: electricityMeters,
         image: imagePath,
         deed_image: deedImagePath,
       };
@@ -224,6 +248,59 @@ export default function BuildingForm({ mode = "add" }) {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Add meter number
+  const addMeterNumber = (type) => {
+    if (type === "water") {
+      setFormData((prev) => ({
+        ...prev,
+        water_meter_numbers: [...prev.water_meter_numbers, ""],
+      }));
+    } else if (type === "electricity") {
+      setFormData((prev) => ({
+        ...prev,
+        electricity_meter_numbers: [...prev.electricity_meter_numbers, ""],
+      }));
+    }
+  };
+
+  // Remove meter number
+  const removeMeterNumber = (type, index) => {
+    if (type === "water") {
+      setFormData((prev) => ({
+        ...prev,
+        water_meter_numbers: prev.water_meter_numbers.filter(
+          (_, i) => i !== index
+        ),
+      }));
+    } else if (type === "electricity") {
+      setFormData((prev) => ({
+        ...prev,
+        electricity_meter_numbers: prev.electricity_meter_numbers.filter(
+          (_, i) => i !== index
+        ),
+      }));
+    }
+  };
+
+  // Update meter number
+  const updateMeterNumber = (type, index, value) => {
+    if (type === "water") {
+      const newWaterMeters = [...formData.water_meter_numbers];
+      newWaterMeters[index] = value;
+      setFormData((prev) => ({
+        ...prev,
+        water_meter_numbers: newWaterMeters,
+      }));
+    } else if (type === "electricity") {
+      const newElectricityMeters = [...formData.electricity_meter_numbers];
+      newElectricityMeters[index] = value;
+      setFormData((prev) => ({
+        ...prev,
+        electricity_meter_numbers: newElectricityMeters,
+      }));
+    }
   };
 
   if (loading && mode === "edit") {
@@ -316,22 +393,126 @@ export default function BuildingForm({ mode = "add" }) {
                     />
                   </div>
 
-                  {/* Water Meter Number */}
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="water_meter_number"
-                      className="text-black font-medium"
-                    >
-                      رقم عداد المياه
-                    </Label>
-                    <Input
-                      id="water_meter_number"
-                      name="water_meter_number"
-                      value={formData.water_meter_number}
-                      onChange={handleInputChange}
-                      placeholder="مثال: WM-2024-001"
-                      className="border-gray-300 focus:border-black focus:ring-black"
-                    />
+                  {/* Water Meters Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-black font-medium flex items-center">
+                        <Droplets className="w-4 h-4 mr-2" />
+                        أرقام عدادات المياه
+                      </Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addMeterNumber("water")}
+                        className="border-gray-300 hover:bg-gray-50 text-black"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        إضافة عداد مياه
+                      </Button>
+                    </div>
+                    {formData.water_meter_numbers.length === 0 ? (
+                      <div className="border border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <Droplets className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">
+                          لا توجد عدادات مياه مضافة
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-4">
+                        {formData.water_meter_numbers.map((meter, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                          >
+                            <div className="flex-1">
+                              <Input
+                                value={meter}
+                                onChange={(e) =>
+                                  updateMeterNumber("water", index, e.target.value)
+                                }
+                                placeholder={`عداد مياه ${index + 1}`}
+                                className="border-gray-300 focus:border-black focus:ring-black"
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeMeterNumber("water", index)}
+                              className="text-gray-500 hover:text-black hover:bg-gray-100"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Electricity Meters Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-black font-medium flex items-center">
+                        <Zap className="w-4 h-4 mr-2" />
+                        أرقام عدادات الكهرباء
+                      </Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addMeterNumber("electricity")}
+                        className="border-gray-300 hover:bg-gray-50 text-black"
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        إضافة عداد كهرباء
+                      </Button>
+                    </div>
+                    {formData.electricity_meter_numbers.length === 0 ? (
+                      <div className="border border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <Zap className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">
+                          لا توجد عدادات كهرباء مضافة
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-4">
+                        {formData.electricity_meter_numbers.map(
+                          (meter, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                            >
+                              <div className="flex-1">
+                                <Input
+                                  value={meter}
+                                  onChange={(e) =>
+                                    updateMeterNumber(
+                                      "electricity",
+                                      index,
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={`عداد كهرباء ${index + 1}`}
+                                  className="border-gray-300 focus:border-black focus:ring-black"
+                                />
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  removeMeterNumber("electricity", index)
+                                }
+                                className="text-gray-500 hover:text-black hover:bg-gray-100"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -1,0 +1,9 @@
+2025-01-17 15:30:00
+Update Type: Feature
+إضافة دعم عدة عدادات مياه وكهرباء في نموذج إضافة/تعديل العمارة مع UI محسّن بالأبيض والأسود
+components/buildings/building-form.jsx
+
+2025-01-17 15:45:00
+Update Type: Enhancement
+تعديل تخطيط عدادات المياه والكهرباء: العنوان يأخذ العرض الكامل، كل عداد في عمود منفصل ضمن grid ديناميكي (3 أعمدة)
+components/buildings/building-form.jsx
