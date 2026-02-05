@@ -68,7 +68,7 @@ export const fetchRentalsAPI = async (
   };
 
   if (contractStatusFilter && contractStatusFilter !== "all") {
-    queryParams.status = contractStatusFilter;
+    queryParams.contract_status = contractStatusFilter; // Fixed: use contract_status not status
   }
 
   if (paymentStatusFilter && paymentStatusFilter !== "all") {
@@ -113,8 +113,10 @@ export const fetchRentalsAPI = async (
     queryParams.contract_created_to_date = contractCreatedToDate;
   }
 
+  // Contract start date filter - use period for non-custom values (today, week, month, quarter, year)
   if (contractStartDateFilter && contractStartDateFilter !== "all") {
     if (contractStartDateFilter === "custom") {
+      // Custom date range - use from/to dates
       if (contractStartFromDate) {
         queryParams.contract_start_from_date = contractStartFromDate;
       }
@@ -122,12 +124,15 @@ export const fetchRentalsAPI = async (
         queryParams.contract_start_to_date = contractStartToDate;
       }
     } else {
+      // Period filter (today, week, month, quarter, year) - use contract_start_period
       queryParams.contract_start_period = contractStartDateFilter;
     }
   }
 
+  // Contract end date filter - use period for non-custom values (today, week, month, quarter, year)
   if (contractEndDateFilter && contractEndDateFilter !== "all") {
     if (contractEndDateFilter === "custom") {
+      // Custom date range - use from/to dates
       if (contractEndFromDate) {
         queryParams.contract_end_from_date = contractEndFromDate;
       }
@@ -135,6 +140,7 @@ export const fetchRentalsAPI = async (
         queryParams.contract_end_to_date = contractEndToDate;
       }
     } else {
+      // Period filter (today, week, month, quarter, year) - use contract_end_period
       queryParams.contract_end_period = contractEndDateFilter;
     }
   }
