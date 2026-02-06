@@ -15,9 +15,42 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { getStageNameAr, LIFECYCLE_STAGES } from "@/types/unified-customer";
+import type { CustomerStatistics } from "@/types/unified-customer";
 
-export function CustomersDashboard() {
-  const { statistics, customers } = useUnifiedCustomersStore();
+interface CustomersDashboardProps {
+  stats?: {
+    byStage?: Record<string, number>;
+    totalCustomers?: number;
+    newThisMonth?: number;
+    totalDealValue?: number;
+    closedThisMonth?: number;
+    conversionRate?: string | number;
+    avgDaysInPipeline?: number;
+    avgDaysInStage?: number;
+    byPriority?: Record<string, number>;
+    byType?: Record<string, number>;
+  };
+}
+
+export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps = {}) {
+  const { statistics: storeStatistics, customers } = useUnifiedCustomersStore();
+  
+  // Use API stats if available, otherwise fallback to store statistics
+  const statistics: CustomerStatistics | null = apiStats?.byStage ? {
+    total: apiStats.totalCustomers || 0,
+    byStage: apiStats.byStage as any,
+    bySource: {} as any,
+    byPriority: apiStats.byPriority || {} as any,
+    avgLeadScore: 0,
+    totalDealValue: apiStats.totalDealValue || 0,
+    conversionRate: typeof apiStats.conversionRate === 'string' 
+      ? parseFloat(apiStats.conversionRate.replace('%', '')) || 0
+      : apiStats.conversionRate || 0,
+    avgDaysInPipeline: apiStats.avgDaysInPipeline || apiStats.avgDaysInStage || 0,
+    activeCustomers: 0,
+    newThisMonth: apiStats.newThisMonth || 0,
+    closedThisMonth: apiStats.closedThisMonth || 0,
+  } : storeStatistics;
 
   // AI Insights
   const urgentActions = customers.filter(
@@ -37,7 +70,20 @@ export function CustomersDashboard() {
     return followUpDate === today;
   }).length;
 
-  if (!statistics) return null;
+  // Show loading state if no statistics available
+  if (!statistics) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              جاري التحميل...
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

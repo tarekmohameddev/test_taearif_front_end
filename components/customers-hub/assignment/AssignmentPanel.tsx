@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import useAssignmentStore from "@/context/store/assignment-rules";
+import { useCustomersHubAssignment } from "@/hooks/useCustomersHubAssignment";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import {
   Sheet,
@@ -39,49 +39,61 @@ import {
   Settings,
   User,
   CheckCircle,
+  Save,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-
-// Employee rule configuration
-interface EmployeeRule {
-  id: string;
-  field: "budgetMin" | "budgetMax" | "propertyType" | "city" | "source";
-  operator: "equals" | "greaterThan" | "lessThan" | "contains";
-  value: string;
-}
-
-interface EmployeeConfig {
-  employeeId: string;
-  isActive: boolean;
-  rules: EmployeeRule[];
-}
+import type { EmployeeConfig, EmployeeRule } from "@/lib/services/customers-hub-assignment-api";
 
 export function AssignmentPanel() {
-  const { employees, refreshWorkloads } = useAssignmentStore();
-  const { customers, updateCustomer } = useUnifiedCustomersStore();
+  const {
+    employees,
+    rules: apiRules,
+    unassignedCount,
+    loading: apiLoading,
+    error: apiError,
+    fetchEmployees,
+    fetchUnassignedCount,
+    fetchRules,
+    handleAutoAssign,
+    handleSaveRules,
+  } = useCustomersHubAssignment();
+  
+  const { customers } = useUnifiedCustomersStore();
   
   const [open, setOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
   const [configs, setConfigs] = useState<EmployeeConfig[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  // Initialize configs from employees
+  // Initialize configs from API rules or employees
   useEffect(() => {
-    if (employees.length > 0 && configs.length === 0) {
-      setConfigs(
-        employees.map((emp) => ({
-          employeeId: emp.id,
-          isActive: true,
-          rules: [],
-        }))
-      );
+    if (employees.length > 0) {
+      if (apiRules.length > 0) {
+        // Use rules from API
+        setConfigs(apiRules);
+      } else if (configs.length === 0) {
+        // Initialize empty configs for all employees
+        setConfigs(
+          employees.map((emp) => ({
+            employeeId: emp.id,
+            isActive: true,
+            rules: [],
+          }))
+        );
+      }
     }
-  }, [employees]);
+  }, [employees, apiRules]);
 
+  // Refresh data when panel opens
   useEffect(() => {
-    if (open) refreshWorkloads();
-  }, [open]);
-
-  const unassignedCount = customers.filter((c) => !c.assignedEmployeeId).length;
+    if (open) {
+      fetchEmployees();
+      fetchUnassignedCount();
+      fetchRules();
+    }
+  }, [open, fetchEmployees, fetchUnassignedCount, fetchRules]);
 
   // Get config for employee
   const getConfig = (empId: string) => configs.find((c) => c.employeeId === empId);
@@ -93,6 +105,7 @@ export function AssignmentPanel() {
         c.employeeId === empId ? { ...c, isActive: !c.isActive } : c
       )
     );
+    setHasUnsavedChanges(true);
   };
 
   // Add rule to employee
@@ -110,6 +123,7 @@ export function AssignmentPanel() {
           : c
       )
     );
+    setHasUnsavedChanges(true);
   };
 
   // Update rule
@@ -124,6 +138,7 @@ export function AssignmentPanel() {
           : c
       )
     );
+    setHasUnsavedChanges(true);
   };
 
   // Delete rule
@@ -135,6 +150,26 @@ export function AssignmentPanel() {
           : c
       )
     );
+    setHasUnsavedChanges(true);
+  };
+
+  // Save rules to backend
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const success = await handleSaveRules({ employeeRules: configs });
+      if (success) {
+        toast.success("تم حفظ القواعد بنجاح");
+        setHasUnsavedChanges(false);
+        await fetchRules();
+      } else {
+        toast.error("فشل حفظ القواعد");
+      }
+    } catch (error) {
+      toast.error("حدث خطأ أثناء حفظ القواعد");
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Check if customer matches rules
@@ -179,36 +214,17 @@ export function AssignmentPanel() {
     });
   };
 
-  // Run auto-assignment
-  const runAutoAssignment = () => {
-    const unassigned = customers.filter((c) => !c.assignedEmployeeId);
-    let assigned = 0;
-
-    unassigned.forEach((customer) => {
-      // Find first matching employee with rules
-      for (const config of configs) {
-        if (!config.isActive || config.rules.length === 0) continue;
-        
-        const emp = employees.find((e) => e.id === config.employeeId);
-        if (!emp || emp.customerCount >= emp.maxCapacity) continue;
-
-        if (matchesRules(customer, config.rules)) {
-          updateCustomer(customer.id, {
-            assignedEmployeeId: emp.id,
-            assignedEmployee: { id: emp.id, name: emp.name, role: emp.role },
-          });
-          assigned++;
-          break;
-        }
+  // Run auto-assignment using API
+  const runAutoAssignment = async () => {
+    try {
+      const result = await handleAutoAssign({ employeeRules: configs });
+      if (result.assignedCount > 0) {
+        toast.success(`تم تعيين ${result.assignedCount} عميل تلقائياً`);
+      } else {
+        toast.info("لا يوجد عملاء مطابقين للقواعد");
       }
-    });
-
-    refreshWorkloads();
-    
-    if (assigned > 0) {
-      toast.success(`تم تعيين ${assigned} عميل تلقائياً`);
-    } else {
-      toast.info("لا يوجد عملاء مطابقين للقواعد");
+    } catch (error) {
+      toast.error("حدث خطأ أثناء التعيين التلقائي");
     }
   };
 
@@ -301,9 +317,22 @@ export function AssignmentPanel() {
                 {/* Auto Assign Button */}
                 {unassignedCount > 0 && (
                   <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
-                    <Button onClick={runAutoAssignment} className="w-full gap-2">
-                      <Play className="h-4 w-4" />
-                      تشغيل التعيين التلقائي
+                    <Button 
+                      onClick={runAutoAssignment} 
+                      className="w-full gap-2"
+                      disabled={apiLoading}
+                    >
+                      {apiLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          جاري التعيين...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          تشغيل التعيين التلقائي
+                        </>
+                      )}
                     </Button>
                     <p className="text-xs text-gray-500 text-center mt-2">
                       سيتم تعيين العملاء حسب قواعد كل موظف
@@ -343,12 +372,43 @@ export function AssignmentPanel() {
                       />
                     </div>
                   </div>
+                  
+                  {/* Apply/Save Button in Header */}
+                  {hasUnsavedChanges && (
+                    <div className="mt-3 pt-3 border-t">
+                      <Button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="w-full gap-2"
+                        size="sm"
+                      >
+                        {saving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            جاري الحفظ...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4" />
+                            حفظ التغييرات
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Rules List */}
                 <div className="flex-1 overflow-y-auto p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium">قواعد التعيين</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium">قواعد التعيين</h3>
+                      {hasUnsavedChanges && (
+                        <Badge variant="outline" className="text-xs text-amber-600 border-amber-300">
+                          تغييرات غير محفوظة
+                        </Badge>
+                      )}
+                    </div>
                     <Button size="sm" variant="outline" onClick={() => addRule(selectedEmployee)}>
                       <Plus className="h-4 w-4 ml-1" />
                       إضافة قاعدة
@@ -457,8 +517,8 @@ export function AssignmentPanel() {
                   )}
                 </div>
 
-                {/* Employee Stats */}
-                <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
+                {/* Employee Stats & Save Button */}
+                <div className="p-4 border-t bg-gray-50 dark:bg-gray-900 space-y-3">
                   <div className="grid grid-cols-3 gap-2 text-center text-sm">
                     <div>
                       <p className="font-bold text-lg">{selectedEmp?.customerCount}</p>
@@ -473,6 +533,26 @@ export function AssignmentPanel() {
                       <p className="text-xs text-gray-500">السعة</p>
                     </div>
                   </div>
+                  
+                  {/* Save Rules Button */}
+                  <Button
+                    onClick={handleSave}
+                    disabled={!hasUnsavedChanges || saving}
+                    className="w-full gap-2"
+                    variant={hasUnsavedChanges ? "default" : "outline"}
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        جاري الحفظ...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4" />
+                        {hasUnsavedChanges ? "حفظ التغييرات" : "تم الحفظ"}
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
             )}

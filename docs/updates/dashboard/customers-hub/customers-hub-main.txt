@@ -12,3 +12,8 @@ app/dashboard/customers-hub/page.tsx
 Update Type: Enhancement
 Changed all customers hub pages background from gray to white - updated main page, list page, pipeline page, analytics page, requests center page, request detail page, actions page, customer detail page, and enhanced customers hub page
 app/dashboard/customers-hub/page.tsx, app/dashboard/customers-hub/analytics/page.tsx, components/customers-hub/page/EnhancedCustomersHubPage.tsx, components/customers-hub/pipeline/PipelinePage.tsx, components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/requests/RequestDetailPage.tsx, components/customers-hub/actions/ActionsPage.tsx, components/customers-hub/detail/CustomerDetailPageSimple.tsx
+
+2026-02-06 15:04:10
+Update Type: Feature
+Connected assignment management sidebar to backend API - created assignment API service with endpoints for employees, auto-assign, manual assign, and rules management, created useCustomersHubAssignment hook, updated AssignmentPanel to use API instead of local store, added Save button to persist rules to backend, connected updateCustomer to API when assigning employees
+lib/services/customers-hub-assignment-api.ts, hooks/useCustomersHubAssignment.ts, components/customers-hub/assignment/AssignmentPanel.tsx, context/store/unified-customers.ts

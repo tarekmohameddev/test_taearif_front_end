@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import useAssignmentStore from "@/context/store/assignment-rules";
+import { useCustomersHubAssignment } from "@/hooks/useCustomersHubAssignment";
+import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,16 +28,51 @@ export function AssignmentDropdown({
   currentEmployeeName,
   size = "sm",
 }: AssignmentDropdownProps) {
-  const { employees, assignCustomer, unassignCustomer } = useAssignmentStore();
+  const { employees } = useCustomersHubAssignment();
+  const { updateCustomer } = useUnifiedCustomersStore();
 
-  const handleAssign = (employeeId: string, employeeName: string) => {
-    assignCustomer(customerId, employeeId);
-    toast.success(`تم التعيين إلى ${employeeName}`);
+  const handleAssign = async (employeeId: string, employeeName: string) => {
+    try {
+      // Convert employeeId to number if it's a string representation of a number
+      // Employee IDs from API are strings, but API expects number
+      const employeeIdNum = typeof employeeId === 'string' 
+        ? (employeeId.startsWith('emp_') 
+            ? parseInt(employeeId.replace('emp_', '')) 
+            : parseInt(employeeId))
+        : employeeId;
+      
+      if (isNaN(employeeIdNum as number)) {
+        toast.error("خطأ في معرف الموظف");
+        return;
+      }
+
+      // Update customer with employee assignment
+      await updateCustomer(customerId, {
+        assignedEmployeeId: employeeId,
+        assignedEmployee: {
+          id: employeeId,
+          name: employeeName,
+        },
+      });
+      
+      toast.success(`تم التعيين إلى ${employeeName}`);
+    } catch (error) {
+      console.error("Error assigning employee:", error);
+      toast.error("حدث خطأ أثناء التعيين");
+    }
   };
 
-  const handleUnassign = () => {
-    unassignCustomer(customerId);
-    toast.success("تم إلغاء التعيين");
+  const handleUnassign = async () => {
+    try {
+      await updateCustomer(customerId, {
+        assignedEmployeeId: undefined,
+        assignedEmployee: undefined,
+      });
+      toast.success("تم إلغاء التعيين");
+    } catch (error) {
+      console.error("Error unassigning employee:", error);
+      toast.error("حدث خطأ أثناء إلغاء التعيين");
+    }
   };
 
   return (

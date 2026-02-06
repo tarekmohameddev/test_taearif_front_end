@@ -83,7 +83,7 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
       console.log("Search triggered");
     },
     onAddCustomer: () => {
-      setShowAddCustomerDialog(true);
+      router.push("/ar/dashboard/customers-hub/add");
     },
     onExport: () => {
       setShowExportDialog(true);
@@ -168,7 +168,7 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
                     console.log("Search");
                     break;
                   case "add-customer":
-                    setShowAddCustomerDialog(true);
+                    router.push("/ar/dashboard/customers-hub/add");
                     break;
                   case "export":
                     setShowExportDialog(true);
@@ -259,7 +259,7 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
       </div>
 
       {/* Dashboard Statistics */}
-      <CustomersDashboard />
+      <CustomersDashboard stats={apiStats} />
 
       {/* Advanced Filters with Save Feature */}
       <div className="flex items-start justify-between gap-4">
@@ -319,7 +319,7 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
 
       {/* Quick Add FAB */}
       <QuickAddFAB
-        onAddCustomer={() => setShowAddCustomerDialog(true)}
+        onAddCustomer={() => router.push("/ar/dashboard/customers-hub/add")}
         onAddAppointment={() => {
           // TODO: Implement
           console.log("Add appointment");

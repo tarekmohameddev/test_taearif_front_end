@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,10 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Plus, UserPlus, Upload, FileDown } from "lucide-react";
-import useUnifiedCustomersStore from "@/context/store/unified-customers";
 
 export function QuickActions() {
-  const { setShowAddCustomerDialog } = useUnifiedCustomersStore();
+  const router = useRouter();
 
   return (
     <DropdownMenu>
@@ -26,7 +26,7 @@ export function QuickActions() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>إضافة عميل جديد</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => setShowAddCustomerDialog(true)}>
+        <DropdownMenuItem onClick={() => router.push("/ar/dashboard/customers-hub/add")}>
           <UserPlus className="ml-2 h-4 w-4" />
           إضافة عميل يدوياً
         </DropdownMenuItem>

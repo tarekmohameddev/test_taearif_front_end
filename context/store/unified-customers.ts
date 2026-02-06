@@ -511,8 +511,47 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
         });
       },
       
-      updateCustomer: (customerId, updates) => {
+      updateCustomer: async (customerId, updates) => {
         const { customers, customersCache } = get();
+        
+        // If assigning employee, call API first
+        if (updates.assignedEmployeeId !== undefined) {
+          try {
+            const { updateCustomer: updateCustomerAPI } = await import("@/lib/services/customers-hub-detail-api");
+            // Convert assignedEmployeeId to responsible_employee_id for API
+            let employeeId: number | null = null;
+            
+            if (updates.assignedEmployeeId) {
+              if (typeof updates.assignedEmployeeId === 'string') {
+                // Handle string IDs like "emp_1" or "15"
+                if (updates.assignedEmployeeId.startsWith('emp_')) {
+                  // Extract number from "emp_1" -> 1
+                  const numStr = updates.assignedEmployeeId.replace('emp_', '');
+                  employeeId = parseInt(numStr, 10);
+                } else {
+                  // Direct number string like "15" or numeric string
+                  const parsed = parseInt(updates.assignedEmployeeId, 10);
+                  employeeId = isNaN(parsed) ? null : parsed;
+                }
+              } else if (typeof updates.assignedEmployeeId === 'number') {
+                employeeId = updates.assignedEmployeeId;
+              }
+              
+              // Validate the converted ID
+              if (employeeId !== null && (isNaN(employeeId) || employeeId <= 0)) {
+                console.error("Invalid employee ID:", updates.assignedEmployeeId, "->", employeeId);
+                employeeId = null;
+              }
+            }
+            
+            await updateCustomerAPI(customerId, {
+              responsible_employee_id: employeeId,
+            });
+          } catch (error) {
+            console.error("Error updating customer assignment:", error);
+            // Continue with local update even if API fails
+          }
+        }
         
         const updatedCustomers = customers.map((customer) =>
           customer.id === customerId
