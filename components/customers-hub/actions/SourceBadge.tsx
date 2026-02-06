@@ -54,7 +54,16 @@ const defaultConfig = {
 
 export function SourceBadge({ source, className }: SourceBadgeProps) {
   // Safely get config with fallback
-  if (!source) {
+  // Handle case where source might be an object (from API)
+  let sourceString: string | undefined;
+  if (typeof source === 'object' && source !== null) {
+    // Extract string value from object (id, name, or fallback to string conversion)
+    sourceString = (source as any).id || (source as any).name || String(source);
+  } else {
+    sourceString = source || undefined;
+  }
+
+  if (!sourceString) {
     const Icon = defaultConfig.icon;
     return (
       <Badge
@@ -71,7 +80,7 @@ export function SourceBadge({ source, className }: SourceBadgeProps) {
     );
   }
 
-  const config = sourceConfig[source as keyof typeof sourceConfig] || defaultConfig;
+  const config = sourceConfig[sourceString as keyof typeof sourceConfig] || defaultConfig;
   const Icon = config.icon;
 
   return (

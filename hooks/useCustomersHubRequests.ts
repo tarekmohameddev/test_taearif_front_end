@@ -39,12 +39,16 @@ export function useCustomersHubRequests() {
         const response = await getRequestsList(params);
         
         if (response.status === "success") {
-          // Transform actions to ensure assignedTo is string format
+          // Transform actions to ensure assignedTo and source are string format
           const transformedActions = response.data.actions.map((action: any) => ({
             ...action,
             assignedTo: action.assignedTo?.id?.toString() || action.assignedTo?.toString() || action.assignedTo,
             assignedToName: action.assignedTo?.name || action.assignedToName,
             customerId: action.customerId?.toString() || action.customerId,
+            // Handle source: if it's an object, extract the id or name, otherwise use as-is
+            source: typeof action.source === 'object' && action.source !== null
+              ? (action.source.id || action.source.name || action.source)
+              : (action.source || 'manual'),
           }));
           
           setActions(transformedActions);
