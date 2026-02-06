@@ -118,7 +118,8 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6" dir="rtl">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col gap-6 p-6" dir="rtl">
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex-shrink-0">
@@ -351,6 +352,7 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
           <kbd className="px-2 py-1 bg-gray-800 rounded">?</kbd>
           <span>اضغط لعرض الاختصارات</span>
         </div>
+      </div>
       </div>
     </div>
   );

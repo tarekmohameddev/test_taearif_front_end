@@ -370,7 +370,7 @@ export function RequestDetailPage({
   ) ?? [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900" dir="rtl">
+    <div className="min-h-screen bg-white dark:bg-gray-900" dir="rtl">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

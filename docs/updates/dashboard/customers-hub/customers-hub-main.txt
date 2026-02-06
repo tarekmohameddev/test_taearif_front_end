@@ -7,3 +7,8 @@ app/dashboard/customers-hub/page.tsx
 Update Type: Enhancement
 تم إزالة الخطوط الملونة من أسفل cards التنقل وتحسين الكود
 app/dashboard/customers-hub/page.tsx
+
+2026-02-06 14:57:06
+Update Type: Enhancement
+Changed all customers hub pages background from gray to white - updated main page, list page, pipeline page, analytics page, requests center page, request detail page, actions page, customer detail page, and enhanced customers hub page
+app/dashboard/customers-hub/page.tsx, app/dashboard/customers-hub/analytics/page.tsx, components/customers-hub/page/EnhancedCustomersHubPage.tsx, components/customers-hub/pipeline/PipelinePage.tsx, components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/requests/RequestDetailPage.tsx, components/customers-hub/actions/ActionsPage.tsx, components/customers-hub/detail/CustomerDetailPageSimple.tsx

@@ -48,7 +48,8 @@ export default function AnalyticsPage() {
   }, [userData?.token, authLoading, fetchAllAnalytics, initialLoad]);
 
   return (
-    <div className="flex flex-col gap-6 p-6" dir="rtl">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col gap-6 p-6" dir="rtl">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -80,6 +81,7 @@ export default function AnalyticsPage() {
         onTimeRangeChange={setTimeRange}
         onFetchAllAnalytics={fetchAllAnalytics}
       />
+      </div>
     </div>
   );
 }

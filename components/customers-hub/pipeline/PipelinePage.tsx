@@ -113,7 +113,8 @@ export function PipelinePage(props?: PipelinePageProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6" dir="rtl">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="flex flex-col gap-6 p-6" dir="rtl">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -192,6 +193,7 @@ export function PipelinePage(props?: PipelinePageProps) {
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

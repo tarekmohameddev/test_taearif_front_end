@@ -68,7 +68,7 @@ const hubPages = [
 
 export default function CustomersHubMainPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6" dir="rtl">
+    <div className="min-h-screen bg-white dark:bg-gray-900 p-6" dir="rtl">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
