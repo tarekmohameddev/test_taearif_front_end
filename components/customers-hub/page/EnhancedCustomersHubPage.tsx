@@ -76,38 +76,7 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
   // Get pending actions count
   const pendingActionsCount = getPendingActionsCount();
 
-  // Get filtered customers - use prop customers if available
-  const filteredCustomers = customers; // Already filtered by store or from API
-
-  // Show loading state
-  if (apiLoading && customers.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-        <p className="text-gray-600 dark:text-gray-400">جاري تحميل العملاء...</p>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (apiError && customers.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-red-500 mb-2">حدث خطأ</div>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{apiError}</p>
-          <Button onClick={() => props?.onFetchCustomers?.({
-            action: "list",
-            includeStats: true,
-            pagination: { page: 1, limit: 50 },
-            sorting: { field: "created_at", order: "desc" },
-          })}>إعادة المحاولة</Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Keyboard shortcuts handlers
+  // Keyboard shortcuts handlers - MUST be called before any early returns
   useKeyboardShortcuts({
     onSearch: () => {
       // TODO: Implement search
@@ -140,6 +109,9 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
       setShowExportDialog(false);
     },
   });
+
+  // Get filtered customers - use prop customers if available
+  const filteredCustomers = customers; // Already filtered by store or from API
 
   const handleApplyFilter = (newFilters: CustomerFilters) => {
     setFilters(newFilters);

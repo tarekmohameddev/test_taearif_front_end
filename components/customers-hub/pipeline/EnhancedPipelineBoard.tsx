@@ -255,16 +255,29 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
                               )}
 
                               {/* Property Preferences */}
-                              <div className="flex items-center gap-1 text-xs text-gray-600">
-                                {customer.preferences.propertyType.slice(0, 2).map((type) => (
-                                  <Badge key={type} variant="outline" className="text-xs px-1 py-0">
-                                    {type === "villa" ? "فيلا" :
-                                     type === "apartment" ? "شقة" :
-                                     type === "land" ? "أرض" :
-                                     type === "commercial" ? "تجاري" : type}
+                              {customer.preferences?.propertyType && Array.isArray(customer.preferences.propertyType) && (
+                                <div className="flex items-center gap-1 text-xs text-gray-600">
+                                  {customer.preferences.propertyType.slice(0, 2).map((type: string) => (
+                                    <Badge key={type} variant="outline" className="text-xs px-1 py-0">
+                                      {type === "villa" ? "فيلا" :
+                                       type === "apartment" ? "شقة" :
+                                       type === "land" ? "أرض" :
+                                       type === "commercial" ? "تجاري" : type}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                              {customer.preferences?.propertyType && !Array.isArray(customer.preferences.propertyType) && (
+                                <div className="flex items-center gap-1 text-xs text-gray-600">
+                                  <Badge variant="outline" className="text-xs px-1 py-0">
+                                    {customer.preferences.propertyType === "villa" ? "فيلا" :
+                                     customer.preferences.propertyType === "apartment" ? "شقة" :
+                                     customer.preferences.propertyType === "land" ? "أرض" :
+                                     customer.preferences.propertyType === "commercial" ? "تجاري" : 
+                                     String(customer.preferences.propertyType)}
                                   </Badge>
-                                ))}
-                              </div>
+                                </div>
+                              )}
 
                               {/* Priority */}
                               {customer.priority === "urgent" && (

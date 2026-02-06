@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +32,7 @@ interface PipelinePageProps {
 
 export function PipelinePage(props?: PipelinePageProps) {
   const store = useUnifiedCustomersStore();
-  const { customers: storeCustomers, setViewMode } = store;
+  const { customers: storeCustomers, setViewMode, setCustomers: setStoreCustomers } = store;
   
   // Use prop stages if provided, otherwise use store customers
   const stages = props?.stages;
@@ -41,18 +41,30 @@ export function PipelinePage(props?: PipelinePageProps) {
   const apiError = props?.error;
   
   // Calculate total customers from stages or store
-  const totalCustomers = stages 
-    ? stages.reduce((sum, stage) => sum + stage.customerCount, 0)
-    : storeCustomers.length;
+  const totalCustomers = stages && stages.length > 0
+    ? stages.reduce((sum, stage) => sum + (stage.customerCount || 0), 0)
+    : storeCustomers.length || 0;
 
+  // Track last stages IDs to avoid infinite loop
+  const lastStagesRef = useRef<string>("");
+  
   // Update store if prop stages are provided
   useEffect(() => {
     if (stages && stages.length > 0) {
-      // Extract all customers from stages and update store
-      const allCustomers = stages.flatMap(stage => stage.customers);
-      store.setCustomers(allCustomers);
+      // Create a unique key from stages to detect changes
+      const stagesKey = JSON.stringify(stages.map(s => `${s.id}-${s.customerCount}`));
+      
+      // Only update if stages actually changed
+      if (stagesKey !== lastStagesRef.current) {
+        // Extract all customers from stages and update store
+        const allCustomers = stages.flatMap(stage => stage.customers);
+        if (allCustomers.length > 0) {
+          setStoreCustomers(allCustomers);
+          lastStagesRef.current = stagesKey;
+        }
+      }
     }
-  }, [stages, store]);
+  }, [stages, setStoreCustomers]);
 
   const [pipelineView, setPipelineView] = useState<"enhanced" | "classic">("enhanced");
   const [isFullScreen, setIsFullScreen] = useState(false);
