@@ -17,3 +17,8 @@ app/dashboard/customers-hub/page.tsx, app/dashboard/customers-hub/analytics/page
 Update Type: Feature
 Connected assignment management sidebar to backend API - created assignment API service with endpoints for employees, auto-assign, manual assign, and rules management, created useCustomersHubAssignment hook, updated AssignmentPanel to use API instead of local store, added Save button to persist rules to backend, connected updateCustomer to API when assigning employees
 lib/services/customers-hub-assignment-api.ts, hooks/useCustomersHubAssignment.ts, components/customers-hub/assignment/AssignmentPanel.tsx, context/store/unified-customers.ts
+
+2026-02-06 15:57:34
+Update Type: Bug Fix
+Fixed issue where customers-hub pages were showing as tenant/merchant pages in production - added mandhoor.com to base domains list in dashboard/layout.tsx and proxy.ts to prevent it from being treated as tenant domain, added double-check in proxy.ts to prevent x-tenant-id header from being set for base domains
+app/dashboard/layout.tsx, proxy.ts

@@ -136,34 +136,43 @@ export default function DashboardLayout({
       const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
       const isDevelopment = process.env.NODE_ENV === "development";
 
-      // التحقق من أن المستخدم على الدومين الأساسي
+      // 🔒 Base domains list: includes both production and staging/pre-production domains
+      const baseDomains = [
+        productionDomain, // taearif.com (production)
+        `www.${productionDomain}`, // www.taearif.com
+        "mandhoor.com", // mandhoor.com (staging/pre-production on Vercel)
+        "www.mandhoor.com", // www.mandhoor.com
+      ];
+
+      // التحقق من أن المستخدم على الدومين الأساسي (الأولوية الأولى)
       const isOnBaseDomain = isDevelopment
         ? hostname === localDomain || hostname === `${localDomain}:3000`
-        : hostname === productionDomain ||
-          hostname === `www.${productionDomain}`;
+        : baseDomains.includes(hostname);
+
+      // إذا كان الدومين الأساسي، اعرض Dashboard العادي (لا تتحقق من custom domain)
+      if (isOnBaseDomain) {
+        console.log(
+          "🏠 Dashboard Layout: Base domain detected, showing main dashboard",
+          { hostname, productionDomain, isDevelopment }
+        );
+        setIsValidDomain(true); // true يعني أنه الدومين الأساسي
+        return;
+      }
 
       // التحقق من أن الـ host هو custom domain (يحتوي على .com, .net, .org, إلخ)
+      // فقط إذا لم يكن الدومين الأساسي
       const isCustomDomain =
         /\.(com|net|org|io|co|me|info|biz|name|pro|aero|asia|cat|coop|edu|gov|int|jobs|mil|museum|tel|travel|xxx)$/i.test(
           hostname,
         );
 
-      if (isCustomDomain && !isOnBaseDomain) {
-        // إذا كان custom domain، اعتبره tenant domain
+      if (isCustomDomain) {
+        // إذا كان custom domain وليس الدومين الأساسي، اعتبره tenant domain
         console.log(
           "🏢 Dashboard Layout: Custom domain detected, treating as tenant domain:",
           hostname,
         );
         setIsValidDomain(false); // false يعني أنه tenant domain
-        return;
-      }
-
-      // إذا كان الدومين الأساسي، اعرض Dashboard العادي
-      if (isOnBaseDomain) {
-        console.log(
-          "🏠 Dashboard Layout: Base domain detected, showing main dashboard",
-        );
-        setIsValidDomain(true); // true يعني أنه الدومين الأساسي
         return;
       }
 

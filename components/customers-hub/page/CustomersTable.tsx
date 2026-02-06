@@ -85,8 +85,6 @@ export function CustomersTable() {
 
   return (
     <Card>
-      {/* Filters and Search */}
- 
 
       {/* Table */}
       <div className="overflow-x-auto">

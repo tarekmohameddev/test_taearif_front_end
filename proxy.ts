@@ -12,6 +12,14 @@ const PRODUCTION_DOMAIN =
 const LOCAL_DOMAIN = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
 const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
 
+// 🔒 Base domains list: includes both production and staging/pre-production domains
+const BASE_DOMAINS = [
+  PRODUCTION_DOMAIN, // taearif.com (production)
+  `www.${PRODUCTION_DOMAIN}`, // www.taearif.com
+  "mandhoor.com", // mandhoor.com (staging/pre-production on Vercel)
+  "www.mandhoor.com", // www.mandhoor.com
+];
+
 // Cache regex patterns
 const CUSTOM_DOMAIN_REGEX = /\.([a-z]{2,})$/i;
 
@@ -63,10 +71,10 @@ function getTenantIdFromCustomDomain(host: string): string | null {
   // Remove port from host (e.g., "example.com:3000" -> "example.com")
   const hostWithoutPort = host.split(":")[0];
   
-  // التحقق من أن المستخدم على الدومين الأساسي
+  // 🔒 التحقق من أن المستخدم على الدومين الأساسي (يشمل mandhoor.com)
   const isOnBaseDomain = IS_DEVELOPMENT
     ? hostWithoutPort === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
-    : hostWithoutPort === PRODUCTION_DOMAIN || hostWithoutPort === `www.${PRODUCTION_DOMAIN}`;
+    : BASE_DOMAINS.includes(hostWithoutPort);
 
   // إذا كان الدومين الأساسي، لا نعتبره custom domain
   if (isOnBaseDomain) {
@@ -200,10 +208,10 @@ export function proxy(request: NextRequest) {
   // Remove port from host for processing (e.g., "kkkkk.localhost:3000" -> "kkkkk.localhost")
   const hostWithoutPort = host.split(":")[0];
   
-  // التحقق من أن الصفحة على الدومين الأساسي
+  // 🔒 التحقق من أن الصفحة على الدومين الأساسي (يشمل mandhoor.com)
   const isOnBaseDomain = IS_DEVELOPMENT
     ? hostWithoutPort === LOCAL_DOMAIN || host === `${LOCAL_DOMAIN}:3000`
-    : hostWithoutPort === PRODUCTION_DOMAIN || hostWithoutPort === `www.${PRODUCTION_DOMAIN}`;
+    : BASE_DOMAINS.includes(hostWithoutPort);
 
   // التحقق من أن الـ host هو custom domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
   // لكن ليس الدومين الأساسي
@@ -220,6 +228,19 @@ export function proxy(request: NextRequest) {
     if (tenantId) {
       domainType = "custom";
     }
+  }
+
+  // 🔒 IMPORTANT: Double-check that we don't set tenantId for base domain
+  // This prevents dashboard pages from being treated as tenant pages
+  if (tenantId && isOnBaseDomain) {
+    console.log("⚠️ proxy.ts - tenantId found but isOnBaseDomain=true, clearing tenantId:", {
+      tenantId,
+      host,
+      hostWithoutPort,
+      isOnBaseDomain,
+    });
+    tenantId = null;
+    domainType = null;
   }
   
   // Debug logging
