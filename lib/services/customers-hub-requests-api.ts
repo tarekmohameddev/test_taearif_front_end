@@ -4,15 +4,20 @@ import type { CustomerAction, CustomerActionType, CustomerSource, Priority } fro
 const BASE_URL = "/v2/customers-hub/requests";
 
 export interface RequestsListFilters {
-  tab?: "all" | "pending" | "overdue" | "completed";
+  tab?: "all" | "pending" | "overdue" | "completed" | "inbox" | "followups";
   type?: CustomerActionType[];
   priority?: Priority[];
-  status?: ("pending" | "in_progress" | "overdue" | "completed" | "dismissed")[];
-  dateRange?: {
-    start: string;
-    end: string;
-  };
+  status?: ("pending" | "in_progress" | "overdue" | "completed" | "dismissed" | "snoozed")[];
+  source?: CustomerSource[];
+  assignedTo?: string[]; // Employee IDs
+  dueDate?: "all" | "overdue" | "today" | "week" | "no_date";
   search?: string;
+  // Customer-based filters
+  city?: string[];
+  state?: string[]; // Regions/states
+  budgetMin?: number;
+  budgetMax?: number;
+  propertyType?: string[];
 }
 
 export interface RequestsListParams {

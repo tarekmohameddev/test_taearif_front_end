@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -265,15 +265,171 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const [quickViewCustomer, setQuickViewCustomer] = useState<UnifiedCustomer | null>(null);
   const [showQuickView, setShowQuickView] = useState(false);
 
+  // Debounced search query
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounce search query
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
+
+  // Fetch requests when filters change (only if API handler is provided)
+  useEffect(() => {
+    if (!props?.onFetchRequests) {
+      return; // Use local filtering if no API handler
+    }
+
+    const buildFilters = () => {
+      const filters: any = {};
+
+      // Tab filter
+      if (activeTab === "completed") {
+        filters.status = ["completed"];
+      } else {
+        // Only set tab if no specific types are selected
+        if (selectedTypes.length === 0) {
+          if (activeTab === "inbox") {
+            filters.tab = "inbox";
+            filters.type = REQUEST_TYPES;
+          } else if (activeTab === "followups") {
+            filters.tab = "followups";
+            filters.type = FOLLOWUP_TYPES;
+          } else {
+            filters.tab = "all";
+          }
+        }
+      }
+
+      // Search
+      if (debouncedSearchQuery) {
+        filters.search = debouncedSearchQuery;
+      }
+
+      // Source filter
+      if (selectedSources.length > 0) {
+        filters.source = selectedSources;
+      }
+
+      // Priority filter
+      if (selectedPriorities.length > 0) {
+        filters.priority = selectedPriorities;
+      }
+
+      // Type filter (overrides tab type if selected)
+      if (selectedTypes.length > 0) {
+        filters.type = selectedTypes;
+      }
+
+      // Assignee filter
+      if (selectedAssignees.length > 0) {
+        filters.assignedTo = selectedAssignees;
+      }
+
+      // Due date filter
+      if (dueDateFilter !== "all") {
+        filters.dueDate = dueDateFilter;
+      }
+
+      // City filter
+      if (selectedCities.length > 0) {
+        filters.city = selectedCities;
+      }
+
+      // State/Region filter
+      if (selectedStates.length > 0) {
+        filters.state = selectedStates;
+      }
+
+      // Budget filter
+      if (budgetMin) {
+        filters.budgetMin = Number(budgetMin);
+      }
+      if (budgetMax) {
+        filters.budgetMax = Number(budgetMax);
+      }
+
+      // Property type filter
+      if (selectedPropertyTypes.length > 0) {
+        filters.propertyType = selectedPropertyTypes;
+      }
+
+      return filters;
+    };
+
+    const fetchWithFilters = async () => {
+      try {
+        const filters = buildFilters();
+        await props.onFetchRequests!({
+          action: "list",
+          includeStats: true,
+          filters,
+          pagination: {
+            page: 1,
+            limit: 50,
+          },
+          sorting: {
+            field: "dueDate",
+            order: "asc",
+          },
+        });
+      } catch (err) {
+        console.error("Error fetching requests with filters:", err);
+      }
+    };
+
+    fetchWithFilters();
+  }, [
+    props?.onFetchRequests,
+    activeTab,
+    debouncedSearchQuery,
+    selectedSources,
+    selectedPriorities,
+    selectedTypes,
+    selectedAssignees,
+    dueDateFilter,
+    selectedCities,
+    selectedStates,
+    budgetMin,
+    budgetMax,
+    selectedPropertyTypes,
+  ]);
+
+  // Use API-filtered actions if API handler is provided, otherwise use local filtering
+  const useAPIFiltering = !!props?.onFetchRequests;
+
   const allPendingActions = useMemo(
-    () =>
-      sortActionsByPriority(
+    () => {
+      if (useAPIFiltering) {
+        // API handles filtering, just return actions sorted by priority
+        return sortActionsByPriority(
+          actions.filter((a) => a.status === "pending" || a.status === "in_progress")
+        );
+      }
+      // Local filtering (fallback)
+      return sortActionsByPriority(
         actions.filter((a) => a.status === "pending" || a.status === "in_progress")
-      ),
-    [actions]
+      );
+    },
+    [actions, useAPIFiltering]
   );
 
-  const completedActions = useMemo(() => getCompletedActions(), [actions]);
+  const completedActions = useMemo(() => {
+    if (useAPIFiltering) {
+      return actions.filter((a) => a.status === "completed" || a.status === "dismissed");
+    }
+    return getCompletedActions();
+  }, [actions, useAPIFiltering]);
 
   /** Stable map for customer lookup so cards get phone without store calls during list render */
   const customerByIdMap = useMemo(() => {
@@ -303,7 +459,14 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     return Array.from(cities).sort((a, b) => a.localeCompare(b, "ar"));
   }, [customers]);
 
+  // Local filtering (fallback when API is not available)
   const filteredActions = useMemo(() => {
+    if (useAPIFiltering) {
+      // API handles filtering, return actions as-is
+      return allPendingActions;
+    }
+
+    // Local filtering fallback
     let filtered = allPendingActions;
 
     if (searchQuery) {
@@ -385,6 +548,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     return filtered;
   }, [
     allPendingActions,
+    useAPIFiltering,
     searchQuery,
     selectedSources,
     selectedPriorities,
@@ -400,12 +564,25 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   ]);
 
   const inboxRequests = useMemo(
-    () => filteredActions.filter((a) => REQUEST_TYPES.includes(a.type)),
-    [filteredActions]
+    () => {
+      if (useAPIFiltering && activeTab === "inbox") {
+        // API already filtered for inbox, return actions as-is
+        return filteredActions;
+      }
+      return filteredActions.filter((a) => REQUEST_TYPES.includes(a.type));
+    },
+    [filteredActions, useAPIFiltering, activeTab]
   );
+  
   const followupRequests = useMemo(
-    () => filteredActions.filter((a) => FOLLOWUP_TYPES.includes(a.type)),
-    [filteredActions]
+    () => {
+      if (useAPIFiltering && activeTab === "followups") {
+        // API already filtered for followups, return actions as-is
+        return filteredActions;
+      }
+      return filteredActions.filter((a) => FOLLOWUP_TYPES.includes(a.type));
+    },
+    [filteredActions, useAPIFiltering, activeTab]
   );
   const overdueActions = useMemo(
     () => getOverdueActions(filteredActions),

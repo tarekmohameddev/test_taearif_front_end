@@ -7,7 +7,7 @@ import type { CustomerSource } from "@/types/unified-customer";
 import { cn } from "@/lib/utils";
 
 interface SourceBadgeProps {
-  source: CustomerSource;
+  source: CustomerSource | string | undefined | null;
   className?: string;
 }
 
@@ -42,10 +42,36 @@ const sourceConfig = {
     icon: Users,
     color: "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300",
   },
+} as const;
+
+// Default fallback config for unknown sources
+const defaultConfig = {
+  label: "غير محدد",
+  labelEn: "Unknown",
+  icon: Globe,
+  color: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300",
 };
 
 export function SourceBadge({ source, className }: SourceBadgeProps) {
-  const config = sourceConfig[source];
+  // Safely get config with fallback
+  if (!source) {
+    const Icon = defaultConfig.icon;
+    return (
+      <Badge
+        variant="outline"
+        className={cn(
+          "gap-1.5 font-medium",
+          defaultConfig.color,
+          className
+        )}
+      >
+        <Icon className="h-3 w-3" />
+        {defaultConfig.label}
+      </Badge>
+    );
+  }
+
+  const config = sourceConfig[source as keyof typeof sourceConfig] || defaultConfig;
   const Icon = config.icon;
 
   return (
