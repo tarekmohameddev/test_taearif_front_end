@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import useAuthStore from "@/context/AuthContext";
+import axiosInstance from "@/lib/axiosInstance";
 import {
   type EmployeeWorkload,
   type EmployeeConfig,
@@ -15,22 +16,91 @@ import {
 } from "@/lib/services/customers-hub-assignment-api";
 
 /**
- * NOTE: All API functions have been removed because the endpoints
- * are not documented in docs/backend/customersHubDoc.txt
+ * NOTE: Temporarily using /v1/employees endpoint until 
+ * /api/v2/customers-hub/assignment/employees is implemented.
  * 
- * These are stub functions that return empty/default values
- * to prevent breaking the code that uses this hook.
+ * The new endpoint is documented in:
+ * docs/backend-integration/api/assignment/customers-hub-assignment-api-specification.md
  */
 
-// Stub function - endpoint not available
+// Interface for /v1/employees response
+interface V1Employee {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  active: boolean;
+  roles?: Array<{ id: number; name: string; team_id: number }>;
+}
+
+interface V1EmployeesResponse {
+  current_page: number;
+  data: V1Employee[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
+// Fetch employees from /v1/employees and transform to EmployeeWorkload format
 async function getEmployees(): Promise<EmployeesResponse> {
-  return {
-    status: "success",
-    code: 200,
-    message: "Endpoint not available - not documented in API docs",
-    data: { employees: [] },
-    timestamp: new Date().toISOString(),
-  };
+  try {
+    const response = await axiosInstance.get<V1EmployeesResponse>("/v1/employees");
+    
+    // Transform V1Employee[] to EmployeeWorkload[]
+    const employees: EmployeeWorkload[] = response.data.data.map((emp) => {
+      const fullName = `${emp.first_name} ${emp.last_name}`.trim();
+      const roleName = emp.roles && emp.roles.length > 0 
+        ? emp.roles[0].name 
+        : "Employee";
+      
+      // Default values - these should come from the new endpoint when implemented
+      const customerCount = 0;
+      const activeCount = 0;
+      const maxCapacity = 50; // Default capacity
+      const loadPercentage = maxCapacity > 0 
+        ? Math.round((customerCount / maxCapacity) * 100) 
+        : 0;
+      
+      return {
+        id: emp.id.toString(),
+        name: fullName,
+        role: roleName,
+        email: emp.email || undefined,
+        phone: emp.phone || undefined,
+        customerCount,
+        activeCount,
+        maxCapacity,
+        isActive: emp.active,
+        loadPercentage,
+      };
+    });
+    
+    return {
+      status: "success",
+      code: 200,
+      message: "Employees retrieved successfully",
+      data: { employees },
+      timestamp: new Date().toISOString(),
+    };
+  } catch (error: any) {
+    console.error("Error fetching employees from /v1/employees:", error);
+    // Return empty array on error to prevent breaking the UI
+    return {
+      status: "error",
+      code: error.response?.status || 500,
+      message: error.response?.data?.message || "Failed to fetch employees",
+      data: { employees: [] },
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
 
 // Stub function - endpoint not available
