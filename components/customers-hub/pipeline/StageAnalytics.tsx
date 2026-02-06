@@ -17,36 +17,47 @@ export function StageAnalytics(props?: StageAnalyticsProps) {
   
   // Use prop analytics if provided, otherwise use store statistics
   const analytics = props?.analytics;
-  const statistics = analytics 
-    ? {
-        total: analytics.totalCustomers,
-        byStage: {} as Record<string, number>,
-        avgDaysInPipeline: 0,
-      }
-    : storeStatistics;
+  
+  // Get conversion rate from analytics or fallback to store calculation
+  const conversionRate = analytics?.conversionRate !== undefined
+    ? analytics.conversionRate
+    : (() => {
+        // Fallback to calculating from store statistics
+        const qualifiedCount = storeStatistics?.byStage["qualified"] || 0;
+        const closingCount = storeStatistics?.byStage["closing"] || 0;
+        return qualifiedCount > 0 ? Math.round((closingCount / qualifiedCount) * 100) : 0;
+      })();
 
-  // Calculate bottlenecks (stages with more than average customers)
-  const avgCustomersPerStage = statistics ? statistics.total / LIFECYCLE_STAGES.length : 0;
-  const bottleneckStages = LIFECYCLE_STAGES.filter((stage) => {
-    const count = statistics?.byStage[stage.id] || 0;
-    return count > avgCustomersPerStage * 1.5;
-  });
+  // Get average days in pipeline from analytics or fallback to store
+  const avgDaysInPipeline = analytics?.avgDaysInPipeline !== undefined
+    ? analytics.avgDaysInPipeline
+    : (storeStatistics?.avgDaysInPipeline || 0);
 
-  // Calculate conversion rate from analytics or between key stages
-  let conversionRate = 0;
-  if (analytics?.conversionRates) {
-    // Use conversion rate from analytics if available
-    const rates = analytics.conversionRates;
-    const lastRate = Object.values(rates).pop();
-    if (lastRate) {
-      conversionRate = parseInt(lastRate.replace('%', ''));
-    }
-  } else {
-    // Fallback to calculating from statistics
-    const qualifiedCount = statistics?.byStage["qualified"] || 0;
-    const closingCount = statistics?.byStage["closing"] || 0;
-    conversionRate = qualifiedCount > 0 ? Math.round((closingCount / qualifiedCount) * 100) : 0;
+  // Get bottlenecks from analytics or calculate from store statistics
+  let bottleneckStages: any[] = [];
+  
+  if (analytics?.bottlenecks && analytics.bottlenecks.length > 0) {
+    // Use bottlenecks from API
+    bottleneckStages = analytics.bottlenecks;
+  } else if (storeStatistics) {
+    // Calculate bottlenecks from store statistics
+    const avgCustomersPerStage = storeStatistics.total / LIFECYCLE_STAGES.length;
+    bottleneckStages = LIFECYCLE_STAGES.filter((stage) => {
+      const count = storeStatistics.byStage[stage.id] || 0;
+      return count > avgCustomersPerStage * 1.5;
+    });
   }
+  
+  // Format bottleneck names for display
+  const bottleneckNames = bottleneckStages.length > 0
+    ? bottleneckStages.map((s: any) => {
+        if (typeof s === 'string') return s;
+        if (typeof s === 'object' && s !== null) {
+          return s.nameAr || s.name || s.id || String(s);
+        }
+        return String(s);
+      }).join(", ")
+    : "لا يوجد";
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -74,7 +85,7 @@ export function StageAnalytics(props?: StageAnalyticsProps) {
             <div>
               <div className="text-sm text-gray-600">متوسط الوقت</div>
               <div className="text-2xl font-bold">
-                {statistics?.avgDaysInPipeline || 0} يوم
+                {avgDaysInPipeline} يوم
               </div>
               <div className="text-xs text-gray-500">من البداية للإغلاق</div>
             </div>
@@ -92,9 +103,7 @@ export function StageAnalytics(props?: StageAnalyticsProps) {
               <div className="text-sm text-gray-600">اختناقات المسار</div>
               <div className="text-2xl font-bold">{bottleneckStages.length}</div>
               <div className="text-xs text-gray-500">
-                {bottleneckStages.length > 0
-                  ? bottleneckStages.map((s) => s.nameAr).join(", ")
-                  : "لا يوجد"}
+                {bottleneckNames}
               </div>
             </div>
           </div>

@@ -12,3 +12,8 @@ components/customers-hub/pipeline/PipelinePage.tsx
 Update Type: Bug Fix
 Fixed total customers count showing zero - converted API's 'count' field to 'customerCount' in hook transformation, added totalCustomers from API response to interface and hook state, updated PipelinePage to use API totalCustomers value instead of manual calculation
 hooks/useCustomersHubPipeline.ts, components/customers-hub/pipeline/PipelinePage.tsx, app/dashboard/customers-hub/pipeline/page.tsx, lib/services/customers-hub-pipeline-api.ts
+
+2026-02-06 14:53:28
+Update Type: Bug Fix
+Fixed stats cards (conversion rate, average days, bottlenecks) - updated PipelineAnalytics interface to match API response structure (conversionRate, avgDaysInPipeline, bottlenecks), updated StageAnalytics component to use correct API fields with fallback to store statistics
+lib/services/customers-hub-pipeline-api.ts, components/customers-hub/pipeline/StageAnalytics.tsx

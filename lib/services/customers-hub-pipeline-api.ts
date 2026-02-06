@@ -25,9 +25,9 @@ export interface PipelineStage {
 }
 
 export interface PipelineAnalytics {
-  totalCustomers: number;
-  avgTimePerStage: Record<string, string>;
-  conversionRates: Record<string, string>;
+  conversionRate: number;
+  avgDaysInPipeline: number;
+  bottlenecks: any[];
 }
 
 export interface PipelineBoardResponse {
