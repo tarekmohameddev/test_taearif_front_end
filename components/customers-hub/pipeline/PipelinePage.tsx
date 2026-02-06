@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, KanbanSquare, Maximize2, Minimize2 } from "lucide-react";
+import { ArrowRight, KanbanSquare, Maximize2, Minimize2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { StageAnalytics } from "./StageAnalytics";
 import { EnhancedPipelineBoard } from "./EnhancedPipelineBoard";
@@ -15,9 +15,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import type { PipelineStage, PipelineAnalytics } from "@/lib/services/customers-hub-pipeline-api";
+import type { PipelineBoardParams } from "@/lib/services/customers-hub-pipeline-api";
+import type { MoveCustomerParams } from "@/lib/services/customers-hub-pipeline-api";
 
-export function PipelinePage() {
-  const { customers, setViewMode } = useUnifiedCustomersStore();
+interface PipelinePageProps {
+  stages?: PipelineStage[];
+  analytics?: PipelineAnalytics | null;
+  filterOptions?: any;
+  loading?: boolean;
+  error?: string | null;
+  onFetchPipelineBoard?: (params: PipelineBoardParams) => Promise<void>;
+  onMoveCustomer?: (params: MoveCustomerParams) => Promise<boolean>;
+}
+
+export function PipelinePage(props?: PipelinePageProps) {
+  const store = useUnifiedCustomersStore();
+  const { customers: storeCustomers, setViewMode } = store;
+  
+  // Use prop stages if provided, otherwise use store customers
+  const stages = props?.stages;
+  const analytics = props?.analytics;
+  const apiLoading = props?.loading ?? false;
+  const apiError = props?.error;
+  
+  // Calculate total customers from stages or store
+  const totalCustomers = stages 
+    ? stages.reduce((sum, stage) => sum + stage.customerCount, 0)
+    : storeCustomers.length;
+
+  // Update store if prop stages are provided
+  useEffect(() => {
+    if (stages && stages.length > 0) {
+      // Extract all customers from stages and update store
+      const allCustomers = stages.flatMap(stage => stage.customers);
+      store.setCustomers(allCustomers);
+    }
+  }, [stages, store]);
+
   const [pipelineView, setPipelineView] = useState<"enhanced" | "classic">("enhanced");
   const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -30,6 +66,35 @@ export function PipelinePage() {
       setIsFullScreen(false);
     }
   };
+
+  // Show loading state
+  if (apiLoading && (!stages || stages.length === 0)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        <p className="text-gray-600 dark:text-gray-400">جاري تحميل مسار المبيعات...</p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (apiError && (!stages || stages.length === 0)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <Card className="max-w-md">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{apiError}</p>
+            <Button onClick={() => props?.onFetchPipelineBoard?.({
+              action: "board",
+              includeAnalytics: true,
+            })}>إعادة المحاولة</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6" dir="rtl">
@@ -56,7 +121,7 @@ export function PipelinePage() {
         
         <div className="flex items-center gap-3">
           <div className="text-sm text-gray-600">
-            <span className="font-semibold">{customers.length}</span> عميل إجمالاً
+            <span className="font-semibold">{totalCustomers}</span> عميل إجمالاً
           </div>
           
           <Select value={pipelineView} onValueChange={(v: any) => setPipelineView(v)}>
@@ -96,11 +161,14 @@ export function PipelinePage() {
       </div>
 
       {/* Analytics */}
-      <StageAnalytics />
+      <StageAnalytics analytics={analytics} />
 
       {/* Pipeline Board */}
       {pipelineView === "enhanced" ? (
-        <EnhancedPipelineBoard />
+        <EnhancedPipelineBoard 
+          stages={stages}
+          onMoveCustomer={props?.onMoveCustomer}
+        />
       ) : (
         <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
           <p className="text-sm text-gray-600 text-center">

@@ -1,4 +1,4 @@
-2025-01-17 17:00:00
+2026-02-05 12:00:00
 Update Type: Feature
-Created comprehensive backend API specification for Customers Hub Pipeline page with 8 consolidated endpoints, Kanban board with drag-and-drop, stage analytics, customer cards, bulk operations, search, export, and mandatory performance optimizations for millions of records without caching
-docs/backend-integration/customers-hub-pipeline-api-specification.md
+Integrated backend API endpoints for Pipeline page - created API service, custom hook with token validation, updated page component to fetch pipeline board data from API instead of mock data, added loading and error states, updated PipelinePage, StageAnalytics, and EnhancedPipelineBoard components to accept props from API while maintaining backward compatibility with store, connected drag-and-drop move customer functionality to API endpoint
+lib/services/customers-hub-pipeline-api.ts, hooks/useCustomersHubPipeline.ts, app/dashboard/customers-hub/pipeline/page.tsx, components/customers-hub/pipeline/PipelinePage.tsx, components/customers-hub/pipeline/StageAnalytics.tsx, components/customers-hub/pipeline/EnhancedPipelineBoard.tsx

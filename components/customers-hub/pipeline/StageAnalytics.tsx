@@ -5,9 +5,25 @@ import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Card, CardContent } from "@/components/ui/card";
 import { LIFECYCLE_STAGES } from "@/types/unified-customer";
 import { TrendingUp, Clock, Target } from "lucide-react";
+import type { PipelineAnalytics } from "@/lib/services/customers-hub-pipeline-api";
 
-export function StageAnalytics() {
-  const { customers, statistics } = useUnifiedCustomersStore();
+interface StageAnalyticsProps {
+  analytics?: PipelineAnalytics | null;
+}
+
+export function StageAnalytics(props?: StageAnalyticsProps) {
+  const store = useUnifiedCustomersStore();
+  const { customers, statistics: storeStatistics } = store;
+  
+  // Use prop analytics if provided, otherwise use store statistics
+  const analytics = props?.analytics;
+  const statistics = analytics 
+    ? {
+        total: analytics.totalCustomers,
+        byStage: {} as Record<string, number>,
+        avgDaysInPipeline: 0,
+      }
+    : storeStatistics;
 
   // Calculate bottlenecks (stages with more than average customers)
   const avgCustomersPerStage = statistics ? statistics.total / LIFECYCLE_STAGES.length : 0;
@@ -16,11 +32,21 @@ export function StageAnalytics() {
     return count > avgCustomersPerStage * 1.5;
   });
 
-  // Calculate conversion rate between key stages
-  const qualifiedCount = statistics?.byStage["qualified"] || 0;
-  const closingCount = statistics?.byStage["closing"] || 0;
-  const conversionRate =
-    qualifiedCount > 0 ? Math.round((closingCount / qualifiedCount) * 100) : 0;
+  // Calculate conversion rate from analytics or between key stages
+  let conversionRate = 0;
+  if (analytics?.conversionRates) {
+    // Use conversion rate from analytics if available
+    const rates = analytics.conversionRates;
+    const lastRate = Object.values(rates).pop();
+    if (lastRate) {
+      conversionRate = parseInt(lastRate.replace('%', ''));
+    }
+  } else {
+    // Fallback to calculating from statistics
+    const qualifiedCount = statistics?.byStage["qualified"] || 0;
+    const closingCount = statistics?.byStage["closing"] || 0;
+    conversionRate = qualifiedCount > 0 ? Math.round((closingCount / qualifiedCount) * 100) : 0;
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-3">

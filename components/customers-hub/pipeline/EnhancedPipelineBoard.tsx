@@ -17,9 +17,24 @@ import {
   TrendingUp, ChevronLeft, ChevronRight
 } from "lucide-react";
 import Link from "next/link";
+import type { PipelineStage } from "@/lib/services/customers-hub-pipeline-api";
+import type { MoveCustomerParams } from "@/lib/services/customers-hub-pipeline-api";
 
-export function EnhancedPipelineBoard() {
-  const { customers, updateCustomerStage } = useUnifiedCustomersStore();
+interface EnhancedPipelineBoardProps {
+  stages?: PipelineStage[];
+  onMoveCustomer?: (params: MoveCustomerParams) => Promise<boolean>;
+}
+
+export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
+  const store = useUnifiedCustomersStore();
+  const { customers: storeCustomers, updateCustomerStage: storeUpdateCustomerStage } = store;
+  
+  // Use prop stages if provided, otherwise use store customers
+  const stages = props?.stages;
+  const customers = stages 
+    ? stages.flatMap(stage => stage.customers)
+    : storeCustomers;
+
   const [draggedCustomer, setDraggedCustomer] = useState<UnifiedCustomer | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState<string | null>(null);
@@ -58,16 +73,40 @@ export function EnhancedPipelineBoard() {
     }
   };
 
-  const handleDrop = (e: React.DragEvent, stageId: string) => {
+  const handleDrop = async (e: React.DragEvent, stageId: string) => {
     e.preventDefault();
     
     if (draggedCustomer && draggedCustomer.stage !== stageId) {
-      // Update customer stage
-      updateCustomerStage(draggedCustomer.id, stageId as any);
-      
-      // Show success animation
-      setShowSuccessAnimation(stageId);
-      setTimeout(() => setShowSuccessAnimation(null), 2000);
+      try {
+        // Find stage from displayStages or stages
+        const targetStage = stages?.find(s => s.id.toString() === stageId || s.name === stageId) ||
+                           LIFECYCLE_STAGES.find(s => s.id === stageId);
+        
+        let newStageId: number;
+        if (targetStage && 'id' in targetStage && typeof targetStage.id === 'number') {
+          newStageId = targetStage.id;
+        } else if (targetStage && 'id' in targetStage) {
+          newStageId = parseInt(targetStage.id.toString());
+        } else {
+          newStageId = parseInt(stageId);
+        }
+        
+        // Use API handler if provided, otherwise use store handler
+        if (props?.onMoveCustomer) {
+          await props.onMoveCustomer({
+            customerId: parseInt(draggedCustomer.id),
+            newStageId: newStageId,
+          });
+        } else {
+          storeUpdateCustomerStage(draggedCustomer.id, stageId as any);
+        }
+        
+        // Show success animation
+        setShowSuccessAnimation(stageId);
+        setTimeout(() => setShowSuccessAnimation(null), 2000);
+      } catch (err) {
+        console.error("Error moving customer:", err);
+      }
     }
     
     setDraggedCustomer(null);
@@ -75,8 +114,25 @@ export function EnhancedPipelineBoard() {
   };
 
   const getStageCustomers = (stageId: string) => {
+    // If stages are provided, use them directly
+    if (stages) {
+      const stage = stages.find(s => s.id.toString() === stageId || s.name === stageId);
+      return stage?.customers || [];
+    }
+    // Otherwise filter from customers
     return customers.filter(c => c.stage === stageId);
   };
+  
+  // Get stages to display - use prop stages if available, otherwise use LIFECYCLE_STAGES
+  const displayStages = stages 
+    ? stages.map(stage => ({
+        id: stage.id.toString(),
+        nameAr: stage.name,
+        nameEn: stage.name,
+        color: stage.color,
+        order: stage.order,
+      }))
+    : LIFECYCLE_STAGES;
 
   const getInitials = (name: string) => {
     return name
@@ -97,7 +153,7 @@ export function EnhancedPipelineBoard() {
       {/* Pipeline Board */}
       <div className="overflow-x-auto pb-4">
         <div className="flex gap-4 min-w-max">
-          {LIFECYCLE_STAGES.map((stage) => {
+          {displayStages.map((stage) => {
             const stageCustomers = getStageCustomers(stage.id);
             const totalDealValue = stageCustomers.reduce((sum, c) => sum + (c.totalDealValue || 0), 0);
             const isDropTarget = dragOverStage === stage.id;
