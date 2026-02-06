@@ -232,7 +232,7 @@ export function ExportDialog({ open, onOpenChange, customers }: ExportDialogProp
           </CustomDialogDescription>
         </CustomDialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 p-4">
           {/* Format Selection */}
           <div className="space-y-2">
             <Label>تنسيق الملف</Label>
