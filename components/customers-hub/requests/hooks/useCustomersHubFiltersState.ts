@@ -20,11 +20,14 @@ export const useCustomersHubFiltersState = () => {
   const [budgetMax, setBudgetMax] = useState<string>("");
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
 
-  // Debounced search query
+  // Applied search query (used in filters - applied manually via button)
+  const [appliedSearchQuery, setAppliedSearchQuery] = useState<string>("");
+  
+  // Debounced search query (kept for backward compatibility, but not used in filters)
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Debounce search query
+  // Debounce search query (optional - for future use)
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -38,6 +41,11 @@ export const useCustomersHubFiltersState = () => {
       }
     };
   }, [searchQuery]);
+  
+  // Function to apply search (called when user clicks search button)
+  const applySearch = () => {
+    setAppliedSearchQuery(searchQuery);
+  };
 
   // Sync localSearchQuery with searchQuery
   useEffect(() => {
@@ -66,9 +74,9 @@ export const useCustomersHubFiltersState = () => {
       }
     }
 
-    // Search
-    if (debouncedSearchQuery?.trim()) {
-      filters.search = debouncedSearchQuery.trim();
+    // Search (use applied search query instead of debounced)
+    if (appliedSearchQuery?.trim()) {
+      filters.search = appliedSearchQuery.trim();
     }
 
     // Source filter
@@ -130,7 +138,7 @@ export const useCustomersHubFiltersState = () => {
     return filters;
   }, [
     activeTab,
-    debouncedSearchQuery,
+    appliedSearchQuery,
     selectedSources,
     selectedPriorities,
     selectedTypes,
@@ -146,6 +154,7 @@ export const useCustomersHubFiltersState = () => {
   const handleClearFilters = () => {
     setSearchQuery("");
     setLocalSearchQuery("");
+    setAppliedSearchQuery("");
     setActiveTab("inbox");
     setSelectedSources([]);
     setSelectedPriorities([]);
@@ -165,6 +174,7 @@ export const useCustomersHubFiltersState = () => {
     setSearchQuery,
     localSearchQuery,
     setLocalSearchQuery,
+    appliedSearchQuery,
     debouncedSearchQuery,
     activeTab,
     setActiveTab,
@@ -191,6 +201,7 @@ export const useCustomersHubFiltersState = () => {
     // Computed filters object
     newFilters,
     // Handlers
+    applySearch,
     handleClearFilters,
   };
 };

@@ -251,7 +251,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const {
     searchQuery,
     setSearchQuery,
-    debouncedSearchQuery,
+    appliedSearchQuery,
     activeTab,
     setActiveTab,
     selectedSources,
@@ -274,6 +274,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     setBudgetMax,
     selectedPropertyTypes,
     setSelectedPropertyTypes,
+    applySearch,
     newFilters,
   } = filterHooks;
 
@@ -283,6 +284,11 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const [quickViewAction, setQuickViewAction] = useState<CustomerAction | null>(null);
   const [quickViewCustomer, setQuickViewCustomer] = useState<UnifiedCustomer | null>(null);
   const [showQuickView, setShowQuickView] = useState(false);
+  
+  // Temporary budget state for dialog (before applying)
+  const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
+  const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
+  const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
 
   // Fetch requests when filters change (only if API handler is provided)
   // Use useRef to track previous filters and prevent unnecessary API calls
@@ -388,8 +394,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     // Local filtering fallback
     let filtered = allPendingActions;
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
+    if (appliedSearchQuery) {
+      const q = appliedSearchQuery.toLowerCase();
       filtered = filtered.filter(
         (a) =>
           a.customerName.toLowerCase().includes(q) ||
@@ -468,7 +474,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   }, [
     allPendingActions,
     useAPIFiltering,
-    searchQuery,
+    appliedSearchQuery,
     selectedSources,
     selectedPriorities,
     selectedTypes,
@@ -664,7 +670,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   };
 
   const hasActiveFilters =
-    searchQuery ||
+    appliedSearchQuery ||
     selectedSources.length > 0 ||
     selectedPriorities.length > 0 ||
     selectedTypes.length > 0 ||
@@ -786,14 +792,30 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           <CardContent className="p-4">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="البحث في الطلبات..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pr-10"
-                  />
+                <div className="relative flex-1 max-w-md flex gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="البحث في الطلبات..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          applySearch();
+                        }
+                      }}
+                      className="pr-10"
+                    />
+                  </div>
+                  <Button
+                    onClick={applySearch}
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Search className="h-4 w-4" />
+                    بحث
+                  </Button>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <DropdownMenu>
@@ -1027,7 +1049,14 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <DropdownMenu>
+                  <DropdownMenu open={isBudgetDialogOpen} onOpenChange={(open) => {
+                    setIsBudgetDialogOpen(open);
+                    // Initialize temp values when opening dialog
+                    if (open) {
+                      setTempBudgetMin(budgetMin);
+                      setTempBudgetMax(budgetMax);
+                    }
+                  }}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">
                         <DollarSign className="h-4 w-4" />
@@ -1049,8 +1078,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                           <Input
                             type="number"
                             placeholder="الحد الأدنى"
-                            value={budgetMin}
-                            onChange={(e) => setBudgetMin(e.target.value)}
+                            value={tempBudgetMin}
+                            onChange={(e) => setTempBudgetMin(e.target.value)}
                             className="h-8"
                             min={0}
                           />
@@ -1060,12 +1089,38 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                           <Input
                             type="number"
                             placeholder="الحد الأقصى"
-                            value={budgetMax}
-                            onChange={(e) => setBudgetMax(e.target.value)}
+                            value={tempBudgetMax}
+                            onChange={(e) => setTempBudgetMax(e.target.value)}
                             className="h-8"
                             min={0}
                           />
                         </div>
+                      </div>
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            setBudgetMin(tempBudgetMin);
+                            setBudgetMax(tempBudgetMax);
+                            setIsBudgetDialogOpen(false);
+                          }}
+                        >
+                          تطبيق
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setTempBudgetMin("");
+                            setTempBudgetMax("");
+                            setBudgetMin("");
+                            setBudgetMax("");
+                            setIsBudgetDialogOpen(false);
+                          }}
+                        >
+                          إعادة تعيين
+                        </Button>
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
