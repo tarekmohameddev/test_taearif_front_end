@@ -50,6 +50,8 @@ export function useCustomersHubPipeline() {
               stage: customer.stage?.name || customer.stage || "new_lead",
               priority: customer.priority?.name?.toLowerCase() || customer.priority || "medium",
               preferences: customer.preferences || {},
+              // Use budgetMax from preferences as totalDealValue if totalDealValue is not provided
+              totalDealValue: customer.totalDealValue || customer.preferences?.budgetMax || customer.budgetMax || undefined,
               stageHistory: customer.stageHistory || [],
               properties: customer.properties || [],
               interactions: customer.interactions || [],
