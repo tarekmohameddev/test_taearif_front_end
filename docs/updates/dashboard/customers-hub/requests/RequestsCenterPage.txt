@@ -42,3 +42,8 @@ lib/services/customers-hub-requests-api.ts, hooks/useCustomersHubRequests.ts, ap
 Update Type: Feature
 Integrated backend API endpoints for Request Detail page - created useRequestDetail hook with token validation, updated [requestId]/page.tsx to fetch action details and stats from API, updated RequestDetailPage component to accept props from API, added loading and error states, connected all action operations (complete, dismiss, snooze, assign) to API endpoints with auto-refresh
 hooks/useRequestDetail.ts, app/dashboard/customers-hub/requests/[requestId]/page.tsx, components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-06 22:24:21
+Update Type: Documentation
+Created comprehensive documentation for Bulk Actions Endpoints - detailed specifications for bulk operations (complete, dismiss, snooze, assign, change_priority) to replace multiple individual API requests with single bulk endpoint, includes request/response formats, validation rules, error handling, database transactions, performance requirements, and frontend integration examples
+docs/backend-integration/api/requests/bulk-actions-endpoints.md

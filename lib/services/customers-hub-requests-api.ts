@@ -144,6 +144,22 @@ export interface AssignActionResponse {
   timestamp: string;
 }
 
+export interface AddNoteResponse {
+  status: "success";
+  code: number;
+  message: string;
+  data: {
+    actionId: string;
+    note: string;
+    addedAt: string;
+    addedBy: {
+      id: number;
+      name: string;
+    };
+  };
+  timestamp: string;
+}
+
 // Get Requests List
 export async function getRequestsList(params: RequestsListParams): Promise<RequestsListResponse> {
   const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, params);
@@ -196,5 +212,24 @@ export async function assignAction(actionId: string, employeeId: number): Promis
 // Get Action Stats
 export async function getActionStats(actionId: string): Promise<any> {
   const response = await axiosInstance.get(`${BASE_URL}/${actionId}/stats`);
+  return response.data;
+}
+
+// Add Note to Action
+export async function addNoteToAction(
+  actionId: string,
+  note: string,
+  addedBy?: number
+): Promise<AddNoteResponse> {
+  const response = await axiosInstance.post<AddNoteResponse>(
+    `${BASE_URL}/${actionId}`,
+    {
+      action: "add_note",
+      data: {
+        note,
+        addedBy: addedBy?.toString() || "current_user",
+      },
+    }
+  );
   return response.data;
 }

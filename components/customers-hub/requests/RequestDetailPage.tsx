@@ -44,6 +44,8 @@ import { cn } from "@/lib/utils";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerAction, UnifiedCustomer, Appointment, PropertyInterest } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
+import { addNoteToAction } from "@/lib/services/customers-hub-requests-api";
+import useAuthStore from "@/context/AuthContext";
 
 interface RequestDetailPageProps {
   requestId: string;
@@ -108,6 +110,7 @@ export function RequestDetailPage({
 }: RequestDetailPageProps) {
   const router = useRouter();
   const store = useUnifiedCustomersStore();
+  const { userData } = useAuthStore();
   const {
     actions: storeActions,
     getCustomerById,
@@ -278,11 +281,49 @@ export function RequestDetailPage({
     }
   };
 
-  const handleAddNote = () => {
+  const handleAddNote = async () => {
     if (!newNote.trim()) return;
-    addActionNote(action.id, newNote.trim());
-    setNewNote("");
-    setShowNoteForm(false);
+    
+    const toastId = toast.loading("جاري إضافة الملاحظة...");
+    
+    try {
+      // Get current user ID - check multiple possible locations
+      const currentUserId = userData?.user?.id || userData?.id || null;
+      
+      // Call API to add note
+      const response = await addNoteToAction(
+        action.id,
+        newNote.trim(),
+        currentUserId ? parseInt(currentUserId.toString()) : undefined
+      );
+      
+      if (response.status === "success") {
+        // Update local store with the new note (for compatibility with existing code)
+        storeAddActionNote(action.id, newNote.trim());
+        
+        // Update action metadata if needed
+        if (action.metadata) {
+          action.metadata.notes = newNote.trim();
+        }
+        
+        toast.success("تم إضافة الملاحظة بنجاح", { id: toastId });
+        setNewNote("");
+        setShowNoteForm(false);
+        
+        // Refresh page data if refetch is available
+        if (onRefetch) {
+          await onRefetch();
+        }
+      } else {
+        throw new Error(response.message || "فشل إضافة الملاحظة");
+      }
+    } catch (err: any) {
+      console.error("Error adding note:", err);
+      toast.error(
+        err.response?.data?.message || err.message || "حدث خطأ أثناء إضافة الملاحظة",
+        { id: toastId }
+      );
+    }
   };
 
   const handleScheduleAppointment = async () => {
