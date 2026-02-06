@@ -86,14 +86,17 @@ export function AssignmentPanel() {
     }
   }, [employees, apiRules]);
 
-  // Refresh data when panel opens
+  // Refresh data when panel opens - only fetch if not already loaded
   useEffect(() => {
-    if (open) {
+    if (open && !apiLoading) {
+      // Only fetch if data is not already loaded
+      // The store will prevent duplicate requests
       fetchEmployees();
       fetchUnassignedCount();
       fetchRules();
     }
-  }, [open, fetchEmployees, fetchUnassignedCount, fetchRules]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   // Get config for employee
   const getConfig = (empId: string) => configs.find((c) => c.employeeId === empId);

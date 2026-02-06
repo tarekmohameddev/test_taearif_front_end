@@ -27,3 +27,13 @@ app/dashboard/layout.tsx, proxy.ts
 Update Type: Refactor
 Refactored customers-hub main page to follow same pattern as incomplete-requests page - moved component code to separate file CustomersHubMainPage.tsx in components/customers-hub/page/ and simplified page.tsx to just import and render the component
 app/dashboard/customers-hub/page.tsx, components/customers-hub/page/CustomersHubMainPage.tsx
+
+2026-02-06 16:21:25
+Update Type: Bug Fix
+Fixed spam GET requests to /v1/employees endpoint in customers-hub/list page - removed fetchEmployees, fetchUnassignedCount, fetchRules from useEffect dependencies in useCustomersHubAssignment hook and AssignmentPanel component, added useRef to track if initial load has completed to prevent multiple loads
+hooks/useCustomersHubAssignment.ts, components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-06 16:26:36
+Update Type: Refactor
+Refactored employees data fetching to use shared Zustand store - created customers-hub-assignment.ts store to fetch employees data once and share it across all components, updated useCustomersHubAssignment hook to use store instead of local state, prevents duplicate API calls when multiple components use the hook
+context/store/customers-hub-assignment.ts, hooks/useCustomersHubAssignment.ts
