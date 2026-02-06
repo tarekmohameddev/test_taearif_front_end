@@ -17,3 +17,8 @@ hooks/useCustomersHubPipeline.ts, components/customers-hub/pipeline/PipelinePage
 Update Type: Bug Fix
 Fixed stats cards (conversion rate, average days, bottlenecks) - updated PipelineAnalytics interface to match API response structure (conversionRate, avgDaysInPipeline, bottlenecks), updated StageAnalytics component to use correct API fields with fallback to store statistics
 lib/services/customers-hub-pipeline-api.ts, components/customers-hub/pipeline/StageAnalytics.tsx
+
+2026-02-06 14:54:55
+Update Type: Bug Fix
+Fixed "القيمة" showing "غير محدد" in pipeline boards - added fallback to use budgetMax from preferences as totalDealValue if totalDealValue is not provided in API response, updated hook transformation to map budgetMax to totalDealValue
+hooks/useCustomersHubPipeline.ts
