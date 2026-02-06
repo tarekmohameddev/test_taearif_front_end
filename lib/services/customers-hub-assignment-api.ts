@@ -1,16 +1,6 @@
-/**
- * NOTE: This file contains TypeScript interfaces/types only.
- * All API endpoints for assignment functionality have been removed
- * because they are not documented in docs/backend/customersHubDoc.txt
- * 
- * The following endpoints were removed (not found in documentation):
- * - GET /v2/customers-hub/assignment/employees
- * - GET /v2/customers-hub/assignment/unassigned-count
- * - POST /v2/customers-hub/assignment/auto-assign
- * - POST /v2/customers-hub/assignment/assign
- * - POST /v2/customers-hub/assignment/rules
- * - GET /v2/customers-hub/assignment/rules
- */
+import axiosInstance from "@/lib/axiosInstance";
+
+const BASE_URL = "/v2/customers-hub/assignment";
 
 export interface EmployeeWorkload {
   id: string;
@@ -121,4 +111,40 @@ export interface GetRulesResponse {
     rules: EmployeeConfig[];
   };
   timestamp: string;
+}
+
+// Get Employees
+export async function getEmployees(): Promise<EmployeesResponse> {
+  const response = await axiosInstance.get<EmployeesResponse>(`${BASE_URL}/employees`);
+  return response.data;
+}
+
+// Get Unassigned Count
+export async function getUnassignedCount(): Promise<UnassignedCountResponse> {
+  const response = await axiosInstance.get<UnassignedCountResponse>(`${BASE_URL}/unassigned-count`);
+  return response.data;
+}
+
+// Auto Assign Customers
+export async function autoAssignCustomers(params: AutoAssignParams): Promise<AutoAssignResponse> {
+  const response = await axiosInstance.post<AutoAssignResponse>(`${BASE_URL}/auto-assign`, params);
+  return response.data;
+}
+
+// Manual Assign Customers
+export async function manualAssignCustomers(params: ManualAssignParams): Promise<ManualAssignResponse> {
+  const response = await axiosInstance.post<ManualAssignResponse>(`${BASE_URL}/assign`, params);
+  return response.data;
+}
+
+// Save Assignment Rules
+export async function saveAssignmentRules(params: SaveRulesParams): Promise<SaveRulesResponse> {
+  const response = await axiosInstance.post<SaveRulesResponse>(`${BASE_URL}/rules`, params);
+  return response.data;
+}
+
+// Get Assignment Rules
+export async function getAssignmentRules(): Promise<GetRulesResponse> {
+  const response = await axiosInstance.get<GetRulesResponse>(`${BASE_URL}/rules`);
+  return response.data;
 }

@@ -7,3 +7,8 @@ docs/backend-integration/api/assignment/customers-hub-assignment-api-specificati
 Update Type: Bug Fix
 Fixed employees dropdown not showing in customers hub list table. Updated useCustomersHubAssignment hook to use /v1/employees endpoint temporarily until /api/v2/customers-hub/assignment/employees is implemented. Added data transformation from V1Employee format to EmployeeWorkload format. Employees dropdown now displays correctly in AssignmentDropdown component.
 hooks/useCustomersHubAssignment.ts
+
+2026-02-06 16:45:02
+Update Type: Enhancement
+Updated frontend code to use new assignment API endpoints. Added real API functions in customers-hub-assignment-api.ts for all 6 endpoints (getEmployees, getUnassignedCount, autoAssignCustomers, manualAssignCustomers, saveAssignmentRules, getAssignmentRules). Updated customers-hub-assignment store to use real API functions instead of stub functions. Removed temporary /v1/employees workaround. All assignment functionality now uses the new /api/v2/customers-hub/assignment endpoints.
+lib/services/customers-hub-assignment-api.ts, context/store/customers-hub-assignment.ts
