@@ -40,6 +40,20 @@ import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 
 interface CustomerDetailPageSimpleProps {
   customerId: string;
+  customer?: UnifiedCustomer | null;
+  stats?: any;
+  tasks?: any[];
+  interestedProperties?: PropertyInterest[];
+  preferences?: any;
+  history?: any[];
+  loading?: boolean;
+  error?: string | null;
+  onRefetch?: () => Promise<void>;
+  onUpdateCustomer?: (params: any) => Promise<boolean>;
+  onAddTask?: (params: any) => Promise<boolean>;
+  onUpdateTask?: (taskId: string, params: any) => Promise<boolean>;
+  onDeleteTask?: (taskId: string) => Promise<boolean>;
+  onUpdatePreferences?: (params: any) => Promise<boolean>;
 }
 
 // Collapsible Section Component
@@ -223,16 +237,27 @@ function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
 }
 
 // Properties Section with 3 categories
-function PropertiesSection({ customer }: { customer: UnifiedCustomer }) {
+function PropertiesSection({ 
+  customer, 
+  interestedProperties: propInterestedProperties,
+  preferences: propPreferences,
+}: { 
+  customer: UnifiedCustomer;
+  interestedProperties?: PropertyInterest[];
+  preferences?: any;
+}) {
+  // Use prop interestedProperties if provided, otherwise use customer.properties
+  const properties = propInterestedProperties ?? customer.properties;
+  
   // Categorize properties (in real app, this would come from backend)
   // For now, we'll simulate based on property data
-  const websiteProperties = customer.properties.filter(
+  const websiteProperties = properties.filter(
     (p) => p.status === "interested" && !p.notes?.includes("AI") && !p.notes?.includes("manual")
   );
-  const aiMatchedProperties = customer.properties.filter(
+  const aiMatchedProperties = properties.filter(
     (p) => p.notes?.includes("AI") || p.status === "viewing_scheduled"
   );
-  const manualProperties = customer.properties.filter(
+  const manualProperties = properties.filter(
     (p) => p.notes?.includes("manual") || p.status === "offer_made"
   );
 
@@ -487,8 +512,26 @@ function TasksSectionCard({ customer }: { customer: UnifiedCustomer }) {
     propertyTitle: "",
   });
 
-  // Mock tasks data - in real app, this would come from customer data
+  // Use prop tasks if provided, otherwise convert from customer data
   const [tasks, setTasks] = useState<CustomerTask[]>(() => {
+    // If prop tasks are provided, convert them to CustomerTask format
+    if (propTasks && propTasks.length > 0) {
+      return propTasks.map((task: any) => ({
+        id: task.id?.toString() || `task_${task.id}`,
+        type: task.type === "contact" ? "contact" : 
+              task.type === "site_visit" ? "property_viewing" : 
+              task.type === "meeting" ? "office_visit" : "contact",
+        datetime: task.dueDate || task.datetime || task.createdAt,
+        notes: task.description || task.notes || task.title,
+        status: task.status === "completed" ? "completed" : 
+                task.status === "cancelled" ? "cancelled" : "pending",
+        propertyId: task.propertyId,
+        propertyTitle: task.propertyTitle,
+        createdAt: task.createdAt,
+      }));
+    }
+
+    // Fallback to converting from customer data
     const convertedTasks: CustomerTask[] = [];
     
     customer.reminders.forEach((r, index) => {
@@ -517,6 +560,26 @@ function TasksSectionCard({ customer }: { customer: UnifiedCustomer }) {
 
     return convertedTasks;
   });
+
+  // Update tasks when propTasks change
+  useEffect(() => {
+    if (propTasks && propTasks.length > 0) {
+      const convertedTasks = propTasks.map((task: any) => ({
+        id: task.id?.toString() || `task_${task.id}`,
+        type: task.type === "contact" ? "contact" : 
+              task.type === "site_visit" ? "property_viewing" : 
+              task.type === "meeting" ? "office_visit" : "contact",
+        datetime: task.dueDate || task.datetime || task.createdAt,
+        notes: task.description || task.notes || task.title,
+        status: task.status === "completed" ? "completed" : 
+                task.status === "cancelled" ? "cancelled" : "pending",
+        propertyId: task.propertyId,
+        propertyTitle: task.propertyTitle,
+        createdAt: task.createdAt,
+      }));
+      setTasks(convertedTasks);
+    }
+  }, [propTasks]);
 
   const getTaskTypeConfig = (type: TaskType): TaskTypeConfig => {
     return TASK_TYPES.find((t) => t.id === type) || TASK_TYPES[0];
@@ -563,33 +626,77 @@ function TasksSectionCard({ customer }: { customer: UnifiedCustomer }) {
     setSelectedTaskType(type);
   };
 
-  const handleSaveTask = () => {
+  const handleSaveTask = async () => {
     if (!selectedTaskType || !newTaskData.datetime) return;
 
-    const newTask: CustomerTask = {
-      id: `task_${Date.now()}`,
-      type: selectedTaskType,
-      datetime: newTaskData.datetime,
-      notes: newTaskData.notes,
-      propertyTitle: newTaskData.propertyTitle || undefined,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-    };
+    // Use API handler if provided
+    if (onAddTask) {
+      try {
+        const taskType = selectedTaskType === "property_viewing" ? "site_visit" :
+                        selectedTaskType === "office_visit" ? "meeting" : "contact";
+        
+        await onAddTask({
+          type: taskType,
+          datetime: newTaskData.datetime,
+          notes: newTaskData.notes,
+          priority: 2, // Default priority
+        });
+        
+        setIsAddFormOpen(false);
+        setSelectedTaskType(null);
+        setNewTaskData({ datetime: "", notes: "", propertyTitle: "" });
+      } catch (err) {
+        console.error("Error adding task:", err);
+      }
+    } else {
+      // Fallback to local state
+      const newTask: CustomerTask = {
+        id: `task_${Date.now()}`,
+        type: selectedTaskType,
+        datetime: newTaskData.datetime,
+        notes: newTaskData.notes,
+        propertyTitle: newTaskData.propertyTitle || undefined,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
 
-    setTasks((prev) => [newTask, ...prev]);
-    setIsAddFormOpen(false);
-    setSelectedTaskType(null);
-    setNewTaskData({ datetime: "", notes: "", propertyTitle: "" });
+      setTasks((prev) => [newTask, ...prev]);
+      setIsAddFormOpen(false);
+      setSelectedTaskType(null);
+      setNewTaskData({ datetime: "", notes: "", propertyTitle: "" });
+    }
   };
 
-  const handleCompleteTask = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: "completed" as const } : t))
-    );
+  const handleCompleteTask = async (taskId: string) => {
+    // Use API handler if provided
+    if (onUpdateTask) {
+      try {
+        await onUpdateTask(taskId, { status: "completed" });
+        // Tasks will be refreshed via refetch in the hook
+      } catch (err) {
+        console.error("Error completing task:", err);
+      }
+    } else {
+      // Fallback to local state
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? { ...t, status: "completed" as const } : t))
+      );
+    }
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  const handleDeleteTask = async (taskId: string) => {
+    // Use API handler if provided
+    if (onDeleteTask) {
+      try {
+        await onDeleteTask(taskId);
+        // Tasks will be refreshed via refetch in the hook
+      } catch (err) {
+        console.error("Error deleting task:", err);
+      }
+    } else {
+      // Fallback to local state
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    }
   };
 
   // Split tasks by status
@@ -1033,15 +1140,75 @@ function CustomerRequestsSection({ customer }: { customer: UnifiedCustomer }) {
 }
 
 // Main Component
-export function CustomerDetailPageSimple({ customerId }: CustomerDetailPageSimpleProps) {
-  const { getCustomerById } = useUnifiedCustomersStore();
-  const customer = getCustomerById(customerId);
+export function CustomerDetailPageSimple({
+  customerId,
+  customer: propCustomer,
+  stats: propStats,
+  tasks: propTasks,
+  interestedProperties: propInterestedProperties,
+  preferences: propPreferences,
+  history: propHistory,
+  loading: propLoading,
+  error: propError,
+  onRefetch,
+  onUpdateCustomer,
+  onAddTask,
+  onUpdateTask,
+  onDeleteTask,
+  onUpdatePreferences,
+}: CustomerDetailPageSimpleProps) {
+  const store = useUnifiedCustomersStore();
+  const { getCustomerById, setSelectedCustomer } = store;
+
+  // Use prop customer if provided, otherwise find in store
+  const customer = propCustomer ?? getCustomerById(customerId);
+
+  // Update store if prop customer is provided
+  React.useEffect(() => {
+    if (propCustomer) {
+      setSelectedCustomer(propCustomer);
+    }
+  }, [propCustomer, setSelectedCustomer]);
+
+  // Show loading state
+  if (propLoading && !customer) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        <p className="text-gray-600 dark:text-gray-400">جاري تحميل تفاصيل العميل...</p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (propError && !customer) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <Card className="max-w-md">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{propError}</p>
+            <div className="flex gap-2 justify-center">
+              <Button onClick={() => onRefetch?.()}>إعادة المحاولة</Button>
+              <Link href="/ar/dashboard/customers-hub/list">
+                <Button variant="outline">
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                  العودة للقائمة
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!customer) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
         <div className="text-2xl font-bold text-gray-400">العميل غير موجود</div>
-        <Link href="/ar/dashboard/customers-hub">
+        <Link href="/ar/dashboard/customers-hub/list">
           <Button>
             <ArrowRight className="ml-2 h-4 w-4" />
             العودة للقائمة
@@ -1082,19 +1249,31 @@ export function CustomerDetailPageSimple({ customerId }: CustomerDetailPageSimpl
       {/* Collapsible Sections */}
       <div className="space-y-4">
         {/* Tasks Section - First after customer details */}
-        <TasksSectionCard customer={customer} />
+        <TasksSectionCard 
+          customer={customer} 
+          tasks={propTasks}
+          onAddTask={onAddTask}
+          onUpdateTask={onUpdateTask}
+          onDeleteTask={onDeleteTask}
+        />
 
         <CollapsibleSection
           title="العقارات"
           icon={Building}
           defaultOpen={true}
           badge={
-            customer.properties.length > 0 && (
-              <Badge variant="secondary">{customer.properties.length}</Badge>
+            (propInterestedProperties?.length ?? customer.properties.length) > 0 && (
+              <Badge variant="secondary">
+                {propInterestedProperties?.length ?? customer.properties.length}
+              </Badge>
             )
           }
         >
-          <PropertiesSection customer={customer} />
+          <PropertiesSection 
+            customer={customer} 
+            interestedProperties={propInterestedProperties}
+            preferences={propPreferences}
+          />
         </CollapsibleSection>
 
         <CollapsibleSection
