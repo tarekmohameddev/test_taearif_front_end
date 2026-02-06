@@ -789,6 +789,52 @@ When responding to user:
 
 ---
 
+## 🚫 ASK MODE RULES - CRITICAL
+
+### **When User is in ASK Mode (Not Agent Mode):**
+
+**MANDATORY RULES:**
+
+1. **NEVER write code blocks in chat:**
+   - ❌ NO code snippets
+   - ❌ NO code examples
+   - ❌ NO code references with line numbers
+   - ❌ NO markdown code blocks (```language)
+   - ❌ NO inline code with backticks for code
+
+2. **ALWAYS provide solution as:**
+   - ✅ Plain text explanation
+   - ✅ Step-by-step instructions
+   - ✅ Descriptive guidance
+   - ✅ Table at the end summarizing the solution
+
+3. **REQUIRED: Include Summary Table:**
+   - At the end of every response in Ask Mode
+   - Table format with columns: Step | Action | Details | File/Location
+   - Summarize all steps and changes needed
+
+**Example Response Structure in Ask Mode:**
+
+```
+[Plain text explanation of the solution]
+
+[Step-by-step instructions without code]
+
+[Summary Table at the end]
+```
+
+**Summary Table Format:**
+```
+| الخطوة | الإجراء | التفاصيل | الملف/الموقع |
+|--------|---------|----------|--------------|
+| 1 | ... | ... | ... |
+| 2 | ... | ... | ... |
+```
+
+**CRITICAL:** If user is in Ask Mode, AI must detect this and follow these rules strictly. NO exceptions.
+
+---
+
 ## 🎓 LEARNING FROM EXAMPLES
 
 ### **Good Examples to Study:**
