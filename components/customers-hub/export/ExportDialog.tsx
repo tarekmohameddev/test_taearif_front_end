@@ -105,13 +105,13 @@ export function ExportDialog({ open, onOpenChange, customers }: ExportDialogProp
             row["المصدر"] = customer.source;
             break;
           case "propertyType":
-            row["نوع العقار"] = customer.preferences.propertyType.join(", ");
+            row["نوع العقار"] = customer.preferences?.propertyType?.join(", ") || "-";
             break;
           case "budget":
-            row["الميزانية"] = `${customer.preferences.budgetMin || 0} - ${customer.preferences.budgetMax || 0}`;
+            row["الميزانية"] = `${customer.preferences?.budgetMin || 0} - ${customer.preferences?.budgetMax || 0}`;
             break;
           case "preferredAreas":
-            row["المناطق المفضلة"] = customer.preferences.preferredAreas.join(", ");
+            row["المناطق المفضلة"] = customer.preferences?.preferredAreas?.join(", ") || "-";
             break;
           case "timeline":
             row["الإطار الزمني"] = customer.preferences.timeline;
@@ -136,7 +136,7 @@ export function ExportDialog({ open, onOpenChange, customers }: ExportDialogProp
             row["تاريخ الإنشاء"] = new Date(customer.createdAt).toLocaleDateString("ar-SA");
             break;
           case "tags":
-            row["الوسوم"] = customer.tags.join(", ");
+            row["الوسوم"] = customer.tags?.join(", ") || "-";
             break;
           case "interactions":
             row["عدد التفاعلات"] = customer.totalInteractions || 0;
@@ -145,7 +145,7 @@ export function ExportDialog({ open, onOpenChange, customers }: ExportDialogProp
             row["عدد المواعيد"] = customer.totalAppointments || 0;
             break;
           case "properties":
-            row["عدد العقارات المهتم بها"] = customer.properties.length;
+            row["عدد العقارات المهتم بها"] = customer.properties?.length || 0;
             break;
         }
       });
