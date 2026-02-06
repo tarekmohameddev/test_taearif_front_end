@@ -77,8 +77,11 @@ export interface StatsResponse {
       newToday: number;
       newThisWeek: number;
       newThisMonth: number;
+      totalDealValue: number;
+      closedThisMonth: number;
+      conversionRate: number | string;
+      avgDaysInPipeline: number;
       avgDaysInStage: number;
-      conversionRate: string;
       byStage: Record<string, number>;
       byPriority: Record<string, number>;
       byType: Record<string, number>;

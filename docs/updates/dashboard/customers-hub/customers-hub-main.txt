@@ -37,3 +37,8 @@ hooks/useCustomersHubAssignment.ts, components/customers-hub/assignment/Assignme
 Update Type: Refactor
 Refactored employees data fetching to use shared Zustand store - created customers-hub-assignment.ts store to fetch employees data once and share it across all components, updated useCustomersHubAssignment hook to use store instead of local state, prevents duplicate API calls when multiple components use the hook
 context/store/customers-hub-assignment.ts, hooks/useCustomersHubAssignment.ts
+
+2026-02-06 16:28:26
+Update Type: Enhancement
+Updated StatsResponse interface to match actual API response - added totalDealValue, closedThisMonth, and avgDaysInPipeline fields to StatsResponse interface to match the actual API response structure from /v2/customers-hub/list/stats endpoint
+lib/services/customers-hub-list-api.ts
