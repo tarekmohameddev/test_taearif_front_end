@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
 import { staticMenuItems } from "./menu-items";
+import { removeLocaleFromPathname } from "@/lib/i18n/config";
 
 // Hook لمراقبة ارتفاع الشاشة
 const useScreenHeight = () => {
@@ -54,20 +55,45 @@ export function DesktopSidebar({
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
+  const currentPathWithoutLocale = removeLocaleFromPathname(currentPath);
 
   // تحديث العنصر النشط عند تغيير المسار
   useEffect(() => {
     const computed =
       activeTab ||
-      (currentPath.startsWith("/dashboard") ? "dashboard" : "dashboard");
+      (currentPathWithoutLocale.startsWith("/dashboard") ? "dashboard" : "dashboard");
     setInternalActiveTab(computed);
     if (typeof setActiveTab === "function") {
       setActiveTab(computed);
     }
-  }, [currentPath, activeTab, setActiveTab]);
+  }, [currentPathWithoutLocale, activeTab, setActiveTab]);
 
-  const isActivePath = (href: string) =>
-    currentPath === href || currentPath.startsWith(href + "/");
+  const isActivePath = (href: string) => {
+    // إذا كان المسار يطابق تماماً
+    if (currentPathWithoutLocale === href) {
+      return true;
+    }
+    
+    // إذا كان المسار يبدأ بـ href + "/"
+    if (currentPathWithoutLocale.startsWith(href + "/")) {
+      // إذا كان href = "/dashboard"، يجب أن يكون المسار /dashboard بالضبط فقط
+      if (href === "/dashboard") {
+        return false;
+      }
+      
+      // للروابط الأخرى، التحقق من عدم وجود رابط آخر في القائمة يطابق بشكل أفضل
+      const hasBetterMatch = staticMenuItems.some(
+        (item) =>
+          item.path !== href &&
+          item.path.startsWith(href + "/") &&
+          currentPathWithoutLocale.startsWith(item.path)
+      );
+      
+      return !hasBetterMatch;
+    }
+    
+    return false;
+  };
 
   const StaticLink = ({
     href,
@@ -91,7 +117,7 @@ export function DesktopSidebar({
                 "justify-start gap-3 h-auto py-2 px-3 w-full",
                 isCollapsed && "justify-center px-2",
                 isActive &&
-                  "bg-primary/10 text-primary border-r-2 border-primary",
+                  "bg-gray-100 text-primary border-r-2 border-primary",
               )}
               asChild
             >

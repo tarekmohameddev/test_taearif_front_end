@@ -1,0 +1,19 @@
+2025-01-17 15:30:00
+Update Type: Enhancement
+Updated sidebar active link styling to use gray-200 background instead of bg-primary/10 for both mobile and desktop sidebars
+components/mainCOMP/sidebarComponents/enhanced-sidebar.tsx, components/mainCOMP/sidebarComponents/MobileSidebar.tsx, components/mainCOMP/sidebarComponents/DesktopSidebar.tsx
+
+2025-01-17 15:45:00
+Update Type: Bug Fix
+Fixed sidebar active link detection to work with locale-prefixed paths (e.g., /ar/dashboard) by using removeLocaleFromPathname before path comparison
+components/mainCOMP/sidebarComponents/enhanced-sidebar.tsx, components/mainCOMP/sidebarComponents/MobileSidebar.tsx, components/mainCOMP/sidebarComponents/DesktopSidebar.tsx
+
+2025-01-17 15:50:00
+Update Type: Update
+Changed sidebar active link background color from gray-200 to gray-100 for a lighter appearance
+components/mainCOMP/sidebarComponents/enhanced-sidebar.tsx, components/mainCOMP/sidebarComponents/MobileSidebar.tsx, components/mainCOMP/sidebarComponents/DesktopSidebar.tsx
+
+2025-01-17 16:00:00
+Update Type: Bug Fix
+Fixed sidebar active link detection to prevent /dashboard from being active when on sub-paths like /dashboard/customers-hub/analytics. Now /dashboard is only active when path is exactly /dashboard
+components/mainCOMP/sidebarComponents/enhanced-sidebar.tsx, components/mainCOMP/sidebarComponents/MobileSidebar.tsx, components/mainCOMP/sidebarComponents/DesktopSidebar.tsx

@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import useAuthStore from "@/context/AuthContext";
 import useStore from "@/context/Store";
 import { staticMenuItems, type MainNavItem } from "./menu-items";
+import { removeLocaleFromPathname } from "@/lib/i18n/config";
 
 interface MobileSidebarProps {
   children: React.ReactNode; // Menu trigger button
@@ -30,8 +31,9 @@ export function MobileSidebar({
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
-  const isContentSection = currentPath.startsWith("/content");
-  const isLiveEditorSection = currentPath.startsWith("/live-editor");
+  const currentPathWithoutLocale = removeLocaleFromPathname(currentPath);
+  const isContentSection = currentPathWithoutLocale.startsWith("/content");
+  const isLiveEditorSection = currentPathWithoutLocale.startsWith("/live-editor");
   const currentTab =
     isContentSection
       ? "content"
@@ -39,13 +41,41 @@ export function MobileSidebar({
         ? "live-editor"
         : mainNavItems.find(
             (item: MainNavItem) =>
-              item.path === currentPath ||
-              (item.path !== "/" && currentPath.startsWith(item.path)),
+              item.path === currentPathWithoutLocale ||
+              (item.path !== "/" && currentPathWithoutLocale.startsWith(item.path)),
           )?.id || activeTab || "dashboard";
 
   // Use static menu items if mainNavItems is empty or not loaded
   const menuItemsToUse =
     mainNavItems && mainNavItems.length > 0 ? mainNavItems : staticMenuItems;
+
+  // دالة للتحقق من الرابط النشط بشكل دقيق
+  const isActivePath = (href: string, allItems: MainNavItem[]) => {
+    // إذا كان المسار يطابق تماماً
+    if (currentPathWithoutLocale === href) {
+      return true;
+    }
+    
+    // إذا كان المسار يبدأ بـ href + "/"
+    if (currentPathWithoutLocale.startsWith(href + "/")) {
+      // إذا كان href = "/dashboard"، يجب أن يكون المسار /dashboard بالضبط فقط
+      if (href === "/dashboard") {
+        return false;
+      }
+      
+      // للروابط الأخرى، التحقق من عدم وجود رابط آخر في القائمة يطابق بشكل أفضل
+      const hasBetterMatch = allItems.some(
+        (item) =>
+          item.path !== href &&
+          item.path.startsWith(href + "/") &&
+          currentPathWithoutLocale.startsWith(item.path)
+      );
+      
+      return !hasBetterMatch;
+    }
+    
+    return false;
+  };
 
   // دالة للتعامل مع النقر على العنصر
   const handleItemClick = (item: MainNavItem, e: any) => {
@@ -154,7 +184,7 @@ export function MobileSidebar({
                 menuItemsToUse.map((item: MainNavItem) => {
                   const isActive =
                     currentTab === item.id ||
-                    (item.path !== "/" && currentPath.startsWith(item.path));
+                    isActivePath(item.path, menuItemsToUse);
                   const IconComponent = item.icon;
                   return (
                     <Button
@@ -163,7 +193,7 @@ export function MobileSidebar({
                       className={cn(
                         "justify-start gap-3 h-auto py-2 px-3 w-full",
                         isActive &&
-                          "bg-primary/10 text-primary border-r-2 border-primary",
+                          "bg-gray-100 text-primary border-r-2 border-primary",
                       )}
                       asChild={!item.isAPP}
                     >

@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
+import { removeLocaleFromPathname } from "@/lib/i18n/config";
 
 // Hook لمراقبة ارتفاع الشاشة
 const useScreenHeight = () => {
@@ -82,21 +83,64 @@ export function EnhancedSidebar({
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
+  const currentPathWithoutLocale = removeLocaleFromPathname(currentPath);
 
   // تحديث العنصر النشط عند تغيير المسار
   useEffect(() => {
     // Static sidebar: just keep internal tab in sync with provided activeTab or current path
     const computed =
       activeTab ||
-      (currentPath.startsWith("/dashboard") ? "dashboard" : "dashboard");
+      (currentPathWithoutLocale.startsWith("/dashboard") ? "dashboard" : "dashboard");
     setInternalActiveTab(computed);
     if (typeof setActiveTab === "function") {
       setActiveTab(computed);
     }
-  }, [currentPath, activeTab, setActiveTab]);
+  }, [currentPathWithoutLocale, activeTab, setActiveTab]);
 
-  const isActivePath = (href: string) =>
-    currentPath === href || currentPath.startsWith(href + "/");
+  // قائمة الروابط الثابتة للتحقق من التطابق الأفضل
+  const staticLinks = [
+    "/dashboard/settings",
+    "/dashboard/customers",
+    "/dashboard/crm",
+    "/dashboard/projects",
+    "/dashboard/buildings",
+    "/dashboard/properties",
+    "/dashboard/property-requests",
+    "/dashboard/blogs",
+    "/dashboard/job-applications",
+    "/dashboard/matching",
+    "/dashboard/access-control",
+    "/dashboard/rental-management",
+    "/dashboard/apps",
+    "/live-editor",
+  ];
+
+  const isActivePath = (href: string) => {
+    // إذا كان المسار يطابق تماماً
+    if (currentPathWithoutLocale === href) {
+      return true;
+    }
+    
+    // إذا كان المسار يبدأ بـ href + "/"
+    if (currentPathWithoutLocale.startsWith(href + "/")) {
+      // إذا كان href = "/dashboard"، يجب أن يكون المسار /dashboard بالضبط فقط
+      if (href === "/dashboard") {
+        return false;
+      }
+      
+      // للروابط الأخرى، التحقق من عدم وجود رابط آخر في القائمة يطابق بشكل أفضل
+      const hasBetterMatch = staticLinks.some(
+        (link) =>
+          link !== href &&
+          link.startsWith(href + "/") &&
+          currentPathWithoutLocale.startsWith(link)
+      );
+      
+      return !hasBetterMatch;
+    }
+    
+    return false;
+  };
 
   const StaticLink = ({
     href,
@@ -120,7 +164,7 @@ export function EnhancedSidebar({
                 "justify-start gap-3 h-auto py-2 px-3 w-full",
                 isCollapsed && "justify-center px-2",
                 isActive &&
-                  "bg-primary/10 text-primary border-r-2 border-primary",
+                  "bg-gray-100 text-primary border-r-2 border-primary",
               )}
               asChild
             >
