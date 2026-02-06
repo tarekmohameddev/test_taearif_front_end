@@ -9,6 +9,7 @@ import {
   assignAction as apiAssignAction,
 } from "@/lib/services/customers-hub-requests-api";
 import type { CustomerAction } from "@/types/unified-customer";
+import toast from "react-hot-toast";
 
 export function useRequestDetail(requestId: string) {
   const { userData, IsLoading: authLoading } = useAuthStore();
@@ -79,13 +80,19 @@ export function useRequestDetail(requestId: string) {
         return false;
       }
 
+      const toastId = toast.loading("جاري إتمام الطلب...");
       try {
         await apiCompleteAction(requestId, notes);
+        toast.success("تم إتمام الطلب بنجاح", { id: toastId });
         // Refresh action detail
         await fetchActionDetail();
         return true;
       } catch (err: any) {
         console.error("Error completing action:", err);
+        toast.error(
+          err.response?.data?.message || "حدث خطأ أثناء إتمام الطلب",
+          { id: toastId }
+        );
         throw err;
       }
     },
@@ -99,13 +106,19 @@ export function useRequestDetail(requestId: string) {
         return false;
       }
 
+      const toastId = toast.loading("جاري رفض الطلب...");
       try {
         await apiDismissAction(requestId, reason);
+        toast.success("تم رفض الطلب بنجاح", { id: toastId });
         // Refresh action detail
         await fetchActionDetail();
         return true;
       } catch (err: any) {
         console.error("Error dismissing action:", err);
+        toast.error(
+          err.response?.data?.message || "حدث خطأ أثناء رفض الطلب",
+          { id: toastId }
+        );
         throw err;
       }
     },
@@ -119,13 +132,19 @@ export function useRequestDetail(requestId: string) {
         return false;
       }
 
+      const toastId = toast.loading("جاري تأجيل الطلب...");
       try {
         await apiSnoozeAction(requestId, snoozeUntil, reason);
+        toast.success("تم تأجيل الطلب بنجاح", { id: toastId });
         // Refresh action detail
         await fetchActionDetail();
         return true;
       } catch (err: any) {
         console.error("Error snoozing action:", err);
+        toast.error(
+          err.response?.data?.message || "حدث خطأ أثناء تأجيل الطلب",
+          { id: toastId }
+        );
         throw err;
       }
     },
@@ -139,13 +158,19 @@ export function useRequestDetail(requestId: string) {
         return false;
       }
 
+      const toastId = toast.loading("جاري تعيين الطلب...");
       try {
         const response = await apiAssignAction(requestId, employeeId);
+        toast.success("تم تعيين الطلب بنجاح", { id: toastId });
         // Refresh action detail
         await fetchActionDetail();
         return true;
       } catch (err: any) {
         console.error("Error assigning action:", err);
+        toast.error(
+          err.response?.data?.message || "حدث خطأ أثناء تعيين الطلب",
+          { id: toastId }
+        );
         throw err;
       }
     },

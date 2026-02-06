@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -246,20 +247,35 @@ export function RequestDetailPage({
   const isOverdue = action.dueDate && new Date(action.dueDate) < new Date();
 
   const handleComplete = async () => {
-    await completeAction();
+    try {
+      await completeAction();
+    } catch (err) {
+      // Error toast is handled in hook
+    }
   };
 
   const handleDismiss = async () => {
-    await dismissAction();
+    try {
+      await dismissAction();
+    } catch (err) {
+      // Error toast is handled in hook
+    }
   };
 
   const handleSnooze = async () => {
-    if (!snoozeDate) return;
-    const datetime = new Date(`${snoozeDate}T${snoozeTime}`).toISOString();
-    await snoozeAction(datetime);
-    setShowSnoozeForm(false);
-    setSnoozeDate("");
-    setSnoozeTime("10:00");
+    if (!snoozeDate) {
+      toast.error("الرجاء اختيار تاريخ التأجيل");
+      return;
+    }
+    try {
+      const datetime = new Date(`${snoozeDate}T${snoozeTime}`).toISOString();
+      await snoozeAction(datetime);
+      setShowSnoozeForm(false);
+      setSnoozeDate("");
+      setSnoozeTime("10:00");
+    } catch (err) {
+      // Error toast is handled in hook
+    }
   };
 
   const handleAddNote = () => {
@@ -269,30 +285,49 @@ export function RequestDetailPage({
     setShowNoteForm(false);
   };
 
-  const handleScheduleAppointment = () => {
-    if (!aptDate || !aptTime || !customer) return;
-    const now = new Date().toISOString();
-    const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
-    const appointment: Appointment = {
-      id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-      title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
-      type: aptType,
-      date: datetime,
-      time: aptTime,
-      datetime,
-      duration: 30,
-      status: "scheduled",
-      priority: "medium",
-      notes: aptNotes.trim() || undefined,
-      createdAt: now,
-      updatedAt: now,
-    };
-    addAppointment(customer.id, appointment);
-    setShowScheduleForm(false);
-    setAptType("office_meeting");
-    setAptDate("");
-    setAptTime("10:00");
-    setAptNotes("");
+  const handleScheduleAppointment = async () => {
+    if (!aptDate || !aptTime || !customer) {
+      toast.error("الرجاء اختيار التاريخ والوقت");
+      return;
+    }
+    
+    const toastId = toast.loading("جاري جدولة الموعد...");
+    try {
+      const now = new Date().toISOString();
+      const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
+      const appointment: Appointment = {
+        id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+        title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
+        type: aptType,
+        date: datetime,
+        time: aptTime,
+        datetime,
+        duration: 30,
+        status: "scheduled",
+        priority: "medium",
+        notes: aptNotes.trim() || undefined,
+        createdAt: now,
+        updatedAt: now,
+      };
+      addAppointment(customer.id, appointment);
+      toast.success("تم جدولة الموعد بنجاح", { id: toastId });
+      
+      // Refresh page data
+      if (onRefetch) {
+        await onRefetch();
+      }
+      
+      setShowScheduleForm(false);
+      setAptType("office_meeting");
+      setAptDate("");
+      setAptTime("10:00");
+      setAptNotes("");
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.message || "حدث خطأ أثناء جدولة الموعد",
+        { id: toastId }
+      );
+    }
   };
 
   // Get property info from metadata or customer preferences

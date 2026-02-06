@@ -43,6 +43,7 @@ import { BulkActionsToolbar } from "../actions/BulkActionsToolbar";
 import { QuickViewPanel } from "../actions/QuickViewPanel";
 import { ActionHistoryList } from "../actions/ActionHistoryList";
 import { SourceBadge } from "../actions/SourceBadge";
+import { useCustomersHubFiltersState } from "./hooks/useCustomersHubFiltersState";
 import type {
   CustomerAction,
   CustomerActionType,
@@ -245,165 +246,83 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
       }
     : storeAssignMultipleActions;
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"inbox" | "followups" | "all" | "completed">("inbox");
-  const [selectedSources, setSelectedSources] = useState<CustomerSource[]>([]);
-  const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<CustomerActionType[]>([]);
-  const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
-  const [dueDateFilter, setDueDateFilter] = useState<
-    "all" | "overdue" | "today" | "week" | "no_date"
-  >("all");
-  const [selectedCities, setSelectedCities] = useState<string[]>([]);
-  const [selectedStates, setSelectedStates] = useState<string[]>([]);
-  const [budgetMin, setBudgetMin] = useState<string>("");
-  const [budgetMax, setBudgetMax] = useState<string>("");
-  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  // Use the new filters hook (like Properties)
+  const filterHooks = useCustomersHubFiltersState();
+  const {
+    searchQuery,
+    setSearchQuery,
+    debouncedSearchQuery,
+    activeTab,
+    setActiveTab,
+    selectedSources,
+    setSelectedSources,
+    selectedPriorities,
+    setSelectedPriorities,
+    selectedTypes,
+    setSelectedTypes,
+    selectedAssignees,
+    setSelectedAssignees,
+    dueDateFilter,
+    setDueDateFilter,
+    selectedCities,
+    setSelectedCities,
+    selectedStates,
+    setSelectedStates,
+    budgetMin,
+    setBudgetMin,
+    budgetMax,
+    setBudgetMax,
+    selectedPropertyTypes,
+    setSelectedPropertyTypes,
+    newFilters,
+  } = filterHooks;
+
+  // Other local states (not filters)
   const [selectedActionIds, setSelectedActionIds] = useState<Set<string>>(new Set());
   const [isCompactView, setIsCompactView] = useState(false);
   const [quickViewAction, setQuickViewAction] = useState<CustomerAction | null>(null);
   const [quickViewCustomer, setQuickViewCustomer] = useState<UnifiedCustomer | null>(null);
   const [showQuickView, setShowQuickView] = useState(false);
 
-  // Debounced search query
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Debounce search query
-  useEffect(() => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    searchTimeoutRef.current = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 500);
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, [searchQuery]);
-
   // Fetch requests when filters change (only if API handler is provided)
+  // Use useRef to track previous filters and prevent unnecessary API calls
+  const prevFiltersRef = useRef<string>("");
+
   useEffect(() => {
     if (!props?.onFetchRequests) {
       return; // Use local filtering if no API handler
     }
 
-    const buildFilters = () => {
-      const filters: any = {};
-
-      // Tab filter
-      if (activeTab === "completed") {
-        filters.status = ["completed"];
-      } else {
-        // Only set tab if no specific types are selected
-        if (selectedTypes.length === 0) {
-          if (activeTab === "inbox") {
-            filters.tab = "inbox";
-            filters.type = REQUEST_TYPES;
-          } else if (activeTab === "followups") {
-            filters.tab = "followups";
-            filters.type = FOLLOWUP_TYPES;
-          } else {
-            filters.tab = "all";
-          }
+    const currentFiltersString = JSON.stringify(newFilters);
+    
+    // Only fetch if filters actually changed
+    if (prevFiltersRef.current !== currentFiltersString) {
+      prevFiltersRef.current = currentFiltersString;
+      
+      const fetchWithFilters = async () => {
+        try {
+          console.log("🔄 Filters changed, fetching requests with filters:", newFilters);
+          await props.onFetchRequests!({
+            action: "list",
+            includeStats: true,
+            filters: newFilters,
+            pagination: {
+              page: 1,
+              limit: 50,
+            },
+            sorting: {
+              field: "dueDate",
+              order: "asc",
+            },
+          });
+        } catch (err) {
+          console.error("Error fetching requests with filters:", err);
         }
-      }
+      };
 
-      // Search
-      if (debouncedSearchQuery) {
-        filters.search = debouncedSearchQuery;
-      }
-
-      // Source filter
-      if (selectedSources.length > 0) {
-        filters.source = selectedSources;
-      }
-
-      // Priority filter
-      if (selectedPriorities.length > 0) {
-        filters.priority = selectedPriorities;
-      }
-
-      // Type filter (overrides tab type if selected)
-      if (selectedTypes.length > 0) {
-        filters.type = selectedTypes;
-      }
-
-      // Assignee filter
-      if (selectedAssignees.length > 0) {
-        filters.assignedTo = selectedAssignees;
-      }
-
-      // Due date filter
-      if (dueDateFilter !== "all") {
-        filters.dueDate = dueDateFilter;
-      }
-
-      // City filter
-      if (selectedCities.length > 0) {
-        filters.city = selectedCities;
-      }
-
-      // State/Region filter
-      if (selectedStates.length > 0) {
-        filters.state = selectedStates;
-      }
-
-      // Budget filter
-      if (budgetMin) {
-        filters.budgetMin = Number(budgetMin);
-      }
-      if (budgetMax) {
-        filters.budgetMax = Number(budgetMax);
-      }
-
-      // Property type filter
-      if (selectedPropertyTypes.length > 0) {
-        filters.propertyType = selectedPropertyTypes;
-      }
-
-      return filters;
-    };
-
-    const fetchWithFilters = async () => {
-      try {
-        const filters = buildFilters();
-        await props.onFetchRequests!({
-          action: "list",
-          includeStats: true,
-          filters,
-          pagination: {
-            page: 1,
-            limit: 50,
-          },
-          sorting: {
-            field: "dueDate",
-            order: "asc",
-          },
-        });
-      } catch (err) {
-        console.error("Error fetching requests with filters:", err);
-      }
-    };
-
-    fetchWithFilters();
-  }, [
-    props?.onFetchRequests,
-    activeTab,
-    debouncedSearchQuery,
-    selectedSources,
-    selectedPriorities,
-    selectedTypes,
-    selectedAssignees,
-    dueDateFilter,
-    selectedCities,
-    selectedStates,
-    budgetMin,
-    budgetMax,
-    selectedPropertyTypes,
-  ]);
+      fetchWithFilters();
+    }
+  }, [props?.onFetchRequests, newFilters]);
 
   // Use API-filtered actions if API handler is provided, otherwise use local filtering
   const useAPIFiltering = !!props?.onFetchRequests;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -368,19 +368,22 @@ function PropertiesSection({
           <div>
             <span className="text-gray-500 block text-xs">نوع العقار</span>
             <div className="flex flex-wrap gap-1 mt-1">
-              {customer.preferences.propertyType.map((type) => (
-                <Badge key={type} variant="outline" className="text-xs">
-                  {type === "villa"
-                    ? "فيلا"
-                    : type === "apartment"
-                    ? "شقة"
-                    : type === "land"
-                    ? "أرض"
-                    : type === "commercial"
-                    ? "تجاري"
-                    : type}
-                </Badge>
-              ))}
+              {customer.preferences?.propertyType && Array.isArray(customer.preferences.propertyType) 
+                ? customer.preferences.propertyType.map((type) => (
+                    <Badge key={type} variant="outline" className="text-xs">
+                      {type === "villa"
+                        ? "فيلا"
+                        : type === "apartment"
+                        ? "شقة"
+                        : type === "land"
+                        ? "أرض"
+                        : type === "commercial"
+                        ? "تجاري"
+                        : type}
+                    </Badge>
+                  ))
+                : <span className="text-xs text-gray-400">لا توجد تفضيلات</span>
+              }
             </div>
           </div>
           {customer.preferences.budgetMax && (
@@ -397,7 +400,7 @@ function PropertiesSection({
               <span className="font-medium">{customer.preferences.bedrooms}+</span>
             </div>
           )}
-          {customer.preferences.preferredAreas.length > 0 && (
+          {customer.preferences?.preferredAreas && Array.isArray(customer.preferences.preferredAreas) && customer.preferences.preferredAreas.length > 0 && (
             <div>
               <span className="text-gray-500 block text-xs">المناطق المفضلة</span>
               <span className="font-medium">{customer.preferences.preferredAreas.slice(0, 2).join("، ")}</span>
@@ -501,7 +504,19 @@ interface CustomerTask {
 }
 
 // Tasks Section Card with built-in header and "+" button
-function TasksSectionCard({ customer }: { customer: UnifiedCustomer }) {
+function TasksSectionCard({ 
+  customer, 
+  tasks: propTasks,
+  onAddTask,
+  onUpdateTask,
+  onDeleteTask,
+}: { 
+  customer: UnifiedCustomer;
+  tasks?: any[];
+  onAddTask?: (task: any) => void;
+  onUpdateTask?: (taskId: string, updates: any) => void;
+  onDeleteTask?: (taskId: string) => void;
+}) {
   const [isOpen, setIsOpen] = useState(true);
   const [showCompleted, setShowCompleted] = useState(false);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
@@ -516,19 +531,34 @@ function TasksSectionCard({ customer }: { customer: UnifiedCustomer }) {
   const [tasks, setTasks] = useState<CustomerTask[]>(() => {
     // If prop tasks are provided, convert them to CustomerTask format
     if (propTasks && propTasks.length > 0) {
-      return propTasks.map((task: any) => ({
-        id: task.id?.toString() || `task_${task.id}`,
-        type: task.type === "contact" ? "contact" : 
-              task.type === "site_visit" ? "property_viewing" : 
-              task.type === "meeting" ? "office_visit" : "contact",
-        datetime: task.dueDate || task.datetime || task.createdAt,
-        notes: task.description || task.notes || task.title,
-        status: task.status === "completed" ? "completed" : 
-                task.status === "cancelled" ? "cancelled" : "pending",
-        propertyId: task.propertyId,
-        propertyTitle: task.propertyTitle,
-        createdAt: task.createdAt,
-      }));
+      return propTasks.map((task: any) => {
+        let taskType: TaskType = "contact";
+        if (task.type === "contact") {
+          taskType = "contact";
+        } else if (task.type === "site_visit") {
+          taskType = "property_viewing";
+        } else if (task.type === "meeting") {
+          taskType = "office_visit";
+        }
+
+        let taskStatus: "pending" | "completed" | "cancelled" = "pending";
+        if (task.status === "completed") {
+          taskStatus = "completed";
+        } else if (task.status === "cancelled") {
+          taskStatus = "cancelled";
+        }
+
+        return {
+          id: task.id?.toString() || `task_${task.id}`,
+          type: taskType,
+          datetime: task.dueDate || task.datetime || task.createdAt || "",
+          notes: task.description || task.notes || task.title || "",
+          status: taskStatus,
+          propertyId: task.propertyId,
+          propertyTitle: task.propertyTitle,
+          createdAt: task.createdAt || "",
+        };
+      });
     }
 
     // Fallback to converting from customer data
@@ -564,19 +594,34 @@ function TasksSectionCard({ customer }: { customer: UnifiedCustomer }) {
   // Update tasks when propTasks change
   useEffect(() => {
     if (propTasks && propTasks.length > 0) {
-      const convertedTasks = propTasks.map((task: any) => ({
-        id: task.id?.toString() || `task_${task.id}`,
-        type: task.type === "contact" ? "contact" : 
-              task.type === "site_visit" ? "property_viewing" : 
-              task.type === "meeting" ? "office_visit" : "contact",
-        datetime: task.dueDate || task.datetime || task.createdAt,
-        notes: task.description || task.notes || task.title,
-        status: task.status === "completed" ? "completed" : 
-                task.status === "cancelled" ? "cancelled" : "pending",
-        propertyId: task.propertyId,
-        propertyTitle: task.propertyTitle,
-        createdAt: task.createdAt,
-      }));
+      const convertedTasks: CustomerTask[] = propTasks.map((task: any) => {
+        let taskType: TaskType = "contact";
+        if (task.type === "contact") {
+          taskType = "contact";
+        } else if (task.type === "site_visit") {
+          taskType = "property_viewing";
+        } else if (task.type === "meeting") {
+          taskType = "office_visit";
+        }
+
+        let taskStatus: "pending" | "completed" | "cancelled" = "pending";
+        if (task.status === "completed") {
+          taskStatus = "completed";
+        } else if (task.status === "cancelled") {
+          taskStatus = "cancelled";
+        }
+
+        return {
+          id: task.id?.toString() || `task_${task.id}`,
+          type: taskType,
+          datetime: task.dueDate || task.datetime || task.createdAt || "",
+          notes: task.description || task.notes || task.title || "",
+          status: taskStatus,
+          propertyId: task.propertyId,
+          propertyTitle: task.propertyTitle,
+          createdAt: task.createdAt || "",
+        };
+      });
       setTasks(convertedTasks);
     }
   }, [propTasks]);
@@ -1009,7 +1054,7 @@ function CustomerRequestsSection({ customer }: { customer: UnifiedCustomer }) {
                 : customer.preferences.purpose === "rent"
                 ? "يرغب في استئجار عقار"
                 : "يرغب في الاستثمار العقاري"}
-              {customer.preferences.propertyType.length > 0 &&
+              {customer.preferences?.propertyType && Array.isArray(customer.preferences.propertyType) && customer.preferences.propertyType.length > 0 &&
                 ` - ${customer.preferences.propertyType
                   .map((t) =>
                     t === "villa"
@@ -1100,7 +1145,7 @@ function CustomerRequestsSection({ customer }: { customer: UnifiedCustomer }) {
             <span className="font-medium text-sm">المناطق المفضلة</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {customer.preferences.preferredAreas.length > 0 ? (
+            {customer.preferences?.preferredAreas && Array.isArray(customer.preferences.preferredAreas) && customer.preferences.preferredAreas.length > 0 ? (
               customer.preferences.preferredAreas.map((area) => (
                 <Badge key={area} variant="outline" className="text-xs">
                   {area}
