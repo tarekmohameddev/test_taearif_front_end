@@ -214,6 +214,17 @@ export function IncomingActionsCard({
   const [aptNotes, setAptNotes] = useState("");
   const [isSubmittingApt, setIsSubmittingApt] = useState(false);
 
+  // Normalize customer.stage to always be a string (handle API objects)
+  const normalizedStage = React.useMemo(() => {
+    if (!customer?.stage) return undefined;
+    if (typeof customer.stage === 'string') return customer.stage;
+    if (typeof customer.stage === 'object' && customer.stage !== null) {
+      // Extract ID from object: {id, name, color} -> id
+      return (customer.stage as any).id || (customer.stage as any).name || String(customer.stage);
+    }
+    return String(customer.stage);
+  }, [customer?.stage]);
+
   const propertyFromMeta = getPropertyFromMetadata(action.metadata);
   const propertyFromPrefs = getPropertyFromPreferences(customer);
   /** Prefer specific property from metadata; fallback to request summary from customer preferences */
@@ -366,15 +377,15 @@ export function IncomingActionsCard({
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
-                    {customer.stage ? (
+                    {normalizedStage ? (
                       <>
                         <span
                           className="size-1.5 rounded-full shrink-0"
-                          style={{ backgroundColor: getStageColor(customer.stage) }}
+                          style={{ backgroundColor: getStageColor(normalizedStage as CustomerLifecycleStage) }}
                           aria-hidden
                         />
-                        <span style={{ color: getStageColor(customer.stage) }} className="font-medium">
-                          {getStageNameAr(customer.stage)}
+                        <span style={{ color: getStageColor(normalizedStage as CustomerLifecycleStage) }} className="font-medium">
+                          {getStageNameAr(normalizedStage as CustomerLifecycleStage)}
                         </span>
                         <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
                       </>
@@ -652,15 +663,15 @@ export function IncomingActionsCard({
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
-                    {customer.stage ? (
+                    {normalizedStage ? (
                       <>
                         <span
                           className="size-2 rounded-full shrink-0"
-                          style={{ backgroundColor: getStageColor(customer.stage) }}
+                          style={{ backgroundColor: getStageColor(normalizedStage as CustomerLifecycleStage) }}
                           aria-hidden
                         />
-                        <span style={{ color: getStageColor(customer.stage) }} className="font-medium">
-                          {getStageNameAr(customer.stage)}
+                        <span style={{ color: getStageColor(normalizedStage as CustomerLifecycleStage) }} className="font-medium">
+                          {getStageNameAr(normalizedStage as CustomerLifecycleStage)}
                         </span>
                         <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
                       </>

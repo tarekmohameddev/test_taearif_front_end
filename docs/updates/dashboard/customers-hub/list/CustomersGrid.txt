@@ -1,0 +1,4 @@
+2026-02-06 16:35:50
+Update Type: Bug Fix
+Fixed TypeError "Cannot read properties of undefined (reading 'slice')" by adding null/undefined checks for customer.preferences properties (propertyType, preferredAreas, budgetMax, timeline) and customer.aiInsights before accessing them. Also added stage normalization to handle API objects.
+components/customers-hub/page/CustomersGrid.tsx

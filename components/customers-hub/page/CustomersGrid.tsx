@@ -20,6 +20,16 @@ export function CustomersGrid() {
   const endIndex = startIndex + pageSize;
   const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
 
+  // Normalize customer.stage to always be a string (handle API objects)
+  const normalizeStage = (stage: any): string => {
+    if (!stage) return "new_lead";
+    if (typeof stage === 'string') return stage;
+    if (typeof stage === 'object' && stage !== null) {
+      return (stage as any).id || (stage as any).name || "new_lead";
+    }
+    return String(stage);
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -61,46 +71,48 @@ export function CustomersGrid() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {paginatedCustomers.map((customer) => (
-        <Card 
-          key={customer.id} 
-          className="hover:shadow-lg transition-shadow overflow-hidden group"
-        >
-          {/* Header with Avatar & Lead Score */}
-          <div 
-            className="h-20 relative"
-            style={{ backgroundColor: getStageColor(customer.stage) + "20" }}
+      {paginatedCustomers.map((customer) => {
+        const normalizedStage = normalizeStage(customer.stage);
+        return (
+          <Card 
+            key={customer.id} 
+            className="hover:shadow-lg transition-shadow overflow-hidden group"
           >
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
-              <Avatar className="h-16 w-16 border-4 border-white dark:border-gray-900">
-                <AvatarFallback 
-                  className="text-lg font-bold"
-                  style={{ backgroundColor: getStageColor(customer.stage) }}
-                >
-                  {getInitials(customer.name)}
-                </AvatarFallback>
-              </Avatar>
+            {/* Header with Avatar & Lead Score */}
+            <div 
+              className="h-20 relative"
+              style={{ backgroundColor: getStageColor(normalizedStage) + "20" }}
+            >
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                <Avatar className="h-16 w-16 border-4 border-white dark:border-gray-900">
+                  <AvatarFallback 
+                    className="text-lg font-bold"
+                    style={{ backgroundColor: getStageColor(normalizedStage) }}
+                  >
+                    {getInitials(customer.name)}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              <div className="absolute top-2 left-2 text-xl">
+                {getPriorityIcon(customer.priority)}
+              </div>
             </div>
-            <div className="absolute top-2 left-2 text-xl">
-              {getPriorityIcon(customer.priority)}
-            </div>
-          </div>
 
-          <CardContent className="pt-10 pb-4 space-y-3">
-            {/* Name & Stage */}
-            <div className="text-center space-y-1">
-              <Link href={`/ar/dashboard/customers-hub/${customer.id}`}>
-                <h3 className="font-bold text-lg hover:text-blue-600 transition-colors">
-                  {customer.name}
-                </h3>
-              </Link>
-              <Badge 
-                className="text-xs"
-                style={{ backgroundColor: getStageColor(customer.stage) }}
-              >
-                {getStageNameAr(customer.stage)}
-              </Badge>
-            </div>
+            <CardContent className="pt-10 pb-4 space-y-3">
+              {/* Name & Stage */}
+              <div className="text-center space-y-1">
+                <Link href={`/ar/dashboard/customers-hub/${customer.id}`}>
+                  <h3 className="font-bold text-lg hover:text-blue-600 transition-colors">
+                    {customer.name}
+                  </h3>
+                </Link>
+                <Badge 
+                  className="text-xs"
+                  style={{ backgroundColor: getStageColor(normalizedStage) }}
+                >
+                  {getStageNameAr(normalizedStage)}
+                </Badge>
+              </div>
 
             {/* Quick Info */}
             <div className="space-y-2 text-sm">
@@ -113,7 +125,7 @@ export function CustomersGrid() {
               </div>
 
               {/* Budget */}
-              {customer.preferences.budgetMax && (
+              {customer.preferences?.budgetMax && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1 text-gray-600 text-xs">
                     <DollarSign className="h-3 w-3" />
@@ -126,25 +138,27 @@ export function CustomersGrid() {
               )}
 
               {/* Property Type */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-gray-600 text-xs">
-                  <Home className="h-3 w-3" />
-                  <span>النوع:</span>
+              {customer.preferences?.propertyType && customer.preferences.propertyType.length > 0 && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-gray-600 text-xs">
+                    <Home className="h-3 w-3" />
+                    <span>النوع:</span>
+                  </div>
+                  <div className="flex gap-1">
+                    {customer.preferences.propertyType.slice(0, 2).map((type) => (
+                      <Badge key={type} variant="outline" className="text-xs px-1 py-0">
+                        {type === "villa" ? "فيلا" : 
+                         type === "apartment" ? "شقة" : 
+                         type === "land" ? "أرض" : 
+                         type === "commercial" ? "تجاري" : type}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  {customer.preferences.propertyType.slice(0, 2).map((type) => (
-                    <Badge key={type} variant="outline" className="text-xs px-1 py-0">
-                      {type === "villa" ? "فيلا" : 
-                       type === "apartment" ? "شقة" : 
-                       type === "land" ? "أرض" : 
-                       type === "commercial" ? "تجاري" : type}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              )}
 
               {/* Preferred Areas */}
-              {customer.preferences.preferredAreas.length > 0 && (
+              {customer.preferences?.preferredAreas && customer.preferences.preferredAreas.length > 0 && (
                 <div className="flex items-center gap-1 text-gray-600 text-xs">
                   <MapPin className="h-3 w-3" />
                   <span className="truncate">
@@ -154,18 +168,20 @@ export function CustomersGrid() {
               )}
 
               {/* Timeline */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-gray-600 text-xs">
-                  <Clock className="h-3 w-3" />
-                  <span>الجدول:</span>
+              {customer.preferences?.timeline && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-gray-600 text-xs">
+                    <Clock className="h-3 w-3" />
+                    <span>الجدول:</span>
+                  </div>
+                  <span className="text-xs font-medium">
+                    {customer.preferences.timeline === "immediate" ? "فوري" :
+                     customer.preferences.timeline === "1-3months" ? "1-3 شهور" :
+                     customer.preferences.timeline === "3-6months" ? "3-6 شهور" :
+                     "6+ شهور"}
+                  </span>
                 </div>
-                <span className="text-xs font-medium">
-                  {customer.preferences.timeline === "immediate" ? "فوري" :
-                   customer.preferences.timeline === "1-3months" ? "1-3 شهور" :
-                   customer.preferences.timeline === "3-6months" ? "3-6 شهور" :
-                   "6+ شهور"}
-                </span>
-              </div>
+              )}
 
               {/* Last Contact */}
               <div className="flex items-center justify-between text-xs pt-2 border-t">
@@ -179,7 +195,7 @@ export function CustomersGrid() {
               </div>
 
               {/* AI Insight */}
-              {customer.aiInsights.conversionProbability && (
+              {customer.aiInsights?.conversionProbability && (
                 <div className="flex items-center justify-between bg-purple-50 dark:bg-purple-950 p-2 rounded text-xs">
                   <div className="flex items-center gap-1 text-purple-600">
                     <TrendingUp className="h-3 w-3" />
@@ -203,9 +219,10 @@ export function CustomersGrid() {
                 عرض التفاصيل
               </Button>
             </Link>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

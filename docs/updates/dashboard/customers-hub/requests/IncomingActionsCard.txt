@@ -1,0 +1,4 @@
+2026-02-06 16:31:44
+Update Type: Bug Fix
+Fixed React error "Objects are not valid as a React child" by normalizing customer.stage to always be a string before passing to getStageColor and getStageNameAr functions. The API sometimes returns stage as an object {id, name, color} instead of a string ID.
+components/customers-hub/actions/IncomingActionsCard.tsx
