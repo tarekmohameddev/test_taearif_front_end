@@ -24,6 +24,7 @@ interface PipelinePageProps {
   stages?: PipelineStage[];
   analytics?: PipelineAnalytics | null;
   filterOptions?: any;
+  totalCustomers?: number;
   loading?: boolean;
   error?: string | null;
   onFetchPipelineBoard?: (params: PipelineBoardParams) => Promise<void>;
@@ -37,11 +38,14 @@ export function PipelinePage(props?: PipelinePageProps) {
   // Use prop stages if provided, otherwise use store customers
   const stages = props?.stages;
   const analytics = props?.analytics;
+  const apiTotalCustomers = props?.totalCustomers;
   const apiLoading = props?.loading ?? false;
   const apiError = props?.error;
   
-  // Calculate total customers from stages or store
-  const totalCustomers = stages && stages.length > 0
+  // Calculate total customers: use API value if available, otherwise calculate from stages or store
+  const totalCustomers = apiTotalCustomers !== undefined
+    ? apiTotalCustomers
+    : stages && stages.length > 0
     ? stages.reduce((sum, stage) => sum + (stage.customerCount || 0), 0)
     : storeCustomers.length || 0;
 
@@ -137,7 +141,7 @@ export function PipelinePage(props?: PipelinePageProps) {
           </div>
           
           <Select value={pipelineView} onValueChange={(v: any) => setPipelineView(v)}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-52">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

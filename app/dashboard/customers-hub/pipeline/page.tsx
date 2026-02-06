@@ -12,6 +12,7 @@ export default function CustomersHubPipelinePage() {
     stages,
     analytics,
     filterOptions,
+    totalCustomers,
     loading,
     error,
     fetchPipelineBoard,
@@ -58,6 +59,7 @@ export default function CustomersHubPipelinePage() {
       stages={stages}
       analytics={analytics}
       filterOptions={filterOptions}
+      totalCustomers={totalCustomers}
       loading={loading}
       error={error}
       onFetchPipelineBoard={fetchPipelineBoard}

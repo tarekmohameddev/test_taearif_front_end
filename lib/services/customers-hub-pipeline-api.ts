@@ -36,6 +36,7 @@ export interface PipelineBoardResponse {
   message: string;
   data: {
     stages: PipelineStage[];
+    totalCustomers?: number;
     analytics?: PipelineAnalytics;
   };
   timestamp: string;

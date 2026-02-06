@@ -16,6 +16,7 @@ export function useCustomersHubPipeline() {
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [analytics, setAnalytics] = useState<PipelineAnalytics | null>(null);
   const [filterOptions, setFilterOptions] = useState<FilterOptionsResponse["data"] | null>(null);
+  const [totalCustomers, setTotalCustomers] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,8 +34,9 @@ export function useCustomersHubPipeline() {
         
         if (response.status === "success") {
           // Transform stages and customers data
-          const transformedStages = response.data.stages.map((stage) => ({
+          const transformedStages = response.data.stages.map((stage: any) => ({
             ...stage,
+            customerCount: stage.count ?? stage.customerCount ?? 0, // Convert API's 'count' to 'customerCount'
             customers: stage.customers.map((customer: any) => ({
               ...customer,
               id: customer.id?.toString() || customer.id,
@@ -64,6 +66,9 @@ export function useCustomersHubPipeline() {
           }));
           
           setStages(transformedStages);
+          if (response.data.totalCustomers !== undefined) {
+            setTotalCustomers(response.data.totalCustomers);
+          }
           if (response.data.analytics) {
             setAnalytics(response.data.analytics);
           }
@@ -125,6 +130,7 @@ export function useCustomersHubPipeline() {
     stages,
     analytics,
     filterOptions,
+    totalCustomers,
     loading,
     error,
     fetchPipelineBoard,
