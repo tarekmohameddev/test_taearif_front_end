@@ -25,6 +25,8 @@ export interface CustomerAction {
   id: string;
   customerId: string;
   customerName: string;
+  customerPhone?: string;
+  customerEmail?: string;
   type: CustomerActionType;
   title: string;
   description?: string;

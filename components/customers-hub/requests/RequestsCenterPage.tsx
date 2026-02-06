@@ -129,23 +129,121 @@ const REQUEST_TYPES: CustomerActionType[] = [
 
 const FOLLOWUP_TYPES: CustomerActionType[] = ["follow_up", "site_visit"];
 
-export function RequestsCenterPage() {
+interface RequestsCenterPageProps {
+  actions?: CustomerAction[];
+  stats?: any;
+  filterOptions?: any;
+  loading?: boolean;
+  error?: string | null;
+  pagination?: any;
+  onFetchRequests?: (params: any) => Promise<void>;
+  onCompleteAction?: (actionId: string, notes?: string) => Promise<boolean>;
+  onDismissAction?: (actionId: string, reason?: string) => Promise<boolean>;
+  onSnoozeAction?: (actionId: string, snoozeUntil: string, reason?: string) => Promise<boolean>;
+  onAssignAction?: (actionId: string, employeeId: number) => Promise<boolean>;
+  onCompleteMultipleActions?: (actionIds: string[], notes?: string) => Promise<boolean>;
+  onDismissMultipleActions?: (actionIds: string[], reason?: string) => Promise<boolean>;
+  onSnoozeMultipleActions?: (actionIds: string[], snoozeUntil: string, reason?: string) => Promise<boolean>;
+  onAssignMultipleActions?: (actionIds: string[], employeeId: number) => Promise<boolean>;
+}
+
+export function RequestsCenterPage(props?: RequestsCenterPageProps) {
+  const store = useUnifiedCustomersStore();
   const {
-    actions,
+    actions: storeActions,
     customers,
-    completeAction,
-    dismissAction,
-    snoozeAction,
-    completeMultipleActions,
-    dismissMultipleActions,
-    snoozeMultipleActions,
-    assignMultipleActions,
+    completeAction: storeCompleteAction,
+    dismissAction: storeDismissAction,
+    snoozeAction: storeSnoozeAction,
+    completeMultipleActions: storeCompleteMultipleActions,
+    dismissMultipleActions: storeDismissMultipleActions,
+    snoozeMultipleActions: storeSnoozeMultipleActions,
+    assignMultipleActions: storeAssignMultipleActions,
     updateMultipleActionsPriority,
     getCustomerById,
     getCompletedActions,
     addActionNote,
     restoreAction,
-  } = useUnifiedCustomersStore();
+  } = store;
+
+  // Use props if provided, otherwise use store
+  const actions = props?.actions ?? storeActions;
+  const apiStats = props?.stats;
+  const apiFilterOptions = props?.filterOptions;
+  const apiLoading = props?.loading ?? false;
+  const apiError = props?.error;
+
+  // API handlers with fallback to store
+  const completeAction = props?.onCompleteAction 
+    ? async (actionId: string) => {
+        try {
+          await props.onCompleteAction!(actionId);
+        } catch (err) {
+          console.error("Error completing action:", err);
+        }
+      }
+    : storeCompleteAction;
+
+  const dismissAction = props?.onDismissAction
+    ? async (actionId: string) => {
+        try {
+          await props.onDismissAction!(actionId);
+        } catch (err) {
+          console.error("Error dismissing action:", err);
+        }
+      }
+    : storeDismissAction;
+
+  const snoozeAction = props?.onSnoozeAction
+    ? async (actionId: string, until: string) => {
+        try {
+          await props.onSnoozeAction!(actionId, until);
+        } catch (err) {
+          console.error("Error snoozing action:", err);
+        }
+      }
+    : storeSnoozeAction;
+
+  const completeMultipleActions = props?.onCompleteMultipleActions
+    ? async (actionIds: string[]) => {
+        try {
+          await props.onCompleteMultipleActions!(actionIds);
+        } catch (err) {
+          console.error("Error completing multiple actions:", err);
+        }
+      }
+    : storeCompleteMultipleActions;
+
+  const dismissMultipleActions = props?.onDismissMultipleActions
+    ? async (actionIds: string[]) => {
+        try {
+          await props.onDismissMultipleActions!(actionIds);
+        } catch (err) {
+          console.error("Error dismissing multiple actions:", err);
+        }
+      }
+    : storeDismissMultipleActions;
+
+  const snoozeMultipleActions = props?.onSnoozeMultipleActions
+    ? async (actionIds: string[], until: string) => {
+        try {
+          await props.onSnoozeMultipleActions!(actionIds, until);
+        } catch (err) {
+          console.error("Error snoozing multiple actions:", err);
+        }
+      }
+    : storeSnoozeMultipleActions;
+
+  const assignMultipleActions = props?.onAssignMultipleActions
+    ? async (actionIds: string[], employeeId: string, employeeName: string) => {
+        try {
+          const empId = typeof employeeId === 'string' ? parseInt(employeeId) : employeeId;
+          await props.onAssignMultipleActions!(actionIds, empId);
+        } catch (err) {
+          console.error("Error assigning multiple actions:", err);
+        }
+      }
+    : storeAssignMultipleActions;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"inbox" | "followups" | "all" | "completed">("inbox");
@@ -340,14 +438,16 @@ export function RequestsCenterPage() {
 
   const stats = useMemo(
     () => ({
-      pending: allPendingActions.length,
+      pending: apiStats?.pending ?? allPendingActions.length,
       inbox: inboxRequests.length,
       followups: followupRequests.length,
-      overdue: overdueActions.length,
+      overdue: apiStats?.overdue ?? overdueActions.length,
       today: todayActions.length,
-      completed: completedActions.length,
+      completed: apiStats?.completed ?? completedActions.length,
+      total: apiStats?.total ?? allPendingActions.length,
     }),
     [
+      apiStats,
       allPendingActions.length,
       inboxRequests.length,
       followupRequests.length,
@@ -357,29 +457,41 @@ export function RequestsCenterPage() {
     ]
   );
 
-  const handleComplete = (actionId: string) => {
-    completeAction(actionId);
-    setSelectedActionIds((prev) => {
-      const next = new Set(prev);
-      next.delete(actionId);
-      return next;
-    });
+  const handleComplete = async (actionId: string) => {
+    try {
+      await completeAction(actionId);
+      setSelectedActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(actionId);
+        return next;
+      });
+    } catch (err) {
+      console.error("Error completing action:", err);
+    }
   };
-  const handleDismiss = (actionId: string) => {
-    dismissAction(actionId);
-    setSelectedActionIds((prev) => {
-      const next = new Set(prev);
-      next.delete(actionId);
-      return next;
-    });
+  const handleDismiss = async (actionId: string) => {
+    try {
+      await dismissAction(actionId);
+      setSelectedActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(actionId);
+        return next;
+      });
+    } catch (err) {
+      console.error("Error dismissing action:", err);
+    }
   };
-  const handleSnooze = (actionId: string, until: string) => {
-    snoozeAction(actionId, until);
-    setSelectedActionIds((prev) => {
-      const next = new Set(prev);
-      next.delete(actionId);
-      return next;
-    });
+  const handleSnooze = async (actionId: string, until: string) => {
+    try {
+      await snoozeAction(actionId, until);
+      setSelectedActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(actionId);
+        return next;
+      });
+    } catch (err) {
+      console.error("Error snoozing action:", err);
+    }
   };
   const handleSelectAction = (actionId: string, selected: boolean) => {
     setSelectedActionIds((prev) => {
@@ -392,21 +504,37 @@ export function RequestsCenterPage() {
   const handleSelectAll = () =>
     setSelectedActionIds(new Set(currentTabActions.map((a) => a.id)));
   const handleDeselectAll = () => setSelectedActionIds(new Set());
-  const handleBulkComplete = () => {
-    completeMultipleActions(Array.from(selectedActionIds));
-    setSelectedActionIds(new Set());
+  const handleBulkComplete = async () => {
+    try {
+      await completeMultipleActions(Array.from(selectedActionIds));
+      setSelectedActionIds(new Set());
+    } catch (err) {
+      console.error("Error completing multiple actions:", err);
+    }
   };
-  const handleBulkDismiss = () => {
-    dismissMultipleActions(Array.from(selectedActionIds));
-    setSelectedActionIds(new Set());
+  const handleBulkDismiss = async () => {
+    try {
+      await dismissMultipleActions(Array.from(selectedActionIds));
+      setSelectedActionIds(new Set());
+    } catch (err) {
+      console.error("Error dismissing multiple actions:", err);
+    }
   };
-  const handleBulkSnooze = (until: string) => {
-    snoozeMultipleActions(Array.from(selectedActionIds), until);
-    setSelectedActionIds(new Set());
+  const handleBulkSnooze = async (until: string) => {
+    try {
+      await snoozeMultipleActions(Array.from(selectedActionIds), until);
+      setSelectedActionIds(new Set());
+    } catch (err) {
+      console.error("Error snoozing multiple actions:", err);
+    }
   };
-  const handleBulkAssign = (employeeId: string, employeeName: string) => {
-    assignMultipleActions(Array.from(selectedActionIds), employeeId, employeeName);
-    setSelectedActionIds(new Set());
+  const handleBulkAssign = async (employeeId: string, employeeName: string) => {
+    try {
+      await assignMultipleActions(Array.from(selectedActionIds), employeeId, employeeName);
+      setSelectedActionIds(new Set());
+    } catch (err) {
+      console.error("Error assigning multiple actions:", err);
+    }
   };
   const handleBulkChangePriority = (priority: Priority) => {
     updateMultipleActionsPriority(Array.from(selectedActionIds), priority);
@@ -451,6 +579,34 @@ export function RequestsCenterPage() {
     budgetMin !== "" ||
     budgetMax !== "" ||
     selectedPropertyTypes.length > 0;
+
+  // Show loading state
+  if (apiLoading && actions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center" dir="rtl">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">جاري تحميل الطلبات...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (apiError && actions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center" dir="rtl">
+        <Card className="max-w-md">
+          <CardContent className="p-6 text-center">
+            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{apiError}</p>
+            <Button onClick={() => window.location.reload()}>إعادة المحاولة</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900" dir="rtl">

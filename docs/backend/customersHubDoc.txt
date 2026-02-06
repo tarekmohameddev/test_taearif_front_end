@@ -1,0 +1,1627 @@
+# Customers Hub API - Endpoints Reference
+
+**Version:** 2.0.0  
+**Last Updated:** February 5, 2026  
+**Base URL:** `/api/v2/customers-hub`  
+**Authentication:** Bearer Token (Laravel Sanctum)
+
+---
+
+## Table of Contents
+
+- [Authentication](#authentication)
+- [Requests Center Endpoints](#requests-center-endpoints)
+- [Customers List Endpoints](#customers-list-endpoints)
+- [Pipeline Endpoints](#pipeline-endpoints)
+- [Analytics Endpoints](#analytics-endpoints)
+- [Customer Detail Endpoints](#customer-detail-endpoints)
+
+---
+
+## Authentication
+
+All requests require authentication header:
+
+```http
+Authorization: Bearer {your_token_here}
+Content-Type: application/json
+Accept: application/json
+```
+
+---
+
+## Requests Center Endpoints
+
+### 1. Get Requests List
+
+**Endpoint:** `POST /api/v2/customers-hub/requests/list`
+
+**Request Body:**
+```json
+{
+  "action": "list",
+  "includeStats": true,
+  "filters": {
+    "tab": "all",
+    "type": ["new_inquiry", "callback_request", "follow_up"],
+    "priority": ["high", "medium"],
+    "status": ["pending", "overdue"],
+    "dateRange": {
+      "start": "2026-01-01",
+      "end": "2026-02-05"
+    },
+    "search": "John Doe"
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 20
+  },
+  "sorting": {
+    "field": "dueDate",
+    "order": "asc"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Requests retrieved successfully",
+  "data": {
+    "actions": [
+      {
+        "id": "reminder_123",
+        "type": "follow_up",
+        "customerId": 228,
+        "customerName": "John Doe",
+        "customerPhone": "+966501234567",
+        "title": "Follow up call",
+        "description": "Check on property interest",
+        "priority": "high",
+        "status": "pending",
+        "dueDate": "2026-02-10T10:00:00Z",
+        "createdAt": "2026-02-05T08:00:00Z",
+        "assignedTo": {
+          "id": 15,
+          "name": "Ahmed Ali"
+        }
+      },
+      {
+        "id": "inquiry_456",
+        "type": "new_inquiry",
+        "customerId": 229,
+        "customerName": "Sara Mohammed",
+        "customerPhone": "+966509876543",
+        "title": "New inquiry about villa",
+        "description": "Customer interested in 5BR villa in North Riyadh",
+        "priority": "high",
+        "status": "pending",
+        "dueDate": "2026-02-06T14:00:00Z",
+        "createdAt": "2026-02-05T12:00:00Z",
+        "assignedTo": null
+      }
+    ],
+    "stats": {
+      "total": 45,
+      "pending": 30,
+      "completed": 10,
+      "overdue": 5
+    },
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 3,
+      "totalItems": 45,
+      "itemsPerPage": 20
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 2. Get Filter Options
+
+**Endpoint:** `GET /api/v2/customers-hub/requests/filter-options`
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Filter options retrieved successfully",
+  "data": {
+    "types": [
+      {"value": "new_inquiry", "label": "New Inquiry"},
+      {"value": "callback_request", "label": "Callback Request"},
+      {"value": "whatsapp_incoming", "label": "WhatsApp Message"},
+      {"value": "property_match", "label": "Property Match"},
+      {"value": "follow_up", "label": "Follow Up"},
+      {"value": "site_visit", "label": "Site Visit"}
+    ],
+    "priorities": [
+      {"value": "high", "label": "High"},
+      {"value": "medium", "label": "Medium"},
+      {"value": "low", "label": "Low"}
+    ],
+    "statuses": [
+      {"value": "pending", "label": "Pending"},
+      {"value": "completed", "label": "Completed"},
+      {"value": "overdue", "label": "Overdue"},
+      {"value": "dismissed", "label": "Dismissed"}
+    ],
+    "employees": [
+      {"id": 15, "name": "Ahmed Ali"},
+      {"id": 22, "name": "Sara Mohammed"},
+      {"id": 31, "name": "Mohammed Hassan"}
+    ]
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 3. Get Single Action Detail
+
+**Endpoint:** `GET /api/v2/customers-hub/requests/{actionId}`
+
+**URL Parameters:**
+- `actionId` - Format: `{type}_{id}` (e.g., `reminder_123`, `inquiry_456`)
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Action retrieved successfully",
+  "data": {
+    "action": {
+      "id": "reminder_123",
+      "type": "follow_up",
+      "customerId": 228,
+      "customerName": "John Doe",
+      "customerPhone": "+966501234567",
+      "customerEmail": "john@example.com",
+      "title": "Follow up call",
+      "description": "Check on property interest and schedule viewing",
+      "priority": "high",
+      "status": "pending",
+      "dueDate": "2026-02-10T10:00:00Z",
+      "createdAt": "2026-02-05T08:00:00Z",
+      "updatedAt": "2026-02-05T08:00:00Z",
+      "assignedTo": {
+        "id": 15,
+        "name": "Ahmed Ali",
+        "email": "ahmed@example.com"
+      },
+      "metadata": {
+        "source": "manual",
+        "reminderType": "call",
+        "previousContact": "2026-02-01T10:00:00Z"
+      }
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 4. Complete Action
+
+**Endpoint:** `POST /api/v2/customers-hub/requests/{actionId}/complete`
+
+**URL Parameters:**
+- `actionId` - Format: `{type}_{id}`
+
+**Request Body:**
+```json
+{
+  "notes": "Called customer, they are interested in viewing the property next week"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Action completed successfully",
+  "data": {
+    "actionId": "reminder_123",
+    "status": "completed",
+    "completedAt": "2026-02-05T10:30:00Z",
+    "completedBy": {
+      "id": 15,
+      "name": "Ahmed Ali"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 5. Dismiss Action
+
+**Endpoint:** `POST /api/v2/customers-hub/requests/{actionId}/dismiss`
+
+**URL Parameters:**
+- `actionId` - Format: `{type}_{id}`
+
+**Request Body:**
+```json
+{
+  "reason": "Customer not interested anymore"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Action dismissed successfully",
+  "data": {
+    "actionId": "reminder_123",
+    "status": "dismissed",
+    "dismissedAt": "2026-02-05T10:30:00Z",
+    "reason": "Customer not interested anymore"
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 6. Snooze Action
+
+**Endpoint:** `POST /api/v2/customers-hub/requests/{actionId}/snooze`
+
+**URL Parameters:**
+- `actionId` - Format: `{type}_{id}`
+
+**Request Body:**
+```json
+{
+  "snoozeUntil": "2026-02-10T14:00:00Z",
+  "reason": "Customer requested to call back later in the afternoon"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Action snoozed successfully",
+  "data": {
+    "actionId": "reminder_123",
+    "previousDueDate": "2026-02-05T10:00:00Z",
+    "newDueDate": "2026-02-10T14:00:00Z",
+    "snoozedAt": "2026-02-05T10:30:00Z",
+    "reason": "Customer requested to call back later in the afternoon"
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 7. Assign Action
+
+**Endpoint:** `POST /api/v2/customers-hub/requests/{actionId}/assign`
+
+**URL Parameters:**
+- `actionId` - Format: `{type}_{id}`
+
+**Request Body:**
+```json
+{
+  "employeeId": 22
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Action assigned successfully",
+  "data": {
+    "actionId": "reminder_123",
+    "previousAssignee": {
+      "id": 15,
+      "name": "Ahmed Ali"
+    },
+    "newAssignee": {
+      "id": 22,
+      "name": "Sara Mohammed"
+    },
+    "assignedAt": "2026-02-05T10:30:00Z"
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 8. Get Action Stats
+
+**Endpoint:** `GET /api/v2/customers-hub/requests/{actionId}/stats`
+
+**URL Parameters:**
+- `actionId` - Format: `{type}_{id}`
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Action stats retrieved successfully",
+  "data": {
+    "stats": {
+      "actionId": "property_request_25",
+      "totalActions": 5,
+      "completedActions": 3,
+      "pendingActions": 2,
+      "averageCompletionTime": "2.5 hours",
+      "relatedCustomer": {
+        "id": 228,
+        "name": "John Doe",
+        "totalActions": 12,
+        "completedActions": 8
+      }
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+## Customers List Endpoints
+
+### 1. Get Customers List
+
+**Endpoint:** `POST /api/v2/customers-hub/list`
+
+**Request Body:**
+```json
+{
+  "action": "list",
+  "includeStats": true,
+  "filters": {
+    "stage": [135, 136],
+    "priority": [1, 2],
+    "type": [5, 6],
+    "city": [10, 11],
+    "search": "John",
+    "dateRange": {
+      "start": "2026-01-01",
+      "end": "2026-02-05"
+    }
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50
+  },
+  "sorting": {
+    "field": "created_at",
+    "order": "desc"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Customers retrieved successfully",
+  "data": {
+    "customers": [
+      {
+        "id": 228,
+        "name": "John Doe",
+        "phone": "+966501234567",
+        "email": "john@example.com",
+        "stage": {
+          "id": 135,
+          "name": "Qualified",
+          "color": "#4CAF50"
+        },
+        "priority": {
+          "id": 2,
+          "name": "High"
+        },
+        "type": {
+          "id": 5,
+          "name": "Buyer"
+        },
+        "city": {
+          "id": 10,
+          "name": "الرياض"
+        },
+        "district": {
+          "id": 50,
+          "name": "العليا"
+        },
+        "assignedTo": {
+          "id": 15,
+          "name": "Ahmed Ali"
+        },
+        "stats": {
+          "totalInquiries": 3,
+          "totalTasks": 5,
+          "completedTasks": 2,
+          "pendingTasks": 3,
+          "totalAppointments": 1
+        },
+        "createdAt": "2026-01-15T08:00:00Z",
+        "updatedAt": "2026-02-05T10:00:00Z"
+      },
+      {
+        "id": 229,
+        "name": "Sara Mohammed",
+        "phone": "+966509876543",
+        "email": "sara@example.com",
+        "stage": {
+          "id": 136,
+          "name": "Negotiation",
+          "color": "#FF9800"
+        },
+        "priority": {
+          "id": 2,
+          "name": "High"
+        },
+        "type": {
+          "id": 5,
+          "name": "Buyer"
+        },
+        "city": {
+          "id": 10,
+          "name": "الرياض"
+        },
+        "district": null,
+        "assignedTo": {
+          "id": 22,
+          "name": "Sara Mohammed"
+        },
+        "stats": {
+          "totalInquiries": 5,
+          "totalTasks": 8,
+          "completedTasks": 6,
+          "pendingTasks": 2,
+          "totalAppointments": 3
+        },
+        "createdAt": "2026-01-20T10:00:00Z",
+        "updatedAt": "2026-02-04T15:30:00Z"
+      }
+    ],
+    "stats": {
+      "totalCustomers": 150,
+      "newThisMonth": 25,
+      "avgDaysInStage": 12,
+      "conversionRate": "15%"
+    },
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 3,
+      "totalItems": 150,
+      "itemsPerPage": 50
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 2. Get List Filter Options
+
+**Endpoint:** `GET /api/v2/customers-hub/list/filter-options`
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Filter options retrieved successfully",
+  "data": {
+    "stages": [
+      {"id": 135, "name": "New", "color": "#2196F3", "order": 1},
+      {"id": 136, "name": "Contacted", "color": "#FF9800", "order": 2},
+      {"id": 137, "name": "Qualified", "color": "#4CAF50", "order": 3},
+      {"id": 138, "name": "Negotiation", "color": "#9C27B0", "order": 4},
+      {"id": 139, "name": "Deal", "color": "#00BCD4", "order": 5}
+    ],
+    "priorities": [
+      {"id": 1, "name": "Low"},
+      {"id": 2, "name": "High"}
+    ],
+    "types": [
+      {"id": 5, "name": "Buyer"},
+      {"id": 6, "name": "Seller"},
+      {"id": 7, "name": "Renter"},
+      {"id": 8, "name": "Landlord"}
+    ],
+    "cities": [
+      {"id": 10, "name": "الرياض"},
+      {"id": 11, "name": "جدة"},
+      {"id": 12, "name": "الدمام"}
+    ]
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 3. Get List Stats
+
+**Endpoint:** `GET /api/v2/customers-hub/list/stats`
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Stats retrieved successfully",
+  "data": {
+    "stats": {
+      "totalCustomers": 150,
+      "newToday": 5,
+      "newThisWeek": 18,
+      "newThisMonth": 25,
+      "avgDaysInStage": 12,
+      "conversionRate": "15%",
+      "byStage": {
+        "New": 30,
+        "Contacted": 25,
+        "Qualified": 20,
+        "Negotiation": 15,
+        "Deal": 10
+      },
+      "byPriority": {
+        "High": 45,
+        "Low": 105
+      },
+      "byType": {
+        "Buyer": 80,
+        "Seller": 40,
+        "Renter": 20,
+        "Landlord": 10
+      }
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+## Pipeline Endpoints
+
+### 1. Get Pipeline Board
+
+**Endpoint:** `POST /api/v2/customers-hub/pipeline`
+
+**Request Body:**
+```json
+{
+  "action": "board",
+  "includeAnalytics": true,
+  "filters": {
+    "priority": [2],
+    "type": [5],
+    "assignedTo": [15]
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Pipeline retrieved successfully",
+  "data": {
+    "stages": [
+      {
+        "id": 135,
+        "name": "New",
+        "color": "#2196F3",
+        "order": 1,
+        "customerCount": 30,
+        "customers": [
+          {
+            "id": 228,
+            "name": "John Doe",
+            "phone": "+966501234567",
+            "email": "john@example.com",
+            "priority": {
+              "id": 2,
+              "name": "High"
+            },
+            "type": {
+              "id": 5,
+              "name": "Buyer"
+            },
+            "daysInStage": 3,
+            "lastActivity": "2026-02-05T08:00:00Z",
+            "nextTask": {
+              "id": 123,
+              "type": "follow_up",
+              "dueDate": "2026-02-10T10:00:00Z",
+              "title": "Follow up call"
+            },
+            "assignedTo": {
+              "id": 15,
+              "name": "Ahmed Ali"
+            }
+          }
+        ]
+      },
+      {
+        "id": 136,
+        "name": "Contacted",
+        "color": "#FF9800",
+        "order": 2,
+        "customerCount": 25,
+        "customers": [
+          {
+            "id": 229,
+            "name": "Sara Mohammed",
+            "phone": "+966509876543",
+            "email": "sara@example.com",
+            "priority": {
+              "id": 2,
+              "name": "High"
+            },
+            "type": {
+              "id": 5,
+              "name": "Buyer"
+            },
+            "daysInStage": 5,
+            "lastActivity": "2026-02-04T15:30:00Z",
+            "nextTask": {
+              "id": 124,
+              "type": "site_visit",
+              "dueDate": "2026-02-08T14:00:00Z",
+              "title": "Property viewing"
+            },
+            "assignedTo": {
+              "id": 15,
+              "name": "Ahmed Ali"
+            }
+          }
+        ]
+      }
+    ],
+    "analytics": {
+      "totalCustomers": 150,
+      "avgTimePerStage": {
+        "New": "5 days",
+        "Contacted": "8 days",
+        "Qualified": "12 days",
+        "Negotiation": "15 days",
+        "Deal": "3 days"
+      },
+      "conversionRates": {
+        "New->Contacted": "80%",
+        "Contacted->Qualified": "60%",
+        "Qualified->Negotiation": "50%",
+        "Negotiation->Deal": "40%"
+      }
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 2. Get Pipeline Filter Options
+
+**Endpoint:** `GET /api/v2/customers-hub/pipeline/filter-options`
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Filter options retrieved successfully",
+  "data": {
+    "priorities": [
+      {"id": 1, "name": "Low"},
+      {"id": 2, "name": "High"}
+    ],
+    "types": [
+      {"id": 5, "name": "Buyer"},
+      {"id": 6, "name": "Seller"}
+    ],
+    "employees": [
+      {"id": 15, "name": "Ahmed Ali"},
+      {"id": 22, "name": "Sara Mohammed"}
+    ]
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 3. Move Customer in Pipeline
+
+**Endpoint:** `POST /api/v2/customers-hub/pipeline/move`
+
+**Request Body:**
+```json
+{
+  "customerId": 228,
+  "newStageId": 136,
+  "notes": "Customer showed strong interest in the property during call"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Customer moved successfully",
+  "data": {
+    "customerId": 228,
+    "customerName": "John Doe",
+    "previousStage": {
+      "id": 135,
+      "name": "New"
+    },
+    "newStage": {
+      "id": 136,
+      "name": "Contacted"
+    },
+    "movedAt": "2026-02-05T10:30:00Z",
+    "movedBy": {
+      "id": 15,
+      "name": "Ahmed Ali"
+    },
+    "notes": "Customer showed strong interest in the property during call"
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+## Analytics Endpoints
+
+### 1. Get Analytics Metrics
+
+**Endpoint:** `POST /api/v2/customers-hub/analytics`
+
+**Request Body:**
+```json
+{
+  "action": "metrics",
+  "timeRange": {
+    "timeRange": "last30days"
+  }
+}
+```
+
+**Time Range Options:**
+- `today`
+- `yesterday`
+- `last7days`
+- `last30days`
+- `thisMonth`
+- `lastMonth`
+- `custom` (requires `start` and `end` dates)
+
+**For custom range:**
+```json
+{
+  "action": "metrics",
+  "timeRange": {
+    "timeRange": "custom",
+    "start": "2026-01-01",
+    "end": "2026-01-31"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Analytics retrieved successfully",
+  "data": {
+    "metrics": {
+      "totalCustomers": 150,
+      "newCustomers": 25,
+      "activeCustomers": 80,
+      "totalInquiries": 120,
+      "completedTasks": 95,
+      "totalAppointments": 45,
+      "conversionRate": "15%",
+      "avgResponseTime": "2.5 hours",
+      "avgDaysToClose": 45
+    },
+    "timeRange": {
+      "start": "2026-01-06",
+      "end": "2026-02-05"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 2. Get Analytics Trends
+
+**Endpoint:** `POST /api/v2/customers-hub/analytics/trends`
+
+**Request Body:**
+```json
+{
+  "action": "trends",
+  "timeRange": {
+    "timeRange": "last30days"
+  },
+  "metrics": ["newCustomers", "completedTasks", "appointments"]
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Trends retrieved successfully",
+  "data": {
+    "trends": [
+      {
+        "date": "2026-02-01",
+        "newCustomers": 5,
+        "completedTasks": 12,
+        "appointments": 3
+      },
+      {
+        "date": "2026-02-02",
+        "newCustomers": 3,
+        "completedTasks": 8,
+        "appointments": 2
+      },
+      {
+        "date": "2026-02-03",
+        "newCustomers": 4,
+        "completedTasks": 10,
+        "appointments": 4
+      },
+      {
+        "date": "2026-02-04",
+        "newCustomers": 6,
+        "completedTasks": 15,
+        "appointments": 5
+      },
+      {
+        "date": "2026-02-05",
+        "newCustomers": 7,
+        "completedTasks": 11,
+        "appointments": 3
+      }
+    ],
+    "timeRange": {
+      "start": "2026-01-06",
+      "end": "2026-02-05"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 3. Get Analytics by Sources
+
+**Endpoint:** `POST /api/v2/customers-hub/analytics/sources`
+
+**Request Body:**
+```json
+{
+  "action": "sources",
+  "timeRange": {
+    "timeRange": "last30days"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Source analytics retrieved successfully",
+  "data": {
+    "sources": [
+      {
+        "source": "website",
+        "count": 45,
+        "percentage": "30%",
+        "conversionRate": "20%"
+      },
+      {
+        "source": "referral",
+        "count": 30,
+        "percentage": "20%",
+        "conversionRate": "25%"
+      },
+      {
+        "source": "social_media",
+        "count": 25,
+        "percentage": "17%",
+        "conversionRate": "15%"
+      },
+      {
+        "source": "direct",
+        "count": 20,
+        "percentage": "13%",
+        "conversionRate": "30%"
+      },
+      {
+        "source": "other",
+        "count": 30,
+        "percentage": "20%",
+        "conversionRate": "10%"
+      }
+    ],
+    "timeRange": {
+      "start": "2026-01-06",
+      "end": "2026-02-05"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 4. Get Performance Analytics
+
+**Endpoint:** `POST /api/v2/customers-hub/analytics/performance`
+
+**Request Body:**
+```json
+{
+  "action": "performance",
+  "timeRange": {
+    "timeRange": "last30days"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Performance analytics retrieved successfully",
+  "data": {
+    "employees": [
+      {
+        "id": 15,
+        "name": "Ahmed Ali",
+        "customersManaged": 25,
+        "tasksCompleted": 45,
+        "avgResponseTime": "1.5 hours",
+        "conversionRate": "18%",
+        "totalDeals": 5
+      },
+      {
+        "id": 22,
+        "name": "Sara Mohammed",
+        "customersManaged": 30,
+        "tasksCompleted": 52,
+        "avgResponseTime": "2 hours",
+        "conversionRate": "16%",
+        "totalDeals": 6
+      },
+      {
+        "id": 31,
+        "name": "Mohammed Hassan",
+        "customersManaged": 20,
+        "tasksCompleted": 38,
+        "avgResponseTime": "1.8 hours",
+        "conversionRate": "14%",
+        "totalDeals": 3
+      }
+    ],
+    "timeRange": {
+      "start": "2026-01-06",
+      "end": "2026-02-05"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+## Customer Detail Endpoints
+
+### 1. Get Customer Details
+
+**Endpoint:** `GET /api/v2/customers-hub/customers/{customerId}`
+
+**URL Parameters:**
+- `customerId` - Customer ID (integer)
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Customer details retrieved successfully",
+  "data": {
+    "customer": {
+      "id": 228,
+      "name": "John Doe",
+      "phone": "+966501234567",
+      "whatsapp": "+966501234567",
+      "email": "john@example.com",
+      "stage": {
+        "id": 135,
+        "name": "Qualified",
+        "color": "#4CAF50"
+      },
+      "priority": {
+        "id": 2,
+        "name": "High"
+      },
+      "type": {
+        "id": 5,
+        "name": "Buyer"
+      },
+      "city": {
+        "id": 10,
+        "name": "الرياض"
+      },
+      "district": {
+        "id": 50,
+        "name": "العليا"
+      },
+      "assignedTo": {
+        "id": 15,
+        "name": "Ahmed Ali",
+        "email": "ahmed@example.com",
+        "phone": "+966501111111"
+      },
+      "note": "Customer is very interested in properties in North Riyadh. Budget is flexible. Prefers villas with gardens.",
+      "createdAt": "2026-01-15T08:00:00Z",
+      "updatedAt": "2026-02-05T10:00:00Z"
+    },
+    "stats": {
+      "totalInquiries": 3,
+      "totalTasks": 5,
+      "completedTasks": 2,
+      "pendingTasks": 3,
+      "totalAppointments": 1,
+      "daysAsCustomer": 21
+    },
+    "tasks": [
+      {
+        "id": 123,
+        "type": "contact",
+        "title": "Follow up call",
+        "description": "Check on property interest and schedule viewing",
+        "priority": 2,
+        "status": "pending",
+        "dueDate": "2026-02-10T10:00:00Z",
+        "createdAt": "2026-02-05T08:00:00Z"
+      },
+      {
+        "id": 124,
+        "type": "site_visit",
+        "title": "Property viewing",
+        "description": "Show villa in North Riyadh",
+        "priority": 2,
+        "status": "pending",
+        "dueDate": "2026-02-12T14:00:00Z",
+        "createdAt": "2026-02-05T09:00:00Z"
+      }
+    ],
+    "interestedProperties": [
+      {
+        "id": 456,
+        "title": "Luxury Villa in North Riyadh",
+        "price": 2500000,
+        "area": 500,
+        "bedrooms": 5,
+        "bathrooms": 4,
+        "location": "العليا، الرياض",
+        "interestLevel": "high",
+        "addedAt": "2026-02-01T10:00:00Z"
+      },
+      {
+        "id": 457,
+        "title": "Modern Villa with Pool",
+        "price": 2800000,
+        "area": 550,
+        "bedrooms": 6,
+        "bathrooms": 5,
+        "location": "النخيل، الرياض",
+        "interestLevel": "medium",
+        "addedAt": "2026-02-03T11:00:00Z"
+      }
+    ],
+    "preferences": {
+      "propertyType": "villa",
+      "minBudget": 2000000,
+      "maxBudget": 3000000,
+      "preferredAreas": ["العليا", "النخيل", "الملقا"],
+      "minBedrooms": 4,
+      "minBathrooms": 3,
+      "features": ["pool", "garden", "parking", "maid_room"]
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 2. Update Customer
+
+**Endpoint:** `PUT /api/v2/customers-hub/customers/{customerId}`
+
+**URL Parameters:**
+- `customerId` - Customer ID (integer)
+
+**Request Body:**
+```json
+{
+  "name": "John Doe Updated",
+  "email": "john.updated@example.com",
+  "phone_number": "+966501234567",
+  "stage_id": 136,
+  "priority_id": 2,
+  "type_id": 5,
+  "city_id": 10,
+  "district_id": 50,
+  "responsible_employee_id": 15,
+  "note": "Updated customer information - customer confirmed interest in North Riyadh properties",
+  "source": "website"
+}
+```
+
+**Allowed Fields:**
+- `name` (string)
+- `phone_number` (string)
+- `email` (string, nullable)
+- `source` (string, nullable)
+- `note` (text, nullable)
+- `stage_id` (integer, nullable)
+- `priority_id` (integer, nullable)
+- `type_id` (integer, nullable)
+- `procedure_id` (integer, nullable)
+- `responsible_employee_id` (integer, nullable)
+- `city_id` (integer, nullable)
+- `district_id` (integer, nullable)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Customer updated successfully",
+  "data": {
+    "customer": {
+      "id": 228,
+      "name": "John Doe Updated",
+      "email": "john.updated@example.com",
+      "phone_number": "+966501234567",
+      "stage_id": 136,
+      "updatedAt": "2026-02-05T10:30:00Z"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 3. Add Task to Customer
+
+**Endpoint:** `POST /api/v2/customers-hub/customers/{customerId}/tasks`
+
+**URL Parameters:**
+- `customerId` - Customer ID (integer)
+
+**Request Body:**
+```json
+{
+  "type": "contact",
+  "datetime": "2026-02-10T10:00:00Z",
+  "notes": "Follow up on property viewing interest",
+  "priority": 2
+}
+```
+
+**Task Types:**
+- `contact` - Phone call or contact
+- `meeting` - In-person meeting
+- `site_visit` - Property viewing
+- `follow_up` - General follow-up
+
+**Priority Levels:**
+- `0` - Low
+- `1` - Medium
+- `2` - High
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 201,
+  "message": "Task created successfully",
+  "data": {
+    "task": {
+      "id": 125,
+      "customerId": 228,
+      "type": "contact",
+      "title": "Follow up on property viewing interest",
+      "datetime": "2026-02-10T10:00:00Z",
+      "notes": "Follow up on property viewing interest",
+      "priority": 2,
+      "status": "pending",
+      "createdAt": "2026-02-05T10:30:00Z"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 4. Update Task
+
+**Endpoint:** `PUT /api/v2/customers-hub/customers/{customerId}/tasks/{taskId}`
+
+**URL Parameters:**
+- `customerId` - Customer ID (integer)
+- `taskId` - Task ID (integer)
+
+**Request Body:**
+```json
+{
+  "datetime": "2026-02-11T14:00:00Z",
+  "notes": "Rescheduled - customer requested later time",
+  "priority": 2,
+  "status": "pending"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Task updated successfully",
+  "data": {
+    "task": {
+      "id": 125,
+      "customerId": 228,
+      "datetime": "2026-02-11T14:00:00Z",
+      "notes": "Rescheduled - customer requested later time",
+      "priority": 2,
+      "status": "pending",
+      "updatedAt": "2026-02-05T10:30:00Z"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 5. Delete Task
+
+**Endpoint:** `DELETE /api/v2/customers-hub/customers/{customerId}/tasks/{taskId}`
+
+**URL Parameters:**
+- `customerId` - Customer ID (integer)
+- `taskId` - Task ID (integer)
+
+**Request Body:** None
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Task deleted successfully",
+  "data": {
+    "taskId": 125,
+    "customerId": 228,
+    "deletedAt": "2026-02-05T10:30:00Z"
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 6. Update Customer Preferences
+
+**Endpoint:** `PUT /api/v2/customers-hub/customers/{customerId}/preferences`
+
+**URL Parameters:**
+- `customerId` - Customer ID (integer)
+
+**Request Body:**
+```json
+{
+  "propertyType": "villa",
+  "minBudget": 2000000,
+  "maxBudget": 3000000,
+  "preferredAreas": ["العليا", "النخيل", "الملقا"],
+  "minBedrooms": 4,
+  "minBathrooms": 3,
+  "minArea": 400,
+  "maxArea": 600,
+  "features": ["pool", "garden", "parking", "maid_room", "driver_room"]
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Preferences updated successfully",
+  "data": {
+    "preferences": {
+      "propertyType": "villa",
+      "minBudget": 2000000,
+      "maxBudget": 3000000,
+      "preferredAreas": ["العليا", "النخيل", "الملقا"],
+      "minBedrooms": 4,
+      "minBathrooms": 3,
+      "minArea": 400,
+      "maxArea": 600,
+      "features": ["pool", "garden", "parking", "maid_room", "driver_room"],
+      "updatedAt": "2026-02-05T10:30:00Z"
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### 7. Get Customer History
+
+**Endpoint:** `GET /api/v2/customers-hub/customers/{customerId}/history`
+
+**URL Parameters:**
+- `customerId` - Customer ID (integer)
+
+**Query Parameters:**
+- `limit` - Number of history items (default: 50)
+- `offset` - Pagination offset (default: 0)
+
+**Request Body:** None (GET request)
+
+**Response:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "Customer history retrieved successfully",
+  "data": {
+    "history": [
+      {
+        "id": 1,
+        "type": "stage_change",
+        "description": "Moved from 'New' to 'Contacted'",
+        "details": {
+          "previousStage": "New",
+          "newStage": "Contacted"
+        },
+        "performedBy": {
+          "id": 15,
+          "name": "Ahmed Ali"
+        },
+        "timestamp": "2026-02-05T10:00:00Z"
+      },
+      {
+        "id": 2,
+        "type": "task_completed",
+        "description": "Completed task: Follow up call",
+        "details": {
+          "taskId": 123,
+          "taskTitle": "Follow up call"
+        },
+        "performedBy": {
+          "id": 15,
+          "name": "Ahmed Ali"
+        },
+        "timestamp": "2026-02-04T14:30:00Z"
+      },
+      {
+        "id": 3,
+        "type": "task_created",
+        "description": "Created task: Property viewing",
+        "details": {
+          "taskId": 124,
+          "taskTitle": "Property viewing",
+          "dueDate": "2026-02-12T14:00:00Z"
+        },
+        "performedBy": {
+          "id": 15,
+          "name": "Ahmed Ali"
+        },
+        "timestamp": "2026-02-04T14:35:00Z"
+      },
+      {
+        "id": 4,
+        "type": "customer_updated",
+        "description": "Updated customer information",
+        "details": {
+          "fields": ["email", "note"]
+        },
+        "performedBy": {
+          "id": 15,
+          "name": "Ahmed Ali"
+        },
+        "timestamp": "2026-02-03T11:20:00Z"
+      },
+      {
+        "id": 5,
+        "type": "property_interested",
+        "description": "Added interested property: Luxury Villa in North Riyadh",
+        "details": {
+          "propertyId": 456,
+          "propertyTitle": "Luxury Villa in North Riyadh",
+          "interestLevel": "high"
+        },
+        "performedBy": {
+          "id": 15,
+          "name": "Ahmed Ali"
+        },
+        "timestamp": "2026-02-01T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "limit": 50,
+      "offset": 0,
+      "total": 5
+    }
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+## Error Responses
+
+### Validation Error (422)
+
+```json
+{
+  "status": "error",
+  "code": 422,
+  "message": "Validation failed",
+  "errors": {
+    "email": ["The email field must be a valid email address."],
+    "phone_number": ["The phone number field is required."],
+    "stage_id": ["The selected stage id is invalid."]
+  },
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### Unauthorized Error (401)
+
+```json
+{
+  "status": "error",
+  "code": 401,
+  "message": "Unauthenticated",
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### Not Found Error (404)
+
+```json
+{
+  "status": "error",
+  "code": 404,
+  "message": "Customer not found",
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+### Server Error (500)
+
+```json
+{
+  "status": "error",
+  "code": 500,
+  "message": "Internal server error",
+  "timestamp": "2026-02-05T10:30:00Z"
+}
+```
+
+---
+
+## Quick Reference
+
+### Base URL
+```
+/api/v2/customers-hub
+```
+
+### Authentication Header
+```
+Authorization: Bearer {token}
+```
+
+### Content Type
+```
+Content-Type: application/json
+Accept: application/json
+```
+
+### Date Format
+All dates use ISO 8601 format with UTC timezone:
+```
+2026-02-05T10:30:00Z
+```
+
+### Pagination
+```json
+{
+  "page": 1,
+  "limit": 20
+}
+```
+
+### Sorting
+```json
+{
+  "field": "created_at",
+  "order": "desc"
+}
+```
+
+---

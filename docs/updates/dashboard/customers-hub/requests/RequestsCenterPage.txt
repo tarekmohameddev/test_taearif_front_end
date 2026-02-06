@@ -32,3 +32,8 @@ docs/backend-integration/customers-hub-requests-api-specification.md
 Update Type: Documentation
 Created comprehensive backend API integration specification document for Request Detail Page - includes stats cards, filters (dropdown and tabs), related actions grid, AI matching properties grid, and all action operations
 docs/backend-integration/customers-hub-request-detail-api-specification.md
+
+2026-02-05 10:30:00
+Update Type: Feature
+Integrated backend API endpoints for Requests Center page - created API service, custom hook with token validation, updated page component to fetch data from API instead of mock data, added loading and error states, connected all action operations (complete, dismiss, snooze, assign) to API endpoints
+lib/services/customers-hub-requests-api.ts, hooks/useCustomersHubRequests.ts, app/dashboard/customers-hub/requests/page.tsx, components/customers-hub/requests/RequestsCenterPage.tsx, types/unified-customer.ts
