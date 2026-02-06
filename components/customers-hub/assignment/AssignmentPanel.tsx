@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useCustomersHubAssignment } from "@/hooks/useCustomersHubAssignment";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import {
@@ -66,6 +66,7 @@ export function AssignmentPanel() {
   const [configs, setConfigs] = useState<EmployeeConfig[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
+  const hasFetchedOnOpenRef = useRef(false);
 
   // Initialize configs from API rules or employees
   useEffect(() => {
@@ -86,17 +87,23 @@ export function AssignmentPanel() {
     }
   }, [employees, apiRules]);
 
-  // Refresh data when panel opens - only fetch if not already loaded
+  // Refresh data when panel opens - only fetch once per open session
   useEffect(() => {
-    if (open && !apiLoading) {
+    if (open && !apiLoading && !hasFetchedOnOpenRef.current) {
+      hasFetchedOnOpenRef.current = true;
       // Only fetch if data is not already loaded
       // The store will prevent duplicate requests
       fetchEmployees();
       fetchUnassignedCount();
       fetchRules();
     }
+    
+    // Reset flag when panel closes
+    if (!open) {
+      hasFetchedOnOpenRef.current = false;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, apiLoading]);
 
   // Get config for employee
   const getConfig = (empId: string) => configs.find((c) => c.employeeId === empId);

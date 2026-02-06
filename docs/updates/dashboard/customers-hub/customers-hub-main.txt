@@ -42,3 +42,8 @@ context/store/customers-hub-assignment.ts, hooks/useCustomersHubAssignment.ts
 Update Type: Enhancement
 Updated StatsResponse interface to match actual API response - added totalDealValue, closedThisMonth, and avgDaysInPipeline fields to StatsResponse interface to match the actual API response structure from /v2/customers-hub/list/stats endpoint
 lib/services/customers-hub-list-api.ts
+
+2026-02-06 22:15:59
+Update Type: Bug Fix
+Fixed spam API requests to /v2/customers-hub/assignment/unassigned-count and /v2/customers-hub/assignment/rules endpoints causing rate limiting (20+ requests per second) - removed store functions from useEffect dependencies in useCustomersHubAssignment hook, added useRef to track initialization, added fetchingUnassignedCount and fetchingRules loading flags in store to prevent simultaneous duplicate requests, added useRef in AssignmentPanel to prevent refetching when panel opens multiple times
+hooks/useCustomersHubAssignment.ts, context/store/customers-hub-assignment.ts, components/customers-hub/assignment/AssignmentPanel.tsx

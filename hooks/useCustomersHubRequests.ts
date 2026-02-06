@@ -52,8 +52,12 @@ export function useCustomersHubRequests() {
           }));
           
           setActions(transformedActions);
+          // تحديث stats دائماً من API response (إجباري)
           if (response.data.stats) {
             setStats(response.data.stats);
+          } else {
+            // إذا لم تأت stats من API، احتفظ بالقيمة الحالية (لا تقم بالحساب المحلي)
+            // هذا يضمن أن stats تأتي فقط من API
           }
           if (response.data.pagination) {
             setPagination(response.data.pagination);

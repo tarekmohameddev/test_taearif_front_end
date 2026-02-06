@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import { useCustomersHubAssignmentStore } from "@/context/store/customers-hub-assignment";
 
@@ -13,6 +13,7 @@ import { useCustomersHubAssignmentStore } from "@/context/store/customers-hub-as
 export function useCustomersHubAssignment() {
   const { userData, IsLoading: authLoading } = useAuthStore();
   const store = useCustomersHubAssignmentStore();
+  const hasInitializedRef = useRef(false);
 
   // Initial load - only run once when token is available
   useEffect(() => {
@@ -20,23 +21,24 @@ export function useCustomersHubAssignment() {
       return;
     }
 
-    // Load initial data if not already loaded
-    // The store will prevent duplicate requests
-    if (!store.hasLoaded) {
+    // Load initial data if not already loaded and not initialized
+    if (!store.hasLoaded && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
       Promise.all([
         store.fetchEmployees(),
         store.fetchUnassignedCount(),
         store.fetchRules(),
       ]);
     }
-  }, [userData?.token, authLoading, store.hasLoaded, store.fetchEmployees, store.fetchUnassignedCount, store.fetchRules]);
+  }, [userData?.token, authLoading, store.hasLoaded]);
 
   // Reset store when token is removed (logout)
   useEffect(() => {
     if (!userData?.token && store.hasLoaded) {
+      hasInitializedRef.current = false;
       store.reset();
     }
-  }, [userData?.token, store.hasLoaded, store.reset]);
+  }, [userData?.token, store.hasLoaded]);
 
   return {
     employees: store.employees,

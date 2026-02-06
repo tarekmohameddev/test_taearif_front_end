@@ -21,6 +21,9 @@ interface CustomersHubAssignmentStore {
   loading: boolean;
   error: string | null;
   hasLoaded: boolean;
+  // Loading flags for individual fetches
+  fetchingUnassignedCount: boolean;
+  fetchingRules: boolean;
 
   // Actions
   fetchEmployees: () => Promise<void>;
@@ -40,6 +43,8 @@ export const useCustomersHubAssignmentStore = create<CustomersHubAssignmentStore
   loading: false,
   error: null,
   hasLoaded: false,
+  fetchingUnassignedCount: false,
+  fetchingRules: false,
 
   // Fetch employees - only fetch if not already loaded
   fetchEmployees: async () => {
@@ -79,8 +84,15 @@ export const useCustomersHubAssignmentStore = create<CustomersHubAssignmentStore
     }
   },
 
-  // Fetch unassigned count
+  // Fetch unassigned count - with debouncing protection
   fetchUnassignedCount: async () => {
+    // Prevent multiple simultaneous requests
+    if (get().fetchingUnassignedCount) {
+      return;
+    }
+
+    set({ fetchingUnassignedCount: true });
+
     try {
       const response = await getUnassignedCount();
       if (response.status === "success") {
@@ -88,11 +100,20 @@ export const useCustomersHubAssignmentStore = create<CustomersHubAssignmentStore
       }
     } catch (err: any) {
       console.error("Error fetching unassigned count:", err);
+    } finally {
+      set({ fetchingUnassignedCount: false });
     }
   },
 
-  // Fetch assignment rules
+  // Fetch assignment rules - with debouncing protection
   fetchRules: async () => {
+    // Prevent multiple simultaneous requests
+    if (get().fetchingRules) {
+      return;
+    }
+
+    set({ fetchingRules: true });
+
     try {
       const response = await getAssignmentRules();
       if (response.status === "success") {
@@ -100,6 +121,8 @@ export const useCustomersHubAssignmentStore = create<CustomersHubAssignmentStore
       }
     } catch (err: any) {
       console.error("Error fetching rules:", err);
+    } finally {
+      set({ fetchingRules: false });
     }
   },
 
@@ -166,6 +189,8 @@ export const useCustomersHubAssignmentStore = create<CustomersHubAssignmentStore
       loading: false,
       error: null,
       hasLoaded: false,
+      fetchingUnassignedCount: false,
+      fetchingRules: false,
     });
   },
 }));

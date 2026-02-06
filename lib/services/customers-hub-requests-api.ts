@@ -41,10 +41,13 @@ export interface RequestsListResponse {
   data: {
     actions: CustomerAction[];
     stats?: {
-      total: number;
+      inbox: number;
+      followups: number;
       pending: number;
-      completed: number;
       overdue: number;
+      today: number;
+      completed: number;
+      total?: number;
     };
     pagination?: {
       currentPage: number;

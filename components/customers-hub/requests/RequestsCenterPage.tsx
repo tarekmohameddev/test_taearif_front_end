@@ -539,15 +539,30 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     currentTabActions.every((a) => selectedActionIds.has(a.id));
 
   const stats = useMemo(
-    () => ({
-      pending: apiStats?.pending ?? allPendingActions.length,
-      inbox: inboxRequests.length,
-      followups: followupRequests.length,
-      overdue: apiStats?.overdue ?? overdueActions.length,
-      today: todayActions.length,
-      completed: apiStats?.completed ?? completedActions.length,
-      total: apiStats?.total ?? allPendingActions.length,
-    }),
+    () => {
+      // إذا كان apiStats موجوداً، استخدمه بشكل إجباري (لا تحسب محلياً)
+      if (apiStats) {
+        return {
+          pending: apiStats.pending ?? 0,
+          inbox: apiStats.inbox ?? 0,
+          followups: apiStats.followups ?? 0,
+          overdue: apiStats.overdue ?? 0,
+          today: apiStats.today ?? 0,
+          completed: apiStats.completed ?? 0,
+          total: apiStats.total ?? 0,
+        };
+      }
+      // Fallback: حساب محلي فقط إذا لم يكن apiStats موجوداً
+      return {
+        pending: allPendingActions.length,
+        inbox: inboxRequests.length,
+        followups: followupRequests.length,
+        overdue: overdueActions.length,
+        today: todayActions.length,
+        completed: completedActions.length,
+        total: allPendingActions.length,
+      };
+    },
     [
       apiStats,
       allPendingActions.length,
