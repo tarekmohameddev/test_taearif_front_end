@@ -86,71 +86,7 @@ export function CustomersTable() {
   return (
     <Card>
       {/* Filters and Search */}
-      <div className="p-4 border-b space-y-4">
-        <div className="flex items-center gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="ابحث بالاسم، رقم الجوال، البريد..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10"
-            />
-          </div>
-
-          <Select
-            value={filters.stage?.[0] || "all"}
-            onValueChange={(value) => {
-              if (value === "all") {
-                setFilters({ stage: undefined });
-              } else {
-                setFilters({ stage: [value as any] });
-              }
-            }}
-          >
-            <SelectTrigger className="w-[180px]">
-              <Filter className="h-4 w-4 ml-2" />
-              <SelectValue placeholder="جميع المراحل" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">جميع المراحل</SelectItem>
-              {LIFECYCLE_STAGES.map((stage) => (
-                <SelectItem key={stage.id} value={stage.id}>
-                  {stage.nameAr}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={filters.priority?.[0] || "all"}
-            onValueChange={(value) => {
-              if (value === "all") {
-                setFilters({ priority: undefined });
-              } else {
-                setFilters({ priority: [value as any] });
-              }
-            }}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="الأولوية" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">جميع الأولويات</SelectItem>
-              <SelectItem value="urgent">عاجل</SelectItem>
-              <SelectItem value="high">عالي</SelectItem>
-              <SelectItem value="medium">متوسط</SelectItem>
-              <SelectItem value="low">منخفض</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Results count */}
-        <div className="text-sm text-gray-600">
-          عرض {startIndex + 1} - {Math.min(endIndex, filteredCustomers.length)} من{" "}
-          {filteredCustomers.length} عميل
-        </div>
-      </div>
+ 
 
       {/* Table */}
       <div className="overflow-x-auto">
