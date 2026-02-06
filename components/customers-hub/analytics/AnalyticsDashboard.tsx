@@ -12,15 +12,64 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { LIFECYCLE_STAGES } from "@/types/unified-customer";
+import type { TimeRange } from "@/lib/services/customers-hub-analytics-api";
+import type { TrendDataPoint, SourceAnalytics, EmployeePerformance } from "@/lib/services/customers-hub-analytics-api";
 
-export function AnalyticsDashboard() {
-  const { customers, statistics } = useUnifiedCustomersStore();
+interface AnalyticsDashboardProps {
+  metrics?: {
+    totalCustomers: number;
+    newCustomers: number;
+    activeCustomers: number;
+    totalInquiries: number;
+    completedTasks: number;
+    totalAppointments: number;
+    conversionRate: string;
+    avgResponseTime: string;
+    avgDaysToClose: number;
+  } | null;
+  trends?: TrendDataPoint[] | null;
+  sources?: SourceAnalytics[] | null;
+  performance?: EmployeePerformance[] | null;
+  timeRange?: TimeRange | { start?: string; end?: string };
+  loading?: boolean;
+  error?: string | null;
+  onTimeRangeChange?: (range: TimeRange) => void;
+  onFetchAllAnalytics?: (range: TimeRange) => Promise<void>;
+}
 
-  // Calculate advanced analytics
+export function AnalyticsDashboard(props?: AnalyticsDashboardProps) {
+  const store = useUnifiedCustomersStore();
+  const { customers: storeCustomers, statistics: storeStatistics } = store;
+  
+  // Use prop metrics if provided, otherwise use store data
+  const apiMetrics = props?.metrics;
+  const apiTrends = props?.trends;
+  const apiSources = props?.sources;
+  const apiPerformance = props?.performance;
+  const apiLoading = props?.loading ?? false;
+  const apiError = props?.error;
+  
+  // Use API metrics if available, otherwise calculate from store
+  const customers = storeCustomers; // Keep using store customers for now
+  const statistics = apiMetrics 
+    ? {
+        total: apiMetrics.totalCustomers,
+        newThisMonth: apiMetrics.newCustomers,
+        conversionRate: parseFloat(apiMetrics.conversionRate.replace('%', '')) || 0,
+        avgDaysInPipeline: apiMetrics.avgDaysToClose,
+        totalDealValue: 0, // Not provided in API metrics
+        closedThisMonth: 0, // Not provided in API metrics
+        byStage: {} as Record<string, number>,
+      }
+    : storeStatistics;
+
+  // Calculate advanced analytics - use API data if available
   const analytics = {
     // Conversion metrics
-    conversionRate: statistics?.conversionRate || 0,
-    avgDaysInPipeline: statistics?.avgDaysInPipeline || 0,
+    conversionRate: apiMetrics 
+      ? parseFloat(apiMetrics.conversionRate.replace('%', '')) || 0
+      : statistics?.conversionRate || 0,
+    avgDaysInPipeline: apiMetrics?.avgDaysToClose || statistics?.avgDaysInPipeline || 0,
     closingRatio: customers.filter(c => c.stage === "closing").length / Math.max(customers.length, 1) * 100,
     
     // Timeline distribution
@@ -65,6 +114,37 @@ export function AnalyticsDashboard() {
     return <Minus className="h-4 w-4 text-gray-600" />;
   };
 
+  // Show loading state
+  if (apiLoading && !apiMetrics) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        <p className="text-gray-600 dark:text-gray-400">جاري تحميل التحليلات...</p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (apiError && !apiMetrics) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <Card className="max-w-md">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">حدث خطأ</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{apiError}</p>
+            <button 
+              onClick={() => props?.onFetchAllAnalytics?.({ timeRange: "last30days" })}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            >
+              إعادة المحاولة
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
@@ -75,10 +155,10 @@ export function AnalyticsDashboard() {
               <span className="text-sm text-gray-600">إجمالي العملاء</span>
               <Users className="h-5 w-5 text-blue-600" />
             </div>
-            <div className="text-3xl font-bold">{customers.length}</div>
+            <div className="text-3xl font-bold">{apiMetrics?.totalCustomers ?? customers.length}</div>
             <div className="flex items-center gap-1 mt-1 text-xs text-green-600">
-              {getTrendIcon(statistics?.newThisMonth || 0)}
-              <span>+{statistics?.newThisMonth || 0} هذا الشهر</span>
+              {getTrendIcon(apiMetrics?.newCustomers ?? statistics?.newThisMonth || 0)}
+              <span>+{apiMetrics?.newCustomers ?? statistics?.newThisMonth || 0} هذا الشهر</span>
             </div>
           </CardContent>
         </Card>
@@ -89,10 +169,10 @@ export function AnalyticsDashboard() {
               <span className="text-sm text-gray-600">معدل التحويل</span>
               <Target className="h-5 w-5 text-green-600" />
             </div>
-            <div className="text-3xl font-bold">{analytics.conversionRate}%</div>
+            <div className="text-3xl font-bold">{analytics.conversionRate.toFixed(1)}%</div>
             <div className="flex items-center gap-1 mt-1 text-xs text-gray-600">
               <CheckCircle className="h-3 w-3" />
-              <span>{statistics?.closedThisMonth || 0} صفقات مغلقة</span>
+              <span>{apiMetrics?.totalAppointments ?? statistics?.closedThisMonth || 0} مواعيد/صفقات</span>
             </div>
           </CardContent>
         </Card>
@@ -104,9 +184,13 @@ export function AnalyticsDashboard() {
               <DollarSign className="h-5 w-5 text-purple-600" />
             </div>
             <div className="text-3xl font-bold">
-              {((statistics?.totalDealValue || 0) / 1000000).toFixed(1)}M
+              {apiMetrics?.totalInquiries 
+                ? ((apiMetrics.totalInquiries * 100000) / 1000000).toFixed(1) + "M"
+                : ((statistics?.totalDealValue || 0) / 1000000).toFixed(1) + "M"}
             </div>
-            <div className="text-xs text-gray-600 mt-1">ريال سعودي</div>
+            <div className="text-xs text-gray-600 mt-1">
+              {apiMetrics?.totalInquiries ? "استفسارات" : "ريال سعودي"}
+            </div>
           </CardContent>
         </Card>
 

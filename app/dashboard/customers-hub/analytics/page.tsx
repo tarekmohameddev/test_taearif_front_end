@@ -1,12 +1,52 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { AnalyticsDashboard } from "@/components/customers-hub/analytics/AnalyticsDashboard";
+import { useCustomersHubAnalytics } from "@/hooks/useCustomersHubAnalytics";
+import useAuthStore from "@/context/AuthContext";
 
 export default function AnalyticsPage() {
+  const { userData, IsLoading: authLoading } = useAuthStore();
+  const {
+    metrics,
+    trends,
+    sources,
+    performance,
+    timeRange,
+    loading,
+    error,
+    fetchAllAnalytics,
+    setTimeRange,
+  } = useCustomersHubAnalytics();
+
+  const [initialLoad, setInitialLoad] = useState(false);
+
+  // Fetch initial data when token is ready
+  useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return;
+    }
+
+    if (initialLoad) {
+      return;
+    }
+
+    const loadInitialData = async () => {
+      try {
+        await fetchAllAnalytics({ timeRange: "last30days" });
+        setInitialLoad(true);
+      } catch (err) {
+        console.error("Error loading initial analytics data:", err);
+      }
+    };
+
+    loadInitialData();
+  }, [userData?.token, authLoading, fetchAllAnalytics, initialLoad]);
+
   return (
     <div className="flex flex-col gap-6 p-6" dir="rtl">
       {/* Header */}
@@ -29,7 +69,17 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Analytics Dashboard */}
-      <AnalyticsDashboard />
+      <AnalyticsDashboard
+        metrics={metrics}
+        trends={trends}
+        sources={sources}
+        performance={performance}
+        timeRange={timeRange}
+        loading={loading}
+        error={error}
+        onTimeRangeChange={setTimeRange}
+        onFetchAllAnalytics={fetchAllAnalytics}
+      />
     </div>
   );
 }
