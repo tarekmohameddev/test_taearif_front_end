@@ -22,3 +22,8 @@ lib/services/customers-hub-assignment-api.ts, hooks/useCustomersHubAssignment.ts
 Update Type: Bug Fix
 Fixed issue where customers-hub pages were showing as tenant/merchant pages in production - added mandhoor.com to base domains list in dashboard/layout.tsx and proxy.ts to prevent it from being treated as tenant domain, added double-check in proxy.ts to prevent x-tenant-id header from being set for base domains
 app/dashboard/layout.tsx, proxy.ts
+
+2026-02-06 16:16:12
+Update Type: Refactor
+Refactored customers-hub main page to follow same pattern as incomplete-requests page - moved component code to separate file CustomersHubMainPage.tsx in components/customers-hub/page/ and simplified page.tsx to just import and render the component
+app/dashboard/customers-hub/page.tsx, components/customers-hub/page/CustomersHubMainPage.tsx
