@@ -46,6 +46,15 @@ import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 
 interface RequestDetailPageProps {
   requestId: string;
+  action?: CustomerAction | null;
+  stats?: any;
+  loading?: boolean;
+  error?: string | null;
+  onCompleteAction?: (notes?: string) => Promise<boolean>;
+  onDismissAction?: (reason?: string) => Promise<boolean>;
+  onSnoozeAction?: (snoozeUntil: string, reason?: string) => Promise<boolean>;
+  onAssignAction?: (employeeId: number) => Promise<boolean>;
+  onRefetch?: () => Promise<void>;
 }
 
 const priorityConfig = {
@@ -84,20 +93,100 @@ const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
   { value: "other", label: "أخرى" },
 ];
 
-export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
+export function RequestDetailPage({
+  requestId,
+  action: propAction,
+  stats: propStats,
+  loading: propLoading,
+  error: propError,
+  onCompleteAction,
+  onDismissAction,
+  onSnoozeAction,
+  onAssignAction,
+  onRefetch,
+}: RequestDetailPageProps) {
   const router = useRouter();
+  const store = useUnifiedCustomersStore();
   const {
-    actions,
+    actions: storeActions,
     getCustomerById,
-    completeAction,
-    dismissAction,
-    snoozeAction,
-    addActionNote,
-    addAppointment,
-  } = useUnifiedCustomersStore();
+    completeAction: storeCompleteAction,
+    dismissAction: storeDismissAction,
+    snoozeAction: storeSnoozeAction,
+    addActionNote: storeAddActionNote,
+    addAppointment: storeAddAppointment,
+  } = store;
 
-  const action = actions.find((a) => a.id === requestId);
-  const customer = action ? getCustomerById(action.customerId) : undefined;
+  // Use prop action if provided, otherwise find in store
+  const action = propAction ?? storeActions.find((a) => a.id === requestId);
+  
+  // Get customer info - try from action metadata first, then from store
+  const customer = action 
+    ? (getCustomerById(action.customerId) ?? {
+        id: action.customerId,
+        name: action.customerName,
+        phone: action.customerPhone || "",
+        email: action.customerEmail,
+        source: action.source,
+        stage: "new_lead" as const,
+        stageHistory: [],
+        preferences: {} as any,
+        leadScore: 0,
+        aiInsights: {} as any,
+        priority: action.priority,
+        tags: [],
+        properties: [],
+        interactions: [],
+        appointments: [],
+        reminders: [],
+        documents: [],
+        createdAt: action.createdAt,
+        updatedAt: action.createdAt,
+      })
+    : undefined;
+
+  // Use API handlers if provided, otherwise use store handlers
+  const completeAction = onCompleteAction
+    ? async () => {
+        try {
+          await onCompleteAction();
+          if (onRefetch) await onRefetch();
+        } catch (err) {
+          console.error("Error completing action:", err);
+        }
+      }
+    : () => {
+        storeCompleteAction(requestId);
+      };
+
+  const dismissAction = onDismissAction
+    ? async () => {
+        try {
+          await onDismissAction();
+          if (onRefetch) await onRefetch();
+        } catch (err) {
+          console.error("Error dismissing action:", err);
+        }
+      }
+    : () => {
+        storeDismissAction(requestId);
+      };
+
+  const snoozeAction = onSnoozeAction
+    ? async (snoozeUntil: string, reason?: string) => {
+        try {
+          await onSnoozeAction(snoozeUntil, reason);
+          if (onRefetch) await onRefetch();
+        } catch (err) {
+          console.error("Error snoozing action:", err);
+        }
+      }
+    : (snoozeUntil: string) => {
+        storeSnoozeAction(requestId, snoozeUntil);
+      };
+
+  const addActionNote = storeAddActionNote;
+  const addAppointment = storeAddAppointment;
 
   const [showSnoozeForm, setShowSnoozeForm] = useState(false);
   const [snoozeDate, setSnoozeDate] = useState("");
@@ -109,6 +198,36 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
   const [aptDate, setAptDate] = useState("");
   const [aptTime, setAptTime] = useState("10:00");
   const [aptNotes, setAptNotes] = useState("");
+
+  // Show loading state
+  if (propLoading && !action) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        <p className="text-gray-600 dark:text-gray-400">جاري تحميل تفاصيل الطلب...</p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (propError && !action) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+        <div className="text-2xl font-bold text-gray-400">حدث خطأ</div>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">{propError}</p>
+        <div className="flex gap-2">
+          <Button onClick={() => onRefetch?.()}>إعادة المحاولة</Button>
+          <Link href="/ar/dashboard/customers-hub/requests">
+            <Button variant="outline">
+              <ArrowRight className="ml-2 h-4 w-4" />
+              العودة للطلبات
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!action) {
     return (
@@ -126,18 +245,18 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
 
   const isOverdue = action.dueDate && new Date(action.dueDate) < new Date();
 
-  const handleComplete = () => {
-    completeAction(action.id);
+  const handleComplete = async () => {
+    await completeAction();
   };
 
-  const handleDismiss = () => {
-    dismissAction(action.id);
+  const handleDismiss = async () => {
+    await dismissAction();
   };
 
-  const handleSnooze = () => {
+  const handleSnooze = async () => {
     if (!snoozeDate) return;
     const datetime = new Date(`${snoozeDate}T${snoozeTime}`).toISOString();
-    snoozeAction(action.id, datetime);
+    await snoozeAction(datetime);
     setShowSnoozeForm(false);
     setSnoozeDate("");
     setSnoozeTime("10:00");
