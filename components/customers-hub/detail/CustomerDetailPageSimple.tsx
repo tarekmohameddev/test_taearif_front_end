@@ -677,8 +677,8 @@ function TasksSectionCard({
     // Use API handler if provided
     if (onAddTask) {
       try {
-        const taskType = selectedTaskType === "property_viewing" ? "site_visit" :
-                        selectedTaskType === "office_visit" ? "meeting" : "contact";
+        // API expects: "contact", "office_visit", "property_viewing" (no conversion needed)
+        const taskType = selectedTaskType; // Use directly: "contact" | "office_visit" | "property_viewing"
         
         await onAddTask({
           type: taskType,
