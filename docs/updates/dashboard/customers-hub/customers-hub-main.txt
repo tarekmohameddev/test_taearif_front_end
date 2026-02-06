@@ -47,3 +47,48 @@ lib/services/customers-hub-list-api.ts
 Update Type: Bug Fix
 Fixed spam API requests to /v2/customers-hub/assignment/unassigned-count and /v2/customers-hub/assignment/rules endpoints causing rate limiting (20+ requests per second) - removed store functions from useEffect dependencies in useCustomersHubAssignment hook, added useRef to track initialization, added fetchingUnassignedCount and fetchingRules loading flags in store to prevent simultaneous duplicate requests, added useRef in AssignmentPanel to prevent refetching when panel opens multiple times
 hooks/useCustomersHubAssignment.ts, context/store/customers-hub-assignment.ts, components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-06 23:51:38
+Update Type: Enhancement
+Prevented sending requests to employees without rules in assignment management sidebar - filtered out employees without rules before sending auto-assign request, added validation to check if any employees have rules before sending request, disabled auto-assign button when no employees have rules, added user-friendly error message and status indicator showing number of employees with rules
+components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-06 23:55:00
+Update Type: Enhancement
+Filtered out employees without rules when saving assignment rules - only employees with at least one rule are sent to /v2/customers-hub/assignment/rules endpoint, even if employee is active, added validation to prevent saving when no employees have rules
+components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-06 23:58:00
+Update Type: Enhancement
+Reset selected employee to null when assignment sidebar opens - automatically shows employee list view instead of specific employee details when sidebar is opened
+components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-07 00:05:00
+Update Type: Enhancement
+Fixed auto-assign endpoint integration - updated store to return full AutoAssignResponse instead of boolean, updated AssignmentPanel to properly handle response data including assignedCount and failedCount, added proper error handling and user feedback messages
+context/store/customers-hub-assignment.ts, components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-07 00:11:54
+Update Type: Bug Fix
+Added debugging console.log statements and loading state for auto-assignment - added autoAssigning state to prevent multiple simultaneous requests, added comprehensive console.log in runAutoAssignment and handleAutoAssign for debugging, improved error handling with detailed error messages, updated button to show loading state during auto-assignment
+components/customers-hub/assignment/AssignmentPanel.tsx, context/store/customers-hub-assignment.ts
+
+2026-02-07 00:17:20
+Update Type: Enhancement
+Added validation for assignment rules to prevent invalid rule combinations - added getValidOperatorsForField to restrict operators based on field type (budgetMin/greaterThan, budgetMax/lessThan, propertyType/equals, city&source/equals|contains), added isValidValueForField to validate value types (numbers for budget fields, strings for text fields), added validateRule function to check rule validity, updated updateRule to auto-correct invalid operators when field changes, added validation check in handleSave before sending to API, added visual error indicators (red border, error badge, error message) for invalid rules, updated operator Select to only show valid operators for selected field, updated Input to show appropriate placeholder and type for budget fields
+components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-07 00:20:00
+Update Type: Enhancement
+Added error indicators in employee list view - added validation check for each employee's rules in the employee list, added red border and background color for employees with invalid rules, added error badge showing count of invalid rules next to employee name, changed rules badge to outline variant when employee has invalid rules
+components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-07 00:24:53
+Update Type: Refactor
+Removed duplicate save button from employee details header - removed "حفظ التغييرات" button from header section, kept only the save button at the bottom of employee rules editor
+components/customers-hub/assignment/AssignmentPanel.tsx
+
+2026-02-07 00:30:00
+Update Type: Feature
+Added beautiful assignment results dialog - created CustomDialog to display auto-assignment results with summary cards (success count, failed count, total attempts), grouped assignments by employee with employee name and avatar, displayed customer IDs in grid layout with checkmarks, added timestamp display, added empty state for no assignments, integrated dialog opening after successful auto-assignment
+components/customers-hub/assignment/AssignmentPanel.tsx

@@ -9,6 +9,7 @@ import {
   type EmployeeWorkload,
   type EmployeeConfig,
   type AutoAssignParams,
+  type AutoAssignResponse,
   type ManualAssignParams,
   type SaveRulesParams,
 } from "@/lib/services/customers-hub-assignment-api";
@@ -29,7 +30,7 @@ interface CustomersHubAssignmentStore {
   fetchEmployees: () => Promise<void>;
   fetchUnassignedCount: () => Promise<void>;
   fetchRules: () => Promise<void>;
-  handleAutoAssign: (params: AutoAssignParams) => Promise<boolean>;
+  handleAutoAssign: (params: AutoAssignParams) => Promise<AutoAssignResponse | null>;
   handleManualAssign: (params: ManualAssignParams) => Promise<boolean>;
   handleSaveRules: (params: SaveRulesParams) => Promise<boolean>;
   reset: () => void;
@@ -128,20 +129,32 @@ export const useCustomersHubAssignmentStore = create<CustomersHubAssignmentStore
 
   // Auto assign customers
   handleAutoAssign: async (params: AutoAssignParams) => {
+    console.log("handleAutoAssign called in store with params:", params);
     try {
+      console.log("Calling autoAssignCustomers API...");
       const response = await autoAssignCustomers(params);
+      console.log("autoAssignCustomers API response:", response);
+      
       if (response.status === "success") {
+        console.log("Assignment successful, refreshing data...");
         // Refresh employees and unassigned count after assignment
         await Promise.all([
           get().fetchEmployees(),
           get().fetchUnassignedCount(),
         ]);
-        return true;
+        console.log("Data refreshed successfully");
+        return response;
       }
-      return false;
+      console.warn("Assignment failed - response status not success:", response.status);
+      return null;
     } catch (err: any) {
       console.error("Error auto assigning customers:", err);
-      return false;
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
+      return null;
     }
   },
 

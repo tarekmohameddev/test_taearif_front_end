@@ -41,9 +41,20 @@ import {
   CheckCircle,
   Save,
   Loader2,
+  X,
+  CheckCircle2,
+  XCircle,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { EmployeeConfig, EmployeeRule } from "@/lib/services/customers-hub-assignment-api";
+import type { EmployeeConfig, EmployeeRule, AutoAssignResponse } from "@/lib/services/customers-hub-assignment-api";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 
 export function AssignmentPanel() {
   const {
@@ -66,6 +77,9 @@ export function AssignmentPanel() {
   const [configs, setConfigs] = useState<EmployeeConfig[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [autoAssigning, setAutoAssigning] = useState(false);
+  const [assignmentResult, setAssignmentResult] = useState<AutoAssignResponse | null>(null);
+  const [showResultDialog, setShowResultDialog] = useState(false);
   const hasFetchedOnOpenRef = useRef(false);
 
   // Initialize configs from API rules or employees
@@ -87,6 +101,13 @@ export function AssignmentPanel() {
     }
   }, [employees, apiRules]);
 
+  // Reset selected employee when panel opens - always show employee list first
+  useEffect(() => {
+    if (open) {
+      setSelectedEmployee(null);
+    }
+  }, [open]);
+
   // Refresh data when panel opens - only fetch once per open session
   useEffect(() => {
     if (open && !apiLoading && !hasFetchedOnOpenRef.current) {
@@ -107,6 +128,68 @@ export function AssignmentPanel() {
 
   // Get config for employee
   const getConfig = (empId: string) => configs.find((c) => c.employeeId === empId);
+
+  // Validate rule field and operator compatibility
+  const getValidOperatorsForField = (field: EmployeeRule["field"]): EmployeeRule["operator"][] => {
+    switch (field) {
+      case "budgetMin":
+        return ["greaterThan"];
+      case "budgetMax":
+        return ["lessThan"];
+      case "propertyType":
+        return ["equals"];
+      case "city":
+        return ["equals", "contains"];
+      case "source":
+        return ["equals", "contains"];
+      default:
+        return [];
+    }
+  };
+
+  // Validate rule value type
+  const isValidValueForField = (field: EmployeeRule["field"], value: string): boolean => {
+    if (!value || value.trim() === "") return false;
+    
+    switch (field) {
+      case "budgetMin":
+      case "budgetMax":
+        // Must be a valid number
+        const num = Number(value);
+        return !isNaN(num) && isFinite(num) && num >= 0;
+      case "propertyType":
+      case "city":
+      case "source":
+        // Must be non-empty string
+        return value.trim().length > 0;
+      default:
+        return false;
+    }
+  };
+
+  // Validate a single rule
+  const validateRule = (rule: EmployeeRule): { valid: boolean; error?: string } => {
+    const validOperators = getValidOperatorsForField(rule.field);
+    
+    if (!validOperators.includes(rule.operator)) {
+      return {
+        valid: false,
+        error: `العامل "${rule.operator}" غير صالح للحقل "${rule.field}". العوامل الصالحة: ${validOperators.join(", ")}`
+      };
+    }
+
+    if (!isValidValueForField(rule.field, rule.value)) {
+      const fieldName = rule.field === "budgetMin" || rule.field === "budgetMax" 
+        ? "رقم" 
+        : "نص";
+      return {
+        valid: false,
+        error: `قيمة غير صالحة للحقل "${rule.field}". يجب أن يكون ${fieldName}`
+      };
+    }
+
+    return { valid: true };
+  };
 
   // Toggle employee active
   const toggleEmployeeActive = (empId: string) => {
@@ -143,7 +226,29 @@ export function AssignmentPanel() {
         c.employeeId === empId
           ? {
               ...c,
-              rules: c.rules.map((r) => (r.id === ruleId ? { ...r, ...updates } : r)),
+              rules: c.rules.map((r) => {
+                if (r.id === ruleId) {
+                  const updatedRule = { ...r, ...updates };
+                  
+                  // If field changed, reset operator and value to defaults
+                  if (updates.field && updates.field !== r.field) {
+                    const validOperators = getValidOperatorsForField(updates.field);
+                    updatedRule.operator = validOperators[0] || "equals";
+                    updatedRule.value = "";
+                  }
+                  
+                  // If operator changed and is invalid for field, reset to first valid operator
+                  if (updates.operator) {
+                    const validOperators = getValidOperatorsForField(updatedRule.field);
+                    if (!validOperators.includes(updates.operator)) {
+                      updatedRule.operator = validOperators[0] || "equals";
+                    }
+                  }
+                  
+                  return updatedRule;
+                }
+                return r;
+              }),
             }
           : c
       )
@@ -167,7 +272,44 @@ export function AssignmentPanel() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const success = await handleSaveRules({ employeeRules: configs });
+      // Filter out employees without rules - only send employees with at least one rule
+      const configsWithRules = configs.filter(
+        (config) => config.rules.length > 0
+      );
+
+      // Check if there are any employees with rules
+      if (configsWithRules.length === 0) {
+        toast.error("لا يمكن حفظ القواعد: يجب أن يكون هناك موظف واحد على الأقل لديه قواعد");
+        setSaving(false);
+        return;
+      }
+
+      // Validate all rules before saving
+      const validationErrors: string[] = [];
+      configsWithRules.forEach((config) => {
+        const employee = employees.find((e) => e.id === config.employeeId);
+        config.rules.forEach((rule, index) => {
+          const validation = validateRule(rule);
+          if (!validation.valid) {
+            validationErrors.push(
+              `موظف "${employee?.name || config.employeeId}" - قاعدة ${index + 1}: ${validation.error}`
+            );
+          }
+        });
+      });
+
+      if (validationErrors.length > 0) {
+        toast.error(
+          `يوجد أخطاء في القواعد:\n${validationErrors.slice(0, 3).join("\n")}${
+            validationErrors.length > 3 ? `\nو ${validationErrors.length - 3} أخطاء أخرى...` : ""
+          }`,
+          { duration: 5000 }
+        );
+        setSaving(false);
+        return;
+      }
+
+      const success = await handleSaveRules({ employeeRules: configsWithRules });
       if (success) {
         toast.success("تم حفظ القواعد بنجاح");
         setHasUnsavedChanges(false);
@@ -226,15 +368,73 @@ export function AssignmentPanel() {
 
   // Run auto-assignment using API
   const runAutoAssignment = async () => {
+    console.log("runAutoAssignment called", { 
+      configs, 
+      configsLength: configs.length,
+      employees: employees.length,
+      apiRules: apiRules.length
+    });
+    
+    if (autoAssigning) {
+      console.warn("Auto assignment already in progress");
+      return;
+    }
+
+    setAutoAssigning(true);
+    
     try {
-      const result = await handleAutoAssign({ employeeRules: configs });
-      if (result.assignedCount > 0) {
-        toast.success(`تم تعيين ${result.assignedCount} عميل تلقائياً`);
+      // Filter out employees without rules - only send employees with at least one rule
+      const configsWithRules = configs.filter(
+        (config) => config.isActive && config.rules.length > 0
+      );
+
+      console.log("configsWithRules:", configsWithRules, "count:", configsWithRules.length);
+
+      // Check if there are any employees with rules
+      if (configsWithRules.length === 0) {
+        console.warn("No employees with rules found");
+        toast.error("لا يمكن إرسال الطلب: يجب أن يكون هناك موظف واحد على الأقل لديه قواعد");
+        setAutoAssigning(false);
+        return;
+      }
+
+      console.log("Sending request with:", { 
+        employeeRules: configsWithRules,
+        employeeCount: configsWithRules.length
+      });
+      
+      const result = await handleAutoAssign({ employeeRules: configsWithRules });
+      
+      console.log("Response received:", result);
+      
+      if (result && result.status === "success") {
+        const { assignedCount, failedCount } = result.data;
+        console.log("Assignment result:", { assignedCount, failedCount });
+        
+        // Save result and show dialog
+        setAssignmentResult(result);
+        setShowResultDialog(true);
+        
+        // Save result and show dialog
+        setAssignmentResult(result);
+        setShowResultDialog(true);
+        
+        if (assignedCount > 0) {
+          toast.success(
+            `تم تعيين ${assignedCount} عميل تلقائياً${failedCount > 0 ? ` (فشل ${failedCount})` : ""}`
+          );
+        } else {
+          toast.info("لا يوجد عملاء مطابقين للقواعد");
+        }
       } else {
-        toast.info("لا يوجد عملاء مطابقين للقواعد");
+        console.error("Auto assign failed - invalid response:", result);
+        toast.error("فشل التعيين التلقائي");
       }
     } catch (error) {
+      console.error("Error in runAutoAssignment:", error);
       toast.error("حدث خطأ أثناء التعيين التلقائي");
+    } finally {
+      setAutoAssigning(false);
     }
   };
 
@@ -242,6 +442,7 @@ export function AssignmentPanel() {
   const selectedConfig = selectedEmployee ? getConfig(selectedEmployee) : null;
 
   return (
+    <>
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="outline" className="gap-2">
@@ -279,11 +480,19 @@ export function AssignmentPanel() {
                     const config = getConfig(emp.id);
                     const rulesCount = config?.rules.length || 0;
                     const loadPercent = Math.round((emp.customerCount / emp.maxCapacity) * 100);
+                    
+                    // Check if employee has invalid rules
+                    const hasInvalidRules = config?.rules.some((rule) => !validateRule(rule).valid) || false;
+                    const invalidRulesCount = config?.rules.filter((rule) => !validateRule(rule).valid).length || 0;
 
                     return (
                       <div
                         key={emp.id}
-                        className="p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                        className={`p-3 border-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors ${
+                          hasInvalidRules
+                            ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10"
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
                         onClick={() => setSelectedEmployee(emp.id)}
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -297,8 +506,13 @@ export function AssignmentPanel() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
+                            {hasInvalidRules && (
+                              <Badge variant="destructive" className="text-xs">
+                                {invalidRulesCount} خطأ
+                              </Badge>
+                            )}
                             {rulesCount > 0 && (
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant={hasInvalidRules ? "outline" : "secondary"} className="text-xs">
                                 {rulesCount} قاعدة
                               </Badge>
                             )}
@@ -327,26 +541,44 @@ export function AssignmentPanel() {
                 {/* Auto Assign Button */}
                 {unassignedCount > 0 && (
                   <div className="p-4 border-t bg-gray-50 dark:bg-gray-900">
-                    <Button 
-                      onClick={runAutoAssignment} 
-                      className="w-full gap-2"
-                      disabled={apiLoading}
-                    >
-                      {apiLoading ? (
+                    {(() => {
+                      // Count employees with rules
+                      const employeesWithRules = configs.filter(
+                        (config) => config.isActive && config.rules.length > 0
+                      ).length;
+                      const hasEmployeesWithRules = employeesWithRules > 0;
+
+                      return (
                         <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          جاري التعيين...
+                          <Button 
+                            onClick={runAutoAssignment} 
+                            className="w-full gap-2"
+                            disabled={apiLoading || autoAssigning || !hasEmployeesWithRules}
+                          >
+                            {apiLoading || autoAssigning ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                جاري التعيين...
+                              </>
+                            ) : (
+                              <>
+                                <Play className="h-4 w-4" />
+                                تشغيل التعيين التلقائي
+                              </>
+                            )}
+                          </Button>
+                          {!hasEmployeesWithRules ? (
+                            <p className="text-xs text-amber-600 text-center mt-2">
+                              يجب إضافة قواعد لموظف واحد على الأقل قبل التعيين التلقائي
+                            </p>
+                          ) : (
+                            <p className="text-xs text-gray-500 text-center mt-2">
+                              سيتم تعيين العملاء حسب قواعد كل موظف ({employeesWithRules} موظف لديه قواعد)
+                            </p>
+                          )}
                         </>
-                      ) : (
-                        <>
-                          <Play className="h-4 w-4" />
-                          تشغيل التعيين التلقائي
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-xs text-gray-500 text-center mt-2">
-                      سيتم تعيين العملاء حسب قواعد كل موظف
-                    </p>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
@@ -382,30 +614,6 @@ export function AssignmentPanel() {
                       />
                     </div>
                   </div>
-                  
-                  {/* Apply/Save Button in Header */}
-                  {hasUnsavedChanges && (
-                    <div className="mt-3 pt-3 border-t">
-                      <Button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="w-full gap-2"
-                        size="sm"
-                      >
-                        {saving ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            جاري الحفظ...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-4 w-4" />
-                            حفظ التغييرات
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
                 </div>
 
                 {/* Rules List */}
@@ -433,19 +641,40 @@ export function AssignmentPanel() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {selectedConfig?.rules.map((rule, idx) => (
-                        <div key={rule.id} className="p-3 border rounded-lg bg-white dark:bg-gray-800 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500">قاعدة {idx + 1}</span>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-7 w-7 p-0 text-red-500"
-                              onClick={() => deleteRule(selectedEmployee, rule.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                      {selectedConfig?.rules.map((rule, idx) => {
+                        const validation = validateRule(rule);
+                        return (
+                          <div 
+                            key={rule.id} 
+                            className={`p-3 border-2 rounded-lg bg-white dark:bg-gray-800 space-y-3 ${
+                              !validation.valid 
+                                ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10" 
+                                : "border-gray-200 dark:border-gray-700"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">قاعدة {idx + 1}</span>
+                                {!validation.valid && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    خطأ
+                                  </Badge>
+                                )}
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 w-7 p-0 text-red-500"
+                                onClick={() => deleteRule(selectedEmployee, rule.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            {!validation.valid && validation.error && (
+                              <p className="text-xs text-red-500 bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                                {validation.error}
+                              </p>
+                            )}
 
                           <div className="grid grid-cols-3 gap-2">
                             {/* Field */}
@@ -474,10 +703,14 @@ export function AssignmentPanel() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="equals">يساوي</SelectItem>
-                                <SelectItem value="greaterThan">أكبر من</SelectItem>
-                                <SelectItem value="lessThan">أقل من</SelectItem>
-                                <SelectItem value="contains">يحتوي</SelectItem>
+                                {getValidOperatorsForField(rule.field).map((op) => (
+                                  <SelectItem key={op} value={op}>
+                                    {op === "equals" && "يساوي"}
+                                    {op === "greaterThan" && "أكبر من"}
+                                    {op === "lessThan" && "أقل من"}
+                                    {op === "contains" && "يحتوي"}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
 
@@ -513,16 +746,31 @@ export function AssignmentPanel() {
                                 </SelectContent>
                               </Select>
                             ) : (
-                              <Input
-                                className="h-9 text-xs"
-                                placeholder="القيمة"
-                                value={rule.value}
-                                onChange={(e) => updateRule(selectedEmployee, rule.id, { value: e.target.value })}
-                              />
+                              <div className="flex-1">
+                                <Input
+                                  className="h-9 text-xs"
+                                  placeholder={
+                                    rule.field === "budgetMin" || rule.field === "budgetMax"
+                                      ? "أدخل رقم (مثال: 5000000)"
+                                      : "القيمة"
+                                  }
+                                  type={rule.field === "budgetMin" || rule.field === "budgetMax" ? "number" : "text"}
+                                  value={rule.value}
+                                  onChange={(e) => updateRule(selectedEmployee, rule.id, { value: e.target.value })}
+                                />
+                                {rule.value && !isValidValueForField(rule.field, rule.value) && (
+                                  <p className="text-xs text-red-500 mt-1">
+                                    {rule.field === "budgetMin" || rule.field === "budgetMax"
+                                      ? "يجب أن يكون رقم"
+                                      : "قيمة غير صالحة"}
+                                  </p>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -570,5 +818,186 @@ export function AssignmentPanel() {
         </div>
       </SheetContent>
     </Sheet>
+
+    {/* Assignment Results Dialog */}
+    <CustomDialog open={showResultDialog} onOpenChange={setShowResultDialog} maxWidth="max-w-4xl">
+      <CustomDialogContent className="max-h-[90vh] overflow-hidden flex flex-col">
+        <CustomDialogHeader>
+          <div className="flex items-center justify-between">
+            <CustomDialogTitle className="text-xl font-bold flex items-center gap-2">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+              نتائج التعيين التلقائي
+            </CustomDialogTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={() => setShowResultDialog(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CustomDialogHeader>
+
+        {assignmentResult && (
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Success Card */}
+              <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
+                    <CheckCircle2 className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">معين بنجاح</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {assignmentResult.data.assignedCount}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Failed Card */}
+              {assignmentResult.data.failedCount > 0 && (
+                <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
+                      <XCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">فشل التعيين</p>
+                      <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                        {assignmentResult.data.failedCount}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Total Card */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">إجمالي المحاولات</p>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {assignmentResult.data.assignedCount + assignmentResult.data.failedCount}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Assignments by Employee */}
+            {assignmentResult.data.assignments.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  التعيينات حسب الموظف
+                </h3>
+
+                {(() => {
+                  // Group assignments by employee
+                  const assignmentsByEmployee = assignmentResult.data.assignments.reduce(
+                    (acc, assignment) => {
+                      const empId = assignment.employeeId;
+                      const employee = employees.find((e) => e.id === empId);
+                      if (!acc[empId]) {
+                        acc[empId] = {
+                          employee: employee || { id: empId, name: `موظف ${empId}` },
+                          assignments: [],
+                        };
+                      }
+                      acc[empId].assignments.push(assignment);
+                      return acc;
+                    },
+                    {} as Record<
+                      string,
+                      {
+                        employee: { id: string; name: string };
+                        assignments: Array<{ customerId: string; employeeId: string; assignedAt: string }>;
+                      }
+                    >
+                  );
+
+                  return Object.values(assignmentsByEmployee).map((group) => (
+                    <div
+                      key={group.employee.id}
+                      className="border rounded-lg p-4 bg-white dark:bg-gray-800 space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                            {group.employee.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="font-semibold">{group.employee.name}</p>
+                            <p className="text-xs text-gray-500">
+                              {group.assignments.length} عميل معين
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="secondary" className="text-sm">
+                          {group.assignments.length}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                        {group.assignments.map((assignment) => (
+                          <div
+                            key={assignment.customerId}
+                            className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm"
+                          >
+                            <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                            <span className="font-mono text-xs">#{assignment.customerId}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
+                        <Clock className="h-3 w-3" />
+                        <span>
+                          {new Date(assignmentResult.timestamp).toLocaleString("ar-SA", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            )}
+
+            {/* Empty State */}
+            {assignmentResult.data.assignments.length === 0 && (
+              <div className="text-center py-12">
+                <XCircle className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">
+                  لا توجد تعيينات
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  لم يتم تعيين أي عملاء تلقائياً
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="border-t p-4 flex justify-end">
+          <Button onClick={() => setShowResultDialog(false)} variant="default">
+            إغلاق
+          </Button>
+        </div>
+      </CustomDialogContent>
+    </CustomDialog>
+    </>
   );
 }
