@@ -1,0 +1,4 @@
+2026-02-05 11:30:00
+Update Type: Feature
+Integrated backend API endpoints for Customers List page - created API service, custom hook with token validation, updated page component to fetch data from API instead of mock data, added loading and error states, updated EnhancedCustomersHubPage to accept props from API while maintaining backward compatibility with store
+lib/services/customers-hub-list-api.ts, hooks/useCustomersHubList.ts, app/dashboard/customers-hub/list/page.tsx, components/customers-hub/page/EnhancedCustomersHubPage.tsx

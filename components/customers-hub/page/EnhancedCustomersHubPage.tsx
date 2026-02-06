@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { CustomersDashboard } from "./CustomersDashboard";
 import { CustomersTable } from "./CustomersTable";
@@ -22,12 +22,52 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AddCustomerDialog } from "../dialogs/AddCustomerDialog";
 import { useRouter } from "next/navigation";
-import type { CustomerFilters } from "@/types/unified-customer";
+import type { CustomerFilters, UnifiedCustomer } from "@/types/unified-customer";
+import type { CustomersListParams } from "@/lib/services/customers-hub-list-api";
 
-export function EnhancedCustomersHubPage() {
+interface EnhancedCustomersHubPageProps {
+  customers?: UnifiedCustomer[];
+  stats?: any;
+  filterOptions?: any;
+  loading?: boolean;
+  error?: string | null;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+  onFetchCustomers?: (params: CustomersListParams) => Promise<void>;
+}
+
+export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) {
   const router = useRouter();
-  const { viewMode, setViewMode, setShowAddCustomerDialog, customers, filters, setFilters, getPendingActionsCount } =
-    useUnifiedCustomersStore();
+  const store = useUnifiedCustomersStore();
+  const {
+    viewMode,
+    setViewMode,
+    setShowAddCustomerDialog,
+    customers: storeCustomers,
+    filters,
+    setFilters,
+    getPendingActionsCount,
+    setCustomers: setStoreCustomers,
+  } = store;
+
+  // Use prop customers if provided, otherwise use store customers
+  const customers = props?.customers ?? storeCustomers;
+  const apiStats = props?.stats;
+  const apiFilterOptions = props?.filterOptions;
+  const apiLoading = props?.loading ?? false;
+  const apiError = props?.error;
+  const apiPagination = props?.pagination;
+
+  // Update store if prop customers are provided
+  React.useEffect(() => {
+    if (props?.customers && props.customers.length > 0) {
+      setStoreCustomers(props.customers);
+    }
+  }, [props?.customers, setStoreCustomers]);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -36,8 +76,36 @@ export function EnhancedCustomersHubPage() {
   // Get pending actions count
   const pendingActionsCount = getPendingActionsCount();
 
-  // Get filtered customers
-  const filteredCustomers = customers; // Already filtered by store
+  // Get filtered customers - use prop customers if available
+  const filteredCustomers = customers; // Already filtered by store or from API
+
+  // Show loading state
+  if (apiLoading && customers.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        <p className="text-gray-600 dark:text-gray-400">جاري تحميل العملاء...</p>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (apiError && customers.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-500 mb-2">حدث خطأ</div>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{apiError}</p>
+          <Button onClick={() => props?.onFetchCustomers?.({
+            action: "list",
+            includeStats: true,
+            pagination: { page: 1, limit: 50 },
+            sorting: { field: "created_at", order: "desc" },
+          })}>إعادة المحاولة</Button>
+        </div>
+      </div>
+    );
+  }
 
   // Keyboard shortcuts handlers
   useKeyboardShortcuts({
