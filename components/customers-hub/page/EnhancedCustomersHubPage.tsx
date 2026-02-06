@@ -7,7 +7,7 @@ import { CustomersTable } from "./CustomersTable";
 import { CustomersMap } from "./CustomersMap";
 import { CustomersGrid } from "./CustomersGrid";
 import { QuickActions } from "./QuickActions";
-import { AdvancedFilters } from "../filters/AdvancedFilters";
+import { FiltersBar } from "../filters/FiltersBar";
 import { SavedFilters } from "../filters/SavedFilters";
 import { BulkActionsBar } from "../bulk/BulkActionsBar";
 import { AssignmentPanel } from "../assignment";
@@ -261,16 +261,97 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
       {/* Dashboard Statistics */}
       <CustomersDashboard stats={apiStats} />
 
-      {/* Advanced Filters with Save Feature */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <AdvancedFilters />
-        </div>
-        <SavedFilters
-          currentFilters={filters}
-          onApplyFilter={handleApplyFilter}
-        />
-      </div>
+      {/* Filters Bar */}
+      <FiltersBar 
+        filterOptions={apiFilterOptions}
+        onSearch={(query) => {
+          setFilters({ search: query || undefined });
+          if (props?.onFetchCustomers) {
+            const params: CustomersListParams = {
+              action: "list",
+              includeStats: true,
+              filters: {
+                search: query || undefined,
+                stage: filters.stage?.map(s => {
+                  const stageOption = apiFilterOptions?.stages?.find(st => st.name === s);
+                  return stageOption?.id || 0;
+                }).filter(id => id > 0),
+                priority: filters.priority?.map(p => {
+                  const priorityOption = apiFilterOptions?.priorities?.find(pr => pr.name === p);
+                  return priorityOption?.id || 0;
+                }).filter(id => id > 0),
+                type: filters.propertyType?.map(t => {
+                  const typeOption = apiFilterOptions?.types?.find(ty => ty.name === t);
+                  return typeOption?.id || 0;
+                }).filter(id => id > 0),
+                city: filters.city?.map(c => {
+                  const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
+                  return cityOption?.id || 0;
+                }).filter(id => id > 0),
+                dateRange: filters.createdFrom || filters.createdTo ? {
+                  start: filters.createdFrom || "",
+                  end: filters.createdTo || "",
+                } : undefined,
+              },
+              pagination: apiPagination ? {
+                page: apiPagination.currentPage,
+                limit: apiPagination.itemsPerPage,
+              } : {
+                page: 1,
+                limit: 50,
+              },
+              sorting: {
+                field: "created_at",
+                order: "desc",
+              },
+            };
+            props.onFetchCustomers(params);
+          }
+        }}
+        onApplyFilters={() => {
+          if (props?.onFetchCustomers) {
+            const params: CustomersListParams = {
+              action: "list",
+              includeStats: true,
+              filters: {
+                search: filters.search,
+                stage: filters.stage?.map(s => {
+                  const stageOption = apiFilterOptions?.stages?.find(st => st.name === s);
+                  return stageOption?.id || 0;
+                }).filter(id => id > 0),
+                priority: filters.priority?.map(p => {
+                  const priorityOption = apiFilterOptions?.priorities?.find(pr => pr.name === p);
+                  return priorityOption?.id || 0;
+                }).filter(id => id > 0),
+                type: filters.propertyType?.map(t => {
+                  const typeOption = apiFilterOptions?.types?.find(ty => ty.name === t);
+                  return typeOption?.id || 0;
+                }).filter(id => id > 0),
+                city: filters.city?.map(c => {
+                  const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
+                  return cityOption?.id || 0;
+                }).filter(id => id > 0),
+                dateRange: filters.createdFrom || filters.createdTo ? {
+                  start: filters.createdFrom || "",
+                  end: filters.createdTo || "",
+                } : undefined,
+              },
+              pagination: apiPagination ? {
+                page: apiPagination.currentPage,
+                limit: apiPagination.itemsPerPage,
+              } : {
+                page: 1,
+                limit: 50,
+              },
+              sorting: {
+                field: "created_at",
+                order: "desc",
+              },
+            };
+            props.onFetchCustomers(params);
+          }
+        }}
+      />
 
       {/* View Mode Tabs */}
       <Tabs value={viewMode} onValueChange={(value: any) => setViewMode(value)}>
