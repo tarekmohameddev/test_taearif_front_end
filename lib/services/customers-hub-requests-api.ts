@@ -160,6 +160,31 @@ export interface AddNoteResponse {
   timestamp: string;
 }
 
+export interface UpdateCustomerStageResponse {
+  status: "success";
+  code: number;
+  message: string;
+  data: {
+    customerId: number;
+    customerName: string;
+    previousStage: {
+      id: number;
+      name: string;
+    };
+    newStage: {
+      id: number;
+      name: string;
+    };
+    movedAt: string;
+    movedBy: {
+      id: number;
+      name: string;
+    };
+    notes?: string;
+  };
+  timestamp: string;
+}
+
 // Get Requests List
 export async function getRequestsList(params: RequestsListParams): Promise<RequestsListResponse> {
   const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, params);
@@ -229,6 +254,36 @@ export async function addNoteToAction(
         note,
         addedBy: addedBy?.toString() || "current_user",
       },
+    }
+  );
+  return response.data;
+}
+
+// Update Customer Stage
+export async function updateCustomerStage(
+  customerId: string | number,
+  newStageId: string | number,
+  notes?: string
+): Promise<UpdateCustomerStageResponse> {
+  // Convert customerId to number
+  const customerIdNum = typeof customerId === "string" ? parseInt(customerId) : customerId;
+  
+  // Convert newStageId to number if it's a numeric string, otherwise send as-is
+  // Backend may accept string stage names or require numeric IDs
+  let newStageIdFinal: string | number;
+  if (typeof newStageId === "string") {
+    const parsed = parseInt(newStageId);
+    newStageIdFinal = isNaN(parsed) ? newStageId : parsed;
+  } else {
+    newStageIdFinal = newStageId;
+  }
+
+  const response = await axiosInstance.post<UpdateCustomerStageResponse>(
+    "/v2/customers-hub/pipeline/move",
+    {
+      customerId: customerIdNum,
+      newStageId: newStageIdFinal,
+      notes: notes || undefined,
     }
   );
   return response.data;

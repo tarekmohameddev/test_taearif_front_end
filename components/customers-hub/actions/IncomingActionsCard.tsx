@@ -42,6 +42,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { updateCustomerStage as apiUpdateCustomerStage } from "@/lib/services/customers-hub-requests-api";
+import useAuthStore from "@/context/AuthContext";
+import toast from "react-hot-toast";
+import axiosInstance from "@/lib/axiosInstance";
+
+// Module-level cache for stages mapping (shared across all component instances)
+let globalStagesMap: Map<string, number> = new Map();
+let stagesFetchPromise: Promise<void> | null = null;
+let stagesFetched = false;
 
 type PropertyBlock = {
   title?: string;
@@ -206,31 +215,130 @@ export function IncomingActionsCard({
   className,
 }: IncomingActionsCardProps) {
   const router = useRouter();
-  const { addAppointment, updateCustomerStage } = useUnifiedCustomersStore();
+  const { addAppointment, updateCustomerStage, getCustomerById } = useUnifiedCustomersStore();
+  const { userData } = useAuthStore();
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [aptType, setAptType] = useState<Appointment["type"]>("office_meeting");
   const [aptDate, setAptDate] = useState("");
   const [aptTime, setAptTime] = useState("10:00");
   const [aptNotes, setAptNotes] = useState("");
   const [isSubmittingApt, setIsSubmittingApt] = useState(false);
+  const [isUpdatingStage, setIsUpdatingStage] = useState(false);
+  const [stagesMap, setStagesMap] = useState<Map<string, number>>(globalStagesMap);
+  const [hasStagesLoaded, setHasStagesLoaded] = useState(stagesFetched || globalStagesMap.size > 0);
+
+  const resolvedCustomer =
+    customer ??
+    getCustomerById(
+      typeof action.customerId === "string" ? action.customerId : String(action.customerId)
+    );
 
   // Normalize customer.stage to always be a string (handle API objects)
+  // Default to 'new_lead' if no stage is found
   const normalizedStage = React.useMemo(() => {
-    if (!customer?.stage) return undefined;
-    if (typeof customer.stage === 'string') return customer.stage;
-    if (typeof customer.stage === 'object' && customer.stage !== null) {
+    if (!resolvedCustomer?.stage) return 'new_lead' as CustomerLifecycleStage;
+    if (typeof resolvedCustomer.stage === "string") return resolvedCustomer.stage as CustomerLifecycleStage;
+    if (typeof resolvedCustomer.stage === "object" && resolvedCustomer.stage !== null) {
       // Extract ID from object: {id, name, color} -> id
-      return (customer.stage as any).id || (customer.stage as any).name || String(customer.stage);
+      const stageId = (
+        (resolvedCustomer.stage as any).id ||
+        (resolvedCustomer.stage as any).name ||
+        String(resolvedCustomer.stage)
+      );
+      // Validate that it's a valid stage, otherwise default to 'new_lead'
+      const validStage = LIFECYCLE_STAGES.find(s => s.id === stageId);
+      return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
     }
-    return String(customer.stage);
-  }, [customer?.stage]);
+    const stageStr = String(resolvedCustomer.stage);
+    const validStage = LIFECYCLE_STAGES.find(s => s.id === stageStr);
+    return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+  }, [resolvedCustomer?.stage]);
+
+  // Get stages from API if available, otherwise use LIFECYCLE_STAGES
+  const availableStages = React.useMemo(() => {
+    if (stagesMap.size > 0) {
+      // Convert stagesMap to array format compatible with LIFECYCLE_STAGES
+      // We'll use LIFECYCLE_STAGES for display but stagesMap for API calls
+      return LIFECYCLE_STAGES;
+    }
+    return LIFECYCLE_STAGES;
+  }, [stagesMap.size]);
+
+  // Get numeric stage ID from customer.stage if it's an object
+  const getNumericStageId = (stage: any): number | null => {
+    if (typeof stage === 'object' && stage !== null && typeof stage.id === 'number') {
+      return stage.id;
+    }
+    return null;
+  };
+
+  // Fetch stages from API to get numeric IDs mapping (shared across all instances)
+  React.useEffect(() => {
+    // If already fetched, use cached data
+    if (stagesFetched && globalStagesMap.size > 0) {
+      setStagesMap(globalStagesMap);
+      setHasStagesLoaded(true);
+      return;
+    }
+
+    // If fetch is in progress, wait for it
+    if (stagesFetchPromise) {
+      stagesFetchPromise.then(() => {
+        setStagesMap(globalStagesMap);
+        setHasStagesLoaded(true);
+      });
+      return;
+    }
+
+    // Start new fetch
+    if (!userData?.token) return;
+
+    stagesFetchPromise = (async () => {
+      try {
+        const response = await axiosInstance.get("/v2/customers-hub/list/filter-options");
+        if (response.data.status === "success" && response.data.data?.stages) {
+          const map = new Map<string, number>();
+          response.data.data.stages.forEach((stage: { id: number; name?: string }) => {
+            // Skip if stage name is missing
+            if (!stage.name || !stage.id) return;
+            
+            // Map by name (case-insensitive)
+            const stageNameLower = stage.name.toLowerCase();
+            map.set(stageNameLower, stage.id);
+            
+            // Also map common stage names
+            const stageNameMap: Record<string, string> = {
+              'new': 'new_lead',
+              'contacted': 'qualified',
+              'qualified': 'qualified',
+              'negotiation': 'negotiation',
+              'deal': 'closing',
+            };
+            const mappedName = stageNameMap[stageNameLower];
+            if (mappedName) {
+              map.set(mappedName, stage.id);
+            }
+          });
+          globalStagesMap = map;
+          stagesFetched = true;
+          setStagesMap(map);
+          setHasStagesLoaded(true);
+        }
+      } catch (err) {
+        console.error("Error fetching stages:", err);
+        stagesFetched = false; // Reset on error to allow retry
+      } finally {
+        stagesFetchPromise = null;
+      }
+    })();
+  }, [userData?.token]);
 
   const propertyFromMeta = getPropertyFromMetadata(action.metadata);
   const propertyFromPrefs = getPropertyFromPreferences(customer);
   /** Prefer specific property from metadata; fallback to request summary from customer preferences */
   const property = propertyFromMeta ?? propertyFromPrefs;
   const showPropertyBlock = property && (property.title || property.type || property.price != null || property.location);
-  const aiMatching = getAIMatchingStatus(customer);
+  const aiMatching = getAIMatchingStatus(resolvedCustomer);
 
   const isOverdue =
     action.dueDate && new Date(action.dueDate) < new Date();
@@ -242,6 +350,87 @@ export function IncomingActionsCard({
     if (!isInteractive) {
       // Navigate to request details page
       router.push(`/ar/dashboard/customers-hub/requests/${action.id}`);
+    }
+  };
+
+  // Handle stage change with optimistic update
+  const handleStageChange = async (newStage: CustomerLifecycleStage) => {
+    if (isUpdatingStage) return;
+
+    // Get current stage from resolvedCustomer if available
+    const currentStage = normalizedStage || resolvedCustomer?.stage;
+    
+    // If already in the same stage, do nothing
+    if (currentStage === newStage) return;
+
+    // Optimistic update: Update UI immediately if customer exists
+    const previousStage = currentStage;
+    if (resolvedCustomer) {
+      updateCustomerStage(action.customerId, newStage);
+    }
+
+    setIsUpdatingStage(true);
+
+    try {
+      // Convert customerId to number if it's a string
+      const customerIdNum = typeof action.customerId === "string" 
+        ? parseInt(action.customerId) 
+        : action.customerId;
+
+      // Get numeric stage ID - API requires integer
+      let newStageIdNum: number | null = null;
+      
+      // Strategy 1: Try to find numeric ID from stages map (from API)
+      const stageFromMap = stagesMap.get(newStage.toLowerCase());
+      if (stageFromMap) {
+        newStageIdNum = stageFromMap;
+      } else {
+        // Strategy 2: Try to find by matching stage name in the map
+        const stageInfo = LIFECYCLE_STAGES.find(s => s.id === newStage);
+        if (stageInfo) {
+          // Try to find by Arabic or English name
+          for (const [key, value] of stagesMap.entries()) {
+            if (key.includes(stageInfo.nameEn.toLowerCase()) || 
+                key.includes(stageInfo.nameAr.toLowerCase())) {
+              newStageIdNum = value;
+              break;
+            }
+          }
+          
+          // Strategy 3: If still not found, use order as fallback (may need adjustment)
+          if (!newStageIdNum) {
+            // Use order + base ID (assuming IDs start around 135)
+            // This is a fallback and may not be accurate
+            newStageIdNum = stageInfo.order + 134;
+          }
+        }
+      }
+      
+      if (!newStageIdNum) {
+        throw new Error(`Unable to determine numeric stage ID for stage: ${newStage}`);
+      }
+
+      // Call API to update stage
+      await apiUpdateCustomerStage(
+        customerIdNum,
+        newStageIdNum,
+        undefined // notes - optional
+      );
+
+      // Success - UI already updated, no need to do anything
+      toast.success("تم تحديث المرحلة بنجاح");
+    } catch (err: any) {
+      // Rollback: Revert to previous stage on error if customer exists
+      if (resolvedCustomer && previousStage) {
+        updateCustomerStage(action.customerId, previousStage as CustomerLifecycleStage);
+      }
+      
+      console.error("Error updating customer stage:", err);
+      toast.error(
+        err.response?.data?.message || err.message || "حدث خطأ أثناء تغيير المرحلة"
+      );
+    } finally {
+      setIsUpdatingStage(false);
     }
   };
 
@@ -322,16 +511,16 @@ export function IncomingActionsCard({
             >
               {action.customerName}
             </Link>
-            {customer?.phone && (
+            {resolvedCustomer?.phone && (
               <a
-                href={`tel:${customer.phone}`}
+                href={`tel:${resolvedCustomer.phone}`}
                 className="text-xs text-gray-600 hover:text-blue-600 flex items-center gap-1 dir-ltr"
                 dir="ltr"
                 data-interactive="true"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Phone className="h-3.5 w-3.5 shrink-0" />
-                {customer.phone}
+                {resolvedCustomer.phone}
               </a>
             )}
             <SourceBadge source={action.source} className="text-xs" />
@@ -368,30 +557,31 @@ export function IncomingActionsCard({
                 })}
               </span>
             )}
-            {customer && (
+            {hasStagesLoaded && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="text-xs flex items-center gap-1 shrink-0 rounded hover:bg-gray-100 dark:hover:bg-gray-800 px-1 -mx-1 py-0.5 transition-colors cursor-pointer"
+                    className="text-xs flex items-center gap-1 shrink-0 rounded-md hover:opacity-80 transition-all cursor-pointer px-2 py-1"
+                    style={{
+                      backgroundColor: `${getStageColor(normalizedStage)}15`,
+                      border: `1px solid ${getStageColor(normalizedStage)}40`,
+                    }}
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
-                    {normalizedStage ? (
-                      <>
-                        <span
-                          className="size-1.5 rounded-full shrink-0"
-                          style={{ backgroundColor: getStageColor(normalizedStage as CustomerLifecycleStage) }}
-                          aria-hidden
-                        />
-                        <span style={{ color: getStageColor(normalizedStage as CustomerLifecycleStage) }} className="font-medium">
-                          {getStageNameAr(normalizedStage as CustomerLifecycleStage)}
-                        </span>
-                        <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
-                      </>
-                    ) : (
-                      <span className="text-gray-500 font-medium">تعيين المرحلة</span>
-                    )}
+                    <span
+                      className="size-1.5 rounded-full shrink-0"
+                      style={{ backgroundColor: getStageColor(normalizedStage) }}
+                      aria-hidden
+                    />
+                    <span 
+                      style={{ color: getStageColor(normalizedStage) }} 
+                      className="font-medium"
+                    >
+                      {getStageNameAr(normalizedStage)}
+                    </span>
+                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(normalizedStage) }} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[180px]">
@@ -400,9 +590,10 @@ export function IncomingActionsCard({
                       key={stage.id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        updateCustomerStage(action.customerId, stage.id as CustomerLifecycleStage);
+                        handleStageChange(stage.id as CustomerLifecycleStage);
                       }}
                       className="flex items-center gap-2"
+                      disabled={isUpdatingStage || normalizedStage === stage.id}
                     >
                       <span
                         className="size-2.5 rounded-full shrink-0"
@@ -410,12 +601,15 @@ export function IncomingActionsCard({
                         aria-hidden
                       />
                       {stage.nameAr}
+                      {normalizedStage === stage.id && (
+                        <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            {customer && (
+            {resolvedCustomer && (
               <div className="flex items-center gap-1.5 text-xs shrink-0">
                 {aiMatching.canMatch ? (
                   <span className="text-violet-600 dark:text-violet-400 font-medium" title="مطابقة الذكاء الاصطناعي">
@@ -572,18 +766,18 @@ export function IncomingActionsCard({
               </p>
             )}
             {/* Customer phone for quick contact */}
-            {customer?.phone && (
+            {resolvedCustomer?.phone && (
               <a
-                href={`tel:${customer.phone}`}
+                href={`tel:${resolvedCustomer.phone}`}
                 className="inline-flex items-center gap-1.5 mt-2 text-sm text-gray-600 hover:text-blue-600 dir-ltr"
                 dir="ltr"
                 data-interactive="true"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Phone className="h-4 w-4 shrink-0" />
-                {customer.phone}
-                {customer.whatsapp && customer.whatsapp !== customer.phone && (
-                  <span className="text-gray-400"> / واتساب: {customer.whatsapp}</span>
+                {resolvedCustomer.phone}
+                {resolvedCustomer.whatsapp && resolvedCustomer.whatsapp !== resolvedCustomer.phone && (
+                  <span className="text-gray-400"> / واتساب: {resolvedCustomer.whatsapp}</span>
                 )}
               </a>
             )}
@@ -654,41 +848,44 @@ export function IncomingActionsCard({
                 </div>
               )}
             </div>
-            {customer && (
+            {/* Stage Dropdown - Always visible once stages are loaded */}
+            {hasStagesLoaded && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-800 px-1 -mx-1 py-0.5 transition-colors cursor-pointer text-right w-fit"
+                    className="flex items-center gap-1.5 text-xs rounded-md hover:opacity-80 transition-all cursor-pointer text-right w-fit px-2 py-1"
+                    style={{
+                      backgroundColor: `${getStageColor(normalizedStage)}15`,
+                      border: `1px solid ${getStageColor(normalizedStage)}40`,
+                    }}
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
-                    {normalizedStage ? (
-                      <>
-                        <span
-                          className="size-2 rounded-full shrink-0"
-                          style={{ backgroundColor: getStageColor(normalizedStage as CustomerLifecycleStage) }}
-                          aria-hidden
-                        />
-                        <span style={{ color: getStageColor(normalizedStage as CustomerLifecycleStage) }} className="font-medium">
-                          {getStageNameAr(normalizedStage as CustomerLifecycleStage)}
-                        </span>
-                        <ChevronDown className="h-3 w-3 text-gray-400 shrink-0" />
-                      </>
-                    ) : (
-                      <span className="text-gray-500 font-medium">تعيين المرحلة</span>
-                    )}
+                    <span
+                      className="size-2 rounded-full shrink-0"
+                      style={{ backgroundColor: getStageColor(normalizedStage) }}
+                      aria-hidden
+                    />
+                    <span 
+                      style={{ color: getStageColor(normalizedStage) }} 
+                      className="font-medium"
+                    >
+                      {getStageNameAr(normalizedStage)}
+                    </span>
+                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(normalizedStage) }} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[180px]">
-                  {LIFECYCLE_STAGES.map((stage) => (
+                  {availableStages.map((stage) => (
                     <DropdownMenuItem
                       key={stage.id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        updateCustomerStage(action.customerId, stage.id as CustomerLifecycleStage);
+                        handleStageChange(stage.id as CustomerLifecycleStage);
                       }}
                       className="flex items-center gap-2"
+                      disabled={isUpdatingStage || normalizedStage === stage.id}
                     >
                       <span
                         className="size-2.5 rounded-full shrink-0"
@@ -696,13 +893,16 @@ export function IncomingActionsCard({
                         aria-hidden
                       />
                       {stage.nameAr}
+                      {normalizedStage === stage.id && (
+                        <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
             {/* AI property matching indicator */}
-            {customer && (
+            {resolvedCustomer && (
               <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">
                 {aiMatching.canMatch ? (
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">

@@ -2,3 +2,8 @@
 Update Type: Bug Fix
 Fixed React error "Objects are not valid as a React child" by normalizing customer.stage to always be a string before passing to getStageColor and getStageNameAr functions. The API sometimes returns stage as an object {id, name, color} instead of a string ID.
 components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-06 22:50:00
+Update Type: Bug Fix
+Fixed stage dropdown visibility and removed duplicate fetch behavior by resolving customer from store when prop isn't provided; stage dropdown now appears consistently across all lists.
+components/customers-hub/actions/IncomingActionsCard.tsx, lib/services/customers-hub-requests-api.ts
