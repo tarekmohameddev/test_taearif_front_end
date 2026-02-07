@@ -14,6 +14,7 @@ import {
   bulkChangePriority,
   type RequestsListParams,
   type FilterOptionsResponse,
+  type StageDistribution,
 } from "@/lib/services/customers-hub-requests-api";
 import type { CustomerAction, Priority } from "@/types/unified-customer";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ export function useCustomersHubRequests() {
   const { userData, IsLoading: authLoading } = useAuthStore();
   const [actions, setActions] = useState<CustomerAction[]>([]);
   const [stats, setStats] = useState<any>(null);
+  const [stages, setStages] = useState<StageDistribution[]>([]);
   const [filterOptions, setFilterOptions] = useState<FilterOptionsResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +66,12 @@ export function useCustomersHubRequests() {
           } else {
             // إذا لم تأت stats من API، احتفظ بالقيمة الحالية (لا تقم بالحساب المحلي)
             // هذا يضمن أن stats تأتي فقط من API
+          }
+          // تحديث stages من API response
+          if (response.data.stages) {
+            setStages(response.data.stages);
+          } else {
+            setStages([]);
           }
           if (response.data.pagination) {
             setPagination(response.data.pagination);
@@ -503,6 +511,7 @@ export function useCustomersHubRequests() {
   return {
     actions,
     stats,
+    stages,
     filterOptions,
     loading,
     error,

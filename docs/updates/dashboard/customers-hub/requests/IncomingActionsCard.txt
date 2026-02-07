@@ -7,3 +7,18 @@ components/customers-hub/actions/IncomingActionsCard.tsx
 Update Type: Bug Fix
 Fixed stage dropdown visibility and removed duplicate fetch behavior by resolving customer from store when prop isn't provided; stage dropdown now appears consistently across all lists.
 components/customers-hub/actions/IncomingActionsCard.tsx, lib/services/customers-hub-requests-api.ts
+
+2026-02-07 03:59:57
+Update Type: Feature
+Replaced static LIFECYCLE_STAGES with dynamic stages from backend API - added useCustomersHubStages hook, updated availableStages to fetch from API, updated normalizedStage validation to use API stages with fallback, added loading state for stages dropdown, replaced all LIFECYCLE_STAGES.map() calls with availableStages.map()
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-07 04:02:40
+Update Type: Bug Fix
+Fixed API spam issue - moved useCustomersHubStages to RequestsCenterPage level to fetch stages once, added stages prop to IncomingActionsCard, updated useCustomersHubStages hook to accept skip parameter, passed stages from parent to all IncomingActionsCard instances to prevent multiple API calls
+components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/actions/IncomingActionsCard.tsx, hooks/useCustomersHubStages.ts
+
+2026-02-07 04:06:41
+Update Type: Bug Fix
+Fixed stages not appearing issue - updated skip condition to check if propStages is not empty (length > 0) instead of just truthy, updated stagesForCards to pass undefined instead of empty array when fetchedStages is empty, updated availableStages logic to properly check if propStages has items before using it
+components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/actions/IncomingActionsCard.tsx

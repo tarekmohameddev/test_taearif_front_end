@@ -44,9 +44,8 @@ import { QuickViewPanel } from "../actions/QuickViewPanel";
 import { ActionHistoryList } from "../actions/ActionHistoryList";
 import { SourceBadge } from "../actions/SourceBadge";
 import { useCustomersHubFiltersState } from "./hooks/useCustomersHubFiltersState";
-import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
-import { LIFECYCLE_STAGES } from "@/types/unified-customer";
 import { Progress } from "@/components/ui/progress";
+import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import type { CustomerStatistics } from "@/types/unified-customer";
 import type {
@@ -61,6 +60,7 @@ import {
   getActionsDueToday,
   sortActionsByPriority,
 } from "@/lib/utils/action-helpers";
+import type { StageDistribution } from "@/lib/services/customers-hub-requests-api";
 
 const priorityLabels: Record<Priority, string> = {
   urgent: "عاجل",
@@ -138,6 +138,7 @@ const FOLLOWUP_TYPES: CustomerActionType[] = ["follow_up", "site_visit"];
 interface RequestsCenterPageProps {
   actions?: CustomerAction[];
   stats?: any;
+  stages?: StageDistribution[];
   filterOptions?: any;
   loading?: boolean;
   error?: string | null;
@@ -174,15 +175,20 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     restoreAction,
   } = store;
 
-  // Fetch dynamic stages from API for stage distribution card
-  const { stages: dynamicStages, loading: stagesLoading } = useCustomersHubStages(true);
+  // Fetch stages from backend API once (shared across all cards to prevent spam)
+  const { stages: fetchedStages, loading: stagesLoading } = useCustomersHubStages(true);
 
   // Use props if provided, otherwise use store
   const actions = props?.actions ?? storeActions;
   const apiStats = props?.stats;
+  const apiStages = props?.stages; // Stages from API response (must come from backend)
   const apiFilterOptions = props?.filterOptions;
   const apiLoading = props?.loading ?? false;
   const apiError = props?.error;
+
+  // Use fetchedStages for IncomingActionsCard (prevents API spam)
+  // Only pass stages if they exist and are not empty, otherwise pass undefined to allow fallback to API
+  const stagesForCards = (fetchedStages && fetchedStages.length > 0) ? fetchedStages : undefined;
 
   // API handlers with fallback to store
   const completeAction = props?.onCompleteAction 
@@ -832,51 +838,32 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
             <CardTitle>توزيع طلبات العملاء حسب المرحلة</CardTitle>
           </CardHeader>
           <CardContent>
-            {stagesLoading ? (
-              <div className="text-center py-8 text-gray-500">جاري تحميل المراحل...</div>
+            {apiLoading ? (
+              <div className="text-center py-8 text-gray-500">جاري تحميل البيانات...</div>
             ) : (() => {
-              // Calculate requests count by customer stage
-              const requestsByStage: Record<string, number> = {};
-              
-              // Count requests (actions) by customer stage
-              allPendingActions.forEach((action) => {
-                const customer = getCustomerById(action.customerId);
-                if (customer && customer.stage) {
-                  const stageId = customer.stage;
-                  requestsByStage[stageId] = (requestsByStage[stageId] || 0) + 1;
-                }
-              });
-
-              const totalRequests = allPendingActions.length;
-
-              if (totalRequests === 0) {
+              // Use stages ONLY from API response (no static fallback)
+              if (!apiStages || apiStages.length === 0) {
                 return (
                   <div className="text-center py-8 text-gray-500">
-                    لا توجد طلبات متاحة
+                    لا توجد مراحل متاحة من الباك إند
                   </div>
                 );
               }
 
+              // Sort stages by order
+              const sortedStages = [...apiStages].sort((a, b) => 
+                (a.order || 0) - (b.order || 0)
+              );
+
               return (
                 <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
-                  {/* Use dynamic stages from API, fallback to LIFECYCLE_STAGES */}
-                  {(dynamicStages && dynamicStages.length > 0
-                    ? dynamicStages.slice(0, 5).map(stage => ({
-                        id: stage.stage_id,
-                        nameAr: stage.stage_name_ar,
-                        nameEn: stage.stage_name_en,
-                        color: stage.color,
-                        order: stage.order,
-                      }))
-                    : LIFECYCLE_STAGES.slice(0, 5)
-                  ).map((stage) => {
-                    const count = requestsByStage[stage.id] || 0;
-                    const percentage =
-                      totalRequests > 0 ? ((count / totalRequests) * 100).toFixed(0) : 0;
+                  {sortedStages.map((stage) => {
+                    const count = stage.requestCount || 0;
+                    const percentage = stage.percentage || 0;
 
                     return (
                       <div
-                        key={stage.id}
+                        key={stage.stage_id}
                         className="flex flex-col gap-2 p-3 border rounded-lg hover:shadow-md transition-shadow"
                         style={{ borderColor: stage.color }}
                       >
@@ -885,14 +872,14 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                             className="text-xs font-medium"
                             style={{ color: stage.color }}
                           >
-                            {stage.nameAr}
+                            {stage.stage_name_ar}
                           </div>
                           <Badge variant="secondary" className="text-xs">
                             {count}
                           </Badge>
                         </div>
                         <Progress
-                          value={Number(percentage)}
+                          value={percentage}
                           className="h-1"
                           style={
                             {
@@ -900,7 +887,9 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                             } as React.CSSProperties
                           }
                         />
-                        <div className="text-xs text-gray-500">{percentage}% من إجمالي الطلبات</div>
+                        <div className="text-xs text-gray-500">
+                          {percentage.toFixed(1)}% من إجمالي الطلبات
+                        </div>
                       </div>
                     );
                   })}
@@ -1337,6 +1326,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               onSnooze={handleSnooze}
               onAddNote={handleAddNote}
               onQuickView={handleQuickView}
+              stages={stagesForCards}
             />
           </TabsContent>
           <TabsContent value="followups" className="mt-6">
@@ -1351,6 +1341,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               onSnooze={handleSnooze}
               onAddNote={handleAddNote}
               onQuickView={handleQuickView}
+              stages={stagesForCards}
             />
           </TabsContent>
           <TabsContent value="all" className="mt-6">
@@ -1365,6 +1356,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               onSnooze={handleSnooze}
               onAddNote={handleAddNote}
               onQuickView={handleQuickView}
+              stages={stagesForCards}
             />
           </TabsContent>
           <TabsContent value="completed" className="mt-6">
@@ -1416,6 +1408,7 @@ function RequestsList({
   onSnooze,
   onAddNote,
   onQuickView,
+  stages,
 }: {
   actions: CustomerAction[];
   getCustomerById: (id: string) => UnifiedCustomer | undefined;
@@ -1427,6 +1420,13 @@ function RequestsList({
   onSnooze: (id: string, until: string) => void;
   onAddNote: (id: string, note: string) => void;
   onQuickView: (id: string) => void;
+  stages?: Array<{
+    stage_id: string;
+    stage_name_ar: string;
+    stage_name_en: string;
+    color: string;
+    order: number;
+  }>;
 }) {
   if (actions.length === 0) {
     return (
@@ -1447,6 +1447,7 @@ function RequestsList({
           key={action.id}
           action={action}
           customer={getCustomerById(action.customerId)}
+          stages={stages}
           onComplete={onComplete}
           onDismiss={onDismiss}
           onSnooze={onSnooze}

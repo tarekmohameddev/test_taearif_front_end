@@ -46,6 +46,7 @@ import { updateCustomerStage as apiUpdateCustomerStage } from "@/lib/services/cu
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
+import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
 
 // Note: Stages now use string stage_id, no need for numeric mapping
 
@@ -162,6 +163,14 @@ interface IncomingActionsCardProps {
   action: CustomerAction;
   /** When provided, customer phone (and WhatsApp) are shown on the card for quick contact */
   customer?: UnifiedCustomer;
+  /** Stages from backend API - if provided, will use these instead of fetching */
+  stages?: Array<{
+    stage_id: string;
+    stage_name_ar: string;
+    stage_name_en: string;
+    color: string;
+    order: number;
+  }>;
   onComplete?: (actionId: string) => void;
   onDismiss?: (actionId: string) => void;
   onSnooze?: (actionId: string, until: string) => void;
@@ -200,6 +209,7 @@ const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
 export function IncomingActionsCard({
   action,
   customer,
+  stages: propStages,
   onComplete,
   onDismiss,
   onSnooze,
@@ -231,29 +241,69 @@ export function IncomingActionsCard({
 
   // Normalize customer.stage to always be a string (handle API objects)
   // Default to 'new_lead' if no stage is found
+  // Use stages from props if provided, otherwise fetch from API (fallback to prevent spam)
+  // Skip API call only if propStages is provided AND not empty
+  const { stages: apiStages, loading: stagesLoading } = useCustomersHubStages(
+    true, // activeOnly
+    !!(propStages && propStages.length > 0) // skip only if propStages is provided AND not empty
+  );
+
+  // Transform stages to match the expected format
+  const availableStages = React.useMemo(() => {
+    // Use propStages if provided AND not empty (prevents API spam)
+    // Otherwise fallback to apiStages
+    const stagesToUse = (propStages && propStages.length > 0) ? propStages : apiStages;
+    if (!stagesToUse || stagesToUse.length === 0) {
+      return [];
+    }
+    return stagesToUse.map(stage => ({
+      id: stage.stage_id, // Use stage_id as the id
+      nameAr: stage.stage_name_ar,
+      nameEn: stage.stage_name_en,
+      color: stage.color,
+      order: stage.order,
+    }));
+  }, [propStages, apiStages]);
+
+  // Normalize stage using availableStages from API, with fallback to LIFECYCLE_STAGES
   const normalizedStage = React.useMemo(() => {
     if (!resolvedCustomer?.stage) return 'new_lead' as CustomerLifecycleStage;
-    if (typeof resolvedCustomer.stage === "string") return resolvedCustomer.stage as CustomerLifecycleStage;
+    if (typeof resolvedCustomer.stage === "string") {
+      // Validate against availableStages if loaded, otherwise use as-is
+      if (availableStages.length > 0) {
+        const validStage = availableStages.find(s => s.id === resolvedCustomer.stage);
+        return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+      }
+      // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
+      const validStage = LIFECYCLE_STAGES.find(s => s.id === resolvedCustomer.stage);
+      return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+    }
     if (typeof resolvedCustomer.stage === "object" && resolvedCustomer.stage !== null) {
       // Extract ID from object: {id, name, color} -> id
       const stageId = (
+        (resolvedCustomer.stage as any).stage_id ||
         (resolvedCustomer.stage as any).id ||
         (resolvedCustomer.stage as any).name ||
         String(resolvedCustomer.stage)
       );
-      // Validate that it's a valid stage, otherwise default to 'new_lead'
+      // Validate against availableStages if loaded
+      if (availableStages.length > 0) {
+        const validStage = availableStages.find(s => s.id === stageId);
+        return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+      }
+      // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
       const validStage = LIFECYCLE_STAGES.find(s => s.id === stageId);
       return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
     }
     const stageStr = String(resolvedCustomer.stage);
+    if (availableStages.length > 0) {
+      const validStage = availableStages.find(s => s.id === stageStr);
+      return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+    }
+    // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
     const validStage = LIFECYCLE_STAGES.find(s => s.id === stageStr);
     return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
-  }, [resolvedCustomer?.stage]);
-
-  // Use LIFECYCLE_STAGES for display (or fetch dynamic stages if needed)
-  const availableStages = React.useMemo(() => {
-    return LIFECYCLE_STAGES;
-  }, []);
+  }, [resolvedCustomer?.stage, availableStages]);
 
   // Get numeric stage ID from customer.stage if it's an object
   // Get stage_id (string) from stage object or value
@@ -494,7 +544,7 @@ export function IncomingActionsCard({
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[180px]">
-                  {LIFECYCLE_STAGES.map((stage) => (
+                  {availableStages.map((stage) => (
                     <DropdownMenuItem
                       key={stage.id}
                       onClick={(e) => {
@@ -757,8 +807,10 @@ export function IncomingActionsCard({
                 </div>
               )}
             </div>
-            {/* Stage Dropdown - Always visible once stages are loaded */}
-            {(
+            {/* Stage Dropdown - Load stages from backend */}
+            {stagesLoading ? (
+              <div className="text-xs text-gray-500 px-2 py-1">جاري تحميل المراحل...</div>
+            ) : availableStages.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -809,7 +861,7 @@ export function IncomingActionsCard({
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-            )}
+            ) : null}
             {/* AI property matching indicator */}
             {resolvedCustomer && (
               <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">

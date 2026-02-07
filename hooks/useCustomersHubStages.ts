@@ -11,10 +11,10 @@ import {
   type UpdateStageParams,
 } from "@/lib/services/customers-hub-stages-api";
 
-export function useCustomersHubStages(activeOnly: boolean = false) {
+export function useCustomersHubStages(activeOnly: boolean = false, skip: boolean = false) {
   const { userData, IsLoading: authLoading } = useAuthStore();
   const [stages, setStages] = useState<Stage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(skip ? false : true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch stages
@@ -134,10 +134,12 @@ export function useCustomersHubStages(activeOnly: boolean = false) {
     [userData?.token, authLoading, fetchStages]
   );
 
-  // Fetch stages on mount
+  // Fetch stages on mount (skip if skip is true)
   useEffect(() => {
-    fetchStages();
-  }, [fetchStages]);
+    if (!skip) {
+      fetchStages();
+    }
+  }, [fetchStages, skip]);
 
   return {
     stages,

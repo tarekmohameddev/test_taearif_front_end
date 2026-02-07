@@ -47,3 +47,13 @@ hooks/useRequestDetail.ts, app/dashboard/customers-hub/requests/[requestId]/page
 Update Type: Documentation
 Created comprehensive documentation for Bulk Actions Endpoints - detailed specifications for bulk operations (complete, dismiss, snooze, assign, change_priority) to replace multiple individual API requests with single bulk endpoint, includes request/response formats, validation rules, error handling, database transactions, performance requirements, and frontend integration examples
 docs/backend-integration/api/requests/bulk-actions-endpoints.md
+
+2026-02-07 03:34:51
+Update Type: Feature
+Implemented stage distribution display for customer requests - added StageDistribution interface, updated RequestsListResponse to include stages array, added stages state in useCustomersHubRequests hook, updated RequestsCenterPage to display stage distribution from API response instead of local calculation, shows request count and percentage per stage with progress bars
+lib/services/customers-hub-requests-api.ts, hooks/useCustomersHubRequests.ts, app/dashboard/customers-hub/requests/page.tsx, components/customers-hub/requests/RequestsCenterPage.tsx
+
+2026-02-07 03:55:08
+Update Type: Refactor
+Removed static stages fallback - removed useCustomersHubStages hook and LIFECYCLE_STAGES import, now stages come ONLY from API response (apiStages), removed dynamicStages fallback logic, display message if stages not available from backend
+components/customers-hub/requests/RequestsCenterPage.tsx

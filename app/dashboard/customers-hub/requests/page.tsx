@@ -11,6 +11,7 @@ export default function CustomersHubRequestsPage() {
   const {
     actions,
     stats,
+    stages,
     filterOptions,
     loading,
     error,
@@ -74,6 +75,7 @@ export default function CustomersHubRequestsPage() {
     <RequestsCenterPage
       actions={actions}
       stats={stats}
+      stages={stages}
       filterOptions={filterOptions}
       loading={loading}
       error={error}

@@ -34,6 +34,16 @@ export interface RequestsListParams {
   };
 }
 
+export interface StageDistribution {
+  stage_id: string;
+  stage_name_ar: string;
+  stage_name_en: string;
+  color: string;
+  order: number;
+  requestCount: number;
+  percentage: number;
+}
+
 export interface RequestsListResponse {
   status: "success";
   code: number;
@@ -49,6 +59,7 @@ export interface RequestsListResponse {
       completed: number;
       total?: number;
     };
+    stages?: StageDistribution[];
     pagination?: {
       currentPage: number;
       totalPages: number;
