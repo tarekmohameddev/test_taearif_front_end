@@ -18,12 +18,20 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import { LIFECYCLE_STAGES, getStageNameAr } from "@/types/unified-customer";
+import { LIFECYCLE_STAGES, getStageNameAr, getStageInfo } from "@/types/unified-customer";
 import type { CustomerFilters } from "@/types/unified-customer";
+import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
 
 interface FiltersBarProps {
   filterOptions?: {
-    stages?: Array<{ id: number; name: string; color: string; order: number }>;
+    stages?: Array<{ 
+      id: string;                 // stage_id (string)
+      label?: string;              // Arabic label
+      labelEn?: string;           // English label
+      name?: string;               // Alias for label (backward compatibility)
+      color: string;
+      order: number;
+    }>;
     priorities?: Array<{ id: number; name: string }>;
     types?: Array<{ id: number; name: string }>;
     cities?: Array<{ id: number; name: string }>;
@@ -45,6 +53,28 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
   const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
   const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
   const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
+  
+  // Fetch dynamic stages from API (as fallback if filterOptions.stages not provided)
+  const { stages: dynamicStages } = useCustomersHubStages(true);
+  
+  // Use filterOptions.stages if provided, otherwise use dynamic stages, otherwise fallback to LIFECYCLE_STAGES
+  const displayStages = filterOptions?.stages && filterOptions.stages.length > 0
+    ? filterOptions.stages.map(s => ({
+        id: s.id,
+        nameAr: s.label || s.name || "",
+        nameEn: s.labelEn || s.name || "",
+        color: s.color,
+        order: s.order,
+      }))
+    : dynamicStages && dynamicStages.length > 0
+    ? dynamicStages.map(s => ({
+        id: s.stage_id,
+        nameAr: s.stage_name_ar,
+        nameEn: s.stage_name_en,
+        color: s.color,
+        order: s.order,
+      }))
+    : LIFECYCLE_STAGES;
 
   const propertyTypes = [
     { value: "villa", label: "فيلا" },
@@ -197,7 +227,7 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                 <DropdownMenuContent align="end" className="w-56 max-h-[400px] overflow-y-auto">
                   <DropdownMenuLabel>المراحل</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {LIFECYCLE_STAGES.map((stage) => (
+                  {displayStages.map((stage) => (
                     <DropdownMenuCheckboxItem
                       key={stage.id}
                       checked={filters.stage?.includes(stage.id as any)}
@@ -208,7 +238,7 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                           className="w-2 h-2 rounded-full"
                           style={{ backgroundColor: stage.color }}
                         />
-                        {getStageNameAr(stage.id)}
+                        {stage.nameAr || getStageNameAr(stage.id, dynamicStages)}
                       </div>
                     </DropdownMenuCheckboxItem>
                   ))}

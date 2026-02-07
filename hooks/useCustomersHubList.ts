@@ -48,7 +48,8 @@ export function useCustomersHubList() {
               email: customer.assignedTo.email,
               phone: customer.assignedTo.phone,
             } : undefined,
-            stage: customer.stage?.name || customer.stage || "new_lead",
+            // Use stage_id (string) from API response
+            stage: customer.stage?.id || customer.stage?.stage_id || customer.stage || "new_lead",
             priority: customer.priority?.name?.toLowerCase() || customer.priority || "medium",
             preferences: customer.preferences || {},
             stageHistory: customer.stageHistory || [],

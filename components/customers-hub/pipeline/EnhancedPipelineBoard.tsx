@@ -12,6 +12,7 @@ import {
   getStageColor,
   type UnifiedCustomer 
 } from "@/types/unified-customer";
+import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
 import { 
   Eye, DollarSign, 
   TrendingUp, ChevronLeft, ChevronRight
@@ -28,6 +29,9 @@ interface EnhancedPipelineBoardProps {
 export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
   const store = useUnifiedCustomersStore();
   const { customers: storeCustomers, updateCustomerStage: storeUpdateCustomerStage } = store;
+  
+  // Fetch dynamic stages from API (as fallback if props.stages not provided)
+  const { stages: dynamicStages } = useCustomersHubStages(true);
   
   // Use prop stages if provided, otherwise use store customers
   const stages = props?.stages;
@@ -78,24 +82,16 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
     
     if (draggedCustomer && draggedCustomer.stage !== stageId) {
       try {
-        // Find stage from displayStages or stages
-        const targetStage = stages?.find(s => s.id.toString() === stageId || s.name === stageId) ||
-                           LIFECYCLE_STAGES.find(s => s.id === stageId);
-        
-        let newStageId: number;
-        if (targetStage && 'id' in targetStage && typeof targetStage.id === 'number') {
-          newStageId = targetStage.id;
-        } else if (targetStage && 'id' in targetStage) {
-          newStageId = parseInt(targetStage.id.toString());
-        } else {
-          newStageId = parseInt(stageId);
-        }
+        // stageId is already a string (stage_id), use it directly
+        const newStageId = stageId;
         
         // Use API handler if provided, otherwise use store handler
         if (props?.onMoveCustomer) {
           await props.onMoveCustomer({
-            customerId: parseInt(draggedCustomer.id),
-            newStageId: newStageId,
+            customerId: typeof draggedCustomer.id === "string" 
+              ? parseInt(draggedCustomer.id) 
+              : draggedCustomer.id,
+            newStageId: newStageId,  // string stage_id
           });
         } else {
           storeUpdateCustomerStage(draggedCustomer.id, stageId as any);
@@ -116,19 +112,32 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
   const getStageCustomers = (stageId: string) => {
     // If stages are provided, use them directly
     if (stages) {
-      const stage = stages.find(s => s.id.toString() === stageId || s.name === stageId);
+      // Match by stage_id (string) or fallback to id
+      const stage = stages.find(s => 
+        s.stage_id === stageId || 
+        s.id?.toString() === stageId || 
+        s.name === stageId
+      );
       return stage?.customers || [];
     }
     // Otherwise filter from customers
     return customers.filter(c => c.stage === stageId);
   };
   
-  // Get stages to display - use prop stages if available, otherwise use LIFECYCLE_STAGES
+  // Get stages to display - use prop stages if available, otherwise use dynamic stages or LIFECYCLE_STAGES
   const displayStages = stages 
     ? stages.map(stage => ({
-        id: stage.id.toString(),
-        nameAr: stage.name,
-        nameEn: stage.name,
+        id: stage.stage_id || stage.id?.toString() || stage.id?.toString() || "",
+        nameAr: stage.stage_name_ar || stage.name || "",
+        nameEn: stage.stage_name_en || stage.name || "",
+        color: stage.color,
+        order: stage.order,
+      }))
+    : dynamicStages && dynamicStages.length > 0
+    ? dynamicStages.map(stage => ({
+        id: stage.stage_id,
+        nameAr: stage.stage_name_ar,
+        nameEn: stage.stage_name_en,
         color: stage.color,
         order: stage.order,
       }))

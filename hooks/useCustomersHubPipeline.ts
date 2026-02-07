@@ -36,6 +36,8 @@ export function useCustomersHubPipeline() {
           // Transform stages and customers data
           const transformedStages = response.data.stages.map((stage: any) => ({
             ...stage,
+            // Ensure stage_id is present (use stage_id from API or fallback to id)
+            stage_id: stage.stage_id || stage.id?.toString() || stage.id,
             customerCount: stage.count ?? stage.customerCount ?? 0, // Convert API's 'count' to 'customerCount'
             customers: stage.customers.map((customer: any) => ({
               ...customer,
@@ -47,7 +49,8 @@ export function useCustomersHubPipeline() {
                 email: customer.assignedTo.email,
                 phone: customer.assignedTo.phone,
               } : undefined,
-              stage: customer.stage?.name || customer.stage || "new_lead",
+              // Use stage_id (string) from API response
+              stage: customer.stage?.id || customer.stage?.stage_id || customer.stage || "new_lead",
               priority: customer.priority?.name?.toLowerCase() || customer.priority || "medium",
               preferences: customer.preferences || {},
               // Use budgetMax from preferences as totalDealValue if totalDealValue is not provided
@@ -113,7 +116,15 @@ export function useCustomersHubPipeline() {
       }
 
       try {
-        await moveCustomerInPipeline(params);
+        // Ensure newStageId is a string (stage_id)
+        const moveParams: MoveCustomerParams = {
+          ...params,
+          newStageId: typeof params.newStageId === "string" 
+            ? params.newStageId 
+            : params.newStageId.toString(),
+        };
+        
+        await moveCustomerInPipeline(moveParams);
         // Refresh pipeline board after move
         await fetchPipelineBoard({
           action: "board",

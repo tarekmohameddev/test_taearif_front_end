@@ -4,7 +4,7 @@ import type { UnifiedCustomer } from "@/types/unified-customer";
 const BASE_URL = "/v2/customers-hub/list";
 
 export interface CustomersListFilters {
-  stage?: number[];
+  stage?: string[];              // Array of stage_id strings (e.g., ["new_lead", "qualified"])
   priority?: number[];
   type?: number[];
   city?: number[];
@@ -58,7 +58,14 @@ export interface FilterOptionsResponse {
   code: number;
   message: string;
   data: {
-    stages: Array<{ id: number; name: string; color: string; order: number }>;
+    stages: Array<{ 
+      id: string;                 // stage_id (string, e.g., "new_lead", "qualified")
+      label?: string;              // Arabic label (stage_name_ar)
+      labelEn?: string;           // English label (stage_name_en)
+      name?: string;               // Alias for label (backward compatibility)
+      color: string;
+      order: number;
+    }>;
     priorities: Array<{ id: number; name: string }>;
     types: Array<{ id: number; name: string }>;
     cities: Array<{ id: number; name: string }>;

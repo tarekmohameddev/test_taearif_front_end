@@ -55,8 +55,8 @@ export function PipelinePage(props?: PipelinePageProps) {
   // Update store if prop stages are provided
   useEffect(() => {
     if (stages && stages.length > 0) {
-      // Create a unique key from stages to detect changes
-      const stagesKey = JSON.stringify(stages.map(s => `${s.id}-${s.customerCount}`));
+      // Create a unique key from stages to detect changes (use stage_id if available)
+      const stagesKey = JSON.stringify(stages.map(s => `${s.stage_id || s.id}-${s.customerCount}`));
       
       // Only update if stages actually changed
       if (stagesKey !== lastStagesRef.current) {

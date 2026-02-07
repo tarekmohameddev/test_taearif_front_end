@@ -16,8 +16,11 @@ export interface PipelineBoardParams {
 }
 
 export interface PipelineStage {
-  id: number;
-  name: string;
+  id?: number;                    // Internal DB id (optional, for backward compatibility)
+  stage_id: string;              // Unique stage identifier (e.g., "new_lead", "qualified")
+  name?: string;                  // Stage name (optional, use stage_name_ar or stage_name_en from API)
+  stage_name_ar?: string;        // Arabic stage name
+  stage_name_en?: string;        // English stage name
   color: string;
   order: number;
   customerCount: number;
@@ -47,6 +50,13 @@ export interface FilterOptionsResponse {
   code: number;
   message: string;
   data: {
+    stages?: Array<{ 
+      id: string;                 // stage_id (string)
+      label?: string;              // Arabic label
+      labelEn?: string;           // English label
+      color: string;
+      order?: number;
+    }>;
     priorities: Array<{ id: number; name: string }>;
     types: Array<{ id: number; name: string }>;
     employees: Array<{ id: number; name: string }>;
@@ -55,8 +65,8 @@ export interface FilterOptionsResponse {
 }
 
 export interface MoveCustomerParams {
-  customerId: number;
-  newStageId: number;
+  customerId: number | string;
+  newStageId: string;             // stage_id (string, e.g., "new_lead", "qualified")
   notes?: string;
 }
 
@@ -65,19 +75,23 @@ export interface MoveCustomerResponse {
   code: number;
   message: string;
   data: {
-    customerId: number;
+    customerId: number | string;
     customerName: string;
     previousStage: {
-      id: number;
-      name: string;
+      id: string;                 // stage_id (string)
+      name?: string;
+      nameAr?: string;
+      nameEn?: string;
     };
     newStage: {
-      id: number;
-      name: string;
+      id: string;                 // stage_id (string)
+      name?: string;
+      nameAr?: string;
+      nameEn?: string;
     };
     movedAt: string;
     movedBy: {
-      id: number;
+      id: number | string;
       name: string;
     };
     notes?: string;

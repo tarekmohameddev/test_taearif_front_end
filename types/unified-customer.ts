@@ -43,29 +43,38 @@ export interface CustomerAction {
   metadata?: Record<string, any>;
 }
 
-export type CustomerLifecycleStage =
-  | 'new_lead'           // عميل جديد
-  | 'qualified'          // مؤهل
-  | 'property_matching'  // مطابقة العقارات
-  | 'site_visit'         // معاينة
-  | 'negotiation'        // تفاوض
-  | 'contract_prep'      // إعداد العقد
-  | 'down_payment'       // الدفعة الأولى
-  | 'closing'            // إتمام الصفقة
-  | 'post_sale';         // ما بعد البيع
+// CustomerLifecycleStage is now a string type to support dynamic stages from API
+// Common stage IDs: 'new_lead', 'qualified', 'negotiation', 'closing', etc.
+export type CustomerLifecycleStage = string;
 
 export type PropertyPurpose = 'buy' | 'rent' | 'invest';
 export type Timeline = 'immediate' | '1-3months' | '3-6months' | '6months+';
 export type ChurnRisk = 'low' | 'medium' | 'high';
 export type Priority = 'low' | 'medium' | 'high' | 'urgent';
 
+// Stage interface matching API response structure
+export interface Stage {
+  id: number;                    // Internal DB id
+  stage_id: string;              // Unique slug (e.g., "new_lead")
+  stage_name_ar: string;
+  stage_name_en: string;
+  color: string;                 // Hex color
+  order: number;
+  description?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Legacy interface for backward compatibility
+// Maps to Stage interface from API
 export interface LifecycleStageInfo {
-  id: CustomerLifecycleStage;
-  nameAr: string;
-  nameEn: string;
+  id: CustomerLifecycleStage;    // stage_id from API
+  nameAr: string;                // stage_name_ar from API
+  nameEn: string;                // stage_name_en from API
   description: string;
   color: string;
-  icon: string;
+  icon?: string;                 // Optional icon (not in API)
   order: number;
 }
 
@@ -507,7 +516,8 @@ export interface UnifiedCustomer {
   ksaCompliance?: KSACompliance;
 }
 
-// Lifecycle Stage Definitions
+// Lifecycle Stage Definitions (DEPRECATED - Use dynamic stages from API)
+// Kept for backward compatibility only
 export const LIFECYCLE_STAGES: LifecycleStageInfo[] = [
   {
     id: 'new_lead',
@@ -593,20 +603,63 @@ export const LIFECYCLE_STAGES: LifecycleStageInfo[] = [
 ];
 
 // Helper Functions
-export const getStageInfo = (stageId: CustomerLifecycleStage): LifecycleStageInfo | undefined => {
+// These functions now work with dynamic stages from API
+// If stages array is provided, use it; otherwise fall back to LIFECYCLE_STAGES
+
+export const getStageInfo = (
+  stageId: CustomerLifecycleStage,
+  stages?: Stage[]
+): LifecycleStageInfo | undefined => {
+  // If dynamic stages are provided, use them
+  if (stages && stages.length > 0) {
+    const stage = stages.find(s => s.stage_id === stageId);
+    if (stage) {
+      return {
+        id: stage.stage_id,
+        nameAr: stage.stage_name_ar,
+        nameEn: stage.stage_name_en,
+        description: stage.description || '',
+        color: stage.color,
+        order: stage.order,
+      };
+    }
+  }
+  
+  // Fallback to hardcoded stages
   return LIFECYCLE_STAGES.find(s => s.id === stageId);
 };
 
-export const getStageColor = (stageId: CustomerLifecycleStage): string => {
-  return getStageInfo(stageId)?.color || '#6b7280';
+export const getStageColor = (
+  stageId: CustomerLifecycleStage,
+  stages?: Stage[]
+): string => {
+  return getStageInfo(stageId, stages)?.color || '#6b7280';
 };
 
-export const getStageNameAr = (stageId: CustomerLifecycleStage): string => {
-  return getStageInfo(stageId)?.nameAr || stageId;
+export const getStageNameAr = (
+  stageId: CustomerLifecycleStage,
+  stages?: Stage[]
+): string => {
+  return getStageInfo(stageId, stages)?.nameAr || stageId;
 };
 
-export const getStageNameEn = (stageId: CustomerLifecycleStage): string => {
-  return getStageInfo(stageId)?.nameEn || stageId;
+export const getStageNameEn = (
+  stageId: CustomerLifecycleStage,
+  stages?: Stage[]
+): string => {
+  return getStageInfo(stageId, stages)?.nameEn || stageId;
+};
+
+// Helper to convert API Stage to LifecycleStageInfo
+export const stageToLifecycleStageInfo = (stage: Stage): LifecycleStageInfo => {
+  return {
+    id: stage.stage_id,
+    nameAr: stage.stage_name_ar,
+    nameEn: stage.stage_name_en,
+    description: stage.description || '',
+    color: stage.color,
+    order: stage.order,
+  };
 };
 
 export const calculateLeadScore = (customer: Partial<UnifiedCustomer>): number => {

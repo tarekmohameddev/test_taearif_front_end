@@ -47,10 +47,7 @@ import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 
-// Module-level cache for stages mapping (shared across all component instances)
-let globalStagesMap: Map<string, number> = new Map();
-let stagesFetchPromise: Promise<void> | null = null;
-let stagesFetched = false;
+// Note: Stages now use string stage_id, no need for numeric mapping
 
 type PropertyBlock = {
   title?: string;
@@ -224,8 +221,7 @@ export function IncomingActionsCard({
   const [aptNotes, setAptNotes] = useState("");
   const [isSubmittingApt, setIsSubmittingApt] = useState(false);
   const [isUpdatingStage, setIsUpdatingStage] = useState(false);
-  const [stagesMap, setStagesMap] = useState<Map<string, number>>(globalStagesMap);
-  const [hasStagesLoaded, setHasStagesLoaded] = useState(stagesFetched || globalStagesMap.size > 0);
+  // Stages now use string stage_id, no mapping needed
 
   const resolvedCustomer =
     customer ??
@@ -254,84 +250,23 @@ export function IncomingActionsCard({
     return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
   }, [resolvedCustomer?.stage]);
 
-  // Get stages from API if available, otherwise use LIFECYCLE_STAGES
+  // Use LIFECYCLE_STAGES for display (or fetch dynamic stages if needed)
   const availableStages = React.useMemo(() => {
-    if (stagesMap.size > 0) {
-      // Convert stagesMap to array format compatible with LIFECYCLE_STAGES
-      // We'll use LIFECYCLE_STAGES for display but stagesMap for API calls
-      return LIFECYCLE_STAGES;
-    }
     return LIFECYCLE_STAGES;
-  }, [stagesMap.size]);
+  }, []);
 
   // Get numeric stage ID from customer.stage if it's an object
-  const getNumericStageId = (stage: any): number | null => {
-    if (typeof stage === 'object' && stage !== null && typeof stage.id === 'number') {
-      return stage.id;
+  // Get stage_id (string) from stage object or value
+  const getStageId = (stage: any): string | null => {
+    if (typeof stage === 'string') {
+      return stage; // Already a stage_id string
+    }
+    if (typeof stage === 'object' && stage !== null) {
+      // Try stage_id first, then id
+      return stage.stage_id || stage.id?.toString() || null;
     }
     return null;
   };
-
-  // Fetch stages from API to get numeric IDs mapping (shared across all instances)
-  React.useEffect(() => {
-    // If already fetched, use cached data
-    if (stagesFetched && globalStagesMap.size > 0) {
-      setStagesMap(globalStagesMap);
-      setHasStagesLoaded(true);
-      return;
-    }
-
-    // If fetch is in progress, wait for it
-    if (stagesFetchPromise) {
-      stagesFetchPromise.then(() => {
-        setStagesMap(globalStagesMap);
-        setHasStagesLoaded(true);
-      });
-      return;
-    }
-
-    // Start new fetch
-    if (!userData?.token) return;
-
-    stagesFetchPromise = (async () => {
-      try {
-        const response = await axiosInstance.get("/v2/customers-hub/list/filter-options");
-        if (response.data.status === "success" && response.data.data?.stages) {
-          const map = new Map<string, number>();
-          response.data.data.stages.forEach((stage: { id: number; name?: string }) => {
-            // Skip if stage name is missing
-            if (!stage.name || !stage.id) return;
-            
-            // Map by name (case-insensitive)
-            const stageNameLower = stage.name.toLowerCase();
-            map.set(stageNameLower, stage.id);
-            
-            // Also map common stage names
-            const stageNameMap: Record<string, string> = {
-              'new': 'new_lead',
-              'contacted': 'qualified',
-              'qualified': 'qualified',
-              'negotiation': 'negotiation',
-              'deal': 'closing',
-            };
-            const mappedName = stageNameMap[stageNameLower];
-            if (mappedName) {
-              map.set(mappedName, stage.id);
-            }
-          });
-          globalStagesMap = map;
-          stagesFetched = true;
-          setStagesMap(map);
-          setHasStagesLoaded(true);
-        }
-      } catch (err) {
-        console.error("Error fetching stages:", err);
-        stagesFetched = false; // Reset on error to allow retry
-      } finally {
-        stagesFetchPromise = null;
-      }
-    })();
-  }, [userData?.token]);
 
   const propertyFromMeta = getPropertyFromMetadata(action.metadata);
   const propertyFromPrefs = getPropertyFromPreferences(customer);
@@ -377,43 +312,17 @@ export function IncomingActionsCard({
         ? parseInt(action.customerId) 
         : action.customerId;
 
-      // Get numeric stage ID - API requires integer
-      let newStageIdNum: number | null = null;
+      // Use string stage_id directly (newStage is already a stage_id string)
+      const newStageId = typeof newStage === 'string' ? newStage : String(newStage);
       
-      // Strategy 1: Try to find numeric ID from stages map (from API)
-      const stageFromMap = stagesMap.get(newStage.toLowerCase());
-      if (stageFromMap) {
-        newStageIdNum = stageFromMap;
-      } else {
-        // Strategy 2: Try to find by matching stage name in the map
-        const stageInfo = LIFECYCLE_STAGES.find(s => s.id === newStage);
-        if (stageInfo) {
-          // Try to find by Arabic or English name
-          for (const [key, value] of stagesMap.entries()) {
-            if (key.includes(stageInfo.nameEn.toLowerCase()) || 
-                key.includes(stageInfo.nameAr.toLowerCase())) {
-              newStageIdNum = value;
-              break;
-            }
-          }
-          
-          // Strategy 3: If still not found, use order as fallback (may need adjustment)
-          if (!newStageIdNum) {
-            // Use order + base ID (assuming IDs start around 135)
-            // This is a fallback and may not be accurate
-            newStageIdNum = stageInfo.order + 134;
-          }
-        }
-      }
-      
-      if (!newStageIdNum) {
-        throw new Error(`Unable to determine numeric stage ID for stage: ${newStage}`);
+      if (!newStageId) {
+        throw new Error(`Invalid stage ID: ${newStage}`);
       }
 
-      // Call API to update stage
+      // Call API to update stage (now uses string stage_id)
       await apiUpdateCustomerStage(
         customerIdNum,
-        newStageIdNum,
+        newStageId,  // string stage_id
         undefined // notes - optional
       );
 
@@ -557,7 +466,7 @@ export function IncomingActionsCard({
                 })}
               </span>
             )}
-            {hasStagesLoaded && (
+            {(
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -849,7 +758,7 @@ export function IncomingActionsCard({
               )}
             </div>
             {/* Stage Dropdown - Always visible once stages are loaded */}
-            {hasStagesLoaded && (
+            {(
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button

@@ -47,7 +47,7 @@ export interface UpdateCustomerParams {
   email?: string;
   source?: string;
   note?: string;
-  stage_id?: number;
+  customers_hub_stage_id?: string;  // stage_id (string, e.g., "new_lead", "qualified")
   priority_id?: number;
   type_id?: number;
   procedure_id?: number;
@@ -62,11 +62,18 @@ export interface UpdateCustomerResponse {
   message: string;
   data: {
     customer: {
-      id: number;
+      id: number | string;
       name?: string;
       email?: string;
       phone_number?: string;
-      stage_id?: number;
+      stage?: {
+        id: string;                 // stage_id (string)
+        name?: string;
+        nameAr?: string;
+        nameEn?: string;
+        color?: string;
+      };
+      customers_hub_stage_id?: string;  // stage_id (string)
       updatedAt: string;
     };
   };
