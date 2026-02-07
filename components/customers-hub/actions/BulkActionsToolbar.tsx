@@ -31,9 +31,11 @@ import {
   ChevronDown,
   X,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Priority } from "@/types/unified-customer";
+import { useCustomersHubAssignment } from "@/hooks/useCustomersHubAssignment";
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
@@ -56,14 +58,6 @@ const priorityOptions: { value: Priority; label: string; color: string }[] = [
   { value: "low", label: "منخفض", color: "bg-green-100 text-green-700" },
 ];
 
-// Mock employees for assignment - in real app, this would come from API
-const employees = [
-  { id: "emp1", name: "أحمد محمد" },
-  { id: "emp2", name: "فاطمة علي" },
-  { id: "emp3", name: "محمد خالد" },
-  { id: "emp4", name: "سارة أحمد" },
-];
-
 export function BulkActionsToolbar({
   selectedCount,
   totalCount,
@@ -77,6 +71,9 @@ export function BulkActionsToolbar({
   isAllSelected,
   className,
 }: BulkActionsToolbarProps) {
+  // جلب الموظفين من API بدلاً من القائمة الثابتة
+  const { employees, loading: employeesLoading } = useCustomersHubAssignment();
+  
   if (selectedCount === 0) return null;
 
   return (
@@ -204,17 +201,37 @@ export function BulkActionsToolbar({
               <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center">
+          <DropdownMenuContent align="center" className="w-56">
             <DropdownMenuLabel>تعيين إلى موظف</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {employees.map((emp) => (
-              <DropdownMenuItem
-                key={emp.id}
-                onClick={() => onAssignAll(emp.id, emp.name)}
-              >
-                {emp.name}
+            {employeesLoading ? (
+              <DropdownMenuItem disabled>
+                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                جاري تحميل الموظفين...
               </DropdownMenuItem>
-            ))}
+            ) : employees.length === 0 ? (
+              <DropdownMenuItem disabled>
+                لا يوجد موظفين متاحين
+              </DropdownMenuItem>
+            ) : (
+              employees
+                .filter((emp) => emp.isActive) // عرض الموظفين النشطين فقط
+                .map((emp) => (
+                  <DropdownMenuItem
+                    key={emp.id}
+                    onClick={() => onAssignAll(emp.id, emp.name)}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <span>{emp.name}</span>
+                      {emp.customerCount !== undefined && emp.maxCapacity !== undefined && (
+                        <span className="text-xs text-gray-400 mr-2">
+                          {emp.customerCount}/{emp.maxCapacity}
+                        </span>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 

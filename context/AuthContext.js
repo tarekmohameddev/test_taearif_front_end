@@ -58,6 +58,8 @@ const useAuthStore = create((set, get) => ({
       // دمج البيانات الجديدة مع البيانات الموجودة
       const updatedUserData = {
         ...currentState.userData,
+        // إضافة user ID - جرب عدة مسارات محتملة
+        id: userData.id || subscriptionDATA.id || userData.user?.id || subscriptionDATA.user?.id || currentState.userData?.id || null,
         // بيانات المستخدم الأساسية
         email: userData.email || currentState.userData?.email || null,
         username: userData.username || currentState.userData?.username || null,

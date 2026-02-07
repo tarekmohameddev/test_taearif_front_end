@@ -185,6 +185,50 @@ export interface UpdateCustomerStageResponse {
   timestamp: string;
 }
 
+// Bulk Actions Types
+export type BulkActionType = 'complete' | 'dismiss' | 'snooze' | 'assign' | 'change_priority';
+
+export interface BulkActionRequest {
+  action: BulkActionType;
+  actionIds: string[];
+  data: {
+    notes?: string;
+    reason?: string;
+    snoozedUntil?: string;
+    assignedTo?: number;
+    priority?: Priority;
+    completedBy?: number;
+    dismissedBy?: number;
+    snoozedBy?: number;
+    assignedBy?: number;
+    changedBy?: number;
+  };
+}
+
+export interface BulkActionResponse {
+  status: 'success' | 'error' | 'partial_success';
+  code: number;
+  message: string;
+  data: {
+    action: string;
+    updatedCount: number;
+    successCount: number;
+    failedCount: number;
+    actionIds: string[];
+    failedActionIds?: string[];
+    failures?: Array<{
+      actionId: string;
+      reason: string;
+    }>;
+    completedAt?: string;
+    completedBy?: {
+      id: number;
+      name: string;
+    };
+  };
+  timestamp: string;
+}
+
 // Get Requests List
 export async function getRequestsList(params: RequestsListParams): Promise<RequestsListResponse> {
   const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, params);
@@ -277,4 +321,93 @@ export async function updateCustomerStage(
     }
   );
   return response.data;
+}
+
+// Bulk Actions - Unified Endpoint
+export async function bulkActions(
+  request: BulkActionRequest
+): Promise<BulkActionResponse> {
+  const response = await axiosInstance.post<BulkActionResponse>(
+    `${BASE_URL}/bulk`,
+    request
+  );
+  return response.data;
+}
+
+// Convenience functions for bulk actions
+export async function bulkCompleteActions(
+  actionIds: string[],
+  completedBy: number,
+  notes?: string
+): Promise<BulkActionResponse> {
+  return bulkActions({
+    action: 'complete',
+    actionIds,
+    data: {
+      notes,
+      completedBy,
+    },
+  });
+}
+
+export async function bulkDismissActions(
+  actionIds: string[],
+  dismissedBy: number,
+  reason?: string
+): Promise<BulkActionResponse> {
+  return bulkActions({
+    action: 'dismiss',
+    actionIds,
+    data: {
+      reason,
+      dismissedBy,
+    },
+  });
+}
+
+export async function bulkSnoozeActions(
+  actionIds: string[],
+  snoozedUntil: string,
+  snoozedBy: number,
+  reason?: string
+): Promise<BulkActionResponse> {
+  return bulkActions({
+    action: 'snooze',
+    actionIds,
+    data: {
+      snoozedUntil,
+      reason,
+      snoozedBy,
+    },
+  });
+}
+
+export async function bulkAssignActions(
+  actionIds: string[],
+  assignedTo: number,
+  assignedBy: number
+): Promise<BulkActionResponse> {
+  return bulkActions({
+    action: 'assign',
+    actionIds,
+    data: {
+      assignedTo,
+      assignedBy,
+    },
+  });
+}
+
+export async function bulkChangePriority(
+  actionIds: string[],
+  priority: Priority,
+  changedBy: number
+): Promise<BulkActionResponse> {
+  return bulkActions({
+    action: 'change_priority',
+    actionIds,
+    data: {
+      priority,
+      changedBy,
+    },
+  });
 }

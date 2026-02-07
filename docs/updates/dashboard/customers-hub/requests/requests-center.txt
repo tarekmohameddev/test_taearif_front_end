@@ -1,9 +1,14 @@
-2025-01-20 12:00:00
-Update Type: Feature
-نقل بطاقة "توزيع العملاء حسب المرحلة" من صفحة القائمة إلى صفحة الطلبات تحت بطاقات الإحصائيات
-components/customers-hub/requests/RequestsCenterPage.tsx
+2025-01-20 15:30:00
+Update Type: Enhancement
+ربط bulk actions في dialog بصفحة customers-hub/requests بـ endpoint الـ bulk بدلاً من الفردي. تم تحديث جميع bulk operations (complete, dismiss, snooze, assign, change_priority) لاستخدام unified bulk endpoint مع معالجة partial success والأخطاء
+app/dashboard/customers-hub/requests/page.tsx, components/customers-hub/requests/RequestsCenterPage.tsx, hooks/useCustomersHubRequests.ts, lib/services/customers-hub-requests-api.ts
 
-2025-01-20 12:05:00
-Update Type: Update
-تعديل البطاقة لعرض "توزيع طلبات العملاء حسب المرحلة" بدلاً من "توزيع العملاء حسب المرحلة" - يعرض الآن عدد الطلبات حسب مرحلة العميل
-components/customers-hub/requests/RequestsCenterPage.tsx
+2025-01-20 16:00:00
+Update Type: Bug Fix
+إصلاح مشكلة إرسال completedBy كـ 0 بدلاً من User ID الحقيقي. تم إضافة حفظ user id في AuthContext عند جلب بيانات المستخدم من /user API وتحسين getCurrentUserId في useCustomersHubRequests
+context/AuthContext.js, hooks/useCustomersHubRequests.ts
+
+2025-01-20 16:30:00
+Update Type: Enhancement
+استبدال قائمة الموظفين الثابتة (mock) في BulkActionsToolbar بـ جلب الموظفين من API باستخدام useCustomersHubAssignment hook. تم إضافة معالجة loading state وعرض عدد العملاء/القدرة لكل موظف
+components/customers-hub/actions/BulkActionsToolbar.tsx

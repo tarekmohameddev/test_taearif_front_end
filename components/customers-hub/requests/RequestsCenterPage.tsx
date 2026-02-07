@@ -151,6 +151,7 @@ interface RequestsCenterPageProps {
   onDismissMultipleActions?: (actionIds: string[], reason?: string) => Promise<boolean>;
   onSnoozeMultipleActions?: (actionIds: string[], snoozeUntil: string, reason?: string) => Promise<boolean>;
   onAssignMultipleActions?: (actionIds: string[], employeeId: number) => Promise<boolean>;
+  onChangeMultipleActionsPriority?: (actionIds: string[], priority: Priority) => Promise<boolean>;
 }
 
 export function RequestsCenterPage(props?: RequestsCenterPageProps) {
@@ -254,6 +255,16 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
         }
       }
     : storeAssignMultipleActions;
+
+  const changeMultipleActionsPriority = props?.onChangeMultipleActionsPriority
+    ? async (actionIds: string[], priority: Priority) => {
+        try {
+          await props.onChangeMultipleActionsPriority!(actionIds, priority);
+        } catch (err) {
+          console.error("Error changing priority for multiple actions:", err);
+        }
+      }
+    : updateMultipleActionsPriority;
 
   // Use the new filters hook (like Properties)
   const filterHooks = useCustomersHubFiltersState();
@@ -662,9 +673,13 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
       console.error("Error assigning multiple actions:", err);
     }
   };
-  const handleBulkChangePriority = (priority: Priority) => {
-    updateMultipleActionsPriority(Array.from(selectedActionIds), priority);
-    setSelectedActionIds(new Set());
+  const handleBulkChangePriority = async (priority: Priority) => {
+    try {
+      await changeMultipleActionsPriority(Array.from(selectedActionIds), priority);
+      setSelectedActionIds(new Set());
+    } catch (err) {
+      console.error("Error changing priority for multiple actions:", err);
+    }
   };
   const handleQuickView = (actionId: string) => {
     const action =

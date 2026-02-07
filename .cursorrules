@@ -789,41 +789,73 @@ When responding to user:
 
 ---
 
-## 🚫 ASK MODE RULES - CRITICAL
+## 🚫 ASK MODE RULES - CRITICAL - ABSOLUTELY MANDATORY
+
+### **⚠️ STRICT PROHIBITION: NO CODE IN ASK MODE ⚠️**
 
 ### **When User is in ASK Mode (Not Agent Mode):**
 
-**MANDATORY RULES:**
+**🚨 ABSOLUTE MANDATORY RULES - ZERO TOLERANCE:**
+**🚨 VIOLATION OF THESE RULES IS STRICTLY FORBIDDEN 🚨**
 
-1. **NEVER write code blocks in chat:**
-   - ❌ NO code snippets
-   - ❌ NO code examples
-   - ❌ NO code references with line numbers
-   - ❌ NO markdown code blocks (```language)
-   - ❌ NO inline code with backticks for code
+1. **ABSOLUTELY FORBIDDEN - NEVER EVER write ANY code in chat:**
+   - ❌ **STRICTLY PROHIBITED:** Code snippets of ANY kind
+   - ❌ **STRICTLY PROHIBITED:** Code examples in ANY format
+   - ❌ **STRICTLY PROHIBITED:** Code references with line numbers (```startLine:endLine:filepath)
+   - ❌ **STRICTLY PROHIBITED:** Markdown code blocks (```language or ```)
+   - ❌ **STRICTLY PROHIBITED:** Inline code with backticks for code (`code`)
+   - ❌ **STRICTLY PROHIBITED:** Any form of code display or representation
+   - ❌ **STRICTLY PROHIBITED:** Pseudo-code or code-like structures
+   - ❌ **STRICTLY PROHIBITED:** Code comments or code explanations in code format
+   - ❌ **STRICTLY PROHIBITED:** File paths in code format
+   - ❌ **STRICTLY PROHIBITED:** ANY text that resembles code structure
 
-2. **ALWAYS provide solution as:**
-   - ✅ Plain text explanation
-   - ✅ Step-by-step instructions
-   - ✅ Descriptive guidance
-   - ✅ Table at the end summarizing the solution
+2. **ONLY ALLOWED - Plain text explanations:**
+   - ✅ **ONLY:** Plain text explanations in natural language
+   - ✅ **ONLY:** Step-by-step instructions in descriptive text
+   - ✅ **ONLY:** Descriptive guidance without code references
+   - ✅ **ONLY:** Natural language descriptions of what needs to be done
+   - ✅ **ONLY:** Textual explanations of concepts and solutions
+   - ✅ **ONLY:** Verbal instructions on how to implement changes
 
 3. **REQUIRED: Include Summary Table:**
-   - At the end of every response in Ask Mode
-   - Table format with columns: Step | Action | Details | File/Location
-   - Summarize all steps and changes needed
+   - **MANDATORY:** At the end of EVERY response in Ask Mode
+   - **MANDATORY:** Table format with columns: Step | Action | Details | File/Location
+   - **MANDATORY:** Summarize ALL steps and changes needed
+   - **MANDATORY:** Use Arabic column headers as shown in format
 
-**Example Response Structure in Ask Mode:**
+**⚠️ CRITICAL REMINDER:**
+- **ASK MODE = ZERO CODE POLICY**
+- **NO EXCEPTIONS WHATSOEVER**
+- **NO CODE MEANS NO CODE - NOT EVEN ONE LINE**
+- **NOT EVEN COMMENTS IN CODE FORMAT**
+- **NOT EVEN PSEUDO-CODE**
+- **ONLY PLAIN TEXT EXPLANATIONS**
+
+**Example Response Structure in Ask Mode (CORRECT):**
 
 ```
-[Plain text explanation of the solution]
+[Plain text explanation of the solution in natural language]
 
-[Step-by-step instructions without code]
+[Step-by-step instructions without ANY code - only descriptive text]
 
 [Summary Table at the end]
 ```
 
-**Summary Table Format:**
+**Example of FORBIDDEN in Ask Mode (WRONG - NEVER DO THIS):**
+```
+❌ ```typescript
+❌ const example = "code";
+❌ ```
+❌ 
+❌ ```12:14:file.tsx
+❌ code here
+❌ ```
+❌ 
+❌ Use `const variable = value` in your code
+```
+
+**Summary Table Format (MANDATORY):**
 ```
 | الخطوة | الإجراء | التفاصيل | الملف/الموقع |
 |--------|---------|----------|--------------|
@@ -831,7 +863,13 @@ When responding to user:
 | 2 | ... | ... | ... |
 ```
 
-**CRITICAL:** If user is in Ask Mode, AI must detect this and follow these rules strictly. NO exceptions.
+**🚨 ENFORCEMENT:**
+- **If user is in Ask Mode, AI MUST detect this immediately**
+- **AI MUST follow these rules with ABSOLUTE STRICTNESS**
+- **NO EXCEPTIONS - NO EXCUSES - NO WORKAROUNDS**
+- **If unsure, default to NO CODE policy**
+- **When in doubt, use ONLY plain text explanations**
+- **Violation of this rule is a CRITICAL ERROR**
 
 ---
 

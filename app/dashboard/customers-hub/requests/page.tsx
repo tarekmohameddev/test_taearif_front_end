@@ -25,6 +25,7 @@ export default function CustomersHubRequestsPage() {
     dismissMultipleActions,
     snoozeMultipleActions,
     assignMultipleActions,
+    changeMultipleActionsPriority,
   } = useCustomersHubRequests();
 
   const [initialLoad, setInitialLoad] = useState(false);
@@ -86,6 +87,7 @@ export default function CustomersHubRequestsPage() {
       onDismissMultipleActions={dismissMultipleActions}
       onSnoozeMultipleActions={snoozeMultipleActions}
       onAssignMultipleActions={assignMultipleActions}
+      onChangeMultipleActionsPriority={changeMultipleActionsPriority}
     />
   );
 }

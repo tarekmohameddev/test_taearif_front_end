@@ -7,10 +7,16 @@ import {
   dismissAction as apiDismissAction,
   snoozeAction as apiSnoozeAction,
   assignAction as apiAssignAction,
+  bulkCompleteActions,
+  bulkDismissActions,
+  bulkSnoozeActions,
+  bulkAssignActions,
+  bulkChangePriority,
   type RequestsListParams,
   type FilterOptionsResponse,
 } from "@/lib/services/customers-hub-requests-api";
-import type { CustomerAction } from "@/types/unified-customer";
+import type { CustomerAction, Priority } from "@/types/unified-customer";
+import { toast } from "sonner";
 
 export function useCustomersHubRequests() {
   const { userData, IsLoading: authLoading } = useAuthStore();
@@ -201,30 +207,83 @@ export function useCustomersHubRequests() {
     [userData?.token, authLoading]
   );
 
-  // Bulk operations
+  // Helper function to get current user ID
+  const getCurrentUserId = useCallback((): number => {
+    // محاولة الحصول على user ID من userData
+    // جرب عدة مسارات محتملة للـ id
+    const userId = 
+      userData?.id || 
+      (userData as any)?.user?.id || 
+      (userData as any)?.tenant_id || 
+      0;
+    
+    // تحويل إلى number إذا كان string
+    const numId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+    
+    // التحقق من أن الرقم صحيح
+    if (isNaN(numId) || numId <= 0) {
+      console.warn('⚠️ User ID not found in userData. Using 0. User data:', userData);
+      return 0;
+    }
+    
+    return numId;
+  }, [userData]);
+
+  // Bulk operations - Using unified bulk endpoint
   const completeMultipleActions = useCallback(
     async (actionIds: string[], notes?: string) => {
       if (authLoading || !userData?.token) {
         return false;
       }
 
-      const promises = actionIds.map((id) => apiCompleteAction(id, notes));
-      try {
-        await Promise.all(promises);
-        setActions((prev) =>
-          prev.map((action) =>
-            actionIds.includes(action.id)
-              ? { ...action, status: "completed" as const, completedAt: new Date().toISOString() }
-              : action
-          )
-        );
+      if (actionIds.length === 0) {
         return true;
+      }
+
+      try {
+        const userId = getCurrentUserId();
+        const response = await bulkCompleteActions(actionIds, userId, notes);
+        
+        // Handle success or partial success
+        if (response.status === 'success' || response.status === 'partial_success') {
+          // Update only successfully completed actions
+          setActions((prev) =>
+            prev.map((action) =>
+              response.data.actionIds.includes(action.id)
+                ? { 
+                    ...action, 
+                    status: "completed" as const, 
+                    completedAt: response.data.completedAt || new Date().toISOString() 
+                  }
+                : action
+            )
+          );
+
+          // Show success message
+          if (response.status === 'partial_success') {
+            toast.success(
+              `تم إكمال ${response.data.successCount} من ${actionIds.length} إجراء`,
+              {
+                description: response.data.failedCount > 0 
+                  ? `فشل ${response.data.failedCount} إجراء` 
+                  : undefined,
+              }
+            );
+          } else {
+            toast.success(`تم إكمال ${response.data.successCount} إجراء بنجاح`);
+          }
+
+          return true;
+        } else {
+          throw new Error(response.message || 'فشل إكمال الإجراءات');
+        }
       } catch (err: any) {
         console.error("Error completing multiple actions:", err);
+        toast.error(err.response?.data?.message || "حدث خطأ أثناء إكمال الإجراءات");
         throw err;
       }
     },
-    [userData?.token, authLoading]
+    [userData?.token, authLoading, getCurrentUserId]
   );
 
   const dismissMultipleActions = useCallback(
@@ -233,23 +292,50 @@ export function useCustomersHubRequests() {
         return false;
       }
 
-      const promises = actionIds.map((id) => apiDismissAction(id, reason));
-      try {
-        await Promise.all(promises);
-        setActions((prev) =>
-          prev.map((action) =>
-            actionIds.includes(action.id)
-              ? { ...action, status: "dismissed" as const }
-              : action
-          )
-        );
+      if (actionIds.length === 0) {
         return true;
+      }
+
+      try {
+        const userId = getCurrentUserId();
+        const response = await bulkDismissActions(actionIds, userId, reason);
+        
+        // Handle success or partial success
+        if (response.status === 'success' || response.status === 'partial_success') {
+          // Update only successfully dismissed actions
+          setActions((prev) =>
+            prev.map((action) =>
+              response.data.actionIds.includes(action.id)
+                ? { ...action, status: "dismissed" as const }
+                : action
+            )
+          );
+
+          // Show success message
+          if (response.status === 'partial_success') {
+            toast.success(
+              `تم رفض ${response.data.successCount} من ${actionIds.length} إجراء`,
+              {
+                description: response.data.failedCount > 0 
+                  ? `فشل ${response.data.failedCount} إجراء` 
+                  : undefined,
+              }
+            );
+          } else {
+            toast.success(`تم رفض ${response.data.successCount} إجراء بنجاح`);
+          }
+
+          return true;
+        } else {
+          throw new Error(response.message || 'فشل رفض الإجراءات');
+        }
       } catch (err: any) {
         console.error("Error dismissing multiple actions:", err);
+        toast.error(err.response?.data?.message || "حدث خطأ أثناء رفض الإجراءات");
         throw err;
       }
     },
-    [userData?.token, authLoading]
+    [userData?.token, authLoading, getCurrentUserId]
   );
 
   const snoozeMultipleActions = useCallback(
@@ -258,23 +344,50 @@ export function useCustomersHubRequests() {
         return false;
       }
 
-      const promises = actionIds.map((id) => apiSnoozeAction(id, snoozeUntil, reason));
-      try {
-        await Promise.all(promises);
-        setActions((prev) =>
-          prev.map((action) =>
-            actionIds.includes(action.id)
-              ? { ...action, snoozedUntil: snoozeUntil, status: "snoozed" as const }
-              : action
-          )
-        );
+      if (actionIds.length === 0) {
         return true;
+      }
+
+      try {
+        const userId = getCurrentUserId();
+        const response = await bulkSnoozeActions(actionIds, snoozeUntil, userId, reason);
+        
+        // Handle success or partial success
+        if (response.status === 'success' || response.status === 'partial_success') {
+          // Update only successfully snoozed actions
+          setActions((prev) =>
+            prev.map((action) =>
+              response.data.actionIds.includes(action.id)
+                ? { ...action, snoozedUntil: snoozeUntil, status: "snoozed" as const }
+                : action
+            )
+          );
+
+          // Show success message
+          if (response.status === 'partial_success') {
+            toast.success(
+              `تم تأجيل ${response.data.successCount} من ${actionIds.length} إجراء`,
+              {
+                description: response.data.failedCount > 0 
+                  ? `فشل ${response.data.failedCount} إجراء` 
+                  : undefined,
+              }
+            );
+          } else {
+            toast.success(`تم تأجيل ${response.data.successCount} إجراء بنجاح`);
+          }
+
+          return true;
+        } else {
+          throw new Error(response.message || 'فشل تأجيل الإجراءات');
+        }
       } catch (err: any) {
         console.error("Error snoozing multiple actions:", err);
+        toast.error(err.response?.data?.message || "حدث خطأ أثناء تأجيل الإجراءات");
         throw err;
       }
     },
-    [userData?.token, authLoading]
+    [userData?.token, authLoading, getCurrentUserId]
   );
 
   const assignMultipleActions = useCallback(
@@ -283,27 +396,108 @@ export function useCustomersHubRequests() {
         return false;
       }
 
-      const promises = actionIds.map((id) => apiAssignAction(id, employeeId));
-      try {
-        await Promise.all(promises);
-        setActions((prev) =>
-          prev.map((action) =>
-            actionIds.includes(action.id)
-              ? {
-                  ...action,
-                  assignedTo: employeeId.toString(),
-                  assignedToName: action.assignedToName || "",
-                }
-              : action
-          )
-        );
+      if (actionIds.length === 0) {
         return true;
+      }
+
+      try {
+        const userId = getCurrentUserId();
+        const response = await bulkAssignActions(actionIds, employeeId, userId);
+        
+        // Handle success or partial success
+        if (response.status === 'success' || response.status === 'partial_success') {
+          // Update only successfully assigned actions
+          // Note: We might need to fetch employee name from response or filter options
+          setActions((prev) =>
+            prev.map((action) =>
+              response.data.actionIds.includes(action.id)
+                ? {
+                    ...action,
+                    assignedTo: employeeId.toString(),
+                    assignedToName: action.assignedToName || "",
+                  }
+                : action
+            )
+          );
+
+          // Show success message
+          if (response.status === 'partial_success') {
+            toast.success(
+              `تم تعيين ${response.data.successCount} من ${actionIds.length} إجراء`,
+              {
+                description: response.data.failedCount > 0 
+                  ? `فشل ${response.data.failedCount} إجراء` 
+                  : undefined,
+              }
+            );
+          } else {
+            toast.success(`تم تعيين ${response.data.successCount} إجراء بنجاح`);
+          }
+
+          return true;
+        } else {
+          throw new Error(response.message || 'فشل تعيين الإجراءات');
+        }
       } catch (err: any) {
         console.error("Error assigning multiple actions:", err);
+        toast.error(err.response?.data?.message || "حدث خطأ أثناء تعيين الإجراءات");
         throw err;
       }
     },
-    [userData?.token, authLoading]
+    [userData?.token, authLoading, getCurrentUserId]
+  );
+
+  // Add bulk change priority function
+  const changeMultipleActionsPriority = useCallback(
+    async (actionIds: string[], priority: Priority) => {
+      if (authLoading || !userData?.token) {
+        return false;
+      }
+
+      if (actionIds.length === 0) {
+        return true;
+      }
+
+      try {
+        const userId = getCurrentUserId();
+        const response = await bulkChangePriority(actionIds, priority, userId);
+        
+        // Handle success or partial success
+        if (response.status === 'success' || response.status === 'partial_success') {
+          // Update only successfully changed actions
+          setActions((prev) =>
+            prev.map((action) =>
+              response.data.actionIds.includes(action.id)
+                ? { ...action, priority }
+                : action
+            )
+          );
+
+          // Show success message
+          if (response.status === 'partial_success') {
+            toast.success(
+              `تم تغيير أولوية ${response.data.successCount} من ${actionIds.length} إجراء`,
+              {
+                description: response.data.failedCount > 0 
+                  ? `فشل ${response.data.failedCount} إجراء` 
+                  : undefined,
+              }
+            );
+          } else {
+            toast.success(`تم تغيير أولوية ${response.data.successCount} إجراء بنجاح`);
+          }
+
+          return true;
+        } else {
+          throw new Error(response.message || 'فشل تغيير أولوية الإجراءات');
+        }
+      } catch (err: any) {
+        console.error("Error changing priority for multiple actions:", err);
+        toast.error(err.response?.data?.message || "حدث خطأ أثناء تغيير أولوية الإجراءات");
+        throw err;
+      }
+    },
+    [userData?.token, authLoading, getCurrentUserId]
   );
 
   return {
@@ -323,6 +517,7 @@ export function useCustomersHubRequests() {
     dismissMultipleActions,
     snoozeMultipleActions,
     assignMultipleActions,
+    changeMultipleActionsPriority,
     setActions,
   };
 }
