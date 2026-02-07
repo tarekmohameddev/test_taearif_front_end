@@ -53,6 +53,16 @@ export function CustomersTable() {
   const endIndex = startIndex + pageSize;
   const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
 
+  // Normalize customer.stage to always be a string (handle API objects)
+  const normalizeStage = (stage: any): string => {
+    if (!stage) return "new_lead";
+    if (typeof stage === 'string') return stage;
+    if (typeof stage === 'object' && stage !== null) {
+      return (stage as any).id || (stage as any).name || "new_lead";
+    }
+    return String(stage);
+  };
+
   const getPriorityBadge = (priority: string) => {
     const variants: Record<string, { variant: any; text: string }> = {
       urgent: { variant: "destructive", text: "عاجل" },
@@ -108,7 +118,9 @@ export function CustomersTable() {
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedCustomers.map((customer) => (
+              paginatedCustomers.map((customer) => {
+                const normalizedStage = normalizeStage(customer.stage);
+                return (
                 <TableRow key={customer.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                   <TableCell>
                     <div>
@@ -124,11 +136,11 @@ export function CustomersTable() {
                       variant="outline"
                       className="text-xs"
                       style={{
-                        borderColor: getStageColor(customer.stage),
-                        color: getStageColor(customer.stage),
+                        borderColor: getStageColor(normalizedStage),
+                        color: getStageColor(normalizedStage),
                       }}
                     >
-                      {getStageNameAr(customer.stage)}
+                      {getStageNameAr(normalizedStage)}
                     </Badge>
                   </TableCell>
                   <TableCell>{getPriorityBadge(customer.priority)}</TableCell>
@@ -165,7 +177,8 @@ export function CustomersTable() {
                     </Link>
                   </TableCell>
                 </TableRow>
-              ))
+              );
+              })
             )}
           </TableBody>
         </Table>
