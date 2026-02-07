@@ -79,7 +79,6 @@ export function AssignmentPanel() {
   const [saving, setSaving] = useState(false);
   const [autoAssigning, setAutoAssigning] = useState(false);
   const [assignmentResult, setAssignmentResult] = useState<AutoAssignResponse | null>(null);
-  const [showResultDialog, setShowResultDialog] = useState(false);
   const hasFetchedOnOpenRef = useRef(false);
 
   // Initialize configs from API rules or employees
@@ -411,13 +410,8 @@ export function AssignmentPanel() {
         const { assignedCount, failedCount } = result.data;
         console.log("Assignment result:", { assignedCount, failedCount });
         
-        // Save result and show dialog
+        // Save result to show in sidebar
         setAssignmentResult(result);
-        setShowResultDialog(true);
-        
-        // Save result and show dialog
-        setAssignmentResult(result);
-        setShowResultDialog(true);
         
         if (assignedCount > 0) {
           toast.success(
@@ -579,6 +573,113 @@ export function AssignmentPanel() {
                         </>
                       );
                     })()}
+
+                    {/* Assignment Results */}
+                    {assignmentResult && assignmentResult.status === "success" && (
+                      <div className="mt-4 p-4 bg-white dark:bg-gray-800 border rounded-lg space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-sm flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            نتائج التعيين
+                          </h4>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => setAssignmentResult(null)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+
+                        {/* Summary Stats */}
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded p-2 text-center">
+                            <p className="text-xs text-gray-600 dark:text-gray-400">نجح</p>
+                            <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                              {assignmentResult.data.assignedCount}
+                            </p>
+                          </div>
+                          {assignmentResult.data.failedCount > 0 && (
+                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-2 text-center">
+                              <p className="text-xs text-gray-600 dark:text-gray-400">فشل</p>
+                              <p className="text-lg font-bold text-red-600 dark:text-red-400">
+                                {assignmentResult.data.failedCount}
+                              </p>
+                            </div>
+                          )}
+                          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-2 text-center">
+                            <p className="text-xs text-gray-600 dark:text-gray-400">إجمالي</p>
+                            <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                              {assignmentResult.data.assignedCount + assignmentResult.data.failedCount}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Assignments by Employee */}
+                        {assignmentResult.data.assignments.length > 0 && (
+                          <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {(() => {
+                              const assignmentsByEmployee = assignmentResult.data.assignments.reduce(
+                                (acc, assignment) => {
+                                  const empId = assignment.employeeId;
+                                  const employee = employees.find((e) => e.id === empId);
+                                  if (!acc[empId]) {
+                                    acc[empId] = {
+                                      employee: employee || { id: empId, name: `موظف ${empId}` },
+                                      assignments: [],
+                                    };
+                                  }
+                                  acc[empId].assignments.push(assignment);
+                                  return acc;
+                                },
+                                {} as Record<
+                                  string,
+                                  {
+                                    employee: { id: string; name: string };
+                                    assignments: Array<{ customerId: string; employeeId: string; assignedAt: string }>;
+                                  }
+                                >
+                              );
+
+                              return Object.values(assignmentsByEmployee).map((group) => (
+                                <div
+                                  key={group.employee.id}
+                                  className="p-2 bg-gray-50 dark:bg-gray-700 rounded border"
+                                >
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                                        {group.employee.name.charAt(0)}
+                                      </div>
+                                      <span className="text-xs font-medium">{group.employee.name}</span>
+                                    </div>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {group.assignments.length}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {group.assignments.slice(0, 5).map((assignment) => (
+                                      <span
+                                        key={assignment.customerId}
+                                        className="text-xs px-1.5 py-0.5 bg-white dark:bg-gray-600 rounded font-mono"
+                                      >
+                                        #{assignment.customerId}
+                                      </span>
+                                    ))}
+                                    {group.assignments.length > 5 && (
+                                      <span className="text-xs text-gray-500">
+                                        +{group.assignments.length - 5}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              ));
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -818,186 +919,6 @@ export function AssignmentPanel() {
         </div>
       </SheetContent>
     </Sheet>
-
-    {/* Assignment Results Dialog */}
-    <CustomDialog open={showResultDialog} onOpenChange={setShowResultDialog} maxWidth="max-w-4xl">
-      <CustomDialogContent className="max-h-[90vh] overflow-hidden flex flex-col">
-        <CustomDialogHeader>
-          <div className="flex items-center justify-between">
-            <CustomDialogTitle className="text-xl font-bold flex items-center gap-2">
-              <CheckCircle2 className="h-6 w-6 text-green-500" />
-              نتائج التعيين التلقائي
-            </CustomDialogTitle>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={() => setShowResultDialog(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </CustomDialogHeader>
-
-        {assignmentResult && (
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Success Card */}
-              <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">معين بنجاح</p>
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {assignmentResult.data.assignedCount}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Failed Card */}
-              {assignmentResult.data.failedCount > 0 && (
-                <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
-                      <XCircle className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">فشل التعيين</p>
-                      <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                        {assignmentResult.data.failedCount}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Total Card */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">إجمالي المحاولات</p>
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {assignmentResult.data.assignedCount + assignmentResult.data.failedCount}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Assignments by Employee */}
-            {assignmentResult.data.assignments.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  التعيينات حسب الموظف
-                </h3>
-
-                {(() => {
-                  // Group assignments by employee
-                  const assignmentsByEmployee = assignmentResult.data.assignments.reduce(
-                    (acc, assignment) => {
-                      const empId = assignment.employeeId;
-                      const employee = employees.find((e) => e.id === empId);
-                      if (!acc[empId]) {
-                        acc[empId] = {
-                          employee: employee || { id: empId, name: `موظف ${empId}` },
-                          assignments: [],
-                        };
-                      }
-                      acc[empId].assignments.push(assignment);
-                      return acc;
-                    },
-                    {} as Record<
-                      string,
-                      {
-                        employee: { id: string; name: string };
-                        assignments: Array<{ customerId: string; employeeId: string; assignedAt: string }>;
-                      }
-                    >
-                  );
-
-                  return Object.values(assignmentsByEmployee).map((group) => (
-                    <div
-                      key={group.employee.id}
-                      className="border rounded-lg p-4 bg-white dark:bg-gray-800 space-y-3"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                            {group.employee.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-semibold">{group.employee.name}</p>
-                            <p className="text-xs text-gray-500">
-                              {group.assignments.length} عميل معين
-                            </p>
-                          </div>
-                        </div>
-                        <Badge variant="secondary" className="text-sm">
-                          {group.assignments.length}
-                        </Badge>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                        {group.assignments.map((assignment) => (
-                          <div
-                            key={assignment.customerId}
-                            className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm"
-                          >
-                            <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span className="font-mono text-xs">#{assignment.customerId}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
-                        <Clock className="h-3 w-3" />
-                        <span>
-                          {new Date(assignmentResult.timestamp).toLocaleString("ar-SA", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  ));
-                })()}
-              </div>
-            )}
-
-            {/* Empty State */}
-            {assignmentResult.data.assignments.length === 0 && (
-              <div className="text-center py-12">
-                <XCircle className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <p className="text-lg font-semibold text-gray-600 dark:text-gray-400">
-                  لا توجد تعيينات
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  لم يتم تعيين أي عملاء تلقائياً
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="border-t p-4 flex justify-end">
-          <Button onClick={() => setShowResultDialog(false)} variant="default">
-            إغلاق
-          </Button>
-        </div>
-      </CustomDialogContent>
-    </CustomDialog>
     </>
   );
 }
