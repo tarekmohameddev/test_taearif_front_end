@@ -46,7 +46,7 @@ import { updateCustomerStage as apiUpdateCustomerStage } from "@/lib/services/cu
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
-import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
+import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 
 // Note: Stages now use string stage_id, no need for numeric mapping
 
@@ -241,29 +241,27 @@ export function IncomingActionsCard({
 
   // Normalize customer.stage to always be a string (handle API objects)
   // Default to 'new_lead' if no stage is found
-  // Use stages from props if provided, otherwise fetch from API (fallback to prevent spam)
-  // Skip API call only if propStages is provided AND not empty
-  const { stages: apiStages, loading: stagesLoading } = useCustomersHubStages(
-    true, // activeOnly
-    !!(propStages && propStages.length > 0) // skip only if propStages is provided AND not empty
-  );
+  // Use stages from Zustand store (fetched once, shared across all components)
+  // Prefer propStages if provided, otherwise use store stages
+  const { stages: storeStages } = useCustomersHubStagesStore();
 
   // Transform stages to match the expected format
   const availableStages = React.useMemo(() => {
     // Use propStages if provided AND not empty (prevents API spam)
-    // Otherwise fallback to apiStages
-    const stagesToUse = (propStages && propStages.length > 0) ? propStages : apiStages;
+    // Otherwise fallback to storeStages from Zustand store
+    const stagesToUse = (propStages && propStages.length > 0) ? propStages : storeStages;
     if (!stagesToUse || stagesToUse.length === 0) {
       return [];
     }
     return stagesToUse.map(stage => ({
-      id: stage.stage_id, // Use stage_id as the id
+      id: stage.stage_id, // stage_id (string) for UI matching
+      numericId: stage.id, // id (number) for API requests
       nameAr: stage.stage_name_ar,
       nameEn: stage.stage_name_en,
       color: stage.color,
       order: stage.order,
     }));
-  }, [propStages, apiStages]);
+  }, [propStages, storeStages]);
 
   // Normalize stage using availableStages from API, with fallback to LIFECYCLE_STAGES
   const normalizedStage = React.useMemo(() => {
@@ -357,22 +355,28 @@ export function IncomingActionsCard({
     setIsUpdatingStage(true);
 
     try {
-      // Convert customerId to number if it's a string
-      const customerIdNum = typeof action.customerId === "string" 
-        ? parseInt(action.customerId) 
-        : action.customerId;
+      // Convert requestId (action.id) to number if it's a string
+      const requestIdNum = typeof action.id === "string" 
+        ? parseInt(action.id) 
+        : action.id;
 
-      // Use string stage_id directly (newStage is already a stage_id string)
-      const newStageId = typeof newStage === 'string' ? newStage : String(newStage);
+      // Find the stage from availableStages to get the numeric ID
+      // newStage is stage_id (string), we need to find the stage and get its numericId
+      const selectedStage = availableStages.find(s => s.id === newStage);
       
-      if (!newStageId) {
-        throw new Error(`Invalid stage ID: ${newStage}`);
+      if (!selectedStage || !selectedStage.numericId) {
+        throw new Error(`Invalid stage ID: ${newStage} - stage not found in available stages`);
       }
 
-      // Call API to update stage (now uses string stage_id)
+      // Use numeric ID (stage.id) for API request
+      const newStageIdNum = typeof selectedStage.numericId === 'number' 
+        ? selectedStage.numericId 
+        : parseInt(selectedStage.numericId.toString());
+
+      // Call API to update stage (uses requestId and numeric stage.id)
       await apiUpdateCustomerStage(
-        customerIdNum,
-        newStageId,  // string stage_id
+        requestIdNum,  // requestId (action.id) instead of customerId
+        newStageIdNum,  // numeric stage.id
         undefined // notes - optional
       );
 
@@ -807,10 +811,8 @@ export function IncomingActionsCard({
                 </div>
               )}
             </div>
-            {/* Stage Dropdown - Load stages from backend */}
-            {stagesLoading ? (
-              <div className="text-xs text-gray-500 px-2 py-1">جاري تحميل المراحل...</div>
-            ) : availableStages.length > 0 ? (
+            {/* Stage Dropdown - Load stages from Zustand store */}
+            {availableStages.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button

@@ -22,3 +22,13 @@ components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-h
 Update Type: Bug Fix
 Fixed stages not appearing issue - updated skip condition to check if propStages is not empty (length > 0) instead of just truthy, updated stagesForCards to pass undefined instead of empty array when fetchedStages is empty, updated availableStages logic to properly check if propStages has items before using it
 components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-07 04:24:12
+Update Type: Bug Fix
+Fixed API validation error "newStageId must be an integer" - updated updateCustomerStage to convert newStageId from string (stage_id) to number (stage.id), updated availableStages to include both id (stage_id string) and numericId (stage.id number), updated handleStageChange to find stage by stage_id and send numericId to API
+components/customers-hub/actions/IncomingActionsCard.tsx, lib/services/customers-hub-requests-api.ts
+
+2026-02-07 04:26:36
+Update Type: Bug Fix
+Changed to send request ID (action.id) instead of customer ID (action.customerId) in stage update API request - updated handleStageChange to use action.id instead of action.customerId when calling apiUpdateCustomerStage
+components/customers-hub/actions/IncomingActionsCard.tsx

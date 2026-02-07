@@ -1,18 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import useUnifiedCustomersStore from "@/context/store/unified-customers";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  LIFECYCLE_STAGES, 
-  getStageNameAr, 
-  getStageColor,
   type UnifiedCustomer 
 } from "@/types/unified-customer";
-import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
+import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 import { 
   Eye, DollarSign, 
   TrendingUp, ChevronLeft, ChevronRight
@@ -20,24 +16,21 @@ import {
 import Link from "next/link";
 import type { PipelineStage } from "@/lib/services/customers-hub-pipeline-api";
 import type { MoveCustomerParams } from "@/lib/services/customers-hub-pipeline-api";
+import type { Stage } from "@/lib/services/customers-hub-stages-api";
 
 interface EnhancedPipelineBoardProps {
   stages?: PipelineStage[];
+  apiStages?: Stage[];  // Stages from API stages (for boards display)
   onMoveCustomer?: (params: MoveCustomerParams) => Promise<boolean>;
 }
 
 export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
-  const store = useUnifiedCustomersStore();
-  const { customers: storeCustomers, updateCustomerStage: storeUpdateCustomerStage } = store;
+  // Use API stages from props (preferred) or fetch from store as fallback
+  const { stages: storeStages } = useCustomersHubStagesStore();
+  const apiStages = props?.apiStages || storeStages;
   
-  // Fetch dynamic stages from API (as fallback if props.stages not provided)
-  const { stages: dynamicStages } = useCustomersHubStages(true);
-  
-  // Use prop stages if provided, otherwise use store customers
+  // Use prop stages only - NO FALLBACK
   const stages = props?.stages;
-  const customers = stages 
-    ? stages.flatMap(stage => stage.customers)
-    : storeCustomers;
 
   const [draggedCustomer, setDraggedCustomer] = useState<UnifiedCustomer | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
@@ -77,28 +70,30 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
     }
   };
 
-  const handleDrop = async (e: React.DragEvent, stageId: string) => {
+  const handleDrop = async (e: React.DragEvent, stageId: string | number) => {
     e.preventDefault();
     
     if (draggedCustomer && draggedCustomer.stage !== stageId) {
       try {
-        // stageId is already a string (stage_id), use it directly
-        const newStageId = stageId;
+        // Convert stageId to integer (API expects integer)
+        const newStageId = typeof stageId === "number" 
+          ? stageId 
+          : parseInt(stageId.toString());
         
-        // Use API handler if provided, otherwise use store handler
+        // Use API handler only - NO FALLBACK
         if (props?.onMoveCustomer) {
           await props.onMoveCustomer({
-            customerId: typeof draggedCustomer.id === "string" 
-              ? parseInt(draggedCustomer.id) 
-              : draggedCustomer.id,
-            newStageId: newStageId,  // string stage_id
+            customerId: typeof draggedCustomer.id === "number" 
+              ? draggedCustomer.id 
+              : parseInt(draggedCustomer.id.toString()),
+            newStageId: newStageId,  // integer stage_id
           });
         } else {
-          storeUpdateCustomerStage(draggedCustomer.id, stageId as any);
+          console.warn("onMoveCustomer handler not provided - cannot move customer");
         }
         
         // Show success animation
-        setShowSuccessAnimation(stageId);
+        setShowSuccessAnimation(stageId.toString());
         setTimeout(() => setShowSuccessAnimation(null), 2000);
       } catch (err) {
         console.error("Error moving customer:", err);
@@ -109,39 +104,46 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
     setDragOverStage(null);
   };
 
-  const getStageCustomers = (stageId: string) => {
-    // If stages are provided, use them directly
-    if (stages) {
-      // Match by stage_id (string) or fallback to id
-      const stage = stages.find(s => 
-        s.stage_id === stageId || 
-        s.id?.toString() === stageId || 
-        s.name === stageId
-      );
-      return stage?.customers || [];
-    }
-    // Otherwise filter from customers
-    return customers.filter(c => c.stage === stageId);
+  const getStageCustomers = (stageId: string | number) => {
+    // Use displayStages which already has customers merged from pipeline stages
+    // NO FALLBACK - Only use data from API
+    const stageIdNum = typeof stageId === "number" ? stageId : parseInt(stageId.toString());
+    const displayStage = displayStages.find(s => 
+      s.id === stageIdNum ||
+      s.id?.toString() === stageId.toString()
+    );
+    
+    return displayStage?.customers || [];
   };
   
-  // Get stages to display - use prop stages if available, otherwise use dynamic stages or LIFECYCLE_STAGES
-  const displayStages = stages 
-    ? stages.map(stage => ({
-        id: stage.stage_id || stage.id?.toString() || stage.id?.toString() || "",
-        nameAr: stage.stage_name_ar || stage.name || "",
-        nameEn: stage.stage_name_en || stage.name || "",
-        color: stage.color,
-        order: stage.order,
-      }))
-    : dynamicStages && dynamicStages.length > 0
-    ? dynamicStages.map(stage => ({
-        id: stage.stage_id,
-        nameAr: stage.stage_name_ar,
-        nameEn: stage.stage_name_en,
-        color: stage.color,
-        order: stage.order,
-      }))
-    : LIFECYCLE_STAGES;
+  // Get stages to display - use API stages (from stages API) as the source of truth for boards
+  // Then merge with pipeline stages data (which contains customers)
+  // NO FALLBACK - Only use data from API
+  const displayStages = apiStages && apiStages.length > 0
+    ? apiStages
+        .filter(stage => stage.is_active) // Only show active stages
+        .sort((a, b) => a.order - b.order) // Sort by order
+        .map(apiStage => {
+          // Find matching pipeline stage (if exists) to get customer data
+          const pipelineStage = stages?.find(ps => 
+            ps.id === apiStage.id || 
+            ps.stage_id === apiStage.id ||
+            ps.id?.toString() === apiStage.id.toString()
+          );
+          
+          return {
+            id: apiStage.id,  // Use API stage id (number)
+            idString: apiStage.id.toString(),
+            nameAr: apiStage.stage_name_ar,
+            nameEn: apiStage.stage_name_en,
+            color: apiStage.color,
+            order: apiStage.order,
+            // Include customer data from pipeline stage if available
+            customers: pipelineStage?.customers || [],
+            customerCount: pipelineStage?.count || pipelineStage?.customerCount || 0,
+          };
+        })
+    : [];
 
   const getInitials = (name: string) => {
     return name
@@ -157,6 +159,19 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
     return `${(amount / 1000).toFixed(0)}k ريال`;
   };
 
+  // Show message if no stages available from API
+  if (!displayStages || displayStages.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-400">
+            لا توجد مراحل متاحة. يرجى التأكد من إعداد المراحل في النظام.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Pipeline Board */}
@@ -165,17 +180,17 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
           {displayStages.map((stage) => {
             const stageCustomers = getStageCustomers(stage.id);
             const totalDealValue = stageCustomers.reduce((sum, c) => sum + (c.totalDealValue || 0), 0);
-            const isDropTarget = dragOverStage === stage.id;
-            const hasAnimation = showSuccessAnimation === stage.id;
+            const isDropTarget = dragOverStage === stage.idString || dragOverStage === stage.id?.toString();
+            const hasAnimation = showSuccessAnimation === stage.idString || showSuccessAnimation === stage.id?.toString();
             
             return (
               <div
-                key={stage.id}
+                key={stage.idString || stage.id}
                 className={`flex-shrink-0 w-80 transition-all duration-300 ${
                   isDropTarget ? "scale-105" : ""
                 } ${hasAnimation ? "animate-pulse" : ""}`}
-                onDragOver={(e) => handleDragOver(e, stage.id)}
-                onDragLeave={(e) => handleDragLeave(e, stage.id)}
+                onDragOver={(e) => handleDragOver(e, stage.idString || stage.id.toString())}
+                onDragLeave={(e) => handleDragLeave(e, stage.idString || stage.id.toString())}
                 onDrop={(e) => handleDrop(e, stage.id)}
               >
                 <Card 
@@ -195,11 +210,13 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: stage.color }}
                           />
-                          {stage.nameAr}
+                          {stage.nameAr || stage.name}
                         </CardTitle>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {stage.nameEn}
-                        </p>
+                        {stage.nameEn && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {stage.nameEn}
+                          </p>
+                        )}
                       </div>
                       <Badge 
                         variant="secondary"

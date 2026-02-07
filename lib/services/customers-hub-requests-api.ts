@@ -317,17 +317,22 @@ export async function addNoteToAction(
 // Update Customer Stage
 export async function updateCustomerStage(
   customerId: string | number,
-  newStageId: string,  // Always string stage_id (e.g., "new_lead", "qualified")
+  newStageId: string | number,  // Can be string stage_id or numeric stage.id - will be converted to number
   notes?: string
 ): Promise<UpdateCustomerStageResponse> {
   // Convert customerId to number if needed
   const customerIdNum = typeof customerId === "string" ? parseInt(customerId) : customerId;
+  
+  // Convert newStageId to number (API expects integer)
+  const newStageIdNum = typeof newStageId === "number" 
+    ? newStageId 
+    : parseInt(newStageId.toString());
 
   const response = await axiosInstance.post<UpdateCustomerStageResponse>(
     "/v2/customers-hub/pipeline/move",
     {
       customerId: customerIdNum,
-      newStageId: newStageId,  // Always string stage_id
+      newStageId: newStageIdNum,  // Always numeric stage.id (integer)
       notes: notes || undefined,
     }
   );

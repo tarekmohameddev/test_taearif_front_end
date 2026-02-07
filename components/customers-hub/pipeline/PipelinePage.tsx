@@ -19,9 +19,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { PipelineStage, PipelineAnalytics } from "@/lib/services/customers-hub-pipeline-api";
 import type { PipelineBoardParams } from "@/lib/services/customers-hub-pipeline-api";
 import type { MoveCustomerParams } from "@/lib/services/customers-hub-pipeline-api";
+import type { Stage } from "@/lib/services/customers-hub-stages-api";
 
 interface PipelinePageProps {
   stages?: PipelineStage[];
+  apiStages?: Stage[];  // Stages from API stages (for boards display)
   analytics?: PipelineAnalytics | null;
   filterOptions?: any;
   totalCustomers?: number;
@@ -42,12 +44,10 @@ export function PipelinePage(props?: PipelinePageProps) {
   const apiLoading = props?.loading ?? false;
   const apiError = props?.error;
   
-  // Calculate total customers: use API value if available, otherwise calculate from stages or store
+  // Calculate total customers: use API value only - NO FALLBACK
   const totalCustomers = apiTotalCustomers !== undefined
     ? apiTotalCustomers
-    : stages && stages.length > 0
-    ? stages.reduce((sum, stage) => sum + (stage.customerCount || 0), 0)
-    : storeCustomers.length || 0;
+    : 0;
 
   // Track last stages IDs to avoid infinite loop
   const lastStagesRef = useRef<string>("");
@@ -184,6 +184,7 @@ export function PipelinePage(props?: PipelinePageProps) {
       {pipelineView === "enhanced" ? (
         <EnhancedPipelineBoard 
           stages={stages}
+          apiStages={props?.apiStages}
           onMoveCustomer={props?.onMoveCustomer}
         />
       ) : (

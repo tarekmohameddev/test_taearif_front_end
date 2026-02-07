@@ -4,11 +4,13 @@ import {
   getPipelineBoard,
   getPipelineFilterOptions,
   moveCustomerInPipeline,
+  bulkMoveCustomersInPipeline,
   type PipelineBoardParams,
   type FilterOptionsResponse,
   type PipelineStage,
   type PipelineAnalytics,
   type MoveCustomerParams,
+  type BulkMoveParams,
 } from "@/lib/services/customers-hub-pipeline-api";
 
 export function useCustomersHubPipeline() {
@@ -36,25 +38,45 @@ export function useCustomersHubPipeline() {
           // Transform stages and customers data
           const transformedStages = response.data.stages.map((stage: any) => ({
             ...stage,
-            // Ensure stage_id is present (use stage_id from API or fallback to id)
-            stage_id: stage.stage_id || stage.id?.toString() || stage.id,
-            customerCount: stage.count ?? stage.customerCount ?? 0, // Convert API's 'count' to 'customerCount'
+            // Ensure both id and stage_id are integers (from API)
+            id: typeof stage.id === 'number' ? stage.id : parseInt(stage.id) || stage.id,
+            stage_id: typeof stage.stage_id === 'number' ? stage.stage_id : (stage.stage_id || stage.id),
+            // Convert API's 'count' to 'customerCount' for compatibility
+            customerCount: stage.count ?? stage.customerCount ?? 0,
+            // Map stage names
+            name: stage.name || stage.nameAr || "",
+            nameAr: stage.name || stage.nameAr || "",
+            nameEn: stage.nameEn || stage.nameEn || "",
             customers: stage.customers.map((customer: any) => ({
               ...customer,
-              id: customer.id?.toString() || customer.id,
-              assignedEmployeeId: customer.assignedTo?.id?.toString() || customer.assignedTo?.toString(),
-              assignedEmployee: customer.assignedTo ? {
-                id: customer.assignedTo.id?.toString() || customer.assignedTo.toString(),
-                name: customer.assignedTo.name || "",
-                email: customer.assignedTo.email,
-                phone: customer.assignedTo.phone,
+              // Keep customer id as is (property request id)
+              id: typeof customer.id === 'number' ? customer.id : parseInt(customer.id) || customer.id,
+              // Handle assignedEmployee (from API response)
+              assignedEmployeeId: customer.assignedEmployee?.id 
+                ? (typeof customer.assignedEmployee.id === 'number' 
+                    ? customer.assignedEmployee.id 
+                    : parseInt(customer.assignedEmployee.id))
+                : undefined,
+              assignedEmployee: customer.assignedEmployee || customer.assignedTo ? {
+                id: customer.assignedEmployee?.id || customer.assignedTo?.id || "",
+                name: customer.assignedEmployee?.name || customer.assignedTo?.name || "",
+                email: customer.assignedEmployee?.email || customer.assignedTo?.email,
+                phone: customer.assignedEmployee?.phone || customer.assignedTo?.phone,
               } : undefined,
-              // Use stage_id (string) from API response
-              stage: customer.stage?.id || customer.stage?.stage_id || customer.stage || "new_lead",
-              priority: customer.priority?.name?.toLowerCase() || customer.priority || "medium",
-              preferences: customer.preferences || {},
-              // Use budgetMax from preferences as totalDealValue if totalDealValue is not provided
+              // Handle priority (from API response)
+              priority: customer.priority?.name?.toLowerCase() 
+                || customer.priority?.id?.toLowerCase() 
+                || customer.priority 
+                || "medium",
+              // Handle propertyType (from API response - can be array or single value)
+              propertyType: customer.propertyType || customer.preferences?.propertyType || [],
+              preferences: {
+                ...customer.preferences,
+                propertyType: customer.propertyType || customer.preferences?.propertyType || [],
+              },
+              // Use totalDealValue from API or fallback
               totalDealValue: customer.totalDealValue || customer.preferences?.budgetMax || customer.budgetMax || undefined,
+              // Additional fields for compatibility
               stageHistory: customer.stageHistory || [],
               properties: customer.properties || [],
               interactions: customer.interactions || [],
@@ -65,8 +87,9 @@ export function useCustomersHubPipeline() {
               aiInsights: customer.aiInsights || {},
               leadScore: customer.leadScore || 0,
               source: customer.source || "manual",
-              createdAt: customer.createdAt || new Date().toISOString(),
+              createdAt: customer.createdAt || customer.lastContactAt || new Date().toISOString(),
               updatedAt: customer.updatedAt || new Date().toISOString(),
+              lastContactAt: customer.lastContactAt || customer.createdAt || new Date().toISOString(),
             })),
           }));
           
@@ -116,12 +139,15 @@ export function useCustomersHubPipeline() {
       }
 
       try {
-        // Ensure newStageId is a string (stage_id)
+        // Ensure customerId and newStageId are integers
         const moveParams: MoveCustomerParams = {
-          ...params,
-          newStageId: typeof params.newStageId === "string" 
+          customerId: typeof params.customerId === "number" 
+            ? params.customerId 
+            : parseInt(params.customerId.toString()),
+          newStageId: typeof params.newStageId === "number" 
             ? params.newStageId 
-            : params.newStageId.toString(),
+            : parseInt(params.newStageId.toString()),
+          notes: params.notes,
         };
         
         await moveCustomerInPipeline(moveParams);
@@ -139,6 +165,39 @@ export function useCustomersHubPipeline() {
     [userData?.token, authLoading, fetchPipelineBoard]
   );
 
+  // Bulk move customers in pipeline
+  const bulkMoveCustomers = useCallback(
+    async (params: BulkMoveParams) => {
+      if (authLoading || !userData?.token) {
+        return false;
+      }
+
+      try {
+        // Ensure all IDs are integers
+        const bulkMoveParams: BulkMoveParams = {
+          customerIds: params.customerIds.map(id => 
+            typeof id === "number" ? id : parseInt(id.toString())
+          ),
+          newStageId: typeof params.newStageId === "number" 
+            ? params.newStageId 
+            : parseInt(params.newStageId.toString()),
+        };
+        
+        const response = await bulkMoveCustomersInPipeline(bulkMoveParams);
+        // Refresh pipeline board after bulk move
+        await fetchPipelineBoard({
+          action: "board",
+          includeAnalytics: true,
+        });
+        return response.data.updated;
+      } catch (err: any) {
+        console.error("Error bulk moving customers:", err);
+        throw err;
+      }
+    },
+    [userData?.token, authLoading, fetchPipelineBoard]
+  );
+
   return {
     stages,
     analytics,
@@ -149,6 +208,7 @@ export function useCustomersHubPipeline() {
     fetchPipelineBoard,
     fetchFilterOptions,
     moveCustomer,
+    bulkMoveCustomers,
     setStages,
   };
 }

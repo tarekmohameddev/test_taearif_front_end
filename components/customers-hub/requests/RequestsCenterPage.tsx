@@ -45,8 +45,9 @@ import { ActionHistoryList } from "../actions/ActionHistoryList";
 import { SourceBadge } from "../actions/SourceBadge";
 import { useCustomersHubFiltersState } from "./hooks/useCustomersHubFiltersState";
 import { Progress } from "@/components/ui/progress";
-import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
 import { CardHeader, CardTitle } from "@/components/ui/card";
+import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
+import useAuthStore from "@/context/AuthContext";
 import type { CustomerStatistics } from "@/types/unified-customer";
 import type {
   CustomerAction,
@@ -175,8 +176,19 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     restoreAction,
   } = store;
 
-  // Fetch stages from backend API once (shared across all cards to prevent spam)
-  const { stages: fetchedStages, loading: stagesLoading } = useCustomersHubStages(true);
+  // Use stages from Zustand store (fetched once, shared across all components)
+  const { stages: storeStages, loading: stagesLoading, fetchStages } = useCustomersHubStagesStore();
+  const { userData, IsLoading: authLoading } = useAuthStore();
+
+  // Fetch stages on mount (only once) - wait for token to be ready
+  React.useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return;
+    }
+    
+    fetchStages(true); // activeOnly = true
+  }, [authLoading, userData?.token, fetchStages]);
 
   // Use props if provided, otherwise use store
   const actions = props?.actions ?? storeActions;
@@ -186,9 +198,9 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const apiLoading = props?.loading ?? false;
   const apiError = props?.error;
 
-  // Use fetchedStages for IncomingActionsCard (prevents API spam)
-  // Only pass stages if they exist and are not empty, otherwise pass undefined to allow fallback to API
-  const stagesForCards = (fetchedStages && fetchedStages.length > 0) ? fetchedStages : undefined;
+  // Use storeStages for IncomingActionsCard (prevents API spam)
+  // Only pass stages if they exist and are not empty
+  const stagesForCards = (storeStages && storeStages.length > 0) ? storeStages : undefined;
 
   // API handlers with fallback to store
   const completeAction = props?.onCompleteAction 

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LIFECYCLE_STAGES, getStageNameAr, getStageInfo } from "@/types/unified-customer";
 import type { CustomerFilters } from "@/types/unified-customer";
-import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
+import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 
 interface FiltersBarProps {
   filterOptions?: {
@@ -54,8 +54,8 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
   const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
   const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
   
-  // Fetch dynamic stages from API (as fallback if filterOptions.stages not provided)
-  const { stages: dynamicStages } = useCustomersHubStages(true);
+  // Use stages from Zustand store (fetched once, shared across all components)
+  const { stages: dynamicStages } = useCustomersHubStagesStore();
   
   // Use filterOptions.stages if provided, otherwise use dynamic stages, otherwise fallback to LIFECYCLE_STAGES
   const displayStages = filterOptions?.stages && filterOptions.stages.length > 0

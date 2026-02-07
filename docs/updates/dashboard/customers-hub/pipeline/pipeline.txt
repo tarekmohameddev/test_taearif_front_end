@@ -22,3 +22,18 @@ lib/services/customers-hub-pipeline-api.ts, components/customers-hub/pipeline/St
 Update Type: Bug Fix
 Fixed "القيمة" showing "غير محدد" in pipeline boards - added fallback to use budgetMax from preferences as totalDealValue if totalDealValue is not provided in API response, updated hook transformation to map budgetMax to totalDealValue
 hooks/useCustomersHubPipeline.ts
+
+2026-02-06 15:30:00
+Update Type: Enhancement
+Updated Pipeline API integration to match V2 API specification - updated PipelineFilters interface to support new filters (status, status_id, property_type, city_id, district_id, budget_from, budget_to, assignedEmployeeId, search), changed stage_id from string to integer in PipelineStage and MoveCustomerParams, added BulkMoveParams and BulkMoveResponse interfaces, added bulkMoveCustomersInPipeline function, updated hook to handle integer stage IDs and added bulkMoveCustomers function, updated EnhancedPipelineBoard to work with integer stage IDs
+lib/services/customers-hub-pipeline-api.ts, hooks/useCustomersHubPipeline.ts, components/customers-hub/pipeline/EnhancedPipelineBoard.tsx, app/dashboard/customers-hub/pipeline/page.tsx
+
+2026-02-06 16:00:00
+Update Type: Feature
+Updated Kanban boards to use API stages - boards (columns) now come from API stages endpoint instead of static data, fetch stages from customers-hub-stages API in page component, pass apiStages to PipelinePage and EnhancedPipelineBoard, merge API stages with pipeline stages data (customers), display all active stages even if empty, removed dependency on static LIFECYCLE_STAGES
+app/dashboard/customers-hub/pipeline/page.tsx, components/customers-hub/pipeline/PipelinePage.tsx, components/customers-hub/pipeline/EnhancedPipelineBoard.tsx
+
+2026-02-06 16:30:00
+Update Type: Enhancement
+Removed all default/dummy data and fallbacks - removed LIFECYCLE_STAGES fallback from EnhancedPipelineBoard and StageAnalytics, removed store customers fallback, removed store statistics fallback, removed all default data sources, now only uses data from API endpoints, added message when no stages available from API, removed unused imports (useUnifiedCustomersStore, LIFECYCLE_STAGES)
+components/customers-hub/pipeline/EnhancedPipelineBoard.tsx, components/customers-hub/pipeline/StageAnalytics.tsx, components/customers-hub/pipeline/PipelinePage.tsx

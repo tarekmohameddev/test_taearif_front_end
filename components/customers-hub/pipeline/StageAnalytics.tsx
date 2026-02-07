@@ -1,9 +1,7 @@
 "use client";
 
 import React from "react";
-import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Card, CardContent } from "@/components/ui/card";
-import { LIFECYCLE_STAGES } from "@/types/unified-customer";
 import { TrendingUp, Clock, Target } from "lucide-react";
 import type { PipelineAnalytics } from "@/lib/services/customers-hub-pipeline-api";
 
@@ -12,41 +10,19 @@ interface StageAnalyticsProps {
 }
 
 export function StageAnalytics(props?: StageAnalyticsProps) {
-  const store = useUnifiedCustomersStore();
-  const { customers, statistics: storeStatistics } = store;
-  
-  // Use prop analytics if provided, otherwise use store statistics
+  // Use prop analytics only - NO FALLBACK
   const analytics = props?.analytics;
   
-  // Get conversion rate from analytics or fallback to store calculation
-  const conversionRate = analytics?.conversionRate !== undefined
-    ? analytics.conversionRate
-    : (() => {
-        // Fallback to calculating from store statistics
-        const qualifiedCount = storeStatistics?.byStage["qualified"] || 0;
-        const closingCount = storeStatistics?.byStage["closing"] || 0;
-        return qualifiedCount > 0 ? Math.round((closingCount / qualifiedCount) * 100) : 0;
-      })();
+  // Get conversion rate from analytics only - NO FALLBACK
+  const conversionRate = analytics?.conversionRate ?? 0;
 
-  // Get average days in pipeline from analytics or fallback to store
-  const avgDaysInPipeline = analytics?.avgDaysInPipeline !== undefined
-    ? analytics.avgDaysInPipeline
-    : (storeStatistics?.avgDaysInPipeline || 0);
+  // Get average days in pipeline from analytics only - NO FALLBACK
+  const avgDaysInPipeline = analytics?.avgDaysInPipeline ?? 0;
 
-  // Get bottlenecks from analytics or calculate from store statistics
-  let bottleneckStages: any[] = [];
-  
-  if (analytics?.bottlenecks && analytics.bottlenecks.length > 0) {
-    // Use bottlenecks from API
-    bottleneckStages = analytics.bottlenecks;
-  } else if (storeStatistics) {
-    // Calculate bottlenecks from store statistics
-    const avgCustomersPerStage = storeStatistics.total / LIFECYCLE_STAGES.length;
-    bottleneckStages = LIFECYCLE_STAGES.filter((stage) => {
-      const count = storeStatistics.byStage[stage.id] || 0;
-      return count > avgCustomersPerStage * 1.5;
-    });
-  }
+  // Get bottlenecks from analytics - NO FALLBACK, only use API data
+  const bottleneckStages: any[] = analytics?.bottlenecks && analytics.bottlenecks.length > 0
+    ? analytics.bottlenecks
+    : [];
   
   // Format bottleneck names for display
   const bottleneckNames = bottleneckStages.length > 0

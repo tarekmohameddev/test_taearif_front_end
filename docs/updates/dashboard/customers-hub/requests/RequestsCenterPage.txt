@@ -57,3 +57,8 @@ lib/services/customers-hub-requests-api.ts, hooks/useCustomersHubRequests.ts, ap
 Update Type: Refactor
 Removed static stages fallback - removed useCustomersHubStages hook and LIFECYCLE_STAGES import, now stages come ONLY from API response (apiStages), removed dynamicStages fallback logic, display message if stages not available from backend
 components/customers-hub/requests/RequestsCenterPage.tsx
+
+2026-02-07 04:16:17
+Update Type: Refactor
+Created Zustand store for stages management - created customers-hub-stages.ts store with fetchStages, createStage, updateStage, deleteStage actions, stages fetched once and shared across all components, auto-refresh on create/update/delete, updated RequestsCenterPage, IncomingActionsCard, EnhancedPipelineBoard, and FiltersBar to use store instead of useCustomersHubStages hook, prevents API spam requests
+context/store/customers-hub-stages.ts, components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/actions/IncomingActionsCard.tsx, components/customers-hub/pipeline/EnhancedPipelineBoard.tsx, components/customers-hub/filters/FiltersBar.tsx
