@@ -44,6 +44,11 @@ import { QuickViewPanel } from "../actions/QuickViewPanel";
 import { ActionHistoryList } from "../actions/ActionHistoryList";
 import { SourceBadge } from "../actions/SourceBadge";
 import { useCustomersHubFiltersState } from "./hooks/useCustomersHubFiltersState";
+import { useCustomersHubStages } from "@/hooks/useCustomersHubStages";
+import { LIFECYCLE_STAGES } from "@/types/unified-customer";
+import { Progress } from "@/components/ui/progress";
+import { CardHeader, CardTitle } from "@/components/ui/card";
+import type { CustomerStatistics } from "@/types/unified-customer";
 import type {
   CustomerAction,
   CustomerActionType,
@@ -153,6 +158,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const {
     actions: storeActions,
     customers,
+    statistics: storeStatistics,
     completeAction: storeCompleteAction,
     dismissAction: storeDismissAction,
     snoozeAction: storeSnoozeAction,
@@ -166,6 +172,9 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     addActionNote,
     restoreAction,
   } = store;
+
+  // Fetch dynamic stages from API for stage distribution card
+  const { stages: dynamicStages, loading: stagesLoading } = useCustomersHubStages(true);
 
   // Use props if provided, otherwise use store
   const actions = props?.actions ?? storeActions;
@@ -799,6 +808,90 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                 <div className="text-xs text-white/80">مكتمل</div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Stage Distribution - Requests by Customer Stage */}
+        <Card className="md:col-span-2 lg:col-span-4">
+          <CardHeader>
+            <CardTitle>توزيع طلبات العملاء حسب المرحلة</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {stagesLoading ? (
+              <div className="text-center py-8 text-gray-500">جاري تحميل المراحل...</div>
+            ) : (() => {
+              // Calculate requests count by customer stage
+              const requestsByStage: Record<string, number> = {};
+              
+              // Count requests (actions) by customer stage
+              allPendingActions.forEach((action) => {
+                const customer = getCustomerById(action.customerId);
+                if (customer && customer.stage) {
+                  const stageId = customer.stage;
+                  requestsByStage[stageId] = (requestsByStage[stageId] || 0) + 1;
+                }
+              });
+
+              const totalRequests = allPendingActions.length;
+
+              if (totalRequests === 0) {
+                return (
+                  <div className="text-center py-8 text-gray-500">
+                    لا توجد طلبات متاحة
+                  </div>
+                );
+              }
+
+              return (
+                <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
+                  {/* Use dynamic stages from API, fallback to LIFECYCLE_STAGES */}
+                  {(dynamicStages && dynamicStages.length > 0
+                    ? dynamicStages.slice(0, 5).map(stage => ({
+                        id: stage.stage_id,
+                        nameAr: stage.stage_name_ar,
+                        nameEn: stage.stage_name_en,
+                        color: stage.color,
+                        order: stage.order,
+                      }))
+                    : LIFECYCLE_STAGES.slice(0, 5)
+                  ).map((stage) => {
+                    const count = requestsByStage[stage.id] || 0;
+                    const percentage =
+                      totalRequests > 0 ? ((count / totalRequests) * 100).toFixed(0) : 0;
+
+                    return (
+                      <div
+                        key={stage.id}
+                        className="flex flex-col gap-2 p-3 border rounded-lg hover:shadow-md transition-shadow"
+                        style={{ borderColor: stage.color }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div
+                            className="text-xs font-medium"
+                            style={{ color: stage.color }}
+                          >
+                            {stage.nameAr}
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {count}
+                          </Badge>
+                        </div>
+                        <Progress
+                          value={Number(percentage)}
+                          className="h-1"
+                          style={
+                            {
+                              "--progress-background": stage.color,
+                            } as React.CSSProperties
+                          }
+                        />
+                        <div className="text-xs text-gray-500">{percentage}% من إجمالي الطلبات</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 

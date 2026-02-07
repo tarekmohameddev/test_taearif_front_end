@@ -13,8 +13,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { getStageNameAr, LIFECYCLE_STAGES } from "@/types/unified-customer";
+import { getStageNameAr } from "@/types/unified-customer";
 import type { CustomerStatistics } from "@/types/unified-customer";
 
 interface CustomersDashboardProps {
@@ -225,52 +224,6 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
                   </div>
                 ))}
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stage Distribution */}
-      <Card className="md:col-span-2 lg:col-span-4">
-        <CardHeader>
-          <CardTitle>توزيع العملاء حسب المرحلة</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-5">
-            {LIFECYCLE_STAGES.slice(0, 5).map((stage) => {
-              const count = statistics.byStage[stage.id] || 0;
-              const percentage =
-                statistics.total > 0 ? ((count / statistics.total) * 100).toFixed(0) : 0;
-
-              return (
-                <div
-                  key={stage.id}
-                  className="flex flex-col gap-2 p-3 border rounded-lg hover:shadow-md transition-shadow"
-                  style={{ borderColor: stage.color }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div
-                      className="text-xs font-medium"
-                      style={{ color: stage.color }}
-                    >
-                      {stage.nameAr}
-                    </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {count}
-                    </Badge>
-                  </div>
-                  <Progress
-                    value={Number(percentage)}
-                    className="h-1"
-                    style={
-                      {
-                        "--progress-background": stage.color,
-                      } as React.CSSProperties
-                    }
-                  />
-                  <div className="text-xs text-gray-500">{percentage}% من الإجمالي</div>
-                </div>
-              );
-            })}
           </div>
         </CardContent>
       </Card>
