@@ -139,11 +139,22 @@ export function useCustomersHubPipeline() {
       }
 
       try {
-        // Ensure customerId and newStageId are integers
+        // Ensure requestId (preferred) or customerId (backward compatibility) and newStageId are integers
         const moveParams: MoveCustomerParams = {
-          customerId: typeof params.customerId === "number" 
-            ? params.customerId 
-            : parseInt(params.customerId.toString()),
+          requestId: params.requestId !== undefined
+            ? (typeof params.requestId === "number" 
+                ? params.requestId 
+                : parseInt(params.requestId.toString()))
+            : (params.customerId !== undefined
+                ? (typeof params.customerId === "number"
+                    ? params.customerId
+                    : parseInt(params.customerId.toString()))
+                : undefined),
+          customerId: params.requestId === undefined && params.customerId !== undefined
+            ? (typeof params.customerId === "number"
+                ? params.customerId
+                : parseInt(params.customerId.toString()))
+            : undefined,
           newStageId: typeof params.newStageId === "number" 
             ? params.newStageId 
             : parseInt(params.newStageId.toString()),
@@ -173,11 +184,22 @@ export function useCustomersHubPipeline() {
       }
 
       try {
-        // Ensure all IDs are integers
+        // Ensure all IDs are integers - prefer requestIds, fallback to customerIds for backward compatibility
         const bulkMoveParams: BulkMoveParams = {
-          customerIds: params.customerIds.map(id => 
-            typeof id === "number" ? id : parseInt(id.toString())
-          ),
+          requestIds: params.requestIds !== undefined
+            ? params.requestIds.map(id => 
+                typeof id === "number" ? id : parseInt(id.toString())
+              )
+            : (params.customerIds !== undefined
+                ? params.customerIds.map(id => 
+                    typeof id === "number" ? id : parseInt(id.toString())
+                  )
+                : undefined),
+          customerIds: params.requestIds === undefined && params.customerIds !== undefined
+            ? params.customerIds.map(id => 
+                typeof id === "number" ? id : parseInt(id.toString())
+              )
+            : undefined,
           newStageId: typeof params.newStageId === "number" 
             ? params.newStageId 
             : parseInt(params.newStageId.toString()),

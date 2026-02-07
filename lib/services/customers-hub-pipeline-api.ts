@@ -75,7 +75,8 @@ export interface FilterOptionsResponse {
 }
 
 export interface MoveCustomerParams {
-  customerId: number;             // Property request ID (integer)
+  requestId?: number;             // Property request ID (integer) - preferred
+  customerId?: number;            // Deprecated: same as request id. Use only for backward compatibility when requestId is omitted.
   newStageId: number;             // Target stage ID (property_request_statuses.id) - integer, must be active
   notes?: string;                 // Optional notes (max 500)
 }
@@ -86,8 +87,9 @@ export interface MoveCustomerResponse {
   message: string;
   data: {
     message: string;
-    customerId: number;
-    customerName: string;
+    requestId: number;            // The property request that was moved
+    customerId: number | null;    // The linked customer id (api_customers.id) for reference; may be null if no customer record exists
+    customerName: string;         // Request contact name (full_name)
     previousStage: {
       id: number;                 // stage_id (integer)
       nameAr: string;
@@ -109,7 +111,8 @@ export interface MoveCustomerResponse {
 }
 
 export interface BulkMoveParams {
-  customerIds: number[];          // Property request IDs (array of integers)
+  requestIds?: number[];         // Property request IDs (array of integers) - preferred
+  customerIds?: number[];         // Deprecated: same as request IDs. Use only for backward compatibility when requestIds is omitted.
   newStageId: number;             // Target stage ID (property_request_statuses.id) - integer, must be active
 }
 

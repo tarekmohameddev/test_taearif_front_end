@@ -263,45 +263,44 @@ export function IncomingActionsCard({
     }));
   }, [propStages, storeStages]);
 
+  // Get stage from multiple sources: action.stage_id, action.stage, or resolvedCustomer.stage
+  const stageSource = React.useMemo(() => {
+    // Priority 1: action.stage_id (string)
+    if ((action as any).stage_id) {
+      return (action as any).stage_id;
+    }
+    // Priority 2: action.stage object (extract stage_id)
+    if ((action as any).stage && typeof (action as any).stage === 'object') {
+      return (action as any).stage.stage_id || (action as any).stage.id || (action as any).stage.name;
+    }
+    // Priority 3: resolvedCustomer.stage
+    if (resolvedCustomer?.stage) {
+      return resolvedCustomer.stage;
+    }
+    return null;
+  }, [action, resolvedCustomer?.stage]);
+
   // Normalize stage using availableStages from API, with fallback to LIFECYCLE_STAGES
   const normalizedStage = React.useMemo(() => {
-    if (!resolvedCustomer?.stage) return 'new_lead' as CustomerLifecycleStage;
-    if (typeof resolvedCustomer.stage === "string") {
-      // Validate against availableStages if loaded, otherwise use as-is
-      if (availableStages.length > 0) {
-        const validStage = availableStages.find(s => s.id === resolvedCustomer.stage);
-        return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
-      }
-      // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
-      const validStage = LIFECYCLE_STAGES.find(s => s.id === resolvedCustomer.stage);
-      return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
-    }
-    if (typeof resolvedCustomer.stage === "object" && resolvedCustomer.stage !== null) {
-      // Extract ID from object: {id, name, color} -> id
-      const stageId = (
-        (resolvedCustomer.stage as any).stage_id ||
-        (resolvedCustomer.stage as any).id ||
-        (resolvedCustomer.stage as any).name ||
-        String(resolvedCustomer.stage)
-      );
-      // Validate against availableStages if loaded
-      if (availableStages.length > 0) {
-        const validStage = availableStages.find(s => s.id === stageId);
-        return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
-      }
-      // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
-      const validStage = LIFECYCLE_STAGES.find(s => s.id === stageId);
-      return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
-    }
-    const stageStr = String(resolvedCustomer.stage);
+    if (!stageSource) return 'new_lead' as CustomerLifecycleStage;
+    
+    // stageSource can be string or extracted from object
+    const stageId = typeof stageSource === "string" 
+      ? stageSource 
+      : (typeof stageSource === "object" && stageSource !== null
+          ? ((stageSource as any).stage_id || (stageSource as any).id || (stageSource as any).name || String(stageSource))
+          : String(stageSource));
+    
+    // Validate against availableStages if loaded
     if (availableStages.length > 0) {
-      const validStage = availableStages.find(s => s.id === stageStr);
+      const validStage = availableStages.find(s => s.id === stageId);
       return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
     }
+    
     // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
-    const validStage = LIFECYCLE_STAGES.find(s => s.id === stageStr);
+    const validStage = LIFECYCLE_STAGES.find(s => s.id === stageId);
     return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
-  }, [resolvedCustomer?.stage, availableStages]);
+  }, [stageSource, availableStages]);
 
   // Get numeric stage ID from customer.stage if it's an object
   // Get stage_id (string) from stage object or value
@@ -355,10 +354,63 @@ export function IncomingActionsCard({
     setIsUpdatingStage(true);
 
     try {
-      // Convert requestId (action.id) to number if it's a string
-      const requestIdNum = typeof action.id === "string" 
-        ? parseInt(action.id) 
-        : action.id;
+      // For stage updates, we need the property request ID (numeric)
+      // Try multiple sources in priority order:
+      // 1. metadata.requestId or metadata.propertyRequestId
+      // 2. action.customerId (if it's numeric)
+      // 3. Extract number from action.id (e.g., "reminder_3" -> 3)
+      let requestId: string | number | undefined;
+      
+      // Try metadata first
+      if (action.metadata) {
+        requestId = (action.metadata.requestId as number | string) || 
+                    (action.metadata.propertyRequestId as number | string) ||
+                    (action.metadata.request_id as number | string);
+      }
+      
+      // Fallback to customerId if it exists and looks like a number
+      if (!requestId && action.customerId) {
+        const customerIdNum = typeof action.customerId === "string" 
+          ? parseInt(action.customerId) 
+          : action.customerId;
+        if (!isNaN(customerIdNum) && customerIdNum > 0) {
+          requestId = customerIdNum;
+        }
+      }
+      
+      // Last resort: try to extract number from action.id
+      if (!requestId && action.id) {
+        const idStr = String(action.id);
+        // Try direct parseInt first
+        const directParse = parseInt(idStr);
+        if (!isNaN(directParse) && directParse > 0) {
+          requestId = directParse;
+        } else {
+          // Try to extract number from string (e.g., "reminder_3" -> 3)
+          const numberMatch = idStr.match(/\d+/);
+          if (numberMatch) {
+            const extracted = parseInt(numberMatch[0]);
+            if (!isNaN(extracted) && extracted > 0) {
+              requestId = extracted;
+            }
+          }
+        }
+      }
+      
+      // Validate that we found a valid requestId
+      if (!requestId || requestId === null || requestId === undefined || requestId === "") {
+        throw new Error(`Request ID is missing - cannot update stage. action.id: ${action.id}, action.customerId: ${action.customerId}, metadata: ${JSON.stringify(action.metadata)}`);
+      }
+
+      // Convert requestId to number if it's a string
+      const requestIdNum = typeof requestId === "string" 
+        ? parseInt(requestId) 
+        : requestId;
+
+      // Validate that requestIdNum is a valid number
+      if (isNaN(requestIdNum) || requestIdNum === null || requestIdNum === undefined || requestIdNum <= 0) {
+        throw new Error(`Invalid request ID: ${requestId} - must be a valid positive number`);
+      }
 
       // Find the stage from availableStages to get the numeric ID
       // newStage is stage_id (string), we need to find the stage and get its numericId
@@ -372,6 +424,11 @@ export function IncomingActionsCard({
       const newStageIdNum = typeof selectedStage.numericId === 'number' 
         ? selectedStage.numericId 
         : parseInt(selectedStage.numericId.toString());
+
+      // Validate that newStageIdNum is a valid number
+      if (isNaN(newStageIdNum) || newStageIdNum === null || newStageIdNum === undefined) {
+        throw new Error(`Invalid stage ID: ${selectedStage.numericId} - must be a valid number`);
+      }
 
       // Call API to update stage (uses requestId and numeric stage.id)
       await apiUpdateCustomerStage(

@@ -83,7 +83,7 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
         // Use API handler only - NO FALLBACK
         if (props?.onMoveCustomer) {
           await props.onMoveCustomer({
-            customerId: typeof draggedCustomer.id === "number" 
+            requestId: typeof draggedCustomer.id === "number" 
               ? draggedCustomer.id 
               : parseInt(draggedCustomer.id.toString()),
             newStageId: newStageId,  // integer stage_id
