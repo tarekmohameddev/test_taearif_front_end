@@ -126,6 +126,50 @@ function CollapsibleSection({
 
 // Customer Info Card (Always visible at top)
 function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
+  // Normalize customer.stage to always be a string (handle API objects)
+  const normalizeStage = (stage: any): string => {
+    // Handle null, undefined, or empty values
+    if (!stage || stage === null || stage === undefined) return "new_lead";
+    
+    // If it's already a string, return it
+    if (typeof stage === 'string' && stage.trim() !== '') {
+      return stage;
+    }
+    
+    // Handle objects
+    if (typeof stage === 'object' && stage !== null) {
+      // Handle Stage object from API (has stage_id)
+      const stageId = (stage as any).stage_id;
+      if (stageId != null && stageId !== '' && stageId !== 'null') {
+        return String(stageId);
+      }
+      
+      // Handle LifecycleStageInfo object (has id) - check for non-null values
+      const id = (stage as any).id;
+      if (id != null && id !== '' && id !== 'null') {
+        return String(id);
+      }
+      
+      // Fallback to name if available and not null
+      const name = (stage as any).name;
+      if (name != null && name !== '' && name !== 'null') {
+        return String(name);
+      }
+      
+      // If all properties are null or invalid, return default
+      return "new_lead";
+    }
+    
+    // Last resort: convert to string, but if it's an object, return default
+    if (typeof stage === 'object') {
+      return "new_lead";
+    }
+    
+    return String(stage);
+  };
+
+  const normalizedStage = normalizeStage(customer.stage);
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -142,11 +186,11 @@ function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
                   variant="outline"
                   className="text-sm px-3 py-1"
                   style={{
-                    borderColor: getStageColor(customer.stage),
-                    color: getStageColor(customer.stage),
+                    borderColor: getStageColor(normalizedStage),
+                    color: getStageColor(normalizedStage),
                   }}
                 >
-                  {getStageNameAr(customer.stage)}
+                  {String(getStageNameAr(normalizedStage) || "غير محدد")}
                 </Badge>
               </div>
 
