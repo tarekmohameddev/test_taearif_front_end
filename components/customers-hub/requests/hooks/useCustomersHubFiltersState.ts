@@ -8,7 +8,7 @@ export const useCustomersHubFiltersState = () => {
   // Filter states - local state like Properties
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [localSearchQuery, setLocalSearchQuery] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"inbox" | "followups" | "all" | "completed">("inbox");
+  const [activeTab, setActiveTab] = useState<"inbox" | "followups" | "all" | "completed">("all");
   const [selectedSources, setSelectedSources] = useState<CustomerSource[]>([]);
   const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<CustomerActionType[]>([]);
@@ -155,7 +155,7 @@ export const useCustomersHubFiltersState = () => {
     setSearchQuery("");
     setLocalSearchQuery("");
     setAppliedSearchQuery("");
-    setActiveTab("inbox");
+    setActiveTab("all");
     setSelectedSources([]);
     setSelectedPriorities([]);
     setSelectedTypes([]);

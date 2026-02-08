@@ -17,3 +17,8 @@ components/customers-hub/actions/BulkActionsToolbar.tsx
 Update Type: Enhancement
 إصلاح إرسال الفلاتر في API request body - تم إضافة filters object في initial load وضمان إرسال جميع الفلاتر المفعّلة عند تغييرها
 app/dashboard/customers-hub/requests/page.tsx, components/customers-hub/requests/RequestsCenterPage.tsx
+
+2026-02-08 17:48:15
+Update Type: Enhancement
+تغيير ترتيب الـ tabs وجعل "الكل" هو الافتراضي - تم نقل tab "الكل" ليكون أولاً على اليمين (RTL) وتغيير القيمة الافتراضية لـ activeTab من "inbox" إلى "all"
+components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts
