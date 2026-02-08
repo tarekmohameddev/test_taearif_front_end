@@ -35,6 +35,8 @@ import {
   MapPin,
   Building2,
   DollarSign,
+  Clock,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -43,6 +45,15 @@ import { BulkActionsToolbar } from "../actions/BulkActionsToolbar";
 import { QuickViewPanel } from "../actions/QuickViewPanel";
 import { ActionHistoryList } from "../actions/ActionHistoryList";
 import { SourceBadge } from "../actions/SourceBadge";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 import { useCustomersHubFiltersState } from "./hooks/useCustomersHubFiltersState";
 import { Progress } from "@/components/ui/progress";
 import { CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,6 +81,91 @@ const priorityLabels: Record<Priority, string> = {
   medium: "متوسط",
   low: "منخفض",
 };
+
+const priorityOptions: { value: Priority; label: string; color: string }[] = [
+  { value: "urgent", label: "عاجل", color: "bg-red-100 text-red-700" },
+  { value: "high", label: "مهم", color: "bg-orange-100 text-orange-700" },
+  { value: "medium", label: "متوسط", color: "bg-yellow-100 text-yellow-700" },
+  { value: "low", label: "منخفض", color: "bg-green-100 text-green-700" },
+];
+
+// Confirmation Dialog Component
+interface ConfirmationDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  confirmText: string;
+  cancelText?: string;
+  onConfirm: () => void;
+  variant?: "default" | "danger";
+  icon?: React.ReactNode;
+}
+
+function ConfirmationDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmText,
+  cancelText = "إلغاء",
+  onConfirm,
+  variant = "default",
+  icon,
+}: ConfirmationDialogProps) {
+  const handleConfirm = () => {
+    onConfirm();
+    onOpenChange(false);
+  };
+
+  return (
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-md">
+      <CustomDialogContent>
+        <CustomDialogClose onClose={() => onOpenChange(false)} />
+        <CustomDialogHeader>
+          <div className="flex items-center gap-3 mb-2">
+            {icon && (
+              <div
+                className={cn(
+                  "p-2 rounded-full",
+                  variant === "danger"
+                    ? "bg-red-50 text-red-600"
+                    : "bg-gray-50 text-gray-600"
+                )}
+              >
+                {icon}
+              </div>
+            )}
+            <CustomDialogTitle>{title}</CustomDialogTitle>
+          </div>
+          <CustomDialogDescription className="text-base text-gray-600 mt-2">
+            {description}
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <CustomDialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="min-w-[100px]"
+          >
+            {cancelText}
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            className={cn(
+              "min-w-[100px]",
+              variant === "danger"
+                ? "bg-red-600 hover:bg-red-700 text-white"
+                : "bg-gray-900 hover:bg-gray-800 text-white"
+            )}
+          >
+            {confirmText}
+          </Button>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
+  );
+}
 
 const actionTypeLabels: Record<CustomerActionType, string> = {
   new_inquiry: "استفسار جديد",
@@ -324,6 +420,16 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const [quickViewCustomer, setQuickViewCustomer] = useState<UnifiedCustomer | null>(null);
   const [showQuickView, setShowQuickView] = useState(false);
   const [completingActionIds, setCompletingActionIds] = useState<Set<string>>(new Set());
+  
+  // Dialog states for bulk actions
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
+  const [dismissDialogOpen, setDismissDialogOpen] = useState(false);
+  const [snoozeDialogOpen, setSnoozeDialogOpen] = useState(false);
+  const [snoozeUntil, setSnoozeUntil] = useState<string>("");
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [assignEmployee, setAssignEmployee] = useState<{ id: string; name: string } | null>(null);
+  const [priorityDialogOpen, setPriorityDialogOpen] = useState(false);
+  const [selectedPriority, setSelectedPriority] = useState<Priority | null>(null);
   
   // Temporary budget state for dialog (before applying)
   const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
@@ -720,6 +826,22 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     } catch (err) {
       console.error("Error changing priority for multiple actions:", err);
     }
+  };
+  
+  // Handlers to open dialogs
+  const handleOpenCompleteDialog = () => setCompleteDialogOpen(true);
+  const handleOpenDismissDialog = () => setDismissDialogOpen(true);
+  const handleOpenSnoozeDialog = (until: string) => {
+    setSnoozeUntil(until);
+    setSnoozeDialogOpen(true);
+  };
+  const handleOpenAssignDialog = (employeeId: string, employeeName: string) => {
+    setAssignEmployee({ id: employeeId, name: employeeName });
+    setAssignDialogOpen(true);
+  };
+  const handleOpenPriorityDialog = (priority: Priority) => {
+    setSelectedPriority(priority);
+    setPriorityDialogOpen(true);
   };
   const handleQuickView = (actionId: string) => {
     const action =
@@ -1410,11 +1532,11 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           totalCount={currentTabActions.length}
           onSelectAll={handleSelectAll}
           onDeselectAll={handleDeselectAll}
-          onCompleteAll={handleBulkComplete}
-          onDismissAll={handleBulkDismiss}
-          onSnoozeAll={handleBulkSnooze}
-          onAssignAll={handleBulkAssign}
-          onChangePriority={handleBulkChangePriority}
+          onCompleteAll={handleOpenCompleteDialog}
+          onDismissAll={handleOpenDismissDialog}
+          onSnoozeAll={handleOpenSnoozeDialog}
+          onAssignAll={handleOpenAssignDialog}
+          onChangePriority={handleOpenPriorityDialog}
           isAllSelected={isAllSelected}
         />
 
@@ -1429,6 +1551,80 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           customer={quickViewCustomer}
           action={quickViewAction}
         />
+
+        {/* Confirmation Dialogs */}
+        <ConfirmationDialog
+          open={completeDialogOpen}
+          onOpenChange={setCompleteDialogOpen}
+          title="تأكيد إكمال الإجراءات"
+          description={`هل أنت متأكد من إكمال ${selectedActionIds.size} إجراء؟ سيتم تحديث حالتها إلى "مكتمل".`}
+          confirmText="تأكيد الإكمال"
+          onConfirm={handleBulkComplete}
+          icon={<CheckCircle2 className="h-5 w-5" />}
+        />
+
+        <ConfirmationDialog
+          open={dismissDialogOpen}
+          onOpenChange={setDismissDialogOpen}
+          title="تأكيد رفض الإجراءات"
+          description={`هل أنت متأكد من رفض ${selectedActionIds.size} إجراء؟ هذا الإجراء لا يمكن التراجع عنه.`}
+          confirmText="تأكيد الرفض"
+          onConfirm={handleBulkDismiss}
+          variant="danger"
+          icon={<Trash2 className="h-5 w-5" />}
+        />
+
+        {snoozeUntil && (
+          <ConfirmationDialog
+            open={snoozeDialogOpen}
+            onOpenChange={setSnoozeDialogOpen}
+            title="تأكيد تأجيل الإجراءات"
+            description={`هل أنت متأكد من تأجيل ${selectedActionIds.size} إجراء حتى ${new Date(snoozeUntil).toLocaleDateString("ar-SA", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}؟`}
+            confirmText="تأكيد التأجيل"
+            onConfirm={() => {
+              handleBulkSnooze(snoozeUntil);
+              setSnoozeUntil("");
+            }}
+            icon={<Clock className="h-5 w-5" />}
+          />
+        )}
+
+        {assignEmployee && (
+          <ConfirmationDialog
+            open={assignDialogOpen}
+            onOpenChange={setAssignDialogOpen}
+            title="تأكيد تعيين الإجراءات"
+            description={`هل أنت متأكد من تعيين ${selectedActionIds.size} إجراء إلى ${assignEmployee.name}؟`}
+            confirmText="تأكيد التعيين"
+            onConfirm={() => {
+              handleBulkAssign(assignEmployee.id, assignEmployee.name);
+              setAssignEmployee(null);
+            }}
+            icon={<UserPlus className="h-5 w-5" />}
+          />
+        )}
+
+        {selectedPriority && (
+          <ConfirmationDialog
+            open={priorityDialogOpen}
+            onOpenChange={setPriorityDialogOpen}
+            title="تأكيد تغيير الأولوية"
+            description={`هل أنت متأكد من تغيير أولوية ${selectedActionIds.size} إجراء إلى "${priorityOptions.find(p => p.value === selectedPriority)?.label}"؟`}
+            confirmText="تأكيد التغيير"
+            onConfirm={() => {
+              handleBulkChangePriority(selectedPriority);
+              setSelectedPriority(null);
+            }}
+            icon={<AlertTriangle className="h-5 w-5" />}
+          />
+        )}
       </div>
     </div>
   );

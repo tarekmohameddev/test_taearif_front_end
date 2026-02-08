@@ -87,7 +87,7 @@ export function CustomDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-200"
@@ -100,17 +100,17 @@ export function CustomDialog({
       {/* Dialog Content */}
       <div
         className={`
-          relative z-50 w-full mx-2 sm:mx-4 md:mx-auto 
+          relative z-[10000] w-full mx-auto
           ${maxWidth}
           max-h-[95vh] sm:max-h-[90vh]
-          bg-white rounded-lg sm:rounded-lg shadow-2xl
+          bg-white dark:bg-gray-900 rounded-lg shadow-2xl
           transform transition-all duration-200
           ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}
           ${className}
         `}
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: `min(${getMaxWidthValue(maxWidth)}, calc(100vw - 1rem))`,
+          maxWidth: `min(${getMaxWidthValue(maxWidth)}, calc(100vw - 2rem))`,
         }}
       >
         {children}

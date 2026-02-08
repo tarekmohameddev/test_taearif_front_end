@@ -22,3 +22,18 @@ app/dashboard/customers-hub/requests/page.tsx, components/customers-hub/requests
 Update Type: Enhancement
 تغيير ترتيب الـ tabs وجعل "الكل" هو الافتراضي - تم نقل tab "الكل" ليكون أولاً على اليمين (RTL) وتغيير القيمة الافتراضية لـ activeTab من "inbox" إلى "all"
 components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts
+
+2026-02-08 17:50:51
+Update Type: Enhancement
+استبدال AlertDialog بـ CustomDialog في bulk actions وإضافة تأكيد ذكي لجميع الإجراءات - تم إنشاء مكون ConfirmationDialog بسيط ورائع مع ألوان قليلة لتأكيد جميع bulk actions (Complete, Dismiss, Snooze, Assign, Change Priority)
+components/customers-hub/actions/BulkActionsToolbar.tsx
+
+2026-02-08 17:52:16
+Update Type: Enhancement
+تحسين CustomDialog ليظهر في منتصف الشاشة بشكل مستقل - تم رفع z-index إلى z-[9999] وإضافة padding للتأكد من ظهور الـ dialog في منتصف الشاشة فوق جميع العناصر
+components/customComponents/CustomDialog.tsx
+
+2026-02-08 17:55:51
+Update Type: Refactor
+نقل confirmation dialogs من BulkActionsToolbar إلى RequestsCenterPage - تم نقل جميع الـ dialogs و state management إلى RequestsCenterPage لضمان ظهورها في منتصف الشاشة بشكل مستقل عن bulk actions toolbar
+components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/actions/BulkActionsToolbar.tsx

@@ -12,19 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
   CheckCircle2,
-  XCircle,
   Clock,
   UserPlus,
   AlertTriangle,
@@ -42,11 +30,11 @@ interface BulkActionsToolbarProps {
   totalCount: number;
   onSelectAll: () => void;
   onDeselectAll: () => void;
-  onCompleteAll: () => void;
-  onDismissAll: () => void;
-  onSnoozeAll: (until: string) => void;
-  onAssignAll: (employeeId: string, employeeName: string) => void;
-  onChangePriority: (priority: Priority) => void;
+  onCompleteAll: () => void; // Opens confirmation dialog
+  onDismissAll: () => void; // Opens confirmation dialog
+  onSnoozeAll: (until: string) => void; // Opens confirmation dialog
+  onAssignAll: (employeeId: string, employeeName: string) => void; // Opens confirmation dialog
+  onChangePriority: (priority: Priority) => void; // Opens confirmation dialog
   isAllSelected: boolean;
   className?: string;
 }
@@ -112,34 +100,14 @@ export function BulkActionsToolbar({
       {/* Bulk Actions */}
       <div className="flex items-center gap-2">
         {/* Complete All */}
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 gap-2"
-            >
-              <CheckCircle2 className="h-4 w-4" />
-              إكمال الكل
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>تأكيد إكمال الإجراءات</AlertDialogTitle>
-              <AlertDialogDescription>
-                هل أنت متأكد من إكمال {selectedCount} إجراء؟ سيتم تحديث حالتها إلى "مكتمل".
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>إلغاء</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={onCompleteAll}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                تأكيد الإكمال
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button
+          size="sm"
+          className="bg-green-600 hover:bg-green-700 gap-2"
+          onClick={onCompleteAll}
+        >
+          <CheckCircle2 className="h-4 w-4" />
+          إكمال الكل
+        </Button>
 
         {/* Snooze All */}
         <DropdownMenu>
@@ -261,35 +229,15 @@ export function BulkActionsToolbar({
         </DropdownMenu>
 
         {/* Dismiss All */}
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4" />
-              رفض الكل
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>تأكيد رفض الإجراءات</AlertDialogTitle>
-              <AlertDialogDescription>
-                هل أنت متأكد من رفض {selectedCount} إجراء؟ هذا الإجراء لا يمكن التراجع عنه.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>إلغاء</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={onDismissAll}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                تأكيد الرفض
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+          onClick={onDismissAll}
+        >
+          <Trash2 className="h-4 w-4" />
+          رفض الكل
+        </Button>
       </div>
     </div>
   );
