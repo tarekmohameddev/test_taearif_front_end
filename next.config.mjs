@@ -46,16 +46,18 @@ const nextConfig = {
   webpack: (config, { isServer, dev, webpack }) => {
     // ⬅️ Webpack في PRODUCTION فقط
     if (!dev) {
-      // Production webpack optimizations
+      // تحسينات الذاكرة - تقليل استهلاك الذاكرة أثناء البناء
       config.optimization = {
         ...config.optimization,
         removeAvailableModules: true,
         removeEmptyChunks: true,
         mergeDuplicateChunks: true,
-        // تحسين splitChunks لتحميل الترجمة والمكونات الكبيرة بشكل منفصل
+        // تقليل maxInitialRequests لتقليل استهلاك الذاكرة
         splitChunks: {
           chunks: 'all',
-          maxInitialRequests: 30,
+          maxInitialRequests: 25, // تقليل من 30 إلى 25
+          maxAsyncRequests: 30,
+          minSize: 20000, // زيادة الحد الأدنى لتقليل عدد chunks
           cacheGroups: {
             default: false,
             vendors: false,
@@ -66,6 +68,7 @@ const nextConfig = {
               chunks: 'async',
               priority: 20,
               reuseExistingChunk: true,
+              minSize: 20000,
             },
             // فصل المكونات الكبيرة
             largeComponents: {
@@ -74,6 +77,7 @@ const nextConfig = {
               chunks: 'async',
               priority: 18,
               reuseExistingChunk: true,
+              minSize: 20000,
             },
             // فصل مكتبات UI الكبيرة
             ui: {
@@ -82,6 +86,7 @@ const nextConfig = {
               chunks: 'async',
               priority: 15,
               reuseExistingChunk: true,
+              minSize: 20000,
             },
             // فصل مكتبات charts
             charts: {
@@ -90,6 +95,7 @@ const nextConfig = {
               chunks: 'async',
               priority: 15,
               reuseExistingChunk: true,
+              minSize: 20000,
             },
             // مكتبات مشتركة
             commons: {
@@ -98,6 +104,7 @@ const nextConfig = {
               chunks: 'async',
               priority: 10,
               reuseExistingChunk: true,
+              minSize: 20000,
             },
           },
         },
@@ -122,6 +129,17 @@ const nextConfig = {
         unknownContextRegExp: /$^/,
         unknownContextRequest: '.',
       };
+
+      // تقليل استهلاك الذاكرة في webpack
+      config.performance = {
+        ...config.performance,
+        hints: false, // تعطيل warnings لتقليل استهلاك الذاكرة
+        maxEntrypointSize: 512000, // 500KB
+        maxAssetSize: 512000, // 500KB
+      };
+
+      // تحسينات إضافية للذاكرة
+      config.cache = false; // تعطيل cache في production build لتقليل الذاكرة
     }
 
     return config;

@@ -1,0 +1,45 @@
+# Documentation - لا حاجة لها في البناء
+/docs
+/docs/**
+*.md
+!README.md
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+test.mjs
+test.js
+
+# Development files
+.vscode
+.idea
+*.log
+*.tsbuildinfo
+
+# Trash and temporary files
+/trash
+/trash/**
+/code
+/pagebuildDashboard
+chat.groovy
+
+# Large files that aren't needed for build
+top20_largest_files.txt
+top20_largest_files2.txt
+desktop.ini
+
+# Lock files (Vercel uses package.json)
+pnpm-lock.yaml
+yarn.lock
+
+# Build artifacts
+/build
+/out
+
+# Environment files (handled by Vercel)
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
