@@ -100,7 +100,7 @@
     "next": "^16.0.7",
     "next-auth": "^4.24.10",
     "next-themes": "^0.4.4",
-    "nodemailer": "^7.0.7",
+    "nodemailer": "^6.9.15",
     "ogl": "^1.0.11",
     "paytabs_pt2": "^2.0.11",
     "pdfkit": "^0.17.2",
@@ -156,7 +156,6 @@
     "typescript": "^5.6.3"
   },
   "overrides": {
-    "@auth/core": "0.34.2",
-    "nodemailer": "^6.9.15"
+    "@auth/core": "0.34.2"
   }
 }
