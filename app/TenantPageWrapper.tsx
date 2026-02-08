@@ -46,6 +46,11 @@ import {
 import { getDefaultComponentForStaticPage } from "@/components/tenant/live-editor/effects/utils/staticPageHelpers";
 import { normalizeComponentSettings } from "@/services/live-editor/componentSettingsHelper";
 import PixelScripts from "@/components/tracking/PixelScripts";
+import {
+  trackPropertyView,
+  trackProjectViewGTM,
+  setTenantInfo,
+} from "@/lib/gtm-utils";
 
 // ⭐ Cache للـ header components
 const headerComponentsCache = new Map<string, any>();
@@ -300,8 +305,15 @@ export default function TenantPageWrapper({
   useEffect(() => {
     if (tenantId) {
       setTenantId(tenantId);
+      
+      // ⭐ Track tenant info in GTM
+      setTenantInfo(tenantId, {
+        domainType,
+        currentPage: slug,
+        dynamicSlug: dynamicSlug || null,
+      });
     }
-  }, [tenantId, setTenantId, domainType]);
+  }, [tenantId, setTenantId, domainType, slug, dynamicSlug]);
 
   // تحميل البيانات إذا لم تكن موجودة
   useEffect(() => {
@@ -320,11 +332,22 @@ export default function TenantPageWrapper({
           ? tenantData.username
           : tenantId;
 
-      // Track project views specifically
+      // Track project views (both GA4 and GTM)
       if (slug === "project") {
-        trackProjectView(finalTenantId, dynamicSlug);
+        trackProjectView(finalTenantId, dynamicSlug); // GA4
+        trackProjectViewGTM(dynamicSlug, {
+          tenantId: finalTenantId,
+          domainType,
+        }); // GTM
       }
-      // يمكن إضافة tracking لأنواع أخرى من الصفحات هنا لاحقاً
+      
+      // Track property views in GTM
+      if (slug === "property") {
+        trackPropertyView(dynamicSlug, {
+          tenantId: finalTenantId,
+          domainType,
+        });
+      }
     }
   }, [slug, dynamicSlug, tenantId, domainType, tenantData?.username]);
 
@@ -674,7 +697,7 @@ export default function TenantPageWrapper({
   if (loadingTenantData || !tenantData) {
     return (
       <I18nProvider>
-        <PixelScripts tenantId={tenantId} />
+        <PixelScripts tenantId={tenantId} pageType={slug} />
         <div className="min-h-screen flex flex-col" dir="rtl">
           {/* Header Skeleton */}
           <StaticHeaderSkeleton1 />
@@ -730,7 +753,7 @@ export default function TenantPageWrapper({
   return (
     <GTMProvider>
       <GA4Provider tenantId={tenantId} domainType={domainType}>
-        <PixelScripts tenantId={tenantId} />
+        <PixelScripts tenantId={tenantId} pageType={slug} />
         <I18nProvider>
           <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header with i18n support */}

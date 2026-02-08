@@ -2,15 +2,26 @@
 
 import { useEffect, useState, Fragment } from "react";
 import Script from "next/script";
+import { usePathname, useSearchParams } from "next/navigation";
 import { PixelData, fetchTenantPixels } from "@/lib/pixel-service";
+import { initializeDataLayer, setTenantInfo } from "@/lib/gtm-utils";
+
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
 
 interface PixelScriptsProps {
   tenantId: string | null;
+  pageType?: string; // ⭐ من Gemini: لمعرفة نوع الصفحة (home, project, etc.)
 }
 
-export default function PixelScripts({ tenantId }: PixelScriptsProps) {
+export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) {
   const [pixels, setPixels] = useState<PixelData[]>([]);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     async function loadPixels() {
@@ -22,6 +33,17 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
       try {
         const data = await fetchTenantPixels(tenantId);
         setPixels(data);
+        
+        // ⭐ من Claude: Initialize dataLayer for GTM
+        initializeDataLayer();
+        
+        // ⭐ من Claude: Set tenant info in dataLayer
+        setTenantInfo(tenantId, {
+          tenantType: "real_estate",
+          loadedPixels: data.map(p => p.provider),
+        });
+        
+        console.log("🎯 Pixels loaded for tenant:", tenantId, data);
       } catch (error) {
         console.error("Failed to fetch pixels:", error);
       } finally {
@@ -31,6 +53,24 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
 
     loadPixels();
   }, [tenantId]);
+
+  // ⭐ من Gemini: تتبع عميق لتغييرات المسار (Deep Tracking)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.dataLayer = window.dataLayer || [];
+      
+      const fullPath = pathname + (searchParams?.toString() ? "?" + searchParams.toString() : "");
+      
+      // ⭐ من Gemini: دفع حدث مخصص لـ GTM لضمان التقاط الصفحات في الـ SPA (Next.js)
+      window.dataLayer.push({
+        event: "virtual_pageview", // ⭐ من Gemini
+        page_path: fullPath,
+        page_title: document.title,
+        tenant_id: tenantId,
+        page_type: pageType || "dynamic", // ⭐ من Gemini
+      });
+    }
+  }, [pathname, searchParams, tenantId, pageType]);
 
   if (loading || pixels.length === 0) return null;
 
@@ -111,17 +151,30 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
               />
             );
           case "gtm":
-            // Remove GTM- or gtm- prefix if present (case-insensitive) for GTM script
-            // GTM script requires ID without prefix (e.g., "17854649" not "GTM-17854649")
-            const gtmId = pixel.externalId.replace(/^gtm-/i, ""); // Remove gtm- prefix (case-insensitive)
-            // Use externalId directly for script id attribute
-            const gtmScriptId = pixel.externalId;
+            // ⭐ CRITICAL FIX: GTM needs full ID with GTM- prefix
+            // ⭐ من Gemini + Claude: التأكد القاطع من وجود بادئة GTM-
+            let gtmId = pixel.externalId.trim();
+            
+            // Check if already has GTM- prefix (case-insensitive)
+            if (!gtmId.toUpperCase().startsWith("GTM-")) {
+              // Remove any existing gtm- prefix first (case-insensitive)
+              gtmId = gtmId.replace(/^gtm-/i, "");
+              // Add GTM- prefix in uppercase
+              gtmId = `GTM-${gtmId}`;
+            } else {
+              // Normalize to uppercase GTM-
+              gtmId = gtmId.replace(/^gtm-/i, "GTM-");
+            }
+            
+            // ⭐ FIX: استخدام gtmId بعد إزالة البادئة لتجنب التكرار في id
+            const idWithoutPrefix = gtmId.replace(/^GTM-/i, "");
+            const gtmScriptId = `gtm-${idWithoutPrefix.toLowerCase()}`;
             const gtmKey = pixel._id || gtmScriptId;
             
             // Debug log to verify GTM loading
             console.log("🔵 GTM Pixel Loading:", {
-              externalId: pixel.externalId,
-              gtmId: gtmId,
+              originalExternalId: pixel.externalId,
+              normalizedGtmId: gtmId,
               scriptId: gtmScriptId,
               provider: pixel.provider,
               settings: pixel.settings,
@@ -134,6 +187,15 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
                   strategy="afterInteractive"
                   onLoad={() => {
                     console.log("✅ GTM Script loaded successfully:", gtmId);
+                    // Initialize dataLayer after GTM loads
+                    if (typeof window !== "undefined") {
+                      window.dataLayer = window.dataLayer || [];
+                      window.dataLayer.push({
+                        event: "gtm_loaded",
+                        gtmId: gtmId,
+                        tenantId: tenantId,
+                      });
+                    }
                   }}
                   onError={() => {
                     console.error("❌ GTM Script failed to load:", gtmId);
@@ -141,7 +203,7 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
                   dangerouslySetInnerHTML={{
                     __html: `
                       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                      new Date().getTime(),event:'gtm.js', 'tenant_id': '${tenantId}'});var f=d.getElementsByTagName(s)[0],
                       j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
                       })(window,document,'script','dataLayer','${gtmId}');

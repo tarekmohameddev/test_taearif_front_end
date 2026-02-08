@@ -1,0 +1,4 @@
+2025-01-20 12:00:00
+Update Type: Feature
+Implemented comprehensive GTM integration with deep tracking - merged Gemini and Claude solutions
+lib/gtm-utils.ts, components/tracking/PixelScripts.tsx, components/GTMProvider.tsx, app/TenantPageWrapper.tsx
