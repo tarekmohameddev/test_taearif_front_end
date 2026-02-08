@@ -509,6 +509,7 @@ export interface UnifiedCustomer {
   totalInteractions?: number;
   totalAppointments?: number;
   totalPropertyViews?: number;
+  totalPropertyRequests?: number;  // Total property requests count
   responseRate?: number;  // 0-100
   avgResponseTime?: number;  // in hours
   

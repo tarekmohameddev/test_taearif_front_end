@@ -62,6 +62,7 @@ export function useCustomersHubList() {
             aiInsights: customer.aiInsights || {},
             leadScore: customer.leadScore || 0,
             source: customer.source || "manual",
+            totalPropertyRequests: customer.totalPropertyRequests ?? customer.propertyRequestsCount ?? 0,
             createdAt: customer.createdAt || new Date().toISOString(),
             updatedAt: customer.updatedAt || new Date().toISOString(),
           }));
