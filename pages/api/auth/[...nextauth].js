@@ -1,18 +1,18 @@
 // pages/api/auth/[...nextauth].js
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import axios from "axios";
 
-export default NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     // إضافة Google Provider
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     // إضافة Credentials Provider
-    CredentialsProvider({
+    Credentials({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
@@ -57,7 +57,7 @@ export default NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account, profile, trigger, session }) {
       // إذا كان تسجيل الدخول بـ Google
       if (account?.provider === "google" && profile) {
         try {
@@ -161,3 +161,6 @@ export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 });
+
+// Export handlers for Pages Router
+export default handlers;
