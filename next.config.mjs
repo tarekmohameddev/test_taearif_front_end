@@ -42,6 +42,9 @@ const nextConfig = {
   },
   output: process.platform === "win32" ? undefined : "standalone",
   
+  // تعطيل Turbopack - استخدام webpack فقط
+  turbopack: {},
+  
   // ⬅️ Webpack configuration - فقط في PRODUCTION
   webpack: (config, { isServer, dev, webpack }) => {
     // ⬅️ Webpack في PRODUCTION فقط
