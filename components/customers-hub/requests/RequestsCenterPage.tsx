@@ -862,6 +862,70 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     }
   };
   const handleAddNote = (actionId: string, note: string) => addActionNote(actionId, note);
+
+  // Wrapper functions for Table view to handle toast and loading states
+  const handleCompleteForTable = async (id: string) => {
+    // Wrapper to prevent duplicate toast (toast shown in TableRequestsList)
+    if (completingActionIds.has(id)) return;
+    setCompletingActionIds((prev) => new Set(prev).add(id));
+    try {
+      await completeAction(id);
+      setSelectedActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (err) {
+      console.error("Error completing action:", err);
+      throw err; // Re-throw to let TableRequestsList handle toast
+    } finally {
+      setCompletingActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
+
+  const handleDismissForTable = async (id: string) => {
+    // Wrapper to prevent duplicate toast (toast shown in TableRequestsList)
+    try {
+      await dismissAction(id);
+      setSelectedActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (err) {
+      console.error("Error dismissing action:", err);
+      throw err; // Re-throw to let TableRequestsList handle toast
+    }
+  };
+
+  const handleSnoozeForTable = async (id: string, until: string) => {
+    // Wrapper to prevent duplicate toast (toast shown in TableRequestsList)
+    try {
+      await snoozeAction(id, until);
+      setSelectedActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (err) {
+      console.error("Error snoozing action:", err);
+      throw err; // Re-throw to let TableRequestsList handle toast
+    }
+  };
+
+  const handleAddNoteForTable = async (id: string, note: string) => {
+    // Wrapper to prevent duplicate toast (toast shown in TableRequestsList)
+    try {
+      await addActionNote(id, note);
+    } catch (err) {
+      console.error("Error adding note:", err);
+      throw err; // Re-throw to let TableRequestsList handle toast
+    }
+  };
   const handleRestore = (actionId: string) => restoreAction(actionId);
 
   const clearFilters = () => {
@@ -1499,10 +1563,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                 getCustomerById={getCustomerForCard}
                 selectedActionIds={selectedActionIds}
                 onSelect={handleSelectAction}
-                onComplete={handleComplete}
-                onDismiss={handleDismiss}
-                onSnooze={handleSnooze}
-                onAddNote={handleAddNote}
+                onComplete={handleCompleteForTable}
+                onDismiss={handleDismissForTable}
+                onSnooze={handleSnoozeForTable}
+                onAddNote={handleAddNoteForTable}
                 onQuickView={handleQuickView}
                 stages={stagesForCards}
                 completingActionIds={completingActionIds}
@@ -1531,10 +1595,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                 getCustomerById={getCustomerForCard}
                 selectedActionIds={selectedActionIds}
                 onSelect={handleSelectAction}
-                onComplete={handleComplete}
-                onDismiss={handleDismiss}
-                onSnooze={handleSnooze}
-                onAddNote={handleAddNote}
+                onComplete={handleCompleteForTable}
+                onDismiss={handleDismissForTable}
+                onSnooze={handleSnoozeForTable}
+                onAddNote={handleAddNoteForTable}
                 onQuickView={handleQuickView}
                 stages={stagesForCards}
                 completingActionIds={completingActionIds}
@@ -1563,10 +1627,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                 getCustomerById={getCustomerForCard}
                 selectedActionIds={selectedActionIds}
                 onSelect={handleSelectAction}
-                onComplete={handleComplete}
-                onDismiss={handleDismiss}
-                onSnooze={handleSnooze}
-                onAddNote={handleAddNote}
+                onComplete={handleCompleteForTable}
+                onDismiss={handleDismissForTable}
+                onSnooze={handleSnoozeForTable}
+                onAddNote={handleAddNoteForTable}
                 onQuickView={handleQuickView}
                 stages={stagesForCards}
                 completingActionIds={completingActionIds}

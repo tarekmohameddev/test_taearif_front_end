@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -72,6 +74,7 @@ export function TableRequestsList({
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>("all");
+  const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -178,6 +181,102 @@ export function TableRequestsList({
     ) : (
       <ArrowDown className="h-3 w-3" />
     );
+  };
+
+  const handleComplete = async (actionId: string) => {
+    setLoadingActions((prev) => new Set(prev).add(actionId));
+    const toastId = toast.loading("جاري إتمام الطلب...");
+    try {
+      const result = onComplete(actionId);
+      // Handle both sync and async functions
+      if (result instanceof Promise) {
+        await result;
+      }
+      toast.success("تم إتمام الطلب بنجاح", { id: toastId });
+    } catch (err: any) {
+      console.error("Error completing action:", err);
+      const errorMessage = err?.response?.data?.message || err?.message || "حدث خطأ أثناء إتمام الطلب";
+      toast.error(errorMessage, { id: toastId });
+    } finally {
+      setLoadingActions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(actionId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleDismiss = async (actionId: string) => {
+    setLoadingActions((prev) => new Set(prev).add(actionId));
+    const toastId = toast.loading("جاري رفض الطلب...");
+    try {
+      const result = onDismiss(actionId);
+      // Handle both sync and async functions
+      if (result instanceof Promise) {
+        await result;
+      }
+      toast.success("تم رفض الطلب بنجاح", { id: toastId });
+    } catch (err: any) {
+      console.error("Error dismissing action:", err);
+      const errorMessage = err?.response?.data?.message || err?.message || "حدث خطأ أثناء رفض الطلب";
+      toast.error(errorMessage, { id: toastId });
+    } finally {
+      setLoadingActions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(actionId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleSnooze = async (actionId: string, until: string) => {
+    setLoadingActions((prev) => new Set(prev).add(actionId));
+    const toastId = toast.loading("جاري تأجيل الطلب...");
+    try {
+      const result = onSnooze(actionId, until);
+      // Handle both sync and async functions
+      if (result instanceof Promise) {
+        await result;
+      }
+      toast.success("تم تأجيل الطلب بنجاح", { id: toastId });
+    } catch (err: any) {
+      console.error("Error snoozing action:", err);
+      toast.error(
+        err.response?.data?.message || "حدث خطأ أثناء تأجيل الطلب",
+        { id: toastId }
+      );
+    } finally {
+      setLoadingActions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(actionId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleAddNote = async (actionId: string, note: string) => {
+    setLoadingActions((prev) => new Set(prev).add(actionId));
+    const toastId = toast.loading("جاري إضافة الملاحظة...");
+    try {
+      const result = onAddNote(actionId, note);
+      // Handle both sync and async functions
+      if (result instanceof Promise) {
+        await result;
+      }
+      toast.success("تم إضافة الملاحظة بنجاح", { id: toastId });
+    } catch (err: any) {
+      console.error("Error adding note:", err);
+      toast.error(
+        err.response?.data?.message || "حدث خطأ أثناء إضافة الملاحظة",
+        { id: toastId }
+      );
+    } finally {
+      setLoadingActions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(actionId);
+        return newSet;
+      });
+    }
   };
 
   // Filter by type
@@ -378,6 +477,7 @@ export function TableRequestsList({
                   const isOverdue = action.dueDate
                     ? new Date(action.dueDate) < new Date() && action.status !== "completed"
                     : false;
+                  const isLoading = loadingActions.has(action.id) || isCompleting;
 
                   return (
                     <TableRow
@@ -492,6 +592,7 @@ export function TableRequestsList({
                             size="sm"
                             className="h-8"
                             onClick={() => onQuickView(action.id)}
+                            disabled={isLoading}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -499,18 +600,27 @@ export function TableRequestsList({
                             variant="ghost"
                             size="sm"
                             className="h-8 text-green-600 hover:text-green-700"
-                            onClick={() => onComplete(action.id)}
-                            disabled={isCompleting}
+                            onClick={() => handleComplete(action.id)}
+                            disabled={isLoading}
                           >
-                            <CheckCircle2 className="h-4 w-4" />
+                            {isLoading && action.status !== "completed" ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <CheckCircle2 className="h-4 w-4" />
+                            )}
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="h-8 text-red-600 hover:text-red-700"
-                            onClick={() => onDismiss(action.id)}
+                            onClick={() => handleDismiss(action.id)}
+                            disabled={isLoading}
                           >
-                            <X className="h-4 w-4" />
+                            {isLoading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <X className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </TableCell>
