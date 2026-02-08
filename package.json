@@ -16,7 +16,7 @@
     "add-indexes": "node scripts/add-tenant-indexes.js"
   },
   "dependencies": {
-    "@auth/core": "0.34.3",
+    "@auth/core": "0.34.2",
     "@auth/mongodb-adapter": "^3.10.0",
     "@dnd-kit/abstract": "^0.1.21",
     "@dnd-kit/collision": "^0.1.21",
@@ -154,5 +154,8 @@
     "prettier": "^3.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.6.3"
+  },
+  "overrides": {
+    "@auth/core": "0.34.2"
   }
 }
