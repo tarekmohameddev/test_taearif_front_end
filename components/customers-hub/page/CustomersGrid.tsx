@@ -5,13 +5,11 @@ import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Phone, MapPin, TrendingUp, 
   Calendar, Home, DollarSign, Clock, Target
 } from "lucide-react";
 import Link from "next/link";
-import { getStageColor, getStageNameAr } from "@/types/unified-customer";
 
 export function CustomersGrid() {
   const { filteredCustomers, currentPage, pageSize } = useUnifiedCustomersStore();
@@ -20,31 +18,6 @@ export function CustomersGrid() {
   const endIndex = startIndex + pageSize;
   const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
 
-  // Normalize customer.stage to always be a string (handle API objects)
-  const normalizeStage = (stage: any): string => {
-    if (!stage) return "new_lead";
-    if (typeof stage === 'string') return stage;
-    if (typeof stage === 'object' && stage !== null) {
-      return (stage as any).id || (stage as any).name || "new_lead";
-    }
-    return String(stage);
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const getPriorityIcon = (priority: string) => {
-    if (priority === "urgent") return "🚨";
-    if (priority === "high") return "🔥";
-    if (priority === "medium") return "⭐";
-    return "📌";
-  };
 
   const formatCurrency = (amount?: number) => {
     if (!amount) return "غير محدد";
@@ -72,46 +45,19 @@ export function CustomersGrid() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {paginatedCustomers.map((customer) => {
-        const normalizedStage = normalizeStage(customer.stage);
         return (
           <Card 
             key={customer.id} 
-            className="hover:shadow-lg transition-shadow overflow-hidden group"
+            className="hover:shadow-lg transition-shadow"
           >
-            {/* Header with Avatar & Lead Score */}
-            <div 
-              className="h-20 relative"
-              style={{ backgroundColor: getStageColor(normalizedStage) + "20" }}
-            >
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                <Avatar className="h-16 w-16 border-4 border-white dark:border-gray-900">
-                  <AvatarFallback 
-                    className="text-lg font-bold"
-                    style={{ backgroundColor: getStageColor(normalizedStage) }}
-                  >
-                    {getInitials(customer.name)}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <div className="absolute top-2 left-2 text-xl">
-                {getPriorityIcon(customer.priority)}
-              </div>
-            </div>
-
-            <CardContent className="pt-10 pb-4 space-y-3">
-              {/* Name & Stage */}
-              <div className="text-center space-y-1">
+            <CardContent className="p-4 space-y-3">
+              {/* Name */}
+              <div>
                 <Link href={`/ar/dashboard/customers-hub/${customer.id}`}>
                   <h3 className="font-bold text-lg hover:text-blue-600 transition-colors">
                     {customer.name}
                   </h3>
                 </Link>
-                <Badge 
-                  className="text-xs"
-                  style={{ backgroundColor: getStageColor(normalizedStage) }}
-                >
-                  {getStageNameAr(normalizedStage)}
-                </Badge>
               </div>
 
             {/* Quick Info */}
