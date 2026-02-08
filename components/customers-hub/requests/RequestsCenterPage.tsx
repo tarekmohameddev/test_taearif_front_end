@@ -8,6 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,6 +52,7 @@ import { BulkActionsToolbar } from "../actions/BulkActionsToolbar";
 import { QuickViewPanel } from "../actions/QuickViewPanel";
 import { ActionHistoryList } from "../actions/ActionHistoryList";
 import { SourceBadge } from "../actions/SourceBadge";
+import { TableRequestsList } from "./TableRequestsList";
 import {
   CustomDialog,
   CustomDialogContent,
@@ -415,7 +423,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
 
   // Other local states (not filters)
   const [selectedActionIds, setSelectedActionIds] = useState<Set<string>>(new Set());
-  const [isCompactView, setIsCompactView] = useState(false);
+  const [viewMode, setViewMode] = useState<"compact" | "grid" | "table">("grid");
   const [quickViewAction, setQuickViewAction] = useState<CustomerAction | null>(null);
   const [quickViewCustomer, setQuickViewCustomer] = useState<UnifiedCustomer | null>(null);
   const [showQuickView, setShowQuickView] = useState(false);
@@ -936,17 +944,31 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant={isCompactView ? "default" : "outline"}
-              size="icon"
-              onClick={() => setIsCompactView(!isCompactView)}
-            >
-              {isCompactView ? (
-                <LayoutList className="h-4 w-4" />
-              ) : (
-                <LayoutGrid className="h-4 w-4" />
-              )}
-            </Button>
+            <Select value={viewMode} onValueChange={(v: any) => setViewMode(v)}>
+              <SelectTrigger className="w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="grid">
+                  <div className="flex items-center gap-2">
+                    <LayoutGrid className="h-4 w-4" />
+                    عرض الشبكة
+                  </div>
+                </SelectItem>
+                <SelectItem value="compact">
+                  <div className="flex items-center gap-2">
+                    <LayoutList className="h-4 w-4" />
+                    عرض مضغوط
+                  </div>
+                </SelectItem>
+                <SelectItem value="table">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">Table</Badge>
+                    عرض جدول منظم
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -1471,52 +1493,100 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           </TabsList>
 
           <TabsContent value="inbox" className="mt-6">
-            <RequestsList
-              actions={inboxRequests}
-              getCustomerById={getCustomerForCard}
-              isCompactView={isCompactView}
-              selectedActionIds={selectedActionIds}
-              onSelect={handleSelectAction}
-              onComplete={handleComplete}
-              onDismiss={handleDismiss}
-              onSnooze={handleSnooze}
-              onAddNote={handleAddNote}
-              onQuickView={handleQuickView}
-              stages={stagesForCards}
-              completingActionIds={completingActionIds}
-            />
+            {viewMode === "table" ? (
+              <TableRequestsList
+                actions={inboxRequests}
+                getCustomerById={getCustomerForCard}
+                selectedActionIds={selectedActionIds}
+                onSelect={handleSelectAction}
+                onComplete={handleComplete}
+                onDismiss={handleDismiss}
+                onSnooze={handleSnooze}
+                onAddNote={handleAddNote}
+                onQuickView={handleQuickView}
+                stages={stagesForCards}
+                completingActionIds={completingActionIds}
+              />
+            ) : (
+              <RequestsList
+                actions={inboxRequests}
+                getCustomerById={getCustomerForCard}
+                isCompactView={viewMode === "compact"}
+                selectedActionIds={selectedActionIds}
+                onSelect={handleSelectAction}
+                onComplete={handleComplete}
+                onDismiss={handleDismiss}
+                onSnooze={handleSnooze}
+                onAddNote={handleAddNote}
+                onQuickView={handleQuickView}
+                stages={stagesForCards}
+                completingActionIds={completingActionIds}
+              />
+            )}
           </TabsContent>
           <TabsContent value="followups" className="mt-6">
-            <RequestsList
-              actions={followupRequests}
-              getCustomerById={getCustomerForCard}
-              isCompactView={isCompactView}
-              selectedActionIds={selectedActionIds}
-              onSelect={handleSelectAction}
-              onComplete={handleComplete}
-              onDismiss={handleDismiss}
-              onSnooze={handleSnooze}
-              onAddNote={handleAddNote}
-              onQuickView={handleQuickView}
-              stages={stagesForCards}
-              completingActionIds={completingActionIds}
-            />
+            {viewMode === "table" ? (
+              <TableRequestsList
+                actions={followupRequests}
+                getCustomerById={getCustomerForCard}
+                selectedActionIds={selectedActionIds}
+                onSelect={handleSelectAction}
+                onComplete={handleComplete}
+                onDismiss={handleDismiss}
+                onSnooze={handleSnooze}
+                onAddNote={handleAddNote}
+                onQuickView={handleQuickView}
+                stages={stagesForCards}
+                completingActionIds={completingActionIds}
+              />
+            ) : (
+              <RequestsList
+                actions={followupRequests}
+                getCustomerById={getCustomerForCard}
+                isCompactView={viewMode === "compact"}
+                selectedActionIds={selectedActionIds}
+                onSelect={handleSelectAction}
+                onComplete={handleComplete}
+                onDismiss={handleDismiss}
+                onSnooze={handleSnooze}
+                onAddNote={handleAddNote}
+                onQuickView={handleQuickView}
+                stages={stagesForCards}
+                completingActionIds={completingActionIds}
+              />
+            )}
           </TabsContent>
           <TabsContent value="all" className="mt-6">
-            <RequestsList
-              actions={filteredActions}
-              getCustomerById={getCustomerForCard}
-              isCompactView={isCompactView}
-              selectedActionIds={selectedActionIds}
-              onSelect={handleSelectAction}
-              onComplete={handleComplete}
-              onDismiss={handleDismiss}
-              onSnooze={handleSnooze}
-              onAddNote={handleAddNote}
-              onQuickView={handleQuickView}
-              stages={stagesForCards}
-              completingActionIds={completingActionIds}
-            />
+            {viewMode === "table" ? (
+              <TableRequestsList
+                actions={filteredActions}
+                getCustomerById={getCustomerForCard}
+                selectedActionIds={selectedActionIds}
+                onSelect={handleSelectAction}
+                onComplete={handleComplete}
+                onDismiss={handleDismiss}
+                onSnooze={handleSnooze}
+                onAddNote={handleAddNote}
+                onQuickView={handleQuickView}
+                stages={stagesForCards}
+                completingActionIds={completingActionIds}
+              />
+            ) : (
+              <RequestsList
+                actions={filteredActions}
+                getCustomerById={getCustomerForCard}
+                isCompactView={viewMode === "compact"}
+                selectedActionIds={selectedActionIds}
+                onSelect={handleSelectAction}
+                onComplete={handleComplete}
+                onDismiss={handleDismiss}
+                onSnooze={handleSnooze}
+                onAddNote={handleAddNote}
+                onQuickView={handleQuickView}
+                stages={stagesForCards}
+                completingActionIds={completingActionIds}
+              />
+            )}
           </TabsContent>
           <TabsContent value="completed" className="mt-6">
             <ActionHistoryList
