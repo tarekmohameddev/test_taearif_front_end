@@ -12,3 +12,8 @@ components/customers-hub/page/CustomersGrid.tsx, types/unified-customer.ts, hook
 Update Type: Enhancement
 Enhanced customer cards UI/UX design with beautiful styling, hover effects, and improved spacing using only two colors (blue and gray)
 components/customers-hub/page/CustomersGrid.tsx
+
+2025-01-17 19:15:00
+Update Type: Feature
+Added more details to customer cards: priority badge, source badge, email, WhatsApp, assigned employee, city, lead score, total interactions, total deal value, and tags
+components/customers-hub/page/CustomersGrid.tsx
