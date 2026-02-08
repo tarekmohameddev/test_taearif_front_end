@@ -181,6 +181,8 @@ interface IncomingActionsCardProps {
   showCheckbox?: boolean;
   isCompact?: boolean;
   className?: string;
+  /** Whether the action is currently being completed */
+  isCompleting?: boolean;
 }
 
 const priorityColors = {
@@ -220,6 +222,7 @@ export function IncomingActionsCard({
   showCheckbox = true,
   isCompact = false,
   className,
+  isCompleting = false,
 }: IncomingActionsCardProps) {
   const router = useRouter();
   const { addAppointment, updateCustomerStage, getCustomerById } = useUnifiedCustomersStore();
@@ -700,9 +703,10 @@ export function IncomingActionsCard({
               e.stopPropagation();
               onComplete?.(action.id);
             }}
+            disabled={isCompleting}
             data-interactive="true"
           >
-            تم
+            {isCompleting ? "جاري..." : "تم"}
           </Button>
         </div>
       </div>

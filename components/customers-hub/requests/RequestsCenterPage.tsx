@@ -48,6 +48,7 @@ import { Progress } from "@/components/ui/progress";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 import useAuthStore from "@/context/AuthContext";
+import toast from "react-hot-toast";
 import type { CustomerStatistics } from "@/types/unified-customer";
 import type {
   CustomerAction,
@@ -322,6 +323,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const [quickViewAction, setQuickViewAction] = useState<CustomerAction | null>(null);
   const [quickViewCustomer, setQuickViewCustomer] = useState<UnifiedCustomer | null>(null);
   const [showQuickView, setShowQuickView] = useState(false);
+  const [completingActionIds, setCompletingActionIds] = useState<Set<string>>(new Set());
   
   // Temporary budget state for dialog (before applying)
   const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
@@ -613,6 +615,14 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   );
 
   const handleComplete = async (actionId: string) => {
+    // Prevent multiple clicks
+    if (completingActionIds.has(actionId)) {
+      return;
+    }
+
+    // Add to completing set
+    setCompletingActionIds((prev) => new Set(prev).add(actionId));
+
     try {
       await completeAction(actionId);
       setSelectedActionIds((prev) => {
@@ -620,8 +630,17 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
         next.delete(actionId);
         return next;
       });
+      toast.success("تم إكمال الطلب بنجاح");
     } catch (err) {
       console.error("Error completing action:", err);
+      toast.error("حدث خطأ أثناء إكمال الطلب");
+    } finally {
+      // Remove from completing set
+      setCompletingActionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(actionId);
+        return next;
+      });
     }
   };
   const handleDismiss = async (actionId: string) => {
@@ -1339,6 +1358,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               onAddNote={handleAddNote}
               onQuickView={handleQuickView}
               stages={stagesForCards}
+              completingActionIds={completingActionIds}
             />
           </TabsContent>
           <TabsContent value="followups" className="mt-6">
@@ -1354,6 +1374,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               onAddNote={handleAddNote}
               onQuickView={handleQuickView}
               stages={stagesForCards}
+              completingActionIds={completingActionIds}
             />
           </TabsContent>
           <TabsContent value="all" className="mt-6">
@@ -1369,6 +1390,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               onAddNote={handleAddNote}
               onQuickView={handleQuickView}
               stages={stagesForCards}
+              completingActionIds={completingActionIds}
             />
           </TabsContent>
           <TabsContent value="completed" className="mt-6">
@@ -1421,6 +1443,7 @@ function RequestsList({
   onAddNote,
   onQuickView,
   stages,
+  completingActionIds,
 }: {
   actions: CustomerAction[];
   getCustomerById: (id: string) => UnifiedCustomer | undefined;
@@ -1439,6 +1462,7 @@ function RequestsList({
     color: string;
     order: number;
   }>;
+  completingActionIds: Set<string>;
 }) {
   if (actions.length === 0) {
     return (
@@ -1469,6 +1493,7 @@ function RequestsList({
           onSelect={onSelect}
           showCheckbox={true}
           isCompact={isCompactView}
+          isCompleting={completingActionIds.has(action.id)}
         />
       ))}
     </div>
