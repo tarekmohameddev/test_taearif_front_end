@@ -51,13 +51,14 @@ export default function CustomersHubRequestsPage() {
         const params: RequestsListParams = {
           action: "list",
           includeStats: true,
+          filters: {}, // Empty filters object - will be populated by RequestsCenterPage when filters change
           pagination: {
             page: 1,
             limit: 50,
           },
           sorting: {
-            field: "dueDate",
-            order: "asc",
+            field: "created_at",
+            order: "desc",
           },
         };
 

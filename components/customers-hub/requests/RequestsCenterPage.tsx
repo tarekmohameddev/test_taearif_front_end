@@ -62,7 +62,7 @@ import {
   getActionsDueToday,
   sortActionsByPriority,
 } from "@/lib/utils/action-helpers";
-import type { StageDistribution } from "@/lib/services/customers-hub-requests-api";
+import type { StageDistribution, RequestsListParams } from "@/lib/services/customers-hub-requests-api";
 
 const priorityLabels: Record<Priority, string> = {
   urgent: "عاجل",
@@ -348,19 +348,22 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
       const fetchWithFilters = async () => {
         try {
           console.log("🔄 Filters changed, fetching requests with filters:", newFilters);
-          await props.onFetchRequests!({
+          // Always send filters object, even if empty
+          const requestParams: RequestsListParams = {
             action: "list",
             includeStats: true,
-            filters: newFilters,
+            filters: Object.keys(newFilters).length > 0 ? newFilters : {},
             pagination: {
               page: 1,
               limit: 50,
             },
             sorting: {
-              field: "dueDate",
-              order: "asc",
+              field: "created_at",
+              order: "desc",
             },
-          });
+          };
+          console.log("📤 Sending API request with params:", JSON.stringify(requestParams, null, 2));
+          await props.onFetchRequests!(requestParams);
         } catch (err) {
           console.error("Error fetching requests with filters:", err);
         }

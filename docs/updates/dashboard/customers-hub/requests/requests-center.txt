@@ -12,3 +12,8 @@ context/AuthContext.js, hooks/useCustomersHubRequests.ts
 Update Type: Enhancement
 استبدال قائمة الموظفين الثابتة (mock) في BulkActionsToolbar بـ جلب الموظفين من API باستخدام useCustomersHubAssignment hook. تم إضافة معالجة loading state وعرض عدد العملاء/القدرة لكل موظف
 components/customers-hub/actions/BulkActionsToolbar.tsx
+
+2026-02-08 17:34:24
+Update Type: Enhancement
+إصلاح إرسال الفلاتر في API request body - تم إضافة filters object في initial load وضمان إرسال جميع الفلاتر المفعّلة عند تغييرها
+app/dashboard/customers-hub/requests/page.tsx, components/customers-hub/requests/RequestsCenterPage.tsx
