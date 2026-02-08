@@ -111,13 +111,33 @@ export default function PixelScripts({ tenantId }: PixelScriptsProps) {
               />
             );
           case "gtm":
-            const gtmId = pixel.externalId.replace(/^GTM-/, ""); // Remove GTM- prefix if present
-            const gtmKey = pixel._id || `${pixel.provider}-${pixel.externalId}`;
+            // Remove GTM- or gtm- prefix if present (case-insensitive) for GTM script
+            // GTM script requires ID without prefix (e.g., "17854649" not "GTM-17854649")
+            const gtmId = pixel.externalId.replace(/^gtm-/i, ""); // Remove gtm- prefix (case-insensitive)
+            // Use externalId directly for script id attribute
+            const gtmScriptId = pixel.externalId;
+            const gtmKey = pixel._id || gtmScriptId;
+            
+            // Debug log to verify GTM loading
+            console.log("🔵 GTM Pixel Loading:", {
+              externalId: pixel.externalId,
+              gtmId: gtmId,
+              scriptId: gtmScriptId,
+              provider: pixel.provider,
+              settings: pixel.settings,
+            });
+            
             return (
               <Fragment key={gtmKey}>
                 <Script
-                  id={`gtm-${gtmKey}`}
+                  id={gtmScriptId}
                   strategy="afterInteractive"
+                  onLoad={() => {
+                    console.log("✅ GTM Script loaded successfully:", gtmId);
+                  }}
+                  onError={() => {
+                    console.error("❌ GTM Script failed to load:", gtmId);
+                  }}
                   dangerouslySetInnerHTML={{
                     __html: `
                       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
