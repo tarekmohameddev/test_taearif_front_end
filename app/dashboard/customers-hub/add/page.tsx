@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LIFECYCLE_STAGES } from "@/types/unified-customer";
-import type { UnifiedCustomer, CustomerSource, Priority } from "@/types/unified-customer";
+import type { UnifiedCustomer, Priority } from "@/types/unified-customer";
 import { createIncomingAction } from "@/lib/utils/action-helpers";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, ArrowLeft } from "lucide-react";
@@ -31,9 +31,8 @@ export default function AddCustomerPage() {
     name: "",
     phone: "",
     email: "",
-    source: "manual" as CustomerSource,
     stage: "new_lead" as const,
-    priority: "medium" as Priority,
+    priority: "" as Priority | "",
     notes: "",
   });
 
@@ -54,9 +53,9 @@ export default function AddCustomerPage() {
       name: formData.name,
       phone: formData.phone,
       email: formData.email || undefined,
-      source: formData.source,
+      source: "manual",
       stage: formData.stage,
-      priority: formData.priority,
+      priority: (formData.priority || "medium") as Priority,
       leadScore: 50,
       aiInsights: {},
       tags: [],
@@ -171,24 +170,6 @@ export default function AddCustomerPage() {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="source">المصدر</Label>
-                  <Select
-                    value={formData.source}
-                    onValueChange={(value) => setFormData({ ...formData, source: value as CustomerSource })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="manual">إدخال يدوي</SelectItem>
-                      <SelectItem value="inquiry">استفسار موقع</SelectItem>
-                      <SelectItem value="whatsapp">واتساب</SelectItem>
-                      <SelectItem value="referral">إحالة</SelectItem>
-                      <SelectItem value="import">استيراد</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -211,13 +192,13 @@ export default function AddCustomerPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="priority">الأولوية</Label>
+                  <Label htmlFor="priority">الأولوية (اختياري)</Label>
                   <Select
-                    value={formData.priority}
+                    value={formData.priority || undefined}
                     onValueChange={(value) => setFormData({ ...formData, priority: value as Priority })}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="اختر الأولوية" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="urgent">عاجل</SelectItem>
