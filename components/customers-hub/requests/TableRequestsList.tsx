@@ -23,7 +23,6 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Filter,
   CheckCircle2,
   X,
   Clock,
@@ -73,7 +72,6 @@ export function TableRequestsList({
 }: TableRequestsListProps) {
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
-  const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>("all");
   const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
 
   const handleSort = (field: SortField) => {
@@ -279,14 +277,8 @@ export function TableRequestsList({
     }
   };
 
-  // Filter by type
-  const filteredActions =
-    selectedTypeFilter === "all"
-      ? actions
-      : actions.filter((a) => a.type === selectedTypeFilter);
-
   // Sort actions
-  const sortedActions = [...filteredActions].sort((a, b) => {
+  const sortedActions = [...actions].sort((a, b) => {
     let aValue: any;
     let bValue: any;
 
@@ -339,40 +331,6 @@ export function TableRequestsList({
 
   return (
     <div className="space-y-4" dir="rtl">
-      {/* Filters and Stats */}
-      <Card className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900 dark:to-gray-900">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {/* Type Filter */}
-            <div className="flex items-center gap-3 flex-1">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <select
-                value={selectedTypeFilter}
-                onChange={(e) => setSelectedTypeFilter(e.target.value)}
-                className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-800"
-              >
-                <option value="all">جميع الأنواع</option>
-                <option value="new_inquiry">استفسار جديد</option>
-                <option value="callback_request">طلب اتصال</option>
-                <option value="property_match">عقار متطابق</option>
-                <option value="follow_up">متابعة</option>
-                <option value="whatsapp_incoming">رسالة واتساب</option>
-              </select>
-            </div>
-
-            {/* Stats */}
-            <div className="flex items-center gap-6 text-sm">
-              <div className="text-center">
-                <div className="font-bold text-lg text-gray-900 dark:text-white">
-                  {sortedActions.length}
-                </div>
-                <div className="text-xs text-gray-500">إجمالي الطلبات</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Table */}
       <Card>
         <CardContent className="p-0">
