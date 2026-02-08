@@ -1369,7 +1369,7 @@ export function CustomerDetailPageSimple({
         <CollapsibleSection
           title="طلبات العميل"
           icon={Sparkles}
-          defaultOpen={false}
+          defaultOpen={true}
         >
           <CustomerRequestsSection customer={customer} />
         </CollapsibleSection>
