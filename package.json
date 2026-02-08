@@ -114,7 +114,7 @@
     "react-infinite-ticker": "^2.2.0",
     "react-is": "^18.2.0",
     "leaflet": "^1.9.4",
-    "react-leaflet": "^5.0.0",
+    "react-leaflet": "^4.2.1",
     "react-redux": "^9.2.0",
     "react-resizable-panels": "^2.1.7",
     "react-select": "^5.10.2",
