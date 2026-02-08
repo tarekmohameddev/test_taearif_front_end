@@ -8,6 +8,8 @@ import { ArrowRight, KanbanSquare, Maximize2, Minimize2, AlertCircle } from "luc
 import Link from "next/link";
 import { StageAnalytics } from "./StageAnalytics";
 import { EnhancedPipelineBoard } from "./EnhancedPipelineBoard";
+import { ClassicPipelineBoard } from "./ClassicPipelineBoard";
+import { TablePipelineBoard } from "./TablePipelineBoard";
 import {
   Select,
   SelectContent,
@@ -70,7 +72,7 @@ export function PipelinePage(props?: PipelinePageProps) {
     }
   }, [stages, setStoreCustomers]);
 
-  const [pipelineView, setPipelineView] = useState<"enhanced" | "classic">("enhanced");
+  const [pipelineView, setPipelineView] = useState<"enhanced" | "classic" | "table">("enhanced");
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   const toggleFullScreen = () => {
@@ -142,7 +144,7 @@ export function PipelinePage(props?: PipelinePageProps) {
           </div>
           
           <Select value={pipelineView} onValueChange={(v: any) => setPipelineView(v)}>
-            <SelectTrigger className="w-52">
+            <SelectTrigger className="w-64">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -152,7 +154,18 @@ export function PipelinePage(props?: PipelinePageProps) {
                   محسّن (سحب وإفلات)
                 </div>
               </SelectItem>
-              <SelectItem value="classic">كلاسيكي</SelectItem>
+              <SelectItem value="classic">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">Timeline</Badge>
+                  عرض زمني تفصيلي
+                </div>
+              </SelectItem>
+              <SelectItem value="table">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">Table</Badge>
+                  عرض جدول منظم
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -187,12 +200,18 @@ export function PipelinePage(props?: PipelinePageProps) {
           apiStages={props?.apiStages}
           onMoveCustomer={props?.onMoveCustomer}
         />
+      ) : pipelineView === "classic" ? (
+        <ClassicPipelineBoard 
+          stages={stages}
+          apiStages={props?.apiStages}
+          onMoveCustomer={props?.onMoveCustomer}
+        />
       ) : (
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-          <p className="text-sm text-gray-600 text-center">
-            العرض الكلاسيكي قيد التطوير. يرجى استخدام العرض المحسّن.
-          </p>
-        </div>
+        <TablePipelineBoard 
+          stages={stages}
+          apiStages={props?.apiStages}
+          onMoveCustomer={props?.onMoveCustomer}
+        />
       )}
       </div>
     </div>

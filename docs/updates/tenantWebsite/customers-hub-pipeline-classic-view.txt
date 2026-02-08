@@ -1,0 +1,9 @@
+2025-01-17 15:30:00
+Update Type: Feature
+إضافة عرض كلاسيكي مبهر لمسار المبيعات بتصميم Timeline عمودي مختلف تماماً عن Kanban board
+components/customers-hub/pipeline/ClassicPipelineBoard.tsx, components/customers-hub/pipeline/PipelinePage.tsx
+
+2025-01-17 16:00:00
+Update Type: Feature
+إضافة عرض جدول منظم (Table View) كخيار ثالث في قائمة عرض مسار المبيعات مع إمكانية التصفية والترتيب
+components/customers-hub/pipeline/TablePipelineBoard.tsx, components/customers-hub/pipeline/PipelinePage.tsx
