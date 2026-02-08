@@ -110,7 +110,7 @@ export default function PropertyFormHeader({
                   variant="outline"
                   size="sm"
                   onClick={() => setActiveTab("owner")}
-                  className="gap-2 w-full sm:w-auto"
+                  className="gap-2 w-full sm:w-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300 hover:border-blue-400"
                 >
                   الأرشيف
                 </Button>
@@ -118,7 +118,7 @@ export default function PropertyFormHeader({
                 <Button
                   variant="outline"
                   onClick={() => setActiveTab("form")}
-                  className="gap-2 w-full sm:w-auto"
+                  className="gap-2 w-full sm:w-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300 hover:border-blue-400"
                 >
                   تفاصيل العقار
                 </Button>

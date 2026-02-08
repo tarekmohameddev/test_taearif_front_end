@@ -466,6 +466,9 @@ export default function PropertyForm({ mode, isDraft = false }) {
           }
           onSave={submit.handleSubmit}
           onCompleteDraft={submit.handleCompleteDraft}
+          canAccessArchive={canAccessArchive}
+          activeTab={state.activeTab}
+          setActiveTab={state.setActiveTab}
         />
         </div>
       ) : (
@@ -500,6 +503,9 @@ export default function PropertyForm({ mode, isDraft = false }) {
               }
               onSave={submit.handleSubmit}
               onCompleteDraft={submit.handleCompleteDraft}
+              canAccessArchive={canAccessArchive}
+              activeTab={state.activeTab}
+              setActiveTab={state.setActiveTab}
             />
           </div>
         )

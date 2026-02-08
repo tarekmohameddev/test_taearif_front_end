@@ -1,0 +1,14 @@
+2026-02-08 22:20:27
+Update Type: Feature
+إضافة زر الأرشيف في نهاية نموذج إضافة وتعديل العقار بجانب الأزرار الموجودة (إلغاء، حفظ التغييرات كمسودة، حفظ ونشر التغييرات)
+components/property/property-form/components/PropertyFormActionsCard.tsx, components/property/property-form/index.jsx
+
+2026-02-08 22:20:57
+Update Type: Enhancement
+نقل زر الأرشيف ليكون قبل زر الإلغاء وإضافة لون أزرق مميز له لتمييزه عن باقي الأزرار
+components/property/property-form/components/PropertyFormActionsCard.tsx
+
+2026-02-08 22:23:36
+Update Type: Enhancement
+تطبيق نفس لون زر الأرشيف (أزرق مميز) على زر الأرشيف في أعلى الصفحة ليكون متسقاً مع زر الأرشيف في الأسفل
+components/property/property-form/components/PropertyFormHeader.tsx

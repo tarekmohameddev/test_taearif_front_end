@@ -1,3 +1,4 @@
+/// <reference types="react" />
 "use client";
 
 import React from "react";
@@ -16,6 +17,9 @@ interface PropertyFormActionsCardProps {
   onBack: () => void;
   onSave: (publish: boolean) => void;
   onCompleteDraft: () => void;
+  canAccessArchive?: boolean;
+  activeTab?: "form" | "owner";
+  setActiveTab?: (tab: "form" | "owner") => void;
 }
 
 export default function PropertyFormActionsCard({
@@ -29,6 +33,9 @@ export default function PropertyFormActionsCard({
   onBack,
   onSave,
   onCompleteDraft,
+  canAccessArchive = false,
+  activeTab = "form",
+  setActiveTab,
 }: PropertyFormActionsCardProps) {
   return (
     <Card className="border border-primary/20 shadow-lg">
@@ -48,6 +55,32 @@ export default function PropertyFormActionsCard({
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-end">
+            {canAccessArchive && setActiveTab && (
+              <>
+                {activeTab === "form" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setActiveTab("owner")}
+                    disabled={isLoading || isCompletingDraft}
+                    className="w-full sm:w-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300 hover:border-blue-400"
+                  >
+                    الأرشيف
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setActiveTab("form")}
+                    disabled={isLoading || isCompletingDraft}
+                    className="w-full sm:w-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300 hover:border-blue-400"
+                  >
+                    تفاصيل العقار
+                  </Button>
+                )}
+              </>
+            )}
+
             <Button
               variant="outline"
               onClick={onBack}
