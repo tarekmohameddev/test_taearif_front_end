@@ -137,14 +137,14 @@ export function AddPageDialog({
         </DialogTrigger>
       )}
       <DialogContent
-        className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto relative"
+        className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto"
         dir="ltr"
       >
-        <DialogHeader className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center">
               <svg
-                className="w-6 h-6 text-white"
+                className="w-4 h-4 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -157,18 +157,14 @@ export function AddPageDialog({
                 />
               </svg>
             </div>
-            <div>
-              <DialogTitle className="text-2xl font-bold text-gray-900">
-                {t("editor.add_page")}
-              </DialogTitle>
-              <DialogDescription className="text-gray-600 mt-1">
-                {t("editor.page_information")} و {t("editor.seo_settings")}
-              </DialogDescription>
-            </div>
-          </div>
+            {t("editor.add_page")}
+          </DialogTitle>
+          <DialogDescription>
+            {t("editor.page_information")} و {t("editor.seo_settings")}
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6">
           <BasicInfoSection
             formData={formData}
             errors={errors}
@@ -191,7 +187,7 @@ export function AddPageDialog({
           />
         </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-3">
+        <DialogFooter className="flex items-center justify-end gap-2">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}

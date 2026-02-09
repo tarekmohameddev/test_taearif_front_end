@@ -2,3 +2,13 @@
 Update Type: Enhancement
 إخفاء الزر الأخضر "إضافة صفحة" في AddPageDialog عندما يتم فتح الـ Dialog من خارج (من الزر الأبيض في DesktopActions) - إضافة شرط لإخفاء DialogTrigger عندما يكون externalOpen محدداً
 app/live-editor/components/AddPageDialog/AddPageDialog.tsx
+
+2026-02-09 20:35:00
+Update Type: Bug Fix
+إصلاح مشكلة المساحة الفارغة الكبيرة في AddPageDialog - إزالة padding الافتراضي من DialogContent وإضافة padding محدد للـ container الداخلي - تقليل المسافات في DialogHeader - إضافة border-top للـ DialogFooter
+app/live-editor/components/AddPageDialog/AddPageDialog.tsx
+
+2026-02-09 20:40:00
+Update Type: Enhancement
+تحديث AddPageDialog ليكون في منتصف الشاشة مثل ThemeChangeDialog - إزالة wrapper div مع padding - تبسيط DialogHeader و DialogFooter - تغيير max-h إلى 90vh - جعل التصميم متسقاً مع ThemeChangeDialog
+app/live-editor/components/AddPageDialog/AddPageDialog.tsx
