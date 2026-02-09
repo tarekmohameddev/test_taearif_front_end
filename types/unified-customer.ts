@@ -2,11 +2,12 @@
 // Designed for Saudi Arabia and Gulf Region Real Estate Operations
 
 export type CustomerSource = 
-  | 'inquiry'      // From website inquiry form
-  | 'manual'       // Manually added by agent
-  | 'whatsapp'     // From WhatsApp conversation
-  | 'import'       // Bulk import
-  | 'referral';    // Customer referral
+  | 'inquiry'         // From website inquiry form
+  | 'manual'          // Manually added by agent
+  | 'whatsapp'        // From WhatsApp conversation
+  | 'import'          // Bulk import
+  | 'referral'        // Customer referral
+  | 'property_request'; // From property request form
 
 export type CustomerActionType = 
   | 'new_inquiry'        // New customer interested in property

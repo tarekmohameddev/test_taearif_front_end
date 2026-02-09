@@ -17,3 +17,8 @@ lib/services/customers-hub-requests-api.ts, components/customers-hub/requests/ho
 Update Type: Bug Fix
 إصلاح مشكلة عرض المراحل (stages) في قسم "توزيع طلبات العملاء حسب المرحلة" - إضافة تحقق أفضل لوجود stages من API response - إضافة console.log للتأكد من وصول stages بشكل صحيح - تحسين التحقق من apiStages قبل العرض
 components/customers-hub/requests/RequestsCenterPage.tsx, hooks/useCustomersHubRequests.ts
+
+2026-02-09 18:42:17
+Update Type: Feature
+إضافة فلتر افتراضي لعرض فقط الطلبات التي source: "property_request" - إضافة "property_request" إلى نوع CustomerSource - تعيين القيمة الافتراضية لـ selectedSources إلى ["property_request"] - تحديث handleClearFilters لإعادة property_request كقيمة افتراضية - إضافة fallback في بناء الفلاتر لإضافة property_request إذا لم يكن هناك sources محددة
+types/unified-customer.ts, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts

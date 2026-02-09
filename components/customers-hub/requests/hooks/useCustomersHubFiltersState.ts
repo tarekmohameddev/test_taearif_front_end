@@ -9,7 +9,8 @@ export const useCustomersHubFiltersState = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [localSearchQuery, setLocalSearchQuery] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"inbox" | "followups" | "all" | "completed">("all");
-  const [selectedSources, setSelectedSources] = useState<CustomerSource[]>([]);
+  // Default to property_request source only
+  const [selectedSources, setSelectedSources] = useState<CustomerSource[]>(["property_request"]);
   const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<CustomerActionType[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
@@ -86,8 +87,12 @@ export const useCustomersHubFiltersState = () => {
     }
 
     // Sources filter (changed from source to sources)
+    // Always include property_request filter (default behavior)
     if (selectedSources.length > 0) {
       filters.sources = selectedSources;
+    } else {
+      // Default to property_request if no sources selected
+      filters.sources = ["property_request"];
     }
 
     // Priorities filter (changed from priority to priorities)
@@ -168,7 +173,7 @@ export const useCustomersHubFiltersState = () => {
     setLocalSearchQuery("");
     setAppliedSearchQuery("");
     setActiveTab("all");
-    setSelectedSources([]);
+    setSelectedSources(["property_request"]); // Reset to property_request default
     setSelectedPriorities([]);
     setSelectedTypes([]);
     setSelectedAssignees([]);
