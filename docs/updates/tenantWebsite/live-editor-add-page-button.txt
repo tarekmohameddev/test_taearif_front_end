@@ -1,0 +1,4 @@
+2026-02-09 20:31:28
+Update Type: Enhancement
+إخفاء الزر الأخضر "إضافة صفحة" في AddPageDialog عندما يتم فتح الـ Dialog من خارج (من الزر الأبيض في DesktopActions) - إضافة شرط لإخفاء DialogTrigger عندما يكون externalOpen محدداً
+app/live-editor/components/AddPageDialog/AddPageDialog.tsx
