@@ -3,7 +3,33 @@ import type { CustomerAction, CustomerActionType, CustomerSource, Priority } fro
 
 const BASE_URL = "/v2/customers-hub/requests";
 
+// Flat structure matching new API format
 export interface RequestsListFilters {
+  tab?: "inbox" | "followups" | "all" | "completed";
+  types?: CustomerActionType[]; // Changed from "type" to "types"
+  statuses?: ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[]; // Changed from "status" to "statuses"
+  sources?: CustomerSource[]; // Changed from "source" to "sources"
+  priorities?: Priority[]; // Changed from "priority" to "priorities"
+  assignees?: number[]; // Changed from "assignedTo" (string[]) to "assignees" (number[])
+  due_date_bucket?: "overdue" | "today" | "week" | "no_date"; // Changed from "dueDate" to "due_date_bucket"
+  customer_id?: number;
+  property_categories?: string[]; // Changed from "propertyType" to "property_categories"
+  property_types?: string[]; // New field
+  cities?: string[]; // Changed from "city" to "cities"
+  states?: string[]; // Changed from "state" to "states"
+  budget_min?: number; // Changed from "budgetMin" to "budget_min"
+  budget_max?: number; // Changed from "budgetMax" to "budget_max"
+  date_from?: string; // New field (ISO date string)
+  date_to?: string; // New field (ISO date string)
+  search?: string;
+  sort_by?: "createdAt" | "dueDate" | "priority" | "customerName"; // Changed from sorting.field
+  sort_dir?: "asc" | "desc"; // Changed from sorting.order
+  limit?: number; // Changed from pagination.limit
+  offset?: number; // Changed from pagination.offset (calculated from page)
+}
+
+// Legacy interface kept for backward compatibility but deprecated
+export interface LegacyRequestsListFilters {
   tab?: "all" | "pending" | "overdue" | "completed" | "inbox" | "followups";
   type?: CustomerActionType[];
   priority?: Priority[];
@@ -21,17 +47,17 @@ export interface RequestsListFilters {
 }
 
 export interface RequestsListParams {
-  action: "list";
-  includeStats?: boolean;
-  filters?: RequestsListFilters;
+  action?: "list"; // Optional now since we're sending flat structure
+  includeStats?: boolean; // Not used in new API format
+  filters?: LegacyRequestsListFilters; // Deprecated - use flat structure instead
   pagination?: {
     page: number;
     limit: number;
-  };
+  }; // Deprecated - use limit/offset instead
   sorting?: {
     field: string;
     order: "asc" | "desc";
-  };
+  }; // Deprecated - use sort_by/sort_dir instead
 }
 
 export interface StageDistribution {
@@ -250,8 +276,80 @@ export interface BulkActionResponse {
 }
 
 // Get Requests List
-export async function getRequestsList(params: RequestsListParams): Promise<RequestsListResponse> {
-  const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, params);
+// New API format: flat structure in request body
+export async function getRequestsList(params: RequestsListFilters | RequestsListParams): Promise<RequestsListResponse> {
+  // Convert legacy nested format to flat format if needed
+  let requestBody: RequestsListFilters;
+  
+  if ('filters' in params && params.filters) {
+    // Legacy format: convert to flat structure
+    // Type guard: params is RequestsListParams when 'filters' exists
+    const legacyParams = params as RequestsListParams;
+    const legacyFilters: LegacyRequestsListFilters = legacyParams.filters!;
+    // Convert legacy tab values to new format
+    let tab: "inbox" | "followups" | "all" | "completed" | undefined;
+    if (legacyFilters.tab === "pending" || legacyFilters.tab === "overdue") {
+      tab = "all"; // Map pending/overdue to "all"
+    } else {
+      tab = legacyFilters.tab as "inbox" | "followups" | "all" | "completed" | undefined;
+    }
+    
+    // Filter out "overdue" from statuses if present
+    const statuses = legacyFilters.status?.filter(s => s !== "overdue") as ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[] | undefined;
+    
+    requestBody = {
+      tab,
+      types: legacyFilters.type ? legacyFilters.type : undefined,
+      statuses,
+      sources: legacyFilters.source,
+      priorities: legacyFilters.priority,
+      assignees: legacyFilters.assignedTo ? legacyFilters.assignedTo.map((id: any) => parseInt(id.toString())) : undefined,
+      due_date_bucket: legacyFilters.dueDate !== "all" ? legacyFilters.dueDate : undefined,
+      property_categories: legacyFilters.propertyType,
+      cities: legacyFilters.city,
+      states: legacyFilters.state,
+      budget_min: legacyFilters.budgetMin,
+      budget_max: legacyFilters.budgetMax,
+      search: legacyFilters.search,
+      sort_by: legacyParams.sorting?.field === "created_at" ? "createdAt" : legacyParams.sorting?.field as any,
+      sort_dir: legacyParams.sorting?.order,
+      limit: legacyParams.pagination?.limit || 50,
+      offset: legacyParams.pagination ? (legacyParams.pagination.page - 1) * legacyParams.pagination.limit : 0,
+    };
+    
+    // Remove undefined fields
+    Object.keys(requestBody).forEach(key => {
+      if (requestBody[key as keyof RequestsListFilters] === undefined) {
+        delete requestBody[key as keyof RequestsListFilters];
+      }
+    });
+  } else {
+    // Already flat format
+    requestBody = params as RequestsListFilters;
+    
+    // Ensure default values
+    if (requestBody.limit === undefined) {
+      requestBody.limit = 50;
+    }
+    if (requestBody.offset === undefined) {
+      requestBody.offset = 0;
+    }
+    if (requestBody.sort_by === undefined) {
+      requestBody.sort_by = "createdAt";
+    }
+    if (requestBody.sort_dir === undefined) {
+      requestBody.sort_dir = "desc";
+    }
+    
+    // Remove undefined fields
+    Object.keys(requestBody).forEach(key => {
+      if (requestBody[key as keyof RequestsListFilters] === undefined) {
+        delete requestBody[key as keyof RequestsListFilters];
+      }
+    });
+  }
+  
+  const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, requestBody);
   return response.data;
 }
 

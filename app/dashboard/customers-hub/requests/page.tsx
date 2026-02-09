@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { RequestsCenterPage } from "@/components/customers-hub/requests/RequestsCenterPage";
 import { useCustomersHubRequests } from "@/hooks/useCustomersHubRequests";
 import useAuthStore from "@/context/AuthContext";
-import type { RequestsListParams } from "@/lib/services/customers-hub-requests-api";
+import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
 
 export default function CustomersHubRequestsPage() {
   const { userData, IsLoading: authLoading } = useAuthStore();
@@ -47,19 +47,13 @@ export default function CustomersHubRequestsPage() {
         // Fetch filter options first
         await fetchFilterOptions();
 
-        // Fetch requests list with default params
-        const params: RequestsListParams = {
-          action: "list",
-          includeStats: true,
-          filters: {}, // Empty filters object - will be populated by RequestsCenterPage when filters change
-          pagination: {
-            page: 1,
-            limit: 50,
-          },
-          sorting: {
-            field: "created_at",
-            order: "desc",
-          },
+        // Fetch requests list with default params (flat structure)
+        const params: RequestsListFilters = {
+          tab: "all",
+          limit: 50,
+          offset: 0,
+          sort_by: "createdAt",
+          sort_dir: "desc",
         };
 
         await fetchRequests(params);

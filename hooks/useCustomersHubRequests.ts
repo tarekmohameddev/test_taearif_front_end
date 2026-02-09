@@ -18,6 +18,7 @@ import {
 } from "@/lib/services/customers-hub-requests-api";
 import type { CustomerAction, Priority } from "@/types/unified-customer";
 import { toast } from "sonner";
+import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
 
 export function useCustomersHubRequests() {
   const { userData, IsLoading: authLoading } = useAuthStore();
@@ -36,7 +37,7 @@ export function useCustomersHubRequests() {
 
   // Fetch requests list
   const fetchRequests = useCallback(
-    async (params: RequestsListParams) => {
+    async (params: RequestsListFilters | RequestsListParams) => {
       if (authLoading || !userData?.token) {
         return;
       }
@@ -76,8 +77,10 @@ export function useCustomersHubRequests() {
           }
           // تحديث stages من API response
           if (response.data.stages) {
+            console.log("📊 Setting stages from API response:", response.data.stages);
             setStages(response.data.stages);
           } else {
+            console.log("⚠️ No stages in API response");
             setStages([]);
           }
           // Handle pagination - support both new format (total/limit/offset/hasMore) and legacy format

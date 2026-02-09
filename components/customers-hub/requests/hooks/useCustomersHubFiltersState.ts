@@ -53,24 +53,30 @@ export const useCustomersHubFiltersState = () => {
   }, [searchQuery]);
 
   // Build newFilters object automatically from filter states using useMemo
+  // New flat structure matching API format
   const newFilters = useMemo(() => {
     const filters: any = {};
 
-    // Tab filter
+    // Tab filter - always set tab
     if (activeTab === "completed") {
-      filters.status = ["completed"];
+      filters.tab = "completed";
+      filters.statuses = ["completed"];
     } else {
-      // Only set tab if no specific types are selected
-      if (selectedTypes.length === 0) {
-        if (activeTab === "inbox") {
-          filters.tab = "inbox";
-          filters.type = REQUEST_TYPES;
-        } else if (activeTab === "followups") {
-          filters.tab = "followups";
-          filters.type = FOLLOWUP_TYPES;
-        } else {
-          filters.tab = "all";
+      // Set tab based on active tab
+      if (activeTab === "inbox") {
+        filters.tab = "inbox";
+        // Only set types if no specific types are selected
+        if (selectedTypes.length === 0) {
+          filters.types = REQUEST_TYPES;
         }
+      } else if (activeTab === "followups") {
+        filters.tab = "followups";
+        // Only set types if no specific types are selected
+        if (selectedTypes.length === 0) {
+          filters.types = FOLLOWUP_TYPES;
+        }
+      } else {
+        filters.tab = "all";
       }
     }
 
@@ -79,55 +85,61 @@ export const useCustomersHubFiltersState = () => {
       filters.search = appliedSearchQuery.trim();
     }
 
-    // Source filter
+    // Sources filter (changed from source to sources)
     if (selectedSources.length > 0) {
-      filters.source = selectedSources;
+      filters.sources = selectedSources;
     }
 
-    // Priority filter
+    // Priorities filter (changed from priority to priorities)
     if (selectedPriorities.length > 0) {
-      filters.priority = selectedPriorities;
+      filters.priorities = selectedPriorities;
     }
 
-    // Type filter (overrides tab type if selected)
+    // Types filter (changed from type to types, overrides tab type if selected)
     if (selectedTypes.length > 0) {
-      filters.type = selectedTypes;
+      filters.types = selectedTypes;
     }
 
-    // Assignee filter
+    // Assignees filter (changed from assignedTo to assignees, convert to numbers)
     if (selectedAssignees.length > 0) {
-      filters.assignedTo = selectedAssignees;
+      filters.assignees = selectedAssignees.map(id => parseInt(id.toString()));
     }
 
-    // Due date filter
+    // Due date bucket filter (changed from dueDate to due_date_bucket)
     if (dueDateFilter !== "all") {
-      filters.dueDate = dueDateFilter;
+      filters.due_date_bucket = dueDateFilter;
     }
 
-    // City filter
+    // Cities filter (changed from city to cities)
     if (selectedCities.length > 0) {
-      filters.city = selectedCities;
+      filters.cities = selectedCities;
     }
 
-    // State/Region filter
+    // States filter (changed from state to states)
     if (selectedStates.length > 0) {
-      filters.state = selectedStates;
+      filters.states = selectedStates;
     }
 
-    // Budget filter
+    // Budget filters (changed from budgetMin/budgetMax to budget_min/budget_max)
     if (budgetMin) {
-      filters.budgetMin = Number(budgetMin);
+      filters.budget_min = Number(budgetMin);
     }
     if (budgetMax) {
-      filters.budgetMax = Number(budgetMax);
+      filters.budget_max = Number(budgetMax);
     }
 
-    // Property type filter
+    // Property types filter (changed from propertyType to property_types)
     if (selectedPropertyTypes.length > 0) {
-      filters.propertyType = selectedPropertyTypes;
+      filters.property_types = selectedPropertyTypes;
     }
 
-    console.log("🔍 Building newFilters (Customers Hub):", {
+    // Default pagination and sorting
+    filters.limit = 50;
+    filters.offset = 0;
+    filters.sort_by = "createdAt";
+    filters.sort_dir = "desc";
+
+    console.log("🔍 Building newFilters (Customers Hub - Flat Format):", {
       activeTab,
       selectedSources,
       selectedPriorities,

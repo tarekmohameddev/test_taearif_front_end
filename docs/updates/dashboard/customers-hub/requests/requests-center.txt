@@ -7,3 +7,13 @@ components/customers-hub/requests/TableRequestsList.tsx, components/customers-hu
 Update Type: Enhancement
 تحديث نظام الطلبات لاستخدام sourceId كـ requestId بدلاً من customerId - إضافة حقول sourceId و sourceTable و stage_id و stage إلى CustomerAction - تحديث منطق تغيير المرحلة لاستخدام sourceId من API response - تحديث RequestsListResponse لدعم pagination الجديد (total/limit/offset/hasMore)
 types/unified-customer.ts, hooks/useCustomersHubRequests.ts, components/customers-hub/actions/IncomingActionsCard.tsx, lib/services/customers-hub-requests-api.ts
+
+2026-02-09 18:24:49
+Update Type: Enhancement
+تحديث بنية الفلاتر في صفحة requests لتكون مسطحة (flat) بدلاً من nested - تغيير أسماء الحقول لتطابق API الجديد (types, statuses, sources, priorities, assignees, due_date_bucket, cities, states, budget_min, budget_max, property_types) - تحديث RequestsListFilters interface - تحديث useCustomersHubFiltersState لبناء الفلاتر بالشكل الصحيح - تحديث getRequestsList لدعم البنية المسطحة
+lib/services/customers-hub-requests-api.ts, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, components/customers-hub/requests/RequestsCenterPage.tsx, app/dashboard/customers-hub/requests/page.tsx, hooks/useCustomersHubRequests.ts
+
+2026-02-09 18:27:36
+Update Type: Bug Fix
+إصلاح مشكلة عرض المراحل (stages) في قسم "توزيع طلبات العملاء حسب المرحلة" - إضافة تحقق أفضل لوجود stages من API response - إضافة console.log للتأكد من وصول stages بشكل صحيح - تحسين التحقق من apiStages قبل العرض
+components/customers-hub/requests/RequestsCenterPage.tsx, hooks/useCustomersHubRequests.ts

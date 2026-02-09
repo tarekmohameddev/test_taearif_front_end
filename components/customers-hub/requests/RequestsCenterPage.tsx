@@ -81,7 +81,7 @@ import {
   getActionsDueToday,
   sortActionsByPriority,
 } from "@/lib/utils/action-helpers";
-import type { StageDistribution, RequestsListParams } from "@/lib/services/customers-hub-requests-api";
+import type { StageDistribution, RequestsListParams, RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
 
 const priorityLabels: Record<Priority, string> = {
   urgent: "عاجل",
@@ -249,7 +249,7 @@ interface RequestsCenterPageProps {
   loading?: boolean;
   error?: string | null;
   pagination?: any;
-  onFetchRequests?: (params: any) => Promise<void>;
+  onFetchRequests?: (params: RequestsListFilters | RequestsListParams) => Promise<void>;
   onCompleteAction?: (actionId: string, notes?: string) => Promise<boolean>;
   onDismissAction?: (actionId: string, reason?: string) => Promise<boolean>;
   onSnoozeAction?: (actionId: string, snoozeUntil: string, reason?: string) => Promise<boolean>;
@@ -302,6 +302,12 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const apiFilterOptions = props?.filterOptions;
   const apiLoading = props?.loading ?? false;
   const apiError = props?.error;
+  
+  // Debug: Log stages to see if they're being passed correctly
+  React.useEffect(() => {
+    console.log("🔍 RequestsCenterPage - apiStages:", apiStages);
+    console.log("🔍 RequestsCenterPage - apiStages length:", apiStages?.length);
+  }, [apiStages]);
 
   // Use storeStages for IncomingActionsCard (prevents API spam)
   // Only pass stages if they exist and are not empty
@@ -462,21 +468,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
       const fetchWithFilters = async () => {
         try {
           console.log("🔄 Filters changed, fetching requests with filters:", newFilters);
-          // Always send filters object, even if empty
-          const requestParams: RequestsListParams = {
-            action: "list",
-            includeStats: true,
-            filters: Object.keys(newFilters).length > 0 ? newFilters : {},
-            pagination: {
-              page: 1,
-              limit: 50,
-            },
-            sorting: {
-              field: "created_at",
-              order: "desc",
-            },
-          };
-          console.log("📤 Sending API request with params:", JSON.stringify(requestParams, null, 2));
+          // Send flat structure directly (newFilters already has the correct flat format)
+          // newFilters already includes limit, offset, sort_by, sort_dir from useCustomersHubFiltersState
+          const requestParams = newFilters as RequestsListFilters;
+          console.log("📤 Sending API request with flat params:", JSON.stringify(requestParams, null, 2));
           await props.onFetchRequests!(requestParams);
         } catch (err) {
           console.error("Error fetching requests with filters:", err);
@@ -1084,7 +1079,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               <div className="text-center py-8 text-gray-500">جاري تحميل البيانات...</div>
             ) : (() => {
               // Use stages ONLY from API response (no static fallback)
-              if (!apiStages || apiStages.length === 0) {
+              // Check if stages exist and have length > 0
+              const hasStages = apiStages && Array.isArray(apiStages) && apiStages.length > 0;
+              
+              if (!hasStages) {
                 return (
                   <div className="text-center py-8 text-gray-500">
                     لا توجد مراحل متاحة من الباك إند
