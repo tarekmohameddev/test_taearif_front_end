@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";

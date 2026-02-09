@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 
 const propertyTypes = [
   "مزرعة",

@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 
 /**
  * Custom hook to sync URL query parameters with the properties store

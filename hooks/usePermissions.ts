@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/context/userStore";
 
 interface PermissionCheck {
   hasPermission: boolean;

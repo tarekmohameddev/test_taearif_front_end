@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultFilterButtonsData } from "@/context/editorStoreFunctions/filterButtonsFunctions";

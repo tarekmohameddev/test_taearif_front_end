@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/context/userStore";
 import {
   CustomDialog,
   CustomDialogContent,

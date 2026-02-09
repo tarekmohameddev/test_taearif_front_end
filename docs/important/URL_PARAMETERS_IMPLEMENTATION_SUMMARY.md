@@ -372,7 +372,7 @@ navigateWithFilters("rent", {
 **Accessing store filters:**
 
 ```typescript
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 
 const cityId = usePropertiesStore((state) => state.cityId);
 const setPrice = usePropertiesStore((state) => state.setPrice);

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePermissions } from "@/hooks/usePermissions";
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/context/userStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Shield, RefreshCw } from "lucide-react";
 

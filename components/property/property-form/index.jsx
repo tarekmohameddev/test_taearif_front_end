@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/context/userStore";
 import { usePropertyFormStore } from "@/context/store/dashboard/properties/propertyForm";
 import {
   PropertyFormHeader,

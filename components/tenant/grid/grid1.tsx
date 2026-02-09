@@ -8,7 +8,7 @@ import PropertyCard3 from "@/components/tenant/cards/card3";
 import Card4 from "@/components/tenant/cards/card4";
 import Card5 from "@/components/tenant/cards/card5";
 import BlogCard1 from "@/components/tenant/blogCard/blogCard1";
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 import { useTenantId } from "@/hooks/useTenantId";
 import Pagination from "@/components/ui/pagination";
 import useTenantStore from "@/context/tenantStore";

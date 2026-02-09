@@ -19,7 +19,7 @@ import {
 import { PermissionsDropdown } from "@/components/access-control/PermissionsDropdown";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/context/userStore";
 import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
 // Types

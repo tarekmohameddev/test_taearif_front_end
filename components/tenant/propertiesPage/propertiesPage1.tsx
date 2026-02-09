@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import PropertyFilter from "@/components/tenant/propertyFilter/propertyFilter1";
 import FilterButtons from "@/components/tenant/filterButtons/filterButtons1";
 import PropertyGrid from "@/components/tenant/grid/grid1";
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 
 interface PropertiesPageProps {
   className?: string;

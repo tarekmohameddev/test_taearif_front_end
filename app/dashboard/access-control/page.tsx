@@ -62,7 +62,7 @@ import {
   Activity,
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/context/userStore";
 import useAuthStore from "@/context/AuthContext";
 import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 

@@ -8,7 +8,7 @@ import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultHero4Data } from "@/context/editorStoreFunctions/heroFunctions";
 import PropertyFilter2 from "@/components/tenant/propertyFilter/propertyFilter2";
-import { usePropertiesStore } from "@/store/propertiesStore";
+import { usePropertiesStore } from "@/context/propertiesStore";
 
 interface Hero4Props {
   title?: string;

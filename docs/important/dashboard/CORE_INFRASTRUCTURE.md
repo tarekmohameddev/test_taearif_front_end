@@ -920,7 +920,7 @@ if (userData.account_type === "tenant") {
 
 ```typescript
 // In PermissionWrapper
-import { useUserStore } from "@/store/userStore";
+import { useUserStore } from "@/context/userStore";
 
 const { userData, hasAccessToPage, loading } = useUserStore();
 const hasPermission = hasAccessToPage("properties");
