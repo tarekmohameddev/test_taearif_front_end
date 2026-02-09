@@ -15,6 +15,7 @@ import { createStaticPageActions } from "./actions/staticPageActions";
 import { createThemeActions } from "./actions/themeActions";
 import { createPageActions } from "./actions/pageActions";
 import { createComponentActions } from "./actions/componentActions";
+import { createDatabaseActions } from "./actions/databaseActions";
 
 // Import component functions for use in actions
 import { heroFunctions } from "../../editorStoreFunctions/heroFunctions";
@@ -110,5 +111,8 @@ export const useEditorStore = create<EditorStore>((set, get) => {
 
     // Component actions (getComponentData, setComponentData, ensureComponentVariant, updateComponentByPath)
     ...createComponentActions(set, get),
+
+    // Database actions (loadFromDatabase)
+    ...createDatabaseActions(set, get),
   } as EditorStore;
 });

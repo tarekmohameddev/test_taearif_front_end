@@ -1,22 +1,20 @@
-"use client";
-
 interface WhatsAppButtonProps {
-  showButton: boolean;
-  phoneNumber: string;
-  buttonText: string;
+  showButton?: boolean;
+  phoneNumber?: string;
+  buttonText?: string;
 }
 
-export function WhatsAppButton({
+export const WhatsAppButton = ({
   showButton,
   phoneNumber,
-  buttonText,
-}: WhatsAppButtonProps) {
+  buttonText = "استفسار عن طريق الواتساب",
+}: WhatsAppButtonProps) => {
   if (!showButton || !phoneNumber || phoneNumber.trim() === "") {
     return null;
   }
 
   return (
-    <div className="mt-8">
+    <section className="bg-transparent" data-purpose="whatsapp-button">
       <a
         href={`https://wa.me/${phoneNumber.replace(/[^0-9]/g, "")}`}
         target="_blank"
@@ -40,6 +38,6 @@ export function WhatsAppButton({
         </svg>
         <span>{buttonText}</span>
       </a>
-    </div>
+    </section>
   );
-}
+};

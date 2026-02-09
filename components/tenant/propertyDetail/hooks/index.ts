@@ -1,4 +1,4 @@
-export { useProperty } from "./useProperty";
-export { useImages } from "./useImages";
-export { useReservation } from "./useReservation";
-export { useWhatsApp } from "./useWhatsApp";
+export { usePropertyData } from "./usePropertyData";
+export { useImageGallery } from "./useImageGallery";
+export { useContactForm } from "./useContactForm";
+export { useFAQs } from "./useFAQs";

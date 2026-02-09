@@ -1,3 +1,6 @@
+// ═══════════════════════════════════════════════════════════
+// PROPERTY INTERFACE
+// ═══════════════════════════════════════════════════════════
 export interface Property {
   id: string;
   slug?: string;
@@ -27,6 +30,7 @@ export interface Property {
   };
   images?: string[];
   payment_method?: string;
+  payment_method_en?: string;
   pricePerMeter?: string;
   building_age?: number;
   floors?: number;
@@ -44,18 +48,18 @@ export interface Property {
   garden?: number;
   elevator?: number;
   private_parking?: number;
+  annex?: number;
+  rooms?: number;
   length?: string;
   width?: string;
   street_width_north?: string;
   street_width_south?: string;
   street_width_east?: string;
   street_width_west?: string;
-  rooms?: number;
-  annex?: number;
-  size?: string;
   facade_id?: number;
-  property_id?: number;
-  building?: any;
+  facade_name?: string;
+  building?: string | null;
+  size?: string;
   floor_planning_image?: string[];
   video_url?: string;
   virtual_tour?: string;
@@ -66,9 +70,6 @@ export interface Property {
     answer: string;
     displayOnPage: boolean;
   }>;
-  createdAt?: string;
-  created_at?: string;
-  updated_at?: string;
   project?: {
     id: number;
     title: string;
@@ -77,18 +78,64 @@ export interface Property {
   } | null;
 }
 
-export interface propertyDetailProps {
-  propertySlug: string;
+// ═══════════════════════════════════════════════════════════
+// PROPS INTERFACE
+// ═══════════════════════════════════════════════════════════
+export interface propertyDetail2Props {
+  // Component-specific props
+  visible?: boolean;
+  layout?: {
+    maxWidth?: string;
+    padding?: {
+      top?: string;
+      bottom?: string;
+    };
+    gap?: string;
+  };
+  styling?: {
+    backgroundColor?: string;
+    primaryColor?: string;
+    textColor?: string;
+    secondaryTextColor?: string;
+    formBackgroundColor?: string;
+    formTextColor?: string;
+    formButtonBackgroundColor?: string;
+    formButtonTextColor?: string;
+  };
+  content?: {
+    descriptionTitle?: string;
+    specsTitle?: string;
+    contactFormTitle?: string;
+    contactFormDescription?: string;
+    submitButtonText?: string;
+  };
+  displaySettings?: {
+    showDescription?: boolean;
+    showSpecs?: boolean;
+    showContactForm?: boolean;
+    showVideoUrl?: boolean;
+    showMap?: boolean;
+  };
   whatsApp?: {
     showButton?: boolean;
     buttonText?: string;
     phoneNumber?: string;
   };
-  displaySettings?: {
-    showWhatsAppButton?: boolean;
+  hero?: {
+    height?: string;
+    overlayOpacity?: number;
   };
-  content?: {
-    whatsAppButtonText?: string;
-    whatsAppPhoneNumber?: string;
+  gallery?: {
+    showThumbnails?: boolean;
+    thumbnailGridColumns?: number;
+    thumbnailHeight?: string;
   };
+
+  // Required prop for fetching property data
+  propertySlug: string;
+
+  // Editor props
+  variant?: string;
+  useStore?: boolean;
+  id?: string;
 }
