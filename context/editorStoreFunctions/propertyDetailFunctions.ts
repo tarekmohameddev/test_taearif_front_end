@@ -21,7 +21,11 @@ export const getDefaultpropertyDetail2Data = (): ComponentData => ({
   // Styling
   styling: {
     backgroundColor: "#ffffff",
-    primaryColor: "#8b5f46", // Brown color
+    primaryColor: {
+      useDefaultColor: true, // Use branding color from merchant settings
+      globalColorType: "primary", // primary, secondary, or accent
+      // color value is not stored when useDefaultColor = true
+    },
     textColor: "#967152",
     secondaryTextColor: "#6b7280",
     formBackgroundColor: "#8b5f46",

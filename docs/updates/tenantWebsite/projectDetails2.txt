@@ -2,3 +2,8 @@
 Update Type: Enhancement
 ربط خلفية السعر وoverlay صورة الـ hero باللون الأساسي (primaryColor) من WebsiteLayout.branding.colors.primary بدلاً من الألوان الثابتة
 components/tenant/projectDetails/hooks/useProjectData.ts, components/tenant/projectDetails/components/HeroSection.tsx
+
+2025-01-17 16:50:00
+Update Type: Enhancement
+إضافة دعم اختيار لون مخصص في primaryColor من EditorSidebar مع دالة helper getPrimaryColor() للتحقق من useDefaultColor و globalColorType. تحديث البيانات الافتراضية لتكون object مع useDefaultColor: true
+components/tenant/projectDetails/hooks/useProjectData.ts, context/editorStoreFunctions/projectDetailsFunctions.ts

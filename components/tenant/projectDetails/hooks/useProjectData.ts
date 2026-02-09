@@ -128,12 +128,92 @@ export const useProjectData = (props: ProjectDetails2Props) => {
       : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
-  // Get primary color from WebsiteLayout branding (fallback to brown #8b5f46)
-  const primaryColor =
-    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
-    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
-      ? tenantData.WebsiteLayout.branding.colors.primary
-      : "#8b5f46"; // Brown fallback
+  // Get branding colors from WebsiteLayout (fallback to brown #8b5f46)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#8b5f46", // Brown fallback
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#8b5f46", // Fallback to brown
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#8b5f46", // Fallback to brown
+  };
+
+  // Helper function to get primary color based on useDefaultColor and globalColorType
+  const getPrimaryColor = (): string => {
+    // ColorObjectRenderer saves data in this structure:
+    // When useDefaultColor = true:
+    //   - styling.primaryColor.useDefaultColor = true
+    //   - styling.primaryColor.globalColorType = "primary" | "secondary" | "accent"
+    // When useDefaultColor = false:
+    //   - styling.primaryColor = "#hexcolor" (direct string)
+    
+    const colorField = mergedData?.styling?.primaryColor;
+    
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+    
+    // Also check at the path level (ColorObjectRenderer stores them separately)
+    if (useDefaultColorValue === undefined) {
+      useDefaultColorValue = mergedData?.styling?.primaryColor?.useDefaultColor;
+    }
+    if (globalColorTypeValue === undefined) {
+      globalColorTypeValue = mergedData?.styling?.primaryColor?.globalColorType;
+    }
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      const brandingColor = brandingColors[globalColorType] || brandingColors.primary;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, try to get custom color
+    // The color is stored as a string directly at styling.primaryColor
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+    
+    // Final fallback: use primary branding color
+    return brandingColors.primary;
+  };
+
+  // Get primary color using the helper function
+  const primaryColor = getPrimaryColor();
 
   // Get logo image from tenantData
   const { loadingTenantData } = useTenantStore();
