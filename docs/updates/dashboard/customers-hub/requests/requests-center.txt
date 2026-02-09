@@ -22,3 +22,8 @@ components/customers-hub/requests/RequestsCenterPage.tsx, hooks/useCustomersHubR
 Update Type: Feature
 إضافة فلتر افتراضي لعرض فقط الطلبات التي source: "property_request" - إضافة "property_request" إلى نوع CustomerSource - تعيين القيمة الافتراضية لـ selectedSources إلى ["property_request"] - تحديث handleClearFilters لإعادة property_request كقيمة افتراضية - إضافة fallback في بناء الفلاتر لإضافة property_request إذا لم يكن هناك sources محددة
 types/unified-customer.ts, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts
+
+2026-02-09 19:48:01
+Update Type: Enhancement
+تحديث الكود ليتوافق مع التوثيق الجديد للـ API - إضافة objectTypes إلى RequestsListFilters interface - إضافة website و affiliate إلى CustomerSource type - إضافة objectType, propertyCategory, propertyType, city, state, budgetMin, budgetMax إلى CustomerAction interface - إضافة selectedObjectTypes إلى useCustomersHubFiltersState - تحديث useCustomersHubRequests لمعالجة الحقول الجديدة من API response
+lib/services/customers-hub-requests-api.ts, types/unified-customer.ts, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, hooks/useCustomersHubRequests.ts

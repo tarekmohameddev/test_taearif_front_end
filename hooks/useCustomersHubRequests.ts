@@ -53,11 +53,21 @@ export function useCustomersHubRequests() {
             ...action,
             assignedTo: action.assignedTo?.id?.toString() || action.assignedTo?.toString() || action.assignedTo,
             assignedToName: action.assignedTo?.name || action.assignedToName,
-            customerId: action.customerId?.toString() || action.customerId,
+            customerId: action.customerId !== null && action.customerId !== undefined
+              ? (typeof action.customerId === 'number' ? action.customerId : parseInt(action.customerId) || action.customerId)
+              : null,
             // Handle source: if it's an object, extract the id or name, otherwise use as-is
             source: typeof action.source === 'object' && action.source !== null
               ? (action.source.id || action.source.name || action.source)
-              : (action.source || 'manual'),
+              : (action.source || ''),
+            // Pass new fields from API response
+            objectType: action.objectType || undefined,
+            propertyCategory: action.propertyCategory || null,
+            propertyType: action.propertyType || null,
+            city: action.city || null,
+            state: action.state || null,
+            budgetMin: action.budgetMin !== undefined && action.budgetMin !== null ? Number(action.budgetMin) : null,
+            budgetMax: action.budgetMax !== undefined && action.budgetMax !== null ? Number(action.budgetMax) : null,
             // Pass sourceId, sourceTable, stage_id, and stage from API response
             sourceId: action.sourceId !== undefined && action.sourceId !== null 
               ? (typeof action.sourceId === 'string' ? parseInt(action.sourceId) || action.sourceId : action.sourceId)

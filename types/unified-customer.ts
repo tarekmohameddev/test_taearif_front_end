@@ -7,7 +7,9 @@ export type CustomerSource =
   | 'whatsapp'        // From WhatsApp conversation
   | 'import'          // Bulk import
   | 'referral'        // Customer referral
-  | 'property_request'; // From property request form
+  | 'property_request' // From property request form
+  | 'website'         // From website
+  | 'affiliate';      // From affiliate
 
 export type CustomerActionType = 
   | 'new_inquiry'        // New customer interested in property
@@ -22,25 +24,28 @@ export type CustomerActionType =
 
 export type CustomerActionStatus = 'pending' | 'in_progress' | 'completed' | 'dismissed' | 'snoozed';
 
+export type ObjectType = "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder";
+
 export interface CustomerAction {
   id: string;
-  customerId: string;
+  customerId: string | number | null; // Can be number or null per API docs
   customerName: string;
-  customerPhone?: string;
+  customerPhone?: string | null;
   customerEmail?: string;
   type: CustomerActionType;
   title: string;
-  description?: string;
+  description?: string | null;
   priority: Priority;
   status: CustomerActionStatus;
-  source: CustomerSource;
-  dueDate?: string;
-  snoozedUntil?: string;
-  assignedTo?: string;
+  source: CustomerSource | string; // Can be string (empty string when not set per API docs)
+  objectType?: ObjectType; // New field: Kind of record (inquiry, property_request, reminder, appointment, customer_reminder)
+  dueDate?: string | null; // ISO 8601 datetime
+  snoozedUntil?: string | null; // ISO 8601 datetime
+  assignedTo?: string | null; // Employee ID
   assignedToName?: string;
-  createdAt: string;
-  completedAt?: string;
-  completedBy?: string;
+  createdAt: string; // ISO 8601 datetime
+  completedAt?: string | null; // ISO 8601 datetime
+  completedBy?: string | null | any; // mixed type per API docs
   metadata?: Record<string, any>;
   // Backend API fields - sourceId is the actual request ID used for pipeline operations
   sourceId?: number | string; // The actual request ID from source table (e.g., property_request.id, inquiry.id, reminder.id)
@@ -53,6 +58,13 @@ export interface CustomerAction {
     color: string;
     order: number;
   } | null; // Stage object with details
+  // New fields from API documentation
+  propertyCategory?: string | null; // Unit type: villa, apartment, building, etc. (inquiries and property requests; null for follow-ups/appointments)
+  propertyType?: string | null; // Sector: Residential, Commercial, Industrial, Agricultural (only set for property requests; null for inquiries)
+  city?: string | null; // City (request-level). Inquiries and property requests; null for reminders/appointments/customer reminders
+  state?: string | null; // State/region (request-level). Inquiries: region_name; property requests: region; null for others
+  budgetMin?: number | null; // Min budget (request-level). Single budget or range min
+  budgetMax?: number | null; // Max budget (request-level). Single budget or range max; null when not applicable
 }
 
 // CustomerLifecycleStage is now a string type to support dynamic stages from API

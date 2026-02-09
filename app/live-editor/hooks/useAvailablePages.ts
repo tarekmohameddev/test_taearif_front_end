@@ -188,5 +188,5 @@ export function useAvailablePages(
     return pages;
   }, [tenantData, recentlyAddedPages, editorWebsiteLayout, locale]);
 
-  return availablePages;
+  return { availablePages };
 }

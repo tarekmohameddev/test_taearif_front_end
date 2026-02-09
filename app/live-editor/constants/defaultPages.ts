@@ -1,4 +1,7 @@
-import { PageSeoData } from "../types/types";
+/**
+ * الصفحات الافتراضية مع بيانات SEO الخاصة بها
+ * Default pages with their SEO data
+ */
 
 export interface DefaultPage {
   path: string;
@@ -23,9 +26,9 @@ export interface DefaultPage {
   "og:locale": string;
   "og:locale:alternate": string;
   "og:site_name": string;
-  "og:image:width": string | null;
-  "og:image:height": string | null;
-  "og:image:type": string | null;
+  "og:image:width": null;
+  "og:image:height": null;
+  "og:image:type": null;
   "og:image:alt": string;
 }
 

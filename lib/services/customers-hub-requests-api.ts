@@ -4,17 +4,20 @@ import type { CustomerAction, CustomerActionType, CustomerSource, Priority } fro
 const BASE_URL = "/v2/customers-hub/requests";
 
 // Flat structure matching new API format
+export type ObjectType = "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder";
+
 export interface RequestsListFilters {
   tab?: "inbox" | "followups" | "all" | "completed";
   types?: CustomerActionType[]; // Changed from "type" to "types"
   statuses?: ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[]; // Changed from "status" to "statuses"
   sources?: CustomerSource[]; // Changed from "source" to "sources"
+  objectTypes?: ObjectType[]; // New field: Kind of record (inquiry, property_request, reminder, appointment, customer_reminder)
   priorities?: Priority[]; // Changed from "priority" to "priorities"
   assignees?: number[]; // Changed from "assignedTo" (string[]) to "assignees" (number[])
   due_date_bucket?: "overdue" | "today" | "week" | "no_date"; // Changed from "dueDate" to "due_date_bucket"
   customer_id?: number;
-  property_categories?: string[]; // Changed from "propertyType" to "property_categories"
-  property_types?: string[]; // New field
+  property_categories?: string[]; // Unit type: villa, apartment, building, etc. (applied to both inquiries and property requests)
+  property_types?: string[]; // Sector: Residential, Commercial, Industrial, Agricultural (property requests only)
   cities?: string[]; // Changed from "city" to "cities"
   states?: string[]; // Changed from "state" to "states"
   budget_min?: number; // Changed from "budgetMin" to "budget_min"

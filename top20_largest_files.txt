@@ -1,52 +1,106 @@
 Top 20 Largest Files in Project:
-s
-4. lib/i18n/locales/ar.json
-   Size: 185856 bytes (181.50 KB / 0.18 MB)
 
-5. componentsStructure/translationHelper.ts
-   Size: 163082 bytes (159.26 KB / 0.16 MB)
-
-6. app/live-editor/layout.tsx
+1. app/live-editor/layout.tsx
    Size: 147829 bytes (144.36 KB / 0.14 MB)
 
-7. context/editorStore.ts
-   Size: 145385 bytes (141.98 KB / 0.14 MB)
+2. components/tenant/propertyDetail/propertyDetail2.tsx
+   Size: 101157 bytes (98.79 KB / 0.10 MB)
 
-8. lib/i18n/locales/en.json
-   Size: 143723 bytes (140.35 KB / 0.14 MB)
-
-9. lib/i18n/locales/ar.json.backup
-   Size: 141642 bytes (138.32 KB / 0.14 MB)
-
-10. lib/defaultData.json
-   Size: 134143 bytes (131.00 KB / 0.13 MB)
-
-11. lib/themes/theme1Data.json
-   Size: 121373 bytes (118.53 KB / 0.12 MB)
-
-12. lib/oldDefaultData.json
-   Size: 110980 bytes (108.38 KB / 0.11 MB)
-
-13. lib/themes/theme2Data.json
-   Size: 105995 bytes (103.51 KB / 0.10 MB)
-
-14. app/dashboard/access-control/page.tsx
+3. app/dashboard/access-control/page.tsx
    Size: 100690 bytes (98.33 KB / 0.10 MB)
 
-15. componentsStructure/whyChooseUs.ts
+4. componentsStructure/whyChooseUs.ts
    Size: 98132 bytes (95.83 KB / 0.09 MB)
 
-16. components/tenant/propertyDetail/propertyDetail2.tsx
-   Size: 98045 bytes (95.75 KB / 0.09 MB)
-
-17. docs/backend-integration.zip
+5. docs/backend-integration.zip
    Size: 88462 bytes (86.39 KB / 0.08 MB)
 
-18. app/dashboard/crm/[id]/edit/page.tsx
+6. app/dashboard/crm/[id]/edit/page.tsx
    Size: 87010 bytes (84.97 KB / 0.08 MB)
 
-19. componentsStructure/halfTextHalfImage.ts
+7. componentsStructure/halfTextHalfImage.ts
    Size: 82387 bytes (80.46 KB / 0.08 MB)
 
-20. lib/mock/customers-hub-data.ts
+8. lib/mock/customers-hub-data.ts
    Size: 80529 bytes (78.64 KB / 0.08 MB)
+
+9. componentsStructure/sideBySide.ts
+   Size: 80188 bytes (78.31 KB / 0.08 MB)
+
+10. app/dashboard/rental-management/[id]/page.tsx
+   Size: 79444 bytes (77.58 KB / 0.08 MB)
+
+11. components/project-detail.tsx
+   Size: 79431 bytes (77.57 KB / 0.08 MB)
+
+12. components/reports/platform-reports-page.tsx
+   Size: 78147 bytes (76.32 KB / 0.07 MB)
+
+13. components/rental-management/rental-details-dialog.tsx
+   Size: 77748 bytes (75.93 KB / 0.07 MB)
+
+14. components/property-reservations-page.tsx
+   Size: 76115 bytes (74.33 KB / 0.07 MB)
+
+15. components/purchase-management/services/purchase-flow-service.tsx
+   Size: 74633 bytes (72.88 KB / 0.07 MB)
+
+16. components/tenant/inputs/inputs2.tsx
+   Size: 73733 bytes (72.00 KB / 0.07 MB)
+
+17. components/customers-hub/requests/RequestsCenterPage.tsx
+   Size: 70219 bytes (68.57 KB / 0.07 MB)
+
+18. docs/backend/hbd/CUSTOMERS_HUB_API.md
+   Size: 67627 bytes (66.04 KB / 0.06 MB)
+
+19. components/property/incomplete-properties-management-page.tsx
+   Size: 66984 bytes (65.41 KB / 0.06 MB)
+
+20. components/tenant/inputs/inputs1.tsx
+   Size: 64504 bytes (62.99 KB / 0.06 MB)
+
+21. components/crm/new-deal-form.tsx
+   Size: 64246 bytes (62.74 KB / 0.06 MB)
+
+22. components/rental-management/payment-collection-dialog.tsx
+   Size: 63469 bytes (61.98 KB / 0.06 MB)
+
+23. components/project/edit-project-page.tsx
+   Size: 62157 bytes (60.70 KB / 0.06 MB)
+
+24. docs/important/prompts/components/ADD_NEW_COMPONENT.md
+   Size: 59683 bytes (58.28 KB / 0.06 MB)
+
+25. components/settings-page.tsx
+   Size: 59505 bytes (58.11 KB / 0.06 MB)
+
+26. docs/backend/hbd/Default_Data_12-10-2025.json
+   Size: 58793 bytes (57.42 KB / 0.06 MB)
+
+27. components/crm/deal-details-page.tsx
+   Size: 58158 bytes (56.79 KB / 0.06 MB)
+
+28. components/rental-management/services/rental-maintenance-service.tsx
+   Size: 57821 bytes (56.47 KB / 0.06 MB)
+
+29. docs/important/liveEditor/context/EDITOR_STORE_FUNCTIONS.md
+   Size: 57290 bytes (55.95 KB / 0.05 MB)
+
+30. components/rental-management/services/updated-rental-form.tsx
+   Size: 57035 bytes (55.70 KB / 0.05 MB)
+
+31. components/project/add-project-page.tsx
+   Size: 56720 bytes (55.39 KB / 0.05 MB)
+
+32. app/dashboard/access-control/roles/page.tsx
+   Size: 56453 bytes (55.13 KB / 0.05 MB)
+
+33. components/rental-management/dashboard-stats/index.tsx
+   Size: 54966 bytes (53.68 KB / 0.05 MB)
+
+34. docs/important/prompts/components/FIX_COMPONENT_PROMPT.md
+   Size: 54897 bytes (53.61 KB / 0.05 MB)
+
+35. docs/backend/hbd/docOfV1RmsDashboardResponse.json
+   Size: 54220 bytes (52.95 KB / 0.05 MB)

@@ -9,6 +9,18 @@ import path from "path";
     "!**/fonts/**",
     "!**/public/**",
     "!**/*.{jpg,jpeg,png,gif,webp,svg,ico,mp4}",
+    // Skip files from top20_largest_files.txt (lines 3-16 and 21-37)
+    "!package-lock.json",
+    "!yarn.lock",
+    "!pnpm-lock.yaml",
+    "!lib/i18n/locales/ar.json",
+    "!componentsStructure/translationHelper.ts",
+    "!lib/i18n/locales/en.json",
+    "!lib/i18n/locales/ar.json.backup",
+    "!lib/defaultData.json",
+    "!lib/themes/theme1Data.json",
+    "!lib/oldDefaultData.json",
+    "!lib/themes/theme2Data.json",
   ], {
     onlyFiles: true,
     stats: false,
@@ -33,7 +45,7 @@ import path from "path";
   // Sort by size (largest first) and take top 20
   const top20LargestFiles = filesWithSizes
     .sort((a, b) => b.size - a.size)
-    .slice(0, 20);
+    .slice(0, 35);
 
   // Format the output
   const output = top20LargestFiles

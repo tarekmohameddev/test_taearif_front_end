@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import type { CustomerSource, Priority, CustomerActionType } from "@/types/unified-customer";
+import type { CustomerSource, Priority, CustomerActionType, ObjectType } from "@/types/unified-customer";
 
 const REQUEST_TYPES: CustomerActionType[] = ["new_inquiry", "callback_request", "whatsapp_incoming"];
 const FOLLOWUP_TYPES: CustomerActionType[] = ["follow_up", "site_visit"];
@@ -11,6 +11,7 @@ export const useCustomersHubFiltersState = () => {
   const [activeTab, setActiveTab] = useState<"inbox" | "followups" | "all" | "completed">("all");
   // Default to property_request source only
   const [selectedSources, setSelectedSources] = useState<CustomerSource[]>(["property_request"]);
+  const [selectedObjectTypes, setSelectedObjectTypes] = useState<ObjectType[]>([]); // New field: Kind of record
   const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<CustomerActionType[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
@@ -95,6 +96,11 @@ export const useCustomersHubFiltersState = () => {
       filters.sources = ["property_request"];
     }
 
+    // ObjectTypes filter (new field: Kind of record)
+    if (selectedObjectTypes.length > 0) {
+      filters.objectTypes = selectedObjectTypes;
+    }
+
     // Priorities filter (changed from priority to priorities)
     if (selectedPriorities.length > 0) {
       filters.priorities = selectedPriorities;
@@ -157,6 +163,7 @@ export const useCustomersHubFiltersState = () => {
     activeTab,
     appliedSearchQuery,
     selectedSources,
+    selectedObjectTypes,
     selectedPriorities,
     selectedTypes,
     selectedAssignees,
@@ -174,6 +181,7 @@ export const useCustomersHubFiltersState = () => {
     setAppliedSearchQuery("");
     setActiveTab("all");
     setSelectedSources(["property_request"]); // Reset to property_request default
+    setSelectedObjectTypes([]);
     setSelectedPriorities([]);
     setSelectedTypes([]);
     setSelectedAssignees([]);
@@ -197,6 +205,8 @@ export const useCustomersHubFiltersState = () => {
     setActiveTab,
     selectedSources,
     setSelectedSources,
+    selectedObjectTypes,
+    setSelectedObjectTypes,
     selectedPriorities,
     setSelectedPriorities,
     selectedTypes,
