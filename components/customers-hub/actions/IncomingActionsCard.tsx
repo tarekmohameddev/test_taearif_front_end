@@ -254,9 +254,12 @@ export function IncomingActionsCard({
     // Otherwise fallback to storeStages from Zustand store
     const stagesToUse = (propStages && propStages.length > 0) ? propStages : storeStages;
     if (!stagesToUse || stagesToUse.length === 0) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:257',message:'availableStages empty - no stages loaded',data:{actionId:action.id,propStagesLength:propStages?.length,storeStagesLength:storeStages?.length},timestamp:Date.now(),runId:'debug1',hypothesisId:'H4'})}).catch(()=>{});
+      // #endregion
       return [];
     }
-    return stagesToUse.map((stage: any) => {
+    const mapped = stagesToUse.map((stage: any) => {
       // propStages may not have 'id', only stage_id, so we need to handle both cases
       // storeStages has both id (number) and stage_id (string)
       const numericId = stage.id !== undefined ? stage.id : null;
@@ -269,45 +272,105 @@ export function IncomingActionsCard({
         order: stage.order,
       };
     });
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:272',message:'availableStages mapped',data:{actionId:action.id,availableStagesCount:mapped.length,availableStagesIds:mapped.map(s=>s.id),availableStagesSample:mapped.slice(0,3).map(s=>({id:s.id,numericId:s.numericId,nameAr:s.nameAr}))},timestamp:Date.now(),runId:'debug1',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
+    // #endregion
+    return mapped;
   }, [propStages, storeStages]);
 
   // Get stage from multiple sources: action.stage_id, action.stage, or resolvedCustomer.stage
   const stageSource = React.useMemo(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:275',message:'stageSource - checking action data',data:{actionId:action.id,actionStageId:(action as any).stage_id,actionStageIdType:typeof (action as any).stage_id,actionStage:(action as any).stage,actionStageType:typeof (action as any).stage,resolvedCustomerStage:resolvedCustomer?.stage},timestamp:Date.now(),runId:'debug1',hypothesisId:'H1,H2,H3'})}).catch(()=>{});
+    // #endregion
     // Priority 1: action.stage_id (string)
     if ((action as any).stage_id) {
-      return (action as any).stage_id;
+      const result = (action as any).stage_id;
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:278',message:'stageSource - using action.stage_id',data:{actionId:action.id,stageSource:result,stageSourceType:typeof result},timestamp:Date.now(),runId:'debug1',hypothesisId:'H1'})}).catch(()=>{});
+      // #endregion
+      return result;
     }
     // Priority 2: action.stage object (extract stage_id)
     if ((action as any).stage && typeof (action as any).stage === 'object') {
-      return (action as any).stage.stage_id || (action as any).stage.id || (action as any).stage.name;
+      const stageObj = (action as any).stage;
+      const result = stageObj.stage_id || stageObj.id || stageObj.name;
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:282',message:'stageSource - using action.stage object',data:{actionId:action.id,stageObj,extracted:result,extractedType:typeof result,hasStageId:!!stageObj.stage_id,hasId:!!stageObj.id,hasName:!!stageObj.name},timestamp:Date.now(),runId:'debug1',hypothesisId:'H2,H3'})}).catch(()=>{});
+      // #endregion
+      return result;
     }
     // Priority 3: resolvedCustomer.stage
     if (resolvedCustomer?.stage) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:286',message:'stageSource - using resolvedCustomer.stage',data:{actionId:action.id,resolvedCustomerStage:resolvedCustomer.stage},timestamp:Date.now(),runId:'debug1',hypothesisId:'H3'})}).catch(()=>{});
+      // #endregion
       return resolvedCustomer.stage;
     }
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:288',message:'stageSource - returning null',data:{actionId:action.id},timestamp:Date.now(),runId:'debug1',hypothesisId:'H4'})}).catch(()=>{});
+    // #endregion
     return null;
   }, [action, resolvedCustomer?.stage]);
 
   // Normalize stage using availableStages from API, with fallback to LIFECYCLE_STAGES
   const normalizedStage = React.useMemo(() => {
-    if (!stageSource) return 'new_lead' as CustomerLifecycleStage;
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:293',message:'normalizedStage - start',data:{actionId:action.id,stageSource,stageSourceType:typeof stageSource,availableStagesLength:availableStages.length},timestamp:Date.now(),runId:'debug1',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
+    // #endregion
+    if (!stageSource) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:293',message:'normalizedStage - stageSource is null, returning new_lead',data:{actionId:action.id},timestamp:Date.now(),runId:'debug1',hypothesisId:'H4'})}).catch(()=>{});
+      // #endregion
+      return 'new_lead' as CustomerLifecycleStage;
+    }
     
-    // stageSource can be string or extracted from object
+    // Validate against availableStages if loaded
+    if (availableStages.length > 0) {
+      // If stageSource is a number, search by numericId first (action.stage_id is numeric from API)
+      // If stageSource is a string, search by stage_id (string slug)
+      let validStage;
+      if (typeof stageSource === 'number') {
+        // Search by numericId when stageSource is a number
+        validStage = availableStages.find(s => s.numericId === stageSource);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:303',message:'normalizedStage - searching by numericId',data:{actionId:action.id,stageSource,found:!!validStage,validStageId:validStage?.id,validStageNameAr:validStage?.nameAr,allAvailableNumericIds:availableStages.map(s=>s.numericId)},timestamp:Date.now(),runId:'post-fix',hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
+      } else {
+        // stageSource is string or object - extract string stage_id
+        const stageId = typeof stageSource === "string" 
+          ? stageSource 
+          : (typeof stageSource === "object" && stageSource !== null
+              ? ((stageSource as any).stage_id || (stageSource as any).id?.toString() || (stageSource as any).name || String(stageSource))
+              : String(stageSource));
+        validStage = availableStages.find(s => s.id === stageId);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:310',message:'normalizedStage - searching by stage_id string',data:{actionId:action.id,stageId,found:!!validStage,validStageId:validStage?.id,validStageNameAr:validStage?.nameAr,allAvailableIds:availableStages.map(s=>s.id)},timestamp:Date.now(),runId:'post-fix',hypothesisId:'H2,H3'})}).catch(()=>{});
+        // #endregion
+      }
+      
+      const result = (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:315',message:'normalizedStage - result from availableStages',data:{actionId:action.id,normalizedStage:result},timestamp:Date.now(),runId:'post-fix',hypothesisId:'H1,H2,H3,H5'})}).catch(()=>{});
+      // #endregion
+      return result;
+    }
+    
+    // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
     const stageId = typeof stageSource === "string" 
       ? stageSource 
       : (typeof stageSource === "object" && stageSource !== null
           ? ((stageSource as any).stage_id || (stageSource as any).id || (stageSource as any).name || String(stageSource))
           : String(stageSource));
-    
-    // Validate against availableStages if loaded
-    if (availableStages.length > 0) {
-      const validStage = availableStages.find(s => s.id === stageId);
-      return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
-    }
-    
-    // Fallback to LIFECYCLE_STAGES if API stages not loaded yet
     const validStage = LIFECYCLE_STAGES.find(s => s.id === stageId);
-    return (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:323',message:'normalizedStage - fallback to LIFECYCLE_STAGES',data:{actionId:action.id,stageId,found:!!validStage,validStageId:validStage?.id,validStageNameAr:validStage?.nameAr},timestamp:Date.now(),runId:'post-fix',hypothesisId:'H4'})}).catch(()=>{});
+    // #endregion
+    const result = (validStage ? validStage.id : 'new_lead') as CustomerLifecycleStage;
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:325',message:'normalizedStage - final result',data:{actionId:action.id,normalizedStage:result},timestamp:Date.now(),runId:'post-fix',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
+    // #endregion
+    return result;
   }, [stageSource, availableStages]);
 
   // Get numeric stage ID from customer.stage if it's an object
