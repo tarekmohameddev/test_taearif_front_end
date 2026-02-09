@@ -87,6 +87,46 @@ function getPropertyFromMetadata(metadata: Record<string, unknown> | undefined):
   }
 }
 
+/** Extract property data directly from action object (property requests) */
+function getPropertyFromAction(action: CustomerAction): PropertyBlock | null {
+  // Check if this is a property request
+  if (action.objectType !== 'property_request') return null;
+  
+  const hasData = 
+    action.propertyType || 
+    action.propertyCategory || 
+    action.city || 
+    action.state || 
+    action.budgetMin != null || 
+    action.budgetMax != null;
+  
+  if (!hasData) return null;
+  
+  // Format budget
+  let priceRange: string | undefined;
+  if (action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax) {
+    priceRange = `${(action.budgetMin / 1_000_000).toFixed(1)}–${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`;
+  } else if (action.budgetMin != null) {
+    priceRange = `${(action.budgetMin / 1_000_000).toFixed(1)} م.ر`;
+  } else if (action.budgetMax != null) {
+    priceRange = `${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`;
+  }
+  
+  // Format location
+  const locationParts: string[] = [];
+  if (action.city) locationParts.push(action.city);
+  if (action.state && action.state !== action.city) locationParts.push(action.state);
+  const location = locationParts.length > 0 ? locationParts.join("، ") : undefined;
+  
+  return {
+    title: priceRange,
+    type: action.propertyType || undefined,
+    price: action.budgetMin ?? action.budgetMax ?? undefined,
+    location,
+    fromPreferences: false,
+  };
+}
+
 /** Build minimal property/request summary from customer preferences when no metadata property */
 function getPropertyFromPreferences(customer: UnifiedCustomer | undefined): PropertyBlock | null {
   if (!customer?.preferences) return null;
@@ -386,10 +426,11 @@ export function IncomingActionsCard({
     return null;
   };
 
+  const propertyFromAction = getPropertyFromAction(action);
   const propertyFromMeta = getPropertyFromMetadata(action.metadata);
   const propertyFromPrefs = getPropertyFromPreferences(customer);
-  /** Prefer specific property from metadata; fallback to request summary from customer preferences */
-  const property = propertyFromMeta ?? propertyFromPrefs;
+  /** Priority: action data > metadata > customer preferences */
+  const property = propertyFromAction ?? propertyFromMeta ?? propertyFromPrefs;
   const showPropertyBlock = property && (property.title || property.type || property.price != null || property.location);
   const aiMatching = getAIMatchingStatus(resolvedCustomer);
 
@@ -753,24 +794,38 @@ export function IncomingActionsCard({
               </div>
             )}
           </div>
-          {showPropertyBlock && (
+          {/* Property request details in compact view */}
+          {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null))) && (
             <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
-              {property?.title && (
+              {/* Budget */}
+              {(action.budgetMin != null || action.budgetMax != null) && (
                 <span className="flex items-center gap-1 truncate max-w-[100px]">
                   <DollarSign className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                  <span className="truncate">{property.title}</span>
+                  <span className="truncate">
+                    {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
+                      ? `${(action.budgetMin / 1_000_000).toFixed(1)}–${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                      : action.budgetMin != null
+                        ? `${(action.budgetMin / 1_000_000).toFixed(1)} م.ر`
+                        : action.budgetMax != null
+                          ? `${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                          : ''}
+                  </span>
                 </span>
               )}
-              {property?.type && (
+              {/* Property Type */}
+              {action.propertyType && (
                 <span className="flex items-center gap-1">
                   <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                  {property.type}
+                  {action.propertyType}
                 </span>
               )}
-              {property?.location && (
+              {/* Location */}
+              {(action.city || action.state) && (
                 <span className="flex items-center gap-1 truncate max-w-[90px]">
                   <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                  <span className="truncate">{property.location}</span>
+                  <span className="truncate">
+                    {[action.city, action.state].filter(Boolean).join("، ")}
+                  </span>
                 </span>
               )}
             </div>
@@ -900,37 +955,50 @@ export function IncomingActionsCard({
                 )}
               </a>
             )}
-            {/* Minimal property data: icon-first, simple layout */}
-            {showPropertyBlock && property && (
+            {/* Property request details - show all available data */}
+            {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) ? (
               <div className="mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-700 dark:text-gray-300">
-                  {property.title && (
-                    <span className="flex items-center gap-1.5 min-w-0">
+                  {/* Budget */}
+                  {(action.budgetMin != null || action.budgetMax != null) && (
+                    <span className="flex items-center gap-1.5">
                       <DollarSign className="h-4 w-4 shrink-0 text-gray-500" />
-                      <span className="truncate">{property.title}</span>
+                      <span>
+                        {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
+                          ? `${(action.budgetMin / 1_000_000).toFixed(1)}–${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                          : action.budgetMin != null
+                            ? `${(action.budgetMin / 1_000_000).toFixed(1)} م.ر`
+                            : action.budgetMax != null
+                              ? `${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                              : ''}
+                      </span>
                     </span>
                   )}
-                  {property.type && (
+                  {/* Property Type */}
+                  {action.propertyType && (
                     <span className="flex items-center gap-1.5">
                       <Building2 className="h-4 w-4 shrink-0 text-gray-500" />
-                      <span>{property.type}</span>
+                      <span>{action.propertyType}</span>
                     </span>
                   )}
-                  {property.price != null && property.price > 0 && !property.fromPreferences && (
-                    <span className="flex items-center gap-1.5">
-                      <DollarSign className="h-4 w-4 shrink-0 text-gray-500" />
-                      {property.price.toLocaleString("ar-SA")} ر.س
-                    </span>
-                  )}
-                  {property.location && (
+                  {/* Location */}
+                  {(action.city || action.state) && (
                     <span className="flex items-center gap-1.5 min-w-0 max-w-[220px]">
                       <MapPin className="h-4 w-4 shrink-0 text-gray-500" />
-                      <span className="truncate">{property.location}</span>
+                      <span className="truncate">
+                        {[action.city, action.state].filter(Boolean).join("، ")}
+                      </span>
+                    </span>
+                  )}
+                  {/* Property Category (if available and different from type) */}
+                  {action.propertyCategory && action.propertyCategory !== action.propertyType && (
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <span>الفئة: {action.propertyCategory}</span>
                     </span>
                   )}
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </CardHeader>
