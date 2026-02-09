@@ -726,15 +726,12 @@ export default function propertyDetail2(props: propertyDetail2Props) {
         ].filter((img) => img && img.trim() !== "")
       : []; // Filter out empty images
 
-  // Get primary color from tenantData or mergedData
-  const primaryColorFromTenant =
+  // Get primary color from WebsiteLayout branding (fallback to brown #8b5f46)
+  const primaryColor =
     tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
-      : "#8b5f46";
-
-  const primaryColor =
-    mergedData.styling?.primaryColor || primaryColorFromTenant;
+      : "#8b5f46"; // Brown fallback
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
@@ -844,7 +841,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
         <div
           className="absolute inset-0"
           style={{
-            backgroundColor: "#361c16",
+            backgroundColor: primaryColor,
             opacity: 0.8,
           }}
         />
