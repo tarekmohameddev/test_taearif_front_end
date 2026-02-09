@@ -106,29 +106,24 @@ function getPropertyFromAction(action: CustomerAction): PropertyBlock | null {
   
   const hasData = 
     action.propertyType || 
-    action.propertyCategory || 
     action.city || 
-    action.state || 
     action.budgetMin != null || 
     action.budgetMax != null;
   
   if (!hasData) return null;
   
-  // Format budget
+  // Format budget (display numbers as-is without conversion to millions)
   let priceRange: string | undefined;
   if (action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax) {
-    priceRange = `${(action.budgetMin / 1_000_000).toFixed(1)}–${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`;
+    priceRange = `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`;
   } else if (action.budgetMin != null) {
-    priceRange = `${(action.budgetMin / 1_000_000).toFixed(1)} م.ر`;
+    priceRange = `${action.budgetMin.toLocaleString("ar-SA")} ر.س`;
   } else if (action.budgetMax != null) {
-    priceRange = `${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`;
+    priceRange = `${action.budgetMax.toLocaleString("ar-SA")} ر.س`;
   }
   
-  // Format location
-  const locationParts: string[] = [];
-  if (action.city) locationParts.push(action.city);
-  if (action.state && action.state !== action.city) locationParts.push(action.state);
-  const location = locationParts.length > 0 ? locationParts.join("، ") : undefined;
+  // Format location (city only, no state)
+  const location = action.city || undefined;
   
   return {
     title: priceRange,
@@ -705,6 +700,12 @@ export function IncomingActionsCard({
             >
               {priorityLabels[action.priority]}
             </Badge>
+            {action.assignedToName && (
+              <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+                <User className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate max-w-[100px]">{action.assignedToName}</span>
+              </div>
+            )}
             {isOverdue && (
               <Badge variant="destructive" className="text-xs">
                 متأخر
@@ -811,15 +812,15 @@ export function IncomingActionsCard({
             <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
               {/* Budget */}
               {(action.budgetMin != null || action.budgetMax != null) && (
-                <span className="flex items-center gap-1 truncate max-w-[100px]">
+                <span className="flex items-center gap-1 truncate max-w-[150px]">
                   <DollarSign className="h-3.5 w-3.5 shrink-0 text-gray-500" />
                   <span className="truncate">
                     {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                      ? `${(action.budgetMin / 1_000_000).toFixed(1)}–${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                      ? `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`
                       : action.budgetMin != null
-                        ? `${(action.budgetMin / 1_000_000).toFixed(1)} م.ر`
+                        ? `${action.budgetMin.toLocaleString("ar-SA")} ر.س`
                         : action.budgetMax != null
-                          ? `${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                          ? `${action.budgetMax.toLocaleString("ar-SA")} ر.س`
                           : ''}
                   </span>
                 </span>
@@ -832,12 +833,19 @@ export function IncomingActionsCard({
                 </span>
               )}
               {/* Location */}
-              {(action.city || action.state) && (
+              {action.city && (
                 <span className="flex items-center gap-1 truncate max-w-[90px]">
                   <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-500" />
                   <span className="truncate">
-                    {[action.city, action.state].filter(Boolean).join("، ")}
+                    {action.city}
                   </span>
+                </span>
+              )}
+              {/* Seriousness */}
+              {action.metadata?.seriousness && (
+                <span className="flex items-center gap-1 text-xs">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                  <span className="truncate">الجدية: {action.metadata.seriousness}</span>
                 </span>
               )}
             </div>
@@ -977,11 +985,11 @@ export function IncomingActionsCard({
                       <DollarSign className="h-4 w-4 shrink-0 text-gray-500" />
                       <span>
                         {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                          ? `${(action.budgetMin / 1_000_000).toFixed(1)}–${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                          ? `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`
                           : action.budgetMin != null
-                            ? `${(action.budgetMin / 1_000_000).toFixed(1)} م.ر`
+                            ? `${action.budgetMin.toLocaleString("ar-SA")} ر.س`
                             : action.budgetMax != null
-                              ? `${(action.budgetMax / 1_000_000).toFixed(1)} م.ر`
+                              ? `${action.budgetMax.toLocaleString("ar-SA")} ر.س`
                               : ''}
                       </span>
                     </span>
@@ -994,18 +1002,19 @@ export function IncomingActionsCard({
                     </span>
                   )}
                   {/* Location */}
-                  {(action.city || action.state) && (
+                  {action.city && (
                     <span className="flex items-center gap-1.5 min-w-0 max-w-[220px]">
                       <MapPin className="h-4 w-4 shrink-0 text-gray-500" />
                       <span className="truncate">
-                        {[action.city, action.state].filter(Boolean).join("، ")}
+                        {action.city}
                       </span>
                     </span>
                   )}
-                  {/* Property Category (if available and different from type) */}
-                  {action.propertyCategory && action.propertyCategory !== action.propertyType && (
-                    <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                      <span>الفئة: {action.propertyCategory}</span>
+                  {/* Seriousness */}
+                  {action.metadata?.seriousness && (
+                    <span className="flex items-center gap-1.5">
+                      <AlertTriangle className="h-4 w-4 shrink-0 text-gray-500" />
+                      <span>الجدية: {action.metadata.seriousness}</span>
                     </span>
                   )}
                 </div>
