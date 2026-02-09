@@ -356,7 +356,18 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
             marginRight: sidebarOpen ? sidebarWidth : 0,
             marginLeft: isComponentsSidebarOpen ? (isTabsContentOpen ? 350 : 52) : 0,
           }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          transition={{
+            marginRight: {
+              type: "spring",
+              damping: 25,
+              stiffness: 200,
+              duration: 0.3,
+            },
+            marginLeft: {
+              duration: 0.3,
+              ease: "easeInOut",
+            },
+          }}
         >
           {/* Header */}
           <LiveEditorHeader

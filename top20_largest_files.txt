@@ -1,0 +1,52 @@
+Top 20 Largest Files in Project:
+s
+4. lib/i18n/locales/ar.json
+   Size: 185856 bytes (181.50 KB / 0.18 MB)
+
+5. componentsStructure/translationHelper.ts
+   Size: 163082 bytes (159.26 KB / 0.16 MB)
+
+6. app/live-editor/layout.tsx
+   Size: 147829 bytes (144.36 KB / 0.14 MB)
+
+7. context/editorStore.ts
+   Size: 145385 bytes (141.98 KB / 0.14 MB)
+
+8. lib/i18n/locales/en.json
+   Size: 143723 bytes (140.35 KB / 0.14 MB)
+
+9. lib/i18n/locales/ar.json.backup
+   Size: 141642 bytes (138.32 KB / 0.14 MB)
+
+10. lib/defaultData.json
+   Size: 134143 bytes (131.00 KB / 0.13 MB)
+
+11. lib/themes/theme1Data.json
+   Size: 121373 bytes (118.53 KB / 0.12 MB)
+
+12. lib/oldDefaultData.json
+   Size: 110980 bytes (108.38 KB / 0.11 MB)
+
+13. lib/themes/theme2Data.json
+   Size: 105995 bytes (103.51 KB / 0.10 MB)
+
+14. app/dashboard/access-control/page.tsx
+   Size: 100690 bytes (98.33 KB / 0.10 MB)
+
+15. componentsStructure/whyChooseUs.ts
+   Size: 98132 bytes (95.83 KB / 0.09 MB)
+
+16. components/tenant/propertyDetail/propertyDetail2.tsx
+   Size: 98045 bytes (95.75 KB / 0.09 MB)
+
+17. docs/backend-integration.zip
+   Size: 88462 bytes (86.39 KB / 0.08 MB)
+
+18. app/dashboard/crm/[id]/edit/page.tsx
+   Size: 87010 bytes (84.97 KB / 0.08 MB)
+
+19. componentsStructure/halfTextHalfImage.ts
+   Size: 82387 bytes (80.46 KB / 0.08 MB)
+
+20. lib/mock/customers-hub-data.ts
+   Size: 80529 bytes (78.64 KB / 0.08 MB)

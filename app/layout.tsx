@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider";
-import "@/app/globals.css";
+import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { Toaster } from "react-hot-toast";
 import { ClientReCaptchaLoader } from "./ClientReCaptchaLoader";
