@@ -14,6 +14,7 @@ import { createWebsiteLayoutActions } from "./actions/websiteLayoutActions";
 import { createStaticPageActions } from "./actions/staticPageActions";
 import { createThemeActions } from "./actions/themeActions";
 import { createPageActions } from "./actions/pageActions";
+import { createComponentActions } from "./actions/componentActions";
 
 // Import component functions for use in actions
 import { heroFunctions } from "../../editorStoreFunctions/heroFunctions";
@@ -107,7 +108,7 @@ export const useEditorStore = create<EditorStore>((set, get) => {
     // Page actions
     ...createPageActions(set, get),
 
-    // Component actions and specific component actions will be added here
-    // They are too large, so they'll be in separate files and imported
+    // Component actions (getComponentData, setComponentData, ensureComponentVariant, updateComponentByPath)
+    ...createComponentActions(set, get),
   } as EditorStore;
 });

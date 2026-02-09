@@ -1,0 +1,9 @@
+2026-02-09 14:18:31
+Update Type: Refactor
+Refactored editorStore.ts to use the new organized structure - replaced 4105 lines with re-export from context/editorStore/store/index.ts
+context/editorStore.ts, context/editorStore/index.ts
+
+2026-02-09 14:23:22
+Update Type: Bug Fix
+Added missing component actions (getComponentData, setComponentData, ensureComponentVariant, updateComponentByPath) to the new organized editorStore structure
+context/editorStore/store/actions/componentActions.ts, context/editorStore/store/index.ts
