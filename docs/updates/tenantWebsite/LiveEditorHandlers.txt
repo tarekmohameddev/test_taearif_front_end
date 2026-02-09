@@ -1,0 +1,4 @@
+2026-02-09 14:14:33
+Update Type: Bug Fix
+Fixed React error "Cannot update component while rendering" by moving forceUpdatePageComponents call outside render phase using setTimeout
+components/tenant/live-editor/LiveEditorHandlers.tsx

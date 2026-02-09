@@ -116,16 +116,16 @@ export function useLiveEditorHandlers(state: any) {
         );
         const newComponents = applyAutoExpandLogic(filteredComponents);
 
-        // ⭐ CRITICAL: Update pageComponentsByPage in the store SYNCHRONOUSLY
-        // This prevents conflicts with useStoreSyncEffect
-        // We must update the store immediately, not in setTimeout
-        const storeAfter = useEditorStore.getState();
-        const currentPageAfter = storeAfter.currentPage || slug;
-        storeAfter.forceUpdatePageComponents(currentPageAfter, newComponents);
-
-        // ========== LOG AFTER ==========
-        // Use setTimeout only for logging to avoid blocking
+        // ⭐ CRITICAL: Update pageComponentsByPage in the store AFTER render
+        // Using setTimeout to avoid "Cannot update component while rendering" error
+        // This still executes quickly but after the render phase completes
         setTimeout(() => {
+          const storeAfter = useEditorStore.getState();
+          const currentPageAfter = storeAfter.currentPage || slug;
+          storeAfter.forceUpdatePageComponents(currentPageAfter, newComponents);
+
+          // ========== LOG AFTER ==========
+          // Log after store update completes
           const finalStore = useEditorStore.getState();
           logAfter(
             "COMPONENT_DELETE",
