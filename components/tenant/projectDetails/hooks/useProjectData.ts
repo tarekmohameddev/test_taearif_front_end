@@ -128,13 +128,12 @@ export const useProjectData = (props: ProjectDetails2Props) => {
       : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
-  // Get primary color
+  // Get primary color from WebsiteLayout branding (fallback to brown #8b5f46)
   const primaryColor =
-    mergedData.styling?.primaryColor ||
-    (tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
     tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
       ? tenantData.WebsiteLayout.branding.colors.primary
-      : "#8b5f46");
+      : "#8b5f46"; // Brown fallback
 
   // Get logo image from tenantData
   const { loadingTenantData } = useTenantStore();

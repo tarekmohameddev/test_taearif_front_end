@@ -31,7 +31,7 @@ export const HeroSection = ({
       <div
         className="absolute inset-0"
         style={{
-          backgroundColor: "#361c16",
+          backgroundColor: primaryColor,
           opacity: 0.8,
         }}
       />
