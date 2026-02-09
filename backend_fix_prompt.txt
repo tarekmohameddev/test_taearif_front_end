@@ -1,0 +1,154 @@
+# Backend Fix Request: Stage Not Persisting After Pipeline Move
+
+## Problem Description
+
+There is an issue with the pipeline stage assignment not persisting or not being returned correctly after moving a request through the pipeline.
+
+## Issue Details
+
+### Step 1: Move Request to Stage (SUCCESS)
+**Endpoint:** `POST /v2/customers-hub/pipeline/move`
+
+**Request Body:**
+```json
+{
+  "requestId": 43,
+  "newStageId": 3
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "message": "Request moved successfully",
+    "requestId": 43,
+    "customerId": 3412,
+    "customerName": "مازن الدوسري",
+    "previousStage": {
+      "id": 2,
+      "nameAr": "متابعة",
+      "nameEn": "Follow Up"
+    },
+    "newStage": {
+      "id": 3,
+      "nameAr": "تم العثور على عقار",
+      "nameEn": "Property Found"
+    },
+    "movedAt": "2026-02-09T22:05:36+03:00",
+    "movedBy": {
+      "id": 1430,
+      "name": "User"
+    },
+    "notes": null
+  }
+}
+```
+
+**Status:** ✅ The move operation appears to succeed and returns the correct stage information.
+
+### Step 2: Get Requests List (PROBLEM)
+**Endpoint:** `POST /v2/customers-hub/requests/list`
+
+**Request Body:**
+```json
+{
+  "tab": "all",
+  "limit": 50,
+  "offset": 0,
+  "sort_by": "createdAt",
+  "sort_dir": "desc",
+  "objectTypes": [
+    "property_request"
+  ]
+}
+```
+
+**Response Issue:** In the response, request with `id: "property_request_43"` (sourceId: 43) shows:
+```json
+{
+  "id": "property_request_43",
+  "sourceId": 43,
+  "stage_id": null,  // ❌ Should be 3
+  "stage": null      // ❌ Should contain stage object
+}
+```
+
+**Expected Behavior:** The request should show:
+```json
+{
+  "id": "property_request_43",
+  "sourceId": 43,
+  "stage_id": 3,
+  "stage": {
+    "id": 3,
+    "nameAr": "تم العثور على عقار",
+    "nameEn": "Property Found"
+  }
+}
+```
+
+## Problem Analysis
+
+The issue could be in one of two places:
+
+### Possibility 1: Save/Update Issue in Move Endpoint
+- The `/v2/customers-hub/pipeline/move` endpoint might not be properly saving the `stage_id` to the database
+- The response shows success, but the actual database record might not be updated
+- Check if the transaction is committed properly
+- Verify that the `stage_id` field is being written to the correct table/column
+
+### Possibility 2: Retrieval Issue in List Endpoint
+- The `/v2/customers-hub/requests/list` endpoint might not be properly joining or fetching the `stage_id` from the database
+- The query might be missing a JOIN to the stages table
+- The field mapping might be incorrect
+- Check if the stage relationship is properly loaded
+
+## Required Actions
+
+1. **Investigate the Move Endpoint (`/v2/customers-hub/pipeline/move`):**
+   - Verify that the `stage_id` is being saved to the database
+   - Check the database directly after a move operation to confirm the record is updated
+   - Review the SQL query/ORM operation that updates the request
+   - Ensure the transaction is committed
+   - Check for any validation or constraint that might prevent the update
+
+2. **Investigate the List Endpoint (`/v2/customers-hub/requests/list`):**
+   - Review the query that fetches requests
+   - Verify that the `stage_id` column is being selected
+   - Check if there's a JOIN with the stages table
+   - Verify the field mapping in the response transformation
+   - Check if there's any filtering or condition that might exclude the stage data
+
+3. **Database Verification:**
+   - Query the database directly to check if `stage_id` exists for request ID 43
+   - Verify the table structure and column names
+   - Check for any foreign key constraints or relationships
+
+4. **Fix the Issue:**
+   - Identify whether the problem is in the save operation or the retrieval operation
+   - Fix the root cause
+   - Ensure both endpoints work correctly together
+
+5. **Testing:**
+   - Test the move operation and verify the stage is saved
+   - Test the list operation and verify the stage is returned
+   - Test with multiple requests to ensure it's not a data-specific issue
+
+## Additional Context
+
+- Request ID: 43
+- Expected Stage ID: 3
+- Object Type: `property_request`
+- Source Table: `users_property_requests`
+- The move operation returns success, but the stage is not reflected in subsequent list queries
+
+## Expected Outcome
+
+After the fix:
+1. When a request is moved via `/v2/customers-hub/pipeline/move`, the `stage_id` should be saved to the database
+2. When fetching requests via `/v2/customers-hub/requests/list`, the `stage_id` and `stage` object should be populated correctly
+3. The stage information should persist across all subsequent API calls
+
+Please investigate both endpoints thoroughly, identify the root cause, and implement the fix. The AI should search the codebase, understand the data flow, and fix the issue completely.

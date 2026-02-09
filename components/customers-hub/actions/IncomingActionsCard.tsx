@@ -256,14 +256,19 @@ export function IncomingActionsCard({
     if (!stagesToUse || stagesToUse.length === 0) {
       return [];
     }
-    return stagesToUse.map(stage => ({
-      id: stage.stage_id, // stage_id (string) for UI matching
-      numericId: stage.id, // id (number) for API requests
-      nameAr: stage.stage_name_ar,
-      nameEn: stage.stage_name_en,
-      color: stage.color,
-      order: stage.order,
-    }));
+    return stagesToUse.map((stage: any) => {
+      // propStages may not have 'id', only stage_id, so we need to handle both cases
+      // storeStages has both id (number) and stage_id (string)
+      const numericId = stage.id !== undefined ? stage.id : null;
+      return {
+        id: stage.stage_id, // stage_id (string) for UI matching
+        numericId: numericId, // id (number) for API requests - may be null for propStages
+        nameAr: stage.stage_name_ar,
+        nameEn: stage.stage_name_en,
+        color: stage.color,
+        order: stage.order,
+      };
+    });
   }, [propStages, storeStages]);
 
   // Get stage from multiple sources: action.stage_id, action.stage, or resolvedCustomer.stage
@@ -350,8 +355,8 @@ export function IncomingActionsCard({
 
     // Optimistic update: Update UI immediately if customer exists
     const previousStage = currentStage;
-    if (resolvedCustomer) {
-      updateCustomerStage(action.customerId, newStage);
+    if (resolvedCustomer && action.customerId) {
+      updateCustomerStage(String(action.customerId), newStage);
     }
 
     setIsUpdatingStage(true);
@@ -359,51 +364,62 @@ export function IncomingActionsCard({
     try {
       // For stage updates, we need the property request ID (numeric)
       // Priority order (sourceId is the primary source from API):
-      // 1. action.sourceId (from API - this is the actual request ID from source table)
+      // 1. action.sourceId (from API - this is the actual request ID from source table) - REQUIRED
       // 2. metadata.requestId or metadata.propertyRequestId (fallback for old data)
       // 3. Extract number from action.id (e.g., "reminder_3" -> 3) (last resort)
       // NOTE: We do NOT use customerId anymore as it's not the request ID
       let requestId: string | number | undefined;
       
-      // Priority 1: Use sourceId from API (this is the actual request ID)
+      // Priority 1: Use sourceId from API (this is the actual request ID) - REQUIRED
       if (action.sourceId !== undefined && action.sourceId !== null && action.sourceId !== "") {
         const sourceIdNum = typeof action.sourceId === "string" 
-          ? parseInt(action.sourceId) 
-          : action.sourceId;
+          ? parseInt(action.sourceId.toString()) 
+          : Number(action.sourceId);
         if (!isNaN(sourceIdNum) && sourceIdNum > 0) {
           requestId = sourceIdNum;
         }
       }
       
-      // Priority 2: Fallback to metadata (for backward compatibility with old data)
-      if (!requestId && action.metadata) {
-        requestId = (action.metadata.requestId as number | string) || 
-                    (action.metadata.propertyRequestId as number | string) ||
-                    (action.metadata.request_id as number | string);
-      }
-      
-      // Priority 3: Last resort - try to extract number from action.id
-      if (!requestId && action.id) {
-        const idStr = String(action.id);
-        // Try direct parseInt first
-        const directParse = parseInt(idStr);
-        if (!isNaN(directParse) && directParse > 0) {
-          requestId = directParse;
-        } else {
-          // Try to extract number from string (e.g., "reminder_3" -> 3)
-          const numberMatch = idStr.match(/\d+/);
-          if (numberMatch) {
-            const extracted = parseInt(numberMatch[0]);
-            if (!isNaN(extracted) && extracted > 0) {
-              requestId = extracted;
+      // If sourceId is not available, throw error (sourceId is required per API docs)
+      if (!requestId) {
+        // Fallback to metadata only if sourceId is truly missing (for backward compatibility)
+        if (action.metadata) {
+          const metadataId = (action.metadata.requestId as number | string) || 
+                            (action.metadata.propertyRequestId as number | string) ||
+                            (action.metadata.request_id as number | string);
+          if (metadataId) {
+            const metadataIdNum = typeof metadataId === "string" 
+              ? parseInt(metadataId.toString()) 
+              : Number(metadataId);
+            if (!isNaN(metadataIdNum) && metadataIdNum > 0) {
+              requestId = metadataIdNum;
             }
           }
         }
-      }
-      
-      // Validate that we found a valid requestId
-      if (!requestId || requestId === null || requestId === undefined || requestId === "") {
-        throw new Error(`Request ID is missing - cannot update stage. action.id: ${action.id}, action.sourceId: ${action.sourceId}, action.customerId: ${action.customerId}, metadata: ${JSON.stringify(action.metadata)}`);
+        
+        // Last resort - try to extract number from action.id
+        if (!requestId && action.id) {
+          const idStr = String(action.id);
+          // Try direct parseInt first
+          const directParse = parseInt(idStr);
+          if (!isNaN(directParse) && directParse > 0) {
+            requestId = directParse;
+          } else {
+            // Try to extract number from string (e.g., "property_request_41" -> 41)
+            const numberMatch = idStr.match(/\d+/);
+            if (numberMatch) {
+              const extracted = parseInt(numberMatch[0]);
+              if (!isNaN(extracted) && extracted > 0) {
+                requestId = extracted;
+              }
+            }
+          }
+        }
+        
+        // Validate that we found a valid requestId
+        if (!requestId || requestId === null || requestId === undefined || requestId === "") {
+          throw new Error(`Request ID (sourceId) is missing - cannot update stage. action.id: ${action.id}, action.sourceId: ${action.sourceId}, action.customerId: ${action.customerId}, metadata: ${JSON.stringify(action.metadata)}`);
+        }
       }
 
       // Convert requestId to number if it's a string
@@ -420,18 +436,31 @@ export function IncomingActionsCard({
       // newStage is stage_id (string), we need to find the stage and get its numericId
       const selectedStage = availableStages.find(s => s.id === newStage);
       
-      if (!selectedStage || !selectedStage.numericId) {
+      if (!selectedStage) {
         throw new Error(`Invalid stage ID: ${newStage} - stage not found in available stages`);
+      }
+      
+      // If numericId is not available (e.g., from propStages), we need to fetch it from storeStages
+      let numericId = selectedStage.numericId;
+      if (!numericId && storeStages && storeStages.length > 0) {
+        const storeStage = storeStages.find(s => s.stage_id === newStage);
+        if (storeStage && storeStage.id) {
+          numericId = storeStage.id;
+        }
+      }
+      
+      if (!numericId) {
+        throw new Error(`Invalid stage ID: ${newStage} - numeric ID not found. Please ensure stages are loaded from API.`);
       }
 
       // Use numeric ID (stage.id) for API request
-      const newStageIdNum = typeof selectedStage.numericId === 'number' 
-        ? selectedStage.numericId 
-        : parseInt(selectedStage.numericId.toString());
+      const newStageIdNum = typeof numericId === 'number' 
+        ? numericId 
+        : parseInt(numericId.toString());
 
       // Validate that newStageIdNum is a valid number
       if (isNaN(newStageIdNum) || newStageIdNum === null || newStageIdNum === undefined) {
-        throw new Error(`Invalid stage ID: ${selectedStage.numericId} - must be a valid number`);
+        throw new Error(`Invalid stage ID: ${numericId} - must be a valid number`);
       }
 
       // Call API to update stage (uses requestId and numeric stage.id)
@@ -445,8 +474,8 @@ export function IncomingActionsCard({
       toast.success("تم تحديث المرحلة بنجاح");
     } catch (err: any) {
       // Rollback: Revert to previous stage on error if customer exists
-      if (resolvedCustomer && previousStage) {
-        updateCustomerStage(action.customerId, previousStage as CustomerLifecycleStage);
+      if (resolvedCustomer && previousStage && action.customerId) {
+        updateCustomerStage(String(action.customerId), previousStage as CustomerLifecycleStage);
       }
       
       console.error("Error updating customer stage:", err);
@@ -498,7 +527,9 @@ export function IncomingActionsCard({
       createdAt: now,
       updatedAt: now,
     };
-    addAppointment(action.customerId, appointment);
+    if (action.customerId) {
+      addAppointment(String(action.customerId), appointment);
+    }
     setIsSubmittingApt(false);
     setShowScheduleForm(false);
     resetScheduleForm();

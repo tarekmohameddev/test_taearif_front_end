@@ -9,9 +9,10 @@ export const useCustomersHubFiltersState = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [localSearchQuery, setLocalSearchQuery] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"inbox" | "followups" | "all" | "completed">("all");
-  // Default to property_request source only
-  const [selectedSources, setSelectedSources] = useState<CustomerSource[]>(["property_request"]);
-  const [selectedObjectTypes, setSelectedObjectTypes] = useState<ObjectType[]>([]); // New field: Kind of record
+  // Default to empty sources (property_request moved to objectTypes)
+  const [selectedSources, setSelectedSources] = useState<CustomerSource[]>([]);
+  // Default to property_request objectType only (moved from sources)
+  const [selectedObjectTypes, setSelectedObjectTypes] = useState<ObjectType[]>(["property_request"]); // New field: Kind of record
   const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<CustomerActionType[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
@@ -88,17 +89,23 @@ export const useCustomersHubFiltersState = () => {
     }
 
     // Sources filter (changed from source to sources)
-    // Always include property_request filter (default behavior)
+    // Only include if sources are selected (property_request moved to objectTypes)
     if (selectedSources.length > 0) {
       filters.sources = selectedSources;
-    } else {
-      // Default to property_request if no sources selected
-      filters.sources = ["property_request"];
     }
 
     // ObjectTypes filter (new field: Kind of record)
+    // ALWAYS include property_request - it's required for all requests
     if (selectedObjectTypes.length > 0) {
-      filters.objectTypes = selectedObjectTypes;
+      // Ensure property_request is always included, even if user selects other types
+      if (!selectedObjectTypes.includes("property_request")) {
+        filters.objectTypes = [...selectedObjectTypes, "property_request"];
+      } else {
+        filters.objectTypes = selectedObjectTypes;
+      }
+    } else {
+      // Default to property_request if no objectTypes selected
+      filters.objectTypes = ["property_request"];
     }
 
     // Priorities filter (changed from priority to priorities)
@@ -180,8 +187,8 @@ export const useCustomersHubFiltersState = () => {
     setLocalSearchQuery("");
     setAppliedSearchQuery("");
     setActiveTab("all");
-    setSelectedSources(["property_request"]); // Reset to property_request default
-    setSelectedObjectTypes([]);
+    setSelectedSources([]); // Reset to empty (property_request moved to objectTypes)
+    setSelectedObjectTypes(["property_request"]); // Reset to property_request default
     setSelectedPriorities([]);
     setSelectedTypes([]);
     setSelectedAssignees([]);

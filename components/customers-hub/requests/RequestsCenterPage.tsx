@@ -405,6 +405,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     setActiveTab,
     selectedSources,
     setSelectedSources,
+    selectedObjectTypes,
+    setSelectedObjectTypes,
     selectedPriorities,
     setSelectedPriorities,
     selectedTypes,
@@ -940,6 +942,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const hasActiveFilters =
     appliedSearchQuery ||
     selectedSources.length > 0 ||
+    selectedObjectTypes.length > 0 ||
     selectedPriorities.length > 0 ||
     selectedTypes.length > 0 ||
     selectedAssignees.length > 0 ||

@@ -113,6 +113,8 @@ export interface FilterOptionsResponse {
     types: Array<{ value: string; label: string }>;
     priorities: Array<{ value: string; label: string }>;
     statuses: Array<{ value: string; label: string }>;
+    sources?: Array<{ value: string; label: string }>; // Optional: Origin options
+    objectTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filtering by kind of record
     employees: Array<{ id: number; name: string }>;
   };
   timestamp: string;
@@ -320,6 +322,13 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       offset: legacyParams.pagination ? (legacyParams.pagination.page - 1) * legacyParams.pagination.limit : 0,
     };
     
+    // ALWAYS ensure objectTypes includes property_request
+    if (!requestBody.objectTypes || requestBody.objectTypes.length === 0) {
+      requestBody.objectTypes = ["property_request"];
+    } else if (!requestBody.objectTypes.includes("property_request")) {
+      requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
+    }
+    
     // Remove undefined fields
     Object.keys(requestBody).forEach(key => {
       if (requestBody[key as keyof RequestsListFilters] === undefined) {
@@ -342,6 +351,13 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
     }
     if (requestBody.sort_dir === undefined) {
       requestBody.sort_dir = "desc";
+    }
+    
+    // ALWAYS ensure objectTypes includes property_request
+    if (!requestBody.objectTypes || requestBody.objectTypes.length === 0) {
+      requestBody.objectTypes = ["property_request"];
+    } else if (!requestBody.objectTypes.includes("property_request")) {
+      requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
     }
     
     // Remove undefined fields

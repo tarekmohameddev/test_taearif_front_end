@@ -27,3 +27,18 @@ types/unified-customer.ts, components/customers-hub/requests/hooks/useCustomersH
 Update Type: Enhancement
 تحديث الكود ليتوافق مع التوثيق الجديد للـ API - إضافة objectTypes إلى RequestsListFilters interface - إضافة website و affiliate إلى CustomerSource type - إضافة objectType, propertyCategory, propertyType, city, state, budgetMin, budgetMax إلى CustomerAction interface - إضافة selectedObjectTypes إلى useCustomersHubFiltersState - تحديث useCustomersHubRequests لمعالجة الحقول الجديدة من API response
 lib/services/customers-hub-requests-api.ts, types/unified-customer.ts, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, hooks/useCustomersHubRequests.ts
+
+2026-02-09 20:57:23
+Update Type: Enhancement
+نقل property_request من sources إلى objectTypes وفقاً للتوثيق الجديد - تحديث القيمة الافتراضية لـ selectedObjectTypes إلى ["property_request"] بدلاً من selectedSources - إزالة property_request من sources filter - إضافة objectTypes إلى FilterOptionsResponse interface - تحديث hasActiveFilters لتشمل selectedObjectTypes
+components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, lib/services/customers-hub-requests-api.ts, components/customers-hub/requests/RequestsCenterPage.tsx
+
+2026-02-09 21:02:57
+Update Type: Enhancement
+تحديث handleStageChange في IncomingActionsCard لاستخدام action.sourceId كأولوية عند إرسال requestId إلى API - تحسين منطق استخراج requestId لاستخدام sourceId أولاً قبل metadata أو action.id - إصلاح أخطاء TypeScript المتعلقة بـ customerId و numericId - إضافة دعم للحصول على numericId من storeStages إذا لم يكن متوفراً في propStages
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-09 21:03:48
+Update Type: Enhancement
+ضمان إرسال property_request دائماً في objectTypes لجميع طلبات API /v2/customers-hub/requests/list - تحديث useCustomersHubFiltersState لضمان إضافة property_request إلى objectTypes حتى لو اختار المستخدم أنواع أخرى - تحديث getRequestsList في customers-hub-requests-api.ts لضمان إضافة property_request إلى objectTypes في كلا الحالتين (legacy و flat format)
+components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, lib/services/customers-hub-requests-api.ts
