@@ -60,26 +60,24 @@ export const useCustomersHubFiltersState = () => {
   const newFilters = useMemo(() => {
     const filters: any = {};
 
-    // Tab filter - always set tab
+    // Tab filter - always set tab and status based on active tab
     if (activeTab === "completed") {
       filters.tab = "completed";
-      filters.statuses = ["completed"];
+      filters.status = ["completed"];
     } else {
       // Set tab based on active tab
       if (activeTab === "inbox") {
         filters.tab = "inbox";
-        // Only set types if no specific types are selected
-        if (selectedTypes.length === 0) {
-          filters.types = REQUEST_TYPES;
-        }
+        // Use status only, not types
+        filters.status = ["pending", "in_progress"];
       } else if (activeTab === "followups") {
         filters.tab = "followups";
-        // Only set types if no specific types are selected
-        if (selectedTypes.length === 0) {
-          filters.types = FOLLOWUP_TYPES;
-        }
+        // Use status only, not types
+        filters.status = ["pending", "in_progress"];
       } else {
         filters.tab = "all";
+        // Use status for "all" tab as well
+        filters.status = ["pending", "in_progress"];
       }
     }
 

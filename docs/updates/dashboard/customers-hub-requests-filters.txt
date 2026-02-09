@@ -1,0 +1,9 @@
+2026-02-09 21:20:34
+Update Type: Enhancement
+Changed tabs filter to use statuses instead of types for inbox, followups, and all tabs. Removed automatic types filter (follow_up, site_visit) when selecting tabs.
+components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts
+
+2026-02-09 21:22:41
+Update Type: Update
+Changed parameter name from statuses to status in API requests to match backend API specification.
+components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, lib/services/customers-hub-requests-api.ts
