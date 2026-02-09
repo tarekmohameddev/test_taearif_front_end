@@ -32,7 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AlertTriangle, User, Eye, Phone, Building2, MapPin, DollarSign, Clock, ChevronDown } from "lucide-react";
+import { AlertTriangle, User, Eye, Phone, Building2, MapPin, DollarSign, Clock, ChevronDown, UserPlus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,6 +47,13 @@ import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 
 // Note: Stages now use string stage_id, no need for numeric mapping
 
@@ -112,14 +119,14 @@ function getPropertyFromAction(action: CustomerAction): PropertyBlock | null {
   
   if (!hasData) return null;
   
-  // Format budget (display numbers as-is without conversion to millions)
+  // Format budget (display numbers as-is without conversion to millions, use English locale)
   let priceRange: string | undefined;
   if (action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax) {
-    priceRange = `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`;
+    priceRange = `${action.budgetMin.toLocaleString("en-US")}–${action.budgetMax.toLocaleString("en-US")} ر.س`;
   } else if (action.budgetMin != null) {
-    priceRange = `${action.budgetMin.toLocaleString("ar-SA")} ر.س`;
+    priceRange = `${action.budgetMin.toLocaleString("en-US")} ر.س`;
   } else if (action.budgetMax != null) {
-    priceRange = `${action.budgetMax.toLocaleString("ar-SA")} ر.س`;
+    priceRange = `${action.budgetMax.toLocaleString("en-US")} ر.س`;
   }
   
   // Format location (city only, no state)
@@ -281,6 +288,11 @@ export function IncomingActionsCard({
   const [aptNotes, setAptNotes] = useState("");
   const [isSubmittingApt, setIsSubmittingApt] = useState(false);
   const [isUpdatingStage, setIsUpdatingStage] = useState(false);
+  const [showAssignEmployeeDialog, setShowAssignEmployeeDialog] = useState(false);
+  const [employees, setEmployees] = useState<Array<{ id: number; name?: string; first_name?: string; last_name?: string; email?: string }>>([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [savingEmployee, setSavingEmployee] = useState(false);
   // Stages now use string stage_id, no mapping needed
 
   const resolvedCustomer =
@@ -608,6 +620,94 @@ export function IncomingActionsCard({
     }
   }, [showScheduleForm, aptDate]);
 
+  // Fetch employees when opening assign dialog
+  React.useEffect(() => {
+    if (showAssignEmployeeDialog && userData?.token && employees.length === 0) {
+      const fetchEmployees = async () => {
+        setLoadingEmployees(true);
+        try {
+          const response = await axiosInstance.get("/v1/employees");
+          if (response.data && response.data.data) {
+            setEmployees(response.data.data);
+          }
+        } catch (error) {
+          console.error("Error fetching employees:", error);
+          toast.error("حدث خطأ أثناء تحميل الموظفين");
+        } finally {
+          setLoadingEmployees(false);
+        }
+      };
+      fetchEmployees();
+    }
+  }, [showAssignEmployeeDialog, userData?.token, employees.length]);
+
+  // Handle assign employee
+  const handleAssignEmployee = async () => {
+    if (!userData?.token) {
+      toast.error("يجب تسجيل الدخول أولاً");
+      return;
+    }
+
+    // For property requests, we need customerId for the API endpoint
+    // If customerId is null, we can't assign employee using this endpoint
+    // Try to get customerId from resolvedCustomer or use sourceId as fallback
+    const customerId = action.customerId 
+      ? (typeof action.customerId === 'string' ? parseInt(action.customerId) : action.customerId)
+      : (resolvedCustomer?.id ? (typeof resolvedCustomer.id === 'string' ? parseInt(resolvedCustomer.id) : resolvedCustomer.id) : null);
+
+    if (!customerId && action.objectType === 'property_request') {
+      toast.error("لا يمكن تعيين الموظف: معرف العميل غير متوفر");
+      return;
+    }
+
+    setSavingEmployee(true);
+    try {
+      const employeeIdToSend = selectedEmployeeId === null || selectedEmployeeId === undefined
+        ? null
+        : selectedEmployeeId;
+
+      // Use the same API endpoint as property-requests
+      await axiosInstance.put(
+        `/v1/property-requests/customer/${customerId}/employee`,
+        {
+          responsible_employee_id: employeeIdToSend,
+        }
+      );
+
+      toast.success("تم تعيين الموظف المسؤول بنجاح!");
+      
+      // Update action locally
+      if (selectedEmployeeId) {
+        const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
+        const employeeName = selectedEmployee 
+          ? (selectedEmployee.first_name && selectedEmployee.last_name
+              ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+              : selectedEmployee.name || selectedEmployee.email || `موظف #${selectedEmployee.id}`)
+          : '';
+        
+        // Update the action locally
+        (action as any).assignedTo = selectedEmployeeId.toString();
+        (action as any).assignedToName = employeeName;
+      } else {
+        (action as any).assignedTo = null;
+        (action as any).assignedToName = '';
+      }
+
+      setShowAssignEmployeeDialog(false);
+      setSelectedEmployeeId(null);
+      
+      // Trigger a page refresh to get updated data
+      window.location.reload();
+    } catch (error: any) {
+      console.error("Error assigning employee:", error);
+      toast.error(
+        error.response?.data?.message || "حدث خطأ أثناء تعيين الموظف المسؤول"
+      );
+    } finally {
+      setSavingEmployee(false);
+    }
+  };
+
   const resetScheduleForm = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -650,6 +750,7 @@ export function IncomingActionsCard({
   // Compact view for dense mode
   if (isCompact) {
     return (
+      <>
       <div
         className={cn(
           "flex items-center gap-3 p-3 border-r-4 rounded-lg bg-white dark:bg-gray-900 hover:shadow-md transition-all cursor-pointer",
@@ -700,12 +801,6 @@ export function IncomingActionsCard({
             >
               {priorityLabels[action.priority]}
             </Badge>
-            {action.assignedToName && (
-              <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
-                <User className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate max-w-[100px]">{action.assignedToName}</span>
-              </div>
-            )}
             {isOverdue && (
               <Badge variant="destructive" className="text-xs">
                 متأخر
@@ -812,39 +907,62 @@ export function IncomingActionsCard({
             <div className="flex items-center gap-2 text-xs flex-wrap">
               {/* Budget */}
               {(action.budgetMin != null || action.budgetMax != null) && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
                   <DollarSign className="h-3 w-3 shrink-0" />
                   <span className="truncate max-w-[120px]">
                     {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                      ? `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`
+                      ? `${action.budgetMin.toLocaleString("en-US")}–${action.budgetMax.toLocaleString("en-US")} ر.س`
                       : action.budgetMin != null
-                        ? `${action.budgetMin.toLocaleString("ar-SA")} ر.س`
+                        ? `${action.budgetMin.toLocaleString("en-US")} ر.س`
                         : action.budgetMax != null
-                          ? `${action.budgetMax.toLocaleString("ar-SA")} ر.س`
+                          ? `${action.budgetMax.toLocaleString("en-US")} ر.س`
                           : ''}
                   </span>
                 </Badge>
               )}
               {/* Property Type */}
               {action.propertyType && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
                   <Building2 className="h-3 w-3 shrink-0" />
                   {translatePropertyType(action.propertyType)}
                 </Badge>
               )}
               {/* Location */}
               {action.city && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
                   <MapPin className="h-3 w-3 shrink-0" />
                   <span className="truncate max-w-[80px]">{action.city}</span>
                 </Badge>
               )}
               {/* Seriousness */}
               {action.metadata?.seriousness && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
                   <AlertTriangle className="h-3 w-3 shrink-0" />
                   <span className="truncate max-w-[100px]">الجدية: {action.metadata.seriousness}</span>
                 </Badge>
+              )}
+              {/* Assign Employee Button or Assigned Employee Name */}
+              {action.objectType === 'property_request' && (
+                action.assignedToName ? (
+                  <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
+                    <User className="h-3 w-3 shrink-0" />
+                    <span className="truncate max-w-[100px]">{action.assignedToName}</span>
+                  </Badge>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-xs px-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAssignEmployeeDialog(true);
+                    }}
+                    data-interactive="true"
+                  >
+                    <UserPlus className="h-3 w-3 ml-1" />
+                    تعيين موظف
+                  </Button>
+                )
               )}
             </div>
           )}
@@ -878,6 +996,136 @@ export function IncomingActionsCard({
           </Button>
         </div>
       </div>
+
+      {/* Assign Employee Dialog */}
+      <CustomDialog open={showAssignEmployeeDialog} onOpenChange={setShowAssignEmployeeDialog} maxWidth="max-w-md">
+        <CustomDialogContent className="p-3">
+          <CustomDialogHeader>
+            <CustomDialogTitle className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                <UserPlus className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
+                <div className="text-sm text-muted-foreground font-normal">
+                  اختر الموظف المسؤول عن طلب العقار
+                </div>
+              </div>
+            </CustomDialogTitle>
+            <CustomDialogClose
+              onClose={() => {
+                setShowAssignEmployeeDialog(false);
+                setSelectedEmployeeId(null);
+              }}
+            />
+          </CustomDialogHeader>
+
+          <div className="space-y-6">
+            {/* معلومات طلب العقار */}
+            <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="font-medium">{action.customerName}</div>
+                <div className="text-sm text-muted-foreground">
+                  {action.objectType === 'property_request' && action.sourceId
+                    ? `طلب عقار رقم #${action.sourceId}`
+                    : action.title}
+                </div>
+              </div>
+            </div>
+
+            {/* اختيار الموظف */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium">اختر الموظف:</label>
+              {loadingEmployees ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="mr-2 text-sm text-muted-foreground">
+                    جاري تحميل الموظفين...
+                  </span>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Select
+                    value={
+                      selectedEmployeeId
+                        ? selectedEmployeeId.toString()
+                        : "none"
+                    }
+                    onValueChange={(value) =>
+                      setSelectedEmployeeId(
+                        value === "none" ? null : Number(value),
+                      )
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="اختر الموظف" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">لا يوجد موظف</SelectItem>
+                      {employees.map((employee) => {
+                        const employeeName =
+                          employee.first_name && employee.last_name
+                            ? `${employee.first_name} ${employee.last_name}`
+                            : employee.name ||
+                              employee.email ||
+                              `موظف #${employee.id}`;
+
+                        return (
+                          <SelectItem
+                            key={employee.id}
+                            value={employee.id.toString()}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{employeeName}</span>
+                              {employee.email && (
+                                <span className="text-xs text-muted-foreground">
+                                  ({employee.email})
+                                </span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* أزرار الحفظ والإلغاء */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAssignEmployeeDialog(false);
+                setSelectedEmployeeId(null);
+              }}
+              disabled={savingEmployee}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleAssignEmployee}
+              disabled={savingEmployee || loadingEmployees}
+              className="min-w-[100px]"
+            >
+              {savingEmployee ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري الحفظ...
+                </>
+              ) : (
+                "حفظ"
+              )}
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
+      </>
     );
   }
 
@@ -979,39 +1227,62 @@ export function IncomingActionsCard({
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   {/* Budget */}
                   {(action.budgetMin != null || action.budgetMax != null) && (
-                    <Badge variant="outline" className="flex items-center gap-1.5">
+                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
                       <DollarSign className="h-3.5 w-3.5 shrink-0" />
                       <span>
                         {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                          ? `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`
+                          ? `${action.budgetMin.toLocaleString("en-US")}–${action.budgetMax.toLocaleString("en-US")} ر.س`
                           : action.budgetMin != null
-                            ? `${action.budgetMin.toLocaleString("ar-SA")} ر.س`
+                            ? `${action.budgetMin.toLocaleString("en-US")} ر.س`
                             : action.budgetMax != null
-                              ? `${action.budgetMax.toLocaleString("ar-SA")} ر.س`
+                              ? `${action.budgetMax.toLocaleString("en-US")} ر.س`
                               : ''}
                       </span>
                     </Badge>
                   )}
                   {/* Property Type */}
                   {action.propertyType && (
-                    <Badge variant="outline" className="flex items-center gap-1.5">
+                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
                       <Building2 className="h-3.5 w-3.5 shrink-0" />
                       <span>{translatePropertyType(action.propertyType)}</span>
                     </Badge>
                   )}
                   {/* Location */}
                   {action.city && (
-                    <Badge variant="outline" className="flex items-center gap-1.5">
+                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
                       <MapPin className="h-3.5 w-3.5 shrink-0" />
                       <span>{action.city}</span>
                     </Badge>
                   )}
                   {/* Seriousness */}
                   {action.metadata?.seriousness && (
-                    <Badge variant="outline" className="flex items-center gap-1.5">
+                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
                       <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                       <span>الجدية: {action.metadata.seriousness}</span>
                     </Badge>
+                  )}
+                  {/* Assign Employee Button or Assigned Employee Name */}
+                  {action.objectType === 'property_request' && (
+                    action.assignedToName ? (
+                      <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
+                        <User className="h-3.5 w-3.5 shrink-0" />
+                        <span>{action.assignedToName}</span>
+                      </Badge>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-xs px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowAssignEmployeeDialog(true);
+                        }}
+                        data-interactive="true"
+                      >
+                        <UserPlus className="h-3 w-3 ml-1" />
+                        تعيين موظف
+                      </Button>
+                    )
                   )}
                 </div>
               </div>
@@ -1043,12 +1314,6 @@ export function IncomingActionsCard({
                       minute: "2-digit",
                     })}
                   </span>
-                </div>
-              )}
-              {action.assignedToName && (
-                <div className="flex items-center gap-1.5">
-                  <User className="h-4 w-4" />
-                  <span>{action.assignedToName}</span>
                 </div>
               )}
             </div>
@@ -1220,6 +1485,135 @@ export function IncomingActionsCard({
           </div>
         )}
       </CardContent>
+
+      {/* Assign Employee Dialog */}
+      <CustomDialog open={showAssignEmployeeDialog} onOpenChange={setShowAssignEmployeeDialog} maxWidth="max-w-md">
+        <CustomDialogContent className="p-3">
+          <CustomDialogHeader>
+            <CustomDialogTitle className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                <UserPlus className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
+                <div className="text-sm text-muted-foreground font-normal">
+                  اختر الموظف المسؤول عن طلب العقار
+                </div>
+              </div>
+            </CustomDialogTitle>
+            <CustomDialogClose
+              onClose={() => {
+                setShowAssignEmployeeDialog(false);
+                setSelectedEmployeeId(null);
+              }}
+            />
+          </CustomDialogHeader>
+
+          <div className="space-y-6">
+            {/* معلومات طلب العقار */}
+            <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="font-medium">{action.customerName}</div>
+                <div className="text-sm text-muted-foreground">
+                  {action.objectType === 'property_request' && action.sourceId
+                    ? `طلب عقار رقم #${action.sourceId}`
+                    : action.title}
+                </div>
+              </div>
+            </div>
+
+            {/* اختيار الموظف */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium">اختر الموظف:</label>
+              {loadingEmployees ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="mr-2 text-sm text-muted-foreground">
+                    جاري تحميل الموظفين...
+                  </span>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Select
+                    value={
+                      selectedEmployeeId
+                        ? selectedEmployeeId.toString()
+                        : "none"
+                    }
+                    onValueChange={(value) =>
+                      setSelectedEmployeeId(
+                        value === "none" ? null : Number(value),
+                      )
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="اختر الموظف" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">لا يوجد موظف</SelectItem>
+                      {employees.map((employee) => {
+                        const employeeName =
+                          employee.first_name && employee.last_name
+                            ? `${employee.first_name} ${employee.last_name}`
+                            : employee.name ||
+                              employee.email ||
+                              `موظف #${employee.id}`;
+
+                        return (
+                          <SelectItem
+                            key={employee.id}
+                            value={employee.id.toString()}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{employeeName}</span>
+                              {employee.email && (
+                                <span className="text-xs text-muted-foreground">
+                                  ({employee.email})
+                                </span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* أزرار الحفظ والإلغاء */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAssignEmployeeDialog(false);
+                setSelectedEmployeeId(null);
+              }}
+              disabled={savingEmployee}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleAssignEmployee}
+              disabled={savingEmployee || loadingEmployees}
+              className="min-w-[100px]"
+            >
+              {savingEmployee ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري الحفظ...
+                </>
+              ) : (
+                "حفظ"
+              )}
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </CustomDialog>
     </Card>
   );
 }
