@@ -50,6 +50,18 @@ import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages
 
 // Note: Stages now use string stage_id, no need for numeric mapping
 
+/** Translate property type from English to Arabic */
+const translatePropertyType = (propertyType: string | null | undefined): string => {
+  if (!propertyType) return '';
+  const translations: { [key: string]: string } = {
+    Residential: "سكني",
+    Industrial: "صناعي",
+    Agricultural: "زراعي",
+    Commercial: "تجاري",
+  };
+  return translations[propertyType] || propertyType;
+};
+
 type PropertyBlock = {
   title?: string;
   type?: string;
@@ -120,7 +132,7 @@ function getPropertyFromAction(action: CustomerAction): PropertyBlock | null {
   
   return {
     title: priceRange,
-    type: action.propertyType || undefined,
+    type: action.propertyType ? translatePropertyType(action.propertyType) : undefined,
     price: action.budgetMin ?? action.budgetMax ?? undefined,
     location,
     fromPreferences: false,
@@ -816,7 +828,7 @@ export function IncomingActionsCard({
               {action.propertyType && (
                 <span className="flex items-center gap-1">
                   <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                  {action.propertyType}
+                  {translatePropertyType(action.propertyType)}
                 </span>
               )}
               {/* Location */}
@@ -978,7 +990,7 @@ export function IncomingActionsCard({
                   {action.propertyType && (
                     <span className="flex items-center gap-1.5">
                       <Building2 className="h-4 w-4 shrink-0 text-gray-500" />
-                      <span>{action.propertyType}</span>
+                      <span>{translatePropertyType(action.propertyType)}</span>
                     </span>
                   )}
                   {/* Location */}
