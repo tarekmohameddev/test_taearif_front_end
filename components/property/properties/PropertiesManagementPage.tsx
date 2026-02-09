@@ -7,6 +7,7 @@ import {
   Upload,
   Grid3X3,
   List,
+  MapPin,
   Plus,
   Search,
   FilterX,
@@ -44,6 +45,7 @@ import { ErrorDisplay } from "@/components/ui/error-display";
 import { AdvancedFilterDialog } from "@/components/property/advanced-filter-dialog";
 import { ActiveFiltersDisplay } from "@/components/property/active-filters-display";
 import { PropertyStatisticsCards } from "@/components/property/property-statistics-cards";
+import { PropertiesMapView } from "@/components/property/properties-map-view";
 import axiosInstance from "@/lib/axiosInstance";
 import { formatErrorMessage } from "@/utils/errorHandler";
 import { normalizeStatus } from "./utils/helpers";
@@ -158,14 +160,15 @@ export function PropertiesManagementPage({
     }));
   }, [properties]);
 
-  const setViewMode = (mode: "grid" | "list") => {
+  const setViewMode = (mode: "grid" | "list" | "map") => {
     setPropertiesManagement({ viewMode: mode });
   };
 
-  const toggleFavorite = (id: string) => {
-    const newFavorites = favorites.includes(id)
-      ? favorites.filter((item: any) => item !== id)
-      : [...favorites, id];
+  const toggleFavorite = (id: string | number) => {
+    const idString = id.toString();
+    const newFavorites = favorites.includes(idString)
+      ? favorites.filter((item: any) => item !== idString)
+      : [...favorites, idString];
     setPropertiesManagement({ favorites: newFavorites });
   };
 
@@ -422,6 +425,17 @@ export function PropertiesManagementPage({
                   <List className="h-4 w-4" />
                   <span className="sr-only">List view</span>
                 </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setViewMode("map")}
+                  className={`flex-1 md:flex-none ${
+                    viewMode === "map" ? "bg-muted" : ""
+                  }`}
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="sr-only">Map view</span>
+                </Button>
               </div>
               <Button
                 className="gap-1 w-full md:w-auto"
@@ -544,6 +558,13 @@ export function PropertiesManagementPage({
               error={error}
               onRetry={() => fetchPropertiesWrapper(currentPage, newFilters)}
               title="خطأ في تحميل الوحدات"
+            />
+          ) : viewMode === "map" ? (
+            <PropertiesMapView
+              properties={normalizedProperties}
+              onToggleFavorite={toggleFavorite}
+              onShare={handleShare}
+              favorites={favorites}
             />
           ) : (
             <Tabs defaultValue="all">

@@ -57,6 +57,13 @@ export function useCustomersHubRequests() {
             source: typeof action.source === 'object' && action.source !== null
               ? (action.source.id || action.source.name || action.source)
               : (action.source || 'manual'),
+            // Pass sourceId, sourceTable, stage_id, and stage from API response
+            sourceId: action.sourceId !== undefined && action.sourceId !== null 
+              ? (typeof action.sourceId === 'string' ? parseInt(action.sourceId) || action.sourceId : action.sourceId)
+              : undefined,
+            sourceTable: action.sourceTable || undefined,
+            stage_id: action.stage_id || undefined,
+            stage: action.stage || undefined,
           }));
           
           setActions(transformedActions);
@@ -73,8 +80,27 @@ export function useCustomersHubRequests() {
           } else {
             setStages([]);
           }
+          // Handle pagination - support both new format (total/limit/offset/hasMore) and legacy format
           if (response.data.pagination) {
-            setPagination(response.data.pagination);
+            const paginationData = response.data.pagination;
+            // Check if it's new format (has total, limit, offset, hasMore)
+            if (paginationData.total !== undefined || paginationData.limit !== undefined) {
+              // New format: convert to legacy format for internal state
+              const limit = paginationData.limit || 50;
+              const total = paginationData.total || 0;
+              const offset = paginationData.offset || 0;
+              const currentPage = Math.floor(offset / limit) + 1;
+              const totalPages = Math.ceil(total / limit) || 1;
+              setPagination({
+                currentPage,
+                totalPages,
+                totalItems: total,
+                itemsPerPage: limit,
+              });
+            } else if (paginationData.currentPage !== undefined) {
+              // Legacy format: use as-is
+              setPagination(paginationData);
+            }
           }
         } else {
           setError(response.message || "Failed to load requests");

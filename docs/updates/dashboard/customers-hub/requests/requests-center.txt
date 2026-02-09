@@ -2,3 +2,8 @@
 Update Type: Feature
 إضافة dropdown selector لتغيير عرض الطلبات مع إضافة Table view جديد مشابه لمسار المبيعات
 components/customers-hub/requests/TableRequestsList.tsx, components/customers-hub/requests/RequestsCenterPage.tsx
+
+2025-01-17 20:30:00
+Update Type: Enhancement
+تحديث نظام الطلبات لاستخدام sourceId كـ requestId بدلاً من customerId - إضافة حقول sourceId و sourceTable و stage_id و stage إلى CustomerAction - تحديث منطق تغيير المرحلة لاستخدام sourceId من API response - تحديث RequestsListResponse لدعم pagination الجديد (total/limit/offset/hasMore)
+types/unified-customer.ts, hooks/useCustomersHubRequests.ts, components/customers-hub/actions/IncomingActionsCard.tsx, lib/services/customers-hub-requests-api.ts

@@ -358,30 +358,31 @@ export function IncomingActionsCard({
 
     try {
       // For stage updates, we need the property request ID (numeric)
-      // Try multiple sources in priority order:
-      // 1. metadata.requestId or metadata.propertyRequestId
-      // 2. action.customerId (if it's numeric)
-      // 3. Extract number from action.id (e.g., "reminder_3" -> 3)
+      // Priority order (sourceId is the primary source from API):
+      // 1. action.sourceId (from API - this is the actual request ID from source table)
+      // 2. metadata.requestId or metadata.propertyRequestId (fallback for old data)
+      // 3. Extract number from action.id (e.g., "reminder_3" -> 3) (last resort)
+      // NOTE: We do NOT use customerId anymore as it's not the request ID
       let requestId: string | number | undefined;
       
-      // Try metadata first
-      if (action.metadata) {
+      // Priority 1: Use sourceId from API (this is the actual request ID)
+      if (action.sourceId !== undefined && action.sourceId !== null && action.sourceId !== "") {
+        const sourceIdNum = typeof action.sourceId === "string" 
+          ? parseInt(action.sourceId) 
+          : action.sourceId;
+        if (!isNaN(sourceIdNum) && sourceIdNum > 0) {
+          requestId = sourceIdNum;
+        }
+      }
+      
+      // Priority 2: Fallback to metadata (for backward compatibility with old data)
+      if (!requestId && action.metadata) {
         requestId = (action.metadata.requestId as number | string) || 
                     (action.metadata.propertyRequestId as number | string) ||
                     (action.metadata.request_id as number | string);
       }
       
-      // Fallback to customerId if it exists and looks like a number
-      if (!requestId && action.customerId) {
-        const customerIdNum = typeof action.customerId === "string" 
-          ? parseInt(action.customerId) 
-          : action.customerId;
-        if (!isNaN(customerIdNum) && customerIdNum > 0) {
-          requestId = customerIdNum;
-        }
-      }
-      
-      // Last resort: try to extract number from action.id
+      // Priority 3: Last resort - try to extract number from action.id
       if (!requestId && action.id) {
         const idStr = String(action.id);
         // Try direct parseInt first
@@ -402,7 +403,7 @@ export function IncomingActionsCard({
       
       // Validate that we found a valid requestId
       if (!requestId || requestId === null || requestId === undefined || requestId === "") {
-        throw new Error(`Request ID is missing - cannot update stage. action.id: ${action.id}, action.customerId: ${action.customerId}, metadata: ${JSON.stringify(action.metadata)}`);
+        throw new Error(`Request ID is missing - cannot update stage. action.id: ${action.id}, action.sourceId: ${action.sourceId}, action.customerId: ${action.customerId}, metadata: ${JSON.stringify(action.metadata)}`);
       }
 
       // Convert requestId to number if it's a string

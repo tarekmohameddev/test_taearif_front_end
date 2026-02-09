@@ -41,6 +41,17 @@ export interface CustomerAction {
   completedAt?: string;
   completedBy?: string;
   metadata?: Record<string, any>;
+  // Backend API fields - sourceId is the actual request ID used for pipeline operations
+  sourceId?: number | string; // The actual request ID from source table (e.g., property_request.id, inquiry.id, reminder.id)
+  sourceTable?: string; // Table name where the request originates (e.g., "users_property_requests", "api_customer_inquiry", "reminders")
+  stage_id?: string | null; // Current stage ID (string slug like "qualified", "new_lead")
+  stage?: {
+    stage_id: string;
+    stage_name_ar: string;
+    stage_name_en: string;
+    color: string;
+    order: number;
+  } | null; // Stage object with details
 }
 
 // CustomerLifecycleStage is now a string type to support dynamic stages from API

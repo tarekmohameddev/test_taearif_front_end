@@ -46,8 +46,8 @@ export interface StageDistribution {
 
 export interface RequestsListResponse {
   status: "success";
-  code: number;
-  message: string;
+  code?: number; // Optional - may not be present in all responses
+  message?: string; // Optional - may not be present in all responses
   data: {
     actions: CustomerAction[];
     stats?: {
@@ -61,13 +61,19 @@ export interface RequestsListResponse {
     };
     stages?: StageDistribution[];
     pagination?: {
-      currentPage: number;
-      totalPages: number;
-      totalItems: number;
-      itemsPerPage: number;
+      // New API format (preferred)
+      total?: number;
+      limit?: number;
+      offset?: number;
+      hasMore?: boolean;
+      // Legacy format (for backward compatibility)
+      currentPage?: number;
+      totalPages?: number;
+      totalItems?: number;
+      itemsPerPage?: number;
     };
   };
-  timestamp: string;
+  timestamp?: string; // Optional - may not be present in all responses
 }
 
 export interface FilterOptionsResponse {
