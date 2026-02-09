@@ -9,7 +9,7 @@ export type ObjectType = "inquiry" | "property_request" | "reminder" | "appointm
 export interface RequestsListFilters {
   tab?: "inbox" | "followups" | "all" | "completed";
   types?: CustomerActionType[]; // Changed from "type" to "types"
-  status?: ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[]; // Changed from "statuses" to "status"
+  statuses?: ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[]; // Changed from "status" to "statuses"
   sources?: CustomerSource[]; // Changed from "source" to "sources"
   objectTypes?: ObjectType[]; // New field: Kind of record (inquiry, property_request, reminder, appointment, customer_reminder)
   priorities?: Priority[]; // Changed from "priority" to "priorities"
@@ -299,13 +299,13 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       tab = legacyFilters.tab as "inbox" | "followups" | "all" | "completed" | undefined;
     }
     
-    // Filter out "overdue" from status if present
-    const status = legacyFilters.status?.filter(s => s !== "overdue") as ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[] | undefined;
+    // Filter out "overdue" from statuses if present
+    const statuses = legacyFilters.status?.filter(s => s !== "overdue") as ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[] | undefined;
     
     requestBody = {
       tab,
       types: legacyFilters.type ? legacyFilters.type : undefined,
-      status,
+      statuses,
       sources: legacyFilters.source,
       priorities: legacyFilters.priority,
       assignees: legacyFilters.assignedTo ? legacyFilters.assignedTo.map((id: any) => parseInt(id.toString())) : undefined,
