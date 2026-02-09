@@ -809,12 +809,12 @@ export function IncomingActionsCard({
           </div>
           {/* Property request details in compact view */}
           {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null))) && (
-            <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 flex-wrap">
+            <div className="flex items-center gap-2 text-xs flex-wrap">
               {/* Budget */}
               {(action.budgetMin != null || action.budgetMax != null) && (
-                <span className="flex items-center gap-1 truncate max-w-[150px]">
-                  <DollarSign className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                  <span className="truncate">
+                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                  <DollarSign className="h-3 w-3 shrink-0" />
+                  <span className="truncate max-w-[120px]">
                     {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
                       ? `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`
                       : action.budgetMin != null
@@ -823,30 +823,28 @@ export function IncomingActionsCard({
                           ? `${action.budgetMax.toLocaleString("ar-SA")} ر.س`
                           : ''}
                   </span>
-                </span>
+                </Badge>
               )}
               {/* Property Type */}
               {action.propertyType && (
-                <span className="flex items-center gap-1">
-                  <Building2 className="h-3.5 w-3.5 shrink-0 text-gray-500" />
+                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                  <Building2 className="h-3 w-3 shrink-0" />
                   {translatePropertyType(action.propertyType)}
-                </span>
+                </Badge>
               )}
               {/* Location */}
               {action.city && (
-                <span className="flex items-center gap-1 truncate max-w-[90px]">
-                  <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                  <span className="truncate">
-                    {action.city}
-                  </span>
-                </span>
+                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                  <MapPin className="h-3 w-3 shrink-0" />
+                  <span className="truncate max-w-[80px]">{action.city}</span>
+                </Badge>
               )}
               {/* Seriousness */}
               {action.metadata?.seriousness && (
-                <span className="flex items-center gap-1 text-xs">
-                  <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-gray-500" />
-                  <span className="truncate">الجدية: {action.metadata.seriousness}</span>
-                </span>
+                <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                  <AlertTriangle className="h-3 w-3 shrink-0" />
+                  <span className="truncate max-w-[100px]">الجدية: {action.metadata.seriousness}</span>
+                </Badge>
               )}
             </div>
           )}
@@ -978,11 +976,11 @@ export function IncomingActionsCard({
             {/* Property request details - show all available data */}
             {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) ? (
               <div className="mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <div className="flex flex-wrap items-center gap-2 text-sm">
                   {/* Budget */}
                   {(action.budgetMin != null || action.budgetMax != null) && (
-                    <span className="flex items-center gap-1.5">
-                      <DollarSign className="h-4 w-4 shrink-0 text-gray-500" />
+                    <Badge variant="outline" className="flex items-center gap-1.5">
+                      <DollarSign className="h-3.5 w-3.5 shrink-0" />
                       <span>
                         {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
                           ? `${action.budgetMin.toLocaleString("ar-SA")}–${action.budgetMax.toLocaleString("ar-SA")} ر.س`
@@ -992,30 +990,28 @@ export function IncomingActionsCard({
                               ? `${action.budgetMax.toLocaleString("ar-SA")} ر.س`
                               : ''}
                       </span>
-                    </span>
+                    </Badge>
                   )}
                   {/* Property Type */}
                   {action.propertyType && (
-                    <span className="flex items-center gap-1.5">
-                      <Building2 className="h-4 w-4 shrink-0 text-gray-500" />
+                    <Badge variant="outline" className="flex items-center gap-1.5">
+                      <Building2 className="h-3.5 w-3.5 shrink-0" />
                       <span>{translatePropertyType(action.propertyType)}</span>
-                    </span>
+                    </Badge>
                   )}
                   {/* Location */}
                   {action.city && (
-                    <span className="flex items-center gap-1.5 min-w-0 max-w-[220px]">
-                      <MapPin className="h-4 w-4 shrink-0 text-gray-500" />
-                      <span className="truncate">
-                        {action.city}
-                      </span>
-                    </span>
+                    <Badge variant="outline" className="flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 shrink-0" />
+                      <span>{action.city}</span>
+                    </Badge>
                   )}
                   {/* Seriousness */}
                   {action.metadata?.seriousness && (
-                    <span className="flex items-center gap-1.5">
-                      <AlertTriangle className="h-4 w-4 shrink-0 text-gray-500" />
+                    <Badge variant="outline" className="flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                       <span>الجدية: {action.metadata.seriousness}</span>
-                    </span>
+                    </Badge>
                   )}
                 </div>
               </div>
