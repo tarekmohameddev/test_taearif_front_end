@@ -182,9 +182,10 @@ export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) 
             
             return (
               <Fragment key={gtmKey}>
+                {/* ⭐ Google Tag Manager - في <head> في أعلى الصفحة */}
                 <Script
                   id={gtmScriptId}
-                  strategy="afterInteractive"
+                  strategy="beforeInteractive"
                   onLoad={() => {
                     console.log("✅ GTM Script loaded successfully:", gtmId);
                     // Initialize dataLayer after GTM loads
@@ -210,6 +211,7 @@ export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) 
                     `,
                   }}
                 />
+                {/* ⭐ Google Tag Manager (noscript) - مباشرة بعد فتح <body> */}
                 <noscript>
                   <iframe
                     src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
