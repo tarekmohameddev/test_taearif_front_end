@@ -1,0 +1,10 @@
+2026-02-10 12:00:00
+Update Type: Update
+Renamed GTM container labels from "vareons" to "taearif" in GA4/GTM container JSON
+docs/Gtm-Container.json
+
+2026-02-10 12:05:00
+Update Type: Update
+Simplified GTM container to GA4 page_view-only tracking (removed ecommerce event tag, triggers, and DL variables)
+docs/Gtm-Container.json
+

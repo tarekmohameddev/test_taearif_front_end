@@ -7,3 +7,13 @@ lib/gtm-utils.ts, components/tracking/PixelScripts.tsx, components/GTMProvider.t
 Update Type: Enhancement
 Updated GTM script placement to follow Google's official guidelines - script in <head> (beforeInteractive) and noscript in <body>
 components/tracking/PixelScripts.tsx
+
+2026-02-10 12:15:00
+Update Type: Enhancement
+Aligned global GTMProvider script to load beforeInteractive in <head> with noscript in <body> for 100% compliant GTM install
+components/GTMProvider.tsx
+
+2026-02-10 14:30:00
+Update Type: Bug Fix
+Fixed GTM script loading in PixelScripts - now injects script directly into <head> using useEffect instead of beforeInteractive strategy (which doesn't work in regular components). Created GTMScriptLoader component for proper head injection.
+components/tracking/PixelScripts.tsx

@@ -1,0 +1,55 @@
+{
+  "exportFormatVersion": 2,
+  "containerVersion": {
+    "container": {
+      "name": "taearif Ecommerce Lite",
+      "usageContext": ["WEB"],
+      "notes": "Import, set GA4 Measurement ID constant, and publish for basic page_view tracking."
+    },
+    "tag": [
+      {
+        "name": "GA4 Configuration - taearif",
+        "type": "gaawc",
+        "notes": "Loads GA4 and sends automatic page_view on all pages.",
+        "firingTriggerId": ["1"],
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementId",
+            "value": "{{GA4 Measurement ID}}"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "sendPageView",
+            "value": "true"
+          }
+        ]
+      }
+    ],
+    "trigger": [
+      {
+        "triggerId": "1",
+        "name": "All Pages",
+        "type": "PAGEVIEW"
+      }
+    ],
+    "variable": [
+      {
+        "name": "GA4 Measurement ID",
+        "type": "c",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "value",
+            "value": "G-XXXXXXXXXX"
+          }
+        ]
+      }
+    ],
+    "builtInVariable": [
+      { "type": "EVENT" },
+      { "type": "PAGE_URL" },
+      { "type": "PAGE_PATH" }
+    ]
+  }
+}

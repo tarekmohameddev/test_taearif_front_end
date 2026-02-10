@@ -17,6 +17,90 @@ interface PixelScriptsProps {
   pageType?: string; // ⭐ من Gemini: لمعرفة نوع الصفحة (home, project, etc.)
 }
 
+// ⭐ Component to load GTM script directly in <head> (100% correct installation)
+interface GTMScriptLoaderProps {
+  gtmId: string;
+  scriptId: string;
+  tenantId: string | null;
+}
+
+function GTMScriptLoader({ gtmId, scriptId, tenantId }: GTMScriptLoaderProps) {
+  useEffect(() => {
+    // Check if script already exists to prevent duplicates
+    if (typeof document !== "undefined") {
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) {
+        console.log("⚠️ GTM script already exists:", scriptId);
+        return;
+      }
+
+      // Initialize dataLayer before GTM script (as per Google's official code)
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js',
+        tenant_id: tenantId,
+      });
+
+      // Create inline script with GTM initialization code (exactly as Google recommends)
+      const inlineScript = document.createElement('script');
+      inlineScript.id = `${scriptId}-inline`;
+      inlineScript.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js','tenant_id':'${tenantId}'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${gtmId}');`;
+
+      // Create and inject GTM script directly into <head> as early as possible
+      const head = document.head || document.getElementsByTagName('head')[0];
+      const firstScript = head.getElementsByTagName('script')[0];
+      
+      // Insert inline script first (initializes dataLayer), then the async script
+      if (firstScript) {
+        head.insertBefore(inlineScript, firstScript);
+      } else {
+        head.appendChild(inlineScript);
+      }
+
+      inlineScript.onload = () => {
+        console.log("✅ GTM Script loaded successfully in <head>:", gtmId);
+        if (typeof window !== "undefined") {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: "gtm_loaded",
+            gtmId: gtmId,
+            tenantId: tenantId,
+          });
+        }
+      };
+
+      inlineScript.onerror = () => {
+        console.error("❌ GTM Script failed to load:", gtmId);
+      };
+
+      // Cleanup function
+      return () => {
+        const scriptToRemove = document.getElementById(`${scriptId}-inline`);
+        if (scriptToRemove) {
+          scriptToRemove.remove();
+        }
+      };
+    }
+  }, [gtmId, scriptId, tenantId]);
+
+  // Return noscript fallback for body
+  return (
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+        height="0"
+        width="0"
+        style={{ display: "none", visibility: "hidden" }}
+      />
+    </noscript>
+  );
+}
+
 export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) {
   const [pixels, setPixels] = useState<PixelData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -181,46 +265,12 @@ export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) 
             });
             
             return (
-              <Fragment key={gtmKey}>
-                {/* ⭐ Google Tag Manager - في <head> في أعلى الصفحة */}
-                <Script
-                  id={gtmScriptId}
-                  strategy="beforeInteractive"
-                  onLoad={() => {
-                    console.log("✅ GTM Script loaded successfully:", gtmId);
-                    // Initialize dataLayer after GTM loads
-                    if (typeof window !== "undefined") {
-                      window.dataLayer = window.dataLayer || [];
-                      window.dataLayer.push({
-                        event: "gtm_loaded",
-                        gtmId: gtmId,
-                        tenantId: tenantId,
-                      });
-                    }
-                  }}
-                  onError={() => {
-                    console.error("❌ GTM Script failed to load:", gtmId);
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                      new Date().getTime(),event:'gtm.js', 'tenant_id': '${tenantId}'});var f=d.getElementsByTagName(s)[0],
-                      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                      })(window,document,'script','dataLayer','${gtmId}');
-                    `,
-                  }}
-                />
-                {/* ⭐ Google Tag Manager (noscript) - مباشرة بعد فتح <body> */}
-                <noscript>
-                  <iframe
-                    src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-                    height="0"
-                    width="0"
-                    style={{ display: "none", visibility: "hidden" }}
-                  />
-                </noscript>
-              </Fragment>
+              <GTMScriptLoader
+                key={gtmKey}
+                gtmId={gtmId}
+                scriptId={gtmScriptId}
+                tenantId={tenantId}
+              />
             );
           default:
             return null;

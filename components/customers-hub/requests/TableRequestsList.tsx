@@ -29,10 +29,15 @@ import {
   Calendar,
   MessageSquare,
   AlertTriangle,
+  DollarSign,
+  Building2,
+  MapPin,
+  UserPlus,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
+import { getStageColor, getStageNameAr } from "@/types/unified-customer";
 
 interface TableRequestsListProps {
   actions: CustomerAction[];
@@ -54,8 +59,20 @@ interface TableRequestsListProps {
   completingActionIds: Set<string>;
 }
 
-type SortField = "customer" | "type" | "priority" | "status" | "dueDate" | "createdAt";
+type SortField = "customer" | "type" | "priority" | "status" | "dueDate" | "createdAt" | "budget" | "propertyType" | "city" | "stage";
 type SortOrder = "asc" | "desc";
+
+/** Translate property type from English to Arabic */
+const translatePropertyType = (propertyType: string | null | undefined): string => {
+  if (!propertyType) return '';
+  const translations: { [key: string]: string } = {
+    Residential: "سكني",
+    Industrial: "صناعي",
+    Agricultural: "زراعي",
+    Commercial: "تجاري",
+  };
+  return translations[propertyType] || propertyType;
+};
 
 export function TableRequestsList({
   actions,
@@ -308,6 +325,22 @@ export function TableRequestsList({
         aValue = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         bValue = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         break;
+      case "budget":
+        aValue = (a as any).budgetMin ?? (a as any).budgetMax ?? 0;
+        bValue = (b as any).budgetMin ?? (b as any).budgetMax ?? 0;
+        break;
+      case "propertyType":
+        aValue = translatePropertyType((a as any).propertyType) || "";
+        bValue = translatePropertyType((b as any).propertyType) || "";
+        break;
+      case "city":
+        aValue = (a as any).city || "";
+        bValue = (b as any).city || "";
+        break;
+      case "stage":
+        aValue = (a as any).stage?.nameAr || (a as any).stage_id || "";
+        bValue = (b as any).stage?.nameAr || (b as any).stage_id || "";
+        break;
       default:
         return 0;
     }
@@ -422,6 +455,52 @@ export function TableRequestsList({
                     >
                       تاريخ الإنشاء
                       <SortIcon field="createdAt" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 -mr-2"
+                      onClick={() => handleSort("budget")}
+                    >
+                      الميزانية
+                      <SortIcon field="budget" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 -mr-2"
+                      onClick={() => handleSort("propertyType")}
+                    >
+                      نوع العقار
+                      <SortIcon field="propertyType" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 -mr-2"
+                      onClick={() => handleSort("city")}
+                    >
+                      المدينة
+                      <SortIcon field="city" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>الجدية</TableHead>
+                  <TableHead>الموظف المسؤول</TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 -mr-2"
+                      onClick={() => handleSort("stage")}
+                    >
+                      المرحلة
+                      <SortIcon field="stage" />
                     </Button>
                   </TableHead>
                   <TableHead className="text-center">الإجراءات</TableHead>
@@ -540,6 +619,132 @@ export function TableRequestsList({
                         ) : (
                           <span className="text-gray-400 text-sm">-</span>
                         )}
+                      </TableCell>
+
+                      {/* Budget */}
+                      <TableCell>
+                        {(action as any).budgetMin != null || (action as any).budgetMax != null ? (
+                          <div className="flex items-center gap-1 text-sm">
+                            <DollarSign className="h-3.5 w-3.5 text-gray-500" />
+                            <span>
+                              {(action as any).budgetMin != null && (action as any).budgetMax != null && (action as any).budgetMin !== (action as any).budgetMax
+                                ? `${(action as any).budgetMin.toLocaleString("en-US")}–${(action as any).budgetMax.toLocaleString("en-US")} ر.س`
+                                : (action as any).budgetMin != null
+                                  ? `${(action as any).budgetMin.toLocaleString("en-US")} ر.س`
+                                  : (action as any).budgetMax != null
+                                    ? `${(action as any).budgetMax.toLocaleString("en-US")} ر.س`
+                                    : ''}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </TableCell>
+
+                      {/* Property Type */}
+                      <TableCell>
+                        {(action as any).propertyType ? (
+                          <div className="flex items-center gap-1">
+                            <Building2 className="h-3.5 w-3.5 text-gray-500" />
+                            <Badge variant="outline" className="text-xs">
+                              {translatePropertyType((action as any).propertyType)}
+                            </Badge>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </TableCell>
+
+                      {/* City */}
+                      <TableCell>
+                        {(action as any).city ? (
+                          <div className="flex items-center gap-1 text-sm">
+                            <MapPin className="h-3.5 w-3.5 text-gray-500" />
+                            <span>{(action as any).city}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </TableCell>
+
+                      {/* Seriousness */}
+                      <TableCell>
+                        {(action as any).metadata?.seriousness ? (
+                          <div className="flex items-center gap-1 text-sm">
+                            <AlertTriangle className="h-3.5 w-3.5 text-gray-500" />
+                            <span>{(action as any).metadata.seriousness}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </TableCell>
+
+                      {/* Assigned Employee */}
+                      <TableCell>
+                        {(action as any).assignedToName ? (
+                          <div className="flex items-center gap-1 text-sm">
+                            <User className="h-3.5 w-3.5 text-gray-500" />
+                            <span>{(action as any).assignedToName}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </TableCell>
+
+                      {/* Stage */}
+                      <TableCell>
+                        {(() => {
+                          // Get stage from action.stage object or action.stage_id
+                          let stageId: string | number | null = null;
+                          let stageNameAr: string | null = null;
+                          
+                          if ((action as any).stage) {
+                            // If stage is an object, extract id or stage_id
+                            const stageObj = (action as any).stage;
+                            stageId = stageObj.id || stageObj.stage_id || null;
+                            stageNameAr = stageObj.nameAr || null;
+                          } else if ((action as any).stage_id) {
+                            // If stage_id is directly available
+                            stageId = (action as any).stage_id;
+                          }
+                          
+                          // Find stage in stages array
+                          let matchedStage = null;
+                          if (stageId != null && stages) {
+                            // Try to match by numeric id first
+                            if (typeof stageId === 'number') {
+                              matchedStage = stages.find((s: any) => s.id === stageId || s.numericId === stageId);
+                            }
+                            // If not found, try to match by string stage_id
+                            if (!matchedStage) {
+                              matchedStage = stages.find((s: any) => s.stage_id === String(stageId));
+                            }
+                          }
+                          
+                          const displayName = stageNameAr || matchedStage?.stage_name_ar || "-";
+                          const stageColor = matchedStage?.color || "#gray";
+                          
+                          if (displayName !== "-") {
+                            return (
+                              <Badge
+                                variant="outline"
+                                className="text-xs flex items-center gap-1 w-fit"
+                                style={{
+                                  borderColor: stageColor,
+                                  color: stageColor,
+                                }}
+                              >
+                                <span
+                                  className="size-1.5 rounded-full shrink-0"
+                                  style={{ backgroundColor: stageColor }}
+                                  aria-hidden
+                                />
+                                {displayName}
+                              </Badge>
+                            );
+                          }
+                          return <span className="text-gray-400 text-sm">-</span>;
+                        })()}
                       </TableCell>
 
                       {/* Actions */}

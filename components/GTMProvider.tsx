@@ -250,10 +250,10 @@ export default function GTMProvider({ children }: GTMProviderProps) {
 
   return (
     <>
-      {/* GTM Script - Global Container */}
+      {/* GTM Script - Global Container (loads in <head> as early as possible) */}
       <Script
         id="gtm-script"
-        strategy="afterInteractive"
+        strategy="beforeInteractive"
         onLoad={() => {
           console.log("✅ GTM Global Container Loaded:", GTM_ID);
         }}
