@@ -320,6 +320,11 @@ export default function Footer2(props: Footer2Props) {
       baseData.content.companyInfo.showCompanyName = true;
     }
 
+    // Ensure showDescription defaults to true if not set
+    if (baseData.content?.companyInfo && baseData.content.companyInfo.showDescription === undefined) {
+      baseData.content.companyInfo.showDescription = true;
+    }
+
 
     return baseData;
   }, [
@@ -818,12 +823,14 @@ export default function Footer2(props: Footer2Props) {
               )}
 
               {/* Company Description */}
-              <p className="text-base leading-relaxed" style={{ color: textAndLinksColor, opacity: 0.9 }}>
-                {replaceBaheya(
-                  mergedData.content?.companyInfo?.description ||
-                    "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
-                )}
-              </p>
+              {(mergedData.content?.companyInfo?.showDescription === true) && (
+                <p className="text-base leading-relaxed" style={{ color: textAndLinksColor, opacity: 0.9 }}>
+                  {replaceBaheya(
+                    mergedData.content?.companyInfo?.description ||
+                      "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
+                  )}
+                </p>
+              )}
             </div>  
 
 

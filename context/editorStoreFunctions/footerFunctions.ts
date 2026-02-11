@@ -153,6 +153,7 @@ export const getDefaultFooter2Data = (): ComponentData => ({
     companyInfo: {
       enabled: true,
       showCompanyName: true,
+      showDescription: true,
       name: "تعاريف العقارية",
       description:
         "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",

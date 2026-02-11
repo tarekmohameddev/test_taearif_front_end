@@ -1,0 +1,4 @@
+2025-01-17 16:30:00
+Update Type: Feature
+Added showDescription toggle field to companyInfo section in footer2 component to control visibility of company description. Default value is true (toggle is open by default). Description field is hidden in EditorSidebar when toggle is closed (using condition field)
+components/tenant/footer/footer2.tsx, componentsStructure/footer.ts, context/editorStoreFunctions/footerFunctions.ts
