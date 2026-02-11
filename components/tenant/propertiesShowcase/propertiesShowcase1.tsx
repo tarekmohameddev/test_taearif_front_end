@@ -858,6 +858,11 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
       : currentStoreData), // 4. Current store data (highest priority if not default)
   };
 
+  // Ensure showLoadMoreButton defaults to true if not set
+  if (mergedData.content && mergedData.content.showLoadMoreButton === undefined) {
+    mergedData.content.showLoadMoreButton = true;
+  }
+
   // ─────────────────────────────────────────────────────────
   // 5.5. FETCH DATA FROM API
   // ─────────────────────────────────────────────────────────
@@ -1220,27 +1225,29 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
         )}
 
         {/* Load More Button */}
-        <div className="flex justify-center mt-12">
-          <Link
-            href={routePath}
-            className="px-5 py-3 border-2 font-medium rounded-2xl transition-all duration-300 hover:scale-110"
-            style={{
-              borderColor: loadMoreButtonColor,
-              backgroundColor: "transparent",
-              color: loadMoreButtonTextColor,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = loadMoreButtonHoverColor;
-              e.currentTarget.style.color = loadMoreButtonHoverTextColor;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = loadMoreButtonTextColor;
-            }}
-          >
-            {mergedData.content?.loadMoreButtonText || "تحميل المزيد"}
-          </Link>
-        </div>
+        {(mergedData.content?.showLoadMoreButton === true) && (
+          <div className="flex justify-center mt-12">
+            <Link
+              href={routePath}
+              className="px-5 py-3 border-2 font-medium rounded-2xl transition-all duration-300 hover:scale-110"
+              style={{
+                borderColor: loadMoreButtonColor,
+                backgroundColor: "transparent",
+                color: loadMoreButtonTextColor,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = loadMoreButtonHoverColor;
+                e.currentTarget.style.color = loadMoreButtonHoverTextColor;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = loadMoreButtonTextColor;
+              }}
+            >
+              {mergedData.content?.loadMoreButtonText || "تحميل المزيد"}
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

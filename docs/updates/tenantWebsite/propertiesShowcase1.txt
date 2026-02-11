@@ -1,0 +1,4 @@
+2025-01-17 17:00:00
+Update Type: Feature
+Added showLoadMoreButton toggle field to content section in propertiesShowcase1 component to control visibility of "Load More" button. Default value is true (toggle is open by default). Load More Button Text field is hidden in EditorSidebar when toggle is closed (using condition field)
+components/tenant/propertiesShowcase/propertiesShowcase1.tsx, componentsStructure/propertiesShowcase.ts, context/editorStoreFunctions/propertiesShowcaseFunctions.ts

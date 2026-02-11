@@ -88,10 +88,19 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               placeholder: "المشاريع والعقارات",
             },
             {
+              key: "showLoadMoreButton",
+              label: "Show Load More Button",
+              type: "boolean",
+            },
+            {
               key: "loadMoreButtonText",
               label: "Load More Button Text",
               type: "text",
               placeholder: "تحميل المزيد",
+              condition: {
+                field: "showLoadMoreButton",
+                value: true,
+              },
             },
             {
               key: "viewAllButtonText",

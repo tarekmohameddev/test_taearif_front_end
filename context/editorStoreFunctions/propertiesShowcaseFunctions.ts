@@ -31,6 +31,7 @@ export const getDefaultPropertiesShowcaseData = (): ComponentData => ({
   content: {
     ThemeTwo: "content",
     title: "المشاريع والعقارات",
+    showLoadMoreButton: true,
     loadMoreButtonText: "تحميل المزيد",
     viewAllButtonText: "عرض الكل",
     cardType: "card1", // "card1" | "card2"
