@@ -71,11 +71,17 @@ export function WrapperObjectRenderer({
         <div className="p-6 bg-gradient-to-b from-white to-slate-50 space-y-6 border-t border-slate-200">
           {wrappedFields.map((field: FieldDefinition) => {
             // بناء المسار الصحيح للحقل
-            // إذا كان normalizedPath يحتوي على المسار الكامل، نستخدمه كـ basePath
+            // إذا كان normalizedPath يحتوي على المسار الكامل (مثل content.companyInfo.descriptionSection)
+            // نستبدل الجزء الأخير بـ field.key (مثل content.companyInfo.showDescription)
             // وإلا نستخدم field.key مباشرة للبيانات flat
-            const basePath = normalizedPath.includes('.') 
-              ? normalizedPath.split('.').slice(0, -1).join('.') + '.' + field.key
-              : field.key;
+            let basePath: string;
+            if (normalizedPath.includes('.')) {
+              const pathParts = normalizedPath.split('.');
+              pathParts[pathParts.length - 1] = field.key;
+              basePath = pathParts.join('.');
+            } else {
+              basePath = field.key;
+            }
             
             return (
               <div key={field.key} className="space-y-2">

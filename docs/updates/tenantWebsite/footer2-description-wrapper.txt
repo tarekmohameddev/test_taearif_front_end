@@ -1,0 +1,4 @@
+2025-01-17 17:00:00
+Update Type: Feature
+Applied WrapperObjectRenderer to description and showDescription fields in footer2. Description section now appears in collapsible container with toggle and description field inside
+componentsStructure/footer.ts, components/tenant/live-editor/EditorSidebar/components/FieldRenderers/WrapperObjectRenderer.tsx

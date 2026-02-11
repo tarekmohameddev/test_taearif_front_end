@@ -722,16 +722,27 @@ export const footerStructure: ComponentStructure = {
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
-                { key: "showDescription", label: "Show Description", type: "boolean" },
                 { key: "name", label: "Company Name", type: "text" },
-                { 
-                  key: "description", 
-                  label: "Description", 
-                  type: "text",
-                  condition: {
-                    field: "showDescription",
-                    value: true,
-                  },
+                {
+                  key: "descriptionSection",
+                  label: "Company Description",
+                  displayAsObject: true,
+                  wrappedFields: [
+                    { 
+                      key: "showDescription", 
+                      label: "Show Description", 
+                      type: "boolean" 
+                    },
+                    { 
+                      key: "description", 
+                      label: "Description", 
+                      type: "text",
+                      condition: {
+                        field: "showDescription",
+                        value: true,
+                      },
+                    },
+                  ],
                 },
                 { key: "tagline", label: "Tagline", type: "text" },
                 { key: "logo", label: "Logo", type: "image" },
