@@ -932,6 +932,18 @@ export function translateLabel(
       "components_structure.footer_specific.show_social_media",
     "Show Footer Bottom":
       "components_structure.footer_specific.show_footer_bottom",
+    "Company Description":
+      "components_structure.footer_specific.company_description",
+    "Show Description":
+      "components_structure.footer_specific.show_description",
+    "Show Company Name":
+      "components_structure.footer_specific.show_company_name",
+    "Show Form":
+      "components_structure.footer_specific.show_form",
+    "Social Media Icons Color":
+      "components_structure.footer_specific.social_media_icons_color",
+    "Logo Rounded (Circular)":
+      "components_structure.footer_specific.logo_rounded_circular",
 
     // Half Text Half Image specific labels
     "Half Text Half Image 1 - Modern":

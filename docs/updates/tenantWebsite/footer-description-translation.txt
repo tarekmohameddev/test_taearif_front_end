@@ -1,0 +1,4 @@
+2025-01-17 17:30:00
+Update Type: Feature
+Added translations for Company Description, Show Description, Description, Show Company Name, Show Form, Social Media Icons Color, and Logo Rounded (Circular) fields in footer component using editorSidebarTranslationSystem
+lib/i18n/locales/ar.json, lib/i18n/locales/en.json, componentsStructure/translationHelper.ts
