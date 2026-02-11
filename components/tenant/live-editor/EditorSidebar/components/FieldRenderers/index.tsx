@@ -1,6 +1,7 @@
 // Export all field renderers
 export { ArrayFieldRenderer } from "./ArrayFieldRenderer";
 export { ObjectFieldRenderer } from "./ObjectFieldRenderer";
+export { WrapperObjectRenderer } from "./WrapperObjectRenderer";
 export {
   BackgroundFieldRenderer,
   SimpleBackgroundFieldRenderer,

@@ -12,6 +12,7 @@ import {
 import {
   ArrayFieldRenderer,
   ObjectFieldRenderer,
+  WrapperObjectRenderer,
 } from "./FieldRenderers/index";
 
 // Hooks
@@ -123,6 +124,20 @@ export function DynamicFieldsRenderer({
       if (conditionFieldValue !== def.condition.value) {
         return null; // لا تعرض الحقل إذا لم تتحقق الشروط
       }
+    }
+
+    // Check if this field should be displayed as object wrapper (flat data structure)
+    if ((def as any).displayAsObject) {
+      return (
+        <WrapperObjectRenderer
+          def={def}
+          normalizedPath={normalizedPath}
+          value={value}
+          updateValue={updateValue}
+          getValueByPath={getValueByPath}
+          renderField={renderField}
+        />
+      );
     }
 
     switch (def.type) {
