@@ -1,0 +1,9 @@
+2025-01-17 18:00:00
+Update Type: Update
+Replaced Twitter icon with custom X icon image (/images/icons/x-twitter.png) in footer1 and footer2 components. Twitter/X icons now use Image component instead of lucide-react Twitter icon. Added CSS filter to make X logo always white (brightness(0) invert(1))
+components/tenant/footer/footer1.tsx, components/tenant/footer/footer2.tsx
+
+2025-01-17 18:30:00
+Update Type: Update
+Replaced Twitter icon with custom X icon image (/images/icons/x-twitter.png) in all components that use Twitter icon. Applied to: hero4, projectDetails ShareDialog, propertyDetail ShareDialog, contactFormSection1, blogDetails1, footer1-i18n, StaticFooter1. All Twitter/X icons now use Image component with white filter instead of lucide-react TwitterIcon or react-icons FaTwitter
+components/tenant/hero/hero4.tsx, components/tenant/projectDetails/projectDetails1/components/ShareDialog.tsx, components/tenant/propertyDetail/components/ShareDialog.tsx, components/tenant/contactFormSection/contactFormSection1.tsx, components/tenant/blogDetails/blogDetails1.tsx, components/tenant/footer/footer1-i18n.tsx, components/tenant/footer/StaticFooter1.tsx

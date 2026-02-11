@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import {
   FaFacebook,
-  FaTwitter,
   FaInstagram,
   FaLinkedinIn,
   FaWhatsapp,
 } from "react-icons/fa6";
+import Image from "next/image";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultContactFormSectionData } from "@/context/editorStoreFunctions/contactFormSectionFunctions";
@@ -43,7 +43,17 @@ const SocialLink: React.FC<SocialLinkProps> = ({
       <FaFacebook size={parseInt(icon.size || "24")} color={icon.color} />
     )}
     {alt === "x" && (
-      <FaTwitter size={parseInt(icon.size || "24")} color={icon.color} />
+      <Image
+        src="/images/icons/x-twitter.png"
+        alt="X (Twitter)"
+        width={parseInt(icon.size || "24")}
+        height={parseInt(icon.size || "24")}
+        style={{ 
+          filter: "brightness(0) invert(1)",
+          color: icon.color 
+        }}
+        className="object-contain"
+      />
     )}
     {alt === "instagram" && (
       <FaInstagram size={parseInt(icon.size || "24")} color={icon.color} />

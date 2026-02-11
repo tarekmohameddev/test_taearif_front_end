@@ -721,7 +721,9 @@ export default function StaticFooter({
                   <div className="flex items-center gap-3 pt-4">
                     {mergedData.content.socialMedia.platforms.map(
                       (platform: any, index: number) => {
-                        const IconComponent = getIconComponent(platform.icon);
+                        // Check if this is Twitter/X icon - use custom image instead
+                        const isTwitter = platform.icon === "Twitter" || platform.name === "Twitter" || platform.name === "X (Twitter)";
+                        
                         return (
                           <a
                             key={index}
@@ -736,7 +738,21 @@ export default function StaticFooter({
                               } as React.CSSProperties
                             }
                           >
-                            <IconComponent className="size-5" />
+                            {isTwitter ? (
+                              <Image
+                                src="/images/icons/x-twitter.png"
+                                alt="X (Twitter)"
+                                width={20}
+                                height={20}
+                                className="size-5 object-contain"
+                                style={{ filter: "brightness(0) invert(1)" }}
+                              />
+                            ) : (
+                              (() => {
+                                const IconComponent = getIconComponent(platform.icon);
+                                return <IconComponent className="size-5" />;
+                              })()
+                            )}
                           </a>
                         );
                       },

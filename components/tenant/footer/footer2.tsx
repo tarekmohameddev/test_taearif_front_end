@@ -570,7 +570,9 @@ export default function Footer2(props: Footer2Props) {
         <div className="flex items-center gap-3">
           {mergedData.content?.socialMedia?.platforms?.map(
             (platform: any, index: number) => {
-              const IconComponent = getIconComponent(platform.icon, platform.name);
+              // Check if this is Twitter/X icon - use custom image instead
+              const isTwitter = platform.icon === "Twitter" || platform.name === "Twitter" || platform.name === "X (Twitter)";
+              
               return (
                 <a
                   key={index}
@@ -594,7 +596,21 @@ export default function Footer2(props: Footer2Props) {
                     e.currentTarget.style.backgroundColor = darkerBgColor;
                   }}
                 >
-                  <IconComponent className="size-5" />
+                  {isTwitter ? (
+                    <Image
+                      src="/images/icons/x-twitter.png"
+                      alt="X (Twitter)"
+                      width={20}
+                      height={20}
+                      className="size-5 object-contain"
+                      style={{ filter: "brightness(0) invert(1)" }}
+                    />
+                  ) : (
+                    (() => {
+                      const IconComponent = getIconComponent(platform.icon, platform.name);
+                      return <IconComponent className="size-5" />;
+                    })()
+                  )}
                 </a>
               );
             },

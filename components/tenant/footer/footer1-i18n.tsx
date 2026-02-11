@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Facebook,
-  Twitter,
   Instagram,
   Linkedin,
   Mail,
   Phone,
   MapPin,
 } from "lucide-react";
+import Image from "next/image";
 
 interface Footer1I18nProps {
   logo?: string;
@@ -110,7 +110,14 @@ export default function Footer1I18n({
                   href={socialLinks.twitter}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  <Twitter className="h-5 w-5" />
+                  <Image
+                    src="/images/icons/x-twitter.png"
+                    alt="X (Twitter)"
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 object-contain"
+                    style={{ filter: "brightness(0) invert(1)" }}
+                  />
                 </a>
               )}
               {socialLinks.instagram && (

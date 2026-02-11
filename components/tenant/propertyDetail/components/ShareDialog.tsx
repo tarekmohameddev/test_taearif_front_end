@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/dialog";
 import {
   FacebookIcon,
-  TwitterIcon,
   LinkedinIcon,
   MessageCircleIcon,
   CopyIcon,
 } from "lucide-react";
+import Image from "next/image";
 import { Property } from "../types/types";
 import {
   shareToFacebook,
@@ -74,7 +74,14 @@ export function ShareDialog({
               onClick={() => shareToTwitter(property)}
               className="flex items-center justify-center gap-2 p-3 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
             >
-              <TwitterIcon className="w-5 h-5" />
+              <Image
+                src="/images/icons/x-twitter.png"
+                alt="X (Twitter)"
+                width={20}
+                height={20}
+                className="w-5 h-5 object-contain"
+                style={{ filter: "brightness(0) invert(1)" }}
+              />
               <span className="text-sm font-medium">تويتر</span>
             </button>
 
