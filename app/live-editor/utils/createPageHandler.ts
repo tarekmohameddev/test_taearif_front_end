@@ -10,18 +10,8 @@ export async function createPageHandler(
   onSuccess?: (slug: string) => void,
 ): Promise<void> {
   // استخدام createPage من editorStore
-  // #region agent log
-  const storeState = useEditorStore.getState();
-  fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'createPageHandler.ts:13',message:'Store state keys',data:{keys:Object.keys(storeState),hasCreatePage:typeof storeState.createPage,createPageType:typeof storeState.createPage},timestamp:Date.now(),runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
-  const { createPage } = storeState;
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'createPageHandler.ts:16',message:'createPage value check',data:{createPage:createPage,isFunction:typeof createPage === 'function',isUndefined:createPage === undefined},timestamp:Date.now(),runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
+  const { createPage } = useEditorStore.getState();
 
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'createPageHandler.ts:22',message:'Calling createPage',data:{slug:formData.slug,name:formData.slug},timestamp:Date.now(),runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   createPage({
     slug: formData.slug,
     name: formData.slug, // استخدام slug كاسم الصفحة

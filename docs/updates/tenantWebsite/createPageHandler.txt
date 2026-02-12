@@ -1,0 +1,4 @@
+2025-01-15 15:30:00
+Update Type: Bug Fix
+Fixed missing createPage function implementation in editorStore - added createPage to createPageActions
+app/live-editor/utils/createPageHandler.ts, context/editorStore/store/actions/pageActions.ts
