@@ -119,6 +119,7 @@ export function RequestDetailPage({
     snoozeAction: storeSnoozeAction,
     addActionNote: storeAddActionNote,
     addAppointment: storeAddAppointment,
+    addAppointmentForRequest,
   } = store;
 
   // Use prop action if provided, otherwise find in store
@@ -327,31 +328,55 @@ export function RequestDetailPage({
   };
 
   const handleScheduleAppointment = async () => {
-    if (!aptDate || !aptTime || !customer) {
+    if (!aptDate || !aptTime) {
       toast.error("الرجاء اختيار التاريخ والوقت");
+      return;
+    }
+    
+    // Check if datetime is in the future
+    const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
+    const now = new Date();
+    if (new Date(datetime) <= now) {
+      toast.error("التاريخ والوقت يجب أن يكون في المستقبل");
       return;
     }
     
     const toastId = toast.loading("جاري جدولة الموعد...");
     try {
-      const now = new Date().toISOString();
-      const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
-      const appointment: Appointment = {
-        id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-        title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
-        type: aptType,
-        date: datetime,
-        time: aptTime,
-        datetime,
-        duration: 30,
-        status: "scheduled",
-        priority: "medium",
-        notes: aptNotes.trim() || undefined,
-        createdAt: now,
-        updatedAt: now,
-      };
-      addAppointment(customer.id, appointment);
-      toast.success("تم جدولة الموعد بنجاح", { id: toastId });
+      // Use addAppointmentForRequest for property_request, fallback to old method for others
+      if (action?.objectType === 'property_request' && action?.id) {
+        await addAppointmentForRequest(action.id, {
+          type: aptType,
+          datetime,
+          duration: 30,
+          notes: aptNotes.trim() || undefined,
+          title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label,
+          priority: 'medium',
+        });
+        toast.success("تم جدولة الموعد بنجاح", { id: toastId });
+      } else if (customer) {
+        // Fallback to old method for non-property_request actions
+        const now = new Date().toISOString();
+        const appointment: Appointment = {
+          id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+          title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
+          type: aptType,
+          date: datetime,
+          time: aptTime,
+          datetime,
+          duration: 30,
+          status: "scheduled",
+          priority: "medium",
+          notes: aptNotes.trim() || undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        addAppointment(customer.id, appointment);
+        toast.success("تم جدولة الموعد بنجاح", { id: toastId });
+      } else {
+        toast.error("لا يمكن جدولة الموعد: بيانات غير صحيحة", { id: toastId });
+        return;
+      }
       
       // Refresh page data
       if (onRefetch) {
@@ -364,8 +389,9 @@ export function RequestDetailPage({
       setAptTime("10:00");
       setAptNotes("");
     } catch (err: any) {
+      console.error("Error scheduling appointment:", err);
       toast.error(
-        err.response?.data?.message || "حدث خطأ أثناء جدولة الموعد",
+        err.message || err.response?.data?.message || "حدث خطأ أثناء جدولة الموعد",
         { id: toastId }
       );
     }

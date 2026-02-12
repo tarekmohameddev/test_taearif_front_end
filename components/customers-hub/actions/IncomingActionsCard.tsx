@@ -279,7 +279,7 @@ export function IncomingActionsCard({
   isCompleting = false,
 }: IncomingActionsCardProps) {
   const router = useRouter();
-  const { addAppointment, updateCustomerStage, getCustomerById } = useUnifiedCustomersStore();
+  const { addAppointment, addAppointmentForRequest, updateCustomerStage, getCustomerById } = useUnifiedCustomersStore();
   const { userData } = useAuthStore();
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [aptType, setAptType] = useState<Appointment["type"]>("office_meeting");
@@ -717,34 +717,72 @@ export function IncomingActionsCard({
     setAptNotes("");
   };
 
-  const handleScheduleSubmit = (e: React.FormEvent) => {
+  const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!aptDate || !aptTime) return;
-    setIsSubmittingApt(true);
-    const now = new Date().toISOString();
+    
+    // Check if datetime is in the future
     const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
-    const appointment: Appointment = {
-      id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-      title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
-      type: aptType,
-      date: datetime,
-      time: aptTime,
-      datetime,
-      duration: 30,
-      location: undefined,
-      status: "scheduled",
-      priority: "medium",
-      notes: aptNotes.trim() || undefined,
-      createdAt: now,
-      updatedAt: now,
-    };
-    if (action.customerId) {
-      addAppointment(String(action.customerId), appointment);
+    const now = new Date();
+    if (new Date(datetime) <= now) {
+      toast.error("التاريخ والوقت يجب أن يكون في المستقبل");
+      return;
     }
-    setIsSubmittingApt(false);
-    setShowScheduleForm(false);
-    resetScheduleForm();
-    onComplete?.(action.id);
+    
+    setIsSubmittingApt(true);
+    
+    try {
+      // Use addAppointmentForRequest for property_request, fallback to old method for others
+      if (action.objectType === 'property_request' && action.id) {
+        const appointmentParams = {
+          type: aptType,
+          datetime,
+          duration: 30,
+          notes: aptNotes.trim() || undefined,
+          title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label,
+          priority: 'medium' as const,
+        };
+        
+        console.log('Creating appointment with params:', {
+          requestId: action.id,
+          params: appointmentParams,
+        });
+        
+        await addAppointmentForRequest(action.id, appointmentParams);
+        toast.success("تم جدولة الموعد بنجاح");
+      } else if (action.customerId) {
+        // Fallback to old method for non-property_request actions
+        const now = new Date().toISOString();
+        const appointment: Appointment = {
+          id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+          title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
+          type: aptType,
+          date: datetime,
+          time: aptTime,
+          datetime,
+          duration: 30,
+          location: undefined,
+          status: "scheduled",
+          priority: "medium",
+          notes: aptNotes.trim() || undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        addAppointment(String(action.customerId), appointment);
+        toast.success("تم جدولة الموعد بنجاح");
+      } else {
+        toast.error("لا يمكن جدولة الموعد: بيانات غير صحيحة");
+      }
+      
+      setIsSubmittingApt(false);
+      setShowScheduleForm(false);
+      resetScheduleForm();
+      onComplete?.(action.id);
+    } catch (err: any) {
+      console.error("Error scheduling appointment:", err);
+      toast.error(err.message || "حدث خطأ أثناء جدولة الموعد");
+      setIsSubmittingApt(false);
+    }
   };
 
   // Compact view for dense mode

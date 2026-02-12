@@ -573,3 +573,174 @@ export async function bulkChangePriority(
     },
   });
 }
+
+// Appointment and Reminder Types
+export interface CreateAppointmentParams {
+  type: 'site_visit' | 'office_meeting' | 'phone_call' | 'video_call' | 'contract_signing' | 'other';
+  datetime: string; // ISO 8601 datetime - must be in the future
+  duration?: number; // Duration in minutes (default 30, min 1)
+  notes?: string; // Optional notes
+  title?: string; // Optional - if omitted, backend sets default title
+  priority?: 'low' | 'medium' | 'high' | 'urgent'; // Default medium
+}
+
+export interface CreateAppointmentResponse {
+  success: boolean;
+  data: {
+    appointment: {
+      id: number;
+      requestId: string;
+      customerId: number | null;
+      title: string;
+      type: string;
+      datetime: string;
+      duration: number;
+      status: string;
+      priority: string;
+      notes: string | null;
+      createdAt: string;
+      updatedAt: string;
+    };
+  };
+  error?: {
+    code: string;
+    message: string;
+    message_ar?: string;
+  };
+}
+
+export interface CreateReminderParams {
+  title: string; // Required
+  description?: string; // Optional
+  datetime: string; // ISO 8601 datetime - must be in the future
+  priority: 'low' | 'medium' | 'high' | 'urgent'; // Required
+  type: 'follow_up' | 'payment_due' | 'document_required' | 'other'; // Required
+  notes?: string; // Optional
+}
+
+export interface CreateReminderResponse {
+  success: boolean;
+  data: {
+    reminder: {
+      id: number;
+      requestId: string;
+      customerId: number | null;
+      title: string;
+      description: string | null;
+      datetime: string;
+      priority: string;
+      type: string;
+      status: string;
+      notes: string | null;
+      isOverdue: boolean;
+      daysUntilDue: number;
+      createdAt: string;
+      updatedAt: string;
+    };
+  };
+  error?: {
+    code: string;
+    message: string;
+    message_ar?: string;
+  };
+}
+
+// Create Appointment for Property Request
+export async function createAppointmentForRequest(
+  requestId: string, // Composite id like "property_request_89"
+  params: CreateAppointmentParams
+): Promise<CreateAppointmentResponse> {
+  // Validate requestId
+  if (!requestId || typeof requestId !== 'string') {
+    throw new Error(`Invalid requestId: ${requestId}. Must be a composite id like "property_request_89"`);
+  }
+  
+  // Validate required fields
+  if (!params.type || !params.datetime) {
+    throw new Error("Missing required fields: type and datetime are required");
+  }
+  
+  // Remove undefined values from params
+  const cleanParams: Record<string, any> = {
+    type: params.type,
+    datetime: params.datetime,
+  };
+  
+  if (params.duration !== undefined) cleanParams.duration = params.duration;
+  if (params.notes !== undefined && params.notes !== null && params.notes !== '') cleanParams.notes = params.notes;
+  if (params.title !== undefined && params.title !== null && params.title !== '') cleanParams.title = params.title;
+  if (params.priority !== undefined) cleanParams.priority = params.priority;
+  
+  const url = `${BASE_URL}/${encodeURIComponent(requestId)}/appointments`;
+  
+  console.log('🔵 createAppointmentForRequest - Request details:', {
+    url,
+    requestId,
+    cleanParams,
+    fullUrl: `${axiosInstance.defaults.baseURL || ''}${url}`,
+  });
+  
+  try {
+    const response = await axiosInstance.post<CreateAppointmentResponse>(url, cleanParams);
+    console.log('✅ createAppointmentForRequest - Success:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Error in createAppointmentForRequest:', {
+      url,
+      requestId,
+      params: cleanParams,
+      error: error.response?.data || error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      headers: error.response?.headers,
+    });
+    throw error;
+  }
+}
+
+// Create Reminder for Property Request
+export async function createReminderForRequest(
+  requestId: string, // Composite id like "property_request_89"
+  params: CreateReminderParams
+): Promise<CreateReminderResponse> {
+  // Validate requestId
+  if (!requestId || typeof requestId !== 'string') {
+    throw new Error(`Invalid requestId: ${requestId}. Must be a composite id like "property_request_89"`);
+  }
+  
+  // Validate required fields
+  if (!params.title || !params.datetime || !params.priority || !params.type) {
+    throw new Error("Missing required fields: title, datetime, priority, and type are required");
+  }
+  
+  // Remove undefined values from params
+  const cleanParams: Record<string, any> = {
+    title: params.title,
+    datetime: params.datetime,
+    priority: params.priority,
+    type: params.type,
+  };
+  
+  if (params.description !== undefined && params.description !== null && params.description !== '') {
+    cleanParams.description = params.description;
+  }
+  if (params.notes !== undefined && params.notes !== null && params.notes !== '') {
+    cleanParams.notes = params.notes;
+  }
+  
+  const url = `${BASE_URL}/${encodeURIComponent(requestId)}/reminders`;
+  
+  try {
+    const response = await axiosInstance.post<CreateReminderResponse>(url, cleanParams);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error in createReminderForRequest:', {
+      url,
+      requestId,
+      params: cleanParams,
+      error: error.response?.data || error.message,
+      status: error.response?.status,
+    });
+    throw error;
+  }
+}

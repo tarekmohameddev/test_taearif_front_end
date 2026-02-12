@@ -17,6 +17,33 @@ import type {
 } from "@/types/unified-customer";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import {
+  createAppointmentForRequest,
+  createReminderForRequest,
+  type CreateAppointmentParams,
+  type CreateReminderParams,
+} from "@/lib/services/customers-hub-requests-api";
+
+// Helper function to map API reminder type to Reminder type
+function mapReminderTypeFromAPI(apiType: string): Reminder['type'] {
+  const mapping: Record<string, Reminder['type']> = {
+    'follow_up': 'follow_up',
+    'payment_due': 'payment',
+    'document_required': 'document',
+    'other': 'general',
+  };
+  return mapping[apiType] || 'general';
+}
+
+// Helper function to map API reminder status to Reminder status
+function mapReminderStatusFromAPI(apiStatus: string): Reminder['status'] {
+  const mapping: Record<string, Reminder['status']> = {
+    'pending': 'pending',
+    'completed': 'completed',
+    'cancelled': 'cancelled',
+  };
+  return mapping[apiStatus] || 'pending';
+}
 
 interface UnifiedCustomersStore {
   // Data
@@ -128,6 +155,10 @@ interface UnifiedCustomersStore {
   updateReminder: (customerId: string, reminderId: string, updates: Partial<Reminder>) => void;
   removeReminder: (customerId: string, reminderId: string) => void;
   addInteraction: (customerId: string, interaction: Interaction) => void;
+  
+  // Actions - Property Request Appointments & Reminders (API calls)
+  addAppointmentForRequest: (requestId: string, params: CreateAppointmentParams) => Promise<void>;
+  addReminderForRequest: (requestId: string, params: CreateReminderParams) => Promise<void>;
   
   // Actions - UI State
   setViewMode: (mode: 'table' | 'grid' | 'map' | 'pipeline') => void;
@@ -958,6 +989,133 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           lastContactType: interaction.type,
           totalInteractions: (customer.totalInteractions || 0) + 1,
         });
+      },
+      
+      // Property Request Appointments & Reminders (API calls)
+      addAppointmentForRequest: async (requestId, params) => {
+        const { userData, IsLoading: authLoading } = useAuthStore.getState();
+        
+        if (authLoading || !userData?.token) {
+          throw new Error("Not authenticated");
+        }
+        
+        // Validate requestId
+        if (!requestId || typeof requestId !== 'string') {
+          throw new Error(`Invalid requestId: ${requestId}. Must be a composite id like "property_request_89"`);
+        }
+        
+        // Validate required params
+        if (!params.type || !params.datetime) {
+          throw new Error("Missing required fields: type and datetime are required");
+        }
+        
+        try {
+          const response = await createAppointmentForRequest(requestId, params);
+          
+          if (response.success && response.data?.appointment) {
+            // Update the action in the store if it exists
+            const actions = get().actions;
+            const actionIndex = actions.findIndex(a => a.id === requestId);
+            
+            if (actionIndex !== -1) {
+              const action = actions[actionIndex];
+              const updatedAction = {
+                ...action,
+                appointments: [
+                  ...(action.appointments || []),
+                  {
+                    id: String(response.data.appointment.id),
+                    title: response.data.appointment.title,
+                    type: response.data.appointment.type as Appointment['type'],
+                    date: response.data.appointment.datetime,
+                    time: new Date(response.data.appointment.datetime).toTimeString().slice(0, 5),
+                    datetime: response.data.appointment.datetime,
+                    duration: response.data.appointment.duration,
+                    status: response.data.appointment.status as Appointment['status'],
+                    priority: response.data.appointment.priority as Priority,
+                    notes: response.data.appointment.notes || undefined,
+                    createdAt: response.data.appointment.createdAt,
+                    updatedAt: response.data.appointment.updatedAt,
+                  },
+                ],
+              };
+              
+              const updatedActions = [...actions];
+              updatedActions[actionIndex] = updatedAction;
+              set({ actions: updatedActions });
+            }
+          } else if (response.error) {
+            throw new Error(response.error.message_ar || response.error.message || "Failed to create appointment");
+          } else {
+            throw new Error("Unknown error: Response was not successful");
+          }
+        } catch (err: any) {
+          console.error("Error creating appointment:", {
+            requestId,
+            params,
+            error: err.response?.data || err.message,
+            status: err.response?.status,
+          });
+          
+          // Extract error message from response
+          const errorMessage = err.response?.data?.error?.message_ar 
+            || err.response?.data?.error?.message
+            || err.response?.data?.message
+            || err.message
+            || "حدث خطأ أثناء إنشاء الموعد";
+            
+          throw new Error(errorMessage);
+        }
+      },
+      
+      addReminderForRequest: async (requestId, params) => {
+        const { userData, IsLoading: authLoading } = useAuthStore.getState();
+        
+        if (authLoading || !userData?.token) {
+          throw new Error("Not authenticated");
+        }
+        
+        try {
+          const response = await createReminderForRequest(requestId, params);
+          
+          if (response.success && response.data?.reminder) {
+            // Update the action in the store if it exists
+            const actions = get().actions;
+            const actionIndex = actions.findIndex(a => a.id === requestId);
+            
+            if (actionIndex !== -1) {
+              const action = actions[actionIndex];
+              const updatedAction = {
+                ...action,
+                reminders: [
+                  ...(action.reminders || []),
+                  {
+                    id: String(response.data.reminder.id),
+                    title: response.data.reminder.title,
+                    description: response.data.reminder.description || undefined,
+                    datetime: response.data.reminder.datetime,
+                    priority: response.data.reminder.priority as Priority,
+                    type: mapReminderTypeFromAPI(response.data.reminder.type),
+                    status: mapReminderStatusFromAPI(response.data.reminder.status),
+                    isOverdue: response.data.reminder.isOverdue,
+                    daysUntilDue: response.data.reminder.daysUntilDue,
+                    createdBy: "",
+                    createdById: "",
+                  },
+                ],
+              };
+              
+              const updatedActions = [...actions];
+              updatedActions[actionIndex] = updatedAction;
+              set({ actions: updatedActions });
+            }
+          } else if (response.error) {
+            throw new Error(response.error.message_ar || response.error.message);
+          }
+        } catch (err: any) {
+          console.error("Error creating reminder:", err);
+          throw err;
+        }
       },
       
       // UI State Actions

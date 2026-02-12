@@ -1,0 +1,4 @@
+2025-01-20 15:30:00
+Update Type: Feature
+إضافة دعم API الجديد لإنشاء appointments و reminders للـ property requests
+lib/services/customers-hub-requests-api.ts, context/store/unified-customers.ts, types/unified-customer.ts, components/customers-hub/actions/IncomingActionsCard.tsx, components/customers-hub/requests/RequestDetailPage.tsx

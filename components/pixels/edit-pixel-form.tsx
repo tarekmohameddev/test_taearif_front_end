@@ -4,13 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CustomSelect } from "@/components/customComponents/CustomSelect";
 import { Switch } from "@/components/ui/switch";
 import {
   CustomDialog,
@@ -101,23 +95,17 @@ export function EditPixelForm({
         <div className="grid gap-4 py-4 px-4 sm:px-6">
           <div className="grid gap-2">
             <Label htmlFor="edit-platform">المنصة</Label>
-            <Select
+            <CustomSelect
               value={formData.platform}
               onValueChange={(value) =>
                 setFormData({ ...formData, platform: value })
               }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر المنصة" />
-              </SelectTrigger>
-              <SelectContent>
-                {availablePlatforms.map((platform) => (
-                  <SelectItem key={platform.value} value={platform.value}>
-                    {platform.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={availablePlatforms.map((p) => ({
+                label: p.label,
+                value: p.value,
+              }))}
+              placeholder="اختر المنصة"
+            />
           </div>
 
           <div className="grid gap-2">

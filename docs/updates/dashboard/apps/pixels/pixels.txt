@@ -7,3 +7,8 @@ components/pixels/pixel-helpers.ts
 Update Type: Bug Fix
 Fixed hydration error by replacing nested <p> tags with <div> tags inside AlertDialogDescription component
 components/pixels/delete-pixel-dialog.tsx
+
+2026-02-12 18:47:07
+Update Type: Bug Fix
+Fixed dropdown z-index issue - SelectContent now appears above dialog by adding z-[10001] class and removing relative positioning when z-index override is present
+components/pixels/add-pixel-form.tsx, components/pixels/edit-pixel-form.tsx, components/ui/select.tsx
