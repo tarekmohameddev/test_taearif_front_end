@@ -12,3 +12,8 @@ components/pixels/delete-pixel-dialog.tsx
 Update Type: Bug Fix
 Fixed dropdown z-index issue - SelectContent now appears above dialog by adding z-[10001] class and removing relative positioning when z-index override is present
 components/pixels/add-pixel-form.tsx, components/pixels/edit-pixel-form.tsx, components/ui/select.tsx
+
+2026-02-12 18:56:13
+Update Type: Bug Fix
+Fixed hydration error - Replaced AlertDialogDescription (which uses <p> tag) with <div> tag to allow nested div elements inside
+components/pixels/delete-pixel-dialog.tsx

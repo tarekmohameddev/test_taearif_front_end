@@ -6,7 +6,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -38,7 +37,7 @@ export function DeletePixelDialog({
             <AlertTriangle className="h-5 w-5" />
             تأكيد الحذف
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-right">
+          <div className="text-sm text-muted-foreground text-right">
             <div className="space-y-3">
               <div className="font-semibold text-lg">
                 هل أنت متأكد من حذف هذا Pixel؟
@@ -57,7 +56,7 @@ export function DeletePixelDialog({
                 النظام.
               </div>
             </div>
-          </AlertDialogDescription>
+          </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>إلغاء</AlertDialogCancel>
