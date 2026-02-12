@@ -16,6 +16,7 @@ export const createPageActions = (
   | "getAllPages"
   | "deletePage"
   | "forceUpdatePageComponents"
+  | "createPage"
 > => ({
   setPageComponentsForPage: (page, components) =>
     set((state) => {
@@ -39,6 +40,24 @@ export const createPageActions = (
       delete newPageComponentsByPage[slug];
       return { pageComponentsByPage: newPageComponentsByPage } as any;
     }),
+  createPage: (pageData) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pageActions.ts:createPage',message:'createPage called',data:{slug:pageData.slug,name:pageData.name,componentsCount:pageData.components?.length || 0},timestamp:Date.now(),runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    set((state) => {
+      // Initialize the page with provided components or empty array
+      const components = pageData.components || [];
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pageActions.ts:createPage',message:'createPage setting state',data:{slug:pageData.slug,componentsCount:components.length,existingPages:Object.keys(state.pageComponentsByPage)},timestamp:Date.now(),runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
+      return {
+        pageComponentsByPage: {
+          ...state.pageComponentsByPage,
+          [pageData.slug]: components,
+        },
+      } as any;
+    });
+  },
   forceUpdatePageComponents: (slug, components) => {
     // ========== LOG BEFORE ==========
     const stateBefore = get();
