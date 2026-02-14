@@ -322,11 +322,17 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       offset: legacyParams.pagination ? (legacyParams.pagination.page - 1) * legacyParams.pagination.limit : 0,
     };
     
-    // ALWAYS ensure objectTypes includes property_request
+    // ALWAYS ensure objectTypes includes inquiry and property_request
     if (!requestBody.objectTypes || requestBody.objectTypes.length === 0) {
-      requestBody.objectTypes = ["property_request"];
-    } else if (!requestBody.objectTypes.includes("property_request")) {
-      requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
+      requestBody.objectTypes = ["inquiry", "property_request"];
+    } else {
+      // Ensure both inquiry and property_request are included
+      if (!requestBody.objectTypes.includes("inquiry")) {
+        requestBody.objectTypes = ["inquiry", ...requestBody.objectTypes];
+      }
+      if (!requestBody.objectTypes.includes("property_request")) {
+        requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
+      }
     }
     
     // Remove undefined fields
@@ -353,11 +359,17 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       requestBody.sort_dir = "desc";
     }
     
-    // ALWAYS ensure objectTypes includes property_request
+    // ALWAYS ensure objectTypes includes inquiry and property_request
     if (!requestBody.objectTypes || requestBody.objectTypes.length === 0) {
-      requestBody.objectTypes = ["property_request"];
-    } else if (!requestBody.objectTypes.includes("property_request")) {
-      requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
+      requestBody.objectTypes = ["inquiry", "property_request"];
+    } else {
+      // Ensure both inquiry and property_request are included
+      if (!requestBody.objectTypes.includes("inquiry")) {
+        requestBody.objectTypes = ["inquiry", ...requestBody.objectTypes];
+      }
+      if (!requestBody.objectTypes.includes("property_request")) {
+        requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
+      }
     }
     
     // Remove undefined fields
@@ -422,21 +434,31 @@ export async function getActionStats(actionId: string): Promise<any> {
 }
 
 // Add Note to Action
+// Endpoint: POST /api/v2/customers-hub/requests/{requestId}/notes
+// Body: { "note": "Required note text", "addedBy": "Optional display name" }
 export async function addNoteToAction(
-  actionId: string,
+  actionId: string, // Composite id like "property_request_89" or "inquiry_17"
   note: string,
-  addedBy?: number
+  addedBy?: number | string // Can be user ID (number) or display name (string)
 ): Promise<AddNoteResponse> {
+  // Build request body according to API documentation
+  const requestBody: { note: string; addedBy?: string } = {
+    note: note.trim(),
+  };
+  
+  // Add addedBy if provided (API expects string display name)
+  if (addedBy !== undefined) {
+    // If it's a number (user ID), convert to string
+    // Backend will handle it appropriately
+    requestBody.addedBy = typeof addedBy === 'string' ? addedBy : String(addedBy);
+  }
+  
+  // Use correct endpoint: /notes (not just the base URL)
   const response = await axiosInstance.post<AddNoteResponse>(
-    `${BASE_URL}/${actionId}`,
-    {
-      action: "add_note",
-      data: {
-        note,
-        addedBy: addedBy?.toString() || "current_user",
-      },
-    }
+    `${BASE_URL}/${actionId}/notes`, // Correct endpoint: /v2/customers-hub/requests/{requestId}/notes
+    requestBody // Flat body structure: { note, addedBy }
   );
+  
   return response.data;
 }
 

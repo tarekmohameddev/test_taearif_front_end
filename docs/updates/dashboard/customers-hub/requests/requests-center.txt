@@ -42,3 +42,23 @@ components/customers-hub/actions/IncomingActionsCard.tsx
 Update Type: Enhancement
 ضمان إرسال property_request دائماً في objectTypes لجميع طلبات API /v2/customers-hub/requests/list - تحديث useCustomersHubFiltersState لضمان إضافة property_request إلى objectTypes حتى لو اختار المستخدم أنواع أخرى - تحديث getRequestsList في customers-hub-requests-api.ts لضمان إضافة property_request إلى objectTypes في كلا الحالتين (legacy و flat format)
 components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, lib/services/customers-hub-requests-api.ts
+
+2026-02-14 16:19:56
+Update Type: Enhancement
+تحديث الكود الافتراضي لعرض inquiries و property requests معاً في صفحة /dashboard/customers-hub/requests - تعديل getRequestsList في customers-hub-requests-api.ts لضمان إضافة ["inquiry", "property_request"] إلى objectTypes بشكل افتراضي في كلا الحالتين (legacy و flat format) - عند عدم تحديد objectTypes، يتم إضافة inquiry و property_request تلقائياً - عند تحديد objectTypes جزئياً، يتم إضافة النوع المفقود (inquiry أو property_request) تلقائياً
+lib/services/customers-hub-requests-api.ts
+
+2026-02-14 16:30:48
+Update Type: Feature
+تحديث دعم appointments و reminders و assign employee للـ inquiries - تعديل IncomingActionsCard لدعم inquiry و property_request في إنشاء appointments (استخدام addAppointmentForRequest مع inquiry_{id} و property_request_{id}) - تعديل RequestDetailPage لدعم inquiry و property_request في إنشاء appointments - تحديث types في unified-customer.ts لتوضيح أن appointments و reminders متاحة لـ inquiry و property_request - تحديث handleAssignEmployee في IncomingActionsCard لاستخدام assignAction API endpoint (v2) بدلاً من endpoint القديم - assignAction الآن يعمل مع inquiry_{id} و property_request_{id} باستخدام composite id
+components/customers-hub/actions/IncomingActionsCard.tsx, components/customers-hub/requests/RequestDetailPage.tsx, types/unified-customer.ts
+
+2026-02-14 16:45:51
+Update Type: Bug Fix
+إصلاح مشكلة فتح /dashboard/customers-hub/null عند الضغط على اسم العميل في صفحة requests - إضافة حساب customerIdForLink في IncomingActionsCard باستخدام action.customerId أو resolvedCustomer?.id كبديل - إضافة تحقق من وجود customerId قبل بناء الرابط في IncomingActionsCard (موقعين) - عرض اسم العميل كـ span بدلاً من Link إذا لم يكن هناك customerId - إصلاح نفس المشكلة في ActionHistoryList.tsx
+components/customers-hub/actions/IncomingActionsCard.tsx, components/customers-hub/actions/ActionHistoryList.tsx
+
+2026-02-14 16:50:23
+Update Type: Enhancement
+ربط إضافة note في صفحة RequestDetailPage بالـ API الصحيح المذكور في الوثائق - تعديل addNoteToAction في customers-hub-requests-api.ts لاستخدام endpoint الصحيح: POST /api/v2/customers-hub/requests/{requestId}/notes بدلاً من POST /api/v2/customers-hub/requests/{requestId} - تغيير body structure من { action: "add_note", data: { note, addedBy } } إلى { note, addedBy } (flat structure) - إضافة تعليقات توضيحية في الكود تشير إلى الوثائق - دعم addedBy كـ number (user ID) أو string (display name) - الكود الآن متوافق مع customers-hub-lead-based.md
+lib/services/customers-hub-requests-api.ts

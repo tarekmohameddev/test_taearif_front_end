@@ -343,8 +343,8 @@ export function RequestDetailPage({
     
     const toastId = toast.loading("جاري جدولة الموعد...");
     try {
-      // Use addAppointmentForRequest for property_request, fallback to old method for others
-      if (action?.objectType === 'property_request' && action?.id) {
+      // Use addAppointmentForRequest for property_request and inquiry, fallback to old method for others
+      if ((action?.objectType === 'property_request' || action?.objectType === 'inquiry') && action?.id) {
         await addAppointmentForRequest(action.id, {
           type: aptType,
           datetime,

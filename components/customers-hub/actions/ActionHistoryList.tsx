@@ -110,12 +110,18 @@ export function ActionHistoryList({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <Link
-                            href={`/ar/dashboard/customers-hub/${action.customerId}`}
-                            className="font-medium hover:text-blue-600 transition-colors"
-                          >
-                            {action.customerName}
-                          </Link>
+                          {action.customerId ? (
+                            <Link
+                              href={`/ar/dashboard/customers-hub/${action.customerId}`}
+                              className="font-medium hover:text-blue-600 transition-colors"
+                            >
+                              {action.customerName}
+                            </Link>
+                          ) : (
+                            <span className="font-medium">
+                              {action.customerName}
+                            </span>
+                          )}
                           <SourceBadge source={action.source} className="text-xs" />
                           <Badge 
                             variant="outline" 

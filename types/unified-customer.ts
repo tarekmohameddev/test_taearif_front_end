@@ -65,9 +65,9 @@ export interface CustomerAction {
   state?: string | null; // State/region (request-level). Inquiries: region_name; property requests: region; null for others
   budgetMin?: number | null; // Min budget (request-level). Single budget or range min
   budgetMax?: number | null; // Max budget (request-level). Single budget or range max; null when not applicable
-  // Appointments and Reminders (only populated for property_request)
-  appointments?: Appointment[]; // Only for objectType === 'property_request', otherwise empty array
-  reminders?: Reminder[]; // Only for objectType === 'property_request', otherwise empty array
+  // Appointments and Reminders (populated for property_request and inquiry)
+  appointments?: Appointment[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
+  reminders?: Reminder[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
 }
 
 // CustomerLifecycleStage is now a string type to support dynamic stages from API

@@ -42,7 +42,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { updateCustomerStage as apiUpdateCustomerStage } from "@/lib/services/customers-hub-requests-api";
+import { updateCustomerStage as apiUpdateCustomerStage, assignAction as apiAssignAction } from "@/lib/services/customers-hub-requests-api";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
@@ -300,6 +300,11 @@ export function IncomingActionsCard({
     getCustomerById(
       typeof action.customerId === "string" ? action.customerId : String(action.customerId)
     );
+
+  // Calculate customer ID for link (use resolvedCustomer.id as fallback)
+  const customerIdForLink = action.customerId 
+    ? (typeof action.customerId === "string" ? action.customerId : String(action.customerId))
+    : (resolvedCustomer?.id ? String(resolvedCustomer.id) : null);
 
   // Normalize customer.stage to always be a string (handle API objects)
   // Default to 'new_lead' if no stage is found
@@ -648,60 +653,45 @@ export function IncomingActionsCard({
       return;
     }
 
-    // For property requests, we need customerId for the API endpoint
-    // If customerId is null, we can't assign employee using this endpoint
-    // Try to get customerId from resolvedCustomer or use sourceId as fallback
-    const customerId = action.customerId 
-      ? (typeof action.customerId === 'string' ? parseInt(action.customerId) : action.customerId)
-      : (resolvedCustomer?.id ? (typeof resolvedCustomer.id === 'string' ? parseInt(resolvedCustomer.id) : resolvedCustomer.id) : null);
+    // Use assignAction API for both property_request and inquiry
+    if (!action.id || (!action.objectType || (action.objectType !== 'property_request' && action.objectType !== 'inquiry'))) {
+      toast.error("لا يمكن تعيين الموظف: نوع الطلب غير مدعوم");
+      return;
+    }
 
-    if (!customerId && action.objectType === 'property_request') {
-      toast.error("لا يمكن تعيين الموظف: معرف العميل غير متوفر");
+    if (selectedEmployeeId === null || selectedEmployeeId === undefined) {
+      toast.error("الرجاء اختيار موظف");
       return;
     }
 
     setSavingEmployee(true);
     try {
-      const employeeIdToSend = selectedEmployeeId === null || selectedEmployeeId === undefined
-        ? null
-        : selectedEmployeeId;
-
-      // Use the same API endpoint as property-requests
-      await axiosInstance.put(
-        `/v1/property-requests/customer/${customerId}/employee`,
-        {
-          responsible_employee_id: employeeIdToSend,
-        }
-      );
+      // Use the v2 API endpoint that works with composite id (property_request_89, inquiry_123)
+      await apiAssignAction(action.id, selectedEmployeeId);
 
       toast.success("تم تعيين الموظف المسؤول بنجاح!");
       
       // Update action locally
-      if (selectedEmployeeId) {
-        const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
-        const employeeName = selectedEmployee 
-          ? (selectedEmployee.first_name && selectedEmployee.last_name
-              ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
-              : selectedEmployee.name || selectedEmployee.email || `موظف #${selectedEmployee.id}`)
-          : '';
-        
-        // Update the action locally
-        (action as any).assignedTo = selectedEmployeeId.toString();
-        (action as any).assignedToName = employeeName;
-      } else {
-        (action as any).assignedTo = null;
-        (action as any).assignedToName = '';
-      }
+      const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
+      const employeeName = selectedEmployee 
+        ? (selectedEmployee.first_name && selectedEmployee.last_name
+            ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+            : selectedEmployee.name || selectedEmployee.email || `موظف #${selectedEmployee.id}`)
+        : '';
+      
+      // Update the action locally
+      (action as any).assignedTo = selectedEmployeeId.toString();
+      (action as any).assignedToName = employeeName;
 
       setShowAssignEmployeeDialog(false);
       setSelectedEmployeeId(null);
       
-      // Trigger a page refresh to get updated data
-      window.location.reload();
+      // Call onComplete to refresh the list
+      onComplete?.(action.id);
     } catch (error: any) {
       console.error("Error assigning employee:", error);
       toast.error(
-        error.response?.data?.message || "حدث خطأ أثناء تعيين الموظف المسؤول"
+        error.response?.data?.message || error.message || "حدث خطأ أثناء تعيين الموظف المسؤول"
       );
     } finally {
       setSavingEmployee(false);
@@ -732,8 +722,8 @@ export function IncomingActionsCard({
     setIsSubmittingApt(true);
     
     try {
-      // Use addAppointmentForRequest for property_request, fallback to old method for others
-      if (action.objectType === 'property_request' && action.id) {
+      // Use addAppointmentForRequest for property_request and inquiry, fallback to old method for others
+      if ((action.objectType === 'property_request' || action.objectType === 'inquiry') && action.id) {
         const appointmentParams = {
           type: aptType,
           datetime,
@@ -809,13 +799,19 @@ export function IncomingActionsCard({
         )}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
           <div className="flex items-center gap-3 flex-wrap">
-            <Link
-              href={`/ar/dashboard/customers-hub/${action.customerId}`}
-              className="font-medium text-sm hover:text-blue-600 transition-colors truncate max-w-[150px]"
-              data-interactive="true"
-            >
-              {action.customerName}
-            </Link>
+            {customerIdForLink ? (
+              <Link
+                href={`/ar/dashboard/customers-hub/${customerIdForLink}`}
+                className="font-medium text-sm hover:text-blue-600 transition-colors truncate max-w-[150px]"
+                data-interactive="true"
+              >
+                {action.customerName}
+              </Link>
+            ) : (
+              <span className="font-medium text-sm truncate max-w-[150px]">
+                {action.customerName}
+              </span>
+            )}
             {resolvedCustomer?.phone && (
               <a
                 href={`tel:${resolvedCustomer.phone}`}
@@ -1193,13 +1189,19 @@ export function IncomingActionsCard({
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <Link
-                href={`/ar/dashboard/customers-hub/${action.customerId}`}
-                className="font-semibold text-lg hover:text-blue-600 transition-colors"
-                data-interactive="true"
-              >
-                {action.customerName}
-              </Link>
+              {customerIdForLink ? (
+                <Link
+                  href={`/ar/dashboard/customers-hub/${customerIdForLink}`}
+                  className="font-semibold text-lg hover:text-blue-600 transition-colors"
+                  data-interactive="true"
+                >
+                  {action.customerName}
+                </Link>
+              ) : (
+                <span className="font-semibold text-lg">
+                  {action.customerName}
+                </span>
+              )}
               {onQuickView && (
                 <Button
                   size="sm"
