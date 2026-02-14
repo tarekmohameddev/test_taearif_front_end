@@ -322,6 +322,16 @@ export const getDefaultHero4Data = (): ComponentData => ({
       address: "contact@baheya.co",
       link: "mailto:contact@baheya.co",
     },
+    accentColor: "#8b5f46", // Default custom color (Brown)
+  },
+  propertyFilterConfig: {
+    propertyTypesSource: "dynamic",
+    propertyTypesApiUrl: "https://api.taearif.com/api/v1/tenant-website/{tenantId}/properties/categories/direct",
+    searchPlaceholder: "أدخل المدينة أو المنطقة",
+    propertyTypePlaceholder: "نوع العقار",
+    pricePlaceholder: "السعر",
+    searchButtonText: "بحث",
+    accentColor: "#8b5f46", // Default custom color (Brown)
   },
   background: {
     image: "https://dalel-lovat.vercel.app/images/hero.webp",

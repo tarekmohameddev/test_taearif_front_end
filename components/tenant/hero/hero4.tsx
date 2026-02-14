@@ -163,7 +163,17 @@ export default function Hero4(props: Hero4Props = {}) {
 
   // Helper function to get accent color based on useDefaultColor and globalColorType
   const getAccentColor = (): string => {
-    const colorField = mergedData?.contactForm?.accentColor;
+    // Determine which accentColor to use based on barType
+    const barType = mergedData?.barType || "default";
+    const isContactForm = barType === "contact" || mergedData?.contact;
+    const isPropertyFilter = barType === "propertyFilter";
+    
+    // Get color field from appropriate location
+    const colorField = isContactForm 
+      ? mergedData?.contactForm?.accentColor 
+      : isPropertyFilter
+        ? mergedData?.propertyFilterConfig?.accentColor
+        : mergedData?.defaultBarConfig?.accentColor;
 
     // Get useDefaultColor and globalColorType from the color field
     let useDefaultColorValue: boolean | undefined;
@@ -176,10 +186,22 @@ export default function Hero4(props: Hero4Props = {}) {
 
     // Also check at the path level (ColorObjectRenderer stores them separately)
     if (useDefaultColorValue === undefined) {
-      useDefaultColorValue = mergedData?.contactForm?.accentColor?.useDefaultColor;
+      if (isContactForm) {
+        useDefaultColorValue = mergedData?.contactForm?.accentColor?.useDefaultColor;
+      } else if (isPropertyFilter) {
+        useDefaultColorValue = mergedData?.propertyFilterConfig?.accentColor?.useDefaultColor;
+      } else {
+        useDefaultColorValue = mergedData?.defaultBarConfig?.accentColor?.useDefaultColor;
+      }
     }
     if (globalColorTypeValue === undefined) {
-      globalColorTypeValue = mergedData?.contactForm?.accentColor?.globalColorType;
+      if (isContactForm) {
+        globalColorTypeValue = mergedData?.contactForm?.accentColor?.globalColorType;
+      } else if (isPropertyFilter) {
+        globalColorTypeValue = mergedData?.propertyFilterConfig?.accentColor?.globalColorType;
+      } else {
+        globalColorTypeValue = mergedData?.defaultBarConfig?.accentColor?.globalColorType;
+      }
     }
 
     // Check useDefaultColor value (default is false for custom color)
@@ -193,7 +215,7 @@ export default function Hero4(props: Hero4Props = {}) {
     }
 
     // If useDefaultColor is false, try to get custom color
-    // The color is stored as a string directly at contactForm.accentColor
+    // The color is stored as a string directly at accentColor
     if (
       colorField &&
       typeof colorField === "string" &&
@@ -440,6 +462,8 @@ export default function Hero4(props: Hero4Props = {}) {
               id={`${uniqueId}-propertyFilter`}
               variant="propertyFilter2"
               content={mergedData.propertyFilterConfig}
+              accentColor={accentColor}
+              accentColorHover={accentColorHover}
             />
           </div>
         ) : mergedData.barType === "contact" || mergedData.contact ? (
@@ -962,7 +986,7 @@ export default function Hero4(props: Hero4Props = {}) {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               {/* Right side - Question (في RTL يكون على اليمين) */}
               <div className="order-2 sm:order-1 text-right sm:text-right">
-                <h5 className="text-base md:text-lg font-medium text-gray-700">
+                <h5 className="text-base md:text-lg font-medium" style={{ color: accentColor }}>
                   {mergedData.defaultBarConfig?.questionText || "هل لديك استفسار؟"}
                 </h5>
               </div>
@@ -975,7 +999,14 @@ export default function Hero4(props: Hero4Props = {}) {
                     href={mergedData.defaultBarConfig.whatsapp.link || `https://api.whatsapp.com/send?phone=${mergedData.defaultBarConfig.whatsapp.number}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#8b5f46] text-white hover:bg-[#6b4630] transition-colors w-full sm:w-auto justify-center sm:justify-start"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white transition-colors w-full sm:w-auto justify-center sm:justify-start"
+                    style={{ backgroundColor: accentColor }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = accentColorHover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = accentColor;
+                    }}
                   >
                     <svg
                       aria-hidden="true"
@@ -995,7 +1026,14 @@ export default function Hero4(props: Hero4Props = {}) {
                 {mergedData.defaultBarConfig?.email?.address && (
                   <a
                     href={mergedData.defaultBarConfig.email.link || `mailto:${mergedData.defaultBarConfig.email.address}`}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#8b5f46] text-white hover:bg-[#6b4630] transition-colors w-full sm:w-auto justify-center sm:justify-start"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white transition-colors w-full sm:w-auto justify-center sm:justify-start"
+                    style={{ backgroundColor: accentColor }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = accentColorHover;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = accentColor;
+                    }}
                   >
                     <Mail className="w-5 h-5" />
                     <span className="text-sm md:text-base font-medium whitespace-nowrap">

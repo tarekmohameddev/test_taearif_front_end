@@ -55,6 +55,8 @@ interface PropertyFilter2Props {
   useStore?: boolean;
   id?: string;
   variant?: string;
+  accentColor?: string;
+  accentColorHover?: string;
 }
 
 export default function PropertyFilter2({
@@ -72,6 +74,8 @@ export default function PropertyFilter2({
   useStore = false,
   id,
   variant = "propertyFilter2",
+  accentColor, // Accent color from hero4
+  accentColorHover, // Accent color hover from hero4
   ...props
 }: PropertyFilter2Props & { content?: any }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -413,15 +417,19 @@ export default function PropertyFilter2({
   };
 
   // Get colors for search button
-  const searchButtonBgColor = getColor("searchButton.bgColor", "#059669");
+  // Use accentColor from props if provided, otherwise use getColor
+  const searchButtonBgColor = accentColor || getColor("searchButton.bgColor", "#8b5f46");
   const searchButtonTextColor = getContrastTextColor(searchButtonBgColor);
-  const searchButtonHoverBgColor = getColor(
+  const searchButtonHoverBgColor = accentColorHover || getColor(
     "searchButton.hoverBgColor",
     getDarkerColor(searchButtonBgColor, 20),
   );
   const searchButtonHoverTextColor = getContrastTextColor(
     searchButtonHoverBgColor,
   );
+  
+  // Use accentColor for icons if provided
+  const iconColor = accentColor || "#896042";
 
   // Get colors for inputs
   const inputTextColor = getColor("inputs.textColor", "#1f2937");
@@ -821,7 +829,7 @@ export default function PropertyFilter2({
               className="flex-shrink-0"
             >
               <path
-                fill="#896042"
+                fill={iconColor}
                 d="M17.95 19.5h0.825v-2.75h2.75v-0.825h-2.75v-2.75H17.95v2.75h-2.75v0.825h2.75V19.5Zm0.3625 1.5c-1.29165 0 -2.39585 -0.4625 -3.3125 -1.3875 -0.91665 -0.925 -1.375 -2.02085 -1.375 -3.2875 0 -1.30715 0.45825 -2.4215 1.37475 -3.343 0.9165 -0.92135 2.0249 -1.382 3.32525 -1.382 1.28335 0 2.3875 0.46065 3.3125 1.382 0.925 0.9215 1.3875 2.03585 1.3875 3.343 0 1.26665 -0.4625 2.3625 -1.3875 3.2875 -0.925 0.925 -2.03335 1.3875 -3.325 1.3875ZM4 19V7L12 1l8 6v3.35c-0.23335 -0.08335 -0.475 -0.14165 -0.725 -0.175 -0.25 -0.03335 -0.50835 -0.05835 -0.775 -0.075v-2.35L12 2.875 5.5 7.75V17.5h6.75c0.04335 0.264 0.10835 0.52165 0.195 0.773 0.08665 0.25135 0.18835 0.49365 0.305 0.727H4Z"
                 strokeWidth="0.5"
               />
@@ -927,7 +935,7 @@ export default function PropertyFilter2({
               className="flex-shrink-0"
             >
               <path
-                fill="#896042"
+                fill={iconColor}
                 d="M12.00225 11.75c0.48185 0 0.8936 -0.1716 1.23525 -0.51475 0.34165 -0.34315 0.5125 -0.75565 0.5125 -1.2375s-0.1716 -0.8936 -0.51475 -1.23525c-0.34315 -0.34165 -0.75565 -0.5125 -1.2375 -0.5125s-0.8936 0.1716 -1.23525 0.51475c-0.34165 0.34315 -0.5125 0.75565 -0.5125 1.2375s0.1716 0.8936 0.51475 1.23525c0.34315 0.34165 0.75565 0.5125 1.2375 0.5125ZM12 20.025c2.21665 -2.01665 3.85415 -3.84585 4.9125 -5.4875C17.97085 12.89585 18.5 11.45 18.5 10.2c0 -1.96315 -0.6274 -3.57065 -1.88225 -4.8225C15.3629 4.125835 13.82365 3.5 12 3.5c-1.82365 0 -3.3629 0.625835 -4.61775 1.8775C6.1274 6.62935 5.5 8.23685 5.5 10.2c0 1.25 0.54165 2.69585 1.625 4.3375 1.08335 1.64165 2.70835 3.47085 4.875 5.4875ZM12 22c-2.68335 -2.28335 -4.6875 -4.40415 -6.0125 -6.3625C4.6625 13.67915 4 11.86665 4 10.2c0 -2.5 0.804165 -4.49165 2.4125 -5.975C8.02085 2.741665 9.88335 2 12 2c2.11665 0 3.97915 0.741665 5.5875 2.225C19.19585 5.70835 20 7.7 20 10.2c0 1.66665 -0.6625 3.47915 -1.9875 5.4375C16.6875 17.59585 14.68335 19.71665 12 22Z"
                 strokeWidth="0.5"
               />
@@ -1033,7 +1041,7 @@ export default function PropertyFilter2({
               className="flex-shrink-0"
             >
               <path
-                fill="#896042"
+                fill={iconColor}
                 d="m21.575 13.9 -7.65 7.675c-0.15 0.14165 -0.31875 0.2479 -0.50625 0.31875 -0.1875 0.07085 -0.375 0.10625 -0.5625 0.10625s-0.3729 -0.0375 -0.55625 -0.1125c-0.18335 -0.075 -0.35 -0.17915 -0.5 -0.3125L2.45 12.2c-0.133335 -0.13335 -0.241665 -0.29135 -0.325 -0.474 -0.083335 -0.1825 -0.125 -0.3745 -0.125 -0.576V3.5c0 -0.4125 0.146915 -0.765665 0.44075 -1.0595C2.734415 2.146835 3.0875 2 3.5 2h7.675c0.20115 0 0.3961 0.040585 0.58475 0.12175 0.1885 0.081335 0.3519 0.19075 0.49025 0.32825l9.325 9.325c0.1565 0.15 0.27065 0.31875 0.3425 0.50625 0.07165 0.1875 0.1075 0.375 0.1075 0.5625s-0.0375 0.3771 -0.1125 0.56875c-0.075 0.19165 -0.1875 0.35415 -0.3375 0.4875ZM12.9 20.55l7.65 -7.675L11.175 3.5H3.5v7.6l9.4 9.45ZM6.125 7.4c0.35 0 0.65415 -0.12915 0.9125 -0.3875 0.25835 -0.25835 0.3875 -0.5625 0.3875 -0.9125s-0.12915 -0.65415 -0.3875 -0.9125c-0.25835 -0.258335 -0.5625 -0.3875 -0.9125 -0.3875s-0.65415 0.129165 -0.9125 0.3875c-0.258335 0.25835 -0.3875 0.5625 -0.3875 0.9125s0.129165 0.65415 0.3875 0.9125c0.25835 0.25835 0.5625 0.3875 0.9125 0.3875Z"
                 strokeWidth="0.5"
               />
@@ -1105,14 +1113,16 @@ export default function PropertyFilter2({
             variant="ghost"
             className="text-sm md:text-base flex items-center justify-center h-12 md:h-14 px-6 rounded-[10px] transition-colors whitespace-nowrap"
             style={{
-              backgroundColor: "#896042",
-              color: "#ffffff",
+              backgroundColor: searchButtonBgColor,
+              color: searchButtonTextColor,
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#7a5235";
+              e.currentTarget.style.backgroundColor = searchButtonHoverBgColor;
+              e.currentTarget.style.color = searchButtonHoverTextColor;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#896042";
+              e.currentTarget.style.backgroundColor = searchButtonBgColor;
+              e.currentTarget.style.color = searchButtonTextColor;
             }}
           >
             {searchButtonText || "تطبيق البحث"}

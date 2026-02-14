@@ -922,6 +922,14 @@ export const heroStructure: ComponentStructure = {
               type: "text",
               placeholder: "بحث",
             },
+            {
+              key: "accentColor",
+              label: "Accent Color",
+              type: "color",
+              useDefaultColor: false,
+              globalColorType: "primary",
+              description: "لون التمييز للفلتر. يطبق على أيقونات الحقول (نوع العقار، موقع العقار، حالة العقار) وزر البحث. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
+            },
           ],
           condition: {
             field: "barType",
@@ -956,6 +964,14 @@ export const heroStructure: ComponentStructure = {
                 { key: "address", label: "Email Address", type: "text" },
                 { key: "link", label: "Email Link", type: "text" },
               ],
+            },
+            {
+              key: "accentColor",
+              label: "Accent Color",
+              type: "color",
+              useDefaultColor: false,
+              globalColorType: "primary",
+              description: "لون التمييز للشريط الافتراضي. يطبق على نص السؤال (هل لديك استفسار؟) وأزرار الواتساب والإيميل. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
             },
           ],
           condition: {
