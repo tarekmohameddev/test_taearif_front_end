@@ -1100,6 +1100,14 @@ export const heroStructure: ComponentStructure = {
                 { key: "text", label: "Button Text", type: "text" },
               ],
             },
+            {
+              key: "accentColor",
+              label: "Accent Color",
+              type: "color",
+              useDefaultColor: false,
+              globalColorType: "primary",
+              description: "لون التمييز للنموذج. يطبق على عناوين الحقول (Labels)، نصوص الإرشاد (Placeholders)، أيقونات الواتساب والإيميل والموقع، وأيقونات وسائل التواصل الاجتماعي. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
+            },
           ],
           condition: {
             field: "barType",

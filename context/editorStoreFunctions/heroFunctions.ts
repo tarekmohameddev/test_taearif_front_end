@@ -384,6 +384,7 @@ export const getDefaultHero4Data = (): ComponentData => ({
     submitButton: {
       text: "إرسال",
     },
+    accentColor: "#8b5f46", // Default custom color (Brown)
   },
   contactInfo: {
     contactText: "أو تواصل معنا مباشرة عبر:",
