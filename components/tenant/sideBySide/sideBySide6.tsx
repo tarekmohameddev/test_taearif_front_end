@@ -266,7 +266,7 @@ export default function SideBySide6(props: SideBySide6Props) {
             )}
 
             {/* Right Side - Text Content (60% من العرض) */}
-            <div className="w-full md:w-[60%] bg-[#f5f0e8] flex flex-col justify-center px-6 md:px-8 lg:px-10 py-8 md:py-12 text-right order-2 md:order-1">
+            <div className="w-full md:w-[60%]  flex flex-col justify-center px-6 md:px-8 lg:px-10 py-8 md:py-12 text-right order-2 md:order-1">
               {/* Heading */}
               <h3
                 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 leading-tight"
