@@ -125,8 +125,49 @@ function LoginPageContent() {
     const urlParams = new URLSearchParams(window.location.search);
     const hasToken = urlParams.get("token");
 
-    if (userData && userData.email && !showLogoutDialog && !hasToken) {
-      router.push("/dashboard");
+    // التحقق من وجود بيانات في localStorage أيضاً
+    let hasLocalStorageData = false;
+    if (typeof window !== "undefined") {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && parsedUser.email) {
+            hasLocalStorageData = true;
+          }
+        }
+      } catch (error) {
+        // تجاهل الأخطاء في قراءة localStorage
+      }
+    }
+
+    // التحقق من وجود cookie authToken
+    let hasAuthCookie = false;
+    if (typeof window !== "undefined") {
+      try {
+        const cookies = document.cookie.split(";");
+        hasAuthCookie = cookies.some((cookie) =>
+          cookie.trim().startsWith("authToken=")
+        );
+      } catch (error) {
+        // تجاهل الأخطاء في قراءة cookies
+      }
+    }
+
+    // إعادة التوجيه فقط إذا كانت هناك بيانات فعلية من store أو localStorage أو cookie
+    // وإذا لم يكن هناك token في URL (لأن token في URL يعني تسجيل دخول جديد)
+    // وإذا لم يكن هناك dialog مفتوح
+    if (
+      !hasToken &&
+      !showLogoutDialog &&
+      (userData?.email || hasLocalStorageData || hasAuthCookie)
+    ) {
+      // إضافة تأخير بسيط للتأكد من اكتمال أي عمليات جلب بيانات
+      const redirectTimer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
+
+      return () => clearTimeout(redirectTimer);
     }
   }, [userData, router, showLogoutDialog]);
 

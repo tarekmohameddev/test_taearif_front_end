@@ -1,0 +1,4 @@
+2025-01-20 12:00:00
+Update Type: Bug Fix
+إصلاح مشكلة logout: عند الضغط على logout، كان يتم إعادة التوجيه إلى login ثم يعيد التوجيه إلى dashboard بسبب عدم مسح cookies و localStorage بشكل كامل
+pages/api/user/logout.js, context/AuthContext.js, app/ClientLayout.tsx, components/signin-up/login-page.tsx

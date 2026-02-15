@@ -66,8 +66,13 @@ export default function ClientLayout({
 
   useEffect(() => {
     setIsMounted(true);
+    // عدم استدعاء fetchUserData في صفحة login لتجنب إعادة تحميل البيانات
+    const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}\//, "/") || pathname;
+    if (pathWithoutLocale?.startsWith("/login")) {
+      return; // لا تجلب البيانات في صفحة login
+    }
     fetchUserData();
-  }, [fetchUserData]);
+  }, [fetchUserData, pathname]);
 
   // دالة للتحقق من الصفحات المسموح بها لعرض InfoPopup
   const isAllowedPageForPopup = (pathname: string) => {
@@ -266,11 +271,48 @@ export default function ClientLayout({
     if (pathname?.startsWith("/login")) {
       const urlParams = new URLSearchParams(window.location.search);
       const hasToken = urlParams.get("token");
-      if (userData && userData.email && !hasToken) {
-        router.push("/dashboard");
+      
+      // التحقق من وجود بيانات في localStorage أيضاً
+      let hasLocalStorageData = false;
+      if (typeof window !== "undefined") {
+        try {
+          const storedUser = localStorage.getItem("user");
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            if (parsedUser && parsedUser.email) {
+              hasLocalStorageData = true;
+            }
+          }
+        } catch (error) {
+          // تجاهل الأخطاء في قراءة localStorage
+        }
+      }
+
+      // التحقق من وجود cookie authToken
+      let hasAuthCookie = false;
+      if (typeof window !== "undefined") {
+        try {
+          const cookies = document.cookie.split(";");
+          hasAuthCookie = cookies.some((cookie) =>
+            cookie.trim().startsWith("authToken=")
+          );
+        } catch (error) {
+          // تجاهل الأخطاء في قراءة cookies
+        }
+      }
+
+      // إعادة التوجيه فقط إذا كانت هناك بيانات فعلية من store أو localStorage أو cookie
+      // وإذا لم يكن هناك token في URL (لأن token في URL يعني تسجيل دخول جديد)
+      if (!hasToken && (userData?.email || hasLocalStorageData || hasAuthCookie)) {
+        // إضافة تأخير بسيط للتأكد من اكتمال أي عمليات جلب بيانات
+        const redirectTimer = setTimeout(() => {
+          router.push("/dashboard");
+        }, 100);
+        
+        return () => clearTimeout(redirectTimer);
       }
     }
-  }, [userData, router]);
+  }, [userData, router, pathname]);
 
   // دالة لإزالة locale من pathname
   const removeLocaleFromPath = (pathname: string) => {

@@ -184,14 +184,49 @@ const useAuthStore = create((set, get) => ({
     unlockAxios();
 
     try {
-      const userInfoResponse = await fetch("/api/user/getUserInfo");
+      const userInfoResponse = await fetch("/api/user/getUserInfo", {
+        credentials: "include", // مهم لإرسال cookies
+      });
 
       if (!userInfoResponse.ok) {
-        set({ authenticated: false });
+        // إذا فشل جلب البيانات، مسح localStorage و sessionStorage
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.removeItem("user");
+            sessionStorage.clear();
+          } catch (error) {
+            console.error("Error clearing storage after failed fetch:", error);
+          }
+        }
+        set({
+          authenticated: false,
+          UserIslogged: false,
+          userData: null,
+        });
         throw new Error("فشل في جلب بيانات المستخدم");
       }
 
       const userData = await userInfoResponse.json();
+      
+      // التحقق من وجود بيانات صحيحة
+      if (!userData || !userData.email) {
+        // إذا لم تكن هناك بيانات صحيحة، مسح localStorage
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.removeItem("user");
+            sessionStorage.clear();
+          } catch (error) {
+            console.error("Error clearing storage after invalid data:", error);
+          }
+        }
+        set({
+          authenticated: false,
+          UserIslogged: false,
+          userData: null,
+        });
+        return;
+      }
+
       const currentState = get();
       set({
         UserIslogged: true,
@@ -207,7 +242,9 @@ const useAuthStore = create((set, get) => ({
       // تحديث localStorage للتوافق مع AuthProvider
       try {
         localStorage.setItem("user", JSON.stringify(userData));
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error saving user data to localStorage:", error);
+      }
 
       // استخدام بيانات الخطة من الكوكي إذا كانت موجودة
       if (typeof window !== "undefined") {
@@ -420,26 +457,107 @@ const useAuthStore = create((set, get) => ({
 
   logout: async (options = { redirect: true, clearStore: true }) => {
     try {
+      // 1. استدعاء API logout لمسح cookie من الخادم
       const response = await fetch("/api/user/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ token: get().userData.token }),
+        credentials: "include", // مهم لإرسال cookies
       });
 
-      if (response.ok) {
-        if (options.clearStore) {
-          set({ UserIslogged: false, authenticated: false, userData: null });
+      // 2. مسح localStorage
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("user");
+          localStorage.clear(); // مسح جميع البيانات من localStorage
+        } catch (error) {
+          console.error("Error clearing localStorage:", error);
         }
-        if (options.redirect) {
+      }
+
+      // 3. مسح sessionStorage
+      if (typeof window !== "undefined") {
+        try {
+          sessionStorage.clear();
+        } catch (error) {
+          console.error("Error clearing sessionStorage:", error);
+        }
+      }
+
+      // 4. مسح plan cookie
+      if (typeof window !== "undefined") {
+        try {
+          const { clearPlanCookie } = require("@/lib/planCookie");
+          clearPlanCookie();
+        } catch (error) {
+          console.error("Error clearing plan cookie:", error);
+        }
+      }
+
+      // 5. محاولة مسح cookies من جانب العميل (للاستخدام مع cookies غير httpOnly)
+      if (typeof window !== "undefined") {
+        try {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i];
+            const eqPos = cookie.indexOf("=");
+            const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+            // محاولة مسح الكوكي من جميع المسارات والنطاقات
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`;
+          }
+        } catch (error) {
+          console.error("Error clearing cookies:", error);
+        }
+      }
+
+      // 6. مسح الـ store
+      if (options.clearStore) {
+        set({
+          UserIslogged: false,
+          authenticated: false,
+          userData: null,
+          IsDone: false, // إعادة تعيين IsDone للسماح بإعادة جلب البيانات في المستقبل
+        });
+      }
+
+      // 7. إعادة التوجيه مع تأخير بسيط لضمان اكتمال عملية المسح
+      if (options.redirect) {
+        // استخدام setTimeout لإعطاء الوقت لضمان اكتمال عملية المسح
+        setTimeout(() => {
           window.location.href = "/login";
-        }
-      } else {
-        console.error("فشل تسجيل الخروج");
+        }, 200);
       }
     } catch (error) {
       console.error("خطأ أثناء عملية تسجيل الخروج:", error);
+      // حتى في حالة الخطأ، حاول مسح البيانات المحلية
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+          const { clearPlanCookie } = require("@/lib/planCookie");
+          clearPlanCookie();
+        } catch (clearError) {
+          console.error("Error clearing data after logout error:", clearError);
+        }
+      }
+      // مسح الـ store حتى في حالة الخطأ
+      if (options.clearStore) {
+        set({
+          UserIslogged: false,
+          authenticated: false,
+          userData: null,
+          IsDone: false,
+        });
+      }
+      // إعادة التوجيه حتى في حالة الخطأ
+      if (options.redirect) {
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 200);
+      }
     }
   },
 
