@@ -1,0 +1,4 @@
+2025-01-17 12:00:00
+Update Type: Enhancement
+تعديل منطق configuredApiUrl في grid1 لفرض API URL بناءً على pathname أولاً لصفحات for-sale و for-rent، وإزالة page=1 من /for-rent
+components/tenant/grid/grid1.tsx

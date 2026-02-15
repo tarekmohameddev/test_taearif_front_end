@@ -290,47 +290,40 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     }
   }, [currentTenantId, setTenantId, mergedData.dataSource?.apiUrl]);
 
-  // Configure API URL based on dataSource or pathname
+  // Configure API URL based on pathname first, then dataSource
   const configuredApiUrl = (() => {
     const rawUrl = mergedData.dataSource?.apiUrl;
     
-    // الحالة الأولى: apiUrl موجود - استخدامه كما هو
+    // ⭐ الأولوية الأولى: فرض API URL بناءً على pathname لصفحات for-sale و for-rent
+    if (pathname?.includes("/for-sale")) {
+      const url = "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1";
+      return url;
+    }
+    if (pathname?.includes("/for-rent")) {
+      const url = "/v1/tenant-website/{{tenantID}}/properties?purpose=rent";
+      return url;
+    }
+    
+    // ⭐ الأولوية الثانية: استخدام apiUrl من البيانات (إذا كان موجوداً)
     if (rawUrl && rawUrl.trim()) {
       // شرط خاص: إذا كانت الصفحة تحتوي على "real-estate" و apiUrl هو "/v1/tenant-website/{{tenantID}}/properties"
       if (pathname?.includes("/real-estate") && rawUrl.trim() === "/v1/tenant-website/{{tenantID}}/properties") {
         const modifiedUrl = "/v1/tenant-website/{{tenantID}}?title=";
-        console.log("🟣 [Grid1] الحالة الخاصة (real-estate): تعديل apiUrl من properties إلى title:", modifiedUrl);
         return modifiedUrl;
       }
-      console.log("🔵 [Grid1] الحالة الأولى: apiUrl موجود - استخدامه كما هو:", rawUrl);
       return rawUrl;
     }
     
-    // الحالة الثانية: apiUrl غير موجود - إنشاءه بناءً على pathname
-    if (pathname?.includes("/for-sale")) {
-      const url = "/v1/tenant-website/{{tenantID}}/properties?purpose=sale&latest=1";
-      console.log("🟢 [Grid1] الحالة الثانية (for-sale): apiUrl غير موجود - إنشاءه من pathname:", url);
-      return url;
-    }
-    if (pathname?.includes("/for-rent")) {
-      const url = "/v1/tenant-website/{{tenantID}}/properties?page=1&purpose=rent";
-      console.log("🟡 [Grid1] الحالة الثانية (for-rent): apiUrl غير موجود - إنشاءه من pathname:", url);
-      return url;
-    }
-    
-    // القيمة الافتراضية
+    // ⭐ القيمة الافتراضية: إذا لم يكن pathname خاص ولم يكن apiUrl موجوداً
     const defaultUrl = "/v1/tenant-website/{{tenantID}}/properties";
-    console.log("⚪ [Grid1] الحالة الافتراضية: apiUrl غير موجود - استخدام القيمة الافتراضية:", defaultUrl);
     return defaultUrl;
   })();
 
   // Function to add searchParams to URL and replace tenantID
   const addSearchParamsToUrl = (url: string, tenantId: string): string => {
-    console.log("📝 [Grid1] addSearchParamsToUrl - المدخلات:", { url, tenantId, pathname });
     
     // استبدال {{tenantID}}
     let finalUrl = url.replace("{{tenantID}}", tenantId);
-    console.log("🔄 [Grid1] بعد استبدال {{tenantID}}:", finalUrl);
     
     // استخراج params الموجودة في url
     const urlParams = new URLSearchParams();
@@ -381,10 +374,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       console.log("🟢 [Grid1] إضافة/تحديث params من pathname (/for-sale) - الأولوية النهائية: purpose=sale, latest=1");
     } else if (pathname?.includes("/for-rent")) {
       urlParams.set("purpose", "rent");
-      if (!urlParams.has("page")) {
-        urlParams.set("page", "1");
-      }
-      console.log("🟡 [Grid1] إضافة/تحديث params من pathname (/for-rent) - الأولوية النهائية: purpose=rent, page=1");
+      // ⭐ إزالة page=1 من /for-rent حسب متطلبات المستخدم
+      console.log("🟡 [Grid1] إضافة/تحديث params من pathname (/for-rent) - الأولوية النهائية: purpose=rent");
     }
     
     // بناء URL النهائي
