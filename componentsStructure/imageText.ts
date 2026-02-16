@@ -24,11 +24,25 @@ export const imageTextStructure: ComponentStructure = {
           displayAsGroup: true,
           groupFields: [
             {
+              key: "background.type",
+              label: "نوع الخلفية",
+              type: "select",
+              options: [
+                { label: "صورة", value: "image" },
+                { label: "لون", value: "color" },
+              ],
+              defaultValue: "image",
+            },
+            {
               key: "backgroundImage",
               label: "Background Image",
               type: "image",
               placeholder:
                 "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80",
+              condition: {
+                field: "background.type",
+                value: "image",
+              },
             },
             {
               key: "background.color",
@@ -37,6 +51,10 @@ export const imageTextStructure: ComponentStructure = {
               useDefaultColor: false,
               globalColorType: "primary",
               description: "لون الخلفية. يمكنك استخدام Primary Color من إعدادات التاجر أو لون مخصص. اتركه فارغاً للشفافية.",
+              condition: {
+                field: "background.type",
+                value: "color",
+              },
             },
             {
               key: "background.opacity",
@@ -45,6 +63,10 @@ export const imageTextStructure: ComponentStructure = {
               placeholder: "1",
               min: 0,
               max: 1,
+              condition: {
+                field: "background.type",
+                value: "color",
+              },
             },
           ],
         },
@@ -135,6 +157,7 @@ export const imageTextStructure: ComponentStructure = {
       // ═══════════════════════════════════════════════════════════
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
+        { key: "background.type", label: "نوع الخلفية", type: "select" },
         { key: "backgroundImage", label: "Background Image", type: "image" },
         { key: "background.color", label: "Background Color", type: "color" },
         { key: "background.opacity", label: "Background Opacity", type: "number" },

@@ -245,23 +245,28 @@ export default function ImageText1(props: ImageTextProps = {}) {
   // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
-  // Get background color and opacity
-  const bgColor = getBackgroundColor();
+  // Get background type (image or color)
+  const backgroundType = mergedData.background?.type || "image";
+
+  // Get background color and opacity (only if type is "color")
+  const bgColor = backgroundType === "color" ? getBackgroundColor() : null;
   const bgOpacity = mergedData.background?.opacity ?? 1;
 
-  // Calculate background color style
+  // Calculate background color style (only for color type)
   const backgroundColorStyle: React.CSSProperties = {};
-  if (bgColor) {
-    // If color exists, apply it with opacity
-    const r = parseInt(bgColor.slice(1, 3), 16);
-    const g = parseInt(bgColor.slice(3, 5), 16);
-    const b = parseInt(bgColor.slice(5, 7), 16);
-    backgroundColorStyle.backgroundColor = `rgba(${r}, ${g}, ${b}, ${bgOpacity})`;
-  } else if (bgOpacity < 1) {
-    // If transparent but opacity is less than 1, apply black with opacity
-    backgroundColorStyle.backgroundColor = `rgba(0, 0, 0, ${bgOpacity})`;
+  if (backgroundType === "color") {
+    if (bgColor) {
+      // If color exists, apply it with opacity
+      const r = parseInt(bgColor.slice(1, 3), 16);
+      const g = parseInt(bgColor.slice(3, 5), 16);
+      const b = parseInt(bgColor.slice(5, 7), 16);
+      backgroundColorStyle.backgroundColor = `rgba(${r}, ${g}, ${b}, ${bgOpacity})`;
+    } else if (bgOpacity < 1) {
+      // If transparent but opacity is less than 1, apply black with opacity
+      backgroundColorStyle.backgroundColor = `rgba(0, 0, 0, ${bgOpacity})`;
+    }
+    // If bgColor is null and bgOpacity is 1, background is fully transparent (no style needed)
   }
-  // If bgColor is null and bgOpacity is 1, background is fully transparent (no style needed)
 
   return (
     <section
@@ -270,16 +275,16 @@ export default function ImageText1(props: ImageTextProps = {}) {
         height: `${mergedData.styling?.height ?? 500}px`,
       }}
     >
-      {/* Background Color Layer */}
-      {(bgColor || bgOpacity < 1) && (
+      {/* Background Color Layer (only if type is "color") */}
+      {backgroundType === "color" && (bgColor || bgOpacity < 1) && (
         <div
           className="absolute inset-0 z-0"
           style={backgroundColorStyle}
         />
       )}
 
-      {/* Background Image */}
-      {mergedData.backgroundImage && (
+      {/* Background Image (only if type is "image") */}
+      {backgroundType === "image" && mergedData.backgroundImage && (
         <div className="absolute inset-0 z-0">
           <Image
             src={
