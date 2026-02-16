@@ -388,7 +388,7 @@ export default function SideBySide7(props: SideBySide7Props) {
                 </h3>
                 {/* Divider */}
                 <div
-                  className="w-24 h-[2px] mb-4 ml-auto"
+                  className="w-24 h-[2px] mb-4 mr-auto"
                   style={{
                     backgroundColor:
                       mergedData.styling?.dividerColor || "#8b5f46",

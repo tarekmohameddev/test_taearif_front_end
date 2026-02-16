@@ -1124,7 +1124,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
             </h3>
             {/* Divider */}
             <div
-              className="w-24 h-[2px] mb-4 ml-auto"
+              className="w-24 h-[2px] mb-4 mr-auto"
               style={{
                 backgroundColor: dividerColor,
               }}
