@@ -2,3 +2,8 @@
 Update Type: Feature
 Added showLoadMoreButton toggle field to content section in propertiesShowcase1 component to control visibility of "Load More" button. Default value is true (toggle is open by default). Load More Button Text field is hidden in EditorSidebar when toggle is closed (using condition field)
 components/tenant/propertiesShowcase/propertiesShowcase1.tsx, componentsStructure/propertiesShowcase.ts, context/editorStoreFunctions/propertiesShowcaseFunctions.ts
+
+2026-02-16 18:17:47
+Update Type: Enhancement
+Added dynamic padding-bottom for titles in same row: if any property/project in a row has title longer than 26 characters, other properties in the same row with titles shorter than 26 characters will get padding-bottom to align properly. This only applies on large screens with grid layout.
+components/tenant/propertiesShowcase/propertiesShowcase1.tsx
