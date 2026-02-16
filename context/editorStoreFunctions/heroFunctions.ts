@@ -182,6 +182,8 @@ export const getDefaultHero2Data = (): ComponentData => ({
 // Default hero3 data structure
 export const getDefaultHero3Data = (): ComponentData => ({
   visible: true,
+  showTitle: true, // Show title by default
+  showSubtitle: true, // Show subtitle by default
   height: {
     desktop: "90vh",
     tablet: "80vh",

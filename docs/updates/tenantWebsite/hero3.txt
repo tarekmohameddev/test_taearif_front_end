@@ -1,0 +1,4 @@
+2025-01-20 14:00:00
+Update Type: Feature
+Added showTitle field to hero3 component to control title visibility. Title is now in a collapsible group with toggle (showTitle) similar to hero4. Title is conditionally rendered based on showTitle value. Added showTitle: true to default data.
+componentsStructure/hero.ts, context/editorStoreFunctions/heroFunctions.ts, components/tenant/hero/hero3.tsx

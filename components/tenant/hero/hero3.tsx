@@ -1048,17 +1048,19 @@ function Hero3(props: HeroProps) {
         <div className="w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
           {/* Desktop/Tablet Layout */}
           <div className="hidden md:flex flex-col items-center text-center text-white">
-            <h2
-              className={cn(
-                "mx-auto text-balance mb-3 font-bold",
-                `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
-                `max-w-${mergedData.content?.maxWidth || "5xl"}`,
-              )}
-              style={titleStyles}
-            >
-              {mergedData.content?.title ||
-                "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
-            </h2>
+            {mergedData.showTitle !== false && (
+              <h2
+                className={cn(
+                  "mx-auto text-balance mb-3 font-bold",
+                  `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
+                  `max-w-${mergedData.content?.maxWidth || "5xl"}`,
+                )}
+                style={titleStyles}
+              >
+                {mergedData.content?.title ||
+                  "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
+              </h2>
+            )}
             <p
               className={cn(
                 "mx-auto mb-6",
@@ -1083,17 +1085,19 @@ function Hero3(props: HeroProps) {
 
           {/* Mobile Layout */}
           <div className="md:hidden flex flex-col items-center text-center text-white">
-            <h2
-              className={cn(
-                "mx-auto text-balance mb-3",
-                `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
-                `max-w-${mergedData.content?.maxWidth || "5xl"}`,
-              )}
-              style={titleStyles}
-            >
-              {mergedData.content?.title ||
-                "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
-            </h2>
+            {mergedData.showTitle !== false && (
+              <h2
+                className={cn(
+                  "mx-auto text-balance mb-3",
+                  `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
+                  `max-w-${mergedData.content?.maxWidth || "5xl"}`,
+                )}
+                style={titleStyles}
+              >
+                {mergedData.content?.title ||
+                  "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
+              </h2>
+            )}
             <p
               className={cn(
                 "mx-auto mb-6",
