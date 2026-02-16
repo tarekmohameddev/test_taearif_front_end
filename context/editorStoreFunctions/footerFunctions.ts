@@ -101,6 +101,9 @@ export const getDefaultFooterData = (): ComponentData => ({
     },
     spacing: {
       sectionPadding: "16",
+      paddingYMobile: "16",
+      paddingYTablet: "20",
+      paddingYDesktop: "24",
       columnGap: "8",
       itemGap: "3",
     },

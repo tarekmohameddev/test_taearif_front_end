@@ -364,6 +364,35 @@ export const footerStructure: ComponentStructure = {
                   placeholder: "16",
                 },
                 {
+                  key: "paddingYGroup",
+                  label: "Padding Y",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "styling.spacing.paddingYMobile",
+                      label: "Padding Y Mobile (py)",
+                      type: "text",
+                      placeholder: "16",
+                      description: "Vertical padding for mobile screens",
+                    },
+                    {
+                      key: "styling.spacing.paddingYTablet",
+                      label: "Padding Y Tablet (py)",
+                      type: "text",
+                      placeholder: "20",
+                      description: "Vertical padding for tablet screens",
+                    },
+                    {
+                      key: "styling.spacing.paddingYDesktop",
+                      label: "Padding Y Desktop (py)",
+                      type: "text",
+                      placeholder: "24",
+                      description: "Vertical padding for desktop screens",
+                    },
+                  ],
+                },
+                {
                   key: "columnGap",
                   label: "Column Gap",
                   type: "text",

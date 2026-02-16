@@ -589,10 +589,65 @@ export default function Footer(props: FooterProps = {}) {
   const backgroundStyle = getBackgroundStyle();
   const bgType = mergedData.background?.type || "color";
 
+  // Get dynamic padding values from mergedData
+  const paddingYMobile = mergedData.styling?.spacing?.paddingYMobile || "16";
+  const paddingYTablet = mergedData.styling?.spacing?.paddingYTablet || "20";
+  const paddingYDesktop = mergedData.styling?.spacing?.paddingYDesktop || "24";
+
+  // Convert padding values to rem (Tailwind: 16 = 4rem, 20 = 5rem, 24 = 6rem)
+  const convertToRem = (value: string): string => {
+    const numValue = parseInt(value) || 16;
+    return `${numValue * 0.25}rem`;
+  };
+
+  // Build dynamic style for padding (mobile first)
+  const contentPaddingStyle: React.CSSProperties = {
+    paddingTop: convertToRem(paddingYMobile),
+    paddingBottom: convertToRem(paddingYMobile),
+  };
+
+  // Add responsive padding via style tag for tablet and desktop breakpoints
+  useEffect(() => {
+    const styleId = 'footer1-responsive-padding';
+    let styleElement = document.getElementById(styleId);
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    
+    const pyTablet = convertToRem(paddingYTablet);
+    const pyDesktop = convertToRem(paddingYDesktop);
+    
+    styleElement.textContent = `
+      @media (min-width: 768px) {
+        footer[data-footer-id="${variantId}"] .footer1-content {
+          padding-top: ${pyTablet} !important;
+          padding-bottom: ${pyTablet} !important;
+        }
+      }
+      @media (min-width: 1024px) {
+        footer[data-footer-id="${variantId}"] .footer1-content {
+          padding-top: ${pyDesktop} !important;
+          padding-bottom: ${pyDesktop} !important;
+        }
+      }
+    `;
+    
+    return () => {
+      const element = document.getElementById(styleId);
+      if (element) {
+        element.remove();
+      }
+    };
+  }, [paddingYTablet, paddingYDesktop, variantId]);
+
   return (
     <footer
       className="relative w-full"
       style={backgroundStyle}
+      data-footer-id={variantId}
     >
       {/* صورة الخلفية */}
       {bgType === "image" &&
@@ -612,10 +667,10 @@ export default function Footer(props: FooterProps = {}) {
 
       {/* المحتوى */}
       <div
-        className={`relative z-10 px-4 py-16 text-white`}
+        className={`relative z-10 px-4 footer1-content text-white`}
         dir="rtl"
         style={{
-          padding: `${mergedData.layout.padding}px`,
+          ...contentPaddingStyle,
           gridTemplateColumns: mergedData.grid?.columns?.desktop
             ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
             : undefined,
