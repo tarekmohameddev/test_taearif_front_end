@@ -36,6 +36,7 @@ import { Building, BuildingsResponse } from "./types";
 
 export default function BuildingsManagementPage() {
   const router = useRouter();
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,8 +111,13 @@ export default function BuildingsManagementPage() {
   };
 
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     fetchBuildings();
-  }, []);
+  }, [userData?.token, authLoading]);
 
   // Filter and sort buildings
   const filteredBuildings = useMemo(() => {

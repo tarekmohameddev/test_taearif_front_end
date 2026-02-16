@@ -30,11 +30,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
 
 export default function BuildingForm({ mode = "add" }) {
   const router = useRouter();
   const params = useParams();
   const buildingId = params?.id;
+  const { userData, IsLoading: authLoading } = useAuthStore();
 
   // States
   const [loading, setLoading] = useState(false);
@@ -61,10 +63,15 @@ export default function BuildingForm({ mode = "add" }) {
 
   // Load building data for edit mode
   useEffect(() => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      return; // Exit early if token is not ready
+    }
+
     if (mode === "edit" && buildingId) {
       loadBuildingData();
     }
-  }, [mode, buildingId]);
+  }, [mode, buildingId, userData?.token, authLoading]);
 
   const loadBuildingData = async () => {
     try {
@@ -145,6 +152,12 @@ export default function BuildingForm({ mode = "add" }) {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
+      return;
+    }
 
     if (!formData.name.trim()) {
       toast.error("يرجى إدخال اسم العمارة");

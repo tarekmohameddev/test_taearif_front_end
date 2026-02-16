@@ -1,2 +1,7 @@
 2026-02-03 18:31:00 - Fixed TypeError: Added optional chaining for building.user properties and improved 401 error handling
 components/buildings/building-card.tsx, components/buildings/buildings-management-page.tsx
+
+2026-02-16 19:19:55
+Update Type: Enhancement
+إضافة نظام التحقق من وجود token قبل إرسال API requests في صفحة إدارة العمارات
+components/buildings/buildings-management-page.tsx

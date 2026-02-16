@@ -7,3 +7,8 @@ components/buildings/building-form.jsx
 Update Type: Enhancement
 تعديل تخطيط عدادات المياه والكهرباء: العنوان يأخذ العرض الكامل، كل عداد في عمود منفصل ضمن grid ديناميكي (3 أعمدة)
 components/buildings/building-form.jsx
+
+2026-02-16 19:19:55
+Update Type: Enhancement
+إضافة نظام التحقق من وجود token قبل إرسال API requests في نموذج إضافة/تعديل العمارة
+components/buildings/building-form.jsx

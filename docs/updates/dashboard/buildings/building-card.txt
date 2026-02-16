@@ -1,0 +1,4 @@
+2026-02-16 19:19:55
+Update Type: Enhancement
+إضافة نظام التحقق من وجود token قبل إرسال API requests في بطاقة العمارة (حذف العمارة)
+components/buildings/building-card.tsx

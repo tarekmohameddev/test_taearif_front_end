@@ -53,6 +53,7 @@ import {
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "sonner";
+import useAuthStore from "@/context/AuthContext";
 
 import { Building } from "./types";
 
@@ -70,10 +71,17 @@ export default function BuildingCard({
   isSelected = false,
 }: BuildingCardProps) {
   const router = useRouter();
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const [showAllProperties, setShowAllProperties] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteBuilding = async () => {
+    // Wait until token is fetched
+    if (authLoading || !userData?.token) {
+      toast.error("يرجى الانتظار حتى يتم تحميل بيانات المصادقة");
+      return;
+    }
+
     // تأكيد قبل الحذف
     const confirmed = window.confirm(
       `هل أنت متأكد من حذف العمارة "${building.name}"؟\nهذا الإجراء لا يمكن التراجع عنه.`,
