@@ -448,11 +448,13 @@ const StarIcon = () => (
 function ProjectCard({ 
   property, 
   iconsColor, 
-  priceBackgroundColor 
+  priceBackgroundColor,
+  needsPaddingBottom = false
 }: { 
   property: Property;
   iconsColor: string;
   priceBackgroundColor: string;
+  needsPaddingBottom?: boolean;
 }) {
   const formatNumber = (num: number) => {
     return num.toLocaleString("en-US");
@@ -496,7 +498,7 @@ function ProjectCard({
       {/* Content Section */}
       <div className="p-4 pb-2 space-y-4 flex-1 flex flex-col">
         {/* Title and Status */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2" style={{ paddingBottom: needsPaddingBottom ? '1.5rem' : '0' }}>
           <div className="flex items-start justify-between gap-4">
             <h4
               className={`${titleFontSize} ${titleMaxWidth} font-bold text-black break-words flex-1`}
@@ -649,7 +651,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
 
         // Check if it's projects API response
         if (url.includes("/projects")) {
-          let projectsData = [];
+          let projectsData: any[] = [];
 
           if (response.data.projects) {
             projectsData = response.data.projects;
@@ -894,6 +896,49 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   // Always limit to 3 properties maximum
   const allProperties = useApiData ? apiProperties : mergedData.properties || [];
   const properties = allProperties.slice(0, 3);
+
+  // ─────────────────────────────────────────────────────────
+  // 6.4. CALCULATE PADDING FOR TITLES IN SAME ROW
+  // ─────────────────────────────────────────────────────────
+  // Calculate which properties need padding-bottom based on row grouping
+  const calculateTitlePadding = (): boolean[] => {
+    const needsPadding: boolean[] = new Array(properties.length).fill(false);
+    
+    // Only apply this logic on large screens where grid has multiple columns
+    if (!isLargeScreen) {
+      return needsPadding;
+    }
+    
+    const columnsPerRow = mergedData.layout?.columns?.desktop || 3;
+    
+    // Group properties into rows
+    for (let i = 0; i < properties.length; i += columnsPerRow) {
+      const row = properties.slice(i, i + columnsPerRow);
+      
+      // Check if any property in this row has title longer than 26 characters
+      const hasLongTitle = row.some(
+        (property) => property.title && property.title.length > 26
+      );
+      
+      // If there's a long title, add padding-bottom to properties with short titles (< 26 chars)
+      if (hasLongTitle) {
+        row.forEach((property, rowIndex) => {
+          const globalIndex = i + rowIndex;
+          if (property.title && property.title.length <= 26) {
+            needsPadding[globalIndex] = true;
+          }
+        });
+      }
+    }
+    
+    return needsPadding;
+  };
+
+  const titlePaddingNeeded = useMemo(() => calculateTitlePadding(), [
+    properties,
+    isLargeScreen,
+    mergedData.layout?.columns?.desktop,
+  ]);
 
   // ─────────────────────────────────────────────────────────
   // 6.5. DETERMINE ROUTE BASED ON DATA TYPE
@@ -1190,6 +1235,7 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
                   property={property} 
                   iconsColor={iconsColor}
                   priceBackgroundColor={priceBackgroundColor}
+                  needsPaddingBottom={titlePaddingNeeded[index] || false}
                 />
               </div>
             ))}
