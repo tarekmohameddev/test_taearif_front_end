@@ -162,6 +162,52 @@ const SearchForm = React.memo(function SearchForm({
   // Priority: savedConfig (saved data) > config (mergedData)
   const sourceConfig = savedConfig || config;
   
+  // Helper function to get icon color based on useDefaultColor and globalColorType
+  const getIconColor = (): string => {
+    const colorField = sourceConfig?.iconColor;
+    
+    // Read useDefaultColor from path FIRST, before checking colorField type
+    const useDefaultColorValue = sourceConfig?.iconColor?.useDefaultColor;
+    const globalColorTypeValue = sourceConfig?.iconColor?.globalColorType;
+    
+    // Check useDefaultColor value (default is true if not specified)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = globalColorTypeValue || "primary";
+      const brandingColor =
+        brandingColors[globalColorType as keyof typeof brandingColors] ||
+        brandingColors.primary;
+      return brandingColor;
+    }
+    
+    // If useDefaultColor is false, colorField should be a string
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    
+    // If colorField is an object (shouldn't happen when useDefaultColor = false, but handle it)
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== "" &&
+        colorField.value.startsWith("#")
+      ) {
+        return colorField.value.trim();
+      }
+    }
+    
+    // Final fallback: use primary branding color
+    return brandingColors.primary;
+  };
+
   // Helper function to get color based on useDefaultColor and globalColorType
   const getButtonColor = (): string => {
     
@@ -235,6 +281,9 @@ const SearchForm = React.memo(function SearchForm({
     
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
+  
+  // Get icon color using the helper function
+  const iconColor = getIconColor();
   
   // Get button color using the helper function
   const buttonColor = getButtonColor();
@@ -437,13 +486,13 @@ const SearchForm = React.memo(function SearchForm({
             {/* Property Type */}
             <div className="flex flex-col gap-2 flex-1">
               <div className="flex items-center gap-2">
-                <Home className="size-5" style={{ color: "#896042" }} />
+                <Home className="size-5" style={{ color: iconColor }} />
                 <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
               </div>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger 
-                  className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-                  style={{ color: "black" }}
+                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black", "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
                 >
                   <SelectValue placeholder={type || "الكل"} />
                 </SelectTrigger>
@@ -460,7 +509,7 @@ const SearchForm = React.memo(function SearchForm({
             {/* City */}
             <div className="flex flex-col gap-2 flex-1">
               <div className="flex items-center gap-2">
-                <MapPin className="size-5" style={{ color: "#896042" }} />
+                <MapPin className="size-5" style={{ color: iconColor }} />
                 <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
               </div>
               <Select
@@ -472,8 +521,8 @@ const SearchForm = React.memo(function SearchForm({
                 }}
               >
                 <SelectTrigger 
-                  className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-                  style={{ color: "black" }}
+                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black", "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
                 >
                   <SelectValue
                     placeholder={
@@ -506,13 +555,13 @@ const SearchForm = React.memo(function SearchForm({
             {/* Property Status */}
             <div className="flex flex-col gap-2 flex-1">
               <div className="flex items-center gap-2">
-                <Tag className="size-5" style={{ color: "#896042" }} />
+                <Tag className="size-5" style={{ color: iconColor }} />
                 <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
               </div>
               <Select value={status} onValueChange={setStatus}>
                 <SelectTrigger 
-                  className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black justify-end text-right [&>svg]:hidden"
-                  style={{ color: "black" }}
+                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
+                  style={{ color: "black", "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
                 >
                   <SelectValue placeholder={status || "بيع / ايجار"} />
                 </SelectTrigger>
@@ -531,7 +580,7 @@ const SearchForm = React.memo(function SearchForm({
         {isAdvancedSearchOpen && (
           <div className="flex flex-col gap-2 flex-1">
             <div className="flex items-center gap-2">
-              <Search className="size-5" style={{ color: "#896042" }} />
+              <Search className="size-5" style={{ color: iconColor }} />
               <h6 className="text-sm font-medium text-gray-700">البحث</h6>
             </div>
             <div className="relative">
@@ -540,7 +589,8 @@ const SearchForm = React.memo(function SearchForm({
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 placeholder="ابحث عن اسم أو صفة العقار"
-                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black text-right pr-10"
+                className="h-12 border border-gray-200 rounded-2xl text-black text-right pr-10"
+                style={{ "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
               />
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
             </div>
@@ -596,7 +646,7 @@ const SearchForm = React.memo(function SearchForm({
             {/* Property Type */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Home className="size-5" style={{ color: "#896042" }} />
+                <Home className="size-5" style={{ color: iconColor }} />
                 <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
               </div>
               <Select value={type} onValueChange={setType}>
@@ -619,7 +669,7 @@ const SearchForm = React.memo(function SearchForm({
             {/* City */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <MapPin className="size-5" style={{ color: "#896042" }} />
+                <MapPin className="size-5" style={{ color: iconColor }} />
                 <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
               </div>
               <Select
@@ -665,7 +715,7 @@ const SearchForm = React.memo(function SearchForm({
             {/* Property Status */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Tag className="size-5" style={{ color: "#896042" }} />
+                <Tag className="size-5" style={{ color: iconColor }} />
                 <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
               </div>
               <Select value={status} onValueChange={setStatus}>
@@ -690,7 +740,7 @@ const SearchForm = React.memo(function SearchForm({
         {isAdvancedSearchOpen && (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <Search className="size-5" style={{ color: "#896042" }} />
+              <Search className="size-5" style={{ color: iconColor }} />
               <h6 className="text-sm font-medium text-gray-700">البحث</h6>
             </div>
             <div className="relative">
@@ -699,7 +749,8 @@ const SearchForm = React.memo(function SearchForm({
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 placeholder="ابحث عن اسم أو صفة العقار"
-                className="h-12 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#896042] text-black text-right pr-10"
+                className="h-12 border border-gray-200 rounded-2xl text-black text-right pr-10"
+                style={{ "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
               />
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
             </div>

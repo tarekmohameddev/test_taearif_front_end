@@ -735,8 +735,16 @@ export const heroStructure: ComponentStructure = {
           type: "object",
           fields: [
             { key: "enabled", label: "Enabled", type: "boolean" },
-            { key: "position", label: "Position", type: "text" },
-            { key: "offset", label: "Offset", type: "text" },
+            {
+              key: "positionGroup",
+              label: "Position Settings",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "searchForm.position", label: "الموضع", type: "text" },
+                { key: "searchForm.offset", label: "Offset", type: "text" },
+              ],
+            },
             {
               key: "background",
               label: "Form Background",
@@ -789,6 +797,14 @@ export const heroStructure: ComponentStructure = {
                 { key: "tablet", label: "Tablet", type: "text" },
                 { key: "mobile", label: "Mobile", type: "text" },
               ],
+            },
+            {
+              key: "iconColor",
+              label: "Icon Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary",
+              description: "لون أيقونات الحقول (نوع العقار، موقع العقار، حالة العقار، البحث). يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
             },
             {
               key: "buttons",

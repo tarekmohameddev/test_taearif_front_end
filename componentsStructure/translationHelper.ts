@@ -397,6 +397,12 @@ export function translateLabel(
     Color: "components_structure.hero_specific.color",
     Animations: "components_structure.hero_specific.animations",
     Type: "components_structure.hero_specific.type",
+    "Position Settings": "components_structure.hero_specific.position_settings",
+    "Form Background": "components_structure.hero_specific.form_background",
+    "Background Video": "components_structure.hero_specific.background_video",
+    "Search Buttons": "components_structure.hero_specific.search_buttons",
+    "Status Field": "components_structure.hero_specific.status_field",
+    Offset: "components_structure.hero_specific.offset",
 
     // Testimonials specific labels
     "Testimonials 1 - Swiper Carousel":

@@ -2115,7 +2115,13 @@
       "opacity": "Opacity",
       "color": "Color",
       "animations": "Animations",
-      "type": "Type"
+      "type": "Type",
+      "position_settings": "Position Settings",
+      "form_background": "Form Background",
+      "background_video": "Background Video",
+      "search_buttons": "Search Buttons",
+      "status_field": "Status Field",
+      "offset": "Offset"
     },
     "testimonials_specific": {
       "testimonials_1_swiper_carousel": "Testimonials 1 - Swiper Carousel",

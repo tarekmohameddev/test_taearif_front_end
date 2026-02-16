@@ -12,3 +12,18 @@ componentsStructure/hero.ts, context/editorStoreFunctions/heroFunctions.ts, comp
 Update Type: Feature
 Added layoutGroup to hero3 component. Padding Top, Alignment, and Max Width fields are now grouped together in a collapsible group for better organization in the editor sidebar.
 componentsStructure/hero.ts
+
+2025-01-20 14:45:00
+Update Type: Feature
+Added positionGroup to hero3 searchForm. Position and Offset fields are now grouped together in a collapsible group for better organization in the editor sidebar.
+componentsStructure/hero.ts
+
+2025-01-20 15:00:00
+Update Type: Feature
+Added iconColor field to hero3 searchForm. Icons (Home, MapPin, Tag, Search) can now use Primary/Secondary/Accent colors from tenant settings or custom color, similar to button color control. Added getIconColor() function and replaced all hardcoded #896042 colors with dynamic iconColor.
+componentsStructure/hero.ts, context/editorStoreFunctions/heroFunctions.ts, components/tenant/hero/hero3.tsx
+
+2025-01-20 15:15:00
+Update Type: Feature
+Added translations for hero3 component labels: Position Settings, Form Background, Background Video, Search Buttons, Status Field, and Offset. Translations added to en.json, ar.json, and translationHelper.ts following the editorSidebarTranslationSystem.
+lib/i18n/locales/en.json, lib/i18n/locales/ar.json, componentsStructure/translationHelper.ts
