@@ -7,3 +7,8 @@ app/live-editor/LiveEditorWrapper.tsx, context/tenantStore.jsx
 Update Type: Bug Fix
 Fixed spam API requests for base domains (www.mandhoor.com). Live editor now uses tenant data from zustand store cache when on base domain, similar to dashboard behavior. Added isBaseDomain check to prevent extracting tenantId from base domains.
 app/live-editor/LiveEditorWrapper.tsx
+
+2025-01-20 16:00:00
+Update Type: Bug Fix
+Fixed live-editor not sending getTenant API request when navigating from dashboard via sidebar menu. Changed to use tenantId from /user API (userData.username) via useAuthStore instead of props, matching dashboard behavior. Now uses zustand store cache system.
+app/live-editor/LiveEditorWrapper.tsx

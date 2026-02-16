@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
 import useTenantStore from "@/context/tenantStore";
+import useAuthStore from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 
 interface LiveEditorWrapperProps {
@@ -72,11 +73,12 @@ function extractTenantFromHostname(hostname: string): string | null {
 }
 
 export default function LiveEditorWrapper({
-  tenantId,
+  tenantId: tenantIdProp,
 }: LiveEditorWrapperProps) {
   const setTenantId = useTenantStore((s) => s.setTenantId);
   const storeTenantId = useTenantStore((s) => s.tenantId);
   const storeTenantData = useTenantStore((s) => s.tenantData);
+  const userData = useAuthStore((s) => s.userData);
   const pathname = usePathname();
   const prevTenantIdRef = useRef<string | null>(null);
   const prevPathnameRef = useRef<string | null>(null);
@@ -84,19 +86,27 @@ export default function LiveEditorWrapper({
 
   useEffect(() => {
     const pathnameChanged = prevPathnameRef.current !== pathname;
-    const tenantIdPropChanged = prevTenantIdRef.current !== tenantId;
 
-    if (!hasInitializedRef.current || pathnameChanged || tenantIdPropChanged) {
-      let finalTenantId = tenantId;
+    if (!hasInitializedRef.current || pathnameChanged) {
+      let finalTenantId: string | null = null;
 
-      if (!finalTenantId && typeof window !== "undefined") {
+      if (typeof window !== "undefined") {
         const hostname = window.location.hostname;
         const isBase = isBaseDomain(hostname);
 
         if (isBase) {
-          finalTenantId = storeTenantId || storeTenantData?.username || null;
+          finalTenantId =
+            storeTenantId ||
+            storeTenantData?.username ||
+            userData?.username ||
+            null;
         } else {
-          finalTenantId = extractTenantFromHostname(hostname);
+          finalTenantId =
+            extractTenantFromHostname(hostname) ||
+            storeTenantId ||
+            storeTenantData?.username ||
+            userData?.username ||
+            null;
         }
       }
 
@@ -105,11 +115,10 @@ export default function LiveEditorWrapper({
         setTenantId(finalTenantId);
       }
 
-      prevTenantIdRef.current = tenantId;
       prevPathnameRef.current = pathname;
       hasInitializedRef.current = true;
     }
-  }, [tenantId, pathname, setTenantId, storeTenantId, storeTenantData]);
+  }, [pathname, setTenantId, storeTenantId, storeTenantData, userData]);
 
   return <LiveEditor />;
 }
