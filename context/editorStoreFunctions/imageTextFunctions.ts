@@ -10,6 +10,13 @@ export const getDefaultImageTextData = (): ComponentData => ({
 
   backgroundImage:
     "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80",
+  background: {
+    // Default: no color (transparent), user can set custom color or primary color
+    // When useDefaultColor = false: color is stored as string (custom color or empty for transparent)
+    // When useDefaultColor = true: color uses branding color from merchant settings
+    color: "", // Empty string = transparent (default)
+    opacity: 1,
+  },
   showTitle: true,
   title: "سكن يليق بطموحك وامكاناتك",
   showParagraph: true,

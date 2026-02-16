@@ -146,6 +146,96 @@ export default function ImageText1(props: ImageTextProps = {}) {
   };
 
   // ─────────────────────────────────────────────────────────
+  // GET BRANDING COLORS
+  // ─────────────────────────────────────────────────────────
+  // Get branding colors from WebsiteLayout (fallback to emerald-600)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#059669", // emerald-600 fallback
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#059669", // fallback
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#059669", // fallback
+  };
+
+  // ─────────────────────────────────────────────────────────
+  // HELPER FUNCTION: Get Background Color
+  // ─────────────────────────────────────────────────────────
+  // Helper function to get background color based on useDefaultColor and globalColorType
+  // Supports: transparent (empty string), custom color, or primary color
+  const getBackgroundColor = (): string | null => {
+    const colorField = mergedData?.background?.color;
+
+    // Get useDefaultColor and globalColorType from the color field
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      useDefaultColorValue = colorField.useDefaultColor;
+      globalColorTypeValue = colorField.globalColorType;
+    }
+
+    // Also check at the path level (ColorObjectRenderer stores them separately)
+    if (useDefaultColorValue === undefined) {
+      useDefaultColorValue = mergedData?.background?.color?.useDefaultColor;
+    }
+    if (globalColorTypeValue === undefined) {
+      globalColorTypeValue = mergedData?.background?.color?.globalColorType;
+    }
+
+    // Check useDefaultColor value (default is false for custom color/transparent)
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : false;
+
+    // If useDefaultColor is true, use branding color from WebsiteLayout
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      const brandingColor = brandingColors[globalColorType] || brandingColors.primary;
+      return brandingColor;
+    }
+
+    // If useDefaultColor is false, try to get custom color
+    // Empty string or null = transparent
+    if (
+      colorField &&
+      typeof colorField === "string" &&
+      colorField.trim() !== ""
+    ) {
+      // If it's a valid hex color, return it
+      if (colorField.startsWith("#")) {
+        return colorField.trim();
+      }
+      // If empty string, return null for transparent
+      return null;
+    }
+
+    // If colorField is an object, check for value property
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      if (
+        colorField.value &&
+        typeof colorField.value === "string" &&
+        colorField.value.trim() !== ""
+      ) {
+        if (colorField.value.startsWith("#")) {
+          return colorField.value.trim();
+        }
+        return null; // Empty value = transparent
+      }
+    }
+
+    // Final fallback: transparent (null)
+    return null;
+  };
+
+  // ─────────────────────────────────────────────────────────
   // 6. EARLY RETURN IF NOT VISIBLE
   // ─────────────────────────────────────────────────────────
   if (!mergedData.visible) {
@@ -155,6 +245,24 @@ export default function ImageText1(props: ImageTextProps = {}) {
   // ─────────────────────────────────────────────────────────
   // 7. RENDER
   // ─────────────────────────────────────────────────────────
+  // Get background color and opacity
+  const bgColor = getBackgroundColor();
+  const bgOpacity = mergedData.background?.opacity ?? 1;
+
+  // Calculate background color style
+  const backgroundColorStyle: React.CSSProperties = {};
+  if (bgColor) {
+    // If color exists, apply it with opacity
+    const r = parseInt(bgColor.slice(1, 3), 16);
+    const g = parseInt(bgColor.slice(3, 5), 16);
+    const b = parseInt(bgColor.slice(5, 7), 16);
+    backgroundColorStyle.backgroundColor = `rgba(${r}, ${g}, ${b}, ${bgOpacity})`;
+  } else if (bgOpacity < 1) {
+    // If transparent but opacity is less than 1, apply black with opacity
+    backgroundColorStyle.backgroundColor = `rgba(0, 0, 0, ${bgOpacity})`;
+  }
+  // If bgColor is null and bgOpacity is 1, background is fully transparent (no style needed)
+
   return (
     <section
       className="relative w-full flex items-center justify-center overflow-hidden"
@@ -162,25 +270,35 @@ export default function ImageText1(props: ImageTextProps = {}) {
         height: `${mergedData.styling?.height ?? 500}px`,
       }}
     >
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src={
-            mergedData.backgroundImage ||
-            "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80"
-          }
-          alt={t("components.imageText.alt_text")}
-          fill
-          className="object-cover brightness-50"
-          priority
-          sizes="100vw"
-        />
-        {/* Dark Overlay for better text readability */}
+      {/* Background Color Layer */}
+      {(bgColor || bgOpacity < 1) && (
         <div
-          className="absolute inset-0 bg-black"
-          style={{ opacity: mergedData.overlayOpacity || 0.3 }}
+          className="absolute inset-0 z-0"
+          style={backgroundColorStyle}
         />
-      </div>
+      )}
+
+      {/* Background Image */}
+      {mergedData.backgroundImage && (
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={
+              mergedData.backgroundImage ||
+              "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80"
+            }
+            alt={t("components.imageText.alt_text")}
+            fill
+            className="object-cover brightness-50"
+            priority
+            sizes="100vw"
+          />
+          {/* Dark Overlay for better text readability */}
+          <div
+            className="absolute inset-0 bg-black"
+            style={{ opacity: mergedData.overlayOpacity || 0.3 }}
+          />
+        </div>
+      )}
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-4xl px-4 md:px-6 lg:px-8 py-12 md:py-16">

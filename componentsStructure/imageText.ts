@@ -136,6 +136,8 @@ export const imageTextStructure: ComponentStructure = {
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "backgroundImage", label: "Background Image", type: "image" },
+        { key: "background.color", label: "Background Color", type: "color" },
+        { key: "background.opacity", label: "Background Opacity", type: "number" },
         { key: "showTitle", label: "إظهار العنوان", type: "boolean" },
         { key: "title", label: "Title", type: "text" },
         { key: "showParagraph", label: "إظهار الفقرة", type: "boolean" },
