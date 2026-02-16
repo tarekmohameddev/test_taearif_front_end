@@ -152,6 +152,32 @@ export function EditorProvider({ children }: { children: ReactNode }) {
       payload.StaticPages = freshState.staticPagesData;
     }
 
+    // ⭐ Remove pages with slug "global-header" or "global-footer" before sending
+    // إزالة الصفحات التي slug الخاص بها "global-header" أو "global-footer" قبل الإرسال
+    if (payload.pages) {
+      const cleanedPages: Record<string, any[]> = {};
+      Object.entries(payload.pages).forEach(([pageSlug, components]) => {
+        // Skip pages with slug "global-header" or "global-footer"
+        if (pageSlug !== "global-header" && pageSlug !== "global-footer") {
+          cleanedPages[pageSlug] = components;
+        }
+      });
+      payload.pages = cleanedPages;
+    }
+
+    // ⭐ Remove StaticPages with slug "global-header" or "global-footer" before sending
+    // إزالة StaticPages التي slug الخاص بها "global-header" أو "global-footer" قبل الإرسال
+    if (payload.StaticPages) {
+      const cleanedStaticPages: Record<string, any> = {};
+      Object.entries(payload.StaticPages).forEach(([pageSlug, pageData]) => {
+        // Skip pages with slug "global-header" or "global-footer"
+        if (pageSlug !== "global-header" && pageSlug !== "global-footer") {
+          cleanedStaticPages[pageSlug] = pageData;
+        }
+      });
+      payload.StaticPages = cleanedStaticPages;
+    }
+
     // Send to backend to persist
     await axiosInstance
       .post("/v1/tenant-website/save-pages", payload)
