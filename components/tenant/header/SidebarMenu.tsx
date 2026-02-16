@@ -12,7 +12,6 @@ import {
   Info,
   Briefcase,
   Phone,
-  Globe,
   Building2,
   MapPin
 } from "lucide-react";
@@ -40,18 +39,7 @@ interface SidebarMenuProps {
     text?: string;
     background?: string;
   };
-  actions?: {
-    logout?: {
-      enabled?: boolean;
-      text?: string;
-      onLogout?: () => void;
-    };
-    language?: {
-      enabled?: boolean;
-      current?: string;
-      onToggle?: () => void;
-    };
-  };
+  actions?: {};
   side?: "left" | "right";
 }
 
@@ -66,6 +54,21 @@ const SidebarMenu = ({
 }: SidebarMenuProps) => {
   const pathname = usePathname();
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
+
+  // Filter out unwanted menu items and empty items
+  const filteredMenuItems = menuItems.filter((item) => {
+    // Remove empty or invalid items
+    if (!item || (!item?.text && !item?.name && !item?.id)) {
+      return false;
+    }
+    const text = (item.text || item.name || "").toLowerCase();
+    return !text.includes("حسابي") && 
+           !text.includes("المفضلة") && 
+           !text.includes("تسجيل الخروج") &&
+           !text.includes("account") &&
+           !text.includes("favorite") &&
+           !text.includes("logout");
+  });
 
   const toggleSubmenu = (id: string) => {
     setOpenSubmenus(prev => ({
@@ -96,19 +99,21 @@ const SidebarMenu = ({
     return <ChevronRight className="w-4 h-4 opacity-50" />;
   };
 
-  const MenuItem = ({ item, depth = 0 }: { item: any, depth: number }) => {
+  const MenuItem = ({ item, depth = 0, uniqueKey }: { item: any, depth: number, uniqueKey: string }) => {
     const hasSubmenu = item.submenu && Array.isArray(item.submenu) && item.submenu.length > 0;
     const itemUrl = item.url || item.path || "#";
     const isActive = pathname === itemUrl;
-    const itemId = item.id || item.text || item.name;
-    const isOpenSub = openSubmenus[itemId];
+    const rawItemId = item.id || item.text || item.name || uniqueKey || `item-${Date.now()}-${Math.random()}`;
+    const itemId = rawItemId ? rawItemId.toString().trim() : uniqueKey || `item-${Date.now()}-${Math.random()}`;
+    const finalItemId = itemId || uniqueKey || `item-${Date.now()}-${Math.random()}`;
+    const isOpenSub = openSubmenus[finalItemId];
 
     return (
       <div className="w-full">
         {hasSubmenu ? (
           <div className="flex flex-col">
             <button
-              onClick={() => toggleSubmenu(itemId)}
+              onClick={() => toggleSubmenu(finalItemId)}
               className={cn(
                 "flex items-center justify-between w-full py-3 px-4 transition-all duration-300 rounded-xl group",
                 isOpenSub ? "bg-stone-50" : "hover:bg-stone-50"
@@ -138,18 +143,25 @@ const SidebarMenu = ({
             <AnimatePresence>
               {isOpenSub && (
                 <motion.div
+                  key={`submenu-${finalItemId}`}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="overflow-hidden border-r-2 border-stone-100 mr-8 mt-1 space-y-1"
                 >
-                  {item.submenu.map((sub: any, idx: number) => {
+                  {item.submenu.flatMap((sub: any, idx: number) => {
                     // Normalize submenu structure (sometimes nested in 'items')
                     const items = sub.items && Array.isArray(sub.items) ? sub.items : [sub];
-                    return items.map((subItem: any, sIdx: number) => (
-                      <MenuItem key={`${itemId}-sub-${idx}-${sIdx}`} item={subItem} depth={depth + 1} />
-                    ));
+                    return items.map((subItem: any, sIdx: number) => {
+                      const rawId = subItem.id || subItem.text || subItem.name || subItem.url || subItem.path || `sub-${idx}-${sIdx}`;
+                      const subItemId = rawId ? rawId.toString().trim() : `sub-${idx}-${sIdx}`;
+                      const finalId = subItemId || `sub-${idx}-${sIdx}-${Date.now()}-${Math.random()}`;
+                      const subUniqueKey = `${uniqueKey}-sub-${idx}-${sIdx}-${finalId}`;
+                      return (
+                        <MenuItem key={subUniqueKey} item={subItem} depth={depth + 1} uniqueKey={subUniqueKey} />
+                      );
+                    });
                   })}
                 </motion.div>
               )}
@@ -184,20 +196,22 @@ const SidebarMenu = ({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
+    <>
+      <AnimatePresence>
+        {isOpen && (
           <motion.div
+            key="sidebar-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-[100]"
           />
+        )}
 
-          {/* Sidebar */}
+        {isOpen && (
           <motion.div
+            key="sidebar-menu"
             initial={{ x: side === "right" ? "100%" : "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: side === "right" ? "100%" : "-100%" }}
@@ -235,37 +249,27 @@ const SidebarMenu = ({
               <div className="px-4 mb-4">
                 <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">القائمة الرئيسية</p>
               </div>
-              {menuItems.map((item, index) => (
-                <MenuItem key={index} item={item} depth={0} />
-              ))}
+              {filteredMenuItems.map((item, index) => {
+                const rawId = item.id || item.url || item.path || item.text || item.name || `item-${index}`;
+                const itemUniqueId = rawId ? rawId.toString().trim() : `item-${index}`;
+                const finalId = itemUniqueId || `item-${index}-${Date.now()}-${Math.random()}`;
+                const uniqueKey = `menu-${index}-${finalId}`;
+                return (
+                  <MenuItem key={uniqueKey} item={item} depth={0} uniqueKey={uniqueKey} />
+                );
+              })}
             </div>
 
             {/* Footer Actions */}
             <div className="p-6 border-t border-stone-100 bg-stone-50/50">
-              <div className="space-y-3">
-                {actions?.language?.enabled && (
-                  <button 
-                    onClick={actions.language.onToggle}
-                    className="flex items-center justify-between w-full p-4 bg-white rounded-xl border border-stone-100 hover:bg-stone-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Globe className="w-5 h-5 text-stone-400" />
-                      <span className="font-medium text-stone-700">تغيير اللغة</span>
-                    </div>
-                    <span className="text-sm font-bold text-stone-900 bg-stone-100 px-2 py-1 rounded">
-                      {actions.language.current === "ar" ? "English" : "عربي"}
-                    </span>
-                  </button>
-                )}
-              </div>
-
-              <div className="mt-8 text-center">
+              <div className="text-center">
                 <p className="text-[10px] text-stone-400 font-medium">© 2026 جميع الحقوق محفوظة</p>
               </div>
             </div>
           </motion.div>
-        </>
-      )}
+        )}
+      </AnimatePresence>
+
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
@@ -279,9 +283,10 @@ const SidebarMenu = ({
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #d6d3d1;
+          border-radius: 10px;
         }
       `}</style>
-    </AnimatePresence>
+    </>
   );
 };
 
