@@ -19,7 +19,14 @@ export function useTenantId() {
         return;
       }
 
-      // 2. محاولة الحصول على tenantId من الـ headers (middleware)
+      // 2. محاولة الحصول على tenantId من userData
+      if (userData?.username) {
+        setTenantId(userData.username);
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. محاولة الحصول على tenantId من الـ url (فقط إذا لم يكن هناك مستخدم مسجل أو لم يكن له username)
       if (typeof window !== "undefined") {
         // في الـ client side، يمكننا الحصول على tenantId من الـ URL
         const hostname = window.location.hostname;
@@ -30,13 +37,6 @@ export function useTenantId() {
           setIsLoading(false);
           return;
         }
-      }
-
-      // 3. محاولة الحصول على tenantId من userData
-      if (userData?.username) {
-        setTenantId(userData.username);
-        setIsLoading(false);
-        return;
       }
 
       // 4. إذا لم نجد tenantId، نبقى في حالة loading

@@ -96,16 +96,16 @@ export default function LiveEditorWrapper({
 
         if (isBase) {
           finalTenantId =
+            userData?.username ||
             storeTenantId ||
             storeTenantData?.username ||
-            userData?.username ||
             null;
         } else {
           finalTenantId =
+            userData?.username ||
             extractTenantFromHostname(hostname) ||
             storeTenantId ||
             storeTenantData?.username ||
-            userData?.username ||
             null;
         }
       }
