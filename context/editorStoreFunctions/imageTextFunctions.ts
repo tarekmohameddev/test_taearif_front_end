@@ -10,9 +10,12 @@ export const getDefaultImageTextData = (): ComponentData => ({
 
   backgroundImage:
     "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=80",
+  showTitle: true,
   title: "سكن يليق بطموحك وامكاناتك",
+  showParagraph: true,
   paragraph:
     "نحن لا نعرض عقارات فقط، بل نقدّم تجربة مبنية على الثقة، والشفافية، واحترافية عالية في كل خطوة. سواء كنت تبحث عن سكن، استثمار، أو فرصة تبني بها استقرارك نحن هنا لنقودك إلى قرار تعرف أنه لك، ويشبهك.",
+  showBlockquote: true,
   blockquote:
     "في باهية، نؤمن أن كل شخص يستحق فرصة لبناء مستقبله العقاري بطريقته الخاصة. نمنحك كامل الحرية في اكتشاف الخيارات التي تناسبك، وبأفضل قيمة ممكنة.",
   overlayOpacity: 0.3,
