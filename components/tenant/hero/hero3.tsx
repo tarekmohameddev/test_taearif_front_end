@@ -1061,17 +1061,19 @@ function Hero3(props: HeroProps) {
                   "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
               </h2>
             )}
-            <p
-              className={cn(
-                "mx-auto mb-6",
-                `text-${mergedData.content?.font?.subtitle?.size?.tablet || "xs"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "md"}`,
-                `max-w-${mergedData.content?.maxWidth || "4xl"}`,
-              )}
-              style={subtitleStyles}
-            >
-              {mergedData.content?.subtitle ||
-                "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}
-            </p>
+            {mergedData.showSubtitle !== false && (
+              <p
+                className={cn(
+                  "mx-auto mb-6",
+                  `text-${mergedData.content?.font?.subtitle?.size?.tablet || "xs"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "md"}`,
+                  `max-w-${mergedData.content?.maxWidth || "4xl"}`,
+                )}
+                style={subtitleStyles}
+              >
+                {mergedData.content?.subtitle ||
+                  "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}
+              </p>
+            )}
             {/* Hero Search Form for Desktop/Tablet */}
             {mergedData.searchForm?.enabled && (
               <div className="w-full pointer-events-auto flex items-center justify-center">
@@ -1098,17 +1100,19 @@ function Hero3(props: HeroProps) {
                   "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
               </h2>
             )}
-            <p
-              className={cn(
-                "mx-auto mb-6",
-                `text-${mergedData.content?.font?.subtitle?.size?.mobile || "xs"}`,
-                `max-w-${mergedData.content?.maxWidth || "4xl"}`,
-              )}
-              style={subtitleStyles}
-            >
-              {mergedData.content?.subtitle ||
-                "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}
-            </p>
+            {mergedData.showSubtitle !== false && (
+              <p
+                className={cn(
+                  "mx-auto mb-6",
+                  `text-${mergedData.content?.font?.subtitle?.size?.mobile || "xs"}`,
+                  `max-w-${mergedData.content?.maxWidth || "4xl"}`,
+                )}
+                style={subtitleStyles}
+              >
+                {mergedData.content?.subtitle ||
+                  "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}
+              </p>
+            )}
             {/* Hero Search Form for Mobile */}
             {mergedData.searchForm?.enabled && (
               <div className="w-full px-4 pointer-events-auto">

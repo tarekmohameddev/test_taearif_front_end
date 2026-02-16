@@ -656,7 +656,17 @@ export const heroStructure: ComponentStructure = {
                 { key: "content.subtitle", label: "Subtitle", type: "text" },
               ],
             },
-            { key: "paddingTop", label: "Padding Top", type: "text" },
+            {
+              key: "layoutGroup",
+              label: "Layout Settings",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.paddingTop", label: "Padding Top", type: "text" },
+                { key: "content.alignment", label: "Alignment", type: "text" },
+                { key: "content.maxWidth", label: "Max Width", type: "text" },
+              ],
+            },
             {
               key: "font",
               label: "Font Settings",
@@ -717,8 +727,6 @@ export const heroStructure: ComponentStructure = {
                 },
               ],
             },
-            { key: "alignment", label: "Alignment", type: "text" },
-            { key: "maxWidth", label: "Max Width", type: "text" },
           ],
         },
         {
