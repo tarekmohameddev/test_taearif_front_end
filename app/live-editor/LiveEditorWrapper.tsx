@@ -8,11 +8,27 @@ interface LiveEditorWrapperProps {
   tenantId: string | null;
 }
 
+function isBaseDomain(hostname: string): boolean {
+  const productionDomain =
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
+  const BASE_DOMAINS = [
+    productionDomain,
+    `www.${productionDomain}`,
+    "mandhoor.com",
+    "www.mandhoor.com",
+  ];
+  return BASE_DOMAINS.includes(hostname);
+}
+
 function extractTenantFromHostname(hostname: string): string | null {
   const localDomain = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
   const productionDomain =
     process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
   const isDevelopment = process.env.NODE_ENV === "development";
+
+  if (isBaseDomain(hostname)) {
+    return null;
+  }
 
   const reservedWords = [
     "www",
@@ -59,6 +75,8 @@ export default function LiveEditorWrapper({
   tenantId,
 }: LiveEditorWrapperProps) {
   const setTenantId = useTenantStore((s) => s.setTenantId);
+  const storeTenantId = useTenantStore((s) => s.tenantId);
+  const storeTenantData = useTenantStore((s) => s.tenantData);
   const pathname = usePathname();
   const prevTenantIdRef = useRef<string | null>(null);
   const prevPathnameRef = useRef<string | null>(null);
@@ -73,7 +91,13 @@ export default function LiveEditorWrapper({
 
       if (!finalTenantId && typeof window !== "undefined") {
         const hostname = window.location.hostname;
-        finalTenantId = extractTenantFromHostname(hostname);
+        const isBase = isBaseDomain(hostname);
+
+        if (isBase) {
+          finalTenantId = storeTenantId || storeTenantData?.username || null;
+        } else {
+          finalTenantId = extractTenantFromHostname(hostname);
+        }
       }
 
       const currentStoreTenantId = useTenantStore.getState().tenantId;
@@ -85,7 +109,7 @@ export default function LiveEditorWrapper({
       prevPathnameRef.current = pathname;
       hasInitializedRef.current = true;
     }
-  }, [tenantId, pathname, setTenantId]);
+  }, [tenantId, pathname, setTenantId, storeTenantId, storeTenantData]);
 
   return <LiveEditor />;
 }
