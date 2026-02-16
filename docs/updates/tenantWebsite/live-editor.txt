@@ -1,0 +1,4 @@
+2025-01-20 12:00:00
+Update Type: Bug Fix
+Fixed getTenant API request not being sent on client-side navigation to /live-editor. Added hostname extraction logic in LiveEditorWrapper and improved cache clearing in tenantStore.
+app/live-editor/LiveEditorWrapper.tsx, context/tenantStore.jsx

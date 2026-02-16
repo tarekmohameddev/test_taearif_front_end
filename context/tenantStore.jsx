@@ -47,7 +47,17 @@ const useTenantStore = create((set) => ({
   tenantId: null,
   lastFetchedWebsite: null,
   setTenant: (tenant) => set({ tenant }),
-  setTenantId: (tenantId) => set({ tenantId }),
+  setTenantId: (tenantId) => {
+    const currentState = useTenantStore.getState();
+    if (tenantId !== currentState.tenantId) {
+      set({
+        tenantId,
+        tenantData: null,
+        lastFetchedWebsite: null,
+        loadingTenantData: false,
+      });
+    }
+  },
   updateHeader: (headerData) =>
     set((state) => ({
       tenantData: state.tenantData
@@ -277,16 +287,19 @@ const useTenantStore = create((set) => ({
   fetchTenantData: async (websiteName) => {
     const state = useTenantStore.getState();
 
-    // Prevent duplicate requests - تحقق من أن البيانات موجودة ونفس الـ username
+    if (state.loadingTenantData) {
+      return;
+    }
+
     if (
-      state.loadingTenantData ||
-      (state.tenantData && state.tenantData.username === websiteName)
+      state.tenantData &&
+      state.tenantData.username === websiteName &&
+      state.tenantId === websiteName
     ) {
       return;
     }
 
-    // منع الـ duplicate calls إذا كان نفس الـ websiteName
-    if (state.lastFetchedWebsite === websiteName) {
+    if (state.lastFetchedWebsite === websiteName && state.tenantId === websiteName) {
       return;
     }
 
