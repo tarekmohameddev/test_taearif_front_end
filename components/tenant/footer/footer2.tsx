@@ -678,11 +678,67 @@ export default function Footer2(props: Footer2Props) {
   const backgroundStyle = getBackgroundStyle();
   const bgType = mergedData.background?.type || "color";
 
+  // Get dynamic padding values from mergedData
+  const paddingYMobile = mergedData.styling?.spacing?.paddingYMobile || "16";
+  const paddingYTablet = mergedData.styling?.spacing?.paddingYTablet || "20";
+  const paddingYDesktop = mergedData.styling?.spacing?.paddingYDesktop || "24";
+
+  // Convert padding values to rem (Tailwind: 16 = 4rem, 20 = 5rem, 24 = 6rem)
+  const convertToRem = (value: string): string => {
+    const numValue = parseInt(value) || 16;
+    return `${numValue * 0.25}rem`;
+  };
+
+  // Build dynamic style for padding (mobile first)
+  const paddingStyle: React.CSSProperties = {
+    paddingTop: convertToRem(paddingYMobile),
+    paddingBottom: convertToRem(paddingYMobile),
+    ...backgroundStyle,
+  };
+
+  // Add responsive padding via style tag for tablet and desktop breakpoints
+  useEffect(() => {
+    const styleId = 'footer2-responsive-padding';
+    let styleElement = document.getElementById(styleId);
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    
+    const pyTablet = convertToRem(paddingYTablet);
+    const pyDesktop = convertToRem(paddingYDesktop);
+    
+    styleElement.textContent = `
+      @media (min-width: 768px) {
+        footer[data-footer-id="${uniqueId}"] {
+          padding-top: ${pyTablet} !important;
+          padding-bottom: ${pyTablet} !important;
+        }
+      }
+      @media (min-width: 1024px) {
+        footer[data-footer-id="${uniqueId}"] {
+          padding-top: ${pyDesktop} !important;
+          padding-bottom: ${pyDesktop} !important;
+        }
+      }
+    `;
+    
+    return () => {
+      const element = document.getElementById(styleId);
+      if (element) {
+        element.remove();
+      }
+    };
+  }, [paddingYTablet, paddingYDesktop, uniqueId]);
+
   return (
     <>
       <footer
-        className="relative z-10 pt-16 md:pt-20 lg:pt-24 pb-8"
-        style={backgroundStyle}
+        className="relative z-10"
+        style={paddingStyle}
+        data-footer-id={uniqueId}
       >
         {/* Background Image - Only show when type is "image" */}
         {bgType === "image" && mergedData.background?.image && (
