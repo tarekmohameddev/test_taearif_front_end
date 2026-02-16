@@ -632,6 +632,8 @@
       "add_step": "إضافة خطوة",
       "step": "خطوة",
       "text": "النص",
+      "paragraph": "الفقرة",
+      "blockquote": "الاقتباس",
       "weight": "الوزن",
       "style": "النمط",
       "width": "العرض",

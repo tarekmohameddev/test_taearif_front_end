@@ -608,6 +608,8 @@
       "add_step": "Add Step",
       "step": "Step",
       "text": "Text",
+      "paragraph": "Paragraph",
+      "blockquote": "Blockquote",
       "weight": "Weight",
       "style": "Style",
       "width": "Width",

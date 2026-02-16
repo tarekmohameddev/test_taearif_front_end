@@ -18,6 +18,8 @@ export function translateLabel(
     Title: "components_structure.basic.title",
     Description: "components_structure.basic.description",
     Text: "components_structure.basic.text",
+    Paragraph: "components_structure.basic.paragraph",
+    Blockquote: "components_structure.basic.blockquote",
     Weight: "components_structure.basic.weight",
     Style: "components_structure.basic.style",
     Width: "components_structure.basic.width",

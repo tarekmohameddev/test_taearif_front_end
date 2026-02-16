@@ -1,0 +1,4 @@
+2026-02-16 18:53:55
+Update Type: Enhancement
+Added translations for "Paragraph" and "Blockquote" labels in editor sidebar translation system
+lib/i18n/locales/ar.json, lib/i18n/locales/en.json, componentsStructure/translationHelper.ts
