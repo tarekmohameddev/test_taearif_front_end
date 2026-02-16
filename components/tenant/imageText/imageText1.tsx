@@ -10,14 +10,18 @@ import { useClientT } from "@/context/clientI18nStore";
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
 // ═══════════════════════════════════════════════════════════
+interface TextItem {
+  type: "heading" | "paragraph" | "blockquote" | "feature";
+  text: string;
+  shapeType?: "plain" | "badge";
+}
+
 interface ImageTextProps {
   // Component-specific props
   visible?: boolean;
   ThemeTwo?: string;
   backgroundImage?: string;
-  title?: string;
-  paragraph?: string;
-  blockquote?: string;
+  texts?: TextItem[];
   overlayOpacity?: number;
   height?: number;
 
@@ -308,28 +312,61 @@ export default function ImageText1(props: ImageTextProps = {}) {
       {/* Content */}
       <div className="relative z-10 w-full max-w-4xl px-4 md:px-6 lg:px-8 py-12 md:py-16">
         <div className="text-center text-white space-y-6 md:space-y-8">
-          {/* Main Title */}
-          {mergedData.showTitle !== false && (
-            <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
-              {mergedData.title}
-            </h3>
-          )}
-
-          {/* First Paragraph */}
-          {mergedData.showParagraph !== false && (
-            <div className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95">
-              <p className="whitespace-pre-line">{mergedData.paragraph}</p>
-            </div>
-          )}
-
-          {/* Blockquote */}
-          {mergedData.showBlockquote !== false && (
-            <blockquote className="border-r-0 border-l-0 border-t-0 border-b-0 pt-6 md:pt-8">
-              <p className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95 italic">
-                {mergedData.blockquote}
-              </p>
-            </blockquote>
-          )}
+          {mergedData.texts &&
+            Array.isArray(mergedData.texts) &&
+            mergedData.texts.map((item: TextItem, index: number) => {
+              if (item.type === "heading") {
+                return (
+                  <h3
+                    key={index}
+                    className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight"
+                  >
+                    {item.text}
+                  </h3>
+                );
+              }
+              if (item.type === "paragraph") {
+                return (
+                  <div
+                    key={index}
+                    className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95"
+                  >
+                    <p className="whitespace-pre-line">{item.text}</p>
+                  </div>
+                );
+              }
+              if (item.type === "blockquote") {
+                return (
+                  <blockquote
+                    key={index}
+                    className="border-r-0 border-l-0 border-t-0 border-b-0 pt-6 md:pt-8"
+                  >
+                    <p className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95 italic">
+                      {item.text}
+                    </p>
+                  </blockquote>
+                );
+              }
+              if (item.type === "feature") {
+                const isBadge = item.shapeType === "badge";
+                return (
+                  <div
+                    key={index}
+                    className={`flex items-center justify-center gap-3 text-base md:text-lg lg:text-xl leading-relaxed text-white/95 m-2 ${
+                      isBadge
+                        ? "bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-lg inline-flex mx-4 w-auto"
+                        : ""
+                    }`}
+                  >
+                    {!isBadge && (
+                      <span className="w-2 h-2 rounded-full bg-white flex-shrink-0" />
+                    )}
+                    <span>{item.text}</span>
+                  </div>
+                );
+              }
+              return null;
+            })}
         </div>
       </div>
     </section>
