@@ -67,7 +67,33 @@ export const updateDataByPath = (
       cursor[key] = nextIsIndex ? [] : {};
     }
 
-    // إذا كان المفتاح موجود ولكن بنوع خاطئ، أصلحه
+    // إذا كان المفتاح موجود ولكن بنوع خاطئ (primitive type)، أصلحه
+    // هذا يحدث عندما نحاول الوصول إلى خاصية على string/number/boolean
+    if (
+      typeof cursor[key] !== "object" ||
+      cursor[key] === null ||
+      Array.isArray(cursor[key]) !== nextIsIndex
+    ) {
+      // إذا كان primitive type (string, number, boolean) ونريد الوصول إلى خاصية،
+      // نحتاج إلى تحويله إلى object
+      if (nextIsIndex) {
+        cursor[key] = [];
+      } else {
+        // إذا كانت القيمة الحالية string/number/boolean، نحفظها في خاصية value
+        const currentValue = cursor[key];
+        cursor[key] = {};
+        // إذا كانت القيمة string وتبدأ بـ # (لون)، نحفظها في value
+        if (
+          typeof currentValue === "string" &&
+          currentValue.trim() !== "" &&
+          currentValue.startsWith("#")
+        ) {
+          cursor[key].value = currentValue;
+        }
+      }
+    }
+
+    // إذا كان المفتاح موجود ولكن بنوع خاطئ (array vs object)
     if (nextIsIndex && !Array.isArray(cursor[key])) {
       cursor[key] = [];
     } else if (!nextIsIndex && Array.isArray(cursor[key])) {
@@ -79,6 +105,28 @@ export const updateDataByPath = (
 
   // تحديث القيمة النهائية
   const lastKey = cleanedSegments[cleanedSegments.length - 1]!;
+  
+  // إذا كان cursor[lastKey] هو primitive type (string/number/boolean) ونريد تحديث خاصية،
+  // نحتاج إلى تحويله إلى object أولاً
+  if (
+    cursor[lastKey] != null &&
+    (typeof cursor[lastKey] === "string" ||
+      typeof cursor[lastKey] === "number" ||
+      typeof cursor[lastKey] === "boolean")
+  ) {
+    // حفظ القيمة الحالية في خاصية value
+    const currentValue = cursor[lastKey];
+    cursor[lastKey] = {};
+    // إذا كانت القيمة string وتبدأ بـ # (لون)، نحفظها في value
+    if (
+      typeof currentValue === "string" &&
+      currentValue.trim() !== "" &&
+      currentValue.startsWith("#")
+    ) {
+      cursor[lastKey].value = currentValue;
+    }
+  }
+  
   cursor[lastKey] = value;
 
   return newData;
