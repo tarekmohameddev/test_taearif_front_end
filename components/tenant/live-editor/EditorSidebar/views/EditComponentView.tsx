@@ -54,6 +54,7 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
   updateComponentByPath,
   handleInputChange,
 }) => {
+  const { updateGlobalFooterByPath, updateGlobalComponentByPath } = useEditorStore();
   const t = useEditorT();
   const { locale } = useEditorLocale();
   const isRTL = locale === "ar";
@@ -155,7 +156,11 @@ export const EditComponentView: React.FC<EditComponentViewProps> = ({
         );
       }
 
+      // Update both tempData (for immediate UI feedback) and globalFooterData (for persistence)
       updateByPath(path, value);
+      updateGlobalFooterByPath(path, value);
+      // Also update globalComponentsData for consistency
+      updateGlobalComponentByPath("footer", path, value);
     } else {
       // Handle regular components with enhanced logic
       if (

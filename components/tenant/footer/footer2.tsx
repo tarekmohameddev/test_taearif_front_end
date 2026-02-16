@@ -325,7 +325,6 @@ export default function Footer2(props: Footer2Props) {
       baseData.content.companyInfo.showDescription = true;
     }
 
-
     return baseData;
   }, [
     isGlobalFooter,
