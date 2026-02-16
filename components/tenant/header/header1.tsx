@@ -15,6 +15,7 @@ import { useEditorStore } from "@/context/editorStore";
 import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context/editorStoreFunctions/headerFunctions";
 import { logChange } from "@/lib/debugLogger";
 import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdown";
+import SidebarMenu from "./SidebarMenu";
 
 // Default header data
 const getDefaultHeaderData = () => ({
@@ -453,110 +454,16 @@ const Header1 = (props: HeaderProps = {}) => {
     }
   }, [globalHeaderData, mergedData, forceUpdate]);
 
+
+
   const { user, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const cartCount = useStore((state) => state.cart?.items?.length || 0);
   const router = useRouter();
 
-  // Mobile menu item component with nested submenu support
-  const MobileMenuItemWithSubmenu = ({
-    item,
-    mergedData,
-    pathname,
-    tenantId,
-    router,
-  }: {
-    item: any;
-    mergedData: any;
-    pathname: string;
-    tenantId: string | null;
-    router: any;
-  }) => {
-    const [isSubOpen, setIsSubOpen] = useState(false);
-
-    const renderMobileSubmenu = (submenuItems: any[], level: number = 0): React.ReactNode => {
-      return submenuItems.map((subItem: any, idx: number) => {
-        const hasNestedSubmenu = subItem.submenu && Array.isArray(subItem.submenu) && subItem.submenu.length > 0;
-        const href = subItem.url?.startsWith("http")
-          ? subItem.url
-          : tenantId
-            ? `${subItem.url || subItem.path || "/"}`
-            : subItem.url || subItem.path || "/";
-
-        if (hasNestedSubmenu) {
-          return (
-            <MobileMenuItemWithSubmenu
-              key={subItem.id || `mobile-sub-${level}-${idx}`}
-              item={subItem}
-              mergedData={mergedData}
-              pathname={pathname}
-              tenantId={tenantId}
-              router={router}
-            />
-          );
-        }
-
-        return (
-          <Link
-            key={subItem.id || `mobile-sub-${level}-${idx}`}
-            href={href}
-            className={cn(
-              "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted block",
-              level > 0 && "me-4",
-              pathname === href ? "text-emerald-700" : "text-foreground"
-            )}
-            style={{
-              color: pathname === href
-                ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
-                : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
-            }}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            {subItem.text || subItem.name}
-          </Link>
-        );
-      });
-    };
-
-    return (
-      <div key={item.id || item.text} className="space-y-2">
-        <button
-          onClick={() => setIsSubOpen(!isSubOpen)}
-          className={cn(
-            "flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
-            pathname === item.href ? "text-emerald-700" : "text-foreground"
-          )}
-          style={{
-            color: pathname === item.href
-              ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
-              : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
-          }}
-        >
-          <span>{item.name || item.text}</span>
-          <svg
-            className={cn("h-4 w-4 transition-transform", isSubOpen && "rotate-180")}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        {isSubOpen && (
-          <div className="me-4 space-y-2 border-e pe-4">
-            {item.submenu.map((submenuSection: any) => {
-              if (submenuSection.items && Array.isArray(submenuSection.items)) {
-                return renderMobileSubmenu(submenuSection.items, 1);
-              }
-              return renderMobileSubmenu([submenuSection], 1);
-            })}
-          </div>
-        )}
-      </div>
-    );
-  };
-
+  // Mobile menu item component is no longer needed here as it's moved to SidebarMenu
+  
   // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
@@ -579,7 +486,7 @@ const Header1 = (props: HeaderProps = {}) => {
     [mergedData.menu, tenantId],
   );
 
-  // Recursive function to render menu items with nested submenu support
+  // Recursive function for desktop menu...
   const renderMenuItem = useCallback((item: any, level: number = 0): React.ReactNode => {
     // If item has submenu, render as DropdownSubMenu
     if (item.submenu && Array.isArray(item.submenu) && item.submenu.length > 0) {
@@ -613,14 +520,14 @@ const Header1 = (props: HeaderProps = {}) => {
           }
         }}
       >
-        <Link href={href} className="w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="w-full">
           {item.text || item.name}
-        </Link>
+        </div>
       </DropdownItem>
     );
   }, [tenantId, router]);
 
-  // Render desktop menu item (for navigation bar)
+  // Render desktop menu item...
   const renderDesktopMenuItem = useCallback((item: any, index: number) => {
     const href = item.href || item.url || "/";
     const isActive = pathname === href;
@@ -850,122 +757,53 @@ const Header1 = (props: HeaderProps = {}) => {
             )}
 
             {/* Mobile Menu Button */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="md:hidden bg-transparent"
-                  style={{
-                    borderColor:
-                      mergedData.colors?.border ||
-                      mergedData.styling?.borderColor ||
-                      "#e5e7eb",
-                    color:
-                      mergedData.colors?.icon ||
-                      mergedData.styling?.textColor ||
-                      "#374151",
-                  }}
-                >
-                  <Menu className="size-5" />
-                  <span className="sr-only">فتح القائمة</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side={
-                  (mergedData.responsive?.mobileMenu?.side as
-                    | "left"
-                    | "right") || "right"
-                }
-                className="w-80"
-                aria-describedby={undefined}
-                style={{
-                  width: `${mergedData.responsive?.mobileMenu?.width || 320}px`,
-                  backgroundColor:
-                    mergedData.background?.colors?.from ||
-                    mergedData.styling?.bgColor ||
-                    "#ffffff",
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  {mergedData.actions?.mobile?.showLogo && (
-                    <div className="flex items-center gap-2">
-                      {(customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo) && (
-                        <img
-                          src={customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo}
-                          alt={customBranding?.header?.name || mergedData.logo?.text || tenantData?.branding?.name || tenantData?.websiteName || "Logo"}
-                          className="size-8"
-                        />
-                      )}
-                      <span
-                        className="text-sm font-semibold"
-                        style={{
-                          color:
-                            mergedData.colors?.text ||
-                            mergedData.styling?.textColor ||
-                            "#1f2937",
-                        }}
-                      >
-                        {customBranding?.header?.name ||
-                          mergedData.logo?.text ||
-                          tenantData?.branding?.name ||
-                          tenantData?.websiteName ||
-                          "الشركة العقارية"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-6 grid gap-2">
-                  {navLinks.map((link: any, i: number) => {
-                    const isActive = pathname === link.href;
-                    const hasSubmenu = link.submenu && Array.isArray(link.submenu) && link.submenu.length > 0;
-
-                    // Mobile menu item with submenu support
-                    if (hasSubmenu) {
-                      return (
-                        <MobileMenuItemWithSubmenu
-                          key={link.id || `mobile-menu-item-${i}`}
-                          item={link}
-                          mergedData={mergedData}
-                          pathname={pathname}
-                          tenantId={tenantId}
-                          router={router}
-                        />
-                      );
-                    }
-
-                    // Regular mobile menu item
-                    return (
-                      <Link
-                        key={link.id || `mobile-menu-item-${i}`}
-                        href={link.href}
-                        className={cn(
-                          "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
-                          isActive ? "text-emerald-700" : "text-foreground"
-                        )}
-                        style={{
-                          color: isActive
-                            ? mergedData.colors?.linkActive ||
-                              mergedData.styling?.textColor ||
-                              "#059669"
-                            : mergedData.colors?.link ||
-                              mergedData.styling?.textColor ||
-                              "#374151",
-                        }}
-                      >
-                        {link.name}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </SheetContent>
-            </Sheet>
+            <Button
+              variant="outline"
+              size="icon"
+              className="md:hidden bg-transparent border-none shadow-none hover:bg-stone-100"
+              onClick={() => setIsMenuOpen(true)}
+              style={{
+                color:
+                  mergedData.colors?.icon ||
+                  mergedData.styling?.textColor ||
+                  "#374151",
+              }}
+            >
+              <Menu className="size-6" />
+              <span className="sr-only">فتح القائمة</span>
+            </Button>
           </div>
         </div>
       </header>
+
+      <SidebarMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        menuItems={mergedData.menu || []}
+        logo={{
+          image: customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo,
+          text: customBranding?.header?.name || mergedData.logo?.text || tenantData?.branding?.name || tenantData?.websiteName || "الشركة العقارية",
+          url: mergedData.logo?.url || "/"
+        }}
+        branding={{
+          accent: mergedData.colors?.accent || "#059669",
+          text: mergedData.colors?.text || "#1f2937",
+          background: mergedData.background?.colors?.from || "#ffffff"
+        }}
+        actions={{
+          language: {
+            enabled: mergedData.actions?.mobile?.showLanguageToggle,
+            current: "ar", // Default to ar for header1
+            onToggle: () => {
+              // Add language toggle logic here if available
+            }
+          }
+        }}
+        side={(mergedData.responsive?.mobileMenu?.side as "left" | "right") || "right"}
+      />
     </>
   );
 };
 
 export default Header1;
+

@@ -12,6 +12,7 @@ import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultHeader2Data } from "@/context/editorStoreFunctions/header2Functions";
 import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdown";
+import SidebarMenu from "./SidebarMenu";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -890,10 +891,7 @@ export default function Header2(props: Header2Props) {
           mergedData.mobileMenu?.enabled && (
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`fixed lg:hidden text-3xl`}
-              style={{
-                [i18n.language === "en" ? "right" : "left"]: "3rem",
-              }}
+              className={`lg:hidden text-3xl p-2 rounded-xl hover:bg-white/10 transition-colors`}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -903,98 +901,39 @@ export default function Header2(props: Header2Props) {
                 delay: mergedData.animations?.mobileMenuButton?.delay || 0.4,
               }}
             >
-              {isMenuOpen ? (
-                <FiX
-                  style={{
-                    color: mergedData.styling?.menuIconColor || "#e5e7eb",
-                  }}
-                />
-              ) : (
-                <FiMenu
-                  style={{
-                    color: mergedData.styling?.menuIconColor || "#e5e7eb",
-                  }}
-                />
-              )}
+              <FiMenu
+                style={{
+                  color: mergedData.styling?.menuIconColor || "#ffffff",
+                }}
+              />
             </motion.button>
           )}
 
-        {/* القائمة الجانبية */}
-        {isMenuOpen && mergedData.mobileMenu?.enabled && (
-          <div
-            className={`fixed top-0 ${
-              i18n.language === "ar" ? "right-0" : "left-0"
-            } bottom-0 h-screen w-64 bg-white shadow-lg lg:hidden transition-transform transform translate-x-0 z-40`}
-            style={{
-              width: `${mergedData.mobileMenu?.width || 256}px`,
-              backgroundColor:
-                mergedData.mobileMenu?.backgroundColor || "#ffffff",
-            }}
-          >
-            <div className="p-4 flex flex-col gap-6">
-              {links.map((link: any, index: number) => {
-                const hasSubmenu = link.submenu && Array.isArray(link.submenu) && link.submenu.length > 0;
-                const isActive = link.path === pathname;
-
-                if (hasSubmenu) {
-                  return (
-                    <MobileMenuItemWithSubmenu
-                      key={link.path || `mobile-link-${index}`}
-                      link={link}
-                      mergedData={mergedData}
-                      pathname={pathname}
-                      router={router}
-                    />
-                  );
-                }
-
-                return (
-                  <Link
-                    href={link.path || "#"}
-                    key={index}
-                    className={`capitalize font-medium ${
-                      isActive
-                        ? "border-b-2 border-purple-500 text-gray-900"
-                        : "text-gray-900"
-                    }`}
-                    style={{
-                      color:
-                        isActive
-                          ? mergedData.styling?.mobileLinkActiveColor ||
-                            "#7c3aed"
-                          : mergedData.styling?.mobileLinkColor || "#111827",
-                      fontSize: ensureFontSizeUnit(mergedData.sizes?.links?.fontSize?.mobile, "18px"),
-                    }}
-                  >
-                    {link.name}
-                  </Link>
-                );
-              })}
-              {UserIslogged && mergedData.mobileMenu?.showLogout && (
-                <button
-                  className={` rounded-all px-3 py-2 font-bold bg-red-800 text-white`}
-                  onClick={handleLogout}
-                >
-                  {mergedData.actions?.logout?.text || "Logout"}
-                </button>
-              )}
-              {mergedData.mobileMenu?.showLanguageToggle && (
-                <button
-                  className={`rounded-all px-3 py-2 font-semibold text-white`}
-                  style={{
-                    background: "linear-gradient(to bottom, #8B5CF6, #150d26)",
-                  }}
-                  onClick={handleChangeLanguage}
-                >
-                  {i18n.language === "en"
-                    ? mergedData.actions?.languageToggle?.text?.ar || "عربي"
-                    : mergedData.actions?.languageToggle?.text?.en || "EN"}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        <SidebarMenu 
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+          menuItems={mergedData.links?.map((l: any) => ({ ...l, text: l.name, url: l.path })) || []}
+          logo={{
+            image: customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo,
+            text: customBranding?.header?.name || mergedData.logo?.alt || tenantData?.branding?.name || tenantData?.websiteName || "الشركة العقارية",
+            url: mergedData.logo?.url || "/"
+          }}
+          actions={{
+            logout: {
+              enabled: mergedData.mobileMenu?.showLogout,
+              text: mergedData.actions?.logout?.text,
+              onLogout: handleLogout
+            },
+            language: {
+              enabled: mergedData.mobileMenu?.showLanguageToggle,
+              current: i18n.language,
+              onToggle: handleChangeLanguage
+            }
+          }}
+          side={mergedData.mobileMenu?.side === "left" ? "left" : "right"}
+        />
       </div>
     </nav>
   );
 }
+

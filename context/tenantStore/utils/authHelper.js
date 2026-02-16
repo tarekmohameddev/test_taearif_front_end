@@ -1,7 +1,7 @@
 // Helper function to get user token from AuthContext
 export const getUserToken = async () => {
   try {
-    const authModule = await import("../../context/AuthContext");
+    const authModule = await import("../../AuthContext");
     const useAuthStore = authModule.default;
     const userData = useAuthStore.getState().userData;
     if (!userData?.token) {

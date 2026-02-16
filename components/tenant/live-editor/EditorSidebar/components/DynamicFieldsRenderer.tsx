@@ -101,20 +101,21 @@ export function DynamicFieldsRenderer({
       let conditionPath: string;
       if (basePath) {
         // Check if condition.field is already a full path
-        if (def.condition.field.includes('.')) {
+        if (def.condition.field.includes(".")) {
           conditionPath = def.condition.field;
         } else {
-          // Extract parent path from basePath
-          // For example: if basePath is "background.image", parent is "background"
-          // Then conditionPath becomes "background.type"
-          const pathParts = basePath.split('.');
-          // Remove the last part (current field) to get parent path
-          const parentPath = pathParts.slice(0, -1).join('.');
+          // If basePath is the same as the field path, we need to strip the last part to get the parent
+          // If basePath is different (it's the parent path), we use it as is
+          const isFieldPath = path === basePath;
+          const pathParts = basePath.split(".");
+          const parentPath = isFieldPath
+            ? pathParts.slice(0, -1).join(".")
+            : basePath;
+
           if (parentPath) {
             conditionPath = `${parentPath}.${def.condition.field}`;
           } else {
-            // If no parent path, use basePath directly
-            conditionPath = `${basePath}.${def.condition.field}`;
+            conditionPath = def.condition.field;
           }
         }
       } else {

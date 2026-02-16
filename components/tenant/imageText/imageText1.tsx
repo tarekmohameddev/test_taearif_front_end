@@ -10,14 +10,20 @@ import { useClientT } from "@/context/clientI18nStore";
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
 // ═══════════════════════════════════════════════════════════
+interface TextItem {
+  type: "heading" | "paragraph" | "blockquote" | "feature";
+  text: string;
+  shapeType?: "plain" | "badge";
+  fontSize?: number;
+  color?: string;
+}
+
 interface ImageTextProps {
   // Component-specific props
   visible?: boolean;
   ThemeTwo?: string;
   backgroundImage?: string;
-  title?: string;
-  paragraph?: string;
-  blockquote?: string;
+  texts?: TextItem[];
   overlayOpacity?: number;
   height?: number;
 
@@ -308,28 +314,98 @@ export default function ImageText1(props: ImageTextProps = {}) {
       {/* Content */}
       <div className="relative z-10 w-full max-w-4xl px-4 md:px-6 lg:px-8 py-12 md:py-16">
         <div className="text-center text-white space-y-6 md:space-y-8">
-          {/* Main Title */}
-          {mergedData.showTitle !== false && (
-            <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
-              {mergedData.title}
-            </h3>
-          )}
+          {mergedData.texts &&
+            Array.isArray(mergedData.texts) &&
+            (() => {
+              const elements: React.ReactNode[] = [];
+              let currentFeatureGroup: TextItem[] = [];
 
-          {/* First Paragraph */}
-          {mergedData.showParagraph !== false && (
-            <div className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95">
-              <p className="whitespace-pre-line">{mergedData.paragraph}</p>
-            </div>
-          )}
+              const getStyle = (item: TextItem) => {
+                const style: React.CSSProperties = {};
+                if (item.fontSize) style.fontSize = `${item.fontSize}px`;
+                if (item.color) style.color = item.color;
+                return style;
+              };
 
-          {/* Blockquote */}
-          {mergedData.showBlockquote !== false && (
-            <blockquote className="border-r-0 border-l-0 border-t-0 border-b-0 pt-6 md:pt-8">
-              <p className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95 italic">
-                {mergedData.blockquote}
-              </p>
-            </blockquote>
-          )}
+              const flushFeatures = (startIndex: number) => {
+                if (currentFeatureGroup.length > 0) {
+                  elements.push(
+                    <div
+                      key={`feature-group-${startIndex}`}
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pt-4 w-full"
+                    >
+                      {currentFeatureGroup.map((feat, fIdx) => {
+                        const isBadge = feat.shapeType === "badge";
+                        return (
+                          <div
+                            key={fIdx}
+                            style={getStyle(feat)}
+                            className={`flex items-center justify-center gap-3 text-base md:text-lg lg:text-xl leading-relaxed text-white/95 transition-all duration-300 ${
+                              isBadge
+                                ? "bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 rounded-xl w-full h-full hover:bg-white/20 hover:scale-[1.02]"
+                                : "w-full py-2"
+                            }`}
+                          >
+                            {!isBadge && (
+                              <span 
+                                className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] flex-shrink-0" 
+                                style={{ backgroundColor: feat.color || "white" }}
+                              />
+                            )}
+                            <span className="font-medium">{feat.text}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                  currentFeatureGroup = [];
+                }
+              };
+
+              mergedData.texts.forEach((item, index) => {
+                if (item.type === "feature") {
+                  currentFeatureGroup.push(item);
+                } else {
+                  flushFeatures(index - currentFeatureGroup.length);
+                  if (item.type === "heading") {
+                    elements.push(
+                      <h3
+                        key={index}
+                        style={getStyle(item)}
+                        className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight"
+                      >
+                        {item.text}
+                      </h3>
+                    );
+                  } else if (item.type === "paragraph") {
+                    elements.push(
+                      <div
+                        key={index}
+                        style={getStyle(item)}
+                        className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95"
+                      >
+                        <p className="whitespace-pre-line">{item.text}</p>
+                      </div>
+                    );
+                  } else if (item.type === "blockquote") {
+                    elements.push(
+                      <blockquote
+                        key={index}
+                        style={getStyle(item)}
+                        className="border-r-0 border-l-0 border-t-0 border-b-0 pt-6 md:pt-8"
+                      >
+                        <p className="text-base md:text-lg lg:text-xl leading-relaxed text-white/95 italic">
+                          {item.text}
+                        </p>
+                      </blockquote>
+                    );
+                  }
+                }
+              });
+
+              flushFeatures(mergedData.texts.length - currentFeatureGroup.length);
+              return elements;
+            })()}
         </div>
       </div>
     </section>

@@ -1,0 +1,24 @@
+2026-02-16 22:40:11
+Update Type: Enhancement
+إزالة عناصر "حسابي" و "المفضلة" و "تسجيل الخروج" من القائمة الجانبية
+components/tenant/header/SidebarMenu.tsx
+
+2026-02-16 22:52:03
+Update Type: Bug Fix
+إصلاح خطأ المفاتيح المكررة في React عن طريق إنشاء مفاتيح فريدة لكل عنصر في القائمة
+components/tenant/header/SidebarMenu.tsx
+
+2026-02-16 22:53:58
+Update Type: Bug Fix
+إصلاح شامل لمشكلة المفاتيح الفارغة والمكررة: إضافة مفاتيح فريدة لجميع motion.div، ضمان عدم وجود مفاتيح فارغة، وإضافة فلتر للعناصر الفارغة
+components/tenant/header/SidebarMenu.tsx
+
+2026-02-16 22:55:39
+Update Type: Bug Fix
+إصلاح نهائي لمشكلة المفاتيح المكررة: استخدام flatMap للقوائم الفرعية، ضمان عدم وجود مفاتيح فارغة في جميع المستويات، وتحسين إنشاء المفاتيح الفريدة
+components/tenant/header/SidebarMenu.tsx
+
+2026-02-16 22:57:14
+Update Type: Enhancement
+إزالة زر "تغيير اللغة" من القائمة الجانبية وإزالة language من interface و Globe من imports
+components/tenant/header/SidebarMenu.tsx

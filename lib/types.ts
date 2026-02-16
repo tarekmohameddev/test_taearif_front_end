@@ -138,7 +138,7 @@ export interface ReturnPolicy {
 }
 
 export interface ComponentData {
-  texts?: { [key: string]: string };
+  texts?: { [key: string]: string } | any[];
   images?: { [key: string]: string };
   colors?: { [key: string]: string };
   settings?: { [key: string]: any };
