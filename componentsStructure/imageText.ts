@@ -109,6 +109,17 @@ export const imageTextStructure: ComponentStructure = {
                 value: "feature",
               },
             },
+            {
+              key: "fontSize",
+              label: "حجم الخط (px)",
+              type: "number",
+              placeholder: "مثال: 24",
+            },
+            {
+              key: "color",
+              label: "لون النص",
+              type: "color",
+            },
           ],
         },
         {
@@ -174,6 +185,17 @@ export const imageTextStructure: ComponentStructure = {
                 field: "type",
                 value: "feature",
               },
+            },
+            {
+              key: "fontSize",
+              label: "حجم الخط (px)",
+              type: "number",
+              placeholder: "مثال: 24",
+            },
+            {
+              key: "color",
+              label: "لون النص",
+              type: "color",
             },
           ],
         },
