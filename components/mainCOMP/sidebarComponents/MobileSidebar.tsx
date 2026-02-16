@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
-import useStore from "@/context/Store";
 import { staticMenuItems, type MainNavItem } from "./menu-items";
 import { removeLocaleFromPathname } from "@/lib/i18n/config";
 
@@ -26,8 +25,6 @@ export function MobileSidebar({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathname = usePathname();
   const { userData } = useAuthStore();
-  const { sidebarData } = useStore();
-  const { mainNavItems, error } = sidebarData;
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
@@ -39,15 +36,14 @@ export function MobileSidebar({
       ? "content"
       : isLiveEditorSection
         ? "live-editor"
-        : mainNavItems.find(
+        : staticMenuItems.find(
             (item: MainNavItem) =>
               item.path === currentPathWithoutLocale ||
               (item.path !== "/" && currentPathWithoutLocale.startsWith(item.path)),
           )?.id || activeTab || "dashboard";
 
-  // Use static menu items if mainNavItems is empty or not loaded
-  const menuItemsToUse =
-    mainNavItems && mainNavItems.length > 0 ? mainNavItems : staticMenuItems;
+  // استخدام static menu items دائماً
+  const menuItemsToUse = staticMenuItems;
 
   // دالة للتحقق من الرابط النشط بشكل دقيق
   const isActivePath = (href: string, allItems: MainNavItem[]) => {
@@ -174,11 +170,6 @@ export function MobileSidebar({
             </Button>
           </div>
           <div className="flex-1 overflow-auto py-2 px-1 min-h-0">
-            {error && (
-              <div className="px-3 py-2">
-                <span className="text-sm text-red-500">{error}</span>
-              </div>
-            )}
             <nav className="space-y-1">
               {menuItemsToUse &&
                 menuItemsToUse.map((item: MainNavItem) => {

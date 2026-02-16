@@ -17,3 +17,8 @@ components/mainCOMP/sidebarComponents/enhanced-sidebar.tsx, components/mainCOMP/
 Update Type: Bug Fix
 Fixed sidebar active link detection to prevent /dashboard from being active when on sub-paths like /dashboard/customers-hub/analytics. Now /dashboard is only active when path is exactly /dashboard
 components/mainCOMP/sidebarComponents/enhanced-sidebar.tsx, components/mainCOMP/sidebarComponents/MobileSidebar.tsx, components/mainCOMP/sidebarComponents/DesktopSidebar.tsx
+
+2026-02-16 22:05:09
+Update Type: Enhancement
+Changed MobileSidebar to use 100% static data from menu-items.ts instead of backend API. Removed dependency on useStore and fetchSideMenus. Now menu items come entirely from staticMenuItems without any API calls
+components/mainCOMP/sidebarComponents/MobileSidebar.tsx
