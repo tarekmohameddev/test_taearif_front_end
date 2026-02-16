@@ -840,10 +840,14 @@ export const heroStructure: ComponentStructure = {
       name: "Hero 4 - Contact Form Hero",
       fields: [
         {
-          key: "title",
+          key: "titleGroup",
           label: "Title",
           type: "text",
-          placeholder: "عن تعاريف العقارية",
+          displayAsGroup: true,
+          groupFields: [
+            { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
+            { key: "content.title", label: "Title", type: "text" },
+          ],
         },
         {
           key: "barType",
@@ -1007,6 +1011,7 @@ export const heroStructure: ComponentStructure = {
             },
           ],
         },
+
         {
           key: "content",
           label: "Content",

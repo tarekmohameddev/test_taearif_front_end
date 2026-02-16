@@ -1,0 +1,14 @@
+2025-01-20 12:00:00
+Update Type: Feature
+Added showTitle field to hero4 component to control title visibility. Title is now conditionally rendered based on showTitle value. Added showTitle: true to default data.
+components/tenant/hero/hero4.tsx, context/editorStoreFunctions/heroFunctions.ts
+
+2025-01-20 12:30:00
+Update Type: Bug Fix
+Fixed showTitle not being saved to database. Updated useValueHelpers to use updateComponentByPath in addition to updateByPath to ensure changes persist when saving to save-pages API.
+components/tenant/live-editor/EditorSidebar/components/DynamicFieldsRenderer/hooks/useValueHelpers.ts
+
+2025-01-20 13:00:00
+Update Type: Bug Fix
+Fixed heroFunctions.updateByPath not updating pageComponentsByPage. Now heroFunctions.updateByPath updates both heroStates and pageComponentsByPage, ensuring showTitle and other fields are correctly saved to database via save-pages API. This matches the pattern used in halfTextHalfImageFunctions and other component functions.
+context/editorStoreFunctions/heroFunctions.ts

@@ -33,6 +33,12 @@ export interface FieldDefinitionBase {
   globalColorType?: "primary" | "secondary" | "accent"; // which branding color to use (primary, secondary, or accent)
   // For background color fields: use mainBgColor from branding or custom color
   useMainBgColor?: boolean; // default: true - use mainBgColor from WebsiteLayout.branding.mainBgColor
+  // For displaying fields as collapsible group (flat data structure, not nested object)
+  displayAsGroup?: boolean; // if true, display fields in groupFields as collapsible group
+  groupFields?: FieldDefinition[]; // fields to display in the collapsible group
+  // For displaying fields as object wrapper (flat data structure, not nested object)
+  displayAsObject?: boolean; // if true, display fields in wrappedFields as object wrapper
+  wrappedFields?: FieldDefinition[]; // fields to display in the object wrapper
 }
 
 export interface ObjectFieldDefinition extends FieldDefinitionBase {

@@ -431,14 +431,16 @@ export default function Hero4(props: Hero4Props = {}) {
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/30 z-[1]" />
 
-        {/* Title */}
-        <div className="absolute inset-0 z-[2] flex items-center justify-center">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
-            {mergedData.title ||
-              mergedData.content?.title ||
-              "عن تعاريف العقارية"}
-          </h2>
-        </div>
+        {/* Title - Show only if showTitle is true */}
+        {mergedData.showTitle !== false && (
+          <div className="absolute inset-0 z-[2] flex items-center justify-center">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
+              {mergedData.title ||
+                mergedData.content?.title ||
+                "عن تعاريف العقارية"}
+            </h2>
+          </div>
+        )}
       </section>
 
       {/* Floating Contact Form Bar - طائرة بين القسمين */}

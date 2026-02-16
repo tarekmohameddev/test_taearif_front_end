@@ -233,6 +233,8 @@ export const useValueHelpers = ({
         ) {
           // Use updateByPath to update tempData for immediate UI feedback
           updateByPath(path, value);
+          // Also update component store to ensure data persists when saving
+          updateComponentByPath(componentType, variantId, path, value);
         } else {
           // Use the unified update function for global components
           onUpdateByPath(path, value);
@@ -246,9 +248,10 @@ export const useValueHelpers = ({
           // Use tempData for global footer components
           updateByPath(path, value);
         } else if (componentType && variantId) {
-          // For regular components, always use tempData for live editing
-          // This ensures that changes are immediately visible in the UI
+          // For regular components, update both tempData and component store
+          // This ensures that changes are immediately visible in the UI AND persist when saving
           updateByPath(path, value);
+          updateComponentByPath(componentType, variantId, path, value);
         } else {
           updateByPath(path, value);
         }

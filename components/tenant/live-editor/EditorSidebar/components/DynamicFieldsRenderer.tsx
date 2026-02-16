@@ -28,6 +28,7 @@ import { ColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/
 import { BackgroundColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/BackgroundColorFieldRendererWithToggle";
 import { BackgroundColorObjectRenderer } from "./DynamicFieldsRenderer/renderers/BackgroundColorObjectRenderer";
 import { ColorObjectRenderer } from "./DynamicFieldsRenderer/renderers/ColorObjectRenderer";
+import { CollapsibleGroupRenderer } from "./DynamicFieldsRenderer/renderers/CollapsibleGroupRenderer";
 
 export function DynamicFieldsRenderer({
   fields,
@@ -124,6 +125,20 @@ export function DynamicFieldsRenderer({
       if (conditionFieldValue !== def.condition.value) {
         return null; // لا تعرض الحقل إذا لم تتحقق الشروط
       }
+    }
+
+    // Check if this field should be displayed as collapsible group (flat data structure)
+    if ((def as any).displayAsGroup && (def as any).groupFields) {
+      return (
+        <CollapsibleGroupRenderer
+          def={def}
+          normalizedPath={normalizedPath}
+          value={value}
+          updateValue={updateValue}
+          getValueByPath={getValueByPath}
+          renderField={renderField}
+        />
+      );
     }
 
     // Check if this field should be displayed as object wrapper (flat data structure)

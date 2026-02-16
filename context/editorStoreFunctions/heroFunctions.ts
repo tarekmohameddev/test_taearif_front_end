@@ -308,6 +308,7 @@ export const getDefaultHero3Data = (): ComponentData => ({
 // Default hero4 data structure
 export const getDefaultHero4Data = (): ComponentData => ({
   visible: true,
+  showTitle: true, // Show title by default
   title: "عن تعاريف العقارية",
   backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
   barType: "default", // "default" | "contact" | "propertyFilter"
@@ -479,8 +480,22 @@ export const heroFunctions = {
     const source = state.heroStates[variantId] || {};
     const newData = updateDataByPath(source, path, value);
 
+    // Update pageComponentsByPage as well
+    const currentPage = state.currentPage;
+    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
+    const updatedComponents = updatedPageComponents.map((comp: any) => {
+      if (comp.type === "hero" && comp.id === variantId) {
+        return { ...comp, data: newData };
+      }
+      return comp;
+    });
+
     return {
       heroStates: { ...state.heroStates, [variantId]: newData },
+      pageComponentsByPage: {
+        ...state.pageComponentsByPage,
+        [currentPage]: updatedComponents,
+      },
     } as any;
   },
 };
