@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import LiveEditor from "@/components/tenant/live-editor/LiveEditor";
 import useTenantStore from "@/context/tenantStore";
-import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 interface LiveEditorWrapperProps {
@@ -60,21 +59,33 @@ export default function LiveEditorWrapper({
   tenantId,
 }: LiveEditorWrapperProps) {
   const setTenantId = useTenantStore((s) => s.setTenantId);
-  const storeTenantId = useTenantStore((s) => s.tenantId);
   const pathname = usePathname();
+  const prevTenantIdRef = useRef<string | null>(null);
+  const prevPathnameRef = useRef<string | null>(null);
+  const hasInitializedRef = useRef(false);
 
   useEffect(() => {
-    let finalTenantId = tenantId;
+    const pathnameChanged = prevPathnameRef.current !== pathname;
+    const tenantIdPropChanged = prevTenantIdRef.current !== tenantId;
 
-    if (!finalTenantId && typeof window !== "undefined") {
-      const hostname = window.location.hostname;
-      finalTenantId = extractTenantFromHostname(hostname);
-    }
+    if (!hasInitializedRef.current || pathnameChanged || tenantIdPropChanged) {
+      let finalTenantId = tenantId;
 
-    if (finalTenantId && finalTenantId !== storeTenantId) {
-      setTenantId(finalTenantId);
+      if (!finalTenantId && typeof window !== "undefined") {
+        const hostname = window.location.hostname;
+        finalTenantId = extractTenantFromHostname(hostname);
+      }
+
+      const currentStoreTenantId = useTenantStore.getState().tenantId;
+      if (finalTenantId && finalTenantId !== currentStoreTenantId) {
+        setTenantId(finalTenantId);
+      }
+
+      prevTenantIdRef.current = tenantId;
+      prevPathnameRef.current = pathname;
+      hasInitializedRef.current = true;
     }
-  }, [tenantId, pathname, storeTenantId, setTenantId]);
+  }, [tenantId, pathname, setTenantId]);
 
   return <LiveEditor />;
 }
