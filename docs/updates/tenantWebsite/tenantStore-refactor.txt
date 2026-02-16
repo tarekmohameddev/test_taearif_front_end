@@ -1,0 +1,4 @@
+2026-02-16 20:58:00
+Update Type: Refactor
+تقسيم ملف tenantStore.jsx (1087 سطر) إلى ملفات متعددة منظمة، كل ملف لا يتجاوز 150 سطر
+context/tenantStore.jsx (تم حذفه), context/tenantStore/ (جميع الملفات الجديدة), lib/metaTags.ts

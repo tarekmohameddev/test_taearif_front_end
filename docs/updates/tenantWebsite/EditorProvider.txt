@@ -2,3 +2,8 @@
 Update Type: Enhancement
 Added logic to remove pages with slug "global-header" or "global-footer" from pages and StaticPages before sending save-pages API request
 context/EditorProvider.tsx
+
+2026-02-16 20:52:01
+Update Type: Enhancement
+Added filter to hide pages with slug "global-header" or "global-footer" from pages dropdown in live editor header
+app/live-editor/hooks/useAvailablePages.ts

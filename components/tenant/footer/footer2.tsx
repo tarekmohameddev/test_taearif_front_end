@@ -679,6 +679,8 @@ export default function Footer2(props: Footer2Props) {
   const bgType = mergedData.background?.type || "color";
 
   // Get dynamic padding values from mergedData
+  // These values come from the paddingYGroup fields in componentsStructure/footer.ts (lines 962-990)
+  // The fields use full paths: styling.spacing.paddingYMobile/Tablet/Desktop
   const paddingYMobile = mergedData.styling?.spacing?.paddingYMobile || "16";
   const paddingYTablet = mergedData.styling?.spacing?.paddingYTablet || "20";
   const paddingYDesktop = mergedData.styling?.spacing?.paddingYDesktop || "24";

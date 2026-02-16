@@ -185,7 +185,13 @@ export function useAvailablePages(
       }
     });
 
-    return pages;
+    // ⭐ Filter out pages with slug "global-header" or "global-footer"
+    // تصفية الصفحات التي slug الخاص بها "global-header" أو "global-footer"
+    const filteredPages = pages.filter(
+      (page) => page.slug !== "global-header" && page.slug !== "global-footer"
+    );
+
+    return filteredPages;
   }, [tenantData, recentlyAddedPages, editorWebsiteLayout, locale]);
 
   return { availablePages };
