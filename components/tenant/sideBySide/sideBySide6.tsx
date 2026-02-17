@@ -276,12 +276,8 @@ export default function SideBySide6(props: SideBySide6Props) {
                 }}
               >
                 <span className="">
-                  {mergedData.content?.titleUnderlined || "خبراء في"}
+                  {mergedData.content?.title || "خبراء في خدمتك – نرافقك نحو استثمار آمن"}
                 </span>
-                {mergedData.content?.title?.replace(
-                  mergedData.content?.titleUnderlined || "",
-                  "",
-                )}
               </h3>
               <div
                 className="w-24 h-[2px] mb-4 mr-auto"
