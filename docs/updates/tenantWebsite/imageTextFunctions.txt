@@ -52,3 +52,18 @@ context/editorStoreFunctions/imageTextFunctions.ts
 Update Type: Enhancement
 Updated mergedData logic in imageText1.tsx to use tenantComponentData when currentStoreData is default, otherwise use currentStoreData (saved data). This ensures backend data appears first when store data is default, and saved data appears after save. tempData is NOT included in mergedData to prevent changes from appearing before save
 components/tenant/imageText/imageText1.tsx
+
+2025-01-20 12:00:00
+Update Type: Enhancement
+Added data validation function isValidImageTextData to detect and reject old/incompatible data structures. When data has texts as object (instead of array) or contains colors/settings fields, component now uses default data instead. Validation applied in imageText1.tsx (useEffect and mergedData) and imageTextFunctions.ts (ensureVariant) to ensure only valid data structures are used
+components/tenant/imageText/imageText1.tsx, context/editorStoreFunctions/imageTextFunctions.ts
+
+2025-01-20 12:30:00
+Update Type: Bug Fix
+Fixed issue where default data was not displayed when backend data was invalid. Added validation for currentStoreData in mergedData logic to ensure default data is always used when both tenantComponentData and currentStoreData are invalid. Also added validation for existing currentData in ensureVariant to replace invalid stored data with default data
+components/tenant/imageText/imageText1.tsx, context/editorStoreFunctions/imageTextFunctions.ts
+
+2025-01-20 13:00:00
+Update Type: Bug Fix
+Fixed issue where component data was not displayed correctly on client-side (when useStore = false). Updated mergedData logic to handle client-side rendering separately: when useStore = false, use tenantComponentData directly if valid, otherwise use default data. When useStore = true (Live Editor), use the existing store data logic
+components/tenant/imageText/imageText1.tsx

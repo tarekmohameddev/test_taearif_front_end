@@ -42,6 +42,51 @@ export const getDefaultImageTextData = (): ComponentData => ({
 });
 
 // ═══════════════════════════════════════════════════════════
+// VALIDATION FUNCTION
+// ═══════════════════════════════════════════════════════════
+/**
+ * Validates if the data structure matches the expected imageText format
+ * Returns false if data has old/incompatible structure (e.g., texts as object, colors/settings fields)
+ */
+const isValidImageTextData = (data: any): boolean => {
+  // If no data, it's invalid
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+
+  // Check if texts exists and is an array
+  if (!data.texts || !Array.isArray(data.texts)) {
+    return false;
+  }
+
+  // Check if texts array has valid structure
+  const hasValidTexts = data.texts.every((item: any) => {
+    return (
+      item &&
+      typeof item === "object" &&
+      typeof item.type === "string" &&
+      typeof item.text === "string"
+    );
+  });
+
+  if (!hasValidTexts) {
+    return false;
+  }
+
+  // If data has old structure fields (colors, settings as top-level), it's invalid
+  if (data.colors || data.settings) {
+    return false;
+  }
+
+  // If texts is an object (old structure), it's invalid
+  if (data.texts && typeof data.texts === "object" && !Array.isArray(data.texts)) {
+    return false;
+  }
+
+  return true;
+};
+
+// ═══════════════════════════════════════════════════════════
 // COMPONENT FUNCTIONS - Standard 4 functions
 // ═══════════════════════════════════════════════════════════
 
@@ -58,8 +103,44 @@ export const imageTextFunctions = {
     // Priority 1: Check if variant already exists
     const currentData = state.imageTextStates?.[variantId];
     if (currentData && Object.keys(currentData).length > 0) {
-      // If initial data provided, update to ensure backend data is synced
+      // Validate current data - if invalid, replace with default
+      const isCurrentDataValid = isValidImageTextData(currentData);
+      if (!isCurrentDataValid) {
+        // Current data is invalid, replace with default or initial (if valid)
+        const defaultData = getDefaultImageTextData();
+        if (initial && Object.keys(initial).length > 0) {
+          const isInitialValid = isValidImageTextData(initial);
+          return {
+            imageTextStates: {
+              ...state.imageTextStates,
+              [variantId]: isInitialValid ? initial : defaultData,
+            },
+          } as any;
+        }
+        return {
+          imageTextStates: {
+            ...state.imageTextStates,
+            [variantId]: defaultData,
+          },
+        } as any;
+      }
+
+      // Current data is valid, proceed with normal logic
+      // If initial data provided, validate it first
       if (initial && Object.keys(initial).length > 0) {
+        // Validate initial data structure
+        const isValid = isValidImageTextData(initial);
+        if (!isValid) {
+          // Use default data if invalid
+          const defaultData = getDefaultImageTextData();
+          return {
+            imageTextStates: {
+              ...state.imageTextStates,
+              [variantId]: defaultData,
+            },
+          } as any;
+        }
+
         return {
           imageTextStates: {
             ...state.imageTextStates,
@@ -67,14 +148,25 @@ export const imageTextFunctions = {
           },
         } as any;
       }
-      return {} as any; // Already exists, skip initialization
+      return {} as any; // Already exists and is valid, skip initialization
     }
 
     // Priority 2: Create with default data
     const defaultData = getDefaultImageTextData();
 
-    // Use provided initial data, else tempData, else defaults
-    const data: ComponentData = initial || state.tempData || defaultData;
+    // Validate initial data if provided
+    let data: ComponentData = defaultData;
+    if (initial && Object.keys(initial).length > 0) {
+      const isValid = isValidImageTextData(initial);
+      if (isValid) {
+        data = initial;
+      } else {
+        // If invalid, use tempData or default
+        data = state.tempData || defaultData;
+      }
+    } else {
+      data = state.tempData || defaultData;
+    }
 
     // Return new state
     return {

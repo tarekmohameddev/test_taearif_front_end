@@ -34,6 +34,51 @@ interface ImageTextProps {
 }
 
 // ═══════════════════════════════════════════════════════════
+// VALIDATION FUNCTION
+// ═══════════════════════════════════════════════════════════
+/**
+ * Validates if the data structure matches the expected imageText format
+ * Returns false if data has old/incompatible structure (e.g., texts as object, colors/settings fields)
+ */
+const isValidImageTextData = (data: any): boolean => {
+  // If no data, it's invalid
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+
+  // Check if texts exists and is an array
+  if (!data.texts || !Array.isArray(data.texts)) {
+    return false;
+  }
+
+  // Check if texts array has valid structure
+  const hasValidTexts = data.texts.every((item: any) => {
+    return (
+      item &&
+      typeof item === "object" &&
+      typeof item.type === "string" &&
+      typeof item.text === "string"
+    );
+  });
+
+  if (!hasValidTexts) {
+    return false;
+  }
+
+  // If data has old structure fields (colors, settings as top-level), it's invalid
+  if (data.colors || data.settings) {
+    return false;
+  }
+
+  // If texts is an object (old structure), it's invalid
+  if (data.texts && typeof data.texts === "object" && !Array.isArray(data.texts)) {
+    return false;
+  }
+
+  return true;
+};
+
+// ═══════════════════════════════════════════════════════════
 // COMPONENT
 // ═══════════════════════════════════════════════════════════
 export default function ImageText1(props: ImageTextProps = {}) {
@@ -147,18 +192,22 @@ export default function ImageText1(props: ImageTextProps = {}) {
 
   useEffect(() => {
     if (props.useStore) {
-      // ✅ Use database data if available
-      const initialData =
-        tenantComponentData && Object.keys(tenantComponentData).length > 0
-          ? {
-              ...getDefaultImageTextData(),
-              ...tenantComponentData, // Database data takes priority
-              ...props,
-            }
-          : {
-              ...getDefaultImageTextData(),
-              ...props,
-            };
+      // ✅ Validate data before using it
+      const isValidData =
+        tenantComponentData &&
+        Object.keys(tenantComponentData).length > 0 &&
+        isValidImageTextData(tenantComponentData);
+
+      const initialData = isValidData
+        ? {
+            ...getDefaultImageTextData(),
+            ...tenantComponentData, // Database data takes priority (only if valid)
+            ...props,
+          }
+        : {
+            ...getDefaultImageTextData(), // Use default data if invalid
+            ...props,
+          };
 
       // Initialize in store
       ensureComponentVariant("imageText", uniqueId, initialData);
@@ -179,10 +228,17 @@ export default function ImageText1(props: ImageTextProps = {}) {
   // Get default data
   const defaultData = getDefaultImageTextData();
 
-  // Check if tenantComponentData exists
+  // Check if tenantComponentData exists and is valid
   const hasTenantData =
     tenantComponentData &&
-    Object.keys(tenantComponentData).length > 0;
+    Object.keys(tenantComponentData).length > 0 &&
+    isValidImageTextData(tenantComponentData);
+
+  // Check if currentStoreData is valid
+  const isStoreDataValid =
+    currentStoreData &&
+    Object.keys(currentStoreData).length > 0 &&
+    isValidImageTextData(currentStoreData);
 
   // Check if currentStoreData is just default data (by comparing a key field like texts[0].text)
   const isStoreDataDefault =
@@ -190,15 +246,27 @@ export default function ImageText1(props: ImageTextProps = {}) {
 
   // Merge data with correct priority
   // IMPORTANT: 
-  // - currentStoreData (saved data) has highest priority after save
-  // - tenantComponentData (backend data) is only used if currentStoreData is default
+  // - When useStore = false (client-side): Use tenantComponentData if valid, otherwise default data
+  // - When useStore = true (Live Editor): currentStoreData (saved data) has highest priority after save (only if valid)
+  // - tenantComponentData (backend data) is only used if currentStoreData is default AND data is valid
+  // - If both are invalid, use default data
   // - tempData is NOT included here - changes only appear after "Save Changes" button
   const mergedData = {
-    ...defaultData, // 1. Defaults (lowest priority)
+    ...defaultData, // 1. Defaults (lowest priority - always included)
     ...props, // 2. Props from parent component
-    // Use tenantComponentData if currentStoreData is still default (not saved yet)
-    // Otherwise use currentStoreData (saved data)
-    ...(hasTenantData && isStoreDataDefault ? tenantComponentData : currentStoreData), // 3. Backend data OR saved data
+    // When useStore = false (client-side): Use tenantComponentData if valid
+    // When useStore = true (Live Editor): Use store data logic
+    ...(props.useStore
+      ? // Live Editor mode: Use store data logic
+        hasTenantData && isStoreDataDefault && isStoreDataValid
+        ? tenantComponentData
+        : isStoreDataValid
+          ? currentStoreData
+          : {}
+      : // Client-side mode: Use tenantComponentData if valid, otherwise default data
+        hasTenantData
+        ? tenantComponentData
+        : {}), // 3. Backend data OR saved data (only if valid), otherwise empty (default data already spread)
   };
 
   // ─────────────────────────────────────────────────────────
