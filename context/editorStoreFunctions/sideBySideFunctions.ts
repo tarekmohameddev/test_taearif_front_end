@@ -365,6 +365,14 @@ export const getDefaultSideBySide6Data = (): ComponentData => ({
     titleUnderlined: "خبراء في",
     paragraph:
       "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم.",
+    textBlocks: [
+      {
+        text: "نوفر لك أفضل الخدمات العقارية",
+      },
+      {
+        text: "فريق من الخبراء المتمرسين",
+      },
+    ],
   },
   image: {
     src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2000",

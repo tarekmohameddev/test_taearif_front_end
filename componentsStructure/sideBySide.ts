@@ -1801,8 +1801,15 @@ export const sideBySideStructure: ComponentStructure = {
           type: "object",
           fields: [
             { key: "title", label: "Title", type: "text" },
-            { key: "titleUnderlined", label: "Title Underlined", type: "text" },
             { key: "paragraph", label: "Paragraph", type: "text" },
+            {
+              key: "textBlocks",
+              label: "Text Blocks",
+              type: "array",
+              addLabel: "Add Text Block",
+              itemLabel: "Text Block",
+              of: [{ key: "text", label: "Text", type: "text" }],
+            },
           ],
         },
         {
@@ -1845,13 +1852,23 @@ export const sideBySideStructure: ComponentStructure = {
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
-        { key: "content.title", label: "Title", type: "text" },
         {
-          key: "content.titleUnderlined",
-          label: "Title Underlined",
-          type: "text",
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            { key: "title", label: "Title", type: "text" },
+            { key: "paragraph", label: "Paragraph", type: "text" },
+            {
+              key: "textBlocks",
+              label: "Text Blocks",
+              type: "array",
+              addLabel: "Add Text Block",
+              itemLabel: "Text Block",
+              of: [{ key: "text", label: "Text", type: "text" }],
+            },
+          ],
         },
-        { key: "content.paragraph", label: "Paragraph", type: "text" },
         { key: "image.src", label: "Image", type: "image" },
         { key: "image.alt", label: "Image Alt Text", type: "text" },
       ],

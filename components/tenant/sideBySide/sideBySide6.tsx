@@ -29,6 +29,7 @@ interface SideBySide6Props {
     title?: string;
     titleUnderlined?: string;
     paragraph?: string;
+    textBlocks?: Array<{ text: string }>;
   };
   image?: {
     ThemeTwo?: string;
@@ -300,6 +301,24 @@ export default function SideBySide6(props: SideBySide6Props) {
                 {mergedData.content?.paragraph ||
                   "نقدّم لك خدمات احترافية في سوق العقارات، بفريق يتمتع بالخبرة والموثوقية، لنساعدك على اتخاذ القرار السليم."}
               </p>
+
+              {/* Text Blocks */}
+              {mergedData.content?.textBlocks &&
+                mergedData.content.textBlocks.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {mergedData.content.textBlocks.map((block, index) => (
+                      <p
+                        key={index}
+                        className="text-sm md:text-base lg:text-lg leading-relaxed"
+                        style={{
+                          color: mergedData.styling?.paragraphColor || "#000000",
+                        }}
+                      >
+                        {block.text}
+                      </p>
+                    ))}
+                  </div>
+                )}
             </div>
           </div>
         </div>
