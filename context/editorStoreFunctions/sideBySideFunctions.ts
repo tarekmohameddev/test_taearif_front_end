@@ -536,11 +536,15 @@ export const sideBySideFunctions = {
    * @returns New state object or empty object if already exists
    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // Check if variant already exists
-    if (
-      state.sideBySideStates[variantId] &&
-      Object.keys(state.sideBySideStates[variantId]).length > 0
-    ) {
+    // Priority 1: Check if variant already exists
+    const currentData = state.sideBySideStates[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, we should probably update it to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          sideBySideStates: { ...state.sideBySideStates, [variantId]: initial },
+        } as any;
+      }
       return {} as any; // Already exists, skip initialization
     }
 
@@ -589,7 +593,7 @@ export const sideBySideFunctions = {
       defaultData = getDefaultSideBySideData();
     }
 
-    // Use provided initial data, else tempData, else defaults
+    // Use provided initial data, else tempData (if compatible variant), else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
     // Return new state
@@ -693,69 +697,21 @@ export const sideBySideFunctions = {
    * @returns New state object
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    // ⭐ FIX: Get componentName from pageComponentsByPage if variantId is UUID
-    let actualVariantId = variantId;
-    if (!variantId.includes("sideBySide")) {
-      const componentName = getComponentNameFromPageComponents(state, variantId);
-      if (componentName) {
-        actualVariantId = componentName;
-      }
-    }
+    // Get current data from sideBySideStates (saved data) or defaults
+    const savedData = state.sideBySideStates[variantId] || {};
 
-    // Determine default data based on actualVariantId
-    let defaultData: ComponentData;
-    if (
-      actualVariantId === "sideBySide2" ||
-      actualVariantId.includes("sideBySide2")
-    ) {
-      defaultData = getDefaultSideBySide2Data();
-    } else if (
-      actualVariantId === "sideBySide3" ||
-      actualVariantId.includes("sideBySide3")
-    ) {
-      defaultData = getDefaultSideBySide3Data();
-    } else if (
-      actualVariantId === "sideBySide4" ||
-      actualVariantId.includes("sideBySide4")
-    ) {
-      defaultData = getDefaultSideBySide4Data();
-    } else if (
-      actualVariantId === "sideBySide5" ||
-      actualVariantId.includes("sideBySide5")
-    ) {
-      defaultData = getDefaultSideBySide5Data();
-    } else if (
-      actualVariantId === "sideBySide6" ||
-      actualVariantId.includes("sideBySide6")
-    ) {
-      defaultData = getDefaultSideBySide6Data();
-    } else if (
-      actualVariantId === "sideBySide7" ||
-      actualVariantId.includes("sideBySide7")
-    ) {
-      defaultData = getDefaultSideBySide7Data();
-    } else {
-      defaultData = getDefaultSideBySideData();
-    }
-    const source = state.sideBySideStates[variantId] || defaultData;
-    const newData = updateDataByPath(source, path, value);
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
 
-    // Update pageComponentsByPage as well
-    const currentPage = state.currentPage;
-    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-    const updatedComponents = updatedPageComponents.map((comp: any) => {
-      if (comp.type === "sideBySide" && comp.id === variantId) {
-        return { ...comp, data: newData };
-      }
-      return comp;
-    });
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
 
+    // Return updated tempData ONLY
+    // This ensures changes only appear after "Save Changes" button
     return {
-      sideBySideStates: { ...state.sideBySideStates, [variantId]: newData },
-      pageComponentsByPage: {
-        ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents,
-      },
+      tempData: newData,
     } as any;
   },
+
 };

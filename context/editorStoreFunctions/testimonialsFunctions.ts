@@ -88,35 +88,67 @@ export const getDefaultTestimonialsData = (): ComponentData => ({
 });
 
 export const testimonialsFunctions = {
+  /**
+   * ensureVariant - Initialize component in store if not exists
+   */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (state.testimonialsStates[variantId]) {
-      return state;
+    // Priority 1: Check if variant already exists
+    const currentData = state.testimonialsStates?.[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          testimonialsStates: {
+            ...state.testimonialsStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
+      return {} as any; // Already exists, skip initialization
     }
 
     const defaultData = getDefaultTestimonialsData();
+
+    // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {
-      ...state,
       testimonialsStates: { ...state.testimonialsStates, [variantId]: data },
-    };
+    } as any;
   },
 
+  /**
+   * getData - Retrieve component data from store
+   */
   getData: (state: any, variantId: string) =>
     state.testimonialsStates[variantId] || getDefaultTestimonialsData(),
 
+  /**
+   * setData - Set/replace component data completely
+   */
   setData: (state: any, variantId: string, data: ComponentData) => ({
-    ...state,
     testimonialsStates: { ...state.testimonialsStates, [variantId]: data },
   }),
 
+  /**
+   * updateByPath - Update specific field in component data
+   */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.testimonialsStates[variantId] || {};
-    const newData = updateDataByPath(source, path, value);
+    // Get current data from testimonialsStates (saved data) or defaults
+    const savedData =
+      state.testimonialsStates[variantId] || getDefaultTestimonialsData();
 
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
+
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData ONLY
     return {
-      ...state,
-      testimonialsStates: { ...state.testimonialsStates, [variantId]: newData },
-    };
+      tempData: newData,
+    } as any;
   },
 };
+

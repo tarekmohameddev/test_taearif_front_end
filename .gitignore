@@ -32,3 +32,6 @@ test.js
 /pagebuildDashboard/
 /code/
 /trash/vareonsProject
+
+# Antigravity AI Debug System
+.antigravity/

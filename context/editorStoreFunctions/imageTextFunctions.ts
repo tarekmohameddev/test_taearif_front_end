@@ -34,12 +34,6 @@ export const getDefaultImageTextData = (): ComponentData => ({
       text: "في باهية، نؤمن أن كل شخص يستحق فرصة لبناء مستقبله العقاري بطريقته الخاصة. نمنحك كامل الحرية في اكتشاف الخيارات التي تناسبك، وبأفضل قيمة ممكنة.",
       color: "#ffffff",
     },
-    {
-      type: "feature",
-      text: "هذه ميزة تجريبية توضح الشكل الجديد",
-      shapeType: "badge",
-      color: "#ffffff",
-    },
   ],
   overlayOpacity: 0.3,
   styling: {
@@ -61,15 +55,22 @@ export const imageTextFunctions = {
    * @returns New state object or empty object if already exists
    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // Check if variant already exists
-    if (
-      state.imageTextStates[variantId] &&
-      Object.keys(state.imageTextStates[variantId]).length > 0
-    ) {
+    // Priority 1: Check if variant already exists
+    const currentData = state.imageTextStates?.[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          imageTextStates: {
+            ...state.imageTextStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
       return {} as any; // Already exists, skip initialization
     }
 
-    // Determine default data
+    // Priority 2: Create with default data
     const defaultData = getDefaultImageTextData();
 
     // Use provided initial data, else tempData, else defaults
@@ -81,6 +82,7 @@ export const imageTextFunctions = {
     } as any;
   },
 
+
   /**
    * getData - Retrieve component data from store
    *
@@ -89,7 +91,7 @@ export const imageTextFunctions = {
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.imageTextStates[variantId] || getDefaultImageTextData(),
+    state.imageTextStates?.[variantId] || getDefaultImageTextData(),
 
   /**
    * setData - Set/replace component data completely
@@ -105,20 +107,33 @@ export const imageTextFunctions = {
 
   /**
    * updateByPath - Update specific field in component data
+   * 
+   * IMPORTANT: This function updates tempData ONLY, not imageTextStates directly.
+   * This ensures changes only appear in iframe after "Save Changes" button is pressed.
+   * On save, tempData is merged into imageTextStates via setComponentData.
    *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "content.title")
    * @param value - New value for the field
-   * @returns New state object
+   * @returns New state object with updated tempData
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.imageTextStates[variantId] || getDefaultImageTextData();
-    const newData = updateDataByPath(source, path, value);
+    // Get current data from imageTextStates (saved data) or defaults
+    const savedData =
+      state.imageTextStates?.[variantId] || getDefaultImageTextData();
 
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
+
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData (NOT imageTextStates)
+    // This ensures changes only appear after "Save Changes" button
     return {
-      imageTextStates: { ...state.imageTextStates, [variantId]: newData },
+      tempData: newData,
     } as any;
   },
 };

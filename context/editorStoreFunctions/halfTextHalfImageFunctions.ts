@@ -514,9 +514,26 @@ export const getDefaultHalfTextHalfImage7Data = (): ComponentData => ({
 });
 
 export const halfTextHalfImageFunctions = {
+  /**
+   * ensureVariant - Initialize component in store if not exists
+   */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // ⭐ STEP 1: Find componentName (Theme) from pageComponentsByPage
-    // Search in all pages for this component
+    // Priority 1: Check if variant already exists
+    const currentData = state.halfTextHalfImageStates[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          halfTextHalfImageStates: {
+            ...state.halfTextHalfImageStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
+      return {} as any;
+    }
+
+    // ⭐ STEP 1: Determine componentName (Theme)
     let currentTheme: string | null = null;
     for (const [pageSlug, pageComponents] of Object.entries(
       state.pageComponentsByPage || {},
@@ -531,8 +548,7 @@ export const halfTextHalfImageFunctions = {
       }
     }
 
-    // ⭐ STEP 1.5: If no componentName found, check if variantId itself is a valid theme name
-    // This handles the case where the component was just created and componentName is not yet set
+    // Fallback if not found in pageComponents
     if (!currentTheme) {
       const validThemes = [
         "halfTextHalfImage1", "halfTextHalfImage2", "halfTextHalfImage3",
@@ -543,113 +559,44 @@ export const halfTextHalfImageFunctions = {
       }
     }
 
-    // ⭐ STEP 2: Determine default data based on currentTheme (like footerFunctions does)
-    // If we found currentTheme, use it to determine default data
+    // ⭐ STEP 2: Get default data for the theme
     let defaultData: ComponentData;
-    if (currentTheme === "halfTextHalfImage2") {
+    if (currentTheme === "halfTextHalfImage2" || currentTheme?.includes("halfTextHalfImage2")) {
       defaultData = getDefaultHalfTextHalfImage2Data();
-    } else if (currentTheme === "halfTextHalfImage3") {
+    } else if (currentTheme === "halfTextHalfImage3" || currentTheme?.includes("halfTextHalfImage3")) {
       defaultData = getDefaultHalfTextHalfImage3Data();
-    } else if (currentTheme === "halfTextHalfImage4") {
+    } else if (currentTheme === "halfTextHalfImage4" || currentTheme?.includes("halfTextHalfImage4")) {
       defaultData = getDefaultHalfTextHalfImage4Data();
-    } else if (currentTheme === "halfTextHalfImage5") {
+    } else if (currentTheme === "halfTextHalfImage5" || currentTheme?.includes("halfTextHalfImage5")) {
       defaultData = getDefaultHalfTextHalfImage5Data();
-    } else if (currentTheme === "halfTextHalfImage6") {
+    } else if (currentTheme === "halfTextHalfImage6" || currentTheme?.includes("halfTextHalfImage6")) {
       defaultData = getDefaultHalfTextHalfImage6Data();
-    } else if (currentTheme === "halfTextHalfImage7") {
+    } else if (currentTheme === "halfTextHalfImage7" || currentTheme?.includes("halfTextHalfImage7")) {
       defaultData = getDefaultHalfTextHalfImage7Data();
     } else {
-      // Fallback: use variantId if it matches a theme name (for backward compatibility)
-      if (variantId === "halfTextHalfImage2") {
-        defaultData = getDefaultHalfTextHalfImage2Data();
-      } else if (variantId === "halfTextHalfImage3") {
-        defaultData = getDefaultHalfTextHalfImage3Data();
-      } else if (variantId === "halfTextHalfImage4") {
-        defaultData = getDefaultHalfTextHalfImage4Data();
-      } else if (variantId === "halfTextHalfImage5") {
-        defaultData = getDefaultHalfTextHalfImage5Data();
-      } else if (variantId === "halfTextHalfImage6") {
-        defaultData = getDefaultHalfTextHalfImage6Data();
-      } else if (variantId === "halfTextHalfImage7") {
-        defaultData = getDefaultHalfTextHalfImage7Data();
-      } else {
-        defaultData = getDefaultHalfTextHalfImageData();
-      }
+      defaultData = getDefaultHalfTextHalfImageData();
     }
 
-    // ⭐ STEP 3: Check if existing data matches currentTheme
-    // If Theme changed, reset to default data (like footerFunctions does)
-    const existingData = state.halfTextHalfImageStates[variantId];
-    if (existingData && Object.keys(existingData).length > 0 && currentTheme) {
-      // Check if existing data structure matches the expected structure for currentTheme
-      const existingHasThemeTwo = !!existingData.ThemeTwo;
-      const defaultHasThemeTwo = !!defaultData.ThemeTwo;
-      const existingHasStats = !!existingData.content?.stats;
-      const defaultHasStats = !!defaultData.content?.stats;
-      const existingHasFeatures = !!existingData.content?.features;
-      const defaultHasFeatures = !!defaultData.content?.features;
-      const existingHasParagraphs = !!existingData.content?.paragraphs;
-      const defaultHasParagraphs = !!defaultData.content?.paragraphs;
+    // Use provided initial data, else tempData, else defaults
+    const data: ComponentData = initial || state.tempData || defaultData;
 
-      // If Theme structure doesn't match, Theme has changed - reset to default
-      const themeChanged =
-        existingHasThemeTwo !== defaultHasThemeTwo ||
-        existingHasStats !== defaultHasStats ||
-        existingHasFeatures !== defaultHasFeatures ||
-        existingHasParagraphs !== defaultHasParagraphs;
-
-      if (themeChanged) {
-        logEditorStore("THEME_CHANGED_RESET_DATA", variantId, currentTheme, {
-          oldData: existingData,
-          newDefaultData: defaultData,
-          currentTheme,
-          reason:
-            "Theme changed, completely removing old data and using only default data for new Theme",
-        });
-
-        // ⭐ IMPORTANT: Use ONLY defaultData when Theme changes - ignore initial and tempData
-        // This ensures old data is completely removed and only default data is shown
-        return {
-          halfTextHalfImageStates: {
-            ...state.halfTextHalfImageStates,
-            [variantId]: defaultData, // ✅ Use ONLY defaultData, not initial or tempData
-          },
-        } as any;
-      }
-    }
-
-    // ⭐ STEP 4: Always use defaultData for currentTheme, ignore initial/tempData
-    // This ensures each theme uses its own default data structure
-    if (
-      state.halfTextHalfImageStates[variantId] &&
-      Object.keys(state.halfTextHalfImageStates[variantId]).length > 0
-    ) {
-      return {} as any;
-    }
-
-    // ⭐ FIX: Always use defaultData based on currentTheme
-    // Ignore initial/tempData to prevent using data from different theme
-    const data: ComponentData = defaultData;
-
-    const result = {
+    return {
       halfTextHalfImageStates: {
         ...state.halfTextHalfImageStates,
         [variantId]: data,
       },
-    };
-
-    logEditorStore("ENSURE_VARIANT_FINAL_RESULT", variantId, "unknown", {
-      finalData: data,
-      result: result,
-      allVariantsAfter: Object.keys(result.halfTextHalfImageStates),
-    });
-
-    return result as any;
+    } as any;
   },
 
+  /**
+   * getData - Retrieve component data from store
+   */
   getData: (state: any, variantId: string) =>
     state.halfTextHalfImageStates[variantId] || {},
 
+  /**
+   * setData - Set/replace component data completely
+   */
   setData: (state: any, variantId: string, data: ComponentData) => {
     // Update pageComponentsByPage as well
     const currentPage = state.currentPage;
@@ -673,29 +620,24 @@ export const halfTextHalfImageFunctions = {
     } as any;
   },
 
+  /**
+   * updateByPath - Update specific field in component data
+   */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.halfTextHalfImageStates[variantId] || {};
-    const newData = updateDataByPath(source, path, value);
+    // Get current data from halfTextHalfImageStates (saved data)
+    const savedData = state.halfTextHalfImageStates[variantId] || {};
 
-    // Update pageComponentsByPage as well
-    const currentPage = state.currentPage;
-    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-    const updatedComponents = updatedPageComponents.map((comp: any) => {
-      if (comp.type === "halfTextHalfImage" && comp.id === variantId) {
-        return { ...comp, data: newData };
-      }
-      return comp;
-    });
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
 
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData ONLY
     return {
-      halfTextHalfImageStates: {
-        ...state.halfTextHalfImageStates,
-        [variantId]: newData,
-      },
-      pageComponentsByPage: {
-        ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents,
-      },
+      tempData: newData,
     } as any;
   },
 };
+

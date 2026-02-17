@@ -146,28 +146,28 @@ export const getDefaultContactUsHomePageData = (): ComponentData => ({
 export const contactUsHomePageFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
-   *
-   * @param state - Current editorStore state
-   * @param variantId - Unique component ID (UUID)
-   * @param initial - Optional initial data to override defaults
-   * @returns New state object or empty object if already exists
-   */
+    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // Check if variant already exists
-    if (
-      state.contactUsHomePageStates[variantId] &&
-      Object.keys(state.contactUsHomePageStates[variantId]).length > 0
-    ) {
+    // Priority 1: Check if variant already exists
+    const currentData = state.contactUsHomePageStates[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          contactUsHomePageStates: {
+            ...state.contactUsHomePageStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
       return {} as any; // Already exists, skip initialization
     }
 
-    // Determine default data
     const defaultData = getDefaultContactUsHomePageData();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
-    // Return new state
     return {
       contactUsHomePageStates: {
         ...state.contactUsHomePageStates,
@@ -178,23 +178,14 @@ export const contactUsHomePageFunctions = {
 
   /**
    * getData - Retrieve component data from store
-   *
-   * @param state - Current editorStore state
-   * @param variantId - Unique component ID
-   * @returns Component data or default data if not found
-   */
+    */
   getData: (state: any, variantId: string) =>
     state.contactUsHomePageStates[variantId] ||
     getDefaultContactUsHomePageData(),
 
   /**
    * setData - Set/replace component data completely
-   *
-   * @param state - Current editorStore state
-   * @param variantId - Unique component ID
-   * @param data - New component data
-   * @returns New state object
-   */
+    */
   setData: (state: any, variantId: string, data: ComponentData) => ({
     contactUsHomePageStates: {
       ...state.contactUsHomePageStates,
@@ -204,24 +195,24 @@ export const contactUsHomePageFunctions = {
 
   /**
    * updateByPath - Update specific field in component data
-   *
-   * @param state - Current editorStore state
-   * @param variantId - Unique component ID
-   * @param path - Dot-separated path to field (e.g., "form.submitButton.text")
-   * @param value - New value for the field
-   * @returns New state object
-   */
+    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
+    // Get current data from contactUsHomePageStates (saved data) or defaults
+    const savedData =
       state.contactUsHomePageStates[variantId] ||
       getDefaultContactUsHomePageData();
-    const newData = updateDataByPath(source, path, value);
 
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
+
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData ONLY
     return {
-      contactUsHomePageStates: {
-        ...state.contactUsHomePageStates,
-        [variantId]: newData,
-      },
+      tempData: newData,
     } as any;
   },
 };
+

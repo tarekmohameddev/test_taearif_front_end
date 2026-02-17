@@ -1,0 +1,54 @@
+2026-02-17 01:58:14
+Update Type: Enhancement
+Updated ensureVariant function to properly merge backend data (tenantComponentData) with default data, ensuring backend data takes priority over defaults when initializing component in store
+context/editorStoreFunctions/imageTextFunctions.ts
+
+2026-02-17 02:13:03
+Update Type: Bug Fix
+Fixed double merge issue in ensureVariant - now uses initial data directly without re-merging with defaults (matches contactFormSectionFunctions pattern). Updated getData and updateByPath to use optional chaining for safer state access
+context/editorStoreFunctions/imageTextFunctions.ts
+
+2026-02-17 02:17:24
+Update Type: Enhancement
+Updated ensureVariant priority order: tempData (highest priority - shows even if backend data exists) > initial (backend data + props) > defaults. tempData now takes precedence over backend data when both exist
+context/editorStoreFunctions/imageTextFunctions.ts
+
+2026-02-17 02:20:31
+Update Type: Enhancement
+Changed ensureVariant priority order to match heroFunctions: initial (backend data + props) > tempData > defaults. This ensures backend data appears first when opening Live Editor
+context/editorStoreFunctions/imageTextFunctions.ts
+
+2026-02-17 02:21:59
+Update Type: Bug Fix
+Fixed mergedData priority in imageText1 component to match halfTextHalfImage pattern. Now when tenantComponentData exists, it takes priority over store data. This ensures backend data appears immediately in iframe when tenantData loads, instead of showing default data first
+components/tenant/imageText/imageText1.tsx
+
+2026-02-17 03:03:38
+Update Type: Enhancement
+Applied propertiesShowcase1.tsx pattern to imageText1.tsx: Added useMemo for tenantComponentData, added isStoreDataDefault check (comparing texts[0].text), and updated mergedData to use currentStoreData only if it's not default data. This preserves user edits in Live Editor while prioritizing backend data when store data is just defaults
+components/tenant/imageText/imageText1.tsx
+
+2026-02-17 03:05:15
+Update Type: Refactor
+Replaced useMemo with useState for tenantComponentData in imageText1.tsx. Now uses useState to store tenantComponentData and useEffect to update it when tenantData, variantId, or props.id changes. This provides more explicit state management
+components/tenant/imageText/imageText1.tsx
+
+2026-02-17 03:08:39
+Update Type: Bug Fix
+Fixed ensureVariant in imageTextFunctions.ts to always use initial data if provided, even if component already exists in store. This ensures backend data updates the store when tenantData loads after component initialization. Previously, ensureVariant would skip update if component existed, causing default data to persist in iframe even when backend data was available. Now matches halfTextHalfImageFunctions pattern
+context/editorStoreFunctions/imageTextFunctions.ts
+
+2026-02-17 03:29:10
+Update Type: Enhancement
+Fixed array format handling in imageText1.tsx tenantComponentData search. Added support for Array.isArray(pageComponents) check to handle cases where pageComponents is an array instead of object. This ensures backend data is found correctly in both object and array formats
+components/tenant/imageText/imageText1.tsx
+
+2026-02-17 03:29:10
+Update Type: Enhancement
+Modified updateByPath in imageTextFunctions.ts to update tempData ONLY instead of imageTextStates directly. This ensures changes made in EditorSidebar do not appear in iframe until "Save Changes" button is pressed. On save, tempData is merged into imageTextStates via setComponentData. This matches the desired flow where edits are saved to tempData but only appear after save
+context/editorStoreFunctions/imageTextFunctions.ts
+
+2026-02-17 03:29:10
+Update Type: Enhancement
+Updated mergedData logic in imageText1.tsx to use tenantComponentData when currentStoreData is default, otherwise use currentStoreData (saved data). This ensures backend data appears first when store data is default, and saved data appears after save. tempData is NOT included in mergedData to prevent changes from appearing before save
+components/tenant/imageText/imageText1.tsx
