@@ -32,3 +32,5 @@ test.js
 /pagebuildDashboard/
 /code/
 /trash/vareonsProject
+*storybook.log
+storybook-static
