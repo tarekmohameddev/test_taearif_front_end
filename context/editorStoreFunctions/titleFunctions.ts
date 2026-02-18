@@ -54,14 +54,24 @@ export const titleFunctions = {
    * ensureVariant - Initialize component in store if not exists
    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.titleStates[variantId] &&
-      Object.keys(state.titleStates[variantId]).length > 0
-    ) {
-      return {} as any; // Already exists
+    // Priority 1: Check if variant already exists
+    const currentData = state.titleStates[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          titleStates: {
+            ...state.titleStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
+      return {} as any; // Already exists, skip initialization
     }
 
     const defaultData = getDefaultTitleData();
+
+    // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {
@@ -92,17 +102,23 @@ export const titleFunctions = {
    * updateByPath - Update specific field in component data
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.titleStates[variantId] || getDefaultTitleData();
-    const newData = updateDataByPath(source, path, value);
+    // Get current data from titleStates (saved data) or defaults
+    const savedData = state.titleStates?.[variantId] || getDefaultTitleData();
 
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
+
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData ONLY
     return {
-      titleStates: {
-        ...state.titleStates,
-        [variantId]: newData,
-      },
+      tempData: newData,
     } as any;
   },
 };
+
 
 
 

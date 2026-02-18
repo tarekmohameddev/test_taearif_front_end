@@ -69,7 +69,8 @@ export interface AutoAssignResponse {
 }
 
 export interface ManualAssignParams {
-  customerIds: string[];
+  requestIds?: string[]; // Composite request IDs (e.g. "property_request_42", "inquiry_17")
+  customerIds?: string[]; // Backward compatibility
   employeeId: string;
 }
 
@@ -131,10 +132,22 @@ export async function autoAssignCustomers(params: AutoAssignParams): Promise<Aut
   return response.data;
 }
 
-// Manual Assign Customers
+// Manual Assign Customers/Requests
+// Supports both requestIds (preferred) and customerIds (backward compatibility)
 export async function manualAssignCustomers(params: ManualAssignParams): Promise<ManualAssignResponse> {
   const response = await axiosInstance.post<ManualAssignResponse>(`${BASE_URL}/assign`, params);
   return response.data;
+}
+
+// Assign single or multiple requests (convenience function)
+export async function assignRequests(
+  requestIds: string[],
+  employeeId: string
+): Promise<ManualAssignResponse> {
+  return manualAssignCustomers({
+    requestIds,
+    employeeId,
+  });
 }
 
 // Save Assignment Rules

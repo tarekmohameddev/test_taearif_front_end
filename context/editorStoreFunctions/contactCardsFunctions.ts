@@ -1,5 +1,5 @@
 import { ComponentData } from "@/lib/types";
-import { createDefaultData } from "./types";
+import { createDefaultData, updateDataByPath } from "./types";
 
 // Default data for contact cards
 export const getDefaultContactCardsData = (): ComponentData => ({
@@ -244,12 +244,19 @@ export const contactCardsFunctions = {
 
   // Ensure variant exists in store
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // If variant already exists with data, don't override
-    if (
-      state.contactCardsStates?.[variantId] &&
-      Object.keys(state.contactCardsStates[variantId]).length > 0
-    ) {
-      return {} as any;
+    // Priority 1: Check if variant already exists
+    const currentData = state.contactCardsStates?.[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          contactCardsStates: {
+            ...(state.contactCardsStates || {}),
+            [variantId]: initial,
+          },
+        } as any;
+      }
+      return {} as any; // Already exists, skip initialization
     }
 
     // Use initial data if provided, otherwise use default
@@ -266,7 +273,9 @@ export const contactCardsFunctions = {
 
   // Get data for variant
   getData: (state: any, variantId: string): ComponentData => {
-    return state.contactCardsStates?.[variantId] || {};
+    return (
+      state.contactCardsStates?.[variantId] || getDefaultContactCardsData()
+    );
   },
 
   // Set data for variant
@@ -281,70 +290,23 @@ export const contactCardsFunctions = {
 
   // Update data by path
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const currentData =
+    // Get current data from contactCardsStates (saved data) or defaults
+    const savedData =
       state.contactCardsStates?.[variantId] || getDefaultContactCardsData();
 
-    const segments = path
-      .replace(/\[(\d+)\]/g, ".$1")
-      .split(".")
-      .filter(Boolean);
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
 
-    const newData: any = { ...currentData };
-    let cursor: any = newData;
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
 
-    for (let i = 0; i < segments.length - 1; i++) {
-      const key = segments[i]!;
-      const nextIsIndex = !Number.isNaN(Number(segments[i + 1]));
-      const existing = cursor[key];
-
-      if (
-        existing == null ||
-        typeof existing === "string" ||
-        typeof existing === "number" ||
-        typeof existing === "boolean"
-      ) {
-        cursor[key] = nextIsIndex ? [] : {};
-      } else if (Array.isArray(existing) && !nextIsIndex) {
-        cursor[key] = {};
-      } else if (
-        typeof existing === "object" &&
-        !Array.isArray(existing) &&
-        nextIsIndex
-      ) {
-        cursor[key] = [];
-      }
-      cursor = cursor[key];
-    }
-
-    const lastKey = segments[segments.length - 1]!;
-    cursor[lastKey] = value;
-
-    // Update pageComponentsByPage with the new data
-    const currentPage = state.currentPage || "homepage";
-    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-
-    // Find and update the component in pageComponents
-    const updatedComponents = updatedPageComponents.map((comp: any) => {
-      if (comp.type === "contactCards" && comp.id === variantId) {
-        return {
-          ...comp,
-          data: newData,
-        };
-      }
-      return comp;
-    });
-
+    // Return updated tempData ONLY
     return {
-      contactCardsStates: {
-        ...state.contactCardsStates,
-        [variantId]: newData,
-      },
-      pageComponentsByPage: {
-        ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents,
-      },
-    };
+      tempData: newData,
+    } as any;
   },
+
 
   // Update contact cards data
   update: (

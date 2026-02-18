@@ -7,3 +7,8 @@ components/customers-hub/page/EnhancedCustomersHubPage.tsx
 Update Type: Enhancement
 Made recommended actions card responsive - flex-col on mobile, flex-row on desktop, improved spacing and text sizes
 components/customers-hub/page/CustomersDashboard.tsx
+
+2025-01-20 16:00:00
+Update Type: Update
+تعليق أزرار الإشعارات واختصارات لوحة المفاتيح وتصدير في صفحة قائمة العملاء
+components/customers-hub/page/EnhancedCustomersHubPage.tsx

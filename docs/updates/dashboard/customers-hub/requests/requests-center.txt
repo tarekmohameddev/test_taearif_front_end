@@ -62,3 +62,38 @@ components/customers-hub/actions/IncomingActionsCard.tsx, components/customers-h
 Update Type: Enhancement
 ربط إضافة note في صفحة RequestDetailPage بالـ API الصحيح المذكور في الوثائق - تعديل addNoteToAction في customers-hub-requests-api.ts لاستخدام endpoint الصحيح: POST /api/v2/customers-hub/requests/{requestId}/notes بدلاً من POST /api/v2/customers-hub/requests/{requestId} - تغيير body structure من { action: "add_note", data: { note, addedBy } } إلى { note, addedBy } (flat structure) - إضافة تعليقات توضيحية في الكود تشير إلى الوثائق - دعم addedBy كـ number (user ID) أو string (display name) - الكود الآن متوافق مع customers-hub-lead-based.md
 lib/services/customers-hub-requests-api.ts
+
+2026-02-18 02:43:26
+Update Type: Bug Fix
+إصلاح مشكلة z-index في dropdown "اختر الموظف" داخل popup "تعيين الموظف المسؤول" - إضافة className="z-[10001]" للـ SelectContent داخل CustomDialog لضمان ظهور dropdown فوق الـ popup بدلاً من تحته - تحديث جميع مواضع SelectContent في IncomingActionsCard.tsx داخل dialog "تعيين الموظف المسؤول"
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-18 02:45:11
+Update Type: Enhancement
+استبدال Select component بـ CustomDropdown في popup "تعيين الموظف المسؤول" - إزالة import لـ Select و SelectContent و SelectItem و SelectTrigger و SelectValue - إضافة import لـ CustomDropdown و DropdownItem من customComponents/customDropdown - استبدال Select بـ CustomDropdown في كلا موضعي dialog "تعيين الموظف المسؤول" - تحديث z-index في CustomDropdown من z-[9999] إلى z-[10001] لضمان ظهوره فوق CustomDialog (z-[10000]) - تحديث z-index في DropdownSubMenu من z-[10000] إلى z-[10001]
+components/customers-hub/actions/IncomingActionsCard.tsx, components/customComponents/customDropdown.tsx
+
+2026-02-18 02:46:45
+Update Type: Bug Fix
+إصلاح مشكلة المسافة بين dropdown trigger و dropdown content في CustomDropdown - إزالة المسافة الإضافية (8px) من حساب موضع القائمة لجعل الـ dropdown ملاصقاً تماماً للـ button - تغيير top من rect.bottom + window.scrollY + 8 إلى rect.bottom + window.scrollY
+components/customComponents/customDropdown.tsx
+
+2026-02-18 04:25:47
+Update Type: Feature
+إضافة زر تعيين موظف و عرض الموظف المعين لـ inquiries في cards صفحة /dashboard/customers-hub/requests - تحديث شرط عرض زر تعيين الموظف في IncomingActionsCard ليشمل inquiry بالإضافة إلى property_request (في compact view و normal view) - تحديث نص dialog تعيين الموظف ليكون عاماً (بدلاً من "طلب العقار" فقط) - تحديث نص نوع الطلب في dialog ليشمل inquiry (عرض "استفسار رقم #" لـ inquiry)
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-18 04:40:11
+Update Type: Bug Fix
+إصلاح مشكلة عدم ظهور زر تعيين موظف واسم الموظف المعين في inquiries التي لا تحتوي على property data - تحديث شرط عرض property details block في IncomingActionsCard ليشمل inquiry حتى بدون property data (في compact view و normal view) - إضافة inquiry إلى الشرط بحيث يظهر زر تعيين الموظف أو اسم الموظف المعين حتى لو لم يكن هناك budget أو propertyType أو city - إصلاح خطأ TypeScript في assignRequests (تحويل selectedEmployeeId من number إلى string) - إضافة import لـ Select component المفقود
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-18 07:23:18
+Update Type: Enhancement
+تحديث dropdown الموظفين لعرض رقم الهاتف بدلاً من البريد الإلكتروني - تحديث employee interface لإضافة phone field - تحديث عرض الموظفين في dropdown ليعرض "اسم الموظف (رقم الهاتف)" بدلاً من "اسم الموظف (email)" - إضافة تنسيق رقم الهاتف لإزالة رموز الدولة (+20, +966) وتحويلها إلى تنسيق محلي (مثل: +201068445229 → 01068445229) - تحديث trigger في dropdown ليعرض رقم الهاتف أيضاً عند اختيار موظف - تطبيق التحديث في كلا الموضعين (compact view و normal view)
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-18 07:24:24
+Update Type: Enhancement
+إضافة إغلاق تلقائي لـ dropdown عند النقر على عنصر - إضافة React Context (DropdownContext) في CustomDropdown لتمرير دالة closeDropdown إلى DropdownItem - تحديث DropdownItem لاستخدام Context وإغلاق dropdown تلقائياً بعد تنفيذ onClick - إضافة Provider للـ Context في dropdownContent لضمان توفر closeDropdown لجميع DropdownItem - الآن عند النقر على أي موظف في dropdown، يتم إغلاق dropdown تلقائياً
+components/customComponents/customDropdown.tsx

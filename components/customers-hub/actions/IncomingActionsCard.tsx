@@ -15,6 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import { SourceBadge } from "./SourceBadge";
 import { ActionQuickPanel } from "./ActionQuickPanel";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
@@ -42,7 +46,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { updateCustomerStage as apiUpdateCustomerStage, assignAction as apiAssignAction } from "@/lib/services/customers-hub-requests-api";
+import { updateCustomerStage as apiUpdateCustomerStage } from "@/lib/services/customers-hub-requests-api";
+import { assignRequests } from "@/lib/services/customers-hub-assignment-api";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
@@ -289,10 +294,12 @@ export function IncomingActionsCard({
   const [isSubmittingApt, setIsSubmittingApt] = useState(false);
   const [isUpdatingStage, setIsUpdatingStage] = useState(false);
   const [showAssignEmployeeDialog, setShowAssignEmployeeDialog] = useState(false);
-  const [employees, setEmployees] = useState<Array<{ id: number; name?: string; first_name?: string; last_name?: string; email?: string }>>([]);
+  const [employees, setEmployees] = useState<Array<{ id: number; name?: string; first_name?: string; last_name?: string; email?: string; phone?: string }>>([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
+  // Optimistic stage update - tracks stage changes immediately before API response
+  const [optimisticStage, setOptimisticStage] = useState<CustomerLifecycleStage | null>(null);
   // Stages now use string stage_id, no mapping needed
 
   const resolvedCustomer =
@@ -342,6 +349,9 @@ export function IncomingActionsCard({
     return mapped;
   }, [propStages, storeStages]);
 
+  // Track action.stage_id changes to force recalculation
+  const [actionStageId, setActionStageId] = React.useState((action as any).stage_id);
+
   // Get stage from multiple sources: action.stage_id, action.stage, or resolvedCustomer.stage
   const stageSource = React.useMemo(() => {
     // #region agent log
@@ -375,7 +385,7 @@ export function IncomingActionsCard({
     fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:288',message:'stageSource - returning null',data:{actionId:action.id},timestamp:Date.now(),runId:'debug1',hypothesisId:'H4'})}).catch(()=>{});
     // #endregion
     return null;
-  }, [action, resolvedCustomer?.stage]);
+  }, [action, actionStageId, resolvedCustomer?.stage]);
 
   // Normalize stage using availableStages from API, with fallback to LIFECYCLE_STAGES
   const normalizedStage = React.useMemo(() => {
@@ -437,6 +447,23 @@ export function IncomingActionsCard({
     return result;
   }, [stageSource, availableStages]);
 
+  // Sync actionStageId with action.stage_id when action prop changes from outside
+  React.useEffect(() => {
+    const currentStageId = (action as any).stage_id;
+    if (currentStageId !== actionStageId) {
+      setActionStageId(currentStageId);
+      // Clear optimistic stage if action was updated from outside (e.g., API refresh)
+      if (optimisticStage && currentStageId !== optimisticStage) {
+        setOptimisticStage(null);
+      }
+    }
+  }, [action, actionStageId, optimisticStage]);
+
+  // Use optimistic stage if available, otherwise use normalized stage
+  const displayStage = React.useMemo(() => {
+    return optimisticStage || normalizedStage;
+  }, [optimisticStage, normalizedStage]);
+
   // Get numeric stage ID from customer.stage if it's an object
   // Get stage_id (string) from stage object or value
   const getStageId = (stage: any): string | null => {
@@ -481,8 +508,11 @@ export function IncomingActionsCard({
     // If already in the same stage, do nothing
     if (currentStage === newStage) return;
 
-    // Optimistic update: Update UI immediately if customer exists
+    // OPTIMISTIC UPDATE: Update UI immediately before API call
     const previousStage = currentStage;
+    setOptimisticStage(newStage); // Update local state immediately
+    
+    // Update store if customer exists
     if (resolvedCustomer && action.customerId) {
       updateCustomerStage(String(action.customerId), newStage);
     }
@@ -591,17 +621,56 @@ export function IncomingActionsCard({
         throw new Error(`Invalid stage ID: ${numericId} - must be a valid number`);
       }
 
-      // Call API to update stage (uses requestId and numeric stage.id)
+      // Determine if this is a request or inquiry based on objectType or source
+      // objectType: "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder"
+      const isInquiry = action.objectType === "inquiry" || action.source === "inquiry";
+      
+      // For inquiries, get inquiryId from metadata.inquiryId or sourceId
+      let inquiryIdValue: number | undefined;
+      if (isInquiry) {
+        // Priority: metadata.inquiryId > sourceId
+        if (action.metadata?.inquiryId) {
+          inquiryIdValue = typeof action.metadata.inquiryId === "number" 
+            ? action.metadata.inquiryId 
+            : parseInt(action.metadata.inquiryId.toString());
+        } else {
+          // sourceId should be the inquiry ID
+          inquiryIdValue = requestIdNum;
+        }
+      }
+      
+      // Call API to update stage - supports both requestId and inquiryId
+      // When inquiry: pass inquiryId in fourth parameter, undefined in first
+      // When request: pass requestId in first parameter, undefined in fourth
       await apiUpdateCustomerStage(
-        requestIdNum,  // requestId (action.id) instead of customerId
-        newStageIdNum,  // numeric stage.id
-        undefined // notes - optional
+        isInquiry ? undefined : requestIdNum,  // requestId only if not inquiry
+        newStageIdNum,  // newStageId can be string or number - API accepts both
+        undefined, // notes - optional
+        isInquiry ? inquiryIdValue : undefined  // inquiryId only if inquiry
       );
 
-      // Success - UI already updated, no need to do anything
+      // Success - Update action object directly to reflect the new stage
+      // This ensures normalizedStage will use the updated value when optimisticStage is cleared
+      (action as any).stage_id = newStage;
+      if ((action as any).stage && typeof (action as any).stage === 'object') {
+        (action as any).stage.stage_id = newStage;
+        (action as any).stage.id = numericId;
+      }
+      
+      // Also update resolvedCustomer stage if it exists
+      if (resolvedCustomer) {
+        (resolvedCustomer as any).stage = newStage;
+      }
+      
+      // Update actionStageId state to trigger recalculation of stageSource and normalizedStage
+      setActionStageId(newStage);
+      
       toast.success("تم تحديث المرحلة بنجاح");
+      // Clear optimistic stage after updating action object (normalizedStage will now use updated value)
+      setOptimisticStage(null);
     } catch (err: any) {
-      // Rollback: Revert to previous stage on error if customer exists
+      // Rollback: Revert optimistic update and store
+      setOptimisticStage(null); // Clear optimistic stage
       if (resolvedCustomer && previousStage && action.customerId) {
         updateCustomerStage(String(action.customerId), previousStage as CustomerLifecycleStage);
       }
@@ -666,28 +735,32 @@ export function IncomingActionsCard({
 
     setSavingEmployee(true);
     try {
-      // Use the v2 API endpoint that works with composite id (property_request_89, inquiry_123)
-      await apiAssignAction(action.id, selectedEmployeeId);
+      // Use POST /api/v2/customers-hub/assignment/assign endpoint
+      const response = await assignRequests([action.id], selectedEmployeeId.toString());
 
-      toast.success("تم تعيين الموظف المسؤول بنجاح!");
-      
-      // Update action locally
-      const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
-      const employeeName = selectedEmployee 
-        ? (selectedEmployee.first_name && selectedEmployee.last_name
-            ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
-            : selectedEmployee.name || selectedEmployee.email || `موظف #${selectedEmployee.id}`)
-        : '';
-      
-      // Update the action locally
-      (action as any).assignedTo = selectedEmployeeId.toString();
-      (action as any).assignedToName = employeeName;
+      if (response.status === "success") {
+        toast.success("تم تعيين الموظف المسؤول بنجاح!");
+        
+        // Update action locally
+        const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
+        const employeeName = selectedEmployee 
+          ? (selectedEmployee.first_name && selectedEmployee.last_name
+              ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+              : selectedEmployee.name || selectedEmployee.email || `موظف #${selectedEmployee.id}`)
+          : '';
+        
+        // Update the action locally
+        (action as any).assignedTo = selectedEmployeeId.toString();
+        (action as any).assignedToName = employeeName;
 
-      setShowAssignEmployeeDialog(false);
-      setSelectedEmployeeId(null);
-      
-      // Call onComplete to refresh the list
-      onComplete?.(action.id);
+        setShowAssignEmployeeDialog(false);
+        setSelectedEmployeeId(null);
+        
+        // Note: We don't call onComplete here because assigning an employee
+        // should NOT complete the action. The action data is already updated locally.
+      } else {
+        throw new Error(response.message || "فشل تعيين الموظف");
+      }
     } catch (error: any) {
       console.error("Error assigning employee:", error);
       toast.error(
@@ -767,7 +840,8 @@ export function IncomingActionsCard({
       setIsSubmittingApt(false);
       setShowScheduleForm(false);
       resetScheduleForm();
-      onComplete?.(action.id);
+      // Note: We don't call onComplete here because scheduling an appointment
+      // should NOT complete the action. The appointment is just scheduled.
     } catch (err: any) {
       console.error("Error scheduling appointment:", err);
       toast.error(err.message || "حدث خطأ أثناء جدولة الموعد");
@@ -865,24 +939,24 @@ export function IncomingActionsCard({
                     type="button"
                     className="text-xs flex items-center gap-1 shrink-0 rounded-md hover:opacity-80 transition-all cursor-pointer px-2 py-1"
                     style={{
-                      backgroundColor: `${getStageColor(normalizedStage)}15`,
-                      border: `1px solid ${getStageColor(normalizedStage)}40`,
+                      backgroundColor: `${getStageColor(displayStage)}15`,
+                      border: `1px solid ${getStageColor(displayStage)}40`,
                     }}
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
                     <span
                       className="size-1.5 rounded-full shrink-0"
-                      style={{ backgroundColor: getStageColor(normalizedStage) }}
+                      style={{ backgroundColor: getStageColor(displayStage) }}
                       aria-hidden
                     />
                     <span 
-                      style={{ color: getStageColor(normalizedStage) }} 
+                      style={{ color: getStageColor(displayStage) }} 
                       className="font-medium"
                     >
-                      {getStageNameAr(normalizedStage)}
+                      {getStageNameAr(displayStage)}
                     </span>
-                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(normalizedStage) }} />
+                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[180px]">
@@ -894,7 +968,7 @@ export function IncomingActionsCard({
                         handleStageChange(stage.id as CustomerLifecycleStage);
                       }}
                       className="flex items-center gap-2"
-                      disabled={isUpdatingStage || normalizedStage === stage.id}
+                      disabled={isUpdatingStage || displayStage === stage.id}
                     >
                       <span
                         className="size-2.5 rounded-full shrink-0"
@@ -902,7 +976,7 @@ export function IncomingActionsCard({
                         aria-hidden
                       />
                       {stage.nameAr}
-                      {normalizedStage === stage.id && (
+                      {displayStage === stage.id && (
                         <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
                       )}
                     </DropdownMenuItem>
@@ -937,7 +1011,7 @@ export function IncomingActionsCard({
             )}
           </div>
           {/* Property request details in compact view */}
-          {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null))) && (
+          {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry') && (
             <div className="flex items-center gap-2 text-xs flex-wrap">
               {/* Budget */}
               {(action.budgetMin != null || action.budgetMax != null) && (
@@ -976,7 +1050,7 @@ export function IncomingActionsCard({
                 </Badge>
               )}
               {/* Assign Employee Button or Assigned Employee Name */}
-              {action.objectType === 'property_request' && (
+              {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
                 action.assignedToName ? (
                   <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
                     <User className="h-3 w-3 shrink-0" />
@@ -1042,7 +1116,7 @@ export function IncomingActionsCard({
               <div>
                 <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
                 <div className="text-sm text-muted-foreground font-normal">
-                  اختر الموظف المسؤول عن طلب العقار
+                  اختر الموظف المسؤول عن الطلب
                 </div>
               </div>
             </CustomDialogTitle>
@@ -1065,6 +1139,8 @@ export function IncomingActionsCard({
                 <div className="text-sm text-muted-foreground">
                   {action.objectType === 'property_request' && action.sourceId
                     ? `طلب عقار رقم #${action.sourceId}`
+                    : action.objectType === 'inquiry' && action.sourceId
+                    ? `استفسار رقم #${action.sourceId}`
                     : action.title}
                 </div>
               </div>
@@ -1082,49 +1158,65 @@ export function IncomingActionsCard({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Select
-                    value={
-                      selectedEmployeeId
-                        ? selectedEmployeeId.toString()
-                        : "none"
+                  <CustomDropdown
+                    trigger={
+                      <span className="flex items-center gap-2">
+                        {selectedEmployeeId ? (
+                          (() => {
+                            const selectedEmployee = employees.find(
+                              (emp) => emp.id === selectedEmployeeId
+                            );
+                            const employeeName = selectedEmployee
+                              ? selectedEmployee.first_name &&
+                                selectedEmployee.last_name
+                                ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+                                : selectedEmployee.name ||
+                                  selectedEmployee.email ||
+                                  `موظف #${selectedEmployee.id}`
+                              : "اختر الموظف";
+                            
+                            const phone = selectedEmployee?.phone 
+                              ? selectedEmployee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                              : null;
+                            
+                            return phone ? `${employeeName} (${phone})` : employeeName;
+                          })()
+                        ) : (
+                          "اختر الموظف"
+                        )}
+                      </span>
                     }
-                    onValueChange={(value) =>
-                      setSelectedEmployeeId(
-                        value === "none" ? null : Number(value),
-                      )
-                    }
+                    triggerClassName="w-full justify-between"
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="اختر الموظف" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">لا يوجد موظف</SelectItem>
-                      {employees.map((employee) => {
-                        const employeeName =
-                          employee.first_name && employee.last_name
-                            ? `${employee.first_name} ${employee.last_name}`
-                            : employee.name ||
-                              employee.email ||
-                              `موظف #${employee.id}`;
+                    <DropdownItem
+                      onClick={() => setSelectedEmployeeId(null)}
+                    >
+                      لا يوجد موظف
+                    </DropdownItem>
+                    {employees.map((employee) => {
+                      const employeeName =
+                        employee.first_name && employee.last_name
+                          ? `${employee.first_name} ${employee.last_name}`
+                          : employee.name ||
+                            employee.email ||
+                            `موظف #${employee.id}`;
+                      
+                      const phone = employee.phone 
+                        ? employee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                        : null;
 
-                        return (
-                          <SelectItem
-                            key={employee.id}
-                            value={employee.id.toString()}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{employeeName}</span>
-                              {employee.email && (
-                                <span className="text-xs text-muted-foreground">
-                                  ({employee.email})
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+                      return (
+                        <DropdownItem
+                          key={employee.id}
+                          onClick={() => setSelectedEmployeeId(employee.id)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{phone ? `${employeeName} (${phone})` : employeeName}</span>
+                          </div>
+                        </DropdownItem>
+                      );
+                    })}
+                  </CustomDropdown>
                 </div>
               )}
             </div>
@@ -1262,7 +1354,7 @@ export function IncomingActionsCard({
               </a>
             )}
             {/* Property request details - show all available data */}
-            {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) ? (
+            {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry' ? (
               <div className="mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   {/* Budget */}
@@ -1302,7 +1394,7 @@ export function IncomingActionsCard({
                     </Badge>
                   )}
                   {/* Assign Employee Button or Assigned Employee Name */}
-                  {action.objectType === 'property_request' && (
+                  {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
                     action.assignedToName ? (
                       <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
                         <User className="h-3.5 w-3.5 shrink-0" />
@@ -1365,24 +1457,24 @@ export function IncomingActionsCard({
                     type="button"
                     className="flex items-center gap-1.5 text-xs rounded-md hover:opacity-80 transition-all cursor-pointer text-right w-fit px-2 py-1"
                     style={{
-                      backgroundColor: `${getStageColor(normalizedStage)}15`,
-                      border: `1px solid ${getStageColor(normalizedStage)}40`,
+                      backgroundColor: `${getStageColor(displayStage)}15`,
+                      border: `1px solid ${getStageColor(displayStage)}40`,
                     }}
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
                     <span
                       className="size-2 rounded-full shrink-0"
-                      style={{ backgroundColor: getStageColor(normalizedStage) }}
+                      style={{ backgroundColor: getStageColor(displayStage) }}
                       aria-hidden
                     />
                     <span 
-                      style={{ color: getStageColor(normalizedStage) }} 
+                      style={{ color: getStageColor(displayStage) }} 
                       className="font-medium"
                     >
-                      {getStageNameAr(normalizedStage)}
+                      {getStageNameAr(displayStage)}
                     </span>
-                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(normalizedStage) }} />
+                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[180px]">
@@ -1394,7 +1486,7 @@ export function IncomingActionsCard({
                         handleStageChange(stage.id as CustomerLifecycleStage);
                       }}
                       className="flex items-center gap-2"
-                      disabled={isUpdatingStage || normalizedStage === stage.id}
+                      disabled={isUpdatingStage || displayStage === stage.id}
                     >
                       <span
                         className="size-2.5 rounded-full shrink-0"
@@ -1402,7 +1494,7 @@ export function IncomingActionsCard({
                         aria-hidden
                       />
                       {stage.nameAr}
-                      {normalizedStage === stage.id && (
+                      {displayStage === stage.id && (
                         <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
                       )}
                     </DropdownMenuItem>
@@ -1537,7 +1629,7 @@ export function IncomingActionsCard({
               <div>
                 <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
                 <div className="text-sm text-muted-foreground font-normal">
-                  اختر الموظف المسؤول عن طلب العقار
+                  اختر الموظف المسؤول عن الطلب
                 </div>
               </div>
             </CustomDialogTitle>
@@ -1560,6 +1652,8 @@ export function IncomingActionsCard({
                 <div className="text-sm text-muted-foreground">
                   {action.objectType === 'property_request' && action.sourceId
                     ? `طلب عقار رقم #${action.sourceId}`
+                    : action.objectType === 'inquiry' && action.sourceId
+                    ? `استفسار رقم #${action.sourceId}`
                     : action.title}
                 </div>
               </div>
@@ -1577,49 +1671,65 @@ export function IncomingActionsCard({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Select
-                    value={
-                      selectedEmployeeId
-                        ? selectedEmployeeId.toString()
-                        : "none"
+                  <CustomDropdown
+                    trigger={
+                      <span className="flex items-center gap-2">
+                        {selectedEmployeeId ? (
+                          (() => {
+                            const selectedEmployee = employees.find(
+                              (emp) => emp.id === selectedEmployeeId
+                            );
+                            const employeeName = selectedEmployee
+                              ? selectedEmployee.first_name &&
+                                selectedEmployee.last_name
+                                ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+                                : selectedEmployee.name ||
+                                  selectedEmployee.email ||
+                                  `موظف #${selectedEmployee.id}`
+                              : "اختر الموظف";
+                            
+                            const phone = selectedEmployee?.phone 
+                              ? selectedEmployee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                              : null;
+                            
+                            return phone ? `${employeeName} (${phone})` : employeeName;
+                          })()
+                        ) : (
+                          "اختر الموظف"
+                        )}
+                      </span>
                     }
-                    onValueChange={(value) =>
-                      setSelectedEmployeeId(
-                        value === "none" ? null : Number(value),
-                      )
-                    }
+                    triggerClassName="w-full justify-between"
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="اختر الموظف" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">لا يوجد موظف</SelectItem>
-                      {employees.map((employee) => {
-                        const employeeName =
-                          employee.first_name && employee.last_name
-                            ? `${employee.first_name} ${employee.last_name}`
-                            : employee.name ||
-                              employee.email ||
-                              `موظف #${employee.id}`;
+                    <DropdownItem
+                      onClick={() => setSelectedEmployeeId(null)}
+                    >
+                      لا يوجد موظف
+                    </DropdownItem>
+                    {employees.map((employee) => {
+                      const employeeName =
+                        employee.first_name && employee.last_name
+                          ? `${employee.first_name} ${employee.last_name}`
+                          : employee.name ||
+                            employee.email ||
+                            `موظف #${employee.id}`;
+                      
+                      const phone = employee.phone 
+                        ? employee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                        : null;
 
-                        return (
-                          <SelectItem
-                            key={employee.id}
-                            value={employee.id.toString()}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{employeeName}</span>
-                              {employee.email && (
-                                <span className="text-xs text-muted-foreground">
-                                  ({employee.email})
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+                      return (
+                        <DropdownItem
+                          key={employee.id}
+                          onClick={() => setSelectedEmployeeId(employee.id)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{phone ? `${employeeName} (${phone})` : employeeName}</span>
+                          </div>
+                        </DropdownItem>
+                      );
+                    })}
+                  </CustomDropdown>
                 </div>
               )}
             </div>

@@ -1,4 +1,5 @@
 export { AddCustomerDialog } from "./AddCustomerDialog";
+export { AddPropertyToCustomerDialog } from "./AddPropertyToCustomerDialog";
 
 // Export placeholder dialogs
 // These can be implemented later:

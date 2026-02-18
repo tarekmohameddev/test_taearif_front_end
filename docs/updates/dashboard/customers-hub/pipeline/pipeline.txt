@@ -37,3 +37,8 @@ app/dashboard/customers-hub/pipeline/page.tsx, components/customers-hub/pipeline
 Update Type: Enhancement
 Removed all default/dummy data and fallbacks - removed LIFECYCLE_STAGES fallback from EnhancedPipelineBoard and StageAnalytics, removed store customers fallback, removed store statistics fallback, removed all default data sources, now only uses data from API endpoints, added message when no stages available from API, removed unused imports (useUnifiedCustomersStore, LIFECYCLE_STAGES)
 components/customers-hub/pipeline/EnhancedPipelineBoard.tsx, components/customers-hub/pipeline/StageAnalytics.tsx, components/customers-hub/pipeline/PipelinePage.tsx
+
+2026-02-18 08:07:59
+Update Type: Bug Fix
+Fixed duplicate key error in ClassicPipelineBoard - replaced simple customer.id key with extremely unique key combining stage.id, customer.id, customerIndex, requestId, inquiryId, multiple random values, and performance.now() timestamp to ensure each Card has a completely unique key and prevent React key conflicts
+components/customers-hub/pipeline/ClassicPipelineBoard.tsx

@@ -454,14 +454,19 @@ export const getDefaultHero4Data = (): ComponentData => ({
 
 export const heroFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.heroStates[variantId] &&
-      Object.keys(state.heroStates[variantId]).length > 0
-    ) {
-      return {} as any;
+    // Priority 1: Check if variant already exists
+    const currentData = state.heroStates[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, we should probably update it to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          heroStates: { ...state.heroStates, [variantId]: initial },
+        } as any;
+      }
+      return {} as any; // Already exists, skip initialization
     }
 
-    // تحديد البيانات الافتراضية حسب نوع المكون
+    // Determine default data based on actualVariantId
     const defaultData =
       variantId === "hero2"
         ? getDefaultHero2Data()
@@ -470,12 +475,16 @@ export const heroFunctions = {
           : variantId === "hero4"
             ? getDefaultHero4Data()
             : getDefaultHeroData();
+
+    // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
+    // Return new state
     return {
       heroStates: { ...state.heroStates, [variantId]: data },
     } as any;
   },
+
 
   getData: (state: any, variantId: string) => state.heroStates[variantId] || {},
 
@@ -484,25 +493,21 @@ export const heroFunctions = {
   }),
 
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.heroStates[variantId] || {};
-    const newData = updateDataByPath(source, path, value);
+    // Get current data from heroStates (saved data) or defaults
+    const savedData = state.heroStates[variantId] || {};
 
-    // Update pageComponentsByPage as well
-    const currentPage = state.currentPage;
-    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-    const updatedComponents = updatedPageComponents.map((comp: any) => {
-      if (comp.type === "hero" && comp.id === variantId) {
-        return { ...comp, data: newData };
-      }
-      return comp;
-    });
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
 
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData ONLY
+    // This ensures changes only appear after "Save Changes" button
     return {
-      heroStates: { ...state.heroStates, [variantId]: newData },
-      pageComponentsByPage: {
-        ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents,
-      },
+      tempData: newData,
     } as any;
   },
+
 };
