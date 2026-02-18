@@ -294,10 +294,12 @@ export function IncomingActionsCard({
   const [isSubmittingApt, setIsSubmittingApt] = useState(false);
   const [isUpdatingStage, setIsUpdatingStage] = useState(false);
   const [showAssignEmployeeDialog, setShowAssignEmployeeDialog] = useState(false);
-  const [employees, setEmployees] = useState<Array<{ id: number; name?: string; first_name?: string; last_name?: string; email?: string }>>([]);
+  const [employees, setEmployees] = useState<Array<{ id: number; name?: string; first_name?: string; last_name?: string; email?: string; phone?: string }>>([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
+  // Optimistic stage update - tracks stage changes immediately before API response
+  const [optimisticStage, setOptimisticStage] = useState<CustomerLifecycleStage | null>(null);
   // Stages now use string stage_id, no mapping needed
 
   const resolvedCustomer =
@@ -347,6 +349,9 @@ export function IncomingActionsCard({
     return mapped;
   }, [propStages, storeStages]);
 
+  // Track action.stage_id changes to force recalculation
+  const [actionStageId, setActionStageId] = React.useState((action as any).stage_id);
+
   // Get stage from multiple sources: action.stage_id, action.stage, or resolvedCustomer.stage
   const stageSource = React.useMemo(() => {
     // #region agent log
@@ -380,7 +385,7 @@ export function IncomingActionsCard({
     fetch('http://127.0.0.1:7242/ingest/9e338d0b-1634-4cc6-9293-9597538269d8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'IncomingActionsCard.tsx:288',message:'stageSource - returning null',data:{actionId:action.id},timestamp:Date.now(),runId:'debug1',hypothesisId:'H4'})}).catch(()=>{});
     // #endregion
     return null;
-  }, [action, resolvedCustomer?.stage]);
+  }, [action, actionStageId, resolvedCustomer?.stage]);
 
   // Normalize stage using availableStages from API, with fallback to LIFECYCLE_STAGES
   const normalizedStage = React.useMemo(() => {
@@ -442,6 +447,23 @@ export function IncomingActionsCard({
     return result;
   }, [stageSource, availableStages]);
 
+  // Sync actionStageId with action.stage_id when action prop changes from outside
+  React.useEffect(() => {
+    const currentStageId = (action as any).stage_id;
+    if (currentStageId !== actionStageId) {
+      setActionStageId(currentStageId);
+      // Clear optimistic stage if action was updated from outside (e.g., API refresh)
+      if (optimisticStage && currentStageId !== optimisticStage) {
+        setOptimisticStage(null);
+      }
+    }
+  }, [action, actionStageId, optimisticStage]);
+
+  // Use optimistic stage if available, otherwise use normalized stage
+  const displayStage = React.useMemo(() => {
+    return optimisticStage || normalizedStage;
+  }, [optimisticStage, normalizedStage]);
+
   // Get numeric stage ID from customer.stage if it's an object
   // Get stage_id (string) from stage object or value
   const getStageId = (stage: any): string | null => {
@@ -486,8 +508,11 @@ export function IncomingActionsCard({
     // If already in the same stage, do nothing
     if (currentStage === newStage) return;
 
-    // Optimistic update: Update UI immediately if customer exists
+    // OPTIMISTIC UPDATE: Update UI immediately before API call
     const previousStage = currentStage;
+    setOptimisticStage(newStage); // Update local state immediately
+    
+    // Update store if customer exists
     if (resolvedCustomer && action.customerId) {
       updateCustomerStage(String(action.customerId), newStage);
     }
@@ -596,17 +621,56 @@ export function IncomingActionsCard({
         throw new Error(`Invalid stage ID: ${numericId} - must be a valid number`);
       }
 
-      // Call API to update stage (uses requestId and numeric stage.id)
+      // Determine if this is a request or inquiry based on objectType or source
+      // objectType: "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder"
+      const isInquiry = action.objectType === "inquiry" || action.source === "inquiry";
+      
+      // For inquiries, get inquiryId from metadata.inquiryId or sourceId
+      let inquiryIdValue: number | undefined;
+      if (isInquiry) {
+        // Priority: metadata.inquiryId > sourceId
+        if (action.metadata?.inquiryId) {
+          inquiryIdValue = typeof action.metadata.inquiryId === "number" 
+            ? action.metadata.inquiryId 
+            : parseInt(action.metadata.inquiryId.toString());
+        } else {
+          // sourceId should be the inquiry ID
+          inquiryIdValue = requestIdNum;
+        }
+      }
+      
+      // Call API to update stage - supports both requestId and inquiryId
+      // When inquiry: pass inquiryId in fourth parameter, undefined in first
+      // When request: pass requestId in first parameter, undefined in fourth
       await apiUpdateCustomerStage(
-        requestIdNum,  // requestId (action.id) instead of customerId
-        newStageIdNum,  // numeric stage.id
-        undefined // notes - optional
+        isInquiry ? undefined : requestIdNum,  // requestId only if not inquiry
+        newStageIdNum,  // newStageId can be string or number - API accepts both
+        undefined, // notes - optional
+        isInquiry ? inquiryIdValue : undefined  // inquiryId only if inquiry
       );
 
-      // Success - UI already updated, no need to do anything
+      // Success - Update action object directly to reflect the new stage
+      // This ensures normalizedStage will use the updated value when optimisticStage is cleared
+      (action as any).stage_id = newStage;
+      if ((action as any).stage && typeof (action as any).stage === 'object') {
+        (action as any).stage.stage_id = newStage;
+        (action as any).stage.id = numericId;
+      }
+      
+      // Also update resolvedCustomer stage if it exists
+      if (resolvedCustomer) {
+        (resolvedCustomer as any).stage = newStage;
+      }
+      
+      // Update actionStageId state to trigger recalculation of stageSource and normalizedStage
+      setActionStageId(newStage);
+      
       toast.success("تم تحديث المرحلة بنجاح");
+      // Clear optimistic stage after updating action object (normalizedStage will now use updated value)
+      setOptimisticStage(null);
     } catch (err: any) {
-      // Rollback: Revert to previous stage on error if customer exists
+      // Rollback: Revert optimistic update and store
+      setOptimisticStage(null); // Clear optimistic stage
       if (resolvedCustomer && previousStage && action.customerId) {
         updateCustomerStage(String(action.customerId), previousStage as CustomerLifecycleStage);
       }
@@ -874,24 +938,24 @@ export function IncomingActionsCard({
                     type="button"
                     className="text-xs flex items-center gap-1 shrink-0 rounded-md hover:opacity-80 transition-all cursor-pointer px-2 py-1"
                     style={{
-                      backgroundColor: `${getStageColor(normalizedStage)}15`,
-                      border: `1px solid ${getStageColor(normalizedStage)}40`,
+                      backgroundColor: `${getStageColor(displayStage)}15`,
+                      border: `1px solid ${getStageColor(displayStage)}40`,
                     }}
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
                     <span
                       className="size-1.5 rounded-full shrink-0"
-                      style={{ backgroundColor: getStageColor(normalizedStage) }}
+                      style={{ backgroundColor: getStageColor(displayStage) }}
                       aria-hidden
                     />
                     <span 
-                      style={{ color: getStageColor(normalizedStage) }} 
+                      style={{ color: getStageColor(displayStage) }} 
                       className="font-medium"
                     >
-                      {getStageNameAr(normalizedStage)}
+                      {getStageNameAr(displayStage)}
                     </span>
-                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(normalizedStage) }} />
+                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[180px]">
@@ -903,7 +967,7 @@ export function IncomingActionsCard({
                         handleStageChange(stage.id as CustomerLifecycleStage);
                       }}
                       className="flex items-center gap-2"
-                      disabled={isUpdatingStage || normalizedStage === stage.id}
+                      disabled={isUpdatingStage || displayStage === stage.id}
                     >
                       <span
                         className="size-2.5 rounded-full shrink-0"
@@ -911,7 +975,7 @@ export function IncomingActionsCard({
                         aria-hidden
                       />
                       {stage.nameAr}
-                      {normalizedStage === stage.id && (
+                      {displayStage === stage.id && (
                         <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
                       )}
                     </DropdownMenuItem>
@@ -1109,7 +1173,12 @@ export function IncomingActionsCard({
                                   selectedEmployee.email ||
                                   `موظف #${selectedEmployee.id}`
                               : "اختر الموظف";
-                            return employeeName;
+                            
+                            const phone = selectedEmployee?.phone 
+                              ? selectedEmployee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                              : null;
+                            
+                            return phone ? `${employeeName} (${phone})` : employeeName;
                           })()
                         ) : (
                           "اختر الموظف"
@@ -1130,6 +1199,10 @@ export function IncomingActionsCard({
                           : employee.name ||
                             employee.email ||
                             `موظف #${employee.id}`;
+                      
+                      const phone = employee.phone 
+                        ? employee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                        : null;
 
                       return (
                         <DropdownItem
@@ -1137,12 +1210,7 @@ export function IncomingActionsCard({
                           onClick={() => setSelectedEmployeeId(employee.id)}
                         >
                           <div className="flex items-center gap-2">
-                            <span>{employeeName}</span>
-                            {employee.email && (
-                              <span className="text-xs text-muted-foreground">
-                                ({employee.email})
-                              </span>
-                            )}
+                            <span>{phone ? `${employeeName} (${phone})` : employeeName}</span>
                           </div>
                         </DropdownItem>
                       );
@@ -1388,24 +1456,24 @@ export function IncomingActionsCard({
                     type="button"
                     className="flex items-center gap-1.5 text-xs rounded-md hover:opacity-80 transition-all cursor-pointer text-right w-fit px-2 py-1"
                     style={{
-                      backgroundColor: `${getStageColor(normalizedStage)}15`,
-                      border: `1px solid ${getStageColor(normalizedStage)}40`,
+                      backgroundColor: `${getStageColor(displayStage)}15`,
+                      border: `1px solid ${getStageColor(displayStage)}40`,
                     }}
                     onClick={(e) => e.stopPropagation()}
                     data-interactive="true"
                   >
                     <span
                       className="size-2 rounded-full shrink-0"
-                      style={{ backgroundColor: getStageColor(normalizedStage) }}
+                      style={{ backgroundColor: getStageColor(displayStage) }}
                       aria-hidden
                     />
                     <span 
-                      style={{ color: getStageColor(normalizedStage) }} 
+                      style={{ color: getStageColor(displayStage) }} 
                       className="font-medium"
                     >
-                      {getStageNameAr(normalizedStage)}
+                      {getStageNameAr(displayStage)}
                     </span>
-                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(normalizedStage) }} />
+                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[180px]">
@@ -1417,7 +1485,7 @@ export function IncomingActionsCard({
                         handleStageChange(stage.id as CustomerLifecycleStage);
                       }}
                       className="flex items-center gap-2"
-                      disabled={isUpdatingStage || normalizedStage === stage.id}
+                      disabled={isUpdatingStage || displayStage === stage.id}
                     >
                       <span
                         className="size-2.5 rounded-full shrink-0"
@@ -1425,7 +1493,7 @@ export function IncomingActionsCard({
                         aria-hidden
                       />
                       {stage.nameAr}
-                      {normalizedStage === stage.id && (
+                      {displayStage === stage.id && (
                         <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
                       )}
                     </DropdownMenuItem>
@@ -1618,7 +1686,12 @@ export function IncomingActionsCard({
                                   selectedEmployee.email ||
                                   `موظف #${selectedEmployee.id}`
                               : "اختر الموظف";
-                            return employeeName;
+                            
+                            const phone = selectedEmployee?.phone 
+                              ? selectedEmployee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                              : null;
+                            
+                            return phone ? `${employeeName} (${phone})` : employeeName;
                           })()
                         ) : (
                           "اختر الموظف"
@@ -1639,6 +1712,10 @@ export function IncomingActionsCard({
                           : employee.name ||
                             employee.email ||
                             `موظف #${employee.id}`;
+                      
+                      const phone = employee.phone 
+                        ? employee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                        : null;
 
                       return (
                         <DropdownItem
@@ -1646,12 +1723,7 @@ export function IncomingActionsCard({
                           onClick={() => setSelectedEmployeeId(employee.id)}
                         >
                           <div className="flex items-center gap-2">
-                            <span>{employeeName}</span>
-                            {employee.email && (
-                              <span className="text-xs text-muted-foreground">
-                                ({employee.email})
-                              </span>
-                            )}
+                            <span>{phone ? `${employeeName} (${phone})` : employeeName}</span>
                           </div>
                         </DropdownItem>
                       );

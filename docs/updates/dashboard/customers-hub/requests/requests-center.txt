@@ -87,3 +87,13 @@ components/customers-hub/actions/IncomingActionsCard.tsx
 Update Type: Bug Fix
 إصلاح مشكلة عدم ظهور زر تعيين موظف واسم الموظف المعين في inquiries التي لا تحتوي على property data - تحديث شرط عرض property details block في IncomingActionsCard ليشمل inquiry حتى بدون property data (في compact view و normal view) - إضافة inquiry إلى الشرط بحيث يظهر زر تعيين الموظف أو اسم الموظف المعين حتى لو لم يكن هناك budget أو propertyType أو city - إصلاح خطأ TypeScript في assignRequests (تحويل selectedEmployeeId من number إلى string) - إضافة import لـ Select component المفقود
 components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-18 07:23:18
+Update Type: Enhancement
+تحديث dropdown الموظفين لعرض رقم الهاتف بدلاً من البريد الإلكتروني - تحديث employee interface لإضافة phone field - تحديث عرض الموظفين في dropdown ليعرض "اسم الموظف (رقم الهاتف)" بدلاً من "اسم الموظف (email)" - إضافة تنسيق رقم الهاتف لإزالة رموز الدولة (+20, +966) وتحويلها إلى تنسيق محلي (مثل: +201068445229 → 01068445229) - تحديث trigger في dropdown ليعرض رقم الهاتف أيضاً عند اختيار موظف - تطبيق التحديث في كلا الموضعين (compact view و normal view)
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-18 07:24:24
+Update Type: Enhancement
+إضافة إغلاق تلقائي لـ dropdown عند النقر على عنصر - إضافة React Context (DropdownContext) في CustomDropdown لتمرير دالة closeDropdown إلى DropdownItem - تحديث DropdownItem لاستخدام Context وإغلاق dropdown تلقائياً بعد تنفيذ onClick - إضافة Provider للـ Context في dropdownContent لضمان توفر closeDropdown لجميع DropdownItem - الآن عند النقر على أي موظف في dropdown، يتم إغلاق dropdown تلقائياً
+components/customComponents/customDropdown.tsx

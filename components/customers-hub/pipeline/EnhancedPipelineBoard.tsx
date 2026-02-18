@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,22 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
   const [draggedCustomer, setDraggedCustomer] = useState<UnifiedCustomer | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState<string | null>(null);
+  // Cache all customers by stage - this is the source of truth for UI
+  const [cachedCustomersByStage, setCachedCustomersByStage] = useState<Map<string | number, UnifiedCustomer[]>>(new Map());
+  
+  // Initialize cache from props when stages data changes
+  useEffect(() => {
+    if (stages && stages.length > 0) {
+      const newCache = new Map<string | number, UnifiedCustomer[]>();
+      stages.forEach(stage => {
+        const stageId = stage.id || stage.stage_id;
+        if (stageId && stage.customers) {
+          newCache.set(stageId, [...stage.customers]);
+        }
+      });
+      setCachedCustomersByStage(newCache);
+    }
+  }, [stages]);
 
   const handleDragStart = (e: React.DragEvent, customer: UnifiedCustomer) => {
     setDraggedCustomer(customer);
@@ -70,33 +86,83 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
     }
   };
 
-  const handleDrop = async (e: React.DragEvent, stageId: string | number) => {
+  const handleDrop = (e: React.DragEvent, stageId: string | number) => {
     e.preventDefault();
     
     if (draggedCustomer && draggedCustomer.stage !== stageId) {
-      try {
-        // Convert stageId to integer (API expects integer)
-        const newStageId = typeof stageId === "number" 
-          ? stageId 
-          : parseInt(stageId.toString());
+      const customerId = draggedCustomer.id.toString();
+      const oldStageId = draggedCustomer.stage;
+      const newStageId = stageId;
+      
+      // UPDATE CACHE IMMEDIATELY - This is the source of truth for UI
+      setCachedCustomersByStage(prev => {
+        const newCache = new Map(prev);
         
-        // Use API handler only - NO FALLBACK
-        if (props?.onMoveCustomer) {
-          await props.onMoveCustomer({
-            requestId: typeof draggedCustomer.id === "number" 
-              ? draggedCustomer.id 
-              : parseInt(draggedCustomer.id.toString()),
-            newStageId: newStageId,  // integer stage_id
-          });
-        } else {
-          console.warn("onMoveCustomer handler not provided - cannot move customer");
+        // Remove customer from old stage
+        const oldStageCustomers = newCache.get(oldStageId) || [];
+        const updatedOldStage = oldStageCustomers.filter(c => c.id.toString() !== customerId);
+        newCache.set(oldStageId, updatedOldStage);
+        
+        // Add customer to new stage
+        const newStageCustomers = newCache.get(newStageId) || [];
+        const updatedCustomer = { ...draggedCustomer, stage: newStageId };
+        // Check if customer already exists (shouldn't, but safety)
+        if (!newStageCustomers.find(c => c.id.toString() === customerId)) {
+          newCache.set(newStageId, [...newStageCustomers, updatedCustomer]);
         }
         
-        // Show success animation
-        setShowSuccessAnimation(stageId.toString());
-        setTimeout(() => setShowSuccessAnimation(null), 2000);
-      } catch (err) {
-        console.error("Error moving customer:", err);
+        return newCache;
+      });
+      
+      // Show success animation immediately
+      setShowSuccessAnimation(newStageId.toString());
+      setTimeout(() => setShowSuccessAnimation(null), 2000);
+      
+      // Call API in background (don't await) - only for sync with backend
+      if (props?.onMoveCustomer) {
+        const customerSource = (draggedCustomer as any).source;
+        const requestId = (draggedCustomer as any).requestId;
+        const inquiryId = (draggedCustomer as any).inquiryId;
+        
+        const moveParams: MoveCustomerParams = {
+          newStageId: newStageId,
+        };
+        
+        if (customerSource === "inquiry" && inquiryId !== undefined && inquiryId !== null) {
+          moveParams.inquiryId = typeof inquiryId === "number" 
+            ? inquiryId 
+            : parseInt(inquiryId.toString());
+        } else if (requestId !== undefined && requestId !== null) {
+          moveParams.requestId = typeof requestId === "number" 
+            ? requestId 
+            : parseInt(requestId.toString());
+        } else {
+          moveParams.requestId = typeof draggedCustomer.id === "number" 
+            ? draggedCustomer.id 
+            : parseInt(draggedCustomer.id.toString());
+        }
+        
+        // Call API in background - if it fails, rollback cache
+        props.onMoveCustomer(moveParams).catch((err) => {
+          console.error("Error moving customer:", err);
+          // Rollback cache on error
+          setCachedCustomersByStage(prev => {
+            const newCache = new Map(prev);
+            
+            // Remove from new stage
+            const newStageCustomers = newCache.get(newStageId) || [];
+            const updatedNewStage = newStageCustomers.filter(c => c.id.toString() !== customerId);
+            newCache.set(newStageId, updatedNewStage);
+            
+            // Add back to old stage
+            const oldStageCustomers = newCache.get(oldStageId) || [];
+            if (!oldStageCustomers.find(c => c.id.toString() === customerId)) {
+              newCache.set(oldStageId, [...oldStageCustomers, { ...draggedCustomer, stage: oldStageId }]);
+            }
+            
+            return newCache;
+          });
+        });
       }
     }
     
@@ -116,34 +182,42 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
     return displayStage?.customers || [];
   };
   
-  // Get stages to display - use API stages (from stages API) as the source of truth for boards
-  // Then merge with pipeline stages data (which contains customers)
-  // NO FALLBACK - Only use data from API
-  const displayStages = apiStages && apiStages.length > 0
-    ? apiStages
-        .filter(stage => stage.is_active) // Only show active stages
-        .sort((a, b) => a.order - b.order) // Sort by order
-        .map(apiStage => {
-          // Find matching pipeline stage (if exists) to get customer data
-          const pipelineStage = stages?.find(ps => 
-            ps.id === apiStage.id || 
-            ps.stage_id === apiStage.id ||
-            ps.id?.toString() === apiStage.id.toString()
+  // Get stages to display - use CACHED customers as source of truth (not backend response)
+  const displayStages = useMemo(() => {
+    if (!apiStages || apiStages.length === 0) return [];
+    
+    return apiStages
+      .filter(stage => stage.is_active)
+      .sort((a, b) => a.order - b.order)
+      .map(apiStage => {
+        const stageId = apiStage.id;
+        
+        // Get customers from CACHE (local state) - this is the source of truth
+        // If cache is empty, fallback to props (initial load)
+        let customers = cachedCustomersByStage.get(stageId) || [];
+        
+        // If cache is empty for this stage, try to get from props (initial load only)
+        if (customers.length === 0 && stages) {
+          const pipelineStage = stages.find(ps => 
+            ps.id === stageId || 
+            ps.stage_id === stageId ||
+            ps.id?.toString() === stageId.toString()
           );
-          
-          return {
-            id: apiStage.id,  // Use API stage id (number)
-            idString: apiStage.id.toString(),
-            nameAr: apiStage.stage_name_ar,
-            nameEn: apiStage.stage_name_en,
-            color: apiStage.color,
-            order: apiStage.order,
-            // Include customer data from pipeline stage if available
-            customers: pipelineStage?.customers || [],
-            customerCount: pipelineStage?.count || pipelineStage?.customerCount || 0,
-          };
-        })
-    : [];
+          customers = pipelineStage?.customers || [];
+        }
+        
+        return {
+          id: apiStage.id,
+          idString: apiStage.id.toString(),
+          nameAr: apiStage.stage_name_ar,
+          nameEn: apiStage.stage_name_en,
+          color: apiStage.color,
+          order: apiStage.order,
+          customers: customers,
+          customerCount: customers.length,
+        };
+      });
+  }, [apiStages, cachedCustomersByStage, stages]);
 
   const getInitials = (name: string) => {
     return name
@@ -240,14 +314,22 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
                         لا يوجد عملاء في هذه المرحلة
                       </div>
                     ) : (
-                      stageCustomers.map((customer) => (
-                        <Card
-                          key={customer.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, customer)}
-                          onDragEnd={handleDragEnd}
-                          className="cursor-move hover:shadow-md transition-all duration-200 active:scale-95"
-                        >
+                      stageCustomers.map((customer, index) => {
+                        // Generate extremely unique key combining multiple random elements
+                        const random1 = Math.random().toString(36).substring(2, 15);
+                        const random2 = Math.random().toString(36).substring(2, 15);
+                        const random3 = crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                        const timestamp = performance.now().toString(36);
+                        const uniqueKey = `${stage.id}-${customer.id}-${index}-${random1}-${random2}-${random3}-${timestamp}`;
+                        
+                        return (
+                          <Card
+                            key={uniqueKey}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, customer)}
+                            onDragEnd={handleDragEnd}
+                            className="cursor-move hover:shadow-md transition-all duration-200 active:scale-95"
+                          >
                           <CardContent className="p-3">
                             <div className="space-y-3">
                               {/* Header */}
@@ -329,7 +411,8 @@ export function EnhancedPipelineBoard(props?: EnhancedPipelineBoardProps) {
                             </div>
                           </CardContent>
                         </Card>
-                      ))
+                        );
+                      })
                     )}
                   </CardContent>
                 </Card>

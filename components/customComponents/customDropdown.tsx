@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils"; // تأكد أن لديك دالة cn أو استخدم classNames العادية
+
+// Context لإغلاق dropdown
+const DropdownContext = createContext<{ closeDropdown: () => void } | null>(null);
 
 // --- المكونات الفرعية ---
 
@@ -17,9 +20,21 @@ export const DropdownItem = ({
   onClick?: () => void;
   className?: string;
 }) => {
+  const context = useContext(DropdownContext);
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+    // إغلاق dropdown بعد تنفيذ onClick
+    if (context?.closeDropdown) {
+      context.closeDropdown();
+    }
+  };
+  
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
       className={cn(
         "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors flex items-center gap-2",
         className
@@ -166,17 +181,19 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor 
   }, [isOpen]);
 
   const dropdownContent = isOpen && mounted ? (
-    <div
-      ref={dropdownRef}
-      className="fixed z-[10001] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-      style={{
-        top: `${position.top}px`,
-        right: `${position.right}px`,
-      }}
-      dir="rtl"
-    >
-      <div className="py-1">{children}</div>
-    </div>
+    <DropdownContext.Provider value={{ closeDropdown: () => setIsOpen(false) }}>
+      <div
+        ref={dropdownRef}
+        className="fixed z-[10001] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        style={{
+          top: `${position.top}px`,
+          right: `${position.right}px`,
+        }}
+        dir="rtl"
+      >
+        <div className="py-1">{children}</div>
+      </div>
+    </DropdownContext.Provider>
   ) : null;
 
   return (

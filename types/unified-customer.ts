@@ -551,6 +551,11 @@ export interface UnifiedCustomer {
   responseRate?: number;  // 0-100
   avgResponseTime?: number;  // in hours
   
+  // Pipeline-specific fields (for customers-hub pipeline)
+  // These fields are set by the pipeline API to distinguish between requests and inquiries
+  requestId?: number | null;  // Property request ID (set when this is a property request)
+  inquiryId?: number | null;  // Inquiry ID (api_customer_inquiry.id) (set when this is an inquiry)
+  
   // KSA-Specific Compliance & Workflows
   ksaCompliance?: KSACompliance;
 }

@@ -61,22 +61,42 @@ export function ClassicPipelineBoard(props?: ClassicPipelineBoardProps) {
   };
 
   const handleMoveCustomer = async (
-    customerId: string | number,
-    newStageId: number
+    customer: UnifiedCustomer,
+    newStageId: string | number
   ) => {
     if (!props?.onMoveCustomer) return;
 
-    setMovingCustomer(customerId.toString());
+    setMovingCustomer(customer.id.toString());
     try {
-      const requestId =
-        typeof customerId === "number"
-          ? customerId
-          : parseInt(customerId.toString());
-
-      await props.onMoveCustomer({
-        requestId,
-        newStageId,
-      });
+      // Determine if this is a request or inquiry based on source field
+      // API response includes source, requestId, and inquiryId fields
+      const customerSource = (customer as any).source;
+      const requestId = (customer as any).requestId;
+      const inquiryId = (customer as any).inquiryId;
+      
+      // Prepare move params based on source
+      const moveParams: MoveCustomerParams = {
+        newStageId: newStageId,
+      };
+      
+      if (customerSource === "inquiry" && inquiryId !== undefined && inquiryId !== null) {
+        // This is an inquiry - use inquiryId
+        moveParams.inquiryId = typeof inquiryId === "number" 
+          ? inquiryId 
+          : parseInt(inquiryId.toString());
+      } else if (requestId !== undefined && requestId !== null) {
+        // This is a request - use requestId
+        moveParams.requestId = typeof requestId === "number" 
+          ? requestId 
+          : parseInt(requestId.toString());
+      } else {
+        // Fallback: use customer id as requestId (backward compatibility)
+        moveParams.requestId = typeof customer.id === "number" 
+          ? customer.id 
+          : parseInt(customer.id.toString());
+      }
+      
+      await props.onMoveCustomer(moveParams);
     } catch (err) {
       console.error("Error moving customer:", err);
     } finally {
@@ -445,9 +465,13 @@ export function ClassicPipelineBoard(props?: ClassicPipelineBoardProps) {
                                     <Select
                                       value=""
                                       onValueChange={(newStageId) => {
+                                        // newStageId can be string or number - API accepts both
+                                        const stageId = newStageId.includes("_") || isNaN(parseInt(newStageId))
+                                          ? newStageId  // String stage_id (e.g. "qualified")
+                                          : parseInt(newStageId);  // Integer id
                                         handleMoveCustomer(
-                                          customer.id,
-                                          parseInt(newStageId)
+                                          customer,
+                                          stageId
                                         );
                                       }}
                                       disabled={isMoving}

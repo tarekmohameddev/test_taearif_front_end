@@ -26,15 +26,25 @@ export interface PipelineBoardParams {
   filters?: PipelineFilters;
 }
 
+// Pipeline Customer extends UnifiedCustomer with pipeline-specific fields
+// Each card in pipeline is either a request or an inquiry
+// Note: source is overridden to be "request" | "inquiry" (pipeline-specific) instead of CustomerSource
+export type PipelineCustomer = Omit<UnifiedCustomer, 'source'> & {
+  // Pipeline-specific fields from API response
+  source: "request" | "inquiry";  // Indicates if this is a property request or inquiry (overrides UnifiedCustomer.source)
+  requestId?: number | null;       // Property request ID (set when source === "request")
+  inquiryId?: number | null;       // Inquiry ID (api_customer_inquiry.id) (set when source === "inquiry")
+}
+
 export interface PipelineStage {
-  id: number;                    // Stage ID (property_request_statuses.id) - integer
-  stage_id: number;              // Same as id (integer)
-  name: string;                  // Stage name (Arabic)
-  nameEn?: string;               // English stage name
+  id: number | null;                    // Stage ID (customers_hub_stages.id) - integer or null for Unassigned
+  stage_id: string | number | null;     // String identifier (e.g. "new_lead", "qualified") or integer (customers_hub_stages.id) or null
+  name: string;                          // Stage name (Arabic)
+  nameEn?: string;                       // English stage name
   color: string;
   order: number;
-  count: number;                 // Number of requests in this stage
-  customers: UnifiedCustomer[];  // Request cards (property requests)
+  count: number;                         // Number of requests + inquiries in this stage
+  customers: PipelineCustomer[];        // Mix of request cards and inquiry cards
 }
 
 export interface PipelineAnalytics {
@@ -75,9 +85,10 @@ export interface FilterOptionsResponse {
 }
 
 export interface MoveCustomerParams {
-  requestId?: number;             // Property request ID (integer) - preferred
-  customerId?: number;            // Deprecated: same as request id. Use only for backward compatibility when requestId is omitted.
-  newStageId: number;             // Target stage ID (property_request_statuses.id) - integer, must be active
+  requestId?: number;             // Property request ID (integer) - required when not using inquiryId
+  customerId?: number;            // Backward compatibility: treated as request id when requestId is omitted
+  inquiryId?: number;             // Inquiry ID (api_customer_inquiry.id) - required when not using requestId/customerId
+  newStageId: string | number;    // Target stage: string (e.g. "qualified") or integer (customers_hub_stages.id). Must be active
   notes?: string;                 // Optional notes (max 500)
 }
 
@@ -87,16 +98,20 @@ export interface MoveCustomerResponse {
   message: string;
   data: {
     message: string;
-    requestId: number;            // The property request that was moved
-    customerId: number | null;    // The linked customer id (api_customers.id) for reference; may be null if no customer record exists
-    customerName: string;         // Request contact name (full_name)
+    source: "request" | "inquiry";  // Indicates what was moved
+    requestId: number | null;        // Set when source === "request"
+    inquiryId: number | null;        // Set when source === "inquiry"
+    customerId: number | null;       // The linked customer id (api_customers.id) for reference; may be null if no customer record exists
+    customerName: string;            // Request/inquiry contact name (full_name)
     previousStage: {
-      id: number;                 // stage_id (integer)
+      id: number;                    // Numeric id (customers_hub_stages.id)
+      stage_id: string;              // String identifier (e.g. "new_lead")
       nameAr: string;
       nameEn: string;
     };
     newStage: {
-      id: number;                 // stage_id (integer)
+      id: number;                    // Numeric id (customers_hub_stages.id)
+      stage_id: string;              // String identifier (e.g. "qualified")
       nameAr: string;
       nameEn: string;
     };
@@ -105,15 +120,15 @@ export interface MoveCustomerResponse {
       id: number;
       name: string;
     };
-    notes?: string;
+    notes?: string | null;
   };
   timestamp: string;
 }
 
 export interface BulkMoveParams {
   requestIds?: number[];         // Property request IDs (array of integers) - preferred
-  customerIds?: number[];         // Deprecated: same as request IDs. Use only for backward compatibility when requestIds is omitted.
-  newStageId: number;             // Target stage ID (property_request_statuses.id) - integer, must be active
+  customerIds?: number[];        // Backward compatibility: same as request IDs. Use only for backward compatibility when requestIds is omitted.
+  newStageId: string | number;   // Target stage: string (e.g. "qualified") or integer (customers_hub_stages.id). Must be active
 }
 
 export interface BulkMoveResponse {
