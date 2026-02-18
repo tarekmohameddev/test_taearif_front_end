@@ -129,9 +129,11 @@ interface DropdownProps {
   children: React.ReactNode;
   triggerClassName?: string;
   iconColor?: string;
+  dropdownWidth?: string;
+  maxHeight?: string;
 }
 
-export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor }: DropdownProps) => {
+export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -169,13 +171,25 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor 
     
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      // إغلاق عند التمرير
-      const handleScroll = () => setIsOpen(false);
-      window.addEventListener("scroll", handleScroll, true);
+      // إغلاق عند التمرير في الصفحة فقط (وليس داخل الـ dropdown)
+      const handleScroll = (event: Event) => {
+        // التحقق من أن الـ scroll ليس داخل الـ dropdown نفسه
+        const target = event.target as Node;
+        if (
+          dropdownRef.current &&
+          target &&
+          !dropdownRef.current.contains(target) &&
+          !buttonRef.current?.contains(target)
+        ) {
+          setIsOpen(false);
+        }
+      };
+      // استخدام capture phase للتقاط scroll events
+      document.addEventListener("scroll", handleScroll, true);
       
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
-        window.removeEventListener("scroll", handleScroll, true);
+        document.removeEventListener("scroll", handleScroll, true);
       };
     }
   }, [isOpen]);
@@ -184,10 +198,14 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor 
     <DropdownContext.Provider value={{ closeDropdown: () => setIsOpen(false) }}>
       <div
         ref={dropdownRef}
-        className="fixed z-[10001] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        className={cn(
+          "fixed z-[10001] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-auto",
+          dropdownWidth
+        )}
         style={{
           top: `${position.top}px`,
           right: `${position.right}px`,
+          maxHeight: maxHeight || undefined,
         }}
         dir="rtl"
       >

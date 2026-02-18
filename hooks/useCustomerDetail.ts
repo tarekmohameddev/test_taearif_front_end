@@ -13,6 +13,11 @@ import {
   type UpdateTaskParams,
   type UpdatePreferencesParams,
 } from "@/lib/services/customers-hub-detail-api";
+import {
+  assignPropertyToCustomer,
+  getCustomerAssignedProperties,
+  type AssignPropertyParams,
+} from "@/lib/services/customer-assigned-properties-api";
 import type { UnifiedCustomer } from "@/types/unified-customer";
 
 export function useCustomerDetail(customerId: string) {
@@ -215,6 +220,46 @@ export function useCustomerDetail(customerId: string) {
     [userData?.token, authLoading, customerId, fetchCustomerDetail]
   );
 
+  // Assign property to customer
+  const assignProperty = useCallback(
+    async (params: AssignPropertyParams) => {
+      if (authLoading || !userData?.token || !customerId) {
+        return false;
+      }
+
+      try {
+        const response = await assignPropertyToCustomer(customerId, params);
+        if (response.status === "success") {
+          // Refresh customer detail with properties
+          await fetchCustomerDetail(true, true, true);
+          return true;
+        }
+        return false;
+      } catch (err: any) {
+        console.error("Error assigning property:", err);
+        throw err;
+      }
+    },
+    [userData?.token, authLoading, customerId, fetchCustomerDetail]
+  );
+
+  // Refetch properties only
+  const refetchProperties = useCallback(
+    async () => {
+      if (authLoading || !userData?.token || !customerId) {
+        return;
+      }
+
+      try {
+        // Refresh customer detail with properties included
+        await fetchCustomerDetail(true, true, true);
+      } catch (err: any) {
+        console.error("Error refetching properties:", err);
+      }
+    },
+    [userData?.token, authLoading, customerId, fetchCustomerDetail]
+  );
+
   // Initial fetch
   useEffect(() => {
     if (authLoading || !userData?.token || !customerId) {
@@ -247,5 +292,7 @@ export function useCustomerDetail(customerId: string) {
     deleteTask,
     updatePreferences,
     fetchHistory,
+    assignProperty,
+    refetchProperties,
   };
 }

@@ -1,0 +1,4 @@
+2026-02-18 08:33:00
+Update Type: Feature
+إضافة زر "إضافة عقار" في صفحة تفاصيل العميل مع Dialog لاختيار العقار من /properties API
+lib/services/customer-assigned-properties-api.ts, components/customers-hub/dialogs/AddPropertyToCustomerDialog.tsx, components/customers-hub/detail/CustomerDetailPageSimple.tsx, hooks/useCustomerDetail.ts, components/customers-hub/dialogs/index.ts
