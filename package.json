@@ -12,12 +12,6 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "check:cloudflare": "node scripts/check-cloudflare-status.js",
-    "add-indexes": "node scripts/add-tenant-indexes.js",
-    "antigravity:server": "tsx scripts/antigravity-ingest-server.ts",
-    "antigravity:inject": "jscodeshift -t scripts/antigravity-codemod.js",
-    "antigravity:cleanup": "node scripts/antigravity-cleanup.js",
-    "antigravity:auto": "node scripts/antigravity-automation.js"
   },
   "dependencies": {
     "@auth/core": "0.34.2",
