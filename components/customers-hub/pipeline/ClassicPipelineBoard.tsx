@@ -315,12 +315,21 @@ export function ClassicPipelineBoard(props?: ClassicPipelineBoardProps) {
                         </div>
                       ) : (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                          {stageCustomers.map((customer) => {
+                          {stageCustomers.map((customer, customerIndex) => {
                             const isMoving = movingCustomer === customer.id.toString();
+                            
+                            // Generate extremely unique key
+                            const random1 = Math.random().toString(36).substring(2, 15);
+                            const random2 = Math.random().toString(36).substring(2, 15);
+                            const random3 = typeof crypto !== 'undefined' && crypto.randomUUID 
+                              ? crypto.randomUUID() 
+                              : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                            const timestamp = performance.now().toString(36);
+                            const uniqueKey = `${stage.id}-${customer.id}-${customerIndex}-${(customer as any).requestId || ''}-${(customer as any).inquiryId || ''}-${random1}-${random2}-${random3}-${timestamp}`;
                             
                             return (
                               <Card
-                                key={customer.id}
+                                key={uniqueKey}
                                 className="group hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 hover:-translate-y-2 border-l-2 bg-white dark:bg-gray-800"
                                 style={{
                                   borderLeftColor: stage.color,

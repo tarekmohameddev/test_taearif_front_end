@@ -756,8 +756,8 @@ export function IncomingActionsCard({
         setShowAssignEmployeeDialog(false);
         setSelectedEmployeeId(null);
         
-        // Call onComplete to refresh the list
-        onComplete?.(action.id);
+        // Note: We don't call onComplete here because assigning an employee
+        // should NOT complete the action. The action data is already updated locally.
       } else {
         throw new Error(response.message || "فشل تعيين الموظف");
       }
