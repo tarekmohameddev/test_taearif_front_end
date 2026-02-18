@@ -840,7 +840,8 @@ export function IncomingActionsCard({
       setIsSubmittingApt(false);
       setShowScheduleForm(false);
       resetScheduleForm();
-      onComplete?.(action.id);
+      // Note: We don't call onComplete here because scheduling an appointment
+      // should NOT complete the action. The appointment is just scheduled.
     } catch (err: any) {
       console.error("Error scheduling appointment:", err);
       toast.error(err.message || "حدث خطأ أثناء جدولة الموعد");
