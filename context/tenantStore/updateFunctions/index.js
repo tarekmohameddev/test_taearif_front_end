@@ -8,13 +8,13 @@ import { createGridUpdateFunctions } from "./grid";
 import { createFilterButtonsUpdateFunctions } from "./filterButtons";
 import { createPropertyFilterUpdateFunctions } from "./propertyFilter";
 
-export const createUpdateFunctions = (set) => ({
-  ...createHeaderUpdateFunctions(set),
-  ...createHeroUpdateFunctions(set),
-  ...createFooterUpdateFunctions(set),
-  ...createHalfTextHalfImageUpdateFunctions(set),
-  ...createCtaValuationUpdateFunctions(set),
-  ...createGridUpdateFunctions(set),
-  ...createFilterButtonsUpdateFunctions(set),
-  ...createPropertyFilterUpdateFunctions(set),
+export const createUpdateFunctions = (set, get) => ({
+  ...createHeaderUpdateFunctions(set, get),
+  ...createHeroUpdateFunctions(set, get),
+  ...createFooterUpdateFunctions(set, get),
+  ...createHalfTextHalfImageUpdateFunctions(set, get),
+  ...createCtaValuationUpdateFunctions(set, get),
+  ...createGridUpdateFunctions(set, get),
+  ...createFilterButtonsUpdateFunctions(set, get),
+  ...createPropertyFilterUpdateFunctions(set, get),
 });

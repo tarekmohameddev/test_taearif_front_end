@@ -16,6 +16,8 @@ import { createThemeActions } from "./actions/themeActions";
 import { createPageActions } from "./actions/pageActions";
 import { createComponentActions } from "./actions/componentActions";
 import { createDatabaseActions } from "./actions/databaseActions";
+import { isDebugEnabled } from "@/lib/debug/live-editor/core/config";
+import { storeTracker } from "@/lib/debug/live-editor/trackers/storeTracker";
 
 export const useEditorStore = create<EditorStore>((set, get) => {
   const initialState = getInitialState();

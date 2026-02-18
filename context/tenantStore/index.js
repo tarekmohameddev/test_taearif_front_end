@@ -16,7 +16,7 @@ import { createSavePropertyFilterChanges } from "./saveFunctions/propertyFilter"
 const useTenantStore = create((set, get) => ({
   ...initialState,
   ...createStoreActions(set, get),
-  ...createUpdateFunctions(set),
+  ...createUpdateFunctions(set, get),
   ...createFetchFunctions(set, get),
   ...createSaveHeaderChanges(set),
   ...createSaveHeroChanges(set),

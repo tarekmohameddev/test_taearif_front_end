@@ -10,6 +10,7 @@ import {
   getAllChangeLogs,
   clearChangeLogs,
 } from "@/lib/debugLogger";
+import { useDebugPanel } from "@/lib/debug/live-editor/hooks/useDebugPanel";
 
 interface DebugControlsProps {
   onClose?: () => void;
@@ -20,6 +21,15 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
   const [logs, setLogs] = useState<any[]>([]);
   const [showChangeLogs, setShowChangeLogs] = useState(false);
   const [changeLogs, setChangeLogs] = useState<any[]>([]);
+
+  // AI Debug Panel hook
+  const {
+    isEnabled,
+    enableDebug,
+    disableDebug,
+    clearDebugData,
+    exportDebugData,
+  } = useDebugPanel();
 
   const handleClearLog = () => {
     clearDebugLog();
@@ -62,6 +72,33 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
     alert("Changes debug info saved to file!");
   };
 
+  const handleToggleDebug = async () => {
+    if (isEnabled) {
+      disableDebug();
+      alert("AI Debug disabled!");
+    } else {
+      await enableDebug();
+      alert("AI Debug enabled! All previous data cleared.");
+    }
+  };
+
+  const handleClearAllData = async () => {
+    if (confirm("Are you sure you want to clear all debug data?")) {
+      await clearDebugData();
+      alert("All debug data cleared!");
+    }
+  };
+
+  const handleExportForAI = async () => {
+    try {
+      const filePath = await exportDebugData();
+      alert(`Debug data exported for AI!\nFile: ${filePath}`);
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Failed to export debug data");
+    }
+  };
+
   if (process.env.NODE_ENV !== "development") {
     return null;
   }
@@ -81,6 +118,38 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
           )}
         </div>
         <div className="space-y-2">
+          {/* AI Debug Controls */}
+          <div className="border-t pt-2 mt-2">
+            <p className="text-xs font-semibold mb-2 text-purple-600">AI Debug System</p>
+            <button
+              onClick={handleToggleDebug}
+              className={`w-full px-3 py-1 text-xs rounded mb-2 ${
+                isEnabled
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-green-500 text-white hover:bg-green-600"
+              }`}
+            >
+              {isEnabled ? "Disable AI Debug" : "Enable AI Debug"}
+            </button>
+            <button
+              onClick={handleClearAllData}
+              className="w-full px-3 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 mb-2"
+              disabled={!isEnabled}
+            >
+              Clear All Data
+            </button>
+            <button
+              onClick={handleExportForAI}
+              className="w-full px-3 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600"
+              disabled={!isEnabled}
+            >
+              Export for AI
+            </button>
+          </div>
+
+          {/* Legacy Debug Controls */}
+          <div className="border-t pt-2 mt-2">
+            <p className="text-xs font-semibold mb-2 text-gray-600">Legacy Debug</p>
           <button
             onClick={handleShowChangeLogs}
             className="w-full px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
@@ -99,6 +168,7 @@ export const DebugControls: React.FC<DebugControlsProps> = ({ onClose }) => {
           >
             Clear Changes
           </button>
+          </div>
         </div>
       </div>
 

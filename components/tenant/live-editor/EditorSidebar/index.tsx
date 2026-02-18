@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { ComponentData, ComponentInstance } from "@/lib/types";
 import { useEditorStore } from "@/context/editorStore";
 import { EditorSidebarProps } from "./types";
 import { BrandingSettings } from "./components/BrandingSettings";
+import { useEventDebug } from "@/lib/debug/live-editor/hooks/useEventDebug";
 
 // Hooks
 import { useEditorSidebarResize } from "./hooks/useEditorSidebarResize";
@@ -80,6 +81,42 @@ export function EditorSidebar({
   });
 
   const { handleInputChange } = useInputHandlers();
+
+  // Debug tracking
+  const { emitEvent } = useEventDebug();
+
+  // Emit EDITOR_SIDEBAR_OPENED event
+  useEffect(() => {
+    if (isOpen && selectedComponent) {
+      emitEvent("EDITOR_SIDEBAR_OPENED", {
+        context: {
+          component: {
+            id: selectedComponent.id,
+            type: selectedComponent.type,
+            variant: selectedComponent.componentName,
+            name: selectedComponent.name || selectedComponent.componentName,
+          },
+          location: {
+            file: "EditorSidebar/index.tsx",
+            function: "EditorSidebar",
+            line: 0,
+          },
+          user: {
+            action: "open_sidebar",
+            page: useEditorStore.getState().currentPage || "homepage",
+          },
+          sidebar: {
+            view: view,
+            initialData: tempData,
+          },
+        },
+        details: {
+          action: "editor_sidebar_opened",
+          source: "EditorSidebar",
+        },
+      });
+    }
+  }, [isOpen, selectedComponent, view, tempData]);
 
   const { handleSave } = useSaveHandler({
     view,
