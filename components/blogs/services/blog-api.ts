@@ -11,7 +11,7 @@
  * - GET /posts - قائمة المقالات
  * - GET /posts/{id} - تفاصيل مقال
  * - POST /posts - إنشاء مقال
- * - PUT /posts/{id} - تحديث مقال
+ * - PUT /posts/{slug} - تحديث مقال
  * - DELETE /posts/{id} - حذف مقال
  * 
  * @related
@@ -110,16 +110,16 @@ export async function createBlog(
 
 /**
  * Update existing post
- * @param id - Post ID
+ * @param slug - Post slug
  * @param data - Updated post data (partial)
  * @returns Promise with updated post
  */
 export async function updateBlog(
-  id: number,
+  slug: string,
   data: Partial<BlogFormData>
 ): Promise<BlogCreateResponse> {
-  // PUT /posts/{id}
-  const response = await axiosInstance.put(`/posts/${id}`, data);
+  // PUT /posts/{slug}
+  const response = await axiosInstance.put(`/posts/${slug}`, data);
   return response.data;
 }
 

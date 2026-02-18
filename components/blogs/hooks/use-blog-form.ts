@@ -4,7 +4,7 @@
  * @description Hook لإدارة حالة النموذج (form state, validation, submit)
  * 
  * @dependencies
- * - Uses: services/blog-api.ts (createBlog, updateBlog, getBlogById)
+ * - Uses: services/blog-api.ts (createBlog, updateBlog, getBlogById, getBlogBySlug)
  * - Uses: utils/blog-validators.ts (validateBlogForm)
  * - Uses: utils/blog-formatters.ts (generateSlug, formatExcerpt)
  * - Used by: components/blogs/blog-form.tsx
@@ -173,18 +173,11 @@ export function useBlogForm(mode: "create" | "edit", blogId?: number | string) {
         router.push(`/dashboard/blogs/${response.data.slug}`);
       } else if (mode === "edit" && blogId) {
         toast.loading("جاري تحديث المقال...", { id: "update-blog" });
-        // Get blog ID - if blogId is slug, we need to fetch the blog first to get the ID
-        let actualBlogId: number;
-        if (typeof blogId === "string" && isNaN(Number(blogId))) {
-          // blogId is a slug, fetch blog to get ID
-          const blogResponse = await blogApi.getBlogBySlug(blogId);
-          actualBlogId = blogResponse.data.id;
-        } else {
-          actualBlogId = Number(blogId);
-        }
+        // Use slug directly for update
+        const slug = typeof blogId === "string" ? blogId : String(blogId);
         
-        // PUT /posts/{id} - تحديث مقال
-        const response = await blogApi.updateBlog(actualBlogId, finalFormData);
+        // PUT /posts/{slug} - تحديث مقال
+        const response = await blogApi.updateBlog(slug, finalFormData);
         toast.success("تم تحديث المقال بنجاح", { id: "update-blog" });
         router.push(`/dashboard/blogs/${response.data.slug}`);
       }
