@@ -16,7 +16,7 @@ The **list** endpoint returns a `stages` array. The hub is **lead-based**: stage
 |--------|----------------|-------------------|----------|
 | All | **Property request statuses** (pipeline) | `new`, `follow_up`, `property_found`, `contract_signed`, `cancelled` (or tenant slugs) | Pipeline bar: count and % per stage for **property requests** only |
 
-Counts are for **property requests** in each pipeline stage. Only property request actions have a stage; other action types (inquiry, reminder, request_appointment, request_reminder) have `stage_id` and `stage` null in the list. Use the returned `stages` to show a bar (or tabs) with **requestCount** and **percentage** per stage. Counts and percentages respect the same filters as the list (tab, priorities, cities, stages, etc.) and are computed over the **full** filtered set (not the current page).
+Counts are for **property requests** in each pipeline stage. **Property request** and **inquiry** actions have `stage_id` and `stage` when the backend has a pipeline stage set; other action types (reminder, request_appointment, request_reminder) have `stage_id` and `stage` null in the list. Use the returned `stages` to show a bar (or tabs) with **requestCount** and **percentage** per stage. Counts and percentages respect the same filters as the list (tab, priorities, cities, stages, etc.) and are computed over the **full** filtered set (not the current page).
 
 ---
 

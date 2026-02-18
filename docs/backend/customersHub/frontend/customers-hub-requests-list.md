@@ -33,7 +33,7 @@ Send all parameters at the **root** of the JSON body. Do **not** wrap them in `f
 | `assignees` | number[] | No | Employee user IDs |
 | `stages` | number[] | No | Pipeline stage IDs (`property_request_statuses.id`). When set, only **property request** actions are returned; other action types are excluded. |
 | `customer_id` | number | No | Filter by one customer ID |
-| `due_date_bucket` | string | No | `overdue` \| `today` \| `week` \| `no_date`. Use **`due_date_bucket`**, not `dueDate`. |
+| `due_date_bucket` | string | No | `overdue` \| `today` \| `week` \| `no_date`. Use **`due_date_bucket`**, not `dueDate`. See **1.3.1** for how `today` works with requests and inquiries. |
 | `property_categories` | string[] | No | Unit type: e.g. `villa`, `apartment`, `building`. Matches both inquiries and property requests. |
 | `property_types` | string[] | No | Sector: `Residential` \| `Commercial` \| `Industrial` \| `Agricultural`. Only property requests have this; inquiries are excluded when this filter is used. |
 | `cities` | string[] | No | Filter by city (request-level). Inquiries: `city`; property requests: city name from `user_cities`. Requests with no city are excluded when this filter is sent. |
@@ -67,7 +67,33 @@ The backend accepts **either** the canonical names **or** these alternate names 
 | `budget_min` | `budgetMin` |
 | `budget_max` | `budgetMax` |
 
-### 1.3 Property filters: two distinct concepts
+### 1.3.1 Due date buckets (`due_date_bucket`)
+
+| Value | Meaning |
+|-------|--------|
+| `overdue` | Action has a due date in the past. |
+| **`today`** | **Inquiry** and **property_request**: included if they have **at least one appointment** (from `inquiry_appointments` or `property_request_appointments`) whose date is **today**. **Reminder**, **request_appointment**, **request_reminder**: included if the action’s own `dueDate` is today. |
+| `week` | Action has a due date from now through the next 7 days. |
+| `no_date` | Action has no due date. |
+
+Use `due_date_bucket: "today"` with `objectTypes: ["inquiry", "property_request"]` to get all requests and inquiries that have at least one appointment scheduled for today.
+
+**Example: requests and inquiries with an appointment today**
+
+```json
+{
+  "tab": "all",
+  "statuses": ["pending", "in_progress"],
+  "objectTypes": ["inquiry", "property_request"],
+  "due_date_bucket": "today",
+  "limit": 50,
+  "offset": 0,
+  "sort_by": "createdAt",
+  "sort_dir": "desc"
+}
+```
+
+### 1.3.2 Property filters: two distinct concepts
 
 - **`property_categories`** — Unit type (villa, apartment, building, etc.).  
   - Use for: “Show me requests about villas/apartments.”  

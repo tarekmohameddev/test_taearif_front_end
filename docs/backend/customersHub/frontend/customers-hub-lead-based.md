@@ -36,7 +36,8 @@ Examples:
 - Get single action: `GET /api/v2/customers-hub/requests/property_request_42`
 - Complete: `POST /api/v2/customers-hub/requests/property_request_42/complete`
 - Add note: `POST /api/v2/customers-hub/requests/inquiry_17/notes`
-- Create appointment (only for property requests): `POST /api/v2/customers-hub/requests/property_request_42/appointments`
+- Update stage: `PATCH /api/v2/customers-hub/requests/inquiry_17` (body: `status_id`)
+- Create appointment: `POST /api/v2/customers-hub/requests/property_request_42/appointments` or `.../requests/inquiry_17/appointments`
 
 ---
 
@@ -92,7 +93,7 @@ To move a **property request** to another pipeline stage via the requests API (w
 }
 ```
 
-- **`status_id`:** Integer, must exist in `property_request_statuses` and be active. Only applied when the action is a property request (`property_request_{id}`). This is the **pipeline stage** (e.g. "Follow up", "Contract signed").
+- **`status_id`:** Integer, must exist in `property_request_statuses` and be active. Applied when the action is a **property request** (`property_request_{id}`) or an **inquiry** (`inquiry_{id}`). This is the **pipeline stage** (e.g. "Follow up", "Contract signed").
 
 ---
 
@@ -136,12 +137,12 @@ To move a **property request** to another pipeline stage via the requests API (w
 
 ```json
 {
-  "requestIds": [10, 20, 30],
+  "requestIds": ["property_request_10", "inquiry_17", "property_request_20"],
   "employeeId": "5"
 }
 ```
 
-- **`requestIds`:** Array of **property request IDs** (integers). Optional if `customerIds` is provided.
+- **`requestIds`:** Array of **composite request IDs** (strings), e.g. `property_request_42`, `inquiry_17`, or numeric strings for backward compatibility. Optional if `customerIds` is provided.
 - **`customerIds`:** Optional; backward compatibility. When used, IDs are resolved (as request or customer) by the backend.
 - **Effect:** For each request, the backend resolves the linked customer and sets `responsible_employee_id` on that customer. So assignment is logically per-request but stored on the customer.
 
@@ -163,10 +164,10 @@ To move a **property request** to another pipeline stage via the requests API (w
 
 ## 8. Appointments and reminders (request-level)
 
-- **Create appointment:** `POST /api/v2/customers-hub/requests/{requestId}/appointments` — only when `{requestId}` is `property_request_{id}`. Body: `type`, `datetime`, `duration`, `notes`, `title`, `priority`, etc.
-- **Create reminder:** `POST /api/v2/customers-hub/requests/{requestId}/reminders` — only when `{requestId}` is `property_request_{id}`. Body: `title`, `description`, `datetime`, `priority`, `type`, `notes`.
+- **Create appointment:** `POST /api/v2/customers-hub/requests/{requestId}/appointments` — when `{requestId}` is `property_request_{id}` or `inquiry_{id}`. Body: `type`, `datetime`, `duration`, `notes`, `title`, `priority`, etc.
+- **Create reminder:** `POST /api/v2/customers-hub/requests/{requestId}/reminders` — when `{requestId}` is `property_request_{id}` or `inquiry_{id}`. Body: `title`, `description`, `datetime`, `priority`, `type`, `notes`.
 
-List and show responses attach `appointments` and `reminders` arrays to **property request** actions (from `property_request_appointments` and `property_request_reminders`). Actions that are themselves `request_appointment` or `request_reminder` do not have nested arrays; they are the appointment/reminder row.
+List and show responses attach `appointments` and `reminders` arrays to **property request** and **inquiry** actions (from `property_request_appointments` / `property_request_reminders` and `inquiry_appointments` / `inquiry_reminders` respectively). Actions that are themselves `request_appointment` or `request_reminder` do not have nested arrays; they are the appointment/reminder row.
 
 ---
 

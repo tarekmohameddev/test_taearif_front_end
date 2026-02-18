@@ -1,6 +1,6 @@
-# Property Request Appointments and Reminders (V2 Frontend)
+# Property Request and Inquiry Appointments and Reminders (V2 Frontend)
 
-**Audience:** Frontend (React) and AI agents. Use this document to create and display appointments and reminders linked to a **property request** in the Customers Hub.
+**Audience:** Frontend (React) and AI agents. Use this document to create and display appointments and reminders linked to a **property request** or an **inquiry** in the Customers Hub.
 
 **Base path:** `/api/v2/customers-hub/requests` (prefix with your API base URL).
 
@@ -8,11 +8,11 @@
 
 ---
 
-## 1. Create appointment for a property request
+## 1. Create appointment for a property request or inquiry
 
 **Endpoint:** `POST /api/v2/customers-hub/requests/{requestId}/appointments`
 
-`{requestId}` must be the **composite id** of a property request, e.g. `property_request_89` (not the numeric id alone).
+`{requestId}` must be the **composite id** of a property request (e.g. `property_request_89`) or an inquiry (e.g. `inquiry_17`), not the numeric id alone.
 
 ### 1.1 Request body
 
@@ -79,11 +79,11 @@ const json = await response.json();
 
 ---
 
-## 2. Create reminder for a property request
+## 2. Create reminder for a property request or inquiry
 
 **Endpoint:** `POST /api/v2/customers-hub/requests/{requestId}/reminders`
 
-`{requestId}` must be the composite id, e.g. `property_request_89`.
+`{requestId}` must be the composite id of a property request (e.g. `property_request_89`) or an inquiry (e.g. `inquiry_17`).
 
 ### 2.1 Request body
 
@@ -160,7 +160,7 @@ When you call:
 - **`POST /api/v2/customers-hub/requests/list`** — each item in `data.actions` has `appointments` and `reminders`.
 - **`GET /api/v2/customers-hub/requests/{requestId}`** — `data.action` has `appointments` and `reminders`.
 
-**Only for `objectType === 'property_request'`** are these arrays populated with data. For `inquiry`, `reminder`, `request_appointment`, and `request_reminder`, the action row is not a property request, so `appointments` and `reminders` are **empty arrays** `[]`. Note: actions with `objectType` `request_appointment` or `request_reminder` are the appointment/reminder row itself (they do not have nested `appointments`/`reminders` arrays).
+**For `objectType === 'property_request'`** the arrays are populated from `property_request_appointments` and `property_request_reminders`. **For `objectType === 'inquiry'`** they are populated from `inquiry_appointments` and `inquiry_reminders`. For `reminder`, `request_appointment`, and `request_reminder`, the action row is not a request/inquiry, so `appointments` and `reminders` are **empty arrays** `[]`. Note: actions with `objectType` `request_appointment` or `request_reminder` are the appointment/reminder row itself (they do not have nested `appointments`/`reminders` arrays).
 
 ### 3.1 Action object (extra fields)
 
@@ -168,8 +168,8 @@ For every action in the list or in the single-request response:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `appointments` | array | For **property_request** only: array of appointment objects (see below). Otherwise `[]`. |
-| `reminders` | array | For **property_request** only: array of reminder objects (see below). Otherwise `[]`. |
+| `appointments` | array | For **property_request** or **inquiry**: array of appointment objects (see below). Otherwise `[]`. |
+| `reminders` | array | For **property_request** or **inquiry**: array of reminder objects (see below). Otherwise `[]`. |
 
 ### 3.2 Appointment object (inside `appointments[]`)
 
@@ -288,5 +288,5 @@ Laravel validation (e.g. invalid `type`, missing required field) returns the usu
 
 - **Create appointment:** `POST .../requests/{requestId}/appointments` — body: `type`, `datetime` (future), optional `duration`, `title`, `notes`, `priority`.
 - **Create reminder:** `POST .../requests/{requestId}/reminders` — body: `title`, `datetime` (future), `priority`, `type`, optional `description`, `notes`.
-- **List / show:** Every action has `appointments` and `reminders`; only `objectType === 'property_request'` has non-empty arrays.
-- **requestId:** Always use the composite id (e.g. `property_request_89`) from `action.id`, not the numeric id alone.
+- **List / show:** Every action has `appointments` and `reminders`; non-empty for `objectType === 'property_request'` or `objectType === 'inquiry'`.
+- **requestId:** Always use the composite id (e.g. `property_request_89`, `inquiry_17`) from `action.id`, not the numeric id alone.
