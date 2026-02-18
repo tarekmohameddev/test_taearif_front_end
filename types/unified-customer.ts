@@ -237,6 +237,7 @@ export interface Note {
   id: number;
   note: string;
   addedBy: string | number; // Can be user ID (number) or display name (string)
+  addedByName?: string; // Name of the person who added the note
   createdAt: string; // ISO 8601 datetime
   updatedAt: string; // ISO 8601 datetime
 }

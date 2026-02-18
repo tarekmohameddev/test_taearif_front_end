@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,8 +47,21 @@ import { cn } from "@/lib/utils";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerAction, UnifiedCustomer, Appointment, PropertyInterest, Note } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
-import { addNoteToAction, createReminderForRequest } from "@/lib/services/customers-hub-requests-api";
+import { addNoteToAction, createReminderForRequest, assignAction as apiAssignAction } from "@/lib/services/customers-hub-requests-api";
 import useAuthStore from "@/context/AuthContext";
+import axiosInstance from "@/lib/axiosInstance";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
+import {
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
+import { Loader2 } from "lucide-react";
 
 interface RequestDetailPageProps {
   requestId: string;
@@ -214,6 +227,11 @@ export function RequestDetailPage({
   const [reminderPriority, setReminderPriority] = useState<"low" | "medium" | "high" | "urgent">("medium");
   const [reminderType, setReminderType] = useState<"follow_up" | "payment_due" | "document_required" | "other">("follow_up");
   const [reminderNotes, setReminderNotes] = useState("");
+  const [showAssignEmployeeDialog, setShowAssignEmployeeDialog] = useState(false);
+  const [employees, setEmployees] = useState<Array<{ id: number; name?: string; first_name?: string; last_name?: string; email?: string }>>([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [savingEmployee, setSavingEmployee] = useState(false);
 
   // Show loading state
   if (propLoading && !action) {
@@ -464,6 +482,83 @@ export function RequestDetailPage({
         err.message || err.response?.data?.message || "حدث خطأ أثناء إضافة التذكير",
         { id: toastId }
       );
+    }
+  };
+
+  // Fetch employees when opening assign dialog
+  useEffect(() => {
+    if (showAssignEmployeeDialog && userData?.token && employees.length === 0) {
+      const fetchEmployees = async () => {
+        setLoadingEmployees(true);
+        try {
+          const response = await axiosInstance.get("/v1/employees");
+          if (response.data && response.data.data) {
+            setEmployees(response.data.data);
+          }
+        } catch (error) {
+          console.error("Error fetching employees:", error);
+          toast.error("حدث خطأ أثناء تحميل الموظفين");
+        } finally {
+          setLoadingEmployees(false);
+        }
+      };
+      fetchEmployees();
+    }
+  }, [showAssignEmployeeDialog, userData?.token, employees.length]);
+
+  // Set current employee when dialog opens
+  useEffect(() => {
+    if (showAssignEmployeeDialog && action?.assignedTo) {
+      const assignedToId = typeof action.assignedTo === 'string' 
+        ? parseInt(action.assignedTo) 
+        : action.assignedTo;
+      if (!isNaN(assignedToId)) {
+        setSelectedEmployeeId(assignedToId);
+      }
+    } else if (showAssignEmployeeDialog && !action?.assignedTo) {
+      setSelectedEmployeeId(null);
+    }
+  }, [showAssignEmployeeDialog, action?.assignedTo]);
+
+  // Handle assign employee
+  const handleAssignEmployee = async () => {
+    if (!userData?.token) {
+      toast.error("يجب تسجيل الدخول أولاً");
+      return;
+    }
+
+    // Use assignAction API for both property_request and inquiry
+    if (!action?.id || (!action.objectType || (action.objectType !== 'property_request' && action.objectType !== 'inquiry'))) {
+      toast.error("لا يمكن تعيين الموظف: نوع الطلب غير مدعوم");
+      return;
+    }
+
+    if (selectedEmployeeId === null || selectedEmployeeId === undefined) {
+      toast.error("الرجاء اختيار موظف");
+      return;
+    }
+
+    setSavingEmployee(true);
+    try {
+      // Use the v2 API endpoint that works with composite id (property_request_89, inquiry_123)
+      await apiAssignAction(action.id, selectedEmployeeId);
+
+      toast.success("تم تعيين الموظف المسؤول بنجاح!");
+      
+      // Refresh page data
+      if (onRefetch) {
+        await onRefetch();
+      }
+
+      setShowAssignEmployeeDialog(false);
+      setSelectedEmployeeId(null);
+    } catch (error: any) {
+      console.error("Error assigning employee:", error);
+      toast.error(
+        error.response?.data?.message || error.message || "حدث خطأ أثناء تعيين الموظف المسؤول"
+      );
+    } finally {
+      setSavingEmployee(false);
     }
   };
 
@@ -1191,9 +1286,9 @@ export function RequestDetailPage({
                               minute: "2-digit",
                             })}
                           </p>
-                          {note.addedBy && (
+                          {note.addedByName && (
                             <p className="text-xs text-gray-500">
-                              أضيف بواسطة: {typeof note.addedBy === "number" ? `#${note.addedBy}` : note.addedBy}
+                              أضيف بواسطة: {note.addedByName}
                             </p>
                           )}
                         </div>
@@ -1327,6 +1422,15 @@ export function RequestDetailPage({
                   >
                     <Bell className="h-4 w-4" />
                     تأجيل
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => setShowAssignEmployeeDialog(true)}
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    تعيين موظف
                   </Button>
 
                   <Button
@@ -1573,6 +1677,147 @@ export function RequestDetailPage({
                       </div>
                     </div>
                   )}
+
+                  {/* Assign Employee Dialog */}
+                  <CustomDialog open={showAssignEmployeeDialog} onOpenChange={setShowAssignEmployeeDialog} maxWidth="max-w-md">
+                    <CustomDialogContent className="p-3">
+                      <CustomDialogHeader>
+                        <CustomDialogTitle className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                            <UserPlus className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
+                            <div className="text-sm text-muted-foreground font-normal">
+                              اختر الموظف المسؤول عن طلب العقار
+                            </div>
+                          </div>
+                        </CustomDialogTitle>
+                        <CustomDialogClose
+                          onClose={() => {
+                            setShowAssignEmployeeDialog(false);
+                            setSelectedEmployeeId(null);
+                          }}
+                        />
+                      </CustomDialogHeader>
+
+                      <div className="space-y-6">
+                        {/* معلومات طلب العقار */}
+                        <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                          <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                            <User className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <div className="font-medium">{action.customerName}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {action.objectType === 'property_request' && action.sourceId
+                                ? `طلب عقار رقم #${action.sourceId}`
+                                : action.title}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* اختيار الموظف */}
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">اختر الموظف:</Label>
+                          {loadingEmployees ? (
+                            <div className="flex items-center justify-center py-8">
+                              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                              <span className="mr-2 text-sm text-muted-foreground">
+                                جاري تحميل الموظفين...
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <CustomDropdown
+                                trigger={
+                                  <span className="flex items-center gap-2">
+                                    {selectedEmployeeId ? (
+                                      (() => {
+                                        const selectedEmployee = employees.find(
+                                          (emp) => emp.id === selectedEmployeeId
+                                        );
+                                        const employeeName = selectedEmployee
+                                          ? selectedEmployee.first_name &&
+                                            selectedEmployee.last_name
+                                            ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+                                            : selectedEmployee.name ||
+                                              selectedEmployee.email ||
+                                              `موظف #${selectedEmployee.id}`
+                                          : "اختر الموظف";
+                                        return employeeName;
+                                      })()
+                                    ) : (
+                                      "اختر الموظف"
+                                    )}
+                                  </span>
+                                }
+                                triggerClassName="w-full justify-between"
+                              >
+                                <DropdownItem
+                                  onClick={() => setSelectedEmployeeId(null)}
+                                >
+                                  لا يوجد موظف
+                                </DropdownItem>
+                                {employees.map((employee) => {
+                                  const employeeName =
+                                    employee.first_name && employee.last_name
+                                      ? `${employee.first_name} ${employee.last_name}`
+                                      : employee.name ||
+                                        employee.email ||
+                                        `موظف #${employee.id}`;
+
+                                  return (
+                                    <DropdownItem
+                                      key={employee.id}
+                                      onClick={() => setSelectedEmployeeId(employee.id)}
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <span>{employeeName}</span>
+                                        {employee.email && (
+                                          <span className="text-xs text-muted-foreground">
+                                            ({employee.email})
+                                          </span>
+                                        )}
+                                      </div>
+                                    </DropdownItem>
+                                  );
+                                })}
+                              </CustomDropdown>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* أزرار الحفظ والإلغاء */}
+                      <div className="flex justify-end gap-2 pt-4 border-t">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setShowAssignEmployeeDialog(false);
+                            setSelectedEmployeeId(null);
+                          }}
+                          disabled={savingEmployee}
+                        >
+                          إلغاء
+                        </Button>
+                        <Button
+                          onClick={handleAssignEmployee}
+                          disabled={savingEmployee || loadingEmployees}
+                          className="min-w-[100px]"
+                        >
+                          {savingEmployee ? (
+                            <>
+                              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                              جاري الحفظ...
+                            </>
+                          ) : (
+                            "حفظ"
+                          )}
+                        </Button>
+                      </div>
+                    </CustomDialogContent>
+                  </CustomDialog>
                 </CardContent>
               </Card>
             )}

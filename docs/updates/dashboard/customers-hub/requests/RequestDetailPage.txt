@@ -12,3 +12,13 @@ components/customers-hub/requests/RequestDetailPage.tsx
 Update Type: Feature
 Added Appointments and Reminders display cards to request detail page - added Appointments card with blue border showing all appointments sorted by date, displays appointment type icon, title, priority badge, status badge, date/time, duration, and notes, added Reminders card with amber border showing all reminders sorted by date, displays reminder type icon, title, description, priority badge, status badge, date/time, days until due, highlights overdue reminders with red border, both cards show count badges in header, added Video and XCircle icons imports
 components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-18 03:31:17
+Update Type: Feature
+Added employee assignment functionality to request detail page - added import for assignAction API function, CustomDialog, CustomDropdown components, and Loader2 icon, added state variables for assignment dialog (showAssignEmployeeDialog, employees, selectedEmployeeId, loadingEmployees, savingEmployee), added useEffect to fetch employees from /v1/employees API when dialog opens, added useEffect to set current assigned employee when dialog opens, added handleAssignEmployee function with validation and API integration using apiAssignAction, added "تعيين موظف" button in actions section with UserPlus icon, added complete assignment dialog with employee selection dropdown, displays action info, shows loading state, handles assignment and refreshes page data after success
+components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-18 03:32:02
+Update Type: Update
+Updated notes display to show addedByName instead of addedBy - added addedByName optional field to Note interface, updated RequestDetailPage to display note.addedByName in "أضيف بواسطة" section instead of note.addedBy (which was showing ID), now displays employee name when available
+types/unified-customer.ts, components/customers-hub/requests/RequestDetailPage.tsx
