@@ -43,13 +43,23 @@ import { assignPropertyToCustomer } from "@/lib/services/customer-assigned-prope
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { CustomerRequestsCard } from "./CustomerRequestsCard";
+import type { PropertyRequest } from "@/lib/services/customers-hub-detail-api";
 
 interface CustomerDetailPageSimpleProps {
   customerId: string;
   customer?: UnifiedCustomer | null;
   stats?: any;
   tasks?: any[];
-  interestedProperties?: PropertyInterest[];
+  assignedProperties?: Array<{
+    id: number;
+    title: string;
+    price: number;
+    purpose: string;
+    type: string;
+    attachedAt: string;
+  }>;
+  propertyRequests?: PropertyRequest[];
   preferences?: any;
   history?: any[];
   loading?: boolean;
@@ -60,6 +70,7 @@ interface CustomerDetailPageSimpleProps {
   onUpdateTask?: (taskId: string, params: any) => Promise<boolean>;
   onDeleteTask?: (taskId: string) => Promise<boolean>;
   onUpdatePreferences?: (params: any) => Promise<boolean>;
+  onPropertyAdded?: () => Promise<void>;
 }
 
 // Collapsible Section Component
@@ -289,13 +300,20 @@ function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
 // Properties Section Card with built-in header and "+" button
 function PropertiesSectionCard({ 
   customer, 
-  interestedProperties: propInterestedProperties,
+  assignedProperties: propAssignedProperties,
   preferences: propPreferences,
   customerId,
   onPropertyAdded,
 }: { 
   customer: UnifiedCustomer;
-  interestedProperties?: PropertyInterest[];
+  assignedProperties?: Array<{
+    id: number;
+    title: string;
+    price: number;
+    purpose: string;
+    type: string;
+    attachedAt: string;
+  }>;
   preferences?: any;
   customerId: string;
   onPropertyAdded?: () => void;
@@ -397,18 +415,31 @@ function PropertiesSectionCard({
     }
   };
 
-  // Use prop interestedProperties if provided, otherwise use customer.properties
-  const assignedProperties = propInterestedProperties ?? customer.properties;
+  // Convert AssignedProperty to PropertyInterest format for display
+  const assignedProperties = propAssignedProperties || [];
+  
+  // Convert assigned properties to PropertyInterest format
+  const propertiesForDisplay: PropertyInterest[] = assignedProperties.map((prop) => ({
+    id: prop.id.toString(),
+    propertyId: prop.id.toString(),
+    propertyTitle: prop.title,
+    propertyPrice: prop.price,
+    propertyLocation: "", // Not available in AssignedProperty
+    propertyImage: "", // Not available in AssignedProperty
+    status: "interested" as const, // Default status
+    notes: "manual", // Mark as manually added
+    addedAt: prop.attachedAt,
+  }));
   
   // Categorize properties (in real app, this would come from backend)
   // For now, we'll simulate based on property data
-  const websiteProperties = assignedProperties.filter(
+  const websiteProperties = propertiesForDisplay.filter(
     (p) => p.status === "interested" && !p.notes?.includes("AI") && !p.notes?.includes("manual")
   );
-  const aiMatchedProperties = assignedProperties.filter(
+  const aiMatchedProperties = propertiesForDisplay.filter(
     (p) => p.notes?.includes("AI") || p.status === "viewing_scheduled"
   );
-  const manualProperties = assignedProperties.filter(
+  const manualProperties = propertiesForDisplay.filter(
     (p) => p.notes?.includes("manual") || p.status === "offer_made"
   );
 
@@ -542,8 +573,8 @@ function PropertiesSectionCard({
             >
               <Plus className={`h-4 w-4 transition-transform ${isAddFormOpen ? "rotate-45" : ""}`} />
             </button>
-            {assignedProperties.length > 0 && (
-              <Badge variant="default">{assignedProperties.length}</Badge>
+            {propertiesForDisplay.length > 0 && (
+              <Badge variant="default">{propertiesForDisplay.length}</Badge>
             )}
           </div>
           {isOpen ? (
@@ -706,25 +737,25 @@ function PropertiesSectionCard({
               <PropertyCategory
                 title="من الموقع الإلكتروني"
                 icon={Globe}
-                properties={websiteProperties.length > 0 ? websiteProperties : assignedProperties.slice(0, 1)}
+                properties={websiteProperties.length > 0 ? websiteProperties : propertiesForDisplay.slice(0, 1)}
                 color="text-blue-600"
               />
               <PropertyCategory
                 title="مطابقة الذكاء الاصطناعي"
                 icon={Bot}
-                properties={aiMatchedProperties.length > 0 ? aiMatchedProperties : assignedProperties.slice(1, 3)}
+                properties={aiMatchedProperties.length > 0 ? aiMatchedProperties : propertiesForDisplay.slice(1, 3)}
                 color="text-purple-600"
               />
               <PropertyCategory
                 title="أضافها الفريق"
                 icon={UserPlus}
-                properties={manualProperties.length > 0 ? manualProperties : assignedProperties.slice(3)}
+                properties={manualProperties.length > 0 ? manualProperties : propertiesForDisplay.slice(3)}
                 color="text-green-600"
               />
             </div>
-          ) : assignedProperties.length > 0 ? (
+          ) : propertiesForDisplay.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {assignedProperties.map((property) => (
+              {propertiesForDisplay.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>
@@ -1478,7 +1509,8 @@ export function CustomerDetailPageSimple({
   customer: propCustomer,
   stats: propStats,
   tasks: propTasks,
-  interestedProperties: propInterestedProperties,
+  assignedProperties: propAssignedProperties,
+  propertyRequests: propPropertyRequests,
   preferences: propPreferences,
   history: propHistory,
   loading: propLoading,
@@ -1489,6 +1521,7 @@ export function CustomerDetailPageSimple({
   onUpdateTask,
   onDeleteTask,
   onUpdatePreferences,
+  onPropertyAdded,
 }: CustomerDetailPageSimpleProps) {
   const store = useUnifiedCustomersStore();
   const { getCustomerById, setSelectedCustomer } = store;
@@ -1593,19 +1626,13 @@ export function CustomerDetailPageSimple({
 
         <PropertiesSectionCard 
           customer={customer} 
-          interestedProperties={propInterestedProperties}
+          assignedProperties={propAssignedProperties}
           preferences={propPreferences}
           customerId={customerId}
-          onPropertyAdded={onRefetch}
+          onPropertyAdded={onPropertyAdded || onRefetch}
         />
 
-        <CollapsibleSection
-          title="طلبات العميل"
-          icon={Sparkles}
-          defaultOpen={true}
-        >
-          <CustomerRequestsSection customer={customer} />
-        </CollapsibleSection>
+        <CustomerRequestsCard propertyRequests={propPropertyRequests} />
       </div>
     </div>
     </div>

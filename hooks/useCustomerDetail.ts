@@ -12,11 +12,13 @@ import {
   type AddTaskParams,
   type UpdateTaskParams,
   type UpdatePreferencesParams,
+  type PropertyRequest,
 } from "@/lib/services/customers-hub-detail-api";
 import {
   assignPropertyToCustomer,
   getCustomerAssignedProperties,
   type AssignPropertyParams,
+  type AssignedProperty,
 } from "@/lib/services/customer-assigned-properties-api";
 import type { UnifiedCustomer } from "@/types/unified-customer";
 
@@ -26,14 +28,41 @@ export function useCustomerDetail(customerId: string) {
   const [stats, setStats] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [interestedProperties, setInterestedProperties] = useState<any[]>([]);
+  const [assignedProperties, setAssignedProperties] = useState<AssignedProperty[]>([]);
+  const [propertyRequests, setPropertyRequests] = useState<PropertyRequest[]>([]);
   const [preferences, setPreferences] = useState<any>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingProperties, setLoadingProperties] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch assigned properties from separate endpoint
+  const fetchAssignedProperties = useCallback(
+    async () => {
+      if (authLoading || !userData?.token || !customerId) {
+        return;
+      }
+
+      try {
+        setLoadingProperties(true);
+        const response = await getCustomerAssignedProperties(customerId);
+        
+        if (response.status === "success" && response.data) {
+          setAssignedProperties(response.data.properties || []);
+        }
+      } catch (err: any) {
+        console.error("Error fetching assigned properties:", err);
+        // Don't set error state, just log it
+      } finally {
+        setLoadingProperties(false);
+      }
+    },
+    [userData?.token, authLoading, customerId]
+  );
 
   // Fetch customer detail
   const fetchCustomerDetail = useCallback(
-    async (includeTasks: boolean = true, includeProperties: boolean = true, includePreferences: boolean = true) => {
+    async (includeTasks: boolean = true, includeProperties: boolean = false, includePreferences: boolean = true) => {
       if (authLoading || !userData?.token || !customerId) {
         return;
       }
@@ -60,7 +89,7 @@ export function useCustomerDetail(customerId: string) {
             priority: response.data.customer.priority?.name?.toLowerCase() || response.data.customer.priority || "medium",
             preferences: response.data.preferences || response.data.customer.preferences || {},
             stageHistory: response.data.customer.stageHistory || [],
-            properties: response.data.interestedProperties || response.data.customer.properties || [],
+            properties: [], // Don't use properties from customer detail endpoint
             interactions: response.data.customer.interactions || [],
             appointments: response.data.customer.appointments || [],
             reminders: response.data.customer.reminders || [],
@@ -80,8 +109,8 @@ export function useCustomerDetail(customerId: string) {
           if (response.data.tasks) {
             setTasks(response.data.tasks);
           }
-          if (response.data.interestedProperties) {
-            setInterestedProperties(response.data.interestedProperties);
+          if (response.data.propertyRequests) {
+            setPropertyRequests(response.data.propertyRequests);
           }
           if (response.data.preferences) {
             setPreferences(response.data.preferences);
@@ -230,8 +259,8 @@ export function useCustomerDetail(customerId: string) {
       try {
         const response = await assignPropertyToCustomer(customerId, params);
         if (response.status === "success") {
-          // Refresh customer detail with properties
-          await fetchCustomerDetail(true, true, true);
+          // Refresh assigned properties from separate endpoint
+          await fetchAssignedProperties();
           return true;
         }
         return false;
@@ -240,7 +269,7 @@ export function useCustomerDetail(customerId: string) {
         throw err;
       }
     },
-    [userData?.token, authLoading, customerId, fetchCustomerDetail]
+    [userData?.token, authLoading, customerId, fetchAssignedProperties]
   );
 
   // Refetch properties only
@@ -251,13 +280,13 @@ export function useCustomerDetail(customerId: string) {
       }
 
       try {
-        // Refresh customer detail with properties included
-        await fetchCustomerDetail(true, true, true);
+        // Refresh assigned properties from separate endpoint
+        await fetchAssignedProperties();
       } catch (err: any) {
         console.error("Error refetching properties:", err);
       }
     },
-    [userData?.token, authLoading, customerId, fetchCustomerDetail]
+    [userData?.token, authLoading, customerId, fetchAssignedProperties]
   );
 
   // Initial fetch
@@ -270,20 +299,24 @@ export function useCustomerDetail(customerId: string) {
       await Promise.all([
         fetchCustomerDetail(),
         fetchHistory(),
+        fetchAssignedProperties(),
       ]);
     };
 
     loadData();
-  }, [userData?.token, authLoading, customerId, fetchCustomerDetail, fetchHistory]);
+  }, [userData?.token, authLoading, customerId, fetchCustomerDetail, fetchHistory, fetchAssignedProperties]);
 
   return {
     customer,
     stats,
     tasks,
     interestedProperties,
+    assignedProperties,
+    propertyRequests,
     preferences,
     history,
     loading,
+    loadingProperties,
     error,
     refetch: fetchCustomerDetail,
     updateCustomer,
@@ -294,5 +327,6 @@ export function useCustomerDetail(customerId: string) {
     fetchHistory,
     assignProperty,
     refetchProperties,
+    fetchAssignedProperties,
   };
 }
