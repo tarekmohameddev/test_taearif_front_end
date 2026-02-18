@@ -16,6 +16,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+.cursor/debug
+.cursor/debug/
 
 # env files
 
@@ -31,7 +33,7 @@ test.js
 
 /pagebuildDashboard/
 /code/
-/trash/vareonsProject
+/trash
 
 # Antigravity AI Debug System
 .antigravity/
