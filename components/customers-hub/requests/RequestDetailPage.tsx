@@ -48,8 +48,9 @@ import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerAction, UnifiedCustomer, Appointment, PropertyInterest, Note } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 import { addNoteToAction, createReminderForRequest, assignAction as apiAssignAction } from "@/lib/services/customers-hub-requests-api";
+import { getEmployees as getAssignmentEmployees } from "@/lib/services/customers-hub-assignment-api";
+import type { EmployeeWorkload } from "@/lib/services/customers-hub-assignment-api";
 import useAuthStore from "@/context/AuthContext";
-import axiosInstance from "@/lib/axiosInstance";
 import {
   CustomDialog,
   CustomDialogContent,
@@ -228,10 +229,43 @@ export function RequestDetailPage({
   const [reminderType, setReminderType] = useState<"follow_up" | "payment_due" | "document_required" | "other">("follow_up");
   const [reminderNotes, setReminderNotes] = useState("");
   const [showAssignEmployeeDialog, setShowAssignEmployeeDialog] = useState(false);
-  const [employees, setEmployees] = useState<Array<{ id: number; name?: string; first_name?: string; last_name?: string; email?: string }>>([]);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
+  const [employees, setEmployees] = useState<EmployeeWorkload[]>([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
+
+  // Fetch employees when opening assign dialog
+  useEffect(() => {
+    if (showAssignEmployeeDialog && userData?.token && employees.length === 0) {
+      const fetchEmployees = async () => {
+        setLoadingEmployees(true);
+        try {
+          const response = await getAssignmentEmployees();
+          if (response.status === "success" && response.data.employees) {
+            setEmployees(response.data.employees);
+          }
+        } catch (error) {
+          console.error("Error fetching employees:", error);
+          toast.error("حدث خطأ أثناء تحميل الموظفين");
+        } finally {
+          setLoadingEmployees(false);
+        }
+      };
+      fetchEmployees();
+    }
+  }, [showAssignEmployeeDialog, userData?.token, employees.length]);
+
+  // Set current employee when dialog opens
+  useEffect(() => {
+    if (showAssignEmployeeDialog && action?.assignedTo) {
+      const assignedToId = typeof action.assignedTo === 'string' 
+        ? action.assignedTo 
+        : String(action.assignedTo);
+      setSelectedEmployeeId(assignedToId);
+    } else if (showAssignEmployeeDialog && !action?.assignedTo) {
+      setSelectedEmployeeId(null);
+    }
+  }, [showAssignEmployeeDialog, action?.assignedTo]);
 
   // Show loading state
   if (propLoading && !action) {
@@ -485,41 +519,6 @@ export function RequestDetailPage({
     }
   };
 
-  // Fetch employees when opening assign dialog
-  useEffect(() => {
-    if (showAssignEmployeeDialog && userData?.token && employees.length === 0) {
-      const fetchEmployees = async () => {
-        setLoadingEmployees(true);
-        try {
-          const response = await axiosInstance.get("/v1/employees");
-          if (response.data && response.data.data) {
-            setEmployees(response.data.data);
-          }
-        } catch (error) {
-          console.error("Error fetching employees:", error);
-          toast.error("حدث خطأ أثناء تحميل الموظفين");
-        } finally {
-          setLoadingEmployees(false);
-        }
-      };
-      fetchEmployees();
-    }
-  }, [showAssignEmployeeDialog, userData?.token, employees.length]);
-
-  // Set current employee when dialog opens
-  useEffect(() => {
-    if (showAssignEmployeeDialog && action?.assignedTo) {
-      const assignedToId = typeof action.assignedTo === 'string' 
-        ? parseInt(action.assignedTo) 
-        : action.assignedTo;
-      if (!isNaN(assignedToId)) {
-        setSelectedEmployeeId(assignedToId);
-      }
-    } else if (showAssignEmployeeDialog && !action?.assignedTo) {
-      setSelectedEmployeeId(null);
-    }
-  }, [showAssignEmployeeDialog, action?.assignedTo]);
-
   // Handle assign employee
   const handleAssignEmployee = async () => {
     if (!userData?.token) {
@@ -533,15 +532,22 @@ export function RequestDetailPage({
       return;
     }
 
-    if (selectedEmployeeId === null || selectedEmployeeId === undefined) {
+    if (!selectedEmployeeId) {
       toast.error("الرجاء اختيار موظف");
+      return;
+    }
+
+    // Convert employeeId to number for API
+    const employeeIdNum = parseInt(selectedEmployeeId);
+    if (isNaN(employeeIdNum)) {
+      toast.error("خطأ في معرف الموظف");
       return;
     }
 
     setSavingEmployee(true);
     try {
       // Use the v2 API endpoint that works with composite id (property_request_89, inquiry_123)
-      await apiAssignAction(action.id, selectedEmployeeId);
+      await apiAssignAction(action.id, employeeIdNum);
 
       toast.success("تم تعيين الموظف المسؤول بنجاح!");
       
@@ -1737,15 +1743,27 @@ export function RequestDetailPage({
                                         const selectedEmployee = employees.find(
                                           (emp) => emp.id === selectedEmployeeId
                                         );
-                                        const employeeName = selectedEmployee
-                                          ? selectedEmployee.first_name &&
-                                            selectedEmployee.last_name
-                                            ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
-                                            : selectedEmployee.name ||
-                                              selectedEmployee.email ||
-                                              `موظف #${selectedEmployee.id}`
-                                          : "اختر الموظف";
-                                        return employeeName;
+                                        if (!selectedEmployee) return "اختر الموظف";
+                                        
+                                        // Get employee name - prioritize name field, then fallback to other fields
+                                        let employeeName = "";
+                                        if (selectedEmployee.name && selectedEmployee.name.trim()) {
+                                          employeeName = selectedEmployee.name.trim();
+                                        } else if ((selectedEmployee as any).first_name || (selectedEmployee as any).last_name) {
+                                          const firstName = (selectedEmployee as any).first_name?.trim() || "";
+                                          const lastName = (selectedEmployee as any).last_name?.trim() || "";
+                                          employeeName = `${firstName} ${lastName}`.trim();
+                                        } else if ((selectedEmployee as any).email && (selectedEmployee as any).email.trim()) {
+                                          employeeName = (selectedEmployee as any).email.trim();
+                                        } else {
+                                          employeeName = `موظف #${selectedEmployee.id}`;
+                                        }
+                                        
+                                        const phone = selectedEmployee.phone 
+                                          ? selectedEmployee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                                          : null;
+                                        
+                                        return phone ? `${employeeName} (${phone})` : employeeName;
                                       })()
                                     ) : (
                                       "اختر الموظف"
@@ -1760,12 +1778,23 @@ export function RequestDetailPage({
                                   لا يوجد موظف
                                 </DropdownItem>
                                 {employees.map((employee) => {
-                                  const employeeName =
-                                    employee.first_name && employee.last_name
-                                      ? `${employee.first_name} ${employee.last_name}`
-                                      : employee.name ||
-                                        employee.email ||
-                                        `موظف #${employee.id}`;
+                                  // Get employee name - prioritize name field, then fallback to other fields
+                                  let employeeName = "";
+                                  if (employee.name && employee.name.trim()) {
+                                    employeeName = employee.name.trim();
+                                  } else if ((employee as any).first_name || (employee as any).last_name) {
+                                    const firstName = (employee as any).first_name?.trim() || "";
+                                    const lastName = (employee as any).last_name?.trim() || "";
+                                    employeeName = `${firstName} ${lastName}`.trim();
+                                  } else if ((employee as any).email && (employee as any).email.trim()) {
+                                    employeeName = (employee as any).email.trim();
+                                  } else {
+                                    employeeName = `موظف #${employee.id}`;
+                                  }
+                                  
+                                  const phone = employee.phone 
+                                    ? employee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
+                                    : null;
 
                                   return (
                                     <DropdownItem
@@ -1773,12 +1802,7 @@ export function RequestDetailPage({
                                       onClick={() => setSelectedEmployeeId(employee.id)}
                                     >
                                       <div className="flex items-center gap-2">
-                                        <span>{employeeName}</span>
-                                        {employee.email && (
-                                          <span className="text-xs text-muted-foreground">
-                                            ({employee.email})
-                                          </span>
-                                        )}
+                                        <span>{phone ? `${employeeName} (${phone})` : employeeName}</span>
                                       </div>
                                     </DropdownItem>
                                   );

@@ -22,3 +22,18 @@ components/customers-hub/requests/RequestDetailPage.tsx
 Update Type: Update
 Updated notes display to show addedByName instead of addedBy - added addedByName optional field to Note interface, updated RequestDetailPage to display note.addedByName in "أضيف بواسطة" section instead of note.addedBy (which was showing ID), now displays employee name when available
 types/unified-customer.ts, components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-18 03:34:50
+Update Type: Update
+Updated employee dropdown to use assignment API and display phone number - changed from /v1/employees to /v2/customers-hub/assignment/employees API endpoint using getEmployees from customers-hub-assignment-api, updated employee type from custom interface to EmployeeWorkload, updated selectedEmployeeId type from number to string, updated employee display format to show "name (phone)" instead of "name (email)", added phone number formatting to remove country code (+20, +966) and convert to local format (e.g., +201068445229 → 01068445229), removed email display from dropdown items, updated both trigger and dropdown items to show phone number
+components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-18 03:37:51
+Update Type: Bug Fix
+Improved employee name display logic in dropdown - updated employee name extraction to check name field first, then fallback to first_name/last_name combination, then email, then default to "موظف #id", added proper null/empty string checks for all name fields, improved name display logic in both trigger (selected employee) and dropdown items to ensure name is always displayed correctly instead of showing "موظف #id"
+components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-18 03:38:57
+Update Type: Bug Fix
+Fixed React Hooks order violation - moved all useEffect hooks (fetch employees and set current employee) before early returns (loading, error, no action states) to comply with Rules of Hooks, hooks must be called in the same order on every render, fixed "React has detected a change in the order of Hooks" error
+components/customers-hub/requests/RequestDetailPage.tsx
