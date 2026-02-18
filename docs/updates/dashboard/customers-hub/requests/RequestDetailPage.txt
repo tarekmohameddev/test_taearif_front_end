@@ -1,0 +1,14 @@
+2026-02-18 03:07:49
+Update Type: Bug Fix
+Fixed notes display on request detail page - added Note interface type, added notes field to CustomerAction interface, updated RequestDetailPage component to display action.notes array instead of action.metadata.notes string, notes now display all notes with proper formatting, sorting (newest first), and metadata (date, addedBy)
+types/unified-customer.ts, components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-18 03:18:51
+Update Type: Feature
+Added reminder creation functionality to request detail page - added import for createReminderForRequest API function, added state variables for reminder form (title, description, date, time, priority, type, notes), added handleAddReminder handler function with validation and API integration, added "إضافة تذكير" button in actions section with AlarmClock icon, added complete reminder form with all required fields (title, description, date/time, priority, type, notes) and validation
+components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-02-18 03:20:07
+Update Type: Feature
+Added Appointments and Reminders display cards to request detail page - added Appointments card with blue border showing all appointments sorted by date, displays appointment type icon, title, priority badge, status badge, date/time, duration, and notes, added Reminders card with amber border showing all reminders sorted by date, displays reminder type icon, title, description, priority badge, status badge, date/time, days until due, highlights overdue reminders with red border, both cards show count badges in header, added Video and XCircle icons imports
+components/customers-hub/requests/RequestDetailPage.tsx

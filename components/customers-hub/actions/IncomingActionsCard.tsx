@@ -9,12 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import { SourceBadge } from "./SourceBadge";
 import { ActionQuickPanel } from "./ActionQuickPanel";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
@@ -1082,49 +1079,61 @@ export function IncomingActionsCard({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Select
-                    value={
-                      selectedEmployeeId
-                        ? selectedEmployeeId.toString()
-                        : "none"
+                  <CustomDropdown
+                    trigger={
+                      <span className="flex items-center gap-2">
+                        {selectedEmployeeId ? (
+                          (() => {
+                            const selectedEmployee = employees.find(
+                              (emp) => emp.id === selectedEmployeeId
+                            );
+                            const employeeName = selectedEmployee
+                              ? selectedEmployee.first_name &&
+                                selectedEmployee.last_name
+                                ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+                                : selectedEmployee.name ||
+                                  selectedEmployee.email ||
+                                  `موظف #${selectedEmployee.id}`
+                              : "اختر الموظف";
+                            return employeeName;
+                          })()
+                        ) : (
+                          "اختر الموظف"
+                        )}
+                      </span>
                     }
-                    onValueChange={(value) =>
-                      setSelectedEmployeeId(
-                        value === "none" ? null : Number(value),
-                      )
-                    }
+                    triggerClassName="w-full justify-between"
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="اختر الموظف" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">لا يوجد موظف</SelectItem>
-                      {employees.map((employee) => {
-                        const employeeName =
-                          employee.first_name && employee.last_name
-                            ? `${employee.first_name} ${employee.last_name}`
-                            : employee.name ||
-                              employee.email ||
-                              `موظف #${employee.id}`;
+                    <DropdownItem
+                      onClick={() => setSelectedEmployeeId(null)}
+                    >
+                      لا يوجد موظف
+                    </DropdownItem>
+                    {employees.map((employee) => {
+                      const employeeName =
+                        employee.first_name && employee.last_name
+                          ? `${employee.first_name} ${employee.last_name}`
+                          : employee.name ||
+                            employee.email ||
+                            `موظف #${employee.id}`;
 
-                        return (
-                          <SelectItem
-                            key={employee.id}
-                            value={employee.id.toString()}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{employeeName}</span>
-                              {employee.email && (
-                                <span className="text-xs text-muted-foreground">
-                                  ({employee.email})
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+                      return (
+                        <DropdownItem
+                          key={employee.id}
+                          onClick={() => setSelectedEmployeeId(employee.id)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{employeeName}</span>
+                            {employee.email && (
+                              <span className="text-xs text-muted-foreground">
+                                ({employee.email})
+                              </span>
+                            )}
+                          </div>
+                        </DropdownItem>
+                      );
+                    })}
+                  </CustomDropdown>
                 </div>
               )}
             </div>
@@ -1577,49 +1586,61 @@ export function IncomingActionsCard({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Select
-                    value={
-                      selectedEmployeeId
-                        ? selectedEmployeeId.toString()
-                        : "none"
+                  <CustomDropdown
+                    trigger={
+                      <span className="flex items-center gap-2">
+                        {selectedEmployeeId ? (
+                          (() => {
+                            const selectedEmployee = employees.find(
+                              (emp) => emp.id === selectedEmployeeId
+                            );
+                            const employeeName = selectedEmployee
+                              ? selectedEmployee.first_name &&
+                                selectedEmployee.last_name
+                                ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+                                : selectedEmployee.name ||
+                                  selectedEmployee.email ||
+                                  `موظف #${selectedEmployee.id}`
+                              : "اختر الموظف";
+                            return employeeName;
+                          })()
+                        ) : (
+                          "اختر الموظف"
+                        )}
+                      </span>
                     }
-                    onValueChange={(value) =>
-                      setSelectedEmployeeId(
-                        value === "none" ? null : Number(value),
-                      )
-                    }
+                    triggerClassName="w-full justify-between"
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="اختر الموظف" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">لا يوجد موظف</SelectItem>
-                      {employees.map((employee) => {
-                        const employeeName =
-                          employee.first_name && employee.last_name
-                            ? `${employee.first_name} ${employee.last_name}`
-                            : employee.name ||
-                              employee.email ||
-                              `موظف #${employee.id}`;
+                    <DropdownItem
+                      onClick={() => setSelectedEmployeeId(null)}
+                    >
+                      لا يوجد موظف
+                    </DropdownItem>
+                    {employees.map((employee) => {
+                      const employeeName =
+                        employee.first_name && employee.last_name
+                          ? `${employee.first_name} ${employee.last_name}`
+                          : employee.name ||
+                            employee.email ||
+                            `موظف #${employee.id}`;
 
-                        return (
-                          <SelectItem
-                            key={employee.id}
-                            value={employee.id.toString()}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{employeeName}</span>
-                              {employee.email && (
-                                <span className="text-xs text-muted-foreground">
-                                  ({employee.email})
-                                </span>
-                              )}
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+                      return (
+                        <DropdownItem
+                          key={employee.id}
+                          onClick={() => setSelectedEmployeeId(employee.id)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{employeeName}</span>
+                            {employee.email && (
+                              <span className="text-xs text-muted-foreground">
+                                ({employee.email})
+                              </span>
+                            )}
+                          </div>
+                        </DropdownItem>
+                      );
+                    })}
+                  </CustomDropdown>
                 </div>
               )}
             </div>

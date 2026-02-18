@@ -96,7 +96,7 @@ export const DropdownSubMenu = ({
       */}
       {isOpen && (
         <div 
-          className="absolute top-0 right-full mr-2 w-48 rounded-md bg-white shadow-lg z-[10000]"
+          className="absolute top-0 right-full mr-2 w-48 rounded-md bg-white shadow-lg z-[10001]"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -133,8 +133,8 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor 
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setPosition({
-        top: rect.bottom + window.scrollY + 8, // 8px للـ margin
-        right: window.innerWidth - rect.right + window.scrollX,
+        top: rect.bottom, // ملاصق تماماً بدون مسافة
+        right: window.innerWidth - rect.right,
       });
     }
   }, [isOpen]);
@@ -168,7 +168,7 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor 
   const dropdownContent = isOpen && mounted ? (
     <div
       ref={dropdownRef}
-      className="fixed z-[9999] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+      className="fixed z-[10001] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
       style={{
         top: `${position.top}px`,
         right: `${position.right}px`,

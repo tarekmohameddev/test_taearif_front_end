@@ -35,16 +35,19 @@ import {
   Sparkles,
   FileText,
   Bell,
+  AlarmClock,
   X,
   Check,
+  Video,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SourceBadge } from "../actions/SourceBadge";
-import type { CustomerAction, UnifiedCustomer, Appointment, PropertyInterest } from "@/types/unified-customer";
+import type { CustomerAction, UnifiedCustomer, Appointment, PropertyInterest, Note } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
-import { addNoteToAction } from "@/lib/services/customers-hub-requests-api";
+import { addNoteToAction, createReminderForRequest } from "@/lib/services/customers-hub-requests-api";
 import useAuthStore from "@/context/AuthContext";
 
 interface RequestDetailPageProps {
@@ -203,6 +206,14 @@ export function RequestDetailPage({
   const [aptDate, setAptDate] = useState("");
   const [aptTime, setAptTime] = useState("10:00");
   const [aptNotes, setAptNotes] = useState("");
+  const [showReminderForm, setShowReminderForm] = useState(false);
+  const [reminderTitle, setReminderTitle] = useState("");
+  const [reminderDescription, setReminderDescription] = useState("");
+  const [reminderDate, setReminderDate] = useState("");
+  const [reminderTime, setReminderTime] = useState("10:00");
+  const [reminderPriority, setReminderPriority] = useState<"low" | "medium" | "high" | "urgent">("medium");
+  const [reminderType, setReminderType] = useState<"follow_up" | "payment_due" | "document_required" | "other">("follow_up");
+  const [reminderNotes, setReminderNotes] = useState("");
 
   // Show loading state
   if (propLoading && !action) {
@@ -392,6 +403,65 @@ export function RequestDetailPage({
       console.error("Error scheduling appointment:", err);
       toast.error(
         err.message || err.response?.data?.message || "حدث خطأ أثناء جدولة الموعد",
+        { id: toastId }
+      );
+    }
+  };
+
+  const handleAddReminder = async () => {
+    if (!reminderTitle.trim()) {
+      toast.error("الرجاء إدخال عنوان التذكير");
+      return;
+    }
+    
+    if (!reminderDate || !reminderTime) {
+      toast.error("الرجاء اختيار التاريخ والوقت");
+      return;
+    }
+    
+    // Check if datetime is in the future
+    const datetime = new Date(`${reminderDate}T${reminderTime}`).toISOString();
+    const now = new Date();
+    if (new Date(datetime) <= now) {
+      toast.error("التاريخ والوقت يجب أن يكون في المستقبل");
+      return;
+    }
+    
+    const toastId = toast.loading("جاري إضافة التذكير...");
+    try {
+      // Use createReminderForRequest for property_request and inquiry
+      if ((action?.objectType === 'property_request' || action?.objectType === 'inquiry') && action?.id) {
+        await createReminderForRequest(action.id, {
+          title: reminderTitle.trim(),
+          description: reminderDescription.trim() || undefined,
+          datetime,
+          priority: reminderPriority,
+          type: reminderType,
+          notes: reminderNotes.trim() || undefined,
+        });
+        toast.success("تم إضافة التذكير بنجاح", { id: toastId });
+      } else {
+        toast.error("لا يمكن إضافة التذكير: نوع الطلب غير مدعوم", { id: toastId });
+        return;
+      }
+      
+      // Refresh page data
+      if (onRefetch) {
+        await onRefetch();
+      }
+      
+      setShowReminderForm(false);
+      setReminderTitle("");
+      setReminderDescription("");
+      setReminderDate("");
+      setReminderTime("10:00");
+      setReminderPriority("medium");
+      setReminderType("follow_up");
+      setReminderNotes("");
+    } catch (err: any) {
+      console.error("Error adding reminder:", err);
+      toast.error(
+        err.message || err.response?.data?.message || "حدث خطأ أثناء إضافة التذكير",
         { id: toastId }
       );
     }
@@ -785,6 +855,268 @@ export function RequestDetailPage({
               </Card>
             )}
 
+            {/* Appointments Section */}
+            {action.appointments && action.appointments.length > 0 && (
+              <Card className="border-blue-200 dark:border-blue-800/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-500" />
+                    المواعيد
+                    <Badge variant="secondary" className="text-blue-600 dark:text-blue-400">
+                      {action.appointments.length}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {action.appointments
+                      .sort((a, b) => new Date(a.datetime || a.date).getTime() - new Date(b.datetime || b.date).getTime())
+                      .map((appointment) => {
+                        const appointmentDate = appointment.datetime 
+                          ? new Date(appointment.datetime)
+                          : new Date(appointment.date);
+                        const isUpcoming = appointmentDate > new Date();
+                        const getTypeIcon = () => {
+                          const icons = {
+                            site_visit: <Building2 className="h-4 w-4 text-blue-600" />,
+                            office_meeting: <User className="h-4 w-4 text-purple-600" />,
+                            phone_call: <Phone className="h-4 w-4 text-green-600" />,
+                            video_call: <Video className="h-4 w-4 text-indigo-600" />,
+                            contract_signing: <CheckCircle className="h-4 w-4 text-emerald-600" />,
+                            other: <Calendar className="h-4 w-4 text-gray-600" />,
+                          };
+                          return icons[appointment.type] || icons.other;
+                        };
+                        const getTypeName = () => {
+                          const names: Record<string, string> = {
+                            site_visit: "معاينة عقار",
+                            office_meeting: "اجتماع مكتب",
+                            phone_call: "مكالمة هاتفية",
+                            video_call: "مكالمة فيديو",
+                            contract_signing: "توقيع عقد",
+                            other: "أخرى",
+                          };
+                          return names[appointment.type] || appointment.type;
+                        };
+                        const getStatusBadge = () => {
+                          const config = {
+                            scheduled: { variant: "secondary" as any, label: "مجدولة" },
+                            confirmed: { variant: "default" as any, label: "مؤكدة" },
+                            completed: { variant: "default" as any, label: "مكتملة" },
+                            cancelled: { variant: "destructive" as any, label: "ملغاة" },
+                            no_show: { variant: "destructive" as any, label: "لم يحضر" },
+                          };
+                          const { variant, label } = config[appointment.status] || config.scheduled;
+                          return <Badge variant={variant}>{label}</Badge>;
+                        };
+                        const getPriorityBadge = () => {
+                          if (appointment.priority === "urgent") return <Badge variant="destructive" className="text-xs">عاجل</Badge>;
+                          if (appointment.priority === "high") return <Badge variant="default" className="text-xs">عالي</Badge>;
+                          if (appointment.priority === "medium") return <Badge variant="secondary" className="text-xs">متوسط</Badge>;
+                          return <Badge variant="outline" className="text-xs">منخفض</Badge>;
+                        };
+
+                        return (
+                          <Card
+                            key={appointment.id}
+                            className={`border-l-4 hover:shadow-md transition-shadow ${
+                              appointment.priority === "urgent" ? "border-l-red-500" :
+                              appointment.priority === "high" ? "border-l-orange-500" :
+                              "border-l-blue-500"
+                            }`}
+                          >
+                            <CardContent className="p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex items-start gap-3 flex-1">
+                                    {getTypeIcon()}
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <h4 className="font-semibold">{appointment.title}</h4>
+                                        {getPriorityBadge()}
+                                      </div>
+                                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                        {getTypeName()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {getStatusBadge()}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                    <Calendar className="h-4 w-4" />
+                                    <span>
+                                      {appointmentDate.toLocaleDateString("ar-SA", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                      })}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                    <Clock className="h-4 w-4" />
+                                    <span>
+                                      {appointmentDate.toLocaleTimeString("ar-SA", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                      {appointment.duration && ` (${appointment.duration} دقيقة)`}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {appointment.notes && (
+                                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-2 rounded">
+                                    {appointment.notes}
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Reminders Section */}
+            {action.reminders && action.reminders.length > 0 && (
+              <Card className="border-amber-200 dark:border-amber-800/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlarmClock className="h-5 w-5 text-amber-500" />
+                    التذكيرات
+                    <Badge variant="secondary" className="text-amber-600 dark:text-amber-400">
+                      {action.reminders.length}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {action.reminders
+                      .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())
+                      .map((reminder) => {
+                        const reminderDate = new Date(reminder.datetime);
+                        const isOverdue = reminder.isOverdue || (
+                          reminder.status === "pending" && reminderDate < new Date()
+                        );
+                        const getTypeIcon = () => {
+                          const icons = {
+                            follow_up: <Phone className="h-4 w-4 text-blue-600" />,
+                            document: <FileText className="h-4 w-4 text-purple-600" />,
+                            payment: <DollarSign className="h-4 w-4 text-green-600" />,
+                            viewing: <Eye className="h-4 w-4 text-indigo-600" />,
+                            general: <Bell className="h-4 w-4 text-gray-600" />,
+                          };
+                          return icons[reminder.type] || icons.general;
+                        };
+                        const getTypeName = () => {
+                          const names: Record<string, string> = {
+                            follow_up: "متابعة",
+                            document: "مستندات",
+                            payment: "دفع",
+                            viewing: "معاينة",
+                            general: "عام",
+                          };
+                          return names[reminder.type] || reminder.type;
+                        };
+                        const getStatusBadge = () => {
+                          if (isOverdue) {
+                            return <Badge variant="destructive">متأخر</Badge>;
+                          }
+                          const config = {
+                            pending: { variant: "secondary" as any, label: "معلق" },
+                            completed: { variant: "default" as any, label: "مكتمل" },
+                            overdue: { variant: "destructive" as any, label: "متأخر" },
+                            cancelled: { variant: "outline" as any, label: "ملغي" },
+                          };
+                          const { variant, label } = config[reminder.status] || config.pending;
+                          return <Badge variant={variant}>{label}</Badge>;
+                        };
+                        const getPriorityBadge = () => {
+                          if (reminder.priority === "urgent") return <Badge variant="destructive" className="text-xs">عاجل</Badge>;
+                          if (reminder.priority === "high") return <Badge variant="default" className="text-xs">عالي</Badge>;
+                          if (reminder.priority === "medium") return <Badge variant="secondary" className="text-xs">متوسط</Badge>;
+                          return <Badge variant="outline" className="text-xs">منخفض</Badge>;
+                        };
+
+                        return (
+                          <Card
+                            key={reminder.id}
+                            className={`border-l-4 hover:shadow-md transition-shadow ${
+                              isOverdue ? "border-l-red-500" :
+                              reminder.priority === "urgent" ? "border-l-red-500" :
+                              reminder.priority === "high" ? "border-l-orange-500" :
+                              "border-l-amber-500"
+                            }`}
+                          >
+                            <CardContent className="p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex items-start gap-3 flex-1">
+                                    {getTypeIcon()}
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <h4 className="font-semibold">{reminder.title}</h4>
+                                        {getPriorityBadge()}
+                                      </div>
+                                      {reminder.description && (
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                          {reminder.description}
+                                        </p>
+                                      )}
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        {getTypeName()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {getStatusBadge()}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                    <Calendar className="h-4 w-4" />
+                                    <span>
+                                      {reminderDate.toLocaleDateString("ar-SA", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                      })}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                    <Clock className="h-4 w-4" />
+                                    <span>
+                                      {reminderDate.toLocaleTimeString("ar-SA", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {reminder.daysUntilDue !== undefined && (
+                                  <div className="text-xs text-gray-500">
+                                    {reminder.daysUntilDue > 0 
+                                      ? `متبقي ${reminder.daysUntilDue} يوم`
+                                      : reminder.daysUntilDue === 0
+                                      ? "اليوم"
+                                      : `متأخر ${Math.abs(reminder.daysUntilDue)} يوم`
+                                    }
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Notes Section */}
             <Card>
               <CardHeader>
@@ -837,22 +1169,36 @@ export function RequestDetailPage({
                   </div>
                 )}
 
-                {action.metadata?.notes ? (
-                  <div className="space-y-2">
-                    <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                      <p className="text-sm text-gray-700 dark:text-gray-300">
-                        {action.metadata.notes}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-2">
-                        {new Date(action.createdAt).toLocaleDateString("ar-SA", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
+                {action.notes && action.notes.length > 0 ? (
+                  <div className="space-y-3">
+                    {[...action.notes]
+                      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                      .map((note) => (
+                      <div
+                        key={note.id}
+                        className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-900/50"
+                      >
+                        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                          {note.note}
+                        </p>
+                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-blue-200 dark:border-blue-800/50">
+                          <p className="text-xs text-gray-500">
+                            {new Date(note.createdAt).toLocaleDateString("ar-SA", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                          {note.addedBy && (
+                            <p className="text-xs text-gray-500">
+                              أضيف بواسطة: {typeof note.addedBy === "number" ? `#${note.addedBy}` : note.addedBy}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   !showNoteForm && (
@@ -963,6 +1309,15 @@ export function RequestDetailPage({
                   >
                     <Calendar className="h-4 w-4" />
                     جدولة موعد
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => setShowReminderForm(!showReminderForm)}
+                  >
+                    <AlarmClock className="h-4 w-4" />
+                    إضافة تذكير
                   </Button>
 
                   <Button
@@ -1094,6 +1449,123 @@ export function RequestDetailPage({
                             setAptDate("");
                             setAptTime("10:00");
                             setAptNotes("");
+                          }}
+                        >
+                          إلغاء
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Add Reminder Form */}
+                  {showReminderForm && (
+                    <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
+                      <div className="space-y-2">
+                        <Label className="text-sm">عنوان التذكير *</Label>
+                        <Input
+                          value={reminderTitle}
+                          onChange={(e) => setReminderTitle(e.target.value)}
+                          placeholder="مثال: متابعة طلب العقار"
+                          className="h-9"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">الوصف</Label>
+                        <Textarea
+                          value={reminderDescription}
+                          onChange={(e) => setReminderDescription(e.target.value)}
+                          placeholder="وصف اختياري للتذكير"
+                          rows={2}
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-2">
+                          <Label className="text-sm">التاريخ *</Label>
+                          <Input
+                            type="date"
+                            value={reminderDate}
+                            onChange={(e) => setReminderDate(e.target.value)}
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm">الوقت *</Label>
+                          <Input
+                            type="time"
+                            value={reminderTime}
+                            onChange={(e) => setReminderTime(e.target.value)}
+                            className="h-9"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-2">
+                          <Label className="text-sm">الأولوية *</Label>
+                          <Select
+                            value={reminderPriority}
+                            onValueChange={(v) => setReminderPriority(v as "low" | "medium" | "high" | "urgent")}
+                          >
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="low">منخفض</SelectItem>
+                              <SelectItem value="medium">متوسط</SelectItem>
+                              <SelectItem value="high">مهم</SelectItem>
+                              <SelectItem value="urgent">عاجل</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm">النوع *</Label>
+                          <Select
+                            value={reminderType}
+                            onValueChange={(v) => setReminderType(v as "follow_up" | "payment_due" | "document_required" | "other")}
+                          >
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="follow_up">متابعة</SelectItem>
+                              <SelectItem value="payment_due">دفع مستحق</SelectItem>
+                              <SelectItem value="document_required">مستندات مطلوبة</SelectItem>
+                              <SelectItem value="other">أخرى</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">ملاحظات</Label>
+                        <Textarea
+                          value={reminderNotes}
+                          onChange={(e) => setReminderNotes(e.target.value)}
+                          placeholder="ملاحظات اختيارية"
+                          rows={2}
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={handleAddReminder}
+                          disabled={!reminderTitle.trim() || !reminderDate || !reminderTime}
+                          className="flex-1"
+                        >
+                          إضافة
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setShowReminderForm(false);
+                            setReminderTitle("");
+                            setReminderDescription("");
+                            setReminderDate("");
+                            setReminderTime("10:00");
+                            setReminderPriority("medium");
+                            setReminderType("follow_up");
+                            setReminderNotes("");
                           }}
                         >
                           إلغاء

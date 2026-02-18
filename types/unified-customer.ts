@@ -68,6 +68,8 @@ export interface CustomerAction {
   // Appointments and Reminders (populated for property_request and inquiry)
   appointments?: Appointment[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
   reminders?: Reminder[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
+  // Notes (populated for property_request and inquiry)
+  notes?: Note[]; // Array of notes for this action
 }
 
 // CustomerLifecycleStage is now a string type to support dynamic stages from API
@@ -229,6 +231,14 @@ export interface Reminder {
   completedAt?: string;
   isOverdue?: boolean;
   daysUntilDue?: number;
+}
+
+export interface Note {
+  id: number;
+  note: string;
+  addedBy: string | number; // Can be user ID (number) or display name (string)
+  createdAt: string; // ISO 8601 datetime
+  updatedAt: string; // ISO 8601 datetime
 }
 
 export interface Document {

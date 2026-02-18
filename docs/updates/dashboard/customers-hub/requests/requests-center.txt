@@ -62,3 +62,18 @@ components/customers-hub/actions/IncomingActionsCard.tsx, components/customers-h
 Update Type: Enhancement
 ربط إضافة note في صفحة RequestDetailPage بالـ API الصحيح المذكور في الوثائق - تعديل addNoteToAction في customers-hub-requests-api.ts لاستخدام endpoint الصحيح: POST /api/v2/customers-hub/requests/{requestId}/notes بدلاً من POST /api/v2/customers-hub/requests/{requestId} - تغيير body structure من { action: "add_note", data: { note, addedBy } } إلى { note, addedBy } (flat structure) - إضافة تعليقات توضيحية في الكود تشير إلى الوثائق - دعم addedBy كـ number (user ID) أو string (display name) - الكود الآن متوافق مع customers-hub-lead-based.md
 lib/services/customers-hub-requests-api.ts
+
+2026-02-18 02:43:26
+Update Type: Bug Fix
+إصلاح مشكلة z-index في dropdown "اختر الموظف" داخل popup "تعيين الموظف المسؤول" - إضافة className="z-[10001]" للـ SelectContent داخل CustomDialog لضمان ظهور dropdown فوق الـ popup بدلاً من تحته - تحديث جميع مواضع SelectContent في IncomingActionsCard.tsx داخل dialog "تعيين الموظف المسؤول"
+components/customers-hub/actions/IncomingActionsCard.tsx
+
+2026-02-18 02:45:11
+Update Type: Enhancement
+استبدال Select component بـ CustomDropdown في popup "تعيين الموظف المسؤول" - إزالة import لـ Select و SelectContent و SelectItem و SelectTrigger و SelectValue - إضافة import لـ CustomDropdown و DropdownItem من customComponents/customDropdown - استبدال Select بـ CustomDropdown في كلا موضعي dialog "تعيين الموظف المسؤول" - تحديث z-index في CustomDropdown من z-[9999] إلى z-[10001] لضمان ظهوره فوق CustomDialog (z-[10000]) - تحديث z-index في DropdownSubMenu من z-[10000] إلى z-[10001]
+components/customers-hub/actions/IncomingActionsCard.tsx, components/customComponents/customDropdown.tsx
+
+2026-02-18 02:46:45
+Update Type: Bug Fix
+إصلاح مشكلة المسافة بين dropdown trigger و dropdown content في CustomDropdown - إزالة المسافة الإضافية (8px) من حساب موضع القائمة لجعل الـ dropdown ملاصقاً تماماً للـ button - تغيير top من rect.bottom + window.scrollY + 8 إلى rect.bottom + window.scrollY
+components/customComponents/customDropdown.tsx
