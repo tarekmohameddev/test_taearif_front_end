@@ -47,8 +47,8 @@ import { cn } from "@/lib/utils";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerAction, UnifiedCustomer, Appointment, PropertyInterest, Note } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
-import { addNoteToAction, createReminderForRequest, assignAction as apiAssignAction } from "@/lib/services/customers-hub-requests-api";
-import { getEmployees as getAssignmentEmployees } from "@/lib/services/customers-hub-assignment-api";
+import { addNoteToAction, createReminderForRequest } from "@/lib/services/customers-hub-requests-api";
+import { getEmployees as getAssignmentEmployees, assignRequests } from "@/lib/services/customers-hub-assignment-api";
 import type { EmployeeWorkload } from "@/lib/services/customers-hub-assignment-api";
 import useAuthStore from "@/context/AuthContext";
 import {
@@ -537,27 +537,24 @@ export function RequestDetailPage({
       return;
     }
 
-    // Convert employeeId to number for API
-    const employeeIdNum = parseInt(selectedEmployeeId);
-    if (isNaN(employeeIdNum)) {
-      toast.error("خطأ في معرف الموظف");
-      return;
-    }
-
     setSavingEmployee(true);
     try {
-      // Use the v2 API endpoint that works with composite id (property_request_89, inquiry_123)
-      await apiAssignAction(action.id, employeeIdNum);
+      // Use POST /api/v2/customers-hub/assignment/assign endpoint
+      const response = await assignRequests([action.id], selectedEmployeeId);
 
-      toast.success("تم تعيين الموظف المسؤول بنجاح!");
-      
-      // Refresh page data
-      if (onRefetch) {
-        await onRefetch();
+      if (response.status === "success") {
+        toast.success("تم تعيين الموظف المسؤول بنجاح!");
+        
+        // Refresh page data
+        if (onRefetch) {
+          await onRefetch();
+        }
+
+        setShowAssignEmployeeDialog(false);
+        setSelectedEmployeeId(null);
+      } else {
+        throw new Error(response.message || "فشل تعيين الموظف");
       }
-
-      setShowAssignEmployeeDialog(false);
-      setSelectedEmployeeId(null);
     } catch (error: any) {
       console.error("Error assigning employee:", error);
       toast.error(

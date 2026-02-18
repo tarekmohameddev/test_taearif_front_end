@@ -9,6 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   CustomDropdown,
   DropdownItem,
 } from "@/components/customComponents/customDropdown";
@@ -39,7 +46,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { updateCustomerStage as apiUpdateCustomerStage, assignAction as apiAssignAction } from "@/lib/services/customers-hub-requests-api";
+import { updateCustomerStage as apiUpdateCustomerStage } from "@/lib/services/customers-hub-requests-api";
+import { assignRequests } from "@/lib/services/customers-hub-assignment-api";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
@@ -663,28 +671,32 @@ export function IncomingActionsCard({
 
     setSavingEmployee(true);
     try {
-      // Use the v2 API endpoint that works with composite id (property_request_89, inquiry_123)
-      await apiAssignAction(action.id, selectedEmployeeId);
+      // Use POST /api/v2/customers-hub/assignment/assign endpoint
+      const response = await assignRequests([action.id], selectedEmployeeId.toString());
 
-      toast.success("تم تعيين الموظف المسؤول بنجاح!");
-      
-      // Update action locally
-      const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
-      const employeeName = selectedEmployee 
-        ? (selectedEmployee.first_name && selectedEmployee.last_name
-            ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
-            : selectedEmployee.name || selectedEmployee.email || `موظف #${selectedEmployee.id}`)
-        : '';
-      
-      // Update the action locally
-      (action as any).assignedTo = selectedEmployeeId.toString();
-      (action as any).assignedToName = employeeName;
+      if (response.status === "success") {
+        toast.success("تم تعيين الموظف المسؤول بنجاح!");
+        
+        // Update action locally
+        const selectedEmployee = employees.find(emp => emp.id === selectedEmployeeId);
+        const employeeName = selectedEmployee 
+          ? (selectedEmployee.first_name && selectedEmployee.last_name
+              ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
+              : selectedEmployee.name || selectedEmployee.email || `موظف #${selectedEmployee.id}`)
+          : '';
+        
+        // Update the action locally
+        (action as any).assignedTo = selectedEmployeeId.toString();
+        (action as any).assignedToName = employeeName;
 
-      setShowAssignEmployeeDialog(false);
-      setSelectedEmployeeId(null);
-      
-      // Call onComplete to refresh the list
-      onComplete?.(action.id);
+        setShowAssignEmployeeDialog(false);
+        setSelectedEmployeeId(null);
+        
+        // Call onComplete to refresh the list
+        onComplete?.(action.id);
+      } else {
+        throw new Error(response.message || "فشل تعيين الموظف");
+      }
     } catch (error: any) {
       console.error("Error assigning employee:", error);
       toast.error(
@@ -934,7 +946,7 @@ export function IncomingActionsCard({
             )}
           </div>
           {/* Property request details in compact view */}
-          {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null))) && (
+          {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry') && (
             <div className="flex items-center gap-2 text-xs flex-wrap">
               {/* Budget */}
               {(action.budgetMin != null || action.budgetMax != null) && (
@@ -973,7 +985,7 @@ export function IncomingActionsCard({
                 </Badge>
               )}
               {/* Assign Employee Button or Assigned Employee Name */}
-              {action.objectType === 'property_request' && (
+              {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
                 action.assignedToName ? (
                   <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
                     <User className="h-3 w-3 shrink-0" />
@@ -1039,7 +1051,7 @@ export function IncomingActionsCard({
               <div>
                 <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
                 <div className="text-sm text-muted-foreground font-normal">
-                  اختر الموظف المسؤول عن طلب العقار
+                  اختر الموظف المسؤول عن الطلب
                 </div>
               </div>
             </CustomDialogTitle>
@@ -1062,6 +1074,8 @@ export function IncomingActionsCard({
                 <div className="text-sm text-muted-foreground">
                   {action.objectType === 'property_request' && action.sourceId
                     ? `طلب عقار رقم #${action.sourceId}`
+                    : action.objectType === 'inquiry' && action.sourceId
+                    ? `استفسار رقم #${action.sourceId}`
                     : action.title}
                 </div>
               </div>
@@ -1271,7 +1285,7 @@ export function IncomingActionsCard({
               </a>
             )}
             {/* Property request details - show all available data */}
-            {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) ? (
+            {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry' ? (
               <div className="mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   {/* Budget */}
@@ -1311,7 +1325,7 @@ export function IncomingActionsCard({
                     </Badge>
                   )}
                   {/* Assign Employee Button or Assigned Employee Name */}
-                  {action.objectType === 'property_request' && (
+                  {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
                     action.assignedToName ? (
                       <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
                         <User className="h-3.5 w-3.5 shrink-0" />
@@ -1546,7 +1560,7 @@ export function IncomingActionsCard({
               <div>
                 <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
                 <div className="text-sm text-muted-foreground font-normal">
-                  اختر الموظف المسؤول عن طلب العقار
+                  اختر الموظف المسؤول عن الطلب
                 </div>
               </div>
             </CustomDialogTitle>
@@ -1569,6 +1583,8 @@ export function IncomingActionsCard({
                 <div className="text-sm text-muted-foreground">
                   {action.objectType === 'property_request' && action.sourceId
                     ? `طلب عقار رقم #${action.sourceId}`
+                    : action.objectType === 'inquiry' && action.sourceId
+                    ? `استفسار رقم #${action.sourceId}`
                     : action.title}
                 </div>
               </div>
