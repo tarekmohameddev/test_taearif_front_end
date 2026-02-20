@@ -32,6 +32,8 @@ import {
   Filter,
   Search,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   AlertTriangle,
   Timer,
   UserPlus,
@@ -97,6 +99,23 @@ const priorityOptions: { value: Priority; label: string; color: string }[] = [
   { value: "medium", label: "متوسط", color: "bg-yellow-100 text-yellow-700" },
   { value: "low", label: "منخفض", color: "bg-green-100 text-green-700" },
 ];
+
+/** Build list of page numbers + ellipsis for pagination (e.g. [1, 'ellipsis', 4, 5, 6, 'ellipsis', 12]) */
+function getPaginationPages(currentPage: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 0) return [];
+  if (totalPages <= 6) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const set = new Set<number>([1, totalPages]);
+  set.add(currentPage);
+  if (currentPage > 1) set.add(currentPage - 1);
+  if (currentPage < totalPages) set.add(currentPage + 1);
+  const sorted = Array.from(set).sort((a, b) => a - b);
+  const result: (number | "ellipsis")[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i]! - sorted[i - 1]! > 1) result.push("ellipsis");
+    result.push(sorted[i]!);
+  }
+  return result;
+}
 
 // Confirmation Dialog Component
 interface ConfirmationDialogProps {
@@ -1700,6 +1719,77 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
             />
           </TabsContent>
         </Tabs>
+
+        {/* Pagination — مثل الصورة: السابق | أرقام الصفحات | التالي */}
+        {props?.onFetchRequests && props?.pagination && props.pagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-1 pt-4 pb-2">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-md border-gray-200 bg-white hover:bg-gray-50"
+              onClick={() => {
+                const { currentPage, itemsPerPage } = props.pagination;
+                if (currentPage <= 1) return;
+                props.onFetchRequests?.({
+                  ...newFilters,
+                  offset: (currentPage - 2) * itemsPerPage,
+                  limit: itemsPerPage,
+                } as RequestsListFilters);
+              }}
+              disabled={props.pagination.currentPage <= 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            {getPaginationPages(props.pagination.currentPage, props.pagination.totalPages).map((item, idx) =>
+              item === "ellipsis" ? (
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="h-9 min-w-[2.25rem] px-2 flex items-center justify-center rounded-md border border-gray-200 bg-white text-sm text-gray-500"
+                >
+                  ...
+                </span>
+              ) : (
+                <Button
+                  key={item}
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 min-w-[2.25rem] rounded-md",
+                    props.pagination.currentPage === item
+                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:text-primary-foreground"
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  )}
+                  onClick={() => {
+                    props?.onFetchRequests?.({
+                      ...newFilters,
+                      offset: (item - 1) * props.pagination.itemsPerPage,
+                      limit: props.pagination.itemsPerPage,
+                    } as RequestsListFilters);
+                  }}
+                >
+                  {item}
+                </Button>
+              )
+            )}
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-md border-gray-200 bg-white hover:bg-gray-50"
+              onClick={() => {
+                const { currentPage, itemsPerPage } = props.pagination;
+                if (currentPage >= props.pagination.totalPages) return;
+                props.onFetchRequests?.({
+                  ...newFilters,
+                  offset: currentPage * itemsPerPage,
+                  limit: itemsPerPage,
+                } as RequestsListFilters);
+              }}
+              disabled={props.pagination.currentPage >= props.pagination.totalPages}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
         {/* Bulk toolbar */}
         <BulkActionsToolbar
