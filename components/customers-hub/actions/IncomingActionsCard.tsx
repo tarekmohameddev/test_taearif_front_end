@@ -1257,7 +1257,7 @@ export function IncomingActionsCard({
   return (
     <Card
       className={cn(
-        "transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group",
+        "rounded-2xl transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group",
         priorityColors[action.priority],
         isOverdue && "border-red-600",
         isSelected && "ring-2 ring-blue-500 bg-blue-50/50 dark:bg-blue-950/30",
