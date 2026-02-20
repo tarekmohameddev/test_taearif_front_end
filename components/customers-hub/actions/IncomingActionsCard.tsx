@@ -1258,7 +1258,7 @@ export function IncomingActionsCard({
   return (
     <Card
       className={cn(
-        "rounded-2xl transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group",
+        "rounded-2xl transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group flex flex-col h-full",
         priorityColors[action.priority],
         isOverdue && "border-red-600",
         isSelected && "ring-2 ring-blue-500 bg-blue-50/50 dark:bg-blue-950/30",
@@ -1266,7 +1266,7 @@ export function IncomingActionsCard({
       )}
       onClick={handleCardClick}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 shrink-0">
         <div className="flex items-start justify-between gap-4">
           {/* Selection Checkbox */}
           {showCheckbox && (
@@ -1361,8 +1361,8 @@ export function IncomingActionsCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 space-y-3">
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex items-center justify-between gap-4">
+      <CardContent className="pt-0 space-y-3 flex-1 flex flex-col min-h-0">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex items-center justify-between gap-4 shrink-0">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
               {action.dueDate && (

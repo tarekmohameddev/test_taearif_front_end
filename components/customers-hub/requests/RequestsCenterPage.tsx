@@ -1867,6 +1867,34 @@ function RequestsList({
   }>;
   completingActionIds: Set<string>;
 }) {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [maxCardHeight, setMaxCardHeight] = useState<number | null>(null);
+
+  // Measure max card height across entire grid so all cards share the same height
+  useEffect(() => {
+    if (isCompactView || actions.length === 0) {
+      setMaxCardHeight(null);
+      return;
+    }
+    const measure = () => {
+      const grid = gridRef.current;
+      if (!grid?.children?.length) return;
+      let max = 0;
+      for (let i = 0; i < grid.children.length; i++) {
+        const h = (grid.children[i] as HTMLElement).getBoundingClientRect().height;
+        if (h > max) max = h;
+      }
+      if (max > 0) setMaxCardHeight(max);
+    };
+    const t = setTimeout(measure, 0);
+    const ro = new ResizeObserver(measure);
+    if (gridRef.current) ro.observe(gridRef.current);
+    return () => {
+      clearTimeout(t);
+      ro.disconnect();
+    };
+  }, [actions, isCompactView]);
+
   if (actions.length === 0) {
     return (
       <Card>
@@ -1880,24 +1908,33 @@ function RequestsList({
   }
 
   return (
-    <div className={cn("grid gap-3", isCompactView ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3")}>
+    <div
+      ref={gridRef}
+      className={cn("grid gap-3 items-stretch", isCompactView ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3")}
+    >
       {actions.map((action) => (
-        <IncomingActionsCard
+        <div
           key={action.id}
-          action={action}
-          customer={getCustomerById(action.customerId)}
-          stages={stages}
-          onComplete={onComplete}
-          onDismiss={onDismiss}
-          onSnooze={onSnooze}
-          onAddNote={onAddNote}
-          onQuickView={onQuickView}
-          isSelected={selectedActionIds.has(action.id)}
-          onSelect={onSelect}
-          showCheckbox={true}
-          isCompact={isCompactView}
-          isCompleting={completingActionIds.has(action.id)}
-        />
+          className={isCompactView ? undefined : "h-full min-h-0"}
+          style={!isCompactView && maxCardHeight != null ? { minHeight: maxCardHeight } : undefined}
+        >
+          <IncomingActionsCard
+            action={action}
+            customer={getCustomerById(action.customerId)}
+            stages={stages}
+            onComplete={onComplete}
+            onDismiss={onDismiss}
+            onSnooze={onSnooze}
+            onAddNote={onAddNote}
+            onQuickView={onQuickView}
+            isSelected={selectedActionIds.has(action.id)}
+            onSelect={onSelect}
+            showCheckbox={true}
+            isCompact={isCompactView}
+            isCompleting={completingActionIds.has(action.id)}
+            className={isCompactView ? undefined : "h-full"}
+          />
+        </div>
       ))}
     </div>
   );
