@@ -1000,7 +1000,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900" dir="rtl">
+    <div className="min-h-screen" dir="rtl">
       <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
