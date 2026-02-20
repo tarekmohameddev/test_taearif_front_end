@@ -1023,33 +1023,6 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Select value={viewMode} onValueChange={(v: any) => setViewMode(v)}>
-              <SelectTrigger className="w-64">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="grid">
-                  <div className="flex items-center gap-2">
-                    <LayoutGrid className="h-4 w-4" />
-                    عرض الشبكة
-                  </div>
-                </SelectItem>
-                <SelectItem value="compact">
-                  <div className="flex items-center gap-2">
-                    <LayoutList className="h-4 w-4" />
-                    عرض مضغوط
-                  </div>
-                </SelectItem>
-                <SelectItem value="table">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">Table</Badge>
-                    عرض جدول منظم
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
         {/* Stats */}
