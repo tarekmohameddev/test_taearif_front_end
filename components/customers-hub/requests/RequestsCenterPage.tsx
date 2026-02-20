@@ -956,6 +956,20 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     budgetMax !== "" ||
     selectedPropertyTypes.length > 0;
 
+  // Count of active filter dimensions (for "تصفية متقدمة" badge)
+  const activeFiltersCount =
+    (appliedSearchQuery ? 1 : 0) +
+    (selectedSources.length > 0 ? 1 : 0) +
+    (selectedObjectTypes.length > 0 ? 1 : 0) +
+    (selectedPriorities.length > 0 ? 1 : 0) +
+    (selectedTypes.length > 0 ? 1 : 0) +
+    (selectedAssignees.length > 0 ? 1 : 0) +
+    (dueDateFilter !== "all" ? 1 : 0) +
+    (selectedCities.length > 0 ? 1 : 0) +
+    (selectedStates.length > 0 ? 1 : 0) +
+    (budgetMin !== "" || budgetMax !== "" ? 1 : 0) +
+    (selectedPropertyTypes.length > 0 ? 1 : 0);
+
   // Show loading state
   if (apiLoading && actions.length === 0) {
     return (
@@ -1149,12 +1163,13 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-col gap-4">
+              {/* Top row: Search (right) | View toggles + مسح الفلاتر + تصفية متقدمة (left) */}
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                <div className="relative flex-1 max-w-md flex gap-2">
+                <div className="relative flex-1 max-w-md flex gap-2 order-2 md:order-1">
                   <div className="relative flex-1">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="البحث في الطلبات..."
+                      placeholder="بحث عن اسم العميل، رقم الهاتف، أو المرجع..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => {
@@ -1175,7 +1190,54 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                     بحث
                   </Button>
                 </div>
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap order-1 md:order-2">
+                  {/* View mode: list / grid */}
+                  <div className="flex items-center rounded-md border bg-muted/30 p-0.5">
+                    <Button
+                      type="button"
+                      variant={viewMode === "compact" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => setViewMode("compact")}
+                    >
+                      <LayoutList className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={viewMode === "grid" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => setViewMode("grid")}
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
+                      مسح الفلاتر
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    className="gap-2 relative"
+                    onClick={() => setShowAdvancedFilters((v) => !v)}
+                  >
+                    <Filter className="h-4 w-4" />
+                    تصفية متقدمة
+                    {activeFiltersCount > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary-foreground text-primary text-[10px] font-bold flex items-center justify-center">
+                        {activeFiltersCount}
+                      </span>
+                    )}
+                    <ChevronDown className={cn("h-4 w-4 transition-transform", showAdvancedFilters && "rotate-180")} />
+                  </Button>
+                </div>
+              </div>
+              {/* Advanced filters (dropdowns) - visible only when "تصفية متقدمة" is open */}
+              {showAdvancedFilters && (
+                <div className="flex flex-wrap items-center gap-2 border-t pt-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">
@@ -1515,14 +1577,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  {hasActiveFilters && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
-                      <X className="h-4 w-4" />
-                      مسح الفلاتر
-                    </Button>
-                  )}
                 </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
