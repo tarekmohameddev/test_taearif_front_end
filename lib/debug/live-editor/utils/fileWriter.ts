@@ -7,19 +7,23 @@
 import { AIFriendlyEvent, ComponentTrace, StoreSnapshot, DataFlowStep, DetailedPerformanceMetrics } from "../core/types";
 import { getLogsDir, isDebugEnabled } from "../core/config";
 
-// Dynamic import for fs/promises (server-side only)
+// Dynamic import for fs/promises (server-side only).
+// Use variables so webpack doesn't statically resolve Node built-ins in client bundle.
+const NODE_FS = "fs/promises";
+const NODE_PATH = "path";
+
 let fs: typeof import("fs/promises") | null = null;
 let path: typeof import("path") | null = null;
 
-// Lazy load fs and path only in server-side (webpackIgnore prevents client bundle from resolving Node built-ins)
-async function getFs() {
-  if (typeof window !== "undefined") {
-    // Client-side: return null
-    return null;
-  }
+async function getFs(): Promise<typeof import("fs/promises") | null> {
+  if (typeof window !== "undefined") return null;
   if (!fs) {
-    fs = await import(/* webpackIgnore: true */ "fs/promises");
-    path = await import(/* webpackIgnore: true */ "path");
+    try {
+      fs = await import(/* webpackIgnore: true */ NODE_FS);
+      path = await import(/* webpackIgnore: true */ NODE_PATH);
+    } catch {
+      return null;
+    }
   }
   return fs;
 }
