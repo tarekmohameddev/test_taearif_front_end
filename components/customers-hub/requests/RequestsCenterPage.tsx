@@ -1178,42 +1178,21 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                           applySearch();
                         }
                       }}
-                      className="pr-10"
+                      className="pr-10 rounded-xl"
                     />
                   </div>
                   <Button
                     onClick={applySearch}
                     size="sm"
-                    className="gap-2"
+                    className="gap-2 rounded-xl"
                   >
                     <Search className="h-4 w-4" />
                     بحث
                   </Button>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap order-1 md:order-2">
-                  {/* View mode: list / grid */}
-                  <div className="flex items-center rounded-md border bg-muted/30 p-0.5">
-                    <Button
-                      type="button"
-                      variant={viewMode === "compact" ? "secondary" : "ghost"}
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                      onClick={() => setViewMode("compact")}
-                    >
-                      <LayoutList className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={viewMode === "grid" ? "secondary" : "ghost"}
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                      onClick={() => setViewMode("grid")}
-                    >
-                      <LayoutGrid className="h-4 w-4" />
-                    </Button>
-                  </div>
                   {hasActiveFilters && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 rounded-xl">
                       مسح الفلاتر
                     </Button>
                   )}
@@ -1221,7 +1200,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                     type="button"
                     variant="default"
                     size="sm"
-                    className="gap-2 relative"
+                    className="gap-2 relative rounded-xl"
                     onClick={() => setShowAdvancedFilters((v) => !v)}
                   >
                     <Filter className="h-4 w-4" />
@@ -1233,6 +1212,27 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                     )}
                     <ChevronDown className={cn("h-4 w-4 transition-transform", showAdvancedFilters && "rotate-180")} />
                   </Button>
+                  {/* View mode: list / grid */}
+                  <div className="flex items-center rounded-md bg-muted/60 p-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={cn("h-10 w-10 p-0 hover:bg-white", viewMode === "compact" && "bg-white")}
+                      onClick={() => setViewMode("compact")}
+                    >
+                      <LayoutList className="h-6 w-6" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={cn("h-10 w-10 p-0 hover:bg-white", viewMode === "grid" && "bg-white")}
+                      onClick={() => setViewMode("grid")}
+                    >
+                      <LayoutGrid className="h-6 w-6" />
+                    </Button>
+                  </div>
                 </div>
               </div>
               {/* Advanced filters (dropdowns) - visible only when "تصفية متقدمة" is open */}
