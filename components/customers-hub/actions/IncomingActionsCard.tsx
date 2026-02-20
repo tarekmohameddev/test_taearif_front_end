@@ -1362,7 +1362,7 @@ export function IncomingActionsCard({
         </div>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
-        <div className="flex items-center justify-between gap-4">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex items-center justify-between gap-4">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
               {action.dueDate && (
