@@ -1930,6 +1930,14 @@ function RequestsList({
 }) {
   const gridRef = useRef<HTMLDivElement>(null);
   const [maxCardHeight, setMaxCardHeight] = useState<number | null>(null);
+  const measureRef = useRef<() => void>(() => {});
+
+  // When any card closes its appointment form, clear minHeight and re-measure so the whole grid shrinks
+  const handleScheduleFormOpenChange = useCallback((open: boolean) => {
+    if (open) return;
+    setMaxCardHeight(null);
+    setTimeout(() => measureRef.current(), 80);
+  }, []);
 
   // Measure max card height across entire grid so all cards share the same height
   useEffect(() => {
@@ -1947,6 +1955,7 @@ function RequestsList({
       }
       if (max > 0) setMaxCardHeight(max);
     };
+    measureRef.current = measure;
     const t = setTimeout(measure, 0);
     const ro = new ResizeObserver(measure);
     if (gridRef.current) ro.observe(gridRef.current);
@@ -1994,6 +2003,7 @@ function RequestsList({
             isCompact={isCompactView}
             isCompleting={completingActionIds.has(action.id)}
             className={isCompactView ? undefined : "h-full"}
+            onScheduleFormOpenChange={handleScheduleFormOpenChange}
           />
         </div>
       ))}

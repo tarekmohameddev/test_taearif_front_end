@@ -242,6 +242,8 @@ interface IncomingActionsCardProps {
   className?: string;
   /** Whether the action is currently being completed */
   isCompleting?: boolean;
+  /** Called when the inline appointment schedule form is opened or closed (for grid height re-measure) */
+  onScheduleFormOpenChange?: (open: boolean) => void;
 }
 
 // Card background: urgent = red→white, medium = yellow→white (top to bottom); rest white
@@ -341,11 +343,15 @@ export function IncomingActionsCard({
   isCompact = false,
   className,
   isCompleting = false,
+  onScheduleFormOpenChange,
 }: IncomingActionsCardProps) {
   const router = useRouter();
   const { addAppointment, addAppointmentForRequest, updateCustomerStage, getCustomerById } = useUnifiedCustomersStore();
   const { userData } = useAuthStore();
   const [showScheduleForm, setShowScheduleForm] = useState(false);
+  React.useEffect(() => {
+    onScheduleFormOpenChange?.(showScheduleForm);
+  }, [showScheduleForm, onScheduleFormOpenChange]);
   const [aptType, setAptType] = useState<Appointment["type"]>("office_meeting");
   const [aptDate, setAptDate] = useState("");
   const [aptTime, setAptTime] = useState("10:00");
