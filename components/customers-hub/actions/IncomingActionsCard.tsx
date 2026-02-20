@@ -1258,7 +1258,7 @@ export function IncomingActionsCard({
   return (
     <Card
       className={cn(
-        "rounded-2xl transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group flex flex-col h-full",
+        "rounded-2xl transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group flex flex-col h-full relative overflow-hidden",
         priorityColors[action.priority],
         isOverdue && "border-red-600",
         isSelected && "ring-2 ring-blue-500 bg-blue-50/50 dark:bg-blue-950/30",
@@ -1361,122 +1361,7 @@ export function IncomingActionsCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 space-y-3 flex-1 flex flex-col min-h-0">
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex items-center justify-between gap-4 shrink-0">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
-              {action.dueDate && (
-                <div
-                  className={cn(
-                    "flex items-center gap-1.5",
-                    isOverdue && "text-red-600 font-medium"
-                  )}
-                >
-                  <Clock className="h-4 w-4 shrink-0" />
-                  <span>
-                    {new Date(action.dueDate).toLocaleDateString("ar-SA", {
-                      weekday: "short",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}{" "}
-                    {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
-              )}
-            </div>
-            {/* Stage Dropdown - Load stages from Zustand store */}
-            {availableStages.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 text-xs rounded-md hover:opacity-80 transition-all cursor-pointer text-right w-fit px-2 py-1"
-                    style={{
-                      backgroundColor: `${getStageColor(displayStage)}15`,
-                      border: `1px solid ${getStageColor(displayStage)}40`,
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    data-interactive="true"
-                  >
-                    <span
-                      className="size-2 rounded-full shrink-0"
-                      style={{ backgroundColor: getStageColor(displayStage) }}
-                      aria-hidden
-                    />
-                    <span 
-                      style={{ color: getStageColor(displayStage) }} 
-                      className="font-medium"
-                    >
-                      {getStageNameAr(displayStage)}
-                    </span>
-                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[180px]">
-                  {availableStages.map((stage) => (
-                    <DropdownMenuItem
-                      key={stage.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStageChange(stage.id as CustomerLifecycleStage);
-                      }}
-                      className="flex items-center gap-2"
-                      disabled={isUpdatingStage || displayStage === stage.id}
-                    >
-                      <span
-                        className="size-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: stage.color }}
-                        aria-hidden
-                      />
-                      {stage.nameAr}
-                      {displayStage === stage.id && (
-                        <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : null}
-            {/* AI property matching indicator */}
-            {resolvedCustomer && (
-              <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">
-                {aiMatching.canMatch ? (
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
-                    ✨ {aiMatching.matchCount}
-                  </div>
-                ) : (
-                  <TooltipProvider delayDuration={200}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400/90 cursor-help">
-                          ✨ —
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs text-xs">
-                        <p className="font-medium mb-1">حقول مطلوبة للمطابقة:</p>
-                        <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
-                          {aiMatching.missingFields.map((f) => (
-                            <li key={f}>{f}</li>
-                          ))}
-                        </ul>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
-            )}
-          </div>
-
-          <ActionQuickPanel
-            action={action}
-            onSchedule={() => setShowScheduleForm((prev) => !prev)}
-          />
-        </div>
-
+      <CardContent className="pt-0 space-y-3 flex-1 flex flex-col min-h-0 pb-20">
         {/* Inline جدولة موعد form (expand in card) */}
         {showScheduleForm && (
           <div
@@ -1556,6 +1441,121 @@ export function IncomingActionsCard({
           </div>
         )}
       </CardContent>
+
+      {/* Bottom bar: stage + appointment — ملتصق بأسفل الكارد (ابن مباشر للـ Card) */}
+      <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700 pt-3 px-6 pb-4 flex items-center justify-between gap-4 rounded-b-2xl bg-white dark:bg-gray-900">
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
+            {action.dueDate && (
+              <div
+                className={cn(
+                  "flex items-center gap-1.5",
+                  isOverdue && "text-red-600 font-medium"
+                )}
+              >
+                <Clock className="h-4 w-4 shrink-0" />
+                <span>
+                  {new Date(action.dueDate).toLocaleDateString("ar-SA", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            )}
+          </div>
+          {/* Stage Dropdown */}
+          {availableStages.length > 0 ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 text-xs rounded-md hover:opacity-80 transition-all cursor-pointer text-right w-fit px-2 py-1"
+                  style={{
+                    backgroundColor: `${getStageColor(displayStage)}15`,
+                    border: `1px solid ${getStageColor(displayStage)}40`,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  data-interactive="true"
+                >
+                  <span
+                    className="size-2 rounded-full shrink-0"
+                    style={{ backgroundColor: getStageColor(displayStage) }}
+                    aria-hidden
+                  />
+                  <span
+                    style={{ color: getStageColor(displayStage) }}
+                    className="font-medium"
+                  >
+                    {getStageNameAr(displayStage)}
+                  </span>
+                  <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[180px]">
+                {availableStages.map((stage) => (
+                  <DropdownMenuItem
+                    key={stage.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStageChange(stage.id as CustomerLifecycleStage);
+                    }}
+                    className="flex items-center gap-2"
+                    disabled={isUpdatingStage || displayStage === stage.id}
+                  >
+                    <span
+                      className="size-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: stage.color }}
+                      aria-hidden
+                    />
+                    {stage.nameAr}
+                    {displayStage === stage.id && (
+                      <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
+          {/* AI property matching indicator */}
+          {resolvedCustomer && (
+            <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">
+              {aiMatching.canMatch ? (
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
+                  ✨ {aiMatching.matchCount}
+                </div>
+              ) : (
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400/90 cursor-help">
+                        ✨ —
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-xs">
+                      <p className="font-medium mb-1">حقول مطلوبة للمطابقة:</p>
+                      <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
+                        {aiMatching.missingFields.map((f) => (
+                          <li key={f}>{f}</li>
+                        ))}
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          )}
+        </div>
+        <ActionQuickPanel
+          action={action}
+          onSchedule={() => setShowScheduleForm((prev) => !prev)}
+        />
+      </div>
 
       {/* Assign Employee Dialog */}
       <CustomDialog open={showAssignEmployeeDialog} onOpenChange={setShowAssignEmployeeDialog} maxWidth="max-w-md">
