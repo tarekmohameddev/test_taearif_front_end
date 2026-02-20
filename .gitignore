@@ -18,6 +18,7 @@ yarn-error.log*
 .pnpm-debug.log*
 .cursor/debug
 .cursor/debug/
+.cursor/debug.log
 
 # env files
 
