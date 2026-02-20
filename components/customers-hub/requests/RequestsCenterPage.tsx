@@ -452,6 +452,9 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
   const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
 
+  // Advanced filters panel visibility (toggle via "تصفية متقدمة" button)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
   // Fetch requests when filters change (only if API handler is provided)
   // Use useRef to track previous filters and prevent unnecessary API calls
   const prevFiltersRef = useRef<string>("");
