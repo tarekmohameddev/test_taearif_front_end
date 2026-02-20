@@ -38,6 +38,7 @@ import {
   MessageSquare,
   LayoutGrid,
   LayoutList,
+  Table2,
   X,
   MapPin,
   Building2,
@@ -1212,7 +1213,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                     )}
                     <ChevronDown className={cn("h-4 w-4 transition-transform", showAdvancedFilters && "rotate-180")} />
                   </Button>
-                  {/* View mode: list / grid */}
+                  {/* View mode: list / grid / table */}
                   <div className="flex items-center rounded-md bg-muted/60 p-1">
                     <Button
                       type="button"
@@ -1231,6 +1232,15 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                       onClick={() => setViewMode("grid")}
                     >
                       <LayoutGrid />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={cn("h-10 w-10 p-0 hover:bg-white [&_svg]:!h-5 [&_svg]:!w-5", viewMode === "table" && "bg-white")}
+                      onClick={() => setViewMode("table")}
+                    >
+                      <Table2 />
                     </Button>
                   </div>
                 </div>
