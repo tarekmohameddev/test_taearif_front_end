@@ -1237,7 +1237,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
               </div>
               {/* Advanced filters (dropdowns) - visible only when "تصفية متقدمة" is open */}
               {showAdvancedFilters && (
-                <div className="flex flex-wrap items-center gap-2 border-t pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 border-t pt-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">
