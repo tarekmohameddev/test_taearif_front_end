@@ -11,15 +11,15 @@ import { getLogsDir, isDebugEnabled } from "../core/config";
 let fs: typeof import("fs/promises") | null = null;
 let path: typeof import("path") | null = null;
 
-// Lazy load fs and path only in server-side
+// Lazy load fs and path only in server-side (webpackIgnore prevents client bundle from resolving Node built-ins)
 async function getFs() {
   if (typeof window !== "undefined") {
     // Client-side: return null
     return null;
   }
   if (!fs) {
-    fs = await import("fs/promises");
-    path = await import("path");
+    fs = await import(/* webpackIgnore: true */ "fs/promises");
+    path = await import(/* webpackIgnore: true */ "path");
   }
   return fs;
 }

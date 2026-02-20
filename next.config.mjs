@@ -47,6 +47,16 @@ const nextConfig = {
   
   // ⬅️ Webpack configuration - فقط في PRODUCTION
   webpack: (config, { isServer, dev, webpack }) => {
+    // منع حل fs/promises و path في bundle العميل (lib/debug يستخدمها فقط في السيرفر)
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        "fs/promises": false,
+        path: false,
+      };
+    }
+
     // ⬅️ Webpack في PRODUCTION فقط
     if (!dev) {
       // تحسينات الذاكرة - تقليل استهلاك الذاكرة أثناء البناء
