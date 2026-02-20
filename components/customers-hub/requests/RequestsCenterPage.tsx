@@ -1240,7 +1240,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 border-t pt-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <Filter className="h-4 w-4" />
                         المصدر
                         {selectedSources.length > 0 && (
@@ -1279,7 +1279,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <AlertTriangle className="h-4 w-4" />
                         الأولوية
                         {selectedPriorities.length > 0 && (
@@ -1310,7 +1310,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <ListTodo className="h-4 w-4" />
                         النوع
                         {selectedTypes.length > 0 && (
@@ -1342,7 +1342,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   {uniqueAssignees.length > 0 && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
+                        <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                           <UserPlus className="h-4 w-4" />
                           الموظف
                           {selectedAssignees.length > 0 && (
@@ -1374,7 +1374,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   )}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <Timer className="h-4 w-4" />
                         الموعد
                         {dueDateFilter !== "all" && (
@@ -1408,7 +1408,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   {uniqueCities.length > 0 && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
+                        <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                           <MapPin className="h-4 w-4" />
                           المدينة
                           {selectedCities.length > 0 && (
@@ -1440,7 +1440,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   )}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <MapPin className="h-4 w-4" />
                         المنطقة
                         {selectedStates.length > 0 && (
@@ -1478,7 +1478,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                     }
                   }}>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <DollarSign className="h-4 w-4" />
                         الميزانية
                         {(budgetMin !== "" || budgetMax !== "") && (
@@ -1546,7 +1546,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <Building2 className="h-4 w-4" />
                         نوع العقار
                         {selectedPropertyTypes.length > 0 && (
