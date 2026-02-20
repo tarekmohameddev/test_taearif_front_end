@@ -1218,19 +1218,19 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className={cn("h-10 w-10 p-0 hover:bg-white", viewMode === "compact" && "bg-white")}
+                      className={cn("h-10 w-10 p-0 hover:bg-white [&_svg]:!h-5 [&_svg]:!w-5", viewMode === "compact" && "bg-white")}
                       onClick={() => setViewMode("compact")}
                     >
-                      <LayoutList className="h-6 w-6" />
+                      <LayoutList />
                     </Button>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className={cn("h-10 w-10 p-0 hover:bg-white", viewMode === "grid" && "bg-white")}
+                      className={cn("h-10 w-10 p-0 hover:bg-white [&_svg]:!h-5 [&_svg]:!w-5", viewMode === "grid" && "bg-white")}
                       onClick={() => setViewMode("grid")}
                     >
-                      <LayoutGrid className="h-6 w-6" />
+                      <LayoutGrid />
                     </Button>
                   </div>
                 </div>
