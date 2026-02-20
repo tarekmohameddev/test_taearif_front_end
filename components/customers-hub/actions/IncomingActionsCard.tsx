@@ -244,11 +244,12 @@ interface IncomingActionsCardProps {
   isCompleting?: boolean;
 }
 
+// Card background: urgent = red→white, medium = yellow→white (top to bottom); rest white
 const priorityColors = {
-  urgent: "border-red-500 bg-red-50/50 dark:bg-red-950/30",
-  high: "border-orange-500 bg-orange-50/50 dark:bg-orange-950/30",
-  medium: "border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/30",
-  low: "border-green-500 bg-green-50/50 dark:bg-green-950/30",
+  urgent: "border-red-500 bg-gradient-to-b from-red-50 to-white ",
+  high: "border-orange-500 bg-white dark:bg-gray-900",
+  medium: "border-yellow-500 bg-gradient-to-b from-[#ffeb2b]/20 to-white ",
+  low: "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900",
 };
 
 const priorityLabels = {
