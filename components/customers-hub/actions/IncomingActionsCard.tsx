@@ -29,7 +29,7 @@ import {
   LIFECYCLE_STAGES,
   type CustomerLifecycleStage,
 } from "@/types/unified-customer";
-import type { Appointment } from "@/types/unified-customer";
+import type { Appointment, Reminder } from "@/types/unified-customer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -266,6 +266,64 @@ const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
   { value: "contract_signing", label: "توقيع عقد" },
   { value: "other", label: "أخرى" },
 ];
+
+/** Format datetime string for display (ar-SA, short) */
+function formatAppointmentDatetime(datetime: string | undefined): string {
+  if (!datetime) return "—";
+  try {
+    const d = new Date(datetime);
+    return d.toLocaleDateString("ar-SA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return datetime;
+  }
+}
+
+/** Appointments + Reminders table block (text-xs) - same data shape as /v2/customers-hub/requests/list */
+function AppointmentsRemindersTable({
+  appointments = [],
+  reminders = [],
+  className = "",
+}: {
+  appointments?: Array<{ id?: number | string; title?: string; type?: string; datetime?: string; status?: string; notes?: string }>;
+  reminders?: Array<{ id?: number | string; title?: string; description?: string; datetime?: string; status?: string; priority?: string }>;
+  className?: string;
+}) {
+  const hasAppointments = Array.isArray(appointments) && appointments.length > 0;
+  const hasReminders = Array.isArray(reminders) && reminders.length > 0;
+  if (!hasAppointments && !hasReminders) return null;
+
+  return (
+    <div className={cn("mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50", className)}>
+      <table className="w-full text-xs border-collapse">
+        <thead>
+          <tr className="text-muted-foreground border-b border-gray-200 dark:border-gray-700">
+            <th className="text-right py-1 px-1.5 font-medium">النوع</th>
+            <th className="text-right py-1 px-1.5 font-medium">العنوان</th>
+            <th className="text-right py-1 px-1.5 font-medium">التاريخ والوقت</th>
+          </tr>
+        </thead>
+        <tbody className="text-xs">
+          {hasAppointments &&
+            appointments.map((apt, i) => (
+              <tr key={apt.id ?? `apt-${i}`} className="border-b border-gray-100 dark:border-gray-700/50">
+                <td className="py-1 px-1.5">موعد</td>
+                <td className="py-1 px-1.5">{apt.title ?? "—"}</td>
+                <td className="py-1 px-1.5 dir-ltr">{formatAppointmentDatetime(apt.datetime)}</td>
+              </tr>
+            ))}
+          {hasReminders &&
+            reminders.map((rem, i) => (
+              <tr key={rem.id ?? `rem-${i}`} className="border-b border-gray-100 dark:border-gray-700/50">
+                <td className="py-1 px-1.5">تذكير</td>
+                <td className="py-1 px-1.5">{rem.title ?? rem.description ?? "—"}</td>
+                <td className="py-1 px-1.5 dir-ltr ">{formatAppointmentDatetime(rem.datetime)}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export function IncomingActionsCard({
   action,
@@ -1010,70 +1068,11 @@ export function IncomingActionsCard({
               </div>
             )}
           </div>
-          {/* Property request details in compact view */}
-          {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry') && (
-            <div className="flex items-center gap-2 text-xs flex-wrap">
-              {/* Budget */}
-              {(action.budgetMin != null || action.budgetMax != null) && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <DollarSign className="h-3 w-3 shrink-0" />
-                  <span className="truncate max-w-[120px]">
-                    {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                      ? `${action.budgetMin.toLocaleString("en-US")}–${action.budgetMax.toLocaleString("en-US")} ر.س`
-                      : action.budgetMin != null
-                        ? `${action.budgetMin.toLocaleString("en-US")} ر.س`
-                        : action.budgetMax != null
-                          ? `${action.budgetMax.toLocaleString("en-US")} ر.س`
-                          : ''}
-                  </span>
-                </Badge>
-              )}
-              {/* Property Type */}
-              {action.propertyType && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <Building2 className="h-3 w-3 shrink-0" />
-                  {translatePropertyType(action.propertyType)}
-                </Badge>
-              )}
-              {/* Location */}
-              {action.city && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <MapPin className="h-3 w-3 shrink-0" />
-                  <span className="truncate max-w-[80px]">{action.city}</span>
-                </Badge>
-              )}
-              {/* Seriousness */}
-              {action.metadata?.seriousness && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <AlertTriangle className="h-3 w-3 shrink-0" />
-                  <span className="truncate max-w-[100px]">الجدية: {action.metadata.seriousness}</span>
-                </Badge>
-              )}
-              {/* Assign Employee Button or Assigned Employee Name */}
-              {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
-                action.assignedToName ? (
-                  <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                    <User className="h-3 w-3 shrink-0" />
-                    <span className="truncate max-w-[100px]">{action.assignedToName}</span>
-                  </Badge>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-6 text-xs px-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowAssignEmployeeDialog(true);
-                    }}
-                    data-interactive="true"
-                  >
-                    <UserPlus className="h-3 w-3 ml-1" />
-                    تعيين موظف
-                  </Button>
-                )
-              )}
-            </div>
-          )}
+          {/* Appointments & Reminders table (replaces: ميزانية / نوع / مدينة / جدية / موظف معيّن) */}
+          <AppointmentsRemindersTable
+            appointments={action.appointments}
+            reminders={action.reminders}
+          />
         </div>
         <div className="flex items-center gap-1">
           {onQuickView && (
@@ -1353,72 +1352,11 @@ export function IncomingActionsCard({
                 )}
               </a>
             )}
-            {/* Property request details - show all available data */}
-            {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry' ? (
-              <div className="mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50">
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  {/* Budget */}
-                  {(action.budgetMin != null || action.budgetMax != null) && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <DollarSign className="h-3.5 w-3.5 shrink-0" />
-                      <span>
-                        {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                          ? `${action.budgetMin.toLocaleString("en-US")}–${action.budgetMax.toLocaleString("en-US")} ر.س`
-                          : action.budgetMin != null
-                            ? `${action.budgetMin.toLocaleString("en-US")} ر.س`
-                            : action.budgetMax != null
-                              ? `${action.budgetMax.toLocaleString("en-US")} ر.س`
-                              : ''}
-                      </span>
-                    </Badge>
-                  )}
-                  {/* Property Type */}
-                  {action.propertyType && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <Building2 className="h-3.5 w-3.5 shrink-0" />
-                      <span>{translatePropertyType(action.propertyType)}</span>
-                    </Badge>
-                  )}
-                  {/* Location */}
-                  {action.city && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <MapPin className="h-3.5 w-3.5 shrink-0" />
-                      <span>{action.city}</span>
-                    </Badge>
-                  )}
-                  {/* Seriousness */}
-                  {action.metadata?.seriousness && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                      <span>الجدية: {action.metadata.seriousness}</span>
-                    </Badge>
-                  )}
-                  {/* Assign Employee Button or Assigned Employee Name */}
-                  {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
-                    action.assignedToName ? (
-                      <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                        <User className="h-3.5 w-3.5 shrink-0" />
-                        <span>{action.assignedToName}</span>
-                      </Badge>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-6 text-xs px-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowAssignEmployeeDialog(true);
-                        }}
-                        data-interactive="true"
-                      >
-                        <UserPlus className="h-3 w-3 ml-1" />
-                        تعيين موظف
-                      </Button>
-                    )
-                  )}
-                </div>
-              </div>
-            ) : null}
+            {/* Appointments & Reminders table (replaces: ميزانية / نوع / مدينة / جدية / موظف معيّن) */}
+            <AppointmentsRemindersTable
+              appointments={action.appointments}
+              reminders={action.reminders}
+            />
           </div>
         </div>
       </CardHeader>
