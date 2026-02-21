@@ -14,7 +14,7 @@ import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultHeaderData as getDefaultHeaderDataFromFunctions } from "@/context/editorStoreFunctions/headerFunctions";
 import { logChange } from "@/lib/debugLogger";
-import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdown";
+import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdownWithSUB";
 import SidebarMenu from "./SidebarMenu";
 
 // Default header data
