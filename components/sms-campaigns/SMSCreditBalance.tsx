@@ -243,7 +243,8 @@ export function SMSCreditBalance() {
 
               {/* Payment iframe popup */}
               <Dialog open={isPaymentPopupOpen} onOpenChange={(open) => !open && handlePaymentClose()}>
-                <DialogContent className="max-w-4xl h-[80vh] p-0 overflow-hidden" dir="rtl">
+                <DialogContent className="max-w-4xl h-[80vh] p-0 overflow-hidden" dir="rtl" aria-describedby={undefined}>
+                  <DialogTitle className="sr-only">إتمام الدفع</DialogTitle>
                   <div className="flex items-center justify-between p-4 border-b">
                     <h3 className="font-semibold">إتمام الدفع</h3>
                     <Button variant="ghost" size="icon" onClick={handlePaymentClose}>
