@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useSmsCampaignsDialogStore } from "@/context/store/dashboard/smsCampaignsDialog";
 import type { SMSTemplate } from "./types";
 import { getCategoryColor, CATEGORY_LABELS, TEMPLATE_CATEGORIES } from "./constants";
 
@@ -50,6 +51,9 @@ export function SmsTemplatesList({
   const [editContent, setEditContent] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editSubmitting, setEditSubmitting] = useState(false);
+  const openCreateCampaignWithTemplate = useSmsCampaignsDialogStore(
+    (s) => s.openCreateCampaignWithTemplate
+  );
 
   const openDeleteDialog = (id: string, name: string) => {
     setDeleteTemplateId(id);
@@ -157,7 +161,16 @@ export function SmsTemplatesList({
                       {new Date(template.updatedAt).toLocaleDateString("ar-SA")}
                     </p>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          openCreateCampaignWithTemplate({
+                            id: template.id,
+                            content: template.content,
+                          })
+                        }
+                      >
                         استخدام
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => openEditDialog(template)}>

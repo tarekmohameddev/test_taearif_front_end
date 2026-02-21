@@ -14,12 +14,13 @@ import { SmsLogsList } from "./SmsLogsList";
 import { CreateCampaignDialog, CreateTemplateDialog } from "./dialogs";
 import { useSmsCampaigns, useSmsTemplates, useSmsStats, useSmsLogs } from "./hooks";
 import useStore from "@/context/Store";
+import { useSmsCampaignsDialogStore } from "@/context/store/dashboard/smsCampaignsDialog";
 
 export function SMSCampaignsPage() {
   const { userData, IsLoading: authLoading } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
-  const [createCampaignOpen, setCreateCampaignOpen] = useState(false);
   const [createTemplateOpen, setCreateTemplateOpen] = useState(false);
+  const openCreateCampaignDialog = useSmsCampaignsDialogStore((s) => s.openCreateCampaignDialog);
 
   const creditBalance = useStore((s) => s.creditBalance);
   const availableCredits = creditBalance.data?.available_credits ?? 0;
@@ -152,7 +153,7 @@ export function SMSCampaignsPage() {
             templatesLoading={templatesLoading}
             campaignsError={campaignsError}
             templatesError={templatesError}
-            onNewCampaign={() => setCreateCampaignOpen(true)}
+            onNewCampaign={openCreateCampaignDialog}
           />
         </TabsContent>
 
@@ -162,7 +163,7 @@ export function SMSCampaignsPage() {
             loading={campaignsLoading}
             error={campaignsError}
             availableCredits={availableCredits}
-            onNewCampaign={() => setCreateCampaignOpen(true)}
+            onNewCampaign={openCreateCampaignDialog}
             onSendCampaign={onSendCampaign}
             onDeleteCampaign={handleDeleteCampaign}
             onEditCampaign={handleEditCampaign}
@@ -185,11 +186,7 @@ export function SMSCampaignsPage() {
         </TabsContent>
       </Tabs>
 
-      <CreateCampaignDialog
-        open={createCampaignOpen}
-        onOpenChange={setCreateCampaignOpen}
-        onSuccess={onCampaignCreated}
-      />
+      <CreateCampaignDialog onSuccess={onCampaignCreated} />
       <CreateTemplateDialog
         open={createTemplateOpen}
         onOpenChange={setCreateTemplateOpen}

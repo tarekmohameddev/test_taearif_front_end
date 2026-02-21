@@ -651,7 +651,7 @@ export default function Card4(props: Card4Props) {
 
       {/* Price Section - absolute ملاصق لأسفل الـ Card (مثل propertiesShowcase1) */}
       <div
-        className="absolute bottom-0 left-0 right-0 rounded-lg mx-4 mb-2 px-4 py-3 text-center"
+        className="absolute bottom-0 left-0 right-0 rounded-lg mx-4 mb-5 px-4 py-3 text-center"
         style={{
           backgroundColor: styling.priceBackgroundColor || "#896042",
         }}

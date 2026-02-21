@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useSmsCampaignsDialogStore } from "@/context/store/dashboard/smsCampaignsDialog";
 import type { SMSCampaign, SMSTemplate } from "./types";
 import { getStatusColor, getCategoryColor, STATUS_LABELS, CATEGORY_LABELS } from "./constants";
 
@@ -28,6 +29,9 @@ export function SmsCampaignsOverview({
   templatesError,
   onNewCampaign,
 }: SmsCampaignsOverviewProps) {
+  const openCreateCampaignWithTemplate = useSmsCampaignsDialogStore(
+    (s) => s.openCreateCampaignWithTemplate
+  );
   const activeCampaigns = campaigns.filter((c) => c.status !== "draft").slice(0, 3);
   const activeTemplates = templates.filter((t) => t.isActive).slice(0, 4);
 
@@ -120,7 +124,16 @@ export function SmsCampaignsOverview({
                       {CATEGORY_LABELS[template.category] ?? template.category}
                     </Badge>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      openCreateCampaignWithTemplate({
+                        id: template.id,
+                        content: template.content,
+                      })
+                    }
+                  >
                     استخدم
                   </Button>
                 </div>

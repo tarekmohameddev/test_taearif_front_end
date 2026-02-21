@@ -88,13 +88,15 @@ export async function getCampaign(id: number): Promise<ApiCampaign> {
 
 export interface CreateCampaignBody {
   name: string;
-  description?: string;
   message: string;
+  description?: string;
+  template_id?: number | null;
   status?: "draft" | "scheduled";
   scheduled_at?: string;
   recipient_ids?: number[];
   segment_filters?: Record<string, unknown>;
   tags?: string[];
+  meta?: Record<string, unknown>;
 }
 
 export async function createCampaign(body: CreateCampaignBody): Promise<ApiCampaign> {

@@ -1,37 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { createCampaign } from "@/lib/services/sms-api";
+import { useSmsCampaignsDialogStore } from "@/context/store/dashboard/smsCampaignsDialog";
 
 interface CreateCampaignDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-export function CreateCampaignDialog({
-  open,
-  onOpenChange,
-  onSuccess,
-}: CreateCampaignDialogProps) {
+export function CreateCampaignDialog({ onSuccess }: CreateCampaignDialogProps) {
+  const {
+    createCampaignDialogOpen: open,
+    setCreateCampaignDialogOpen: onOpenChange,
+    selectedTemplateForCampaign,
+    clearSelectedTemplate,
+  } = useSmsCampaignsDialogStore();
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open && selectedTemplateForCampaign) {
+      setMessage(selectedTemplateForCampaign.content);
+    }
+    if (!open) {
+      setName("");
+      setDescription("");
+      setMessage("");
+      clearSelectedTemplate();
+    }
+  }, [open, selectedTemplateForCampaign, clearSelectedTemplate]);
 
   const handleSubmit = async () => {
     if (!name.trim() || !message.trim()) {
@@ -45,12 +60,14 @@ export function CreateCampaignDialog({
         description: description.trim() || undefined,
         message: message.trim(),
         status: "draft",
+        template_id: selectedTemplateForCampaign?.id ?? undefined,
       });
       toast.success("تم إنشاء الحملة");
       onOpenChange(false);
       setName("");
       setDescription("");
       setMessage("");
+      clearSelectedTemplate();
       onSuccess();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "فشل إنشاء الحملة");
@@ -60,14 +77,15 @@ export function CreateCampaignDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>إنشاء حملة جديدة</DialogTitle>
-          <DialogDescription>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-lg">
+      <CustomDialogContent className="px-4 sm:px-6" dir="rtl">
+        <CustomDialogClose onClose={() => onOpenChange(false)} />
+        <CustomDialogHeader>
+          <CustomDialogTitle>إنشاء حملة جديدة</CustomDialogTitle>
+          <CustomDialogDescription>
             أدخل اسم الحملة والرسالة. يمكنك لاحقاً تحديد المستلمين وتاريخ الإرسال.
-          </DialogDescription>
-        </DialogHeader>
+          </CustomDialogDescription>
+        </CustomDialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="campaign-name">اسم الحملة</Label>
@@ -98,7 +116,7 @@ export function CreateCampaignDialog({
             />
           </div>
         </div>
-        <DialogFooter>
+        <CustomDialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
@@ -112,8 +130,8 @@ export function CreateCampaignDialog({
               "إنشاء الحملة"
             )}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }
