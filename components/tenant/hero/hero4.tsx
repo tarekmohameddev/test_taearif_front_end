@@ -125,7 +125,7 @@ export default function Hero4(props: Hero4Props = {}) {
   // ─────────────────────────────────────────────────────────
   // 5. MERGE DATA (PRIORITY ORDER)
   // ─────────────────────────────────────────────────────────
-  const mergedData = {
+  const mergedData: ReturnType<typeof getDefaultHero4Data> = {
     ...getDefaultHero4Data(), // 1. Defaults (lowest priority)
     ...storeData, // 2. Store state
     ...currentStoreData, // 3. Current store data
@@ -662,10 +662,17 @@ export default function Hero4(props: Hero4Props = {}) {
                   {mergedData.contactInfo?.contactText || "أو تواصل معنا مباشرة عبر:"}
                 </p>
 
-                <ul className="space-y-4">
+                <ul
+                  className={
+                    mergedData.contactInfo?.twoColumnGrid
+                      ? "grid grid-cols-1 sm:grid-cols-2 gap-4"
+                      : "space-y-4"
+                  }
+                >
                   {/* WhatsApp Numbers */}
-                  {mergedData.contactInfo?.whatsappNumbers?.map((whatsapp: any, index: number) => (
-                    <li key={index}>
+                  {(mergedData.contactInfo?.whatsapp?.numbers ?? mergedData.contactInfo?.whatsappNumbers)?.map((whatsapp: any, index: number) => {
+                    const whatsappAsBadge = (mergedData.contactInfo?.whatsapp?.asBadge ?? mergedData.contactInfo?.whatsappNumbersAsBadge) === true;
+                    const linkContent = (
                       <a
                         href={whatsapp.link || `https://api.whatsapp.com/send?phone=${whatsapp.number}`}
                         target="_blank"
@@ -708,12 +715,30 @@ export default function Hero4(props: Hero4Props = {}) {
                         </span>
                         <span style={{ color: accentColor }}>{whatsapp.number}</span>
                       </a>
-                    </li>
-                  ))}
+                    );
+                    return (
+                      <li key={index}>
+                        {whatsappAsBadge ? (
+                          <div
+                            className="backdrop-blur-md rounded-xl px-4 py-3 w-full border transition-all duration-300 hover:scale-[1.02]"
+                            style={{
+                              backgroundColor: `${accentColor}1a`,
+                              borderColor: `${accentColor}40`,
+                            }}
+                          >
+                            {linkContent}
+                          </div>
+                        ) : (
+                          linkContent
+                        )}
+                      </li>
+                    );
+                  })}
 
                   {/* Email */}
-                  {mergedData.contactInfo?.email?.address && (
-                    <li>
+                  {mergedData.contactInfo?.email?.address && (() => {
+                    const emailAsBadge = (mergedData.contactInfo?.email?.asBadge ?? mergedData.contactInfo?.emailAsBadge) === true;
+                    const linkContent = (
                       <a
                         href={mergedData.contactInfo.email.link || `mailto:${mergedData.contactInfo.email.address}`}
                         className="flex items-center gap-3 text-right transition-colors"
@@ -754,12 +779,30 @@ export default function Hero4(props: Hero4Props = {}) {
                         </span>
                         <span style={{ color: accentColor }}>{mergedData.contactInfo.email.address}</span>
                       </a>
-                    </li>
-                  )}
+                    );
+                    return (
+                      <li>
+                        {emailAsBadge ? (
+                          <div
+                            className="backdrop-blur-md rounded-xl px-4 py-3 w-full border transition-all duration-300 hover:scale-[1.02]"
+                            style={{
+                              backgroundColor: `${accentColor}1a`,
+                              borderColor: `${accentColor}40`,
+                            }}
+                          >
+                            {linkContent}
+                          </div>
+                        ) : (
+                          linkContent
+                        )}
+                      </li>
+                    );
+                  })()}
 
                   {/* Location */}
-                  {mergedData.contactInfo?.location?.text && (
-                    <li>
+                  {mergedData.contactInfo?.location?.text && (() => {
+                    const locationAsBadge = (mergedData.contactInfo?.location?.asBadge ?? mergedData.contactInfo?.locationAsBadge) === true;
+                    const linkContent = (
                       <a
                         href={mergedData.contactInfo.location.link || "#"}
                         className="flex items-center gap-3 text-right transition-colors"
@@ -802,8 +845,25 @@ export default function Hero4(props: Hero4Props = {}) {
                           {mergedData.contactInfo.location.text}
                         </span>
                       </a>
-                    </li>
-                  )}
+                    );
+                    return (
+                      <li>
+                        {locationAsBadge ? (
+                          <div
+                            className="backdrop-blur-md rounded-xl px-4 py-3 w-full border transition-all duration-300 hover:scale-[1.02]"
+                            style={{
+                              backgroundColor: `${accentColor}1a`,
+                              borderColor: `${accentColor}40`,
+                            }}
+                          >
+                            {linkContent}
+                          </div>
+                        ) : (
+                          linkContent
+                        )}
+                      </li>
+                    );
+                  })()}
                 </ul>
 
                 {/* Divider */}

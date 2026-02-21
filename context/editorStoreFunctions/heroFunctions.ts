@@ -406,21 +406,27 @@ export const getDefaultHero4Data = (): ComponentData => ({
   },
   contactInfo: {
     contactText: "أو تواصل معنا مباشرة عبر:",
-    whatsappNumbers: [
-      {
-        number: "0542120011",
-        link: "https://api.whatsapp.com/send?phone=966542120011",
-      },
-      {
-        number: "0543332538",
-        link: "https://api.whatsapp.com/send/?phone=966543332538&text&type=phone_number&app_absent=0",
-      },
-    ],
+    twoColumnGrid: false,
+    whatsapp: {
+      asBadge: false,
+      numbers: [
+        {
+          number: "0542120011",
+          link: "https://api.whatsapp.com/send?phone=966542120011",
+        },
+        {
+          number: "0543332538",
+          link: "https://api.whatsapp.com/send/?phone=966543332538&text&type=phone_number&app_absent=0",
+        },
+      ],
+    },
     email: {
+      asBadge: false,
       address: "contact@baheya.co",
       link: "mailto:contact@baheya.co",
     },
     location: {
+      asBadge: false,
       text: "المملكة العربية السعودية - الرياض",
       link: "#",
     },
