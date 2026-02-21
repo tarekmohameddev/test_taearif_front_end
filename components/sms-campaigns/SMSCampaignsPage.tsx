@@ -32,6 +32,7 @@ export function SMSCampaignsPage() {
     fetchCampaigns,
     handleDeleteCampaign,
     handleSendCampaign,
+    handleEditCampaign,
   } = useSmsCampaigns();
   const {
     templates,
@@ -39,6 +40,7 @@ export function SMSCampaignsPage() {
     error: templatesError,
     fetchTemplates,
     handleDeleteTemplate,
+    handleEditTemplate,
   } = useSmsTemplates();
   const { logs, loading: logsLoading, error: logsError, fetchLogs } = useSmsLogs();
 
@@ -163,6 +165,7 @@ export function SMSCampaignsPage() {
             onNewCampaign={() => setCreateCampaignOpen(true)}
             onSendCampaign={onSendCampaign}
             onDeleteCampaign={handleDeleteCampaign}
+            onEditCampaign={handleEditCampaign}
           />
         </TabsContent>
 
@@ -173,6 +176,7 @@ export function SMSCampaignsPage() {
             error={templatesError}
             onNewTemplate={() => setCreateTemplateOpen(true)}
             onDeleteTemplate={handleDeleteTemplate}
+            onEditTemplate={handleEditTemplate}
           />
         </TabsContent>
 

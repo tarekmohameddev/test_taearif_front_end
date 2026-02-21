@@ -14,7 +14,11 @@ import {
   CustomDialogTitle,
   CustomDialogDescription,
   CustomDialogFooter,
+  CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import type { SMSCampaign } from "./types";
 import { getStatusColor, STATUS_LABELS } from "./constants";
 import { CREDITS_PER_SMS } from "./SMSCreditBalance";
@@ -27,6 +31,7 @@ interface SmsCampaignsListProps {
   onNewCampaign: () => void;
   onSendCampaign: (id: string) => void;
   onDeleteCampaign: (id: string) => void;
+  onEditCampaign: (id: string, body: { name: string; description?: string; message: string }) => void;
 }
 
 export function SmsCampaignsList({
@@ -37,6 +42,7 @@ export function SmsCampaignsList({
   onNewCampaign,
   onSendCampaign,
   onDeleteCampaign,
+  onEditCampaign,
 }: SmsCampaignsListProps) {
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [sendCampaignId, setSendCampaignId] = useState<string | null>(null);
@@ -44,6 +50,12 @@ export function SmsCampaignsList({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteCampaignId, setDeleteCampaignId] = useState<string | null>(null);
   const [deleteCampaignName, setDeleteCampaignName] = useState("");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editCampaign, setEditCampaign] = useState<SMSCampaign | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editMessage, setEditMessage] = useState("");
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
   const openSendDialog = (id: string, name: string) => {
     setSendCampaignId(id);
@@ -54,6 +66,28 @@ export function SmsCampaignsList({
     setDeleteCampaignId(id);
     setDeleteCampaignName(name);
     setDeleteDialogOpen(true);
+  };
+  const openEditDialog = (campaign: SMSCampaign) => {
+    setEditCampaign(campaign);
+    setEditName(campaign.name);
+    setEditDescription(campaign.description ?? "");
+    setEditMessage(campaign.message);
+    setEditDialogOpen(true);
+  };
+  const handleConfirmEdit = async () => {
+    if (!editCampaign || !editName.trim() || !editMessage.trim()) return;
+    setEditSubmitting(true);
+    try {
+      await onEditCampaign(editCampaign.id, {
+        name: editName.trim(),
+        description: editDescription.trim() || undefined,
+        message: editMessage.trim(),
+      });
+      setEditDialogOpen(false);
+      setEditCampaign(null);
+    } finally {
+      setEditSubmitting(false);
+    }
   };
   const handleConfirmSend = () => {
     if (sendCampaignId) {
@@ -119,7 +153,7 @@ export function SmsCampaignsList({
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => openEditDialog(campaign)}>
                         تعديل
                       </Button>
                       {(campaign.status === "draft" || campaign.status === "scheduled") && (
@@ -234,6 +268,7 @@ export function SmsCampaignsList({
 
     <CustomDialog open={sendDialogOpen} onOpenChange={setSendDialogOpen} maxWidth="max-w-md">
       <CustomDialogContent>
+        <CustomDialogClose onClose={() => setSendDialogOpen(false)} />
         <CustomDialogHeader>
           <CustomDialogTitle>تأكيد إرسال الحملة</CustomDialogTitle>
           <CustomDialogDescription>
@@ -251,6 +286,7 @@ export function SmsCampaignsList({
 
     <CustomDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} maxWidth="max-w-md">
       <CustomDialogContent>
+        <CustomDialogClose onClose={() => setDeleteDialogOpen(false)} />
         <CustomDialogHeader>
           <CustomDialogTitle>تأكيد حذف الحملة</CustomDialogTitle>
           <CustomDialogDescription>
@@ -263,6 +299,56 @@ export function SmsCampaignsList({
           </Button>
           <Button variant="destructive" onClick={handleConfirmDelete}>
             حذف
+          </Button>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
+
+    <CustomDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} maxWidth="max-w-lg">
+      <CustomDialogContent>
+        <CustomDialogClose onClose={() => setEditDialogOpen(false)} />
+        <CustomDialogHeader>
+          <CustomDialogTitle>تعديل الحملة</CustomDialogTitle>
+          <CustomDialogDescription>
+            تعديل اسم الحملة والرسالة. التغييرات تُحفظ فوراً بعد النقر على حفظ.
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <div className="px-4 sm:px-6 py-4 space-y-4 overflow-y-auto">
+          <div className="space-y-2">
+            <Label htmlFor="edit-campaign-name">اسم الحملة</Label>
+            <Input
+              id="edit-campaign-name"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="اسم الحملة"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-campaign-desc">الوصف (اختياري)</Label>
+            <Input
+              id="edit-campaign-desc"
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              placeholder="وصف مختصر"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-campaign-message">نص الرسالة</Label>
+            <Textarea
+              id="edit-campaign-message"
+              value={editMessage}
+              onChange={(e) => setEditMessage(e.target.value)}
+              placeholder="محتوى الرسالة..."
+              rows={4}
+            />
+          </div>
+        </div>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+            إلغاء
+          </Button>
+          <Button onClick={handleConfirmEdit} disabled={editSubmitting}>
+            {editSubmitting ? "جاري الحفظ..." : "حفظ"}
           </Button>
         </CustomDialogFooter>
       </CustomDialogContent>

@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import { getCampaigns, deleteCampaign, sendCampaign } from "@/lib/services/sms-api";
+import { getCampaigns, deleteCampaign, sendCampaign, updateCampaign } from "@/lib/services/sms-api";
+import type { UpdateCampaignBody } from "@/lib/services/sms-api";
 import type { SMSCampaign } from "../types";
 import { mapApiCampaignToUI } from "../types";
 import useStore from "@/context/Store";
@@ -55,6 +56,19 @@ export function useSmsCampaigns() {
     [fetchCampaigns]
   );
 
+  const handleEditCampaign = useCallback(
+    async (id: string, body: UpdateCampaignBody) => {
+      try {
+        await updateCampaign(Number(id), body);
+        toast.success("تم تحديث الحملة");
+        fetchCampaigns();
+      } catch (e: unknown) {
+        toast.error(e instanceof Error ? e.message : "فشل التحديث");
+      }
+    },
+    [fetchCampaigns]
+  );
+
   return {
     campaigns,
     loading,
@@ -62,5 +76,6 @@ export function useSmsCampaigns() {
     fetchCampaigns,
     handleDeleteCampaign,
     handleSendCampaign,
+    handleEditCampaign,
   };
 }

@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import { getTemplates, deleteTemplate } from "@/lib/services/sms-api";
+import { getTemplates, deleteTemplate, updateTemplate } from "@/lib/services/sms-api";
+import type { UpdateTemplateBody } from "@/lib/services/sms-api";
 import type { SMSTemplate } from "../types";
 import { mapApiTemplateToUI } from "../types";
 
@@ -39,11 +40,25 @@ export function useSmsTemplates() {
     [fetchTemplates]
   );
 
+  const handleEditTemplate = useCallback(
+    async (id: string, body: UpdateTemplateBody) => {
+      try {
+        await updateTemplate(Number(id), body);
+        toast.success("تم تحديث القالب");
+        fetchTemplates();
+      } catch (e: unknown) {
+        toast.error(e instanceof Error ? e.message : "فشل التحديث");
+      }
+    },
+    [fetchTemplates]
+  );
+
   return {
     templates,
     loading,
     error,
     fetchTemplates,
     handleDeleteTemplate,
+    handleEditTemplate,
   };
 }

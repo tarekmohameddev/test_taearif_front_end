@@ -13,9 +13,13 @@ import {
   CustomDialogTitle,
   CustomDialogDescription,
   CustomDialogFooter,
+  CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import type { SMSTemplate } from "./types";
-import { getCategoryColor, CATEGORY_LABELS } from "./constants";
+import { getCategoryColor, CATEGORY_LABELS, TEMPLATE_CATEGORIES } from "./constants";
 
 interface SmsTemplatesListProps {
   templates: SMSTemplate[];
@@ -23,6 +27,10 @@ interface SmsTemplatesListProps {
   error: string | null;
   onNewTemplate: () => void;
   onDeleteTemplate: (id: string) => void;
+  onEditTemplate: (
+    id: string,
+    body: { name: string; content: string; category: string; is_active?: boolean }
+  ) => void;
 }
 
 export function SmsTemplatesList({
@@ -31,15 +39,45 @@ export function SmsTemplatesList({
   error,
   onNewTemplate,
   onDeleteTemplate,
+  onEditTemplate,
 }: SmsTemplatesListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
   const [deleteTemplateName, setDeleteTemplateName] = useState("");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTemplate, setEditTemplate] = useState<SMSTemplate | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editSubmitting, setEditSubmitting] = useState(false);
 
   const openDeleteDialog = (id: string, name: string) => {
     setDeleteTemplateId(id);
     setDeleteTemplateName(name);
     setDeleteDialogOpen(true);
+  };
+  const openEditDialog = (template: SMSTemplate) => {
+    setEditTemplate(template);
+    setEditName(template.name);
+    setEditContent(template.content);
+    setEditCategory(template.category);
+    setEditDialogOpen(true);
+  };
+  const handleConfirmEdit = async () => {
+    if (!editTemplate || !editName.trim() || !editContent.trim()) return;
+    setEditSubmitting(true);
+    try {
+      await onEditTemplate(editTemplate.id, {
+        name: editName.trim(),
+        content: editContent.trim(),
+        category: editCategory,
+        is_active: editTemplate.isActive,
+      });
+      setEditDialogOpen(false);
+      setEditTemplate(null);
+    } finally {
+      setEditSubmitting(false);
+    }
   };
   const handleConfirmDelete = () => {
     if (deleteTemplateId) {
@@ -122,7 +160,7 @@ export function SmsTemplatesList({
                       <Button variant="outline" size="sm">
                         استخدام
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={() => openEditDialog(template)}>
                         تعديل
                       </Button>
                       <Button
@@ -143,6 +181,7 @@ export function SmsTemplatesList({
 
     <CustomDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} maxWidth="max-w-md">
       <CustomDialogContent>
+        <CustomDialogClose onClose={() => setDeleteDialogOpen(false)} />
         <CustomDialogHeader>
           <CustomDialogTitle>تأكيد حذف القالب</CustomDialogTitle>
           <CustomDialogDescription>
@@ -155,6 +194,62 @@ export function SmsTemplatesList({
           </Button>
           <Button variant="destructive" onClick={handleConfirmDelete}>
             حذف
+          </Button>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
+
+    <CustomDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} maxWidth="max-w-lg">
+      <CustomDialogContent>
+        <CustomDialogClose onClose={() => setEditDialogOpen(false)} />
+        <CustomDialogHeader>
+          <CustomDialogTitle>تعديل القالب</CustomDialogTitle>
+          <CustomDialogDescription>
+            تعديل اسم القالب والمحتوى والتصنيف. التغييرات تُحفظ فوراً بعد النقر على حفظ.
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <div className="px-4 sm:px-6 py-4 space-y-4 overflow-y-auto">
+          <div className="space-y-2">
+            <Label htmlFor="edit-template-name">اسم القالب</Label>
+            <Input
+              id="edit-template-name"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="اسم القالب"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-template-category">التصنيف</Label>
+            <select
+              id="edit-template-category"
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+              value={editCategory}
+              onChange={(e) => setEditCategory(e.target.value)}
+            >
+              {TEMPLATE_CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-template-content">محتوى القالب</Label>
+            <Textarea
+              id="edit-template-content"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              placeholder="محتوى القالب..."
+              rows={4}
+            />
+          </div>
+        </div>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+            إلغاء
+          </Button>
+          <Button onClick={handleConfirmEdit} disabled={editSubmitting}>
+            {editSubmitting ? "جاري الحفظ..." : "حفظ"}
           </Button>
         </CustomDialogFooter>
       </CustomDialogContent>
