@@ -1,6 +1,7 @@
 /**
  * SMS API — campaigns, templates, logs, stats
- * Base: /api/v1/sms (backend). Uses axiosInstance (baseURL = NEXT_PUBLIC_Backend_URL).
+ * Base: /api/v1/sms (backend).
+ * All requests use @/lib/axiosInstance (Bearer token from AuthStore).
  */
 import axiosInstance from "@/lib/axiosInstance";
 

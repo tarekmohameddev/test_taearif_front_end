@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import useAuthStore from "@/context/AuthContext";
 import { SMSCreditBalance } from "./SMSCreditBalance";
 import { SmsCampaignsStats } from "./SmsCampaignsStats";
 import { SmsCampaignsOverview } from "./SmsCampaignsOverview";
@@ -15,6 +16,7 @@ import { useSmsCampaigns, useSmsTemplates, useSmsStats, useSmsLogs } from "./hoo
 import useStore from "@/context/Store";
 
 export function SMSCampaignsPage() {
+  const { userData, IsLoading: authLoading } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
   const [createCampaignOpen, setCreateCampaignOpen] = useState(false);
   const [createTemplateOpen, setCreateTemplateOpen] = useState(false);
@@ -41,26 +43,30 @@ export function SMSCampaignsPage() {
   const { logs, loading: logsLoading, error: logsError, fetchLogs } = useSmsLogs();
 
   useEffect(() => {
+    if (authLoading || !userData?.token) return;
     fetchStats();
-  }, [fetchStats]);
+  }, [authLoading, userData?.token, fetchStats]);
 
   useEffect(() => {
+    if (authLoading || !userData?.token) return;
     if (activeTab === "overview" || activeTab === "campaigns") {
       fetchCampaigns();
     }
-  }, [activeTab, fetchCampaigns]);
+  }, [authLoading, userData?.token, activeTab, fetchCampaigns]);
 
   useEffect(() => {
+    if (authLoading || !userData?.token) return;
     if (activeTab === "overview" || activeTab === "templates") {
       fetchTemplates();
     }
-  }, [activeTab, fetchTemplates]);
+  }, [authLoading, userData?.token, activeTab, fetchTemplates]);
 
   useEffect(() => {
+    if (authLoading || !userData?.token) return;
     if (activeTab === "logs") {
       fetchLogs();
     }
-  }, [activeTab, fetchLogs]);
+  }, [authLoading, userData?.token, activeTab, fetchLogs]);
 
   const onSendCampaign = async (id: string) => {
     await handleSendCampaign(id);
@@ -75,6 +81,30 @@ export function SMSCampaignsPage() {
   const onTemplateCreated = () => {
     fetchTemplates();
   };
+
+  if (authLoading) {
+    return (
+      <div className="container mx-auto p-6 flex items-center justify-center min-h-[200px]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">جاري التحقق من الجلسة...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData?.token) {
+    return (
+      <div className="container mx-auto p-6">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            يلزم تسجيل الدخول لعرض حملات الرسائل النصية.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
