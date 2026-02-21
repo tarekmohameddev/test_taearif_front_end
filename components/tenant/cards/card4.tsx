@@ -392,7 +392,7 @@ export default function Card4(props: Card4Props) {
 
   const CardContent = (
     <div
-      className="overflow-hidden transition-shadow duration-300"
+      className="h-full flex flex-col relative overflow-hidden transition-shadow duration-300"
       style={{
         backgroundColor: styling.cardBackgroundColor || "#ffffff",
         borderRadius: styling.cardBorderRadius || "20px",
@@ -470,8 +470,8 @@ export default function Card4(props: Card4Props) {
         )}
       </div>
 
-      {/* Content Section */}
-      <div className="p-4 space-y-4">
+      {/* Content Section - pb-20 لترك مساحة لـ div السعر المطلق */}
+      <div className="flex-1 flex flex-col p-4 pb-20 space-y-4">
         {/* Title and Status */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
@@ -647,43 +647,43 @@ export default function Card4(props: Card4Props) {
             </span>
           </div>
         </div>
+      </div>
 
-        {/* Price Section */}
+      {/* Price Section - absolute ملاصق لأسفل الـ Card (مثل propertiesShowcase1) */}
+      <div
+        className="absolute bottom-0 left-0 right-0 rounded-lg mx-4 mb-2 px-4 py-3 text-center"
+        style={{
+          backgroundColor: styling.priceBackgroundColor || "#896042",
+        }}
+      >
         <div
-          className="rounded-lg px-4 py-3 text-center"
           style={{
-            backgroundColor: styling.priceBackgroundColor || "#896042",
+            fontSize: typography.price?.fontSize || "base",
+            fontWeight: typography.price?.fontWeight || "medium",
+            fontFamily: typography.price?.fontFamily || "Tajawal",
+            color: styling.priceTextColor || "#ffffff",
           }}
         >
-          <div
-            style={{
-              fontSize: typography.price?.fontSize || "base",
-              fontWeight: typography.price?.fontWeight || "medium",
-              fontFamily: typography.price?.fontFamily || "Tajawal",
-              color: styling.priceTextColor || "#ffffff",
-            }}
-          >
-            {(() => {
-              // Check if this is a project (based on URL or status)
-              const isProject = 
-                property.url?.includes('/project/') || 
-                property.status === 'مكتمل' || 
-                property.status === 'قيد الإنشاء';
-              
-              // If it's a project and price is an object with min/max, show as range
-              if (isProject && typeof property.price === 'object' && 'min' in property.price && 'max' in property.price) {
-                return `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`;
-              }
-              
-              // For properties or if price is a number, show as single value
-              // If price is object but it's a property, use min value or convert to number
-              if (typeof property.price === 'object' && 'min' in property.price) {
-                return `${formatPriceNumber(property.price.min)} ريال`;
-              }
-              
-              return `${formatPriceNumber(property.price as number)} ريال`;
-            })()}
-          </div>
+          {(() => {
+            // Check if this is a project (based on URL or status)
+            const isProject = 
+              property.url?.includes('/project/') || 
+              property.status === 'مكتمل' || 
+              property.status === 'قيد الإنشاء';
+            
+            // If it's a project and price is an object with min/max, show as range
+            if (isProject && typeof property.price === 'object' && 'min' in property.price && 'max' in property.price) {
+              return `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`;
+            }
+            
+            // For properties or if price is a number, show as single value
+            // If price is object but it's a property, use min value or convert to number
+            if (typeof property.price === 'object' && 'min' in property.price) {
+              return `${formatPriceNumber(property.price.min)} ريال`;
+            }
+            
+            return `${formatPriceNumber(property.price as number)} ريال`;
+          })()}
         </div>
       </div>
     </div>
@@ -691,7 +691,7 @@ export default function Card4(props: Card4Props) {
 
   if (property.url) {
     return (
-      <Link href={property.url} className="block">
+      <Link href={property.url} className="block h-full">
         {CardContent}
       </Link>
     );
