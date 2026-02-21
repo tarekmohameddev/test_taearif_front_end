@@ -4,6 +4,8 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 // Default hero1 data structure
 export const getDefaultHeroData = (): ComponentData => ({
   visible: true,
+  showTitle: true,
+  showSubtitle: true,
   height: {
     desktop: "90vh",
     tablet: "90vh",
@@ -119,6 +121,8 @@ export const getDefaultHeroData = (): ComponentData => ({
 // Default hero2 data structure
 export const getDefaultHero2Data = (): ComponentData => ({
   visible: true,
+  showTitle: true,
+  showSubtitle: true,
   title: "من نحن",
   description: "شريكك الموثوق في تحقيق أفضل الفرص العقارية",
   imageSrc: "https://dalel-lovat.vercel.app/images/hero.webp",
@@ -316,6 +320,7 @@ export const getDefaultHero3Data = (): ComponentData => ({
 export const getDefaultHero4Data = (): ComponentData => ({
   visible: true,
   showTitle: true, // Show title by default
+  showSubtitle: true, // Show subtitle by default
   title: "عن تعاريف العقارية",
   backgroundImage: "https://dalel-lovat.vercel.app/images/hero.webp",
   barType: "default", // "default" | "contact" | "propertyFilter"
@@ -352,6 +357,7 @@ export const getDefaultHero4Data = (): ComponentData => ({
   },
   content: {
     title: "عن تعاريف العقارية",
+    subtitle: "",
     alignment: "center",
     maxWidth: "5xl",
     font: {
