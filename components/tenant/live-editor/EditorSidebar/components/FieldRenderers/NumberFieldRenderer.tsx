@@ -68,6 +68,8 @@ export const NumberFieldRenderer: React.FC<{
           </svg>
         </button>
         <div className="flex-1 flex items-center justify-center gap-1.5 bg-slate-50 border-2 border-slate-200 rounded-xl overflow-hidden">
+        {unit && <span className="text-slate-500 text-sm font-medium shrink-0 mx-5">{unit}</span>}
+
           <input
             type="number"
             min={min}
@@ -80,7 +82,6 @@ export const NumberFieldRenderer: React.FC<{
             }}
             className="w-full min-w-0 px-2 py-3 bg-transparent focus:outline-none focus:ring-0 text-slate-700 text-center font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
-          {unit && <span className="text-slate-500 text-sm font-medium shrink-0">{unit}</span>}
         </div>
         <button
           type="button"
