@@ -1,0 +1,3044 @@
+{
+  "timestamp": "2026-02-18T22:45:08.326Z",
+  "sessionId": "session-1771453198338-wj23lgm",
+  "componentId": null,
+  "events": [
+    {
+      "eventId": "event-1771454705537-wsqvo8y",
+      "eventType": "SAVE_INITIATED",
+      "timestamp": "2026-02-18T22:45:05.537Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "save",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "save_initiated",
+        "source": "useSaveHandler",
+        "existingData": "[Large Object Removed]",
+        "storeData": "[Large Object Removed]",
+        "tempData": "[Large Object Removed]"
+      },
+      "summary": {
+        "what": "Event type: SAVE_INITIATED. save_initiated",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.537Z",
+        "why": "save_initiated",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "Merge process will start",
+          "Data will be saved to store",
+          "Changes will be persisted to database"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705538-rpg253c",
+      "eventType": "MERGE_STARTED",
+      "timestamp": "2026-02-18T22:45:05.538Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "merge",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "merge_started",
+        "source": "useSaveHandler"
+      },
+      "summary": {
+        "what": "Event type: MERGE_STARTED. merge_started",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.539Z",
+        "why": "merge_started",
+        "how": "Data merged using deepMerge method. Order: existingData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705539-hkny9dl",
+      "eventType": "MERGE_COMPLETED",
+      "timestamp": "2026-02-18T22:45:05.539Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "merge",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "merge_completed",
+        "source": "useSaveHandler"
+      },
+      "summary": {
+        "what": "Event type: MERGE_COMPLETED. merge_completed",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.539Z",
+        "why": "merge_completed",
+        "how": "Data merged using deepMerge method. Order: existingData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705540-kdrlc4f",
+      "eventType": "STORE_UPDATED",
+      "timestamp": "2026-02-18T22:45:05.540Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "store_update",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "store_updated",
+        "source": "useSaveHandler"
+      },
+      "summary": {
+        "what": "Event type: STORE_UPDATED. store_updated",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.540Z",
+        "why": "store_updated",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705542-z3ydm8p",
+      "eventType": "SAVE_COMPLETED",
+      "timestamp": "2026-02-18T22:45:05.542Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "save",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "save_completed",
+        "source": "useSaveHandler",
+        "finalData": "[Large Object Removed]"
+      },
+      "summary": {
+        "what": "Event type: SAVE_COMPLETED. save_completed",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.542Z",
+        "why": "save_completed",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "Data successfully saved",
+          "Component will re-render with new data"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454702218-801dc7h",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:02.218Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:02.218Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704050-lgxj3p1",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.050Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.050Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704051-vkz2rwu",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.051Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمود",
+          "newValue": "استاذ محمودك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.051Z",
+        "why": "Field content.title was updated from \"استاذ محمود\" to \"استاذ محمودك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمود"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودك"
+      }
+    },
+    {
+      "eventId": "event-1771454704117-c1j3t1m",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.117Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.117Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704298-fgjmk1g",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.298Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.298Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704299-l1xmij1",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.299Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودك",
+          "newValue": "استاذ محمودكك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.299Z",
+        "why": "Field content.title was updated from \"استاذ محمودك\" to \"استاذ محمودكك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودكك"
+      }
+    },
+    {
+      "eventId": "event-1771454704364-9u99aid",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.364Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.364Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704373-d7ng8je",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.373Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.373Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704373-1bhxdzr",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.373Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودكك",
+          "newValue": "استاذ محمودككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.373Z",
+        "why": "Field content.title was updated from \"استاذ محمودكك\" to \"استاذ محمودككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودكك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704438-42gnqqb",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.438Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.438Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704445-u6mx5qn",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.445Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.445Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704446-c4r72y1",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.446Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودككك",
+          "newValue": "استاذ محمودكككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.446Z",
+        "why": "Field content.title was updated from \"استاذ محمودككك\" to \"استاذ محمودكككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودكككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704511-kad6wuu",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.511Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.511Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704521-55p7z2b",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.521Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.521Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704521-7ouuai7",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.521Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودكككك",
+          "newValue": "استاذ محمودككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.521Z",
+        "why": "Field content.title was updated from \"استاذ محمودكككك\" to \"استاذ محمودككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودكككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704587-ptvtuiu",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.587Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.587Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704594-3ftg0fi",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.594Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.594Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704595-yyi47u1",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.595Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودككككك",
+          "newValue": "استاذ محمودكككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.595Z",
+        "why": "Field content.title was updated from \"استاذ محمودككككك\" to \"استاذ محمودكككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودكككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704662-mlu99w1",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.662Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.662Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704669-n50zq8s",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.669Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.669Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704670-bkri9p8",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.670Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودكككككك",
+          "newValue": "استاذ محمودككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.670Z",
+        "why": "Field content.title was updated from \"استاذ محمودكككككك\" to \"استاذ محمودككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودكككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704714-zojrygt",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.714Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.714Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704722-rvh04r4",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.722Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.722Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704722-v0fmpun",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.722Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودككككككك",
+          "newValue": "استاذ محمودكككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.722Z",
+        "why": "Field content.title was updated from \"استاذ محمودككككككك\" to \"استاذ محمودكككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودككككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودكككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704753-tghsonw",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.753Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.753Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704761-dq2uz49",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.761Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.761Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704761-fqv8c1i",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.761Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودكككككككك",
+          "newValue": "استاذ محمودككككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.761Z",
+        "why": "Field content.title was updated from \"استاذ محمودكككككككك\" to \"استاذ محمودككككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودكككككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودككككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704784-p67mv1j",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.784Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.784Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704794-yqwdme8",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.794Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.794Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704794-r6rd19n",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.794Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودككككككككك",
+          "newValue": "استاذ محمودكككككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.794Z",
+        "why": "Field content.title was updated from \"استاذ محمودككككككككك\" to \"استاذ محمودكككككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودككككككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودكككككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704818-os35sqk",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.818Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.818Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704826-os71gw8",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.826Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.826Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704826-6ihcjl3",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.826Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودكككككككككك",
+          "newValue": "استاذ محمودككككككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.826Z",
+        "why": "Field content.title was updated from \"استاذ محمودكككككككككك\" to \"استاذ محمودككككككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودكككككككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودككككككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704849-yap9ca6",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.849Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.849Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704856-yjuu6gg",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.856Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.856Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704856-23u6mtu",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.856Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودككككككككككك",
+          "newValue": "استاذ محمودكككككككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.856Z",
+        "why": "Field content.title was updated from \"استاذ محمودككككككككككك\" to \"استاذ محمودكككككككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودككككككككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودكككككككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704879-mlcvrw6",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.879Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.879Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704886-mytwg88",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.886Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.886Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704887-pocosk9",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.887Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودكككككككككككك",
+          "newValue": "استاذ محمودككككككككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.887Z",
+        "why": "Field content.title was updated from \"استاذ محمودكككككككككككك\" to \"استاذ محمودككككككككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودكككككككككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودككككككككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704910-rs24g91",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.910Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.910Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704918-fjv96ga",
+      "eventType": "DATA_SOURCE_CHANGED",
+      "timestamp": "2026-02-18T22:45:04.918Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "unknown",
+          "name": "unknown"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "data_flow_change",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "data_flow_tracker"
+      },
+      "summary": {
+        "what": "Event type: DATA_SOURCE_CHANGED. field_update",
+        "where": "Component: sideBySide (unknown) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.918Z",
+        "why": "field_update",
+        "how": "Data merged using default method. Order: defaultData -> tenantData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454704918-oduthrp",
+      "eventType": "FIELD_UPDATED",
+      "timestamp": "2026-02-18T22:45:04.918Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "7b11f032-c193-4411-a22c-57ef9f014681"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "field_update",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "field_update",
+        "source": "DynamicFieldsRenderer",
+        "field": {
+          "path": "content.title",
+          "oldValue": "استاذ محمودككككككككككككك",
+          "newValue": "استاذ محمودكككككككككككككك",
+          "type": "string"
+        }
+      },
+      "summary": {
+        "what": "Event type: FIELD_UPDATED. field_update",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:04.918Z",
+        "why": "Field content.title was updated from \"استاذ محمودككككككككككككك\" to \"استاذ محمودكككككككككككككك\"",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "Field value updated in tempData",
+          "Changes will be saved when user clicks Save button"
+        ]
+      },
+      "before": {
+        "path": "content.title",
+        "oldValue": "استاذ محمودككككككككككككك"
+      },
+      "after": {
+        "path": "content.title",
+        "newValue": "استاذ محمودكككككككككككككك"
+      }
+    },
+    {
+      "eventId": "event-1771454704941-l86sahi",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:04.941Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:04.941Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705541-6hfzu4p",
+      "eventType": "COMPONENT_UPDATED",
+      "timestamp": "2026-02-18T22:45:05.541Z",
+      "sessionId": "",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "name": "sideBySide"
+        },
+        "location": {
+          "file": "unknown",
+          "function": "unknown",
+          "line": 0
+        },
+        "user": {
+          "action": "setData",
+          "page": "/ar/live-editor"
+        }
+      },
+      "details": {
+        "action": "setData:sideBySideFunctions.setData",
+        "source": "editorStoreFunctions",
+        "existingData": "[Large Object Removed]",
+        "finalData": "[Large Object Removed]"
+      },
+      "summary": {
+        "what": "Event type: COMPONENT_UPDATED. setData:sideBySideFunctions.setData",
+        "where": "Component: sideBySide (7b11f032-c193-4411-a22c-57ef9f014681) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: unknown at line 0",
+        "when": "2026-02-18T22:45:05.541Z",
+        "why": "setData:sideBySideFunctions.setData",
+        "how": "Event executed through normal flow",
+        "impact": "No data changes detected",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705629-87mcxq7",
+      "eventType": "EDITOR_SIDEBAR_OPENED",
+      "timestamp": "2026-02-18T22:45:05.629Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "EditorSidebar/index.tsx",
+          "function": "EditorSidebar",
+          "line": 0
+        },
+        "user": {
+          "action": "open_sidebar",
+          "page": "homepage"
+        },
+        "sidebar": {
+          "view": "edit-component"
+        }
+      },
+      "details": {
+        "action": "editor_sidebar_opened",
+        "source": "EditorSidebar"
+      },
+      "summary": {
+        "what": "Event type: EDITOR_SIDEBAR_OPENED. editor_sidebar_opened",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: EditorSidebar/index.tsx at line 0",
+        "when": "2026-02-18T22:45:05.629Z",
+        "why": "editor_sidebar_opened",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    }
+  ],
+  "traces": [],
+  "snapshots": [
+    {
+      "timestamp": "2026-02-18T22:45:05.539Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "type": "before-save",
+      "operation": "save",
+      "storeType": "editor",
+      "diff": {
+        "hasChanges": false,
+        "changes": {}
+      }
+    },
+    {
+      "timestamp": "2026-02-18T22:45:05.541Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "type": "before-save",
+      "operation": "save",
+      "storeType": "editor",
+      "diff": {
+        "hasChanges": false,
+        "changes": {}
+      }
+    }
+  ],
+  "dataFlowHistory": [
+    {
+      "timestamp": "2026-02-18T22:45:04.048Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.298Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.373Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.445Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.520Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.594Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.669Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.722Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.760Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.794Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.825Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.856Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.886Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    },
+    {
+      "timestamp": "2026-02-18T22:45:04.918Z",
+      "componentId": "7b11f032-c193-4411-a22c-57ef9f014681",
+      "componentType": "sideBySide",
+      "operationType": "data-source-change",
+      "sources": [
+        {
+          "name": "defaultData",
+          "priority": 4,
+          "used": true,
+          "reason": "Default component data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "tenantData",
+          "priority": 3,
+          "used": true,
+          "reason": "Tenant-specific data",
+          "valueType": "object",
+          "valueSize": 0
+        },
+        {
+          "name": "storeData",
+          "priority": 2,
+          "used": true,
+          "reason": "Store data",
+          "valueType": "object",
+          "valueSize": 5
+        },
+        {
+          "name": "tempData",
+          "priority": 1,
+          "used": true,
+          "reason": "Temporary changes",
+          "valueType": "string"
+        }
+      ],
+      "resultKeys": [
+        "visible",
+        "texts",
+        "colors",
+        "settings",
+        "content"
+      ]
+    }
+  ],
+  "performanceMetrics": [],
+  "criticalEvents": [
+    {
+      "eventId": "event-1771454705539-hkny9dl",
+      "eventType": "MERGE_COMPLETED",
+      "timestamp": "2026-02-18T22:45:05.539Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "merge",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "merge_completed",
+        "source": "useSaveHandler"
+      },
+      "summary": {
+        "what": "Event type: MERGE_COMPLETED. merge_completed",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.539Z",
+        "why": "merge_completed",
+        "how": "Data merged using deepMerge method. Order: existingData -> storeData -> tempData",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705540-kdrlc4f",
+      "eventType": "STORE_UPDATED",
+      "timestamp": "2026-02-18T22:45:05.540Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "store_update",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "store_updated",
+        "source": "useSaveHandler"
+      },
+      "summary": {
+        "what": "Event type: STORE_UPDATED. store_updated",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.540Z",
+        "why": "store_updated",
+        "how": "Event executed through normal flow",
+        "impact": "Data was successfully updated",
+        "nextSteps": [
+          "No specific next steps"
+        ]
+      },
+      "before": {},
+      "after": {}
+    },
+    {
+      "eventId": "event-1771454705542-z3ydm8p",
+      "eventType": "SAVE_COMPLETED",
+      "timestamp": "2026-02-18T22:45:05.542Z",
+      "sessionId": "session-1771454701153-ft9sdmm",
+      "context": {
+        "component": {
+          "id": "7b11f032-c193-4411-a22c-57ef9f014681",
+          "type": "sideBySide",
+          "variant": "sideBySide6",
+          "name": "SideBySide"
+        },
+        "location": {
+          "file": "useSaveHandler.ts",
+          "function": "handleRegularComponentSave",
+          "line": 0
+        },
+        "user": {
+          "action": "save",
+          "page": "homepage"
+        }
+      },
+      "details": {
+        "action": "save_completed",
+        "source": "useSaveHandler",
+        "finalData": "[Large Object Removed]"
+      },
+      "summary": {
+        "what": "Event type: SAVE_COMPLETED. save_completed",
+        "where": "Component: sideBySide (sideBySide6) with ID: 7b11f032-c193-4411-a22c-57ef9f014681. Location: useSaveHandler.ts at line 0",
+        "when": "2026-02-18T22:45:05.542Z",
+        "why": "save_completed",
+        "how": "Event executed through normal flow",
+        "impact": "Impact unknown",
+        "nextSteps": [
+          "Data successfully saved",
+          "Component will re-render with new data"
+        ]
+      },
+      "before": {},
+      "after": {}
+    }
+  ]
+}

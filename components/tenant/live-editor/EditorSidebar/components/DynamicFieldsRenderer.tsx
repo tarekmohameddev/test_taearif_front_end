@@ -195,6 +195,7 @@ export function DynamicFieldsRenderer({
             path={normalizedPath}
             value={value ?? 0}
             updateValue={updateValue}
+            def={def}
           />
         );
       case "boolean":

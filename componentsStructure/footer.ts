@@ -755,16 +755,17 @@ export const footerStructure: ComponentStructure = {
                 {
                   key: "descriptionSection",
                   label: "Company Description",
-                  displayAsObject: true,
-                  wrappedFields: [
-                    { 
-                      key: "showDescription", 
-                      label: "Show Description", 
-                      type: "boolean" 
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "content.companyInfo.showDescription",
+                      label: "Show Description",
+                      type: "boolean",
                     },
-                    { 
-                      key: "description", 
-                      label: "Description", 
+                    {
+                      key: "content.companyInfo.description",
+                      label: "Description",
                       type: "text",
                       condition: {
                         field: "showDescription",

@@ -208,14 +208,14 @@ export const getDefaultHero3Data = (): ComponentData => ({
     font: {
       title: {
         family: "Tajawal",
-        size: { desktop: "5xl", tablet: "4xl", mobile: "2xl" },
+        size: { desktop: 48, tablet: 36, mobile: 24 },
         weight: "extrabold",
         color: "#ffffff",
         lineHeight: "1.25",
       },
       subtitle: {
         family: "Tajawal",
-        size: { desktop: "md", tablet: "md", mobile: "sm" },
+        size: { desktop: 16, tablet: 16, mobile: 14 },
         weight: "normal",
         color: "rgba(255, 255, 255, 0.85)",
       },
@@ -406,21 +406,27 @@ export const getDefaultHero4Data = (): ComponentData => ({
   },
   contactInfo: {
     contactText: "أو تواصل معنا مباشرة عبر:",
-    whatsappNumbers: [
-      {
-        number: "0542120011",
-        link: "https://api.whatsapp.com/send?phone=966542120011",
-      },
-      {
-        number: "0543332538",
-        link: "https://api.whatsapp.com/send/?phone=966543332538&text&type=phone_number&app_absent=0",
-      },
-    ],
+    twoColumnGrid: false,
+    whatsapp: {
+      asBadge: false,
+      numbers: [
+        {
+          number: "0542120011",
+          link: "https://api.whatsapp.com/send?phone=966542120011",
+        },
+        {
+          number: "0543332538",
+          link: "https://api.whatsapp.com/send/?phone=966543332538&text&type=phone_number&app_absent=0",
+        },
+      ],
+    },
     email: {
+      asBadge: false,
       address: "contact@baheya.co",
       link: "mailto:contact@baheya.co",
     },
     location: {
+      asBadge: false,
       text: "المملكة العربية السعودية - الرياض",
       link: "#",
     },

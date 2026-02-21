@@ -31,6 +31,7 @@ import { ChangesMadeDialog } from "./components/Dialogs/ChangesMadeDialog";
 import { DebugPanel } from "./components/DebugPanel";
 import { PremiumDialog } from "../PremiumDialog";
 import { useThemes } from "@/hooks/useThemes";
+import { AIDebugPanel } from "../debug/AIDebugPanel";
 
 export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const t = useEditorT();
@@ -104,6 +105,7 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const [positionValidation, setPositionValidation] =
     useState<PositionValidation | null>(null);
   const [showDebugControls, setShowDebugControls] = useState(false);
+  const [showAIDebugPanel, setShowAIDebugPanel] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Premium Dialog State
@@ -525,6 +527,25 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
         {/* Debug Controls */}
         {showDebugControls && process.env.NODE_ENV === "development" && (
           <DebugControls onClose={() => setShowDebugControls(false)} />
+        )}
+
+        {/* AI Debug Panel */}
+        {process.env.NODE_ENV === "development" && (
+          <AIDebugPanel
+            show={showAIDebugPanel}
+            onClose={() => setShowAIDebugPanel(false)}
+          />
+        )}
+
+        {/* AI Debug Panel Toggle Button */}
+        {process.env.NODE_ENV === "development" && (
+          <button
+            onClick={() => setShowAIDebugPanel(true)}
+            className="fixed bottom-20 right-4 z-50 bg-purple-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-purple-600"
+            title="Open AI Debug Panel"
+          >
+            AI Debug
+          </button>
         )}
 
         {/* Premium Dialog */}

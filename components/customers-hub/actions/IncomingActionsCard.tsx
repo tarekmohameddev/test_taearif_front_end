@@ -29,7 +29,7 @@ import {
   LIFECYCLE_STAGES,
   type CustomerLifecycleStage,
 } from "@/types/unified-customer";
-import type { Appointment } from "@/types/unified-customer";
+import type { Appointment, Reminder } from "@/types/unified-customer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -242,13 +242,16 @@ interface IncomingActionsCardProps {
   className?: string;
   /** Whether the action is currently being completed */
   isCompleting?: boolean;
+  /** Called when the inline appointment schedule form is opened or closed (for grid height re-measure) */
+  onScheduleFormOpenChange?: (open: boolean) => void;
 }
 
+// Card background: urgent = red→white, medium = yellow→white (top to bottom); rest white
 const priorityColors = {
-  urgent: "border-red-500 bg-red-50/50 dark:bg-red-950/30",
-  high: "border-orange-500 bg-orange-50/50 dark:bg-orange-950/30",
-  medium: "border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/30",
-  low: "border-green-500 bg-green-50/50 dark:bg-green-950/30",
+  urgent: "border-red-500 bg-gradient-to-b from-red-50 to-white ",
+  high: "border-orange-500 bg-white dark:bg-gray-900",
+  medium: "border-yellow-500 bg-gradient-to-b from-[#ffeb2b]/20 to-white ",
+  low: "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900",
 };
 
 const priorityLabels = {
@@ -267,6 +270,64 @@ const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
   { value: "other", label: "أخرى" },
 ];
 
+/** Format datetime string for display (ar-SA, short) */
+function formatAppointmentDatetime(datetime: string | undefined): string {
+  if (!datetime) return "—";
+  try {
+    const d = new Date(datetime);
+    return d.toLocaleDateString("ar-SA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return datetime;
+  }
+}
+
+/** Appointments + Reminders table block (text-xs) - same data shape as /v2/customers-hub/requests/list */
+function AppointmentsRemindersTable({
+  appointments = [],
+  reminders = [],
+  className = "",
+}: {
+  appointments?: Array<{ id?: number | string; title?: string; type?: string; datetime?: string; status?: string; notes?: string }>;
+  reminders?: Array<{ id?: number | string; title?: string; description?: string; datetime?: string; status?: string; priority?: string }>;
+  className?: string;
+}) {
+  const hasAppointments = Array.isArray(appointments) && appointments.length > 0;
+  const hasReminders = Array.isArray(reminders) && reminders.length > 0;
+  if (!hasAppointments && !hasReminders) return null;
+
+  return (
+    <div className={cn("mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50", className)}>
+      <table className="w-full text-xs border-collapse">
+        <thead>
+          <tr className="text-muted-foreground border-b border-gray-200 dark:border-gray-700">
+            <th className="text-right py-1 px-1.5 font-medium">النوع</th>
+            <th className="text-right py-1 px-1.5 font-medium">العنوان</th>
+            <th className="text-right py-1 px-1.5 font-medium">التاريخ والوقت</th>
+          </tr>
+        </thead>
+        <tbody className="text-xs">
+          {hasAppointments &&
+            appointments.map((apt, i) => (
+              <tr key={apt.id ?? `apt-${i}`} className="border-b border-gray-100 dark:border-gray-700/50">
+                <td className="py-1 px-1.5">موعد</td>
+                <td className="py-1 px-1.5">{apt.title ?? "—"}</td>
+                <td className="py-1 px-1.5 dir-ltr">{formatAppointmentDatetime(apt.datetime)}</td>
+              </tr>
+            ))}
+          {hasReminders &&
+            reminders.map((rem, i) => (
+              <tr key={rem.id ?? `rem-${i}`} className="border-b border-gray-100 dark:border-gray-700/50">
+                <td className="py-1 px-1.5">تذكير</td>
+                <td className="py-1 px-1.5">{rem.title ?? rem.description ?? "—"}</td>
+                <td className="py-1 px-1.5 dir-ltr ">{formatAppointmentDatetime(rem.datetime)}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function IncomingActionsCard({
   action,
   customer,
@@ -282,11 +343,15 @@ export function IncomingActionsCard({
   isCompact = false,
   className,
   isCompleting = false,
+  onScheduleFormOpenChange,
 }: IncomingActionsCardProps) {
   const router = useRouter();
   const { addAppointment, addAppointmentForRequest, updateCustomerStage, getCustomerById } = useUnifiedCustomersStore();
   const { userData } = useAuthStore();
   const [showScheduleForm, setShowScheduleForm] = useState(false);
+  React.useEffect(() => {
+    onScheduleFormOpenChange?.(showScheduleForm);
+  }, [showScheduleForm, onScheduleFormOpenChange]);
   const [aptType, setAptType] = useState<Appointment["type"]>("office_meeting");
   const [aptDate, setAptDate] = useState("");
   const [aptTime, setAptTime] = useState("10:00");
@@ -1010,70 +1075,11 @@ export function IncomingActionsCard({
               </div>
             )}
           </div>
-          {/* Property request details in compact view */}
-          {((showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry') && (
-            <div className="flex items-center gap-2 text-xs flex-wrap">
-              {/* Budget */}
-              {(action.budgetMin != null || action.budgetMax != null) && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <DollarSign className="h-3 w-3 shrink-0" />
-                  <span className="truncate max-w-[120px]">
-                    {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                      ? `${action.budgetMin.toLocaleString("en-US")}–${action.budgetMax.toLocaleString("en-US")} ر.س`
-                      : action.budgetMin != null
-                        ? `${action.budgetMin.toLocaleString("en-US")} ر.س`
-                        : action.budgetMax != null
-                          ? `${action.budgetMax.toLocaleString("en-US")} ر.س`
-                          : ''}
-                  </span>
-                </Badge>
-              )}
-              {/* Property Type */}
-              {action.propertyType && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <Building2 className="h-3 w-3 shrink-0" />
-                  {translatePropertyType(action.propertyType)}
-                </Badge>
-              )}
-              {/* Location */}
-              {action.city && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <MapPin className="h-3 w-3 shrink-0" />
-                  <span className="truncate max-w-[80px]">{action.city}</span>
-                </Badge>
-              )}
-              {/* Seriousness */}
-              {action.metadata?.seriousness && (
-                <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                  <AlertTriangle className="h-3 w-3 shrink-0" />
-                  <span className="truncate max-w-[100px]">الجدية: {action.metadata.seriousness}</span>
-                </Badge>
-              )}
-              {/* Assign Employee Button or Assigned Employee Name */}
-              {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
-                action.assignedToName ? (
-                  <Badge variant="secondary" className="flex items-center gap-1 text-xs bg-transparent border-0 shadow-none">
-                    <User className="h-3 w-3 shrink-0" />
-                    <span className="truncate max-w-[100px]">{action.assignedToName}</span>
-                  </Badge>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-6 text-xs px-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowAssignEmployeeDialog(true);
-                    }}
-                    data-interactive="true"
-                  >
-                    <UserPlus className="h-3 w-3 ml-1" />
-                    تعيين موظف
-                  </Button>
-                )
-              )}
-            </div>
-          )}
+          {/* Appointments & Reminders table (replaces: ميزانية / نوع / مدينة / جدية / موظف معيّن) */}
+          <AppointmentsRemindersTable
+            appointments={action.appointments}
+            reminders={action.reminders}
+          />
         </div>
         <div className="flex items-center gap-1">
           {onQuickView && (
@@ -1258,7 +1264,7 @@ export function IncomingActionsCard({
   return (
     <Card
       className={cn(
-        "transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group",
+        "rounded-2xl transition-all duration-200 hover:shadow-lg border-l-4 cursor-pointer group flex flex-col h-full relative overflow-hidden",
         priorityColors[action.priority],
         isOverdue && "border-red-600",
         isSelected && "ring-2 ring-blue-500 bg-blue-50/50 dark:bg-blue-950/30",
@@ -1266,7 +1272,7 @@ export function IncomingActionsCard({
       )}
       onClick={handleCardClick}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 shrink-0">
         <div className="flex items-start justify-between gap-4">
           {/* Selection Checkbox */}
           {showCheckbox && (
@@ -1353,191 +1359,15 @@ export function IncomingActionsCard({
                 )}
               </a>
             )}
-            {/* Property request details - show all available data */}
-            {(showPropertyBlock && property) || (action.objectType === 'property_request' && (action.propertyType || action.city || action.budgetMin != null)) || action.objectType === 'inquiry' ? (
-              <div className="mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50">
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  {/* Budget */}
-                  {(action.budgetMin != null || action.budgetMax != null) && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <DollarSign className="h-3.5 w-3.5 shrink-0" />
-                      <span>
-                        {action.budgetMin != null && action.budgetMax != null && action.budgetMin !== action.budgetMax
-                          ? `${action.budgetMin.toLocaleString("en-US")}–${action.budgetMax.toLocaleString("en-US")} ر.س`
-                          : action.budgetMin != null
-                            ? `${action.budgetMin.toLocaleString("en-US")} ر.س`
-                            : action.budgetMax != null
-                              ? `${action.budgetMax.toLocaleString("en-US")} ر.س`
-                              : ''}
-                      </span>
-                    </Badge>
-                  )}
-                  {/* Property Type */}
-                  {action.propertyType && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <Building2 className="h-3.5 w-3.5 shrink-0" />
-                      <span>{translatePropertyType(action.propertyType)}</span>
-                    </Badge>
-                  )}
-                  {/* Location */}
-                  {action.city && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <MapPin className="h-3.5 w-3.5 shrink-0" />
-                      <span>{action.city}</span>
-                    </Badge>
-                  )}
-                  {/* Seriousness */}
-                  {action.metadata?.seriousness && (
-                    <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                      <span>الجدية: {action.metadata.seriousness}</span>
-                    </Badge>
-                  )}
-                  {/* Assign Employee Button or Assigned Employee Name */}
-                  {(action.objectType === 'property_request' || action.objectType === 'inquiry') && (
-                    action.assignedToName ? (
-                      <Badge variant="secondary" className="flex items-center gap-1.5 bg-transparent border-0 shadow-none">
-                        <User className="h-3.5 w-3.5 shrink-0" />
-                        <span>{action.assignedToName}</span>
-                      </Badge>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-6 text-xs px-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowAssignEmployeeDialog(true);
-                        }}
-                        data-interactive="true"
-                      >
-                        <UserPlus className="h-3 w-3 ml-1" />
-                        تعيين موظف
-                      </Button>
-                    )
-                  )}
-                </div>
-              </div>
-            ) : null}
+            {/* Appointments & Reminders table (replaces: ميزانية / نوع / مدينة / جدية / موظف معيّن) */}
+            <AppointmentsRemindersTable
+              appointments={action.appointments}
+              reminders={action.reminders}
+            />
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 space-y-3">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
-              {action.dueDate && (
-                <div
-                  className={cn(
-                    "flex items-center gap-1.5",
-                    isOverdue && "text-red-600 font-medium"
-                  )}
-                >
-                  <Clock className="h-4 w-4 shrink-0" />
-                  <span>
-                    {new Date(action.dueDate).toLocaleDateString("ar-SA", {
-                      weekday: "short",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}{" "}
-                    {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
-              )}
-            </div>
-            {/* Stage Dropdown - Load stages from Zustand store */}
-            {availableStages.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1.5 text-xs rounded-md hover:opacity-80 transition-all cursor-pointer text-right w-fit px-2 py-1"
-                    style={{
-                      backgroundColor: `${getStageColor(displayStage)}15`,
-                      border: `1px solid ${getStageColor(displayStage)}40`,
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    data-interactive="true"
-                  >
-                    <span
-                      className="size-2 rounded-full shrink-0"
-                      style={{ backgroundColor: getStageColor(displayStage) }}
-                      aria-hidden
-                    />
-                    <span 
-                      style={{ color: getStageColor(displayStage) }} 
-                      className="font-medium"
-                    >
-                      {getStageNameAr(displayStage)}
-                    </span>
-                    <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[180px]">
-                  {availableStages.map((stage) => (
-                    <DropdownMenuItem
-                      key={stage.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStageChange(stage.id as CustomerLifecycleStage);
-                      }}
-                      className="flex items-center gap-2"
-                      disabled={isUpdatingStage || displayStage === stage.id}
-                    >
-                      <span
-                        className="size-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: stage.color }}
-                        aria-hidden
-                      />
-                      {stage.nameAr}
-                      {displayStage === stage.id && (
-                        <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : null}
-            {/* AI property matching indicator */}
-            {resolvedCustomer && (
-              <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">
-                {aiMatching.canMatch ? (
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
-                    ✨ {aiMatching.matchCount}
-                  </div>
-                ) : (
-                  <TooltipProvider delayDuration={200}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400/90 cursor-help">
-                          ✨ —
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-xs text-xs">
-                        <p className="font-medium mb-1">حقول مطلوبة للمطابقة:</p>
-                        <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
-                          {aiMatching.missingFields.map((f) => (
-                            <li key={f}>{f}</li>
-                          ))}
-                        </ul>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
-            )}
-          </div>
-
-          <ActionQuickPanel
-            action={action}
-            onSchedule={() => setShowScheduleForm((prev) => !prev)}
-          />
-        </div>
-
+      <CardContent className="pt-0 space-y-3 flex-1 flex flex-col min-h-0 pb-20">
         {/* Inline جدولة موعد form (expand in card) */}
         {showScheduleForm && (
           <div
@@ -1617,6 +1447,121 @@ export function IncomingActionsCard({
           </div>
         )}
       </CardContent>
+
+      {/* Bottom bar: stage + appointment — ملتصق بأسفل الكارد (ابن مباشر للـ Card) */}
+      <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700 pt-3 px-6 pb-4 flex items-center justify-between gap-4 rounded-b-2xl bg-white dark:bg-gray-900">
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
+            {action.dueDate && (
+              <div
+                className={cn(
+                  "flex items-center gap-1.5",
+                  isOverdue && "text-red-600 font-medium"
+                )}
+              >
+                <Clock className="h-4 w-4 shrink-0" />
+                <span>
+                  {new Date(action.dueDate).toLocaleDateString("ar-SA", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            )}
+          </div>
+          {/* Stage Dropdown */}
+          {availableStages.length > 0 ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 text-xs rounded-md hover:opacity-80 transition-all cursor-pointer text-right w-fit px-2 py-1"
+                  style={{
+                    backgroundColor: `${getStageColor(displayStage)}15`,
+                    border: `1px solid ${getStageColor(displayStage)}40`,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  data-interactive="true"
+                >
+                  <span
+                    className="size-2 rounded-full shrink-0"
+                    style={{ backgroundColor: getStageColor(displayStage) }}
+                    aria-hidden
+                  />
+                  <span
+                    style={{ color: getStageColor(displayStage) }}
+                    className="font-medium"
+                  >
+                    {getStageNameAr(displayStage)}
+                  </span>
+                  <ChevronDown className="h-3 w-3 shrink-0" style={{ color: getStageColor(displayStage) }} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[180px]">
+                {availableStages.map((stage) => (
+                  <DropdownMenuItem
+                    key={stage.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStageChange(stage.id as CustomerLifecycleStage);
+                    }}
+                    className="flex items-center gap-2"
+                    disabled={isUpdatingStage || displayStage === stage.id}
+                  >
+                    <span
+                      className="size-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: stage.color }}
+                      aria-hidden
+                    />
+                    {stage.nameAr}
+                    {displayStage === stage.id && (
+                      <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
+          {/* AI property matching indicator */}
+          {resolvedCustomer && (
+            <div className="pt-1 border-t border-gray-100 dark:border-gray-800 mt-1">
+              {aiMatching.canMatch ? (
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
+                  ✨ {aiMatching.matchCount}
+                </div>
+              ) : (
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400/90 cursor-help">
+                        ✨ —
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-xs">
+                      <p className="font-medium mb-1">حقول مطلوبة للمطابقة:</p>
+                      <ul className="list-disc list-inside space-y-0.5 text-muted-foreground">
+                        {aiMatching.missingFields.map((f) => (
+                          <li key={f}>{f}</li>
+                        ))}
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          )}
+        </div>
+        <ActionQuickPanel
+          action={action}
+          onSchedule={() => setShowScheduleForm((prev) => !prev)}
+        />
+      </div>
 
       {/* Assign Employee Dialog */}
       <CustomDialog open={showAssignEmployeeDialog} onOpenChange={setShowAssignEmployeeDialog} maxWidth="max-w-md">

@@ -476,7 +476,7 @@ function ProjectCard({
     : "max-w-full";
 
   const CardContent = (
-    <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer h-full flex flex-col">
+    <div className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer h-full flex flex-col relative">
       {/* Image Section */}
       <div className="relative w-full h-[337px] flex-shrink-0">
         <Image
@@ -495,8 +495,8 @@ function ProjectCard({
         )}
       </div>
 
-      {/* Content Section */}
-      <div className="p-4 pb-2 space-y-4 flex-1 flex flex-col">
+      {/* Content Section - padding-bottom لترك مساحة لـ div السعر المطلق */}
+      <div className="p-4 pb-2 space-y-4 flex-1 flex flex-col pb-20">
         {/* Title and Status */}
         <div className="flex flex-col gap-2" style={{ paddingBottom: needsPaddingBottom ? '1.5rem' : '0' }}>
           <div className="flex items-start justify-between gap-4">
@@ -569,17 +569,17 @@ function ProjectCard({
             <span className="text-xs text-gray-600">عدد الطوابق</span>
           </div>
         </div>
+      </div>
 
-        {/* Price Section - في نهاية الـ Card مع مسافة بسيطة */}
-        <div 
-          className="rounded-lg px-4 py-3 text-center mt-auto mb-2"
-          style={{ backgroundColor: priceBackgroundColor }}
-        >
-          <div className="text-white text-base font-medium">
-            {typeof property.price === 'object' && 'min' in property.price && 'max' in property.price
-              ? `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`
-              : `${formatPriceNumber(property.price as number)} ريال`}
-          </div>
+      {/* Price Section - absolute ملاصق لأسفل الـ Card */}
+      <div
+        className="absolute bottom-0 left-0 right-0 rounded-lg mx-4 mb-2 px-4 py-3 text-center"
+        style={{ backgroundColor: priceBackgroundColor }}
+      >
+        <div className="text-white text-base font-medium">
+          {typeof property.price === 'object' && 'min' in property.price && 'max' in property.price
+            ? `${formatPriceNumber(property.price.min)} - ${formatPriceNumber(property.price.max)} ريال`
+            : `${formatPriceNumber(property.price as number)} ريال`}
         </div>
       </div>
     </div>

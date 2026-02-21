@@ -683,9 +683,9 @@ export const heroStructure: ComponentStructure = {
                       label: "Size",
                       type: "object",
                       fields: [
-                        { key: "desktop", label: "Desktop", type: "text" },
-                        { key: "tablet", label: "Tablet", type: "text" },
-                        { key: "mobile", label: "Mobile", type: "text" },
+                        { key: "desktop", label: "سطح المكتب", type: "number", min: 1, max: 200, step: 1, unit: "px" },
+                        { key: "tablet", label: "التابلت", type: "number", min: 1, max: 200, step: 1, unit: "px" },
+                        { key: "mobile", label: "الجوال", type: "number", min: 1, max: 200, step: 1, unit: "px" },
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
@@ -710,9 +710,9 @@ export const heroStructure: ComponentStructure = {
                       label: "Size",
                       type: "object",
                       fields: [
-                        { key: "desktop", label: "Desktop", type: "text" },
-                        { key: "tablet", label: "Tablet", type: "text" },
-                        { key: "mobile", label: "Mobile", type: "text" },
+                        { key: "desktop", label: "سطح المكتب", type: "number", min: 1, max: 200, step: 1, unit: "px" },
+                        { key: "tablet", label: "التابلت", type: "number", min: 1, max: 200, step: 1, unit: "px" },
+                        { key: "mobile", label: "الجوال", type: "number", min: 1, max: 200, step: 1, unit: "px" },
                       ],
                     },
                     { key: "weight", label: "Weight", type: "text" },
@@ -1183,20 +1183,21 @@ export const heroStructure: ComponentStructure = {
           type: "object",
           fields: [
             { key: "contactText", label: "Contact Text", type: "text" },
+            { key: "twoColumnGrid", label: "عرض الواتساب والإيميل والموقع في شبكة عمودين", type: "boolean", defaultValue: false },
             {
-              key: "whatsappNumbers",
+              key: "whatsapp",
               label: "WhatsApp Numbers",
-              type: "array",
-              of: [
+              type: "object",
+              fields: [
+                { key: "asBadge", label: "عرض أرقام الواتساب كشارة", type: "boolean", defaultValue: false },
                 {
-                  key: "number",
-                  label: "Phone Number",
-                  type: "text",
-                },
-                {
-                  key: "link",
-                  label: "WhatsApp Link",
-                  type: "text",
+                  key: "numbers",
+                  label: "Numbers",
+                  type: "array",
+                  of: [
+                    { key: "number", label: "Phone Number", type: "text" },
+                    { key: "link", label: "WhatsApp Link", type: "text" },
+                  ],
                 },
               ],
             },
@@ -1205,6 +1206,7 @@ export const heroStructure: ComponentStructure = {
               label: "Email",
               type: "object",
               fields: [
+                { key: "asBadge", label: "عرض البريد الإلكتروني كشارة", type: "boolean", defaultValue: false },
                 { key: "address", label: "Email Address", type: "text" },
                 { key: "link", label: "Email Link", type: "text" },
               ],
@@ -1214,6 +1216,7 @@ export const heroStructure: ComponentStructure = {
               label: "Location",
               type: "object",
               fields: [
+                { key: "asBadge", label: "عرض الموقع كشارة", type: "boolean", defaultValue: false },
                 { key: "text", label: "Location Text", type: "text" },
                 { key: "link", label: "Location Link", type: "text" },
               ],

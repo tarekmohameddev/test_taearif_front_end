@@ -46,6 +46,11 @@ import {
   logAfter,
   logDuring,
 } from "@/lib/fileLogger";
+import { storeTracker } from "@/lib/debug/live-editor/trackers/storeTracker";
+import { eventTracker } from "@/lib/debug/live-editor/trackers/eventTracker";
+import { eventFormatter } from "@/lib/debug/live-editor/formatters/eventFormatter";
+import { getSessionId, isDebugEnabled } from "@/lib/debug/live-editor/core/config";
+import { extractContext } from "@/lib/debug/live-editor/utils/contextUtils";
 
 export const createComponentActions = (
   set: StateCreator<EditorStore>["setState"],
@@ -59,87 +64,191 @@ export const createComponentActions = (
 > => ({
   getComponentData: (componentType: string, variantId: string): ComponentData => {
     const state = get();
+    
+    // Track getData call from editorStoreFunctions
+    if (isDebugEnabled()) {
+      const context = extractContext(
+        {
+          componentType,
+          componentId: variantId,
+          variantId,
+        },
+        {
+          action: "getData",
+          page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+        }
+      );
 
+      eventTracker.trackEvent(
+        eventFormatter.formatEvent({
+          eventType: "COMPONENT_UPDATED",
+          context,
+          details: {
+            action: `getData:${componentType}Functions.getData`,
+            source: "editorStoreFunctions",
+            existingData: state.getComponentData(componentType, variantId) || {},
+          },
+          before: {
+            componentData: state.getComponentData(componentType, variantId) || {},
+            storeState: state,
+            mergedData: state.getComponentData(componentType, variantId) || {},
+          },
+        })
+      );
+    }
+
+    let result: ComponentData;
     switch (componentType) {
       case "hero":
-        return heroFunctions.getData(state, variantId);
+        result = heroFunctions.getData(state, variantId);
+        break;
       case "header":
-        return headerFunctions.getData(state, variantId);
+        result = headerFunctions.getData(state, variantId);
+        break;
       case "footer":
-        return footerFunctions.getData(state, variantId);
+        result = footerFunctions.getData(state, variantId);
+        break;
       case "halfTextHalfImage":
-        return halfTextHalfImageFunctions.getData(state, variantId);
+        result = halfTextHalfImageFunctions.getData(state, variantId);
+        break;
       case "sideBySide":
-        return sideBySideFunctions.getData(state, variantId);
+        result = sideBySideFunctions.getData(state, variantId);
+        break;
       case "propertySlider":
-        return propertySliderFunctions.getData(state, variantId);
+        result = propertySliderFunctions.getData(state, variantId);
+        break;
       case "ctaValuation":
-        return ctaValuationFunctions.getData(state, variantId);
+        result = ctaValuationFunctions.getData(state, variantId);
+        break;
       case "stepsSection":
-        return stepsSectionFunctions.getData(state, variantId);
+        result = stepsSectionFunctions.getData(state, variantId);
+        break;
       case "testimonials":
-        return testimonialsFunctions.getData(state, variantId);
+        result = testimonialsFunctions.getData(state, variantId);
+        break;
       case "logosTicker":
-        return logosTickerFunctions.getData(state, variantId);
+        result = logosTickerFunctions.getData(state, variantId);
+        break;
       case "propertiesShowcase":
-        return propertiesShowcaseFunctions.getData(state, variantId);
+        result = propertiesShowcaseFunctions.getData(state, variantId);
+        break;
       case "card":
         // Determine which card variant based on variantId
         if (variantId.includes("card5") || variantId === "card5") {
-          return card5Functions.getData(state, variantId);
+          result = card5Functions.getData(state, variantId);
+        } else {
+          result = card4Functions.getData(state, variantId);
         }
-        return card4Functions.getData(state, variantId);
+        break;
       case "partners":
-        return partnersFunctions.getData(state, variantId);
+        result = partnersFunctions.getData(state, variantId);
+        break;
       case "whyChooseUs":
-        return whyChooseUsFunctions.getData(state, variantId);
+        result = whyChooseUsFunctions.getData(state, variantId);
+        break;
       case "contactMapSection":
-        return contactMapSectionFunctions.getData(state, variantId);
+        result = contactMapSectionFunctions.getData(state, variantId);
+        break;
       case "grid":
-        return gridFunctions.getData(state, variantId);
+        result = gridFunctions.getData(state, variantId);
+        break;
       case "filterButtons":
-        return filterButtonsFunctions.getData(state, variantId);
+        result = filterButtonsFunctions.getData(state, variantId);
+        break;
       case "propertyFilter":
-        return propertyFilterFunctions.getData(state, variantId);
+        result = propertyFilterFunctions.getData(state, variantId);
+        break;
       case "mapSection":
-        return mapSectionFunctions.getData(state, variantId);
+        result = mapSectionFunctions.getData(state, variantId);
+        break;
       case "contactCards":
-        return contactCardsFunctions.getData(state, variantId);
+        result = contactCardsFunctions.getData(state, variantId);
+        break;
       case "contactFormSection":
-        return contactFormSectionFunctions.getData(state, variantId);
+        result = contactFormSectionFunctions.getData(state, variantId);
+        break;
       case "applicationForm":
-        return applicationFormFunctions.getData(state, variantId);
+        result = applicationFormFunctions.getData(state, variantId);
+        break;
       case "jobForm":
-        return jobFormFunctions.getData(state, variantId);
+        result = jobFormFunctions.getData(state, variantId);
+        break;
       case "inputs":
-        return inputsFunctions.getData(state, variantId);
+        result = inputsFunctions.getData(state, variantId);
+        break;
       case "inputs2":
-        return inputs2Functions.getData(state, variantId);
+        result = inputs2Functions.getData(state, variantId);
+        break;
       case "imageText":
-        return imageTextFunctions.getData(state, variantId);
+        result = imageTextFunctions.getData(state, variantId);
+        break;
       case "contactUsHomePage":
-        return contactUsHomePageFunctions.getData(state, variantId);
+        result = contactUsHomePageFunctions.getData(state, variantId);
+        break;
       case "blogsSections":
-        return blogsSectionsFunctions.getData(state, variantId);
+        result = blogsSectionsFunctions.getData(state, variantId);
+        break;
       case "blogCard":
-        return blogCardFunctions.getData(state, variantId);
+        result = blogCardFunctions.getData(state, variantId);
+        break;
       case "title":
-        return titleFunctions.getData(state, variantId);
+        result = titleFunctions.getData(state, variantId);
+        break;
       case "responsiveImage":
-        return responsiveImageFunctions.getData(state, variantId);
+        result = responsiveImageFunctions.getData(state, variantId);
+        break;
       case "photosGrid":
-        return photosGridFunctions.getData(state, variantId);
+        result = photosGridFunctions.getData(state, variantId);
+        break;
       case "video":
-        return videoFunctions.getData(state, variantId);
+        result = videoFunctions.getData(state, variantId);
+        break;
       case "projectDetails":
-        return projectDetailsFunctions.getData(state, variantId);
+        result = projectDetailsFunctions.getData(state, variantId);
+        break;
       case "propertyDetail":
-        return propertyDetailFunctions.getData(state, variantId);
+        result = propertyDetailFunctions.getData(state, variantId);
+        break;
       case "blogDetails":
-        return blogDetailsFunctions.getData(state, variantId);
+        result = blogDetailsFunctions.getData(state, variantId);
+        break;
       default:
-        return state.componentStates[componentType]?.[variantId] || {};
+        result = state.componentStates[componentType]?.[variantId] || {};
     }
+    
+    // Track getData result
+    if (isDebugEnabled()) {
+      const context = extractContext(
+        {
+          componentType,
+          componentId: variantId,
+          variantId,
+        },
+        {
+          action: "getData_result",
+          page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+        }
+      );
+
+      eventTracker.trackEvent(
+        eventFormatter.formatEvent({
+          eventType: "COMPONENT_UPDATED",
+          context,
+          details: {
+            action: `getData_result:${componentType}Functions.getData`,
+            source: "editorStoreFunctions",
+            existingData: result || {},
+          },
+          after: {
+            componentData: result || {},
+            storeState: state,
+            mergedData: result || {},
+          },
+        })
+      );
+    }
+    
+    return result;
   },
 
   setComponentData: (
@@ -148,6 +257,55 @@ export const createComponentActions = (
     data: ComponentData,
   ): void => {
     const state = get();
+    const before = state.getComponentData(componentType, variantId);
+
+    // Track setData call from editorStoreFunctions
+    if (isDebugEnabled()) {
+      const context = extractContext(
+        {
+          componentType,
+          componentId: variantId,
+          variantId,
+        },
+        {
+          action: "setData",
+          page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+        }
+      );
+
+      eventTracker.trackEvent(
+        eventFormatter.formatEvent({
+          eventType: "COMPONENT_UPDATED",
+          context,
+          details: {
+            action: `setData:${componentType}Functions.setData`,
+            source: "editorStoreFunctions",
+            existingData: before || {},
+            finalData: data || {},
+          },
+          before: {
+            componentData: before || {},
+            storeState: state,
+            mergedData: before || {},
+          },
+          after: {
+            componentData: data || {},
+            storeState: state,
+            mergedData: data || {},
+          },
+        })
+      );
+    }
+
+    // Track store update
+    storeTracker.trackUpdate({
+      componentType,
+      componentId: variantId,
+      before,
+      after: data,
+      operation: "save",
+      storeType: "editor",
+    });
 
     switch (componentType) {
       case "hero":
@@ -282,9 +440,44 @@ export const createComponentActions = (
     variantId: string,
     initial?: ComponentData,
   ): void => {
+    const currentState = get();
+    
+    // Track ensureVariant call from editorStoreFunctions
+    if (isDebugEnabled()) {
+      const context = extractContext(
+        {
+          componentType,
+          componentId: variantId,
+          variantId,
+        },
+        {
+          action: "ensureVariant",
+          page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+        }
+      );
+
+      const existingData = currentState.getComponentData(componentType, variantId) || {};
+      eventTracker.trackEvent(
+        eventFormatter.formatEvent({
+          eventType: "COMPONENT_UPDATED",
+          context,
+          details: {
+            action: `ensureVariant:${componentType}Functions.ensureVariant`,
+            source: "editorStoreFunctions",
+            existingData,
+            storeData: initial || {},
+          },
+          before: {
+            componentData: existingData,
+            storeState: currentState,
+            mergedData: existingData,
+          },
+        })
+      );
+    }
+    
     // ⭐ CRITICAL: Check if variant already exists BEFORE calling set()
     // This prevents unnecessary store updates that can cause infinite loops
-    const currentState = get();
     const existingData = (() => {
       switch (componentType) {
         case "hero":
@@ -584,6 +777,58 @@ export const createComponentActions = (
     value: any,
   ): void => {
     const state = get();
+    const before = state.getComponentData(componentType, variantId);
+
+    // Track updateByPath call from editorStoreFunctions
+    if (isDebugEnabled()) {
+      const context = extractContext(
+        {
+          componentType,
+          componentId: variantId,
+          variantId,
+        },
+        {
+          action: "updateByPath",
+          page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+        }
+      );
+
+      eventTracker.trackEvent(
+        eventFormatter.formatEvent({
+          eventType: "COMPONENT_UPDATED",
+          context,
+          details: {
+            action: `updateByPath:${componentType}Functions.updateByPath`,
+            source: "editorStoreFunctions",
+            field: {
+              path,
+              oldValue: before,
+              newValue: value,
+              type: typeof value,
+            },
+            existingData: before || {},
+          },
+          before: {
+            componentData: before || {},
+            storeState: state,
+            mergedData: before || {},
+          },
+        })
+      );
+    }
+
+    // Track store update
+    if (isDebugEnabled()) {
+      storeTracker.trackUpdate({
+        componentType,
+        componentId: variantId,
+        before,
+        after: before, // Will be updated after set()
+        operation: "update",
+        storeType: "editor",
+        path,
+      });
+    }
 
     switch (componentType) {
       case "hero":
@@ -755,7 +1000,7 @@ export const createComponentActions = (
           const lastKey = segments[segments.length - 1]!;
           cursor[lastKey] = value;
 
-          return {
+          const newState = {
             componentStates: {
               ...currentState.componentStates,
               [componentType]: {
@@ -764,6 +1009,22 @@ export const createComponentActions = (
               },
             },
           };
+
+          // Track store update after set
+          if (isDebugEnabled()) {
+            const after = newState.componentStates[componentType]?.[variantId];
+            storeTracker.trackUpdate({
+              componentType,
+              componentId: variantId,
+              before,
+              after,
+              operation: "update",
+              storeType: "editor",
+              path,
+            });
+          }
+
+          return newState;
         });
     }
   },

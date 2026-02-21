@@ -1,9 +1,47 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { eventTracker } from "@/lib/debug/live-editor/trackers/eventTracker";
+import { eventFormatter } from "@/lib/debug/live-editor/formatters/eventFormatter";
+import { extractContext } from "@/lib/debug/live-editor/utils/contextUtils";
+import { isDebugEnabled } from "@/lib/debug/live-editor/core/config";
 
 // Fetch tenant data function
 export const createFetchFunctions = (set, get) => ({
   fetchTenantData: async (websiteName) => {
     const state = get();
+    
+    // Track fetchTenantData call
+    if (isDebugEnabled()) {
+      const context = extractContext(
+        {
+          componentType: "tenant",
+          componentId: websiteName || "unknown",
+          variantId: websiteName || "unknown",
+        },
+        {
+          action: "fetchTenantData",
+          page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+        }
+      );
+
+      eventTracker.trackEvent(
+        eventFormatter.formatEvent({
+          eventType: "DATA_SOURCE_CHANGED",
+          context,
+          details: {
+            action: "fetchTenantData",
+            source: "tenantStore",
+            websiteName,
+            existingTenantId: state.tenantId,
+            loadingState: state.loadingTenantData,
+          },
+          before: {
+            componentData: state.tenantData || {},
+            storeState: state,
+            mergedData: state.tenantData || {},
+          },
+        })
+      );
+    }
 
     if (state.loadingTenantData) {
       return;
@@ -139,13 +177,79 @@ export const createFetchFunctions = (set, get) => ({
       }
 
 
-      set({
+      const newState = {
         tenantData: data,
         loadingTenantData: false,
         lastFetchedWebsite: websiteName,
-      });
+      };
+      
+      // Track successful fetch
+      if (isDebugEnabled()) {
+        const context = extractContext(
+          {
+            componentType: "tenant",
+            componentId: websiteName || "unknown",
+            variantId: websiteName || "unknown",
+          },
+          {
+            action: "fetchTenantData_success",
+            page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+          }
+        );
+
+        eventTracker.trackEvent(
+          eventFormatter.formatEvent({
+            eventType: "DATA_SOURCE_CHANGED",
+            context,
+            details: {
+              action: "fetchTenantData_success",
+              source: "tenantStore",
+              websiteName,
+              success: true,
+              hasGlobalComponents: !!data.globalComponentsData,
+              hasStaticPages: !!data.StaticPages,
+            },
+            after: {
+              componentData: data || {},
+              storeState: { ...state, ...newState },
+              mergedData: data || {},
+            },
+          })
+        );
+      }
+      
+      set(newState);
 
     } catch (error) {
+      // Track fetch error
+      if (isDebugEnabled()) {
+        const context = extractContext(
+          {
+            componentType: "tenant",
+            componentId: websiteName || "unknown",
+            variantId: websiteName || "unknown",
+          },
+          {
+            action: "fetchTenantData_error",
+            page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+          }
+        );
+
+        eventTracker.trackEvent(
+          eventFormatter.formatEvent({
+            eventType: "DATA_SOURCE_CHANGED",
+            context,
+            details: {
+              action: "fetchTenantData_error",
+              source: "tenantStore",
+              websiteName,
+              success: false,
+              error: error.message,
+            },
+          })
+        );
+      }
+      
       set({ error: error.message, loadingTenantData: false });
     }
   },

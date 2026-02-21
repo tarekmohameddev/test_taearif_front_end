@@ -612,6 +612,7 @@
       "image_alt": "النص البديل للصورة",
       "image_position": "موضع الصورة",
       "show_image": "إظهار الصورة",
+      "show_load_more_button": "إظهار زر تحميل المزيد",
       "display_mode": "وضع العرض",
       "logos": "الشعارات",
       "both_forward_reverse": "كلاهما (أمامي وعكسي)",

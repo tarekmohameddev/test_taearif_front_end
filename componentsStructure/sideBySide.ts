@@ -1789,8 +1789,35 @@ export const sideBySideStructure: ComponentStructure = {
               label: "Padding",
               type: "object",
               fields: [
-                { key: "top", label: "Top", type: "text" },
-                { key: "bottom", label: "Bottom", type: "text" },
+                { key: "top", label: "Top", type: "number", min: 0, max: 500, step: 1, unit: "px" },
+                { key: "bottom", label: "Bottom", type: "number", min: 0, max: 500, step: 1, unit: "px" },
+              ],
+            },
+            {
+              key: "innerPadding",
+              label: "الحشو الداخلي",
+              type: "object",
+              fields: [
+                {
+                  key: "x",
+                  label: "أفقي (يمين/يسار)",
+                  type: "object",
+                  fields: [
+                    { key: "mobile", label: "الجوال", type: "number", min: 0, max: 200, step: 1, unit: "px" },
+                    { key: "tablet", label: "التابلت", type: "number", min: 0, max: 200, step: 1, unit: "px" },
+                    { key: "desktop", label: "سطح المكتب", type: "number", min: 0, max: 200, step: 1, unit: "px" },
+                  ],
+                },
+                {
+                  key: "y",
+                  label: "عمودي (أعلى/أسفل)",
+                  type: "object",
+                  fields: [
+                    { key: "mobile", label: "الجوال", type: "number", min: 0, max: 200, step: 1, unit: "px" },
+                    { key: "tablet", label: "التابلت", type: "number", min: 0, max: 200, step: 1, unit: "px" },
+                    { key: "desktop", label: "سطح المكتب", type: "number", min: 0, max: 200, step: 1, unit: "px" },
+                  ],
+                },
               ],
             },
           ],

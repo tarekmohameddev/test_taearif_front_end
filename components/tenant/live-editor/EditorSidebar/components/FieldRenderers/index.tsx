@@ -7,10 +7,8 @@ export {
   SimpleBackgroundFieldRenderer,
 } from "./BackgroundFieldRenderer";
 
-// Re-export existing field renderers
-export {
-  ColorFieldRenderer,
-  ImageFieldRenderer,
-  BooleanFieldRenderer,
-  NumberFieldRenderer,
-} from "../FieldRenderers";
+// Simple field renderers (each in its own file)
+export { ColorFieldRenderer } from "./ColorFieldRenderer";
+export { ImageFieldRenderer } from "./ImageFieldRenderer";
+export { BooleanFieldRenderer } from "./BooleanFieldRenderer";
+export { NumberFieldRenderer } from "./NumberFieldRenderer";

@@ -79,6 +79,7 @@ export function translateLabel(
     "Image Alt": "components_structure.basic.image_alt",
     "Image Position": "components_structure.basic.image_position",
     "Show Image": "components_structure.basic.show_image",
+    "Show Load More Button": "components_structure.basic.show_load_more_button",
     "Display Mode": "components_structure.basic.display_mode",
     Logos: "components_structure.basic.logos",
     "Both (Forward & Reverse)":

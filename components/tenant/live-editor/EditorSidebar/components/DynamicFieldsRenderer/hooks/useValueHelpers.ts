@@ -2,6 +2,11 @@ import { useCallback } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import { normalizePath } from "../../../utils";
 import { COMPONENTS } from "@/lib/ComponentsList";
+import { useEventDebug } from "@/lib/debug/live-editor/hooks/useEventDebug";
+import { useDataFlowDebug } from "@/lib/debug/live-editor/hooks/useDataFlowDebug";
+import { contextUtils } from "@/lib/debug/live-editor/utils/contextUtils";
+import { getSessionId } from "@/lib/debug/live-editor/core/config";
+import { isDebugEnabled } from "@/lib/debug/live-editor/core/config";
 
 interface UseValueHelpersProps {
   currentData: any;
@@ -25,6 +30,17 @@ export const useValueHelpers = ({
     globalFooterData,
     globalComponentsData,
   } = useEditorStore();
+
+  // Debug tracking
+  const { emitEvent } = useEventDebug();
+  const { trackDataFlow } = useDataFlowDebug({
+    componentId: variantId || "",
+    componentType: componentType || "unknown",
+    defaultData: {},
+    tenantData: {},
+    storeData: getComponentData(componentType || "", variantId || "") || {},
+    mergedData: currentData || {},
+  });
 
   const getValueByPath = useCallback(
     (path: string) => {
@@ -178,6 +194,20 @@ export const useValueHelpers = ({
 
   const updateValue = useCallback(
     (path: string, value: any) => {
+      // Get old value for debug tracking (before update)
+      let oldValue: any;
+      try {
+        const segments = normalizePath(path).split(".").filter(Boolean);
+        let cursor: any = currentData && Object.keys(currentData).length > 0 ? currentData : (tempData || {});
+        for (const seg of segments) {
+          if (cursor == null) break;
+          cursor = cursor[seg as any];
+        }
+        oldValue = cursor;
+      } catch {
+        oldValue = undefined;
+      }
+
       // Special handling for halfTextHalfImage3 imagePosition
       if (
         path === "content.imagePosition" &&
@@ -201,6 +231,45 @@ export const useValueHelpers = ({
             value,
           );
         }
+
+        // Emit FIELD_UPDATED event
+        if (isDebugEnabled() && componentType && variantId) {
+          const context = contextUtils.buildContext(
+            variantId,
+            componentType,
+            variantId,
+            variantId,
+            {
+              action: "field_update",
+              page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+            }
+          );
+
+          emitEvent("FIELD_UPDATED", {
+            context,
+            details: {
+              action: "field_update",
+              field: {
+                path: "content.imagePosition",
+                oldValue,
+                newValue: value,
+                type: "string",
+              },
+              source: "DynamicFieldsRenderer",
+            },
+            before: {
+              componentData: currentData || {},
+              storeState: getComponentData(componentType, variantId) || {},
+              mergedData: currentData || {},
+            },
+            after: {
+              componentData: { ...(currentData || {}), content: { ...(currentData?.content || {}), imagePosition: value } },
+              storeState: getComponentData(componentType, variantId) || {},
+              mergedData: { ...(currentData || {}), content: { ...(currentData?.content || {}), imagePosition: value } },
+            },
+          });
+        }
+
         return;
       }
 
@@ -220,7 +289,56 @@ export const useValueHelpers = ({
             value,
           );
         }
+
+        // Emit FIELD_UPDATED event
+        if (isDebugEnabled() && componentType && variantId) {
+          const context = contextUtils.buildContext(
+            variantId,
+            componentType,
+            variantId,
+            variantId,
+            {
+              action: "field_update",
+              page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+            }
+          );
+
+          emitEvent("FIELD_UPDATED", {
+            context,
+            details: {
+              action: "field_update",
+              field: {
+                path: "layout.direction",
+                oldValue,
+                newValue: value,
+                type: "string",
+              },
+              source: "DynamicFieldsRenderer",
+            },
+            before: {
+              componentData: currentData || {},
+              storeState: getComponentData(componentType, variantId) || {},
+              mergedData: currentData || {},
+            },
+            after: {
+              componentData: { ...(currentData || {}), layout: { ...(currentData?.layout || {}), direction: value } },
+              storeState: getComponentData(componentType, variantId) || {},
+              mergedData: { ...(currentData || {}), layout: { ...(currentData?.layout || {}), direction: value } },
+            },
+          });
+        }
+
         return;
+      }
+
+      // Track data flow before update
+      if (isDebugEnabled() && componentType && variantId) {
+        trackDataFlow({
+          operation: "field_update",
+          path,
+          oldValue,
+          newValue: value,
+        });
       }
 
       if (onUpdateByPath) {
@@ -256,6 +374,47 @@ export const useValueHelpers = ({
           updateByPath(path, value);
         }
       }
+
+      // Emit FIELD_UPDATED event after update
+      if (isDebugEnabled() && componentType && variantId) {
+        const context = contextUtils.buildContext(
+          variantId,
+          componentType,
+          variantId,
+          variantId,
+          {
+            action: "field_update",
+            page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+          }
+        );
+
+        const storeData = getComponentData(componentType, variantId) || {};
+        const updatedData = { ...(currentData || {}), [path]: value };
+
+        emitEvent("FIELD_UPDATED", {
+          context,
+          details: {
+            action: "field_update",
+            field: {
+              path,
+              oldValue,
+              newValue: value,
+              type: typeof value,
+            },
+            source: "DynamicFieldsRenderer",
+          },
+          before: {
+            componentData: currentData || {},
+            storeState: storeData,
+            mergedData: currentData || {},
+          },
+          after: {
+            componentData: updatedData,
+            storeState: storeData,
+            mergedData: updatedData,
+          },
+        });
+      }
     },
     [
       onUpdateByPath,
@@ -265,6 +424,11 @@ export const useValueHelpers = ({
       variantId,
       globalHeaderData,
       globalFooterData,
+      getValueByPath,
+      getComponentData,
+      currentData,
+      emitEvent,
+      trackDataFlow,
     ],
   );
 

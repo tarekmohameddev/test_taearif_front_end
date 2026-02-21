@@ -1,7 +1,8 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance } from "@/lib/types";
+import { useEventDebug } from "@/lib/debug/live-editor/hooks/useEventDebug";
 
 // Effects
 import { useAuthEffect } from "./effects/useAuthEffect";
@@ -37,6 +38,45 @@ export function useLiveEditorEffects(state: any) {
     setRegisteredComponents,
     slug,
   } = state;
+
+  // Debug tracking
+  const { emitEvent } = useEventDebug();
+  const store = useEditorStore.getState();
+
+  // Emit LIVE_EDITOR_OPENED event
+  useEffect(() => {
+    if (initialized) {
+      emitEvent("LIVE_EDITOR_OPENED", {
+        context: {
+          component: {
+            id: "live-editor",
+            type: "live-editor",
+            variant: "main",
+            name: "Live Editor",
+          },
+          location: {
+            file: "LiveEditorEffects.tsx",
+            function: "useLiveEditorEffects",
+            line: 0,
+          },
+          user: {
+            action: "open",
+            page: slug || "homepage",
+          },
+          editor: {
+            currentPage: store.currentPage || slug || "homepage",
+            componentsCount: pageComponents.length,
+            globalHeaderVariant: store.globalHeaderVariant || null,
+            globalFooterVariant: store.globalFooterVariant || null,
+          },
+        },
+        details: {
+          action: "live_editor_opened",
+          source: "useLiveEditorEffects",
+        },
+      });
+    }
+  }, [initialized, slug, pageComponents.length]);
 
   // Get theme change timestamp for useThemeChangeEffect
   const themeChangeTimestamp = useEditorStore(

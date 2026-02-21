@@ -32,12 +32,15 @@ import {
   Filter,
   Search,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   AlertTriangle,
   Timer,
   UserPlus,
   MessageSquare,
   LayoutGrid,
   LayoutList,
+  Table2,
   X,
   MapPin,
   Building2,
@@ -96,6 +99,23 @@ const priorityOptions: { value: Priority; label: string; color: string }[] = [
   { value: "medium", label: "متوسط", color: "bg-yellow-100 text-yellow-700" },
   { value: "low", label: "منخفض", color: "bg-green-100 text-green-700" },
 ];
+
+/** Build list of page numbers + ellipsis for pagination (e.g. [1, 'ellipsis', 4, 5, 6, 'ellipsis', 12]) */
+function getPaginationPages(currentPage: number, totalPages: number): (number | "ellipsis")[] {
+  if (totalPages <= 0) return [];
+  if (totalPages <= 6) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const set = new Set<number>([1, totalPages]);
+  set.add(currentPage);
+  if (currentPage > 1) set.add(currentPage - 1);
+  if (currentPage < totalPages) set.add(currentPage + 1);
+  const sorted = Array.from(set).sort((a, b) => a - b);
+  const result: (number | "ellipsis")[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i]! - sorted[i - 1]! > 1) result.push("ellipsis");
+    result.push(sorted[i]!);
+  }
+  return result;
+}
 
 // Confirmation Dialog Component
 interface ConfirmationDialogProps {
@@ -451,6 +471,9 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
   const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
   const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
+
+  // Advanced filters panel visibility (toggle via "تصفية متقدمة" button)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Fetch requests when filters change (only if API handler is provided)
   // Use useRef to track previous filters and prevent unnecessary API calls
@@ -953,6 +976,20 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     budgetMax !== "" ||
     selectedPropertyTypes.length > 0;
 
+  // Count of active filter dimensions (for "تصفية متقدمة" badge)
+  const activeFiltersCount =
+    (appliedSearchQuery ? 1 : 0) +
+    (selectedSources.length > 0 ? 1 : 0) +
+    (selectedObjectTypes.length > 0 ? 1 : 0) +
+    (selectedPriorities.length > 0 ? 1 : 0) +
+    (selectedTypes.length > 0 ? 1 : 0) +
+    (selectedAssignees.length > 0 ? 1 : 0) +
+    (dueDateFilter !== "all" ? 1 : 0) +
+    (selectedCities.length > 0 ? 1 : 0) +
+    (selectedStates.length > 0 ? 1 : 0) +
+    (budgetMin !== "" || budgetMax !== "" ? 1 : 0) +
+    (selectedPropertyTypes.length > 0 ? 1 : 0);
+
   // Show loading state
   if (apiLoading && actions.length === 0) {
     return (
@@ -982,56 +1019,27 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900" dir="rtl">
+    <div className="min-h-screen" dir="rtl">
       <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/ar/dashboard/customers-hub/list">
-              <Button variant="outline" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                العملاء
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-white">
-                  <MessageSquare className="h-6 w-6" />
-                </div>
-                مركز طلبات العملاء
-              </h1>
-              <p className="text-gray-500 text-sm mt-1">
-                إدارة الطلبات الواردة والإجراءات في مكان واحد
-              </p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-white">
+                <MessageSquare className="h-6 w-6" />
+              </div>
+              مركز طلبات العملاء
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+              إدارة الطلبات الواردة والإجراءات في مكان واحد
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Select value={viewMode} onValueChange={(v: any) => setViewMode(v)}>
-              <SelectTrigger className="w-64">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="grid">
-                  <div className="flex items-center gap-2">
-                    <LayoutGrid className="h-4 w-4" />
-                    عرض الشبكة
-                  </div>
-                </SelectItem>
-                <SelectItem value="compact">
-                  <div className="flex items-center gap-2">
-                    <LayoutList className="h-4 w-4" />
-                    عرض مضغوط
-                  </div>
-                </SelectItem>
-                <SelectItem value="table">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">Table</Badge>
-                    عرض جدول منظم
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Link href="/ar/dashboard/customers-hub/list">
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              العملاء
+            </Button>
+          </Link>
         </div>
 
         {/* Stats */}
@@ -1146,12 +1154,13 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-col gap-4">
+              {/* Top row: Search (right) | View toggles + مسح الفلاتر + تصفية متقدمة (left) */}
               <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                <div className="relative flex-1 max-w-md flex gap-2">
+                <div className="relative flex-1 max-w-md flex gap-2 order-2 md:order-1">
                   <div className="relative flex-1">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      placeholder="البحث في الطلبات..."
+                      placeholder="بحث عن اسم العميل، رقم الهاتف، أو المرجع..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => {
@@ -1160,22 +1169,78 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                           applySearch();
                         }
                       }}
-                      className="pr-10"
+                      className="pr-10 rounded-xl"
                     />
                   </div>
                   <Button
                     onClick={applySearch}
                     size="sm"
-                    className="gap-2"
+                    className="gap-2 rounded-xl"
                   >
                     <Search className="h-4 w-4" />
                     بحث
                   </Button>
                 </div>
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap order-1 md:order-2">
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 rounded-xl">
+                      مسح الفلاتر
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    className="gap-2 relative rounded-xl"
+                    onClick={() => setShowAdvancedFilters((v) => !v)}
+                  >
+                    <Filter className="h-4 w-4" />
+                    تصفية متقدمة
+                    {activeFiltersCount > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary-foreground text-primary text-[10px] font-bold flex items-center justify-center">
+                        {activeFiltersCount}
+                      </span>
+                    )}
+                    <ChevronDown className={cn("h-4 w-4 transition-transform", showAdvancedFilters && "rotate-180")} />
+                  </Button>
+                  {/* View mode: list / grid / table */}
+                  <div className="flex items-center rounded-md bg-muted/60 p-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={cn("h-10 w-10 p-0 hover:bg-white [&_svg]:!h-5 [&_svg]:!w-5", viewMode === "compact" && "bg-white")}
+                      onClick={() => setViewMode("compact")}
+                    >
+                      <LayoutList />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={cn("h-10 w-10 p-0 hover:bg-white [&_svg]:!h-5 [&_svg]:!w-5", viewMode === "grid" && "bg-white")}
+                      onClick={() => setViewMode("grid")}
+                    >
+                      <LayoutGrid />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className={cn("h-10 w-10 p-0 hover:bg-white [&_svg]:!h-5 [&_svg]:!w-5", viewMode === "table" && "bg-white")}
+                      onClick={() => setViewMode("table")}
+                    >
+                      <Table2 />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              {/* Advanced filters (dropdowns) - visible only when "تصفية متقدمة" is open */}
+              {showAdvancedFilters && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 border-t pt-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <Filter className="h-4 w-4" />
                         المصدر
                         {selectedSources.length > 0 && (
@@ -1214,7 +1279,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <AlertTriangle className="h-4 w-4" />
                         الأولوية
                         {selectedPriorities.length > 0 && (
@@ -1245,7 +1310,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <ListTodo className="h-4 w-4" />
                         النوع
                         {selectedTypes.length > 0 && (
@@ -1277,7 +1342,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   {uniqueAssignees.length > 0 && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
+                        <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                           <UserPlus className="h-4 w-4" />
                           الموظف
                           {selectedAssignees.length > 0 && (
@@ -1309,7 +1374,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   )}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <Timer className="h-4 w-4" />
                         الموعد
                         {dueDateFilter !== "all" && (
@@ -1343,7 +1408,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   {uniqueCities.length > 0 && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
+                        <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                           <MapPin className="h-4 w-4" />
                           المدينة
                           {selectedCities.length > 0 && (
@@ -1375,7 +1440,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   )}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <MapPin className="h-4 w-4" />
                         المنطقة
                         {selectedStates.length > 0 && (
@@ -1413,7 +1478,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                     }
                   }}>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <DollarSign className="h-4 w-4" />
                         الميزانية
                         {(budgetMin !== "" || budgetMax !== "") && (
@@ -1481,7 +1546,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <Building2 className="h-4 w-4" />
                         نوع العقار
                         {selectedPropertyTypes.length > 0 && (
@@ -1512,14 +1577,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  {hasActiveFilters && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
-                      <X className="h-4 w-4" />
-                      مسح الفلاتر
-                    </Button>
-                  )}
                 </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -1661,6 +1720,77 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           </TabsContent>
         </Tabs>
 
+        {/* Pagination — مثل الصورة: السابق | أرقام الصفحات | التالي */}
+        {props?.onFetchRequests && props?.pagination && props.pagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-1 pt-4 pb-2">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-md border-gray-200 bg-white hover:bg-gray-50"
+              onClick={() => {
+                const { currentPage, itemsPerPage } = props.pagination;
+                if (currentPage <= 1) return;
+                props.onFetchRequests?.({
+                  ...newFilters,
+                  offset: (currentPage - 2) * itemsPerPage,
+                  limit: itemsPerPage,
+                } as RequestsListFilters);
+              }}
+              disabled={props.pagination.currentPage <= 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            {getPaginationPages(props.pagination.currentPage, props.pagination.totalPages).map((item, idx) =>
+              item === "ellipsis" ? (
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="h-9 min-w-[2.25rem] px-2 flex items-center justify-center rounded-md border border-gray-200 bg-white text-sm text-gray-500"
+                >
+                  ...
+                </span>
+              ) : (
+                <Button
+                  key={item}
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-9 min-w-[2.25rem] rounded-md",
+                    props.pagination.currentPage === item
+                      ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 hover:text-primary-foreground"
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  )}
+                  onClick={() => {
+                    props?.onFetchRequests?.({
+                      ...newFilters,
+                      offset: (item - 1) * props.pagination.itemsPerPage,
+                      limit: props.pagination.itemsPerPage,
+                    } as RequestsListFilters);
+                  }}
+                >
+                  {item}
+                </Button>
+              )
+            )}
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 rounded-md border-gray-200 bg-white hover:bg-gray-50"
+              onClick={() => {
+                const { currentPage, itemsPerPage } = props.pagination;
+                if (currentPage >= props.pagination.totalPages) return;
+                props.onFetchRequests?.({
+                  ...newFilters,
+                  offset: currentPage * itemsPerPage,
+                  limit: itemsPerPage,
+                } as RequestsListFilters);
+              }}
+              disabled={props.pagination.currentPage >= props.pagination.totalPages}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+
         {/* Bulk toolbar */}
         <BulkActionsToolbar
           selectedCount={selectedActionIds.size}
@@ -1798,6 +1928,43 @@ function RequestsList({
   }>;
   completingActionIds: Set<string>;
 }) {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [maxCardHeight, setMaxCardHeight] = useState<number | null>(null);
+  const measureRef = useRef<() => void>(() => {});
+
+  // When any card closes its appointment form, clear minHeight and re-measure so the whole grid shrinks
+  const handleScheduleFormOpenChange = useCallback((open: boolean) => {
+    if (open) return;
+    setMaxCardHeight(null);
+    setTimeout(() => measureRef.current(), 80);
+  }, []);
+
+  // Measure max card height across entire grid so all cards share the same height
+  useEffect(() => {
+    if (isCompactView || actions.length === 0) {
+      setMaxCardHeight(null);
+      return;
+    }
+    const measure = () => {
+      const grid = gridRef.current;
+      if (!grid?.children?.length) return;
+      let max = 0;
+      for (let i = 0; i < grid.children.length; i++) {
+        const h = (grid.children[i] as HTMLElement).getBoundingClientRect().height;
+        if (h > max) max = h;
+      }
+      if (max > 0) setMaxCardHeight(max);
+    };
+    measureRef.current = measure;
+    const t = setTimeout(measure, 0);
+    const ro = new ResizeObserver(measure);
+    if (gridRef.current) ro.observe(gridRef.current);
+    return () => {
+      clearTimeout(t);
+      ro.disconnect();
+    };
+  }, [actions, isCompactView]);
+
   if (actions.length === 0) {
     return (
       <Card>
@@ -1811,24 +1978,34 @@ function RequestsList({
   }
 
   return (
-    <div className={cn("grid gap-3", isCompactView ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3")}>
+    <div
+      ref={gridRef}
+      className={cn("grid gap-3 items-stretch", isCompactView ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3")}
+    >
       {actions.map((action) => (
-        <IncomingActionsCard
+        <div
           key={action.id}
-          action={action}
-          customer={getCustomerById(action.customerId)}
-          stages={stages}
-          onComplete={onComplete}
-          onDismiss={onDismiss}
-          onSnooze={onSnooze}
-          onAddNote={onAddNote}
-          onQuickView={onQuickView}
-          isSelected={selectedActionIds.has(action.id)}
-          onSelect={onSelect}
-          showCheckbox={true}
-          isCompact={isCompactView}
-          isCompleting={completingActionIds.has(action.id)}
-        />
+          className={isCompactView ? undefined : "h-full min-h-0"}
+          style={!isCompactView && maxCardHeight != null ? { minHeight: maxCardHeight } : undefined}
+        >
+          <IncomingActionsCard
+            action={action}
+            customer={getCustomerById(action.customerId)}
+            stages={stages}
+            onComplete={onComplete}
+            onDismiss={onDismiss}
+            onSnooze={onSnooze}
+            onAddNote={onAddNote}
+            onQuickView={onQuickView}
+            isSelected={selectedActionIds.has(action.id)}
+            onSelect={onSelect}
+            showCheckbox={true}
+            isCompact={isCompactView}
+            isCompleting={completingActionIds.has(action.id)}
+            className={isCompactView ? undefined : "h-full"}
+            onScheduleFormOpenChange={handleScheduleFormOpenChange}
+          />
+        </div>
       ))}
     </div>
   );

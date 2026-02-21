@@ -50,19 +50,19 @@ interface HeroProps {
     };
   };
   content?: {
-    title?: string;
-    subtitle?: string;
-    font?: {
+      title?: string;
+        subtitle?: string;
+        font?: {
       title?: {
         family?: string;
-        size?: { desktop?: string; tablet?: string; mobile?: string };
+        size?: { desktop?: string | number; tablet?: string | number; mobile?: string | number };
         weight?: string;
         color?: string;
         lineHeight?: string;
       };
       subtitle?: {
         family?: string;
-        size?: { desktop?: string; tablet?: string; mobile?: string };
+        size?: { desktop?: string | number; tablet?: string | number; mobile?: string | number };
         weight?: string;
         color?: string;
       };
@@ -952,10 +952,34 @@ function Hero3(props: HeroProps) {
   const heightMobile = normalizeHeight(mergedData.height?.mobile, heightDesktop);
 
   // Generate dynamic styles with responsive height
+  // أحجام الخط: دعم رقم (يعرض كـ px) أو نص قديم (Tailwind)
+  const titleSize = mergedData.content?.font?.title?.size;
+  const subtitleSize = mergedData.content?.font?.subtitle?.size;
+  const toPx = (v: string | number | undefined, fallback: number) =>
+    typeof v === "number" ? `${v}px` : typeof v === "string" && /^\d+$/.test(v) ? `${v}px` : undefined;
+  const titleDesktopPx = toPx(titleSize?.desktop, 48);
+  const titleTabletPx = toPx(titleSize?.tablet, 36);
+  const titleMobilePx = toPx(titleSize?.mobile, 24);
+  const subtitleDesktopPx = toPx(subtitleSize?.desktop, 16);
+  const subtitleTabletPx = toPx(subtitleSize?.tablet, 16);
+  const subtitleMobilePx = toPx(subtitleSize?.mobile, 14);
+  const useTitlePx = titleDesktopPx ?? titleTabletPx ?? titleMobilePx;
+  const useSubtitlePx = subtitleDesktopPx ?? subtitleTabletPx ?? subtitleMobilePx;
+
   const sectionStyles = {
     "--hero-height-desktop": heightDesktop,
     "--hero-height-tablet": heightTablet,
     "--hero-height-mobile": heightMobile,
+    ...(useTitlePx && {
+      "--hero-title-size-mobile": titleMobilePx ?? useTitlePx,
+      "--hero-title-size-tablet": titleTabletPx ?? useTitlePx,
+      "--hero-title-size-desktop": titleDesktopPx ?? useTitlePx,
+    }),
+    ...(useSubtitlePx && {
+      "--hero-subtitle-size-mobile": subtitleMobilePx ?? useSubtitlePx,
+      "--hero-subtitle-size-tablet": subtitleTabletPx ?? useSubtitlePx,
+      "--hero-subtitle-size-desktop": subtitleDesktopPx ?? useSubtitlePx,
+    }),
   } as React.CSSProperties;
 
   const titleStyles = {
@@ -963,6 +987,7 @@ function Hero3(props: HeroProps) {
     fontWeight: mergedData.content?.font?.title?.weight || "extrabold",
     color: mergedData.content?.font?.title?.color || "#ffffff",
     lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
+    ...(useTitlePx && { fontSize: "var(--hero-title-size-mobile)" }),
   };
 
   const subtitleStyles = {
@@ -970,6 +995,7 @@ function Hero3(props: HeroProps) {
     fontWeight: mergedData.content?.font?.subtitle?.weight || "normal",
     color:
       mergedData.content?.font?.subtitle?.color || "rgba(255, 255, 255, 0.85)",
+    ...(useSubtitlePx && { fontSize: "var(--hero-subtitle-size-mobile)" }),
   };
 
   const overlayStyles = {
@@ -1039,6 +1065,24 @@ function Hero3(props: HeroProps) {
               height: var(--hero-height-desktop);
             }
           }
+          ${useTitlePx ? `
+          #${styleId} .hero3-title { font-size: var(--hero-title-size-mobile); }
+          @media (min-width: 768px) {
+            #${styleId} .hero3-title { font-size: var(--hero-title-size-tablet); }
+          }
+          @media (min-width: 1024px) {
+            #${styleId} .hero3-title { font-size: var(--hero-title-size-desktop); }
+          }
+          ` : ""}
+          ${useSubtitlePx ? `
+          #${styleId} .hero3-subtitle { font-size: var(--hero-subtitle-size-mobile); }
+          @media (min-width: 768px) {
+            #${styleId} .hero3-subtitle { font-size: var(--hero-subtitle-size-tablet); }
+          }
+          @media (min-width: 1024px) {
+            #${styleId} .hero3-subtitle { font-size: var(--hero-subtitle-size-desktop); }
+          }
+          ` : ""}
         `
       }} />
       <section
@@ -1103,8 +1147,9 @@ function Hero3(props: HeroProps) {
               <h2
                 className={cn(
                   "mx-auto text-balance mb-3 font-bold",
-                  `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
+                  !useTitlePx && `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
                   `max-w-${mergedData.content?.maxWidth || "5xl"}`,
+                  useTitlePx && "hero3-title",
                 )}
                 style={titleStyles}
               >
@@ -1116,8 +1161,9 @@ function Hero3(props: HeroProps) {
               <p
                 className={cn(
                   "mx-auto mb-6",
-                  `text-${mergedData.content?.font?.subtitle?.size?.tablet || "xs"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "md"}`,
+                  !useSubtitlePx && `text-${mergedData.content?.font?.subtitle?.size?.tablet || "xs"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "md"}`,
                   `max-w-${mergedData.content?.maxWidth || "4xl"}`,
+                  useSubtitlePx && "hero3-subtitle",
                 )}
                 style={subtitleStyles}
               >
@@ -1142,8 +1188,9 @@ function Hero3(props: HeroProps) {
               <h2
                 className={cn(
                   "mx-auto text-balance mb-3",
-                  `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
+                  !useTitlePx && `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
                   `max-w-${mergedData.content?.maxWidth || "5xl"}`,
+                  useTitlePx && "hero3-title",
                 )}
                 style={titleStyles}
               >
@@ -1155,8 +1202,9 @@ function Hero3(props: HeroProps) {
               <p
                 className={cn(
                   "mx-auto mb-6",
-                  `text-${mergedData.content?.font?.subtitle?.size?.mobile || "xs"}`,
+                  !useSubtitlePx && `text-${mergedData.content?.font?.subtitle?.size?.mobile || "xs"}`,
                   `max-w-${mergedData.content?.maxWidth || "4xl"}`,
+                  useSubtitlePx && "hero3-subtitle",
                 )}
                 style={subtitleStyles}
               >

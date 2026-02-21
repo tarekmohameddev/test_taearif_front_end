@@ -2,6 +2,9 @@ import { useEditorStore } from "@/context/editorStore";
 import { ComponentInstance, ComponentData } from "@/lib/types";
 import { logChange } from "@/lib/debugLogger";
 import { deepMerge } from "../utils/deepMerge";
+import { useEventDebug } from "@/lib/debug/live-editor/hooks/useEventDebug";
+import { useDataFlowDebug } from "@/lib/debug/live-editor/hooks/useDataFlowDebug";
+import { storeTracker } from "@/lib/debug/live-editor/trackers/storeTracker";
 
 interface UseSaveHandlerProps {
   view: "main" | "add-section" | "edit-component" | "branding-settings";
@@ -32,6 +35,16 @@ export const useSaveHandler = ({
   onComponentUpdate,
   onClose,
 }: UseSaveHandlerProps) => {
+  // Debug tracking
+  const { emitEvent } = useEventDebug();
+  const { trackDataFlow } = useDataFlowDebug({
+    componentId: selectedComponent?.id || "",
+    componentType: selectedComponent?.type || "unknown",
+    defaultData: {},
+    tenantData: {},
+    storeData: {},
+    mergedData: {},
+  });
   const handleBrandingSave = () => {
     const store = useEditorStore.getState();
     // Get branding data directly from WebsiteLayout (which is updated in real-time)
@@ -218,6 +231,34 @@ export const useSaveHandler = ({
     const currentPage = store.currentPage || "homepage";
     const pageComponentsBefore = store.pageComponentsByPage[currentPage] || [];
 
+    // Emit SAVE_INITIATED event
+    emitEvent("SAVE_INITIATED", {
+      context: {
+        component: {
+          id: component.id,
+          type: component.type,
+          variant: component.componentName,
+          name: component.name || component.componentName,
+        },
+        location: {
+          file: "useSaveHandler.ts",
+          function: "handleRegularComponentSave",
+          line: 0,
+        },
+        user: {
+          action: "save",
+          page: currentPage,
+        },
+      },
+      details: {
+        action: "save_initiated",
+        source: "useSaveHandler",
+        tempData: latestTempData,
+        storeData: store.getComponentData(component.type, component.id),
+        existingData: pageComponentsBefore.find((c: any) => c.id === component.id)?.data,
+      },
+    });
+
     console.group("🔍 Initial Save Debug");
     console.log("Selected Component:", component);
     console.log("Current Page:", currentPage);
@@ -254,11 +295,85 @@ export const useSaveHandler = ({
     console.log("Existing Component Data:", existingComponent?.data);
     console.groupEnd();
 
+    // Emit MERGE_STARTED event
+    emitEvent("MERGE_STARTED", {
+      context: {
+        component: {
+          id: component.id,
+          type: component.type,
+          variant: component.componentName,
+          name: component.name || component.componentName,
+        },
+        location: {
+          file: "useSaveHandler.ts",
+          function: "handleRegularComponentSave",
+          line: 0,
+        },
+        user: {
+          action: "merge",
+          page: currentPage,
+        },
+      },
+      details: {
+        action: "merge_started",
+        source: "useSaveHandler",
+      },
+      dataFlow: {
+        sources: [
+          { name: "existingData", value: existingComponent?.data, priority: 3, used: true, reason: "Existing component data" },
+          { name: "storeData", value: storeData, priority: 2, used: true, reason: "Store data" },
+          { name: "tempData", value: actualTempData, priority: 1, used: true, reason: "Temporary changes" },
+        ],
+        merge: {
+          method: "deepMerge",
+          order: ["existingData", "storeData", "tempData"],
+          result: {},
+        },
+      },
+    });
+
     // Merge tempData with store data to preserve all changes
     // Priority: actualTempData (latest changes) > storeData (previous changes) > existingComponent.data (old changes)
     const mergedData = existingComponent?.data
       ? deepMerge(deepMerge(existingComponent.data, storeData), actualTempData)
       : deepMerge(storeData, actualTempData);
+
+    // Emit MERGE_COMPLETED event
+    emitEvent("MERGE_COMPLETED", {
+      context: {
+        component: {
+          id: component.id,
+          type: component.type,
+          variant: component.componentName,
+          name: component.name || component.componentName,
+        },
+        location: {
+          file: "useSaveHandler.ts",
+          function: "handleRegularComponentSave",
+          line: 0,
+        },
+        user: {
+          action: "merge",
+          page: currentPage,
+        },
+      },
+      details: {
+        action: "merge_completed",
+        source: "useSaveHandler",
+      },
+      dataFlow: {
+        sources: [
+          { name: "existingData", value: existingComponent?.data, priority: 3, used: true, reason: "Existing component data" },
+          { name: "storeData", value: storeData, priority: 2, used: true, reason: "Store data" },
+          { name: "tempData", value: actualTempData, priority: 1, used: true, reason: "Temporary changes" },
+        ],
+        merge: {
+          method: "deepMerge",
+          order: ["existingData", "storeData", "tempData"],
+          result: mergedData,
+        },
+      },
+    });
 
     console.group("🔧 Merge Process Debug");
     console.log("Existing Component Data:", existingComponent?.data);
@@ -283,6 +398,51 @@ export const useSaveHandler = ({
     console.groupEnd();
     console.groupEnd();
     console.groupEnd();
+
+    // Track store update before saving
+    storeTracker.trackUpdate({
+      componentType: component.type,
+      componentId: uniqueVariantId,
+      before: storeData,
+      after: mergedData,
+      operation: "save",
+      storeType: "editor",
+    });
+
+    // Emit STORE_UPDATED event
+    emitEvent("STORE_UPDATED", {
+      context: {
+        component: {
+          id: component.id,
+          type: component.type,
+          variant: component.componentName,
+          name: component.name || component.componentName,
+        },
+        location: {
+          file: "useSaveHandler.ts",
+          function: "handleRegularComponentSave",
+          line: 0,
+        },
+        user: {
+          action: "store_update",
+          page: currentPage,
+        },
+      },
+      details: {
+        action: "store_updated",
+        source: "useSaveHandler",
+      },
+      before: {
+        componentData: {},
+        storeState: storeData,
+        mergedData: {},
+      },
+      after: {
+        componentData: {},
+        storeState: mergedData,
+        mergedData: mergedData,
+      },
+    });
 
     // Update the component data in the store using the merged data
     store.setComponentData(component.type, uniqueVariantId, mergedData);
@@ -328,6 +488,33 @@ export const useSaveHandler = ({
     );
     console.groupEnd();
     console.groupEnd();
+
+    // Emit SAVE_COMPLETED event
+    emitEvent("SAVE_COMPLETED", {
+      context: {
+        component: {
+          id: component.id,
+          type: component.type,
+          variant: component.componentName,
+          name: component.name || component.componentName,
+        },
+        location: {
+          file: "useSaveHandler.ts",
+          function: "handleRegularComponentSave",
+          line: 0,
+        },
+        user: {
+          action: "save",
+          page: currentPage,
+        },
+      },
+      details: {
+        action: "save_completed",
+        source: "useSaveHandler",
+        success: true,
+        finalData: mergedData,
+      },
+    });
 
     onClose();
   };

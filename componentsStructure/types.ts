@@ -16,6 +16,8 @@ export interface FieldDefinitionBase {
   placeholder?: string;
   min?: number;
   max?: number;
+  step?: number; // for number fields (e.g. 1)
+  unit?: string; // for number fields (e.g. "px") - shown next to value in editor
   options?: {
     label: string;
     value: string;
