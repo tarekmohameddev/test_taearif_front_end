@@ -588,6 +588,7 @@
       "image_alt": "Image Alt Text",
       "image_position": "Image Position",
       "show_image": "Show Image",
+      "show_load_more_button": "Show Load More Button",
       "display_mode": "Display Mode",
       "logos": "Logos",
       "both_forward_reverse": "Both (Forward & Reverse)",
