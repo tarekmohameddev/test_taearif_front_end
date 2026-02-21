@@ -20,6 +20,49 @@
 @tailwind utilities;
 
 /* ========================================
+   APP CONTAINER — responsive horizontal padding
+   ======================================== */
+.app {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .app {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 768px) {
+  .app {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app {
+    padding-left: 64px;
+    padding-right: 64px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .app {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .app {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+}
+
+/* ========================================
    CUSTOM STYLES FOR CENTERED COMPONENTS
    ======================================== */
 .center-component-wrapper {
