@@ -11,7 +11,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultHeader2Data } from "@/context/editorStoreFunctions/header2Functions";
-import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdown";
+import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdownWithSUB";
 import SidebarMenu from "./SidebarMenu";
 
 // ═══════════════════════════════════════════════════════════

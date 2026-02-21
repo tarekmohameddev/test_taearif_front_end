@@ -61,8 +61,26 @@ export const heroStructure: ComponentStructure = {
           label: "Content",
           type: "object",
           fields: [
-            { key: "title", label: "Title", type: "text" },
-            { key: "subtitle", label: "Subtitle", type: "text" },
+            {
+              key: "titleGroup",
+              label: "Title",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
+                { key: "content.title", label: "Title", type: "text" },
+              ],
+            },
+            {
+              key: "subtitleGroup",
+              label: "Subtitle",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
+                { key: "content.subtitle", label: "Subtitle", type: "text" },
+              ],
+            },
             { key: "paddingTop", label: "Padding Top", type: "text" },
             {
               key: "font",
@@ -424,8 +442,26 @@ export const heroStructure: ComponentStructure = {
           label: "Content",
           type: "object",
           fields: [
-            { key: "title", label: "Title", type: "text" },
-            { key: "description", label: "Description", type: "text" },
+            {
+              key: "titleGroup",
+              label: "Title",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
+                { key: "content.title", label: "Title", type: "text" },
+              ],
+            },
+            {
+              key: "subtitleGroup",
+              label: "Subtitle",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
+                { key: "content.description", label: "Description", type: "text" },
+              ],
+            },
             { key: "alignment", label: "Alignment", type: "text" },
             { key: "maxWidth", label: "Max Width", type: "text" },
             {
@@ -889,6 +925,16 @@ export const heroStructure: ComponentStructure = {
           groupFields: [
             { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
             { key: "content.title", label: "Title", type: "text" },
+          ],
+        },
+        {
+          key: "subtitleGroup",
+          label: "Subtitle",
+          type: "text",
+          displayAsGroup: true,
+          groupFields: [
+            { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
+            { key: "content.subtitle", label: "Subtitle", type: "text" },
           ],
         },
         {

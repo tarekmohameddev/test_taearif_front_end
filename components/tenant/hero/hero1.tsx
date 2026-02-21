@@ -945,52 +945,60 @@ const Hero1 = (props: HeroProps = {}) => {
           className="hidden md:block"
           style={{ paddingTop: mergedData.content?.paddingTop || "200px" }}
         >
-          <h1
-            className={cn(
-              "mx-auto text-balance",
-              `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
-              `max-w-${mergedData.content?.maxWidth || "5xl"}`,
-            )}
-            style={titleStyles}
-          >
-            {mergedData.content?.title || "اكتشف عقارك المثالي في أفضل المواقع"}
-          </h1>
-          <p
-            className={cn(
-              "mt-4",
-              `text-${mergedData.content?.font?.subtitle?.size?.tablet || "2xl"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "2xl"}`,
-            )}
-            style={subtitleStyles}
-          >
-            {mergedData.content?.subtitle ||
-              "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية"}
-          </p>
-        </div>
-
-        {/* Mobile Layout - Content and Form in proper order */}
-        <div className="md:hidden flex flex-col items-center justify-center h-full w-full">
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
+          {mergedData.showTitle !== false && (
             <h1
               className={cn(
-                "mx-auto text-balance mb-4",
-                `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
+                "mx-auto text-balance",
+                `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
                 `max-w-${mergedData.content?.maxWidth || "5xl"}`,
               )}
               style={titleStyles}
             >
-              {mergedData.content?.title ||
-                "اكتشف عقارك المثالي في أفضل المواقع"}
+              {mergedData.content?.title || "اكتشف عقارك المثالي في أفضل المواقع"}
             </h1>
+          )}
+          {mergedData.showSubtitle !== false && (
             <p
               className={cn(
-                "mb-8",
-                `text-${mergedData.content?.font?.subtitle?.size?.mobile || "2xl"}`,
+                "mt-4",
+                `text-${mergedData.content?.font?.subtitle?.size?.tablet || "2xl"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "2xl"}`,
               )}
               style={subtitleStyles}
             >
               {mergedData.content?.subtitle ||
                 "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية"}
             </p>
+          )}
+        </div>
+
+        {/* Mobile Layout - Content and Form in proper order */}
+        <div className="md:hidden flex flex-col items-center justify-center h-full w-full">
+          <div className="flex-1 flex flex-col items-center justify-center text-center">
+            {mergedData.showTitle !== false && (
+              <h1
+                className={cn(
+                  "mx-auto text-balance mb-4",
+                  `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
+                  `max-w-${mergedData.content?.maxWidth || "5xl"}`,
+                )}
+                style={titleStyles}
+              >
+                {mergedData.content?.title ||
+                  "اكتشف عقارك المثالي في أفضل المواقع"}
+              </h1>
+            )}
+            {mergedData.showSubtitle !== false && (
+              <p
+                className={cn(
+                  "mb-8",
+                  `text-${mergedData.content?.font?.subtitle?.size?.mobile || "2xl"}`,
+                )}
+                style={subtitleStyles}
+              >
+                {mergedData.content?.subtitle ||
+                  "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية"}
+              </p>
+            )}
           </div>
 
           {/* Hero Search Form for Mobile */}

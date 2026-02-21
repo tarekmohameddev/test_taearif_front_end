@@ -98,6 +98,8 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
   // Default data for hero2
   const getDefaultHero2Data = () => ({
     visible: true,
+    showTitle: true,
+    showSubtitle: true,
     title: "من نحن",
     description: "شريكك الموثوق في تحقيق أفضل الفرص العقارية",
     imageSrc: "https://dalel-lovat.vercel.app/images/hero.webp",
@@ -223,12 +225,16 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
         }}
       ></div>
       <div className="relative z-10 text-center text-white px-4">
-        <h1 className="text-[36px] md:text-[60px] text-white mb-4 md:mb-10">
-          {content.title || title}
-        </h1>
-        <p className="text-[15px] md:text-[30px] text-white text-center">
-          {content.description || description}
-        </p>
+        {mergedData.showTitle !== false && (
+          <h1 className="text-[36px] md:text-[60px] text-white mb-4 md:mb-10">
+            {content.title || title}
+          </h1>
+        )}
+        {mergedData.showSubtitle !== false && (
+          <p className="text-[15px] md:text-[30px] text-white text-center">
+            {content.description || description}
+          </p>
+        )}
       </div>
     </section>
   );
