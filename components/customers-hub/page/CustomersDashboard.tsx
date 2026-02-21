@@ -52,22 +52,22 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
   } : storeStatistics;
 
   // AI Insights
-  const urgentActions = customers.filter(
-    (c) =>
-      c.priority === "urgent" &&
-      (c.stage === "negotiation" || c.stage === "closing" || c.stage === "down_payment")
-  ).length;
+  // const urgentActions = customers.filter(
+  //   (c) =>
+  //     c.priority === "urgent" &&
+  //     (c.stage === "negotiation" || c.stage === "closing" || c.stage === "down_payment")
+  // ).length;
 
-  const churnRiskHigh = customers.filter(
-    (c) => c.aiInsights.churnRisk === "high"
-  ).length;
+  // const churnRiskHigh = customers.filter(
+  //   (c) => c.aiInsights.churnRisk === "high"
+  // ).length;
 
-  const todayFollowUps = customers.filter((c) => {
-    if (!c.nextFollowUpDate) return false;
-    const today = new Date().toISOString().split("T")[0];
-    const followUpDate = c.nextFollowUpDate.split("T")[0];
-    return followUpDate === today;
-  }).length;
+  // const todayFollowUps = customers.filter((c) => {
+  //   if (!c.nextFollowUpDate) return false;
+  //   const today = new Date().toISOString().split("T")[0];
+  //   const followUpDate = c.nextFollowUpDate.split("T")[0];
+  //   return followUpDate === today;
+  // }).length;
 
   // Show loading state if no statistics available
   if (!statistics) {
@@ -142,7 +142,8 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
         </CardContent>
       </Card>
 
-      {/* AI Insights Card */}
+      {/* AI Insights Card - Hidden */}
+      {/* 
       <Card className="md:col-span-2 lg:col-span-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -152,7 +153,6 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            {/* Urgent Actions */}
             <div className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg">
               <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
                 <AlertTriangle className="h-4 w-4 text-red-600" />
@@ -166,7 +166,6 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
               </div>
             </div>
 
-            {/* Today Follow-ups */}
             <div className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg">
               <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
                 <Clock className="h-4 w-4 text-blue-600" />
@@ -180,7 +179,6 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
               </div>
             </div>
 
-            {/* High Risk Customers */}
             <div className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg">
               <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
                 <UserCheck className="h-4 w-4 text-orange-600" />
@@ -195,7 +193,6 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
             </div>
           </div>
 
-          {/* Top Actions */}
           <div className="mt-4 p-3 sm:p-4 bg-white dark:bg-gray-900 rounded-lg">
             <div className="mb-3 sm:mb-4">
               <div className="font-semibold text-sm sm:text-base">
@@ -227,6 +224,7 @@ export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps 
           </div>
         </CardContent>
       </Card>
+      */}
     </div>
   );
 }

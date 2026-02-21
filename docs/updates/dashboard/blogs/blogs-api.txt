@@ -1,0 +1,4 @@
+2025-01-18 17:04:00
+Update Type: Enhancement
+تعديل endpoint تحديث المقال لاستخدام slug بدلاً من id في PUT request
+components/blogs/services/blog-api.ts, components/blogs/hooks/use-blog-form.ts

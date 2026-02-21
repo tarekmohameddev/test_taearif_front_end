@@ -88,16 +88,28 @@ export const getDefaultJobFormData = (): ComponentData => ({
 
 // Job Form functions
 export const jobFormFunctions = {
+  /**
+   * ensureVariant - Initialize component in store if not exists
+    */
   ensureVariant: (state: any, variantId: string, initial?: any) => {
-    if (
-      state.jobFormStates &&
-      state.jobFormStates[variantId] &&
-      Object.keys(state.jobFormStates[variantId]).length > 0
-    ) {
+    // Priority 1: Check if variant already exists
+    const currentData = state.jobFormStates?.[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          jobFormStates: {
+            ...state.jobFormStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
       return {} as any; // Already exists, skip initialization
     }
 
     const defaultData = getDefaultJobFormData();
+
+    // Use provided initial data, else tempData, else defaults
     const data: any = initial || state.tempData || defaultData;
 
     return {
@@ -108,6 +120,9 @@ export const jobFormFunctions = {
     } as any;
   },
 
+  /**
+   * getData - Retrieve component data from store
+    */
   getData: (state: any, variantId: string) => {
     const data = state.jobFormStates?.[variantId];
     if (!data || Object.keys(data).length === 0) {
@@ -116,6 +131,9 @@ export const jobFormFunctions = {
     return data;
   },
 
+  /**
+   * setData - Set/replace component data completely
+    */
   setData: (state: any, variantId: string, data: any) => {
     return {
       jobFormStates: {
@@ -125,16 +143,25 @@ export const jobFormFunctions = {
     };
   },
 
+  /**
+   * updateByPath - Update specific field in component data
+    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
+    // Get current data from jobFormStates (saved data) or defaults
+    const savedData =
       state.jobFormStates?.[variantId] || getDefaultJobFormData();
-    const newData = updateDataByPath(source, path, value);
 
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
+
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData ONLY
     return {
-      jobFormStates: {
-        ...state.jobFormStates,
-        [variantId]: newData,
-      },
+      tempData: newData,
     } as any;
   },
 };
+

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ import {
 import Link from "next/link";
 import type { UnifiedCustomer } from "@/types/unified-customer";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
-import type { PipelineStage } from "@/lib/services/customers-hub-pipeline-api";
+import type { PipelineStage, PipelineCustomer } from "@/lib/services/customers-hub-pipeline-api";
 import type { MoveCustomerParams } from "@/lib/services/customers-hub-pipeline-api";
 import type { Stage } from "@/lib/services/customers-hub-stages-api";
 
@@ -58,6 +58,23 @@ export function TablePipelineBoard(props?: TablePipelineBoardProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [selectedStageFilter, setSelectedStageFilter] = useState<string>("all");
   const [movingCustomer, setMovingCustomer] = useState<string | null>(null);
+  // Cache all customers by stage - this is the source of truth for UI
+  const [cachedCustomersByStage, setCachedCustomersByStage] = useState<Map<string | number, UnifiedCustomer[]>>(new Map());
+  
+  // Initialize cache from props when stages data changes
+  useEffect(() => {
+    if (stages && stages.length > 0) {
+      const newCache = new Map<string | number, UnifiedCustomer[]>();
+      stages.forEach(stage => {
+        const stageId = stage.id || stage.stage_id;
+        if (stageId && stage.customers) {
+          // Convert PipelineCustomer to UnifiedCustomer (type assertion for compatibility)
+          newCache.set(stageId, [...(stage.customers as any as UnifiedCustomer[])]);
+        }
+      });
+      setCachedCustomersByStage(newCache);
+    }
+  }, [stages]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -68,65 +85,154 @@ export function TablePipelineBoard(props?: TablePipelineBoardProps) {
     }
   };
 
-  const handleMoveCustomer = async (
-    customerId: string | number,
-    newStageId: number
+  const handleMoveCustomer = (
+    customer: UnifiedCustomer | PipelineCustomer,
+    newStageId: string | number
   ) => {
     if (!props?.onMoveCustomer) return;
 
-    setMovingCustomer(customerId.toString());
-    try {
-      const requestId =
-        typeof customerId === "number"
-          ? customerId
-          : parseInt(customerId.toString());
-
-      await props.onMoveCustomer({
-        requestId,
-        newStageId,
-      });
-    } catch (err) {
-      console.error("Error moving customer:", err);
-    } finally {
-      setMovingCustomer(null);
+    const customerId = customer.id.toString();
+    const oldStageId = (customer as any).stageId || customer.stage;
+    
+    // Find new stage info for optimistic update
+    const newStage = displayStages.find(s => 
+      s.id === newStageId || 
+      s.id?.toString() === newStageId.toString()
+    );
+    
+    if (!newStage) return;
+    
+    // UPDATE CACHE IMMEDIATELY - This is the source of truth for UI
+    setCachedCustomersByStage(prev => {
+      const newCache = new Map(prev);
+      
+      // Remove customer from old stage
+      const oldStageCustomers = newCache.get(oldStageId) || [];
+      const updatedOldStage = oldStageCustomers.filter(c => c.id.toString() !== customerId);
+      newCache.set(oldStageId, updatedOldStage);
+      
+      // Add customer to new stage
+      const newStageCustomers = newCache.get(newStageId) || [];
+      const updatedCustomer = { 
+        ...customer, 
+        stage: newStageId,
+        stageId: newStageId,
+        stageName: newStage.nameAr,
+        stageColor: newStage.color,
+      } as any;
+      // Check if customer already exists (shouldn't, but safety)
+      if (!newStageCustomers.find(c => c.id.toString() === customerId)) {
+        newCache.set(newStageId, [...newStageCustomers, updatedCustomer]);
+      }
+      
+      return newCache;
+    });
+    
+    setMovingCustomer(customerId);
+    
+    // Call API in background (don't await) - only for sync with backend
+    const customerSource = (customer as any).source;
+    const requestId = (customer as any).requestId;
+    const inquiryId = (customer as any).inquiryId;
+    
+    const moveParams: MoveCustomerParams = {
+      newStageId: newStageId,
+    };
+    
+    if (customerSource === "inquiry" && inquiryId !== undefined && inquiryId !== null) {
+      moveParams.inquiryId = typeof inquiryId === "number" 
+        ? inquiryId 
+        : parseInt(inquiryId.toString());
+    } else if (requestId !== undefined && requestId !== null) {
+      moveParams.requestId = typeof requestId === "number" 
+        ? requestId 
+        : parseInt(requestId.toString());
+    } else {
+      moveParams.requestId = typeof customer.id === "number" 
+        ? customer.id 
+        : parseInt(customer.id.toString());
     }
+    
+    // Call API in background - if it fails, rollback cache
+    props.onMoveCustomer(moveParams)
+      .then(() => {
+        setMovingCustomer(null);
+      })
+      .catch((err) => {
+        console.error("Error moving customer:", err);
+        // Rollback cache on error
+        setCachedCustomersByStage(prev => {
+          const newCache = new Map(prev);
+          
+          // Remove from new stage
+          const newStageCustomers = newCache.get(newStageId) || [];
+          const updatedNewStage = newStageCustomers.filter(c => c.id.toString() !== customerId);
+          newCache.set(newStageId, updatedNewStage);
+          
+          // Add back to old stage
+          const oldStageCustomers = newCache.get(oldStageId) || [];
+          if (!oldStageCustomers.find(c => c.id.toString() === customerId)) {
+            newCache.set(oldStageId, [...oldStageCustomers, { 
+              ...customer, 
+              stage: oldStageId,
+              stageId: oldStageId,
+            } as any]);
+          }
+          
+          return newCache;
+        });
+        setMovingCustomer(null);
+      });
   };
 
-  // Get stages to display
-  const displayStages =
-    apiStages && apiStages.length > 0
-      ? apiStages
-          .filter((stage) => stage.is_active)
-          .sort((a, b) => a.order - b.order)
-          .map((apiStage) => {
-            const pipelineStage = stages?.find(
-              (ps) =>
-                ps.id === apiStage.id ||
-                ps.stage_id === apiStage.id ||
-                ps.id?.toString() === apiStage.id.toString()
-            );
+  // Get stages to display - use CACHED customers as source of truth (not backend response)
+  const displayStages = useMemo(() => {
+    if (!apiStages || apiStages.length === 0) return [];
+    
+    return apiStages
+      .filter((stage) => stage.is_active)
+      .sort((a, b) => a.order - b.order)
+      .map((apiStage) => {
+        const stageId = apiStage.id;
+        
+        // Get customers from CACHE (local state) - this is the source of truth
+        // If cache is empty, fallback to props (initial load)
+        let customers = cachedCustomersByStage.get(stageId) || [];
+        
+        // If cache is empty for this stage, try to get from props (initial load only)
+        if (customers.length === 0 && stages) {
+          const pipelineStage = stages.find(
+            (ps) =>
+              ps.id === stageId ||
+              ps.stage_id === stageId ||
+              ps.id?.toString() === stageId.toString()
+          );
+          customers = pipelineStage?.customers ? (pipelineStage.customers as any as UnifiedCustomer[]) : [];
+        }
+        
+        return {
+          id: apiStage.id,
+          nameAr: apiStage.stage_name_ar,
+          nameEn: apiStage.stage_name_en,
+          color: apiStage.color,
+          order: apiStage.order,
+          customers: customers,
+          customerCount: customers.length,
+        };
+      });
+  }, [apiStages, cachedCustomersByStage, stages]);
 
-            return {
-              id: apiStage.id,
-              nameAr: apiStage.stage_name_ar,
-              nameEn: apiStage.stage_name_en,
-              color: apiStage.color,
-              order: apiStage.order,
-              customers: pipelineStage?.customers || [],
-              customerCount: pipelineStage?.count || 0,
-            };
-          })
-      : [];
-
-  // Get all customers from all stages
-  const allCustomers = displayStages.flatMap((stage) =>
-    (stage.customers || []).map((customer) => ({
-      ...customer,
-      stageId: stage.id,
-      stageName: stage.nameAr,
-      stageColor: stage.color,
-    }))
-  );
+  // Get all customers from all stages - uses CACHE as source of truth
+  const allCustomers = useMemo(() => {
+    return displayStages.flatMap((stage) =>
+      (stage.customers || []).map((customer) => ({
+        ...customer,
+        stageId: stage.id,
+        stageName: stage.nameAr,
+        stageColor: stage.color,
+      }))
+    );
+  }, [displayStages]);
 
   // Filter by stage
   const filteredCustomers =
@@ -402,12 +508,19 @@ export function TablePipelineBoard(props?: TablePipelineBoardProps) {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  sortedCustomers.map((customer) => {
+                  sortedCustomers.map((customer, index) => {
                     const isMoving = movingCustomer === customer.id.toString();
+                    
+                    // Generate extremely unique key combining multiple random elements
+                    const random1 = Math.random().toString(36).substring(2, 15);
+                    const random2 = Math.random().toString(36).substring(2, 15);
+                    const random3 = crypto.randomUUID?.() || Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                    const timestamp = performance.now().toString(36);
+                    const uniqueKey = `${customer.id}-${customer.stageId}-${index}-${random1}-${random2}-${random3}-${timestamp}`;
                     
                     return (
                       <TableRow
-                        key={customer.id}
+                        key={uniqueKey}
                         className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                       >
                         {/* Avatar */}
@@ -415,8 +528,8 @@ export function TablePipelineBoard(props?: TablePipelineBoardProps) {
                           <Avatar
                             className="h-10 w-10 mx-auto ring-2"
                             style={{
-                              ringColor: customer.stageColor || "#gray",
-                            }}
+                              "--ring-color": customer.stageColor || "#gray",
+                            } as React.CSSProperties}
                           >
                             <AvatarFallback
                               className="text-white text-sm font-bold"
@@ -517,11 +630,15 @@ export function TablePipelineBoard(props?: TablePipelineBoardProps) {
                               </Button>
                             </Link>
                             <Select
-                              value=""
+                              value={customer.stageId?.toString() || ""}
                               onValueChange={(newStageId: string) => {
+                                // newStageId can be string or number - API accepts both
+                                const stageId = newStageId.includes("_") || isNaN(parseInt(newStageId))
+                                  ? newStageId  // String stage_id (e.g. "qualified")
+                                  : parseInt(newStageId);  // Integer id
                                 handleMoveCustomer(
-                                  customer.id,
-                                  parseInt(newStageId)
+                                  customer,
+                                  stageId
                                 );
                               }}
                               disabled={isMoving}
@@ -530,12 +647,12 @@ export function TablePipelineBoard(props?: TablePipelineBoardProps) {
                                 className="w-32 h-8 text-xs"
                                 disabled={isMoving}
                               >
-                                <SelectValue placeholder="نقل" />
+                                <SelectValue>
+                                  {customer.stageName || "نقل"}
+                                </SelectValue>
                               </SelectTrigger>
                               <SelectContent>
-                                {displayStages
-                                  .filter((s) => s.id !== customer.stageId)
-                                  .map((s) => (
+                                {displayStages.map((s) => (
                                     <SelectItem
                                       key={s.id}
                                       value={s.id.toString()}

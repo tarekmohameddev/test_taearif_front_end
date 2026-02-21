@@ -34,18 +34,57 @@ export const getDefaultImageTextData = (): ComponentData => ({
       text: "في باهية، نؤمن أن كل شخص يستحق فرصة لبناء مستقبله العقاري بطريقته الخاصة. نمنحك كامل الحرية في اكتشاف الخيارات التي تناسبك، وبأفضل قيمة ممكنة.",
       color: "#ffffff",
     },
-    {
-      type: "feature",
-      text: "هذه ميزة تجريبية توضح الشكل الجديد",
-      shapeType: "badge",
-      color: "#ffffff",
-    },
   ],
   overlayOpacity: 0.3,
   styling: {
     height: 500,
   },
 });
+
+// ═══════════════════════════════════════════════════════════
+// VALIDATION FUNCTION
+// ═══════════════════════════════════════════════════════════
+/**
+ * Validates if the data structure matches the expected imageText format
+ * Returns false if data has old/incompatible structure (e.g., texts as object, colors/settings fields)
+ */
+const isValidImageTextData = (data: any): boolean => {
+  // If no data, it's invalid
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+
+  // Check if texts exists and is an array
+  if (!data.texts || !Array.isArray(data.texts)) {
+    return false;
+  }
+
+  // Check if texts array has valid structure
+  const hasValidTexts = data.texts.every((item: any) => {
+    return (
+      item &&
+      typeof item === "object" &&
+      typeof item.type === "string" &&
+      typeof item.text === "string"
+    );
+  });
+
+  if (!hasValidTexts) {
+    return false;
+  }
+
+  // If data has old structure fields (colors, settings as top-level), it's invalid
+  if (data.colors || data.settings) {
+    return false;
+  }
+
+  // If texts is an object (old structure), it's invalid
+  if (data.texts && typeof data.texts === "object" && !Array.isArray(data.texts)) {
+    return false;
+  }
+
+  return true;
+};
 
 // ═══════════════════════════════════════════════════════════
 // COMPONENT FUNCTIONS - Standard 4 functions
@@ -61,25 +100,80 @@ export const imageTextFunctions = {
    * @returns New state object or empty object if already exists
    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // Check if variant already exists
-    if (
-      state.imageTextStates[variantId] &&
-      Object.keys(state.imageTextStates[variantId]).length > 0
-    ) {
-      return {} as any; // Already exists, skip initialization
+    // Priority 1: Check if variant already exists
+    const currentData = state.imageTextStates?.[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // Validate current data - if invalid, replace with default
+      const isCurrentDataValid = isValidImageTextData(currentData);
+      if (!isCurrentDataValid) {
+        // Current data is invalid, replace with default or initial (if valid)
+        const defaultData = getDefaultImageTextData();
+        if (initial && Object.keys(initial).length > 0) {
+          const isInitialValid = isValidImageTextData(initial);
+          return {
+            imageTextStates: {
+              ...state.imageTextStates,
+              [variantId]: isInitialValid ? initial : defaultData,
+            },
+          } as any;
+        }
+        return {
+          imageTextStates: {
+            ...state.imageTextStates,
+            [variantId]: defaultData,
+          },
+        } as any;
+      }
+
+      // Current data is valid, proceed with normal logic
+      // If initial data provided, validate it first
+      if (initial && Object.keys(initial).length > 0) {
+        // Validate initial data structure
+        const isValid = isValidImageTextData(initial);
+        if (!isValid) {
+          // Use default data if invalid
+          const defaultData = getDefaultImageTextData();
+          return {
+            imageTextStates: {
+              ...state.imageTextStates,
+              [variantId]: defaultData,
+            },
+          } as any;
+        }
+
+        return {
+          imageTextStates: {
+            ...state.imageTextStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
+      return {} as any; // Already exists and is valid, skip initialization
     }
 
-    // Determine default data
+    // Priority 2: Create with default data
     const defaultData = getDefaultImageTextData();
 
-    // Use provided initial data, else tempData, else defaults
-    const data: ComponentData = initial || state.tempData || defaultData;
+    // Validate initial data if provided
+    let data: ComponentData = defaultData;
+    if (initial && Object.keys(initial).length > 0) {
+      const isValid = isValidImageTextData(initial);
+      if (isValid) {
+        data = initial;
+      } else {
+        // If invalid, use tempData or default
+        data = state.tempData || defaultData;
+      }
+    } else {
+      data = state.tempData || defaultData;
+    }
 
     // Return new state
     return {
       imageTextStates: { ...state.imageTextStates, [variantId]: data },
     } as any;
   },
+
 
   /**
    * getData - Retrieve component data from store
@@ -89,7 +183,7 @@ export const imageTextFunctions = {
    * @returns Component data or default data if not found
    */
   getData: (state: any, variantId: string) =>
-    state.imageTextStates[variantId] || getDefaultImageTextData(),
+    state.imageTextStates?.[variantId] || getDefaultImageTextData(),
 
   /**
    * setData - Set/replace component data completely
@@ -105,20 +199,33 @@ export const imageTextFunctions = {
 
   /**
    * updateByPath - Update specific field in component data
+   * 
+   * IMPORTANT: This function updates tempData ONLY, not imageTextStates directly.
+   * This ensures changes only appear in iframe after "Save Changes" button is pressed.
+   * On save, tempData is merged into imageTextStates via setComponentData.
    *
    * @param state - Current editorStore state
    * @param variantId - Unique component ID
    * @param path - Dot-separated path to field (e.g., "content.title")
    * @param value - New value for the field
-   * @returns New state object
+   * @returns New state object with updated tempData
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.imageTextStates[variantId] || getDefaultImageTextData();
-    const newData = updateDataByPath(source, path, value);
+    // Get current data from imageTextStates (saved data) or defaults
+    const savedData =
+      state.imageTextStates?.[variantId] || getDefaultImageTextData();
 
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
+
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData (NOT imageTextStates)
+    // This ensures changes only appear after "Save Changes" button
     return {
-      imageTextStates: { ...state.imageTextStates, [variantId]: newData },
+      tempData: newData,
     } as any;
   },
 };

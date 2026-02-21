@@ -213,16 +213,21 @@ export interface UpdateCustomerStageResponse {
   code: number;
   message: string;
   data: {
-    requestId: number;            // The property request that was moved
-    customerId: number | null;    // The linked customer id (api_customers.id) for reference; may be null if no customer record exists
-    customerName: string;         // Request contact name (full_name)
+    message: string;
+    source: "request" | "inquiry";  // Indicates what was moved
+    requestId: number | null;        // Set when source === "request"
+    inquiryId: number | null;        // Set when source === "inquiry"
+    customerId: number | null;       // The linked customer id (api_customers.id) for reference; may be null if no customer record exists
+    customerName: string;            // Request/inquiry contact name (full_name)
     previousStage: {
-      id: number;
+      id: number;                    // Numeric id (customers_hub_stages.id)
+      stage_id: string;              // String identifier (e.g. "new_lead")
       nameAr: string;
       nameEn: string;
     };
     newStage: {
-      id: number;
+      id: number;                    // Numeric id (customers_hub_stages.id)
+      stage_id: string;              // String identifier (e.g. "qualified")
       nameAr: string;
       nameEn: string;
     };
@@ -231,7 +236,7 @@ export interface UpdateCustomerStageResponse {
       id: number;
       name: string;
     };
-    notes?: string;
+    notes?: string | null;
   };
   timestamp: string;
 }
@@ -462,23 +467,17 @@ export async function addNoteToAction(
   return response.data;
 }
 
-// Update Customer Stage (moves property request to new stage)
+// Update Customer Stage (moves property request or inquiry to new stage)
 export async function updateCustomerStage(
-  requestId: string | number,     // Property request ID (preferred) - can also be customerId for backward compatibility
-  newStageId: string | number,    // Can be string stage_id or numeric stage.id - will be converted to number
-  notes?: string
+  requestIdOrInquiryId: string | number | undefined,  // Can be undefined if inquiryId is provided
+  newStageId: string | number,            // Can be string stage_id (e.g. "qualified") or numeric stage.id
+  notes?: string,
+  inquiryId?: number                       // Optional: explicitly provide inquiryId if moving an inquiry
 ): Promise<UpdateCustomerStageResponse> {
-  // Validate requestId
-  if (requestId === null || requestId === undefined || requestId === "") {
-    throw new Error("Request ID is required and cannot be null or empty");
-  }
-
-  // Convert requestId to number if needed
-  const requestIdNum = typeof requestId === "string" ? parseInt(requestId) : requestId;
-  
-  // Validate that requestIdNum is a valid number
-  if (isNaN(requestIdNum) || requestIdNum === null || requestIdNum === undefined) {
-    throw new Error(`Invalid request ID: ${requestId} - must be a valid number`);
+  // Validate: either requestIdOrInquiryId or inquiryId must be provided
+  if ((requestIdOrInquiryId === null || requestIdOrInquiryId === undefined || requestIdOrInquiryId === "") 
+      && (inquiryId === undefined || inquiryId === null)) {
+    throw new Error("Request ID or Inquiry ID is required and cannot be null or empty");
   }
 
   // Validate newStageId
@@ -486,23 +485,40 @@ export async function updateCustomerStage(
     throw new Error("Stage ID is required and cannot be null or empty");
   }
 
-  // Convert newStageId to number (API expects integer)
-  const newStageIdNum = typeof newStageId === "number" 
-    ? newStageId 
-    : parseInt(newStageId.toString());
+  // Prepare request body - API accepts either requestId or inquiryId (not both)
+  const requestBody: {
+    requestId?: number;
+    customerId?: number;
+    inquiryId?: number;
+    newStageId: string | number;
+    notes?: string;
+  } = {
+    newStageId: newStageId,  // API accepts both string and number
+    notes: notes || undefined,
+  };
 
-  // Validate that newStageIdNum is a valid number
-  if (isNaN(newStageIdNum) || newStageIdNum === null || newStageIdNum === undefined) {
-    throw new Error(`Invalid stage ID: ${newStageId} - must be a valid number`);
+  // If inquiryId is explicitly provided, use it
+  if (inquiryId !== undefined && inquiryId !== null) {
+    const inquiryIdNum = typeof inquiryId === "number" ? inquiryId : parseInt(inquiryId.toString());
+    if (isNaN(inquiryIdNum)) {
+      throw new Error(`Invalid inquiry ID: ${inquiryId} - must be a valid number`);
+    }
+    requestBody.inquiryId = inquiryIdNum;
+  } else if (requestIdOrInquiryId !== undefined && requestIdOrInquiryId !== null && requestIdOrInquiryId !== "") {
+    // Otherwise, treat as requestId (backward compatibility)
+    const requestIdNum = typeof requestIdOrInquiryId === "string" 
+      ? parseInt(requestIdOrInquiryId) 
+      : requestIdOrInquiryId;
+    
+    if (isNaN(requestIdNum) || requestIdNum === null || requestIdNum === undefined) {
+      throw new Error(`Invalid request ID: ${requestIdOrInquiryId} - must be a valid number`);
+    }
+    requestBody.requestId = requestIdNum;
   }
 
   const response = await axiosInstance.post<UpdateCustomerStageResponse>(
     "/v2/customers-hub/pipeline/move",
-    {
-      requestId: requestIdNum,     // Use requestId (preferred) - API also accepts customerId for backward compatibility
-      newStageId: newStageIdNum,   // Always numeric stage.id (integer)
-      notes: notes || undefined,
-    }
+    requestBody
   );
   return response.data;
 }

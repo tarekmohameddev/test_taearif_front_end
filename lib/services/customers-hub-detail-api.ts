@@ -3,6 +3,77 @@ import type { UnifiedCustomer, Appointment, PropertyInterest } from "@/types/uni
 
 const BASE_URL = "/v2/customers-hub/customers";
 
+export interface PropertyRequest {
+  id: string;
+  customerId?: string | null;
+  customerName?: string;
+  customerPhone?: string;
+  type: string;
+  title: string;
+  description?: string;
+  priority: string;
+  status: string;
+  source?: string;
+  objectType?: string;
+  dueDate?: string | null;
+  snoozedUntil?: string | null;
+  createdAt: string;
+  completedAt?: string | null;
+  completedBy?: string | null;
+  assignedTo?: string | null;
+  assignedToName?: string;
+  propertyCategory?: string;
+  propertyType?: string;
+  city?: string;
+  state?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  metadata?: Record<string, any>;
+  sourceTable?: string;
+  sourceId?: number;
+  stage_id?: string;
+  stage?: {
+    id: number;
+    stage_id: string;
+    nameAr: string;
+    nameEn: string;
+  };
+  notes?: Array<{
+    id: number;
+    note: string;
+    addedBy: string;
+    addedByName: string;
+    addedByType: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  appointments?: Array<{
+    id: number;
+    title: string;
+    type: string;
+    datetime: string;
+    duration: number;
+    status: string;
+    priority: string;
+    notes?: string | null;
+    createdAt: string;
+  }>;
+  reminders?: Array<{
+    id: number;
+    title: string;
+    description: string;
+    datetime: string;
+    priority: string;
+    type: string;
+    status: string;
+    notes?: string | null;
+    isOverdue?: boolean;
+    daysUntilDue?: number;
+    createdAt: string;
+  }>;
+  [key: string]: any;
+}
+
 export interface CustomerDetailResponse {
   status: "success";
   code: number;
@@ -28,6 +99,7 @@ export interface CustomerDetailResponse {
       createdAt: string;
     }>;
     interestedProperties?: PropertyInterest[];
+    propertyRequests?: PropertyRequest[];
     preferences?: {
       propertyType: string;
       minBudget?: number;

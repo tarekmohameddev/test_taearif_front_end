@@ -13,7 +13,8 @@ export default function CustomerDetailPageRoute() {
     customer,
     stats,
     tasks,
-    interestedProperties,
+    assignedProperties,
+    propertyRequests,
     preferences,
     history,
     loading,
@@ -24,6 +25,7 @@ export default function CustomerDetailPageRoute() {
     updateTask,
     deleteTask,
     updatePreferences,
+    refetchProperties,
   } = useCustomerDetail(customerId);
 
   return (
@@ -32,7 +34,8 @@ export default function CustomerDetailPageRoute() {
       customer={customer}
       stats={stats}
       tasks={tasks}
-      interestedProperties={interestedProperties}
+      assignedProperties={assignedProperties}
+      propertyRequests={propertyRequests}
       preferences={preferences}
       history={history}
       loading={loading}
@@ -43,6 +46,7 @@ export default function CustomerDetailPageRoute() {
       onUpdateTask={updateTask}
       onDeleteTask={deleteTask}
       onUpdatePreferences={updatePreferences}
+      onPropertyAdded={refetchProperties}
     />
   );
 }

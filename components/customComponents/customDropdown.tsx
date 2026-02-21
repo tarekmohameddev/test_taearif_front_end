@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils"; // تأكد أن لديك دالة cn أو استخدم classNames العادية
+
+// Context لإغلاق dropdown
+const DropdownContext = createContext<{ closeDropdown: () => void } | null>(null);
 
 // --- المكونات الفرعية ---
 
@@ -17,9 +20,21 @@ export const DropdownItem = ({
   onClick?: () => void;
   className?: string;
 }) => {
+  const context = useContext(DropdownContext);
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+    // إغلاق dropdown بعد تنفيذ onClick
+    if (context?.closeDropdown) {
+      context.closeDropdown();
+    }
+  };
+  
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
       className={cn(
         "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors flex items-center gap-2",
         className
@@ -96,7 +111,7 @@ export const DropdownSubMenu = ({
       */}
       {isOpen && (
         <div 
-          className="absolute top-0 right-full mr-2 w-48 rounded-md bg-white shadow-lg z-[10000]"
+          className="absolute top-0 right-full mr-2 w-48 rounded-md bg-white shadow-lg z-[10001]"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -114,9 +129,11 @@ interface DropdownProps {
   children: React.ReactNode;
   triggerClassName?: string;
   iconColor?: string;
+  dropdownWidth?: string;
+  maxHeight?: string;
 }
 
-export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor }: DropdownProps) => {
+export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -133,8 +150,8 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor 
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setPosition({
-        top: rect.bottom + window.scrollY + 8, // 8px للـ margin
-        right: window.innerWidth - rect.right + window.scrollX,
+        top: rect.bottom, // ملاصق تماماً بدون مسافة
+        right: window.innerWidth - rect.right,
       });
     }
   }, [isOpen]);
@@ -154,29 +171,47 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor 
     
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      // إغلاق عند التمرير
-      const handleScroll = () => setIsOpen(false);
-      window.addEventListener("scroll", handleScroll, true);
+      // إغلاق عند التمرير في الصفحة فقط (وليس داخل الـ dropdown)
+      const handleScroll = (event: Event) => {
+        // التحقق من أن الـ scroll ليس داخل الـ dropdown نفسه
+        const target = event.target as Node;
+        if (
+          dropdownRef.current &&
+          target &&
+          !dropdownRef.current.contains(target) &&
+          !buttonRef.current?.contains(target)
+        ) {
+          setIsOpen(false);
+        }
+      };
+      // استخدام capture phase للتقاط scroll events
+      document.addEventListener("scroll", handleScroll, true);
       
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
-        window.removeEventListener("scroll", handleScroll, true);
+        document.removeEventListener("scroll", handleScroll, true);
       };
     }
   }, [isOpen]);
 
   const dropdownContent = isOpen && mounted ? (
-    <div
-      ref={dropdownRef}
-      className="fixed z-[9999] w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-      style={{
-        top: `${position.top}px`,
-        right: `${position.right}px`,
-      }}
-      dir="rtl"
-    >
-      <div className="py-1">{children}</div>
-    </div>
+    <DropdownContext.Provider value={{ closeDropdown: () => setIsOpen(false) }}>
+      <div
+        ref={dropdownRef}
+        className={cn(
+          "fixed z-[10001] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-auto",
+          dropdownWidth
+        )}
+        style={{
+          top: `${position.top}px`,
+          right: `${position.right}px`,
+          maxHeight: maxHeight || undefined,
+        }}
+        dir="rtl"
+      >
+        <div className="py-1">{children}</div>
+      </div>
+    </DropdownContext.Provider>
   ) : null;
 
   return (

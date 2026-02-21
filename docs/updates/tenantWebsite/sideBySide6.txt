@@ -1,0 +1,9 @@
+2026-02-18 01:46:59
+Update Type: Feature
+Added textBlocks array field to sideBySide6 component structure, positioned after paragraph field
+componentsStructure/sideBySide.ts
+
+2026-02-18 01:49:28
+Update Type: Feature
+Implemented textBlocks array in sideBySide6 component - added to default data, interface, and render
+context/editorStoreFunctions/sideBySideFunctions.ts, components/tenant/sideBySide/sideBySide6.tsx

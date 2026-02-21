@@ -2,3 +2,8 @@
 Update Type: Update
 إزالة بطاقة "توزيع العملاء حسب المرحلة" من صفحة قائمة العملاء بعد نقلها إلى صفحة الطلبات
 components/customers-hub/page/CustomersDashboard.tsx
+
+2025-01-20 15:30:00
+Update Type: Update
+تعليق قسم "رؤى ذكية" (إجراءات عاجلة، متابعات اليوم، خطر الفقدان، الإجراءات الموصى بها اليوم) في صفحة قائمة العملاء
+components/customers-hub/page/CustomersDashboard.tsx

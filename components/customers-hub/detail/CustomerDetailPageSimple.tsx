@@ -37,13 +37,29 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import type { UnifiedCustomer, PropertyInterest } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
+import { CustomDropdown, DropdownItem } from "@/components/customComponents/customDropdown";
+import axiosInstance from "@/lib/axiosInstance";
+import { assignPropertyToCustomer } from "@/lib/services/customer-assigned-properties-api";
+import useAuthStore from "@/context/AuthContext";
+import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
+import { CustomerRequestsCard } from "./CustomerRequestsCard";
+import type { PropertyRequest } from "@/lib/services/customers-hub-detail-api";
 
 interface CustomerDetailPageSimpleProps {
   customerId: string;
   customer?: UnifiedCustomer | null;
   stats?: any;
   tasks?: any[];
-  interestedProperties?: PropertyInterest[];
+  assignedProperties?: Array<{
+    id: number;
+    title: string;
+    price: number;
+    purpose: string;
+    type: string;
+    attachedAt: string;
+  }>;
+  propertyRequests?: PropertyRequest[];
   preferences?: any;
   history?: any[];
   loading?: boolean;
@@ -54,6 +70,7 @@ interface CustomerDetailPageSimpleProps {
   onUpdateTask?: (taskId: string, params: any) => Promise<boolean>;
   onDeleteTask?: (taskId: string) => Promise<boolean>;
   onUpdatePreferences?: (params: any) => Promise<boolean>;
+  onPropertyAdded?: () => Promise<void>;
 }
 
 // Collapsible Section Component
@@ -280,28 +297,149 @@ function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
   );
 }
 
-// Properties Section with 3 categories
-function PropertiesSection({ 
+// Properties Section Card with built-in header and "+" button
+function PropertiesSectionCard({ 
   customer, 
-  interestedProperties: propInterestedProperties,
+  assignedProperties: propAssignedProperties,
   preferences: propPreferences,
+  customerId,
+  onPropertyAdded,
 }: { 
   customer: UnifiedCustomer;
-  interestedProperties?: PropertyInterest[];
+  assignedProperties?: Array<{
+    id: number;
+    title: string;
+    price: number;
+    purpose: string;
+    type: string;
+    attachedAt: string;
+  }>;
   preferences?: any;
+  customerId: string;
+  onPropertyAdded?: () => void;
 }) {
-  // Use prop interestedProperties if provided, otherwise use customer.properties
-  const properties = propInterestedProperties ?? customer.properties;
+  const { userData } = useAuthStore();
+  const [isOpen, setIsOpen] = useState(true);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const [availableProperties, setAvailableProperties] = useState<any[]>([]);
+  const [isLoadingProperties, setIsLoadingProperties] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Fetch available properties when form opens
+  useEffect(() => {
+    if (isAddFormOpen && userData?.token && availableProperties.length === 0) {
+      fetchAvailableProperties();
+    }
+  }, [isAddFormOpen, userData?.token]);
+
+  // Reset form when it closes
+  useEffect(() => {
+    if (!isAddFormOpen) {
+      setSelectedPropertyId("");
+    }
+  }, [isAddFormOpen]);
+
+  const fetchAvailableProperties = async () => {
+    if (!userData?.token) {
+      return;
+    }
+
+    setIsLoadingProperties(true);
+    try {
+      const response = await axiosInstance.get("/properties");
+      if (response.data.status === "success") {
+        setAvailableProperties(response.data.data.properties || []);
+      }
+    } catch (err) {
+      console.error("Error fetching properties:", err);
+      toast.error("فشل في تحميل العقارات");
+    } finally {
+      setIsLoadingProperties(false);
+    }
+  };
+
+  const handleToggleAddForm = () => {
+    setIsAddFormOpen(!isAddFormOpen);
+    if (!isAddFormOpen && availableProperties.length === 0 && userData?.token) {
+      fetchAvailableProperties();
+    }
+  };
+
+  const handleSubmitProperty = async () => {
+    if (!selectedPropertyId) {
+      toast.error("الرجاء اختيار عقار");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await assignPropertyToCustomer(customerId, {
+        propertyId: parseInt(selectedPropertyId),
+      });
+
+      if (response.status === "success") {
+        toast.success("تم إضافة العقار للعميل بنجاح");
+        setIsAddFormOpen(false);
+        setSelectedPropertyId("");
+        if (onPropertyAdded) {
+          await onPropertyAdded();
+        }
+      } else {
+        if (response.message?.includes("already assigned")) {
+          toast.error("هذا العقار مخصص بالفعل لهذا العميل");
+        } else {
+          toast.error(response.message || "فشل في إضافة العقار");
+        }
+      }
+    } catch (error: any) {
+      console.error("Error assigning property:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "حدث خطأ أثناء إضافة العقار";
+      
+      if (error.response?.status === 409) {
+        toast.error("هذا العقار مخصص بالفعل لهذا العميل");
+      } else if (error.response?.status === 404) {
+        if (error.response?.data?.message?.includes("Customer")) {
+          toast.error("العميل غير موجود");
+        } else {
+          toast.error("العقار غير موجود أو لا ينتمي لحسابك");
+        }
+      } else {
+        toast.error(errorMessage);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Convert AssignedProperty to PropertyInterest format for display
+  const assignedProperties = propAssignedProperties || [];
+  
+  // Convert assigned properties to PropertyInterest format
+  const propertiesForDisplay: PropertyInterest[] = assignedProperties.map((prop) => ({
+    id: prop.id.toString(),
+    propertyId: prop.id.toString(),
+    propertyTitle: prop.title,
+    propertyPrice: prop.price,
+    propertyLocation: "", // Not available in AssignedProperty
+    propertyImage: "", // Not available in AssignedProperty
+    status: "interested" as const, // Default status
+    notes: "manual", // Mark as manually added
+    addedAt: prop.attachedAt,
+  }));
   
   // Categorize properties (in real app, this would come from backend)
   // For now, we'll simulate based on property data
-  const websiteProperties = properties.filter(
+  const websiteProperties = propertiesForDisplay.filter(
     (p) => p.status === "interested" && !p.notes?.includes("AI") && !p.notes?.includes("manual")
   );
-  const aiMatchedProperties = properties.filter(
+  const aiMatchedProperties = propertiesForDisplay.filter(
     (p) => p.notes?.includes("AI") || p.status === "viewing_scheduled"
   );
-  const manualProperties = properties.filter(
+  const manualProperties = propertiesForDisplay.filter(
     (p) => p.notes?.includes("manual") || p.status === "offer_made"
   );
 
@@ -404,95 +542,232 @@ function PropertiesSection({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Preferences Summary - Always visible */}
-      <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-        <h4 className="font-semibold text-sm mb-3">تفضيلات العميل</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <span className="text-gray-500 block text-xs">نوع العقار</span>
-            <div className="flex flex-wrap gap-1 mt-1">
-              {customer.preferences?.propertyType && Array.isArray(customer.preferences.propertyType) 
-                ? customer.preferences.propertyType.map((type) => (
-                    <Badge key={type} variant="outline" className="text-xs">
-                      {type === "villa"
-                        ? "فيلا"
-                        : type === "apartment"
-                        ? "شقة"
-                        : type === "land"
-                        ? "أرض"
-                        : type === "commercial"
-                        ? "تجاري"
-                        : type}
-                    </Badge>
-                  ))
-                : <span className="text-xs text-gray-400">لا توجد تفضيلات</span>
-              }
+    <Card>
+      <CardHeader
+        className="cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest('[data-add-button]')) {
+            return;
+          }
+          setIsOpen(!isOpen);
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Building className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-lg">العقارات</CardTitle>
+            {/* Plus Button */}
+            <button
+              data-add-button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleAddForm();
+              }}
+              className={`p-1.5 rounded-full transition-colors ${
+                isAddFormOpen 
+                  ? "bg-gray-200 dark:bg-gray-700 text-gray-600" 
+                  : "bg-primary text-white hover:bg-primary/90"
+              }`}
+            >
+              <Plus className={`h-4 w-4 transition-transform ${isAddFormOpen ? "rotate-45" : ""}`} />
+            </button>
+            {propertiesForDisplay.length > 0 && (
+              <Badge variant="default">{propertiesForDisplay.length}</Badge>
+            )}
+          </div>
+          {isOpen ? (
+            <ChevronUp className="h-5 w-5 text-gray-400" />
+          ) : (
+            <ChevronDown className="h-5 w-5 text-gray-400" />
+          )}
+        </div>
+      </CardHeader>
+
+      {isOpen && (
+        <CardContent className="pt-0 space-y-4">
+          {/* Inline Add Property Form */}
+          {isAddFormOpen && (
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700 space-y-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">اختر العقار</Label>
+                {isLoadingProperties ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                    <span className="mr-2 text-sm text-gray-500">جاري تحميل العقارات...</span>
+                  </div>
+                ) : availableProperties.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-gray-500 border border-gray-200 rounded-md">
+                    لا توجد عقارات متاحة
+                  </div>
+                ) : (
+                  <CustomDropdown
+                    trigger={
+                      <span className="text-sm">
+                        {selectedPropertyId
+                          ? availableProperties.find((p) => p.id.toString() === selectedPropertyId)?.title ||
+                            "اختر العقار"
+                          : "اختر العقار"}
+                      </span>
+                    }
+                    triggerClassName="w-full justify-between"
+                    dropdownWidth="w-[20rem]"
+                    maxHeight="280px"
+                  >
+                    {availableProperties.map((property) => (
+                      <DropdownItem
+                        key={property.id}
+                        onClick={() => setSelectedPropertyId(property.id.toString())}
+                        className={
+                          selectedPropertyId === property.id.toString()
+                            ? "bg-gray-100 font-medium"
+                            : ""
+                        }
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">{property.title}</span>
+                          {property.address && (
+                            <span className="text-xs text-gray-500">{property.address}</span>
+                          )}
+                          {property.price && (
+                            <span className="text-xs text-green-600">
+                              {property.price.toLocaleString()} ريال
+                            </span>
+                          )}
+                        </div>
+                      </DropdownItem>
+                    ))}
+                  </CustomDropdown>
+                )}
+                {selectedPropertyId && (
+                  <div className="mt-2 p-2 bg-gray-50 rounded-md text-sm">
+                    <span className="text-gray-600">العقار المختار: </span>
+                    <span className="font-medium">
+                      {availableProperties.find((p) => p.id.toString() === selectedPropertyId)?.title}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => {
+                    setIsAddFormOpen(false);
+                    setSelectedPropertyId("");
+                  }}
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8"
+                  onClick={handleSubmitProperty}
+                  disabled={!selectedPropertyId || isSubmitting || isLoadingProperties}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                      جاري الإضافة...
+                    </>
+                  ) : (
+                    "إضافة"
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Preferences Summary - Always visible */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+            <h4 className="font-semibold text-sm mb-3">تفضيلات العميل</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500 block text-xs">نوع العقار</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {customer.preferences?.propertyType && Array.isArray(customer.preferences.propertyType) 
+                    ? customer.preferences.propertyType.map((type) => (
+                        <Badge key={type} variant="outline" className="text-xs">
+                          {type === "villa"
+                            ? "فيلا"
+                            : type === "apartment"
+                            ? "شقة"
+                            : type === "land"
+                            ? "أرض"
+                            : type === "commercial"
+                            ? "تجاري"
+                            : type}
+                        </Badge>
+                      ))
+                    : <span className="text-xs text-gray-400">لا توجد تفضيلات</span>
+                  }
+                </div>
+              </div>
+              {customer.preferences.budgetMax && (
+                <div>
+                  <span className="text-gray-500 block text-xs">الميزانية</span>
+                  <span className="font-medium">
+                    {(customer.preferences.budgetMin || 0) / 1000}k - {customer.preferences.budgetMax / 1000}k ريال
+                  </span>
+                </div>
+              )}
+              {customer.preferences.bedrooms && (
+                <div>
+                  <span className="text-gray-500 block text-xs">غرف النوم</span>
+                  <span className="font-medium">{customer.preferences.bedrooms}+</span>
+                </div>
+              )}
+              {customer.preferences?.preferredAreas && Array.isArray(customer.preferences.preferredAreas) && customer.preferences.preferredAreas.length > 0 && (
+                <div>
+                  <span className="text-gray-500 block text-xs">المناطق المفضلة</span>
+                  <span className="font-medium">{customer.preferences.preferredAreas.slice(0, 2).join("، ")}</span>
+                </div>
+              )}
             </div>
           </div>
-          {customer.preferences.budgetMax && (
-            <div>
-              <span className="text-gray-500 block text-xs">الميزانية</span>
-              <span className="font-medium">
-                {(customer.preferences.budgetMin || 0) / 1000}k - {customer.preferences.budgetMax / 1000}k ريال
-              </span>
-            </div>
-          )}
-          {customer.preferences.bedrooms && (
-            <div>
-              <span className="text-gray-500 block text-xs">غرف النوم</span>
-              <span className="font-medium">{customer.preferences.bedrooms}+</span>
-            </div>
-          )}
-          {customer.preferences?.preferredAreas && Array.isArray(customer.preferences.preferredAreas) && customer.preferences.preferredAreas.length > 0 && (
-            <div>
-              <span className="text-gray-500 block text-xs">المناطق المفضلة</span>
-              <span className="font-medium">{customer.preferences.preferredAreas.slice(0, 2).join("، ")}</span>
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* Property Categories */}
-      {hasCategories ? (
-        <div className="space-y-6">
-          <PropertyCategory
-            title="من الموقع الإلكتروني"
-            icon={Globe}
-            properties={websiteProperties.length > 0 ? websiteProperties : customer.properties.slice(0, 1)}
-            color="text-blue-600"
-          />
-          <PropertyCategory
-            title="مطابقة الذكاء الاصطناعي"
-            icon={Bot}
-            properties={aiMatchedProperties.length > 0 ? aiMatchedProperties : customer.properties.slice(1, 3)}
-            color="text-purple-600"
-          />
-          <PropertyCategory
-            title="أضافها الفريق"
-            icon={UserPlus}
-            properties={manualProperties.length > 0 ? manualProperties : customer.properties.slice(3)}
-            color="text-green-600"
-          />
-        </div>
-      ) : customer.properties.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {customer.properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8 text-gray-500">
-          <Building className="h-10 w-10 mx-auto mb-2 opacity-50" />
-          <p>لم يتم إضافة أي عقارات بعد</p>
-        </div>
+          {/* Property Categories */}
+          {hasCategories ? (
+            <div className="space-y-6">
+              <PropertyCategory
+                title="من الموقع الإلكتروني"
+                icon={Globe}
+                properties={websiteProperties.length > 0 ? websiteProperties : propertiesForDisplay.slice(0, 1)}
+                color="text-blue-600"
+              />
+              <PropertyCategory
+                title="مطابقة الذكاء الاصطناعي"
+                icon={Bot}
+                properties={aiMatchedProperties.length > 0 ? aiMatchedProperties : propertiesForDisplay.slice(1, 3)}
+                color="text-purple-600"
+              />
+              <PropertyCategory
+                title="أضافها الفريق"
+                icon={UserPlus}
+                properties={manualProperties.length > 0 ? manualProperties : propertiesForDisplay.slice(3)}
+                color="text-green-600"
+              />
+            </div>
+          ) : propertiesForDisplay.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {propertiesForDisplay.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : !isAddFormOpen && (
+            <div className="text-center py-8 text-gray-500">
+              <Building className="h-10 w-10 mx-auto mb-2 opacity-50" />
+              <p>لم يتم إضافة أي عقارات بعد</p>
+            </div>
+          )}
+        </CardContent>
       )}
-
-      <Button variant="outline" className="w-full">
-        <Plus className="h-4 w-4 ml-2" />
-        إضافة عقار
-      </Button>
-    </div>
+    </Card>
   );
 }
 
@@ -1234,7 +1509,8 @@ export function CustomerDetailPageSimple({
   customer: propCustomer,
   stats: propStats,
   tasks: propTasks,
-  interestedProperties: propInterestedProperties,
+  assignedProperties: propAssignedProperties,
+  propertyRequests: propPropertyRequests,
   preferences: propPreferences,
   history: propHistory,
   loading: propLoading,
@@ -1245,6 +1521,7 @@ export function CustomerDetailPageSimple({
   onUpdateTask,
   onDeleteTask,
   onUpdatePreferences,
+  onPropertyAdded,
 }: CustomerDetailPageSimpleProps) {
   const store = useUnifiedCustomersStore();
   const { getCustomerById, setSelectedCustomer } = store;
@@ -1347,32 +1624,15 @@ export function CustomerDetailPageSimple({
           onDeleteTask={onDeleteTask}
         />
 
-        <CollapsibleSection
-          title="العقارات"
-          icon={Building}
-          defaultOpen={true}
-          badge={
-            (propInterestedProperties?.length ?? customer.properties.length) > 0 && (
-              <Badge variant="secondary">
-                {propInterestedProperties?.length ?? customer.properties.length}
-              </Badge>
-            )
-          }
-        >
-          <PropertiesSection 
-            customer={customer} 
-            interestedProperties={propInterestedProperties}
-            preferences={propPreferences}
-          />
-        </CollapsibleSection>
+        <PropertiesSectionCard 
+          customer={customer} 
+          assignedProperties={propAssignedProperties}
+          preferences={propPreferences}
+          customerId={customerId}
+          onPropertyAdded={onPropertyAdded || onRefetch}
+        />
 
-        <CollapsibleSection
-          title="طلبات العميل"
-          icon={Sparkles}
-          defaultOpen={true}
-        >
-          <CustomerRequestsSection customer={customer} />
-        </CollapsibleSection>
+        <CustomerRequestsCard propertyRequests={propPropertyRequests} />
       </div>
     </div>
     </div>

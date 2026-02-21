@@ -49,8 +49,17 @@ export function useCustomersHubPipeline() {
             nameEn: stage.nameEn || stage.nameEn || "",
             customers: stage.customers.map((customer: any) => ({
               ...customer,
-              // Keep customer id as is (property request id)
+              // Keep customer id as is (property request id or inquiry id)
               id: typeof customer.id === 'number' ? customer.id : parseInt(customer.id) || customer.id,
+              // CRITICAL: Preserve pipeline-specific fields from API response
+              // These fields are required for move operations (requestId vs inquiryId)
+              source: customer.source || "request",  // "request" or "inquiry" from API
+              requestId: customer.requestId !== undefined && customer.requestId !== null
+                ? (typeof customer.requestId === 'number' ? customer.requestId : parseInt(customer.requestId))
+                : undefined,
+              inquiryId: customer.inquiryId !== undefined && customer.inquiryId !== null
+                ? (typeof customer.inquiryId === 'number' ? customer.inquiryId : parseInt(customer.inquiryId))
+                : undefined,
               // Handle assignedEmployee (from API response)
               assignedEmployeeId: customer.assignedEmployee?.id 
                 ? (typeof customer.assignedEmployee.id === 'number' 
@@ -86,7 +95,6 @@ export function useCustomersHubPipeline() {
               tags: customer.tags || [],
               aiInsights: customer.aiInsights || {},
               leadScore: customer.leadScore || 0,
-              source: customer.source || "manual",
               createdAt: customer.createdAt || customer.lastContactAt || new Date().toISOString(),
               updatedAt: customer.updatedAt || new Date().toISOString(),
               lastContactAt: customer.lastContactAt || customer.createdAt || new Date().toISOString(),
@@ -139,25 +147,32 @@ export function useCustomersHubPipeline() {
       }
 
       try {
-        // Ensure requestId (preferred) or customerId (backward compatibility) and newStageId are integers
+        // Prepare move params - API accepts either requestId or inquiryId (not both)
         const moveParams: MoveCustomerParams = {
-          requestId: params.requestId !== undefined
+          // Handle inquiryId if provided
+          inquiryId: params.inquiryId !== undefined
+            ? (typeof params.inquiryId === "number"
+                ? params.inquiryId
+                : parseInt(params.inquiryId.toString()))
+            : undefined,
+          // Handle requestId if provided (and no inquiryId)
+          requestId: params.inquiryId === undefined && params.requestId !== undefined
             ? (typeof params.requestId === "number" 
                 ? params.requestId 
                 : parseInt(params.requestId.toString()))
-            : (params.customerId !== undefined
+            : (params.inquiryId === undefined && params.customerId !== undefined
                 ? (typeof params.customerId === "number"
                     ? params.customerId
                     : parseInt(params.customerId.toString()))
                 : undefined),
-          customerId: params.requestId === undefined && params.customerId !== undefined
+          // Backward compatibility: customerId only if no requestId and no inquiryId
+          customerId: params.inquiryId === undefined && params.requestId === undefined && params.customerId !== undefined
             ? (typeof params.customerId === "number"
                 ? params.customerId
                 : parseInt(params.customerId.toString()))
             : undefined,
-          newStageId: typeof params.newStageId === "number" 
-            ? params.newStageId 
-            : parseInt(params.newStageId.toString()),
+          // newStageId can be string or number - API accepts both
+          newStageId: params.newStageId,
           notes: params.notes,
         };
         
@@ -184,7 +199,8 @@ export function useCustomersHubPipeline() {
       }
 
       try {
-        // Ensure all IDs are integers - prefer requestIds, fallback to customerIds for backward compatibility
+        // Prepare bulk move params - API accepts requestIds or customerIds (backward compatibility)
+        // Note: Bulk move only supports requests, not inquiries
         const bulkMoveParams: BulkMoveParams = {
           requestIds: params.requestIds !== undefined
             ? params.requestIds.map(id => 
@@ -200,9 +216,8 @@ export function useCustomersHubPipeline() {
                 typeof id === "number" ? id : parseInt(id.toString())
               )
             : undefined,
-          newStageId: typeof params.newStageId === "number" 
-            ? params.newStageId 
-            : parseInt(params.newStageId.toString()),
+          // newStageId can be string or number - API accepts both
+          newStageId: params.newStageId,
         };
         
         const response = await bulkMoveCustomersInPipeline(bulkMoveParams);

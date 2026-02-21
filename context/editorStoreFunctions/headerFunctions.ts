@@ -135,12 +135,20 @@ export const getDefaultHeaderData = (): ComponentData => {
 };
 
 export const headerFunctions = {
+  /**
+   * ensureVariant - Initialize component in store if not exists
+   */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.headerStates[variantId] &&
-      Object.keys(state.headerStates[variantId]).length > 0
-    ) {
-      return {} as any;
+    // Priority 1: Check if variant already exists
+    const currentData = state.headerStates[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          headerStates: { ...state.headerStates, [variantId]: initial },
+        } as any;
+      }
+      return {} as any; // Already exists, skip initialization
     }
 
     // Determine default data based on variant
@@ -149,6 +157,7 @@ export const headerFunctions = {
         ? getDefaultHeader2Data()
         : getDefaultHeaderData();
 
+    // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;
 
     return {
@@ -156,19 +165,37 @@ export const headerFunctions = {
     } as any;
   },
 
+  /**
+   * getData - Retrieve component data from store
+   */
   getData: (state: any, variantId: string) =>
     state.headerStates[variantId] || {},
 
+  /**
+   * setData - Set/replace component data completely
+   */
   setData: (state: any, variantId: string, data: ComponentData) => ({
     headerStates: { ...state.headerStates, [variantId]: data },
   }),
 
+  /**
+   * updateByPath - Update specific field in component data
+   */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source = state.headerStates[variantId] || {};
-    const newData = updateDataByPath(source, path, value);
+    // Get current data from headerStates (saved data) or defaults
+    const savedData = state.headerStates[variantId] || {};
 
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
+
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
+
+    // Return updated tempData ONLY
     return {
-      headerStates: { ...state.headerStates, [variantId]: newData },
+      tempData: newData,
     } as any;
   },
 };
+

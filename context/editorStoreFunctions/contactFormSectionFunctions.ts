@@ -1,5 +1,5 @@
 import { ComponentData } from "@/lib/types";
-import { createDefaultData } from "./types";
+import { createDefaultData, updateDataByPath } from "./types";
 
 // Default data for contactFormSection component
 export const getDefaultContactFormSectionData = (): ComponentData => ({
@@ -161,17 +161,30 @@ export const contactFormSectionFunctions = {
     variantId: string,
     initial?: ComponentData,
   ): any => {
+    // Priority 1: Check if variant already exists
     const currentData = state.contactFormSectionStates?.[variantId];
-    if (!currentData || Object.keys(currentData).length === 0) {
-      const defaultData = initial || getDefaultContactFormSectionData();
-      return {
-        contactFormSectionStates: {
-          ...state.contactFormSectionStates,
-          [variantId]: defaultData,
-        },
-      };
+    if (currentData && Object.keys(currentData).length > 0) {
+      // If initial data provided, update to ensure backend data is synced
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          contactFormSectionStates: {
+            ...state.contactFormSectionStates,
+            [variantId]: initial,
+          },
+        } as any;
+      }
+      return {} as any; // Already exists, skip initialization
     }
-    return state;
+
+    // Priority 2: Use provided initial data, else tempData, else defaults
+    const defaultData = initial || state.tempData || getDefaultContactFormSectionData();
+
+    return {
+      contactFormSectionStates: {
+        ...state.contactFormSectionStates,
+        [variantId]: defaultData,
+      },
+    };
   },
 
   // Get data
@@ -290,48 +303,23 @@ export const contactFormSectionFunctions = {
 
   // Update data by path
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const currentData =
+    // Get current data from contactFormSectionStates (saved data) or defaults
+    const savedData =
       state.contactFormSectionStates?.[variantId] ||
       getDefaultContactFormSectionData();
 
-    // Create a deep copy and update the nested property
-    const newData = { ...currentData };
-    const pathParts = path.split(".");
-    let current = newData;
+    // Merge saved data with existing tempData to preserve all changes
+    const currentTempData = state.tempData || {};
+    const baseData = { ...savedData, ...currentTempData };
 
-    for (let i = 0; i < pathParts.length - 1; i++) {
-      if (!current[pathParts[i]]) {
-        current[pathParts[i]] = {};
-      }
-      current = current[pathParts[i]];
-    }
+    // Update the specific path in the merged data
+    const newData = updateDataByPath(baseData, path, value);
 
-    current[pathParts[pathParts.length - 1]] = value;
-
-    // Update pageComponentsByPage with the new data
-    const currentPage = state.currentPage || "homepage";
-    const updatedPageComponents = state.pageComponentsByPage[currentPage] || [];
-
-    // Find and update the component in pageComponents
-    const updatedComponents = updatedPageComponents.map((comp: any) => {
-      if (comp.type === "contactFormSection" && comp.id === variantId) {
-        return {
-          ...comp,
-          data: newData,
-        };
-      }
-      return comp;
-    });
-
+    // Return updated tempData ONLY
+    // This ensures changes only appear after "Save Changes" button
     return {
-      contactFormSectionStates: {
-        ...state.contactFormSectionStates,
-        [variantId]: newData,
-      },
-      pageComponentsByPage: {
-        ...state.pageComponentsByPage,
-        [currentPage]: updatedComponents,
-      },
-    };
+      tempData: newData,
+    } as any;
   },
 };
+

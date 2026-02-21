@@ -153,13 +153,13 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
             <AssignmentPanel />
           </div>
 
-          {/* Notifications */}
-          <div className="hidden sm:block">
+          {/* Notifications - Hidden */}
+          {/* <div className="hidden sm:block">
             <NotificationsCenter />
-          </div>
+          </div> */}
 
-          {/* Keyboard Shortcuts */}
-          <div className="hidden md:block">
+          {/* Keyboard Shortcuts - Hidden */}
+          {/* <div className="hidden md:block">
             <KeyboardShortcuts
               onNavigate={(route) => router.push(route)}
               onAction={(action) => {
@@ -188,10 +188,10 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
                 }
               }}
             />
-          </div>
+          </div> */}
 
-          {/* Export */}
-          <Button
+          {/* Export - Hidden */}
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => setShowExportDialog(true)}
@@ -199,7 +199,7 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">تصدير</span>
-          </Button>
+          </Button> */}
 
           {/* Pipeline Link */}
           <Link href="/ar/dashboard/customers-hub/pipeline" className="flex-1 sm:flex-initial">
