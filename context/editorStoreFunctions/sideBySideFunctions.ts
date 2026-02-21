@@ -356,8 +356,12 @@ export const getDefaultSideBySide6Data = (): ComponentData => ({
   },
   spacing: {
     padding: {
-      top: "5rem",
-      bottom: "3rem",
+      top: 80,
+      bottom: 48,
+    },
+    innerPadding: {
+      x: { mobile: 24, tablet: 32, desktop: 40 },
+      y: { mobile: 32, tablet: 48, desktop: 48 },
     },
   },
   content: {

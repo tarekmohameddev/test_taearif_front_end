@@ -20,8 +20,12 @@ interface SideBySide6Props {
     ThemeTwo?: string;
     padding?: {
       ThemeTwo?: string;
-      top?: string;
-      bottom?: string;
+      top?: string | number;
+      bottom?: string | number;
+    };
+    innerPadding?: {
+      x?: { mobile?: number; tablet?: number; desktop?: number };
+      y?: { mobile?: number; tablet?: number; desktop?: number };
     };
   };
   content?: {
@@ -230,15 +234,59 @@ export default function SideBySide6(props: SideBySide6Props) {
   // ─────────────────────────────────────────────────────────
   // 8. RENDER
   // ─────────────────────────────────────────────────────────
+  const toPx = (v: string | number | undefined, fallback: number) =>
+    typeof v === "number" ? `${v}px` : typeof v === "string" && /^\d+$/.test(v) ? `${v}px` : v === undefined ? `${fallback}px` : undefined;
+  const paddingTop = toPx(mergedData.spacing?.padding?.top, 80) ?? "5rem";
+  const paddingBottom = toPx(mergedData.spacing?.padding?.bottom, 48) ?? "3rem";
+
+  const inner = mergedData.spacing?.innerPadding;
+  const ix = inner?.x;
+  const iy = inner?.y;
+  const innerXMobile = ix?.mobile ?? 24;
+  const innerXTablet = ix?.tablet ?? 32;
+  const innerXDesktop = ix?.desktop ?? 40;
+  const innerYMobile = iy?.mobile ?? 32;
+  const innerYTablet = iy?.tablet ?? 48;
+  const innerYDesktop = iy?.desktop ?? 48;
+  const sectionId = `sidebyside6-${uniqueId.replace(/[^a-zA-Z0-9]/g, "-")}`;
+
   return (
-    <section
-      className="w-full flex items-center justify-center"
-      style={{
-        backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
-        paddingTop: mergedData.spacing?.padding?.top || "5rem",
-        paddingBottom: mergedData.spacing?.padding?.bottom || "3rem",
-      }}
-    >
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          #${sectionId} .sbs6-inner-content {
+            padding-left: ${innerXMobile}px;
+            padding-right: ${innerXMobile}px;
+            padding-top: ${innerYMobile}px;
+            padding-bottom: ${innerYMobile}px;
+          }
+          @media (min-width: 768px) {
+            #${sectionId} .sbs6-inner-content {
+              padding-left: ${innerXTablet}px;
+              padding-right: ${innerXTablet}px;
+              padding-top: ${innerYTablet}px;
+              padding-bottom: ${innerYTablet}px;
+            }
+          }
+          @media (min-width: 1024px) {
+            #${sectionId} .sbs6-inner-content {
+              padding-left: ${innerXDesktop}px;
+              padding-right: ${innerXDesktop}px;
+              padding-top: ${innerYDesktop}px;
+              padding-bottom: ${innerYDesktop}px;
+            }
+          }
+        `,
+      }} />
+      <section
+        id={sectionId}
+        className="w-full flex items-center justify-center"
+        style={{
+          backgroundColor: mergedData.styling?.backgroundColor || "#f5f0e8",
+          paddingTop,
+          paddingBottom,
+        }}
+      >
       <div
         className="w-full mx-auto px-4 md:px-6 lg:px-8"
         style={{
@@ -266,8 +314,8 @@ export default function SideBySide6(props: SideBySide6Props) {
               </div>
             )}
 
-            {/* Right Side - Text Content (60% من العرض) */}
-            <div className="w-full md:w-[60%]  flex flex-col justify-center px-6 md:px-8 lg:px-10 py-8 md:py-12 text-right order-2 md:order-1">
+            {/* Right Side - Text Content (60% من العرض) - الحشو الداخلي من spacing.innerPadding */}
+            <div className="w-full md:w-[60%] flex flex-col justify-center sbs6-inner-content text-right order-2 md:order-1">
               {/* Heading */}
               <h3
                 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 leading-tight"
@@ -320,5 +368,6 @@ export default function SideBySide6(props: SideBySide6Props) {
         </div>
       </div>
     </section>
+    </>
   );
 }
