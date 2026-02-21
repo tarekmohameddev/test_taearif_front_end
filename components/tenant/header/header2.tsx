@@ -420,12 +420,13 @@ export default function Header2(props: Header2Props) {
   const links = mergedData.links || [];
 
   // Recursive function to render menu items with nested submenu support
-  const renderMenuItem = useCallback((item: any, level: number = 0): React.ReactNode => {
+  const renderMenuItem = useCallback((item: any, level: number = 0, index: number = 0): React.ReactNode => {
+    const stableKey = `menu-${level}-${index}-${(item.id ?? item.text ?? item.name ?? "").toString().replace(/\s/g, "_")}`;
     // If item has submenu, render as DropdownSubMenu
     if (item.submenu && Array.isArray(item.submenu) && item.submenu.length > 0) {
       return (
-        <DropdownSubMenu key={item.id || item.text || item.name} trigger={item.text || item.name}>
-          {item.submenu.map((subItem: any) => renderMenuItem(subItem, level + 1))}
+        <DropdownSubMenu key={stableKey} trigger={item.text || item.name}>
+          {item.submenu.map((subItem: any, subIndex: number) => renderMenuItem(subItem, level + 1, subIndex))}
         </DropdownSubMenu>
       );
     }
@@ -437,7 +438,7 @@ export default function Header2(props: Header2Props) {
 
     return (
       <DropdownItem
-        key={item.id || item.text || item.name}
+        key={stableKey}
         onClick={() => {
           if (href && href !== "#") {
             router.push(href);
@@ -475,7 +476,7 @@ export default function Header2(props: Header2Props) {
           triggerClassName="bg-transparent border-0 ring-0 shadow-none hover:bg-transparent p-0"
           iconColor={mergedData.styling?.linkColor || "#f3f4f6"}
         >
-          {link.submenu.map((subItem: any) => renderMenuItem(subItem))}
+          {link.submenu.map((subItem: any, subIndex: number) => renderMenuItem(subItem, 0, subIndex))}
         </CustomDropdown>
       );
     }
