@@ -7,7 +7,7 @@ import axiosInstance from "@/lib/axiosInstance";
 
 const BASE = "/v1/sms";
 
-function getData<T>(res: { data?: { status?: string; data?: T }; status: number }): T {
+function getData<T>(res: { data?: { status?: string | boolean; data?: T }; status: number }): T {
   const body = res.data;
   if (body?.status === "error" || (res.status >= 400)) {
     const msg = (body as { message?: string })?.message ?? "Request failed";
@@ -54,12 +54,31 @@ export interface CampaignListResponse {
   pagination: Pagination;
 }
 
+/** Laravel-style list: { data: [], current_page, per_page, total, last_page } */
+interface LaravelPaginatedData<T> {
+  data?: T[];
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+}
+
 export async function getCampaigns(params?: CampaignListParams): Promise<CampaignListResponse> {
   const q = new URLSearchParams();
   if (params?.per_page != null) q.set("per_page", String(params.per_page));
   if (params?.page != null) q.set("page", String(params.page));
   const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
-  return getData<CampaignListResponse>(res);
+  const raw = getData<LaravelPaginatedData<ApiCampaign>>(res);
+  const list = raw?.data ?? [];
+  return {
+    campaigns: Array.isArray(list) ? list : [],
+    pagination: {
+      current_page: raw?.current_page ?? 1,
+      per_page: raw?.per_page ?? 20,
+      total: raw?.total ?? 0,
+      last_page: raw?.last_page ?? 1,
+    },
+  };
 }
 
 export async function getCampaign(id: number): Promise<ApiCampaign> {
@@ -102,9 +121,11 @@ export async function deleteCampaign(id: number): Promise<void> {
   getData<unknown>(res);
 }
 
-/** Trigger send (now or scheduled). */
+/** Trigger send (now or scheduled). Sends Idempotency-Key to avoid duplicate charges. */
 export async function sendCampaign(id: number): Promise<{ message?: string }> {
-  const res = await axiosInstance.post(`${BASE}/campaigns/${id}/send`);
+  const res = await axiosInstance.post(`${BASE}/campaigns/${id}/send`, {}, {
+    headers: { "Idempotency-Key": crypto.randomUUID() },
+  });
   return getData<{ message?: string }>(res);
 }
 

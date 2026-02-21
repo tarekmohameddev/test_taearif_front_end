@@ -29,7 +29,6 @@ export function useSmsCampaigns() {
 
   const handleDeleteCampaign = useCallback(
     async (id: string) => {
-      if (!confirm("هل أنت متأكد من حذف هذه الحملة؟")) return;
       try {
         await deleteCampaign(Number(id));
         toast.success("تم حذف الحملة");
@@ -44,7 +43,6 @@ export function useSmsCampaigns() {
 
   const handleSendCampaign = useCallback(
     async (id: string) => {
-      if (!confirm("هل تريد إرسال هذه الحملة الآن؟")) return;
       try {
         await sendCampaign(Number(id));
         toast.success("تم بدء إرسال الحملة");

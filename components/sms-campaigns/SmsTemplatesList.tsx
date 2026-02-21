@@ -1,10 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogFooter,
+} from "@/components/customComponents/CustomDialog";
 import type { SMSTemplate } from "./types";
 import { getCategoryColor, CATEGORY_LABELS } from "./constants";
 
@@ -23,7 +32,26 @@ export function SmsTemplatesList({
   onNewTemplate,
   onDeleteTemplate,
 }: SmsTemplatesListProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
+  const [deleteTemplateName, setDeleteTemplateName] = useState("");
+
+  const openDeleteDialog = (id: string, name: string) => {
+    setDeleteTemplateId(id);
+    setDeleteTemplateName(name);
+    setDeleteDialogOpen(true);
+  };
+  const handleConfirmDelete = () => {
+    if (deleteTemplateId) {
+      onDeleteTemplate(deleteTemplateId);
+      setDeleteDialogOpen(false);
+      setDeleteTemplateId(null);
+      setDeleteTemplateName("");
+    }
+  };
+
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -100,7 +128,7 @@ export function SmsTemplatesList({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => onDeleteTemplate(template.id)}
+                        onClick={() => openDeleteDialog(template.id, template.name)}
                       >
                         حذف
                       </Button>
@@ -112,5 +140,25 @@ export function SmsTemplatesList({
         </div>
       </CardContent>
     </Card>
+
+    <CustomDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} maxWidth="max-w-md">
+      <CustomDialogContent>
+        <CustomDialogHeader>
+          <CustomDialogTitle>تأكيد حذف القالب</CustomDialogTitle>
+          <CustomDialogDescription>
+            هل أنت متأكد من حذف القالب «{deleteTemplateName}»؟ لا يمكن التراجع عن هذا الإجراء.
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            إلغاء
+          </Button>
+          <Button variant="destructive" onClick={handleConfirmDelete}>
+            حذف
+          </Button>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
+    </>
   );
 }

@@ -28,7 +28,6 @@ export function useSmsTemplates() {
 
   const handleDeleteTemplate = useCallback(
     async (id: string) => {
-      if (!confirm("هل أنت متأكد من حذف هذا القالب؟")) return;
       try {
         await deleteTemplate(Number(id));
         toast.success("تم حذف القالب");

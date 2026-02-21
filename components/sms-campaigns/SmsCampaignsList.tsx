@@ -1,11 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { Send, Clock, Coins, Plus, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogFooter,
+} from "@/components/customComponents/CustomDialog";
 import type { SMSCampaign } from "./types";
 import { getStatusColor, STATUS_LABELS } from "./constants";
 import { CREDITS_PER_SMS } from "./SMSCreditBalance";
@@ -29,7 +38,42 @@ export function SmsCampaignsList({
   onSendCampaign,
   onDeleteCampaign,
 }: SmsCampaignsListProps) {
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
+  const [sendCampaignId, setSendCampaignId] = useState<string | null>(null);
+  const [sendCampaignName, setSendCampaignName] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteCampaignId, setDeleteCampaignId] = useState<string | null>(null);
+  const [deleteCampaignName, setDeleteCampaignName] = useState("");
+
+  const openSendDialog = (id: string, name: string) => {
+    setSendCampaignId(id);
+    setSendCampaignName(name);
+    setSendDialogOpen(true);
+  };
+  const openDeleteDialog = (id: string, name: string) => {
+    setDeleteCampaignId(id);
+    setDeleteCampaignName(name);
+    setDeleteDialogOpen(true);
+  };
+  const handleConfirmSend = () => {
+    if (sendCampaignId) {
+      onSendCampaign(sendCampaignId);
+      setSendDialogOpen(false);
+      setSendCampaignId(null);
+      setSendCampaignName("");
+    }
+  };
+  const handleConfirmDelete = () => {
+    if (deleteCampaignId) {
+      onDeleteCampaign(deleteCampaignId);
+      setDeleteDialogOpen(false);
+      setDeleteCampaignId(null);
+      setDeleteCampaignName("");
+    }
+  };
+
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -82,7 +126,7 @@ export function SmsCampaignsList({
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() => onSendCampaign(campaign.id)}
+                          onClick={() => openSendDialog(campaign.id, campaign.name)}
                         >
                           إرسال
                         </Button>
@@ -90,7 +134,7 @@ export function SmsCampaignsList({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => onDeleteCampaign(campaign.id)}
+                        onClick={() => openDeleteDialog(campaign.id, campaign.name)}
                       >
                         حذف
                       </Button>
@@ -187,5 +231,42 @@ export function SmsCampaignsList({
         </div>
       </CardContent>
     </Card>
+
+    <CustomDialog open={sendDialogOpen} onOpenChange={setSendDialogOpen} maxWidth="max-w-md">
+      <CustomDialogContent>
+        <CustomDialogHeader>
+          <CustomDialogTitle>تأكيد إرسال الحملة</CustomDialogTitle>
+          <CustomDialogDescription>
+            هل تريد إرسال الحملة «{sendCampaignName}» الآن؟
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setSendDialogOpen(false)}>
+            إلغاء
+          </Button>
+          <Button onClick={handleConfirmSend}>إرسال</Button>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
+
+    <CustomDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} maxWidth="max-w-md">
+      <CustomDialogContent>
+        <CustomDialogHeader>
+          <CustomDialogTitle>تأكيد حذف الحملة</CustomDialogTitle>
+          <CustomDialogDescription>
+            هل أنت متأكد من حذف الحملة «{deleteCampaignName}»؟ لا يمكن التراجع عن هذا الإجراء.
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            إلغاء
+          </Button>
+          <Button variant="destructive" onClick={handleConfirmDelete}>
+            حذف
+          </Button>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
+    </>
   );
 }

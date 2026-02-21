@@ -77,6 +77,7 @@ export function mapApiCampaignToUI(c: {
   sent_at?: string | null;
   created_at: string;
   created_by?: string | null;
+  user_id?: number | null;
   tags?: string[] | null;
 }): SMSCampaign {
   return {
@@ -85,14 +86,14 @@ export function mapApiCampaignToUI(c: {
     description: c.description ?? undefined,
     message: c.message,
     status: c.status as SMSCampaign["status"],
-    recipientCount: c.recipient_count,
-    sentCount: c.sent_count,
-    deliveredCount: c.delivered_count,
-    failedCount: c.failed_count,
+    recipientCount: c.recipient_count ?? 0,
+    sentCount: c.sent_count ?? 0,
+    deliveredCount: c.delivered_count ?? 0,
+    failedCount: c.failed_count ?? 0,
     scheduledAt: c.scheduled_at ?? undefined,
     sentAt: c.sent_at ?? undefined,
     createdAt: c.created_at,
-    createdBy: c.created_by ?? "",
+    createdBy: c.created_by ?? (c.user_id != null ? String(c.user_id) : ""),
     tags: c.tags ?? undefined,
   };
 }
