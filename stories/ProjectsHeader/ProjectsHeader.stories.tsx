@@ -12,6 +12,20 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
+  args: {
+    headingTextProps: {
+      className: "font-saudi",
+      color: "#d09260",
+      fontSize: "40px",
+      lineHeight: "2.75rem",
+      fontWeight: 700,
+    },
+    descriptionTextProps: {
+      fontSize: "1.125rem",
+      color: "#1a1a2e",
+      className: "mt-5",
+    },
+  },
 } satisfies Meta<typeof ProjectsHeader>;
 
 export default meta;

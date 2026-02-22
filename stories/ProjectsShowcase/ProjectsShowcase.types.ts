@@ -2,6 +2,8 @@
 /*  ProjectsShowcase — Type definitions                                */
 /* ------------------------------------------------------------------ */
 
+import type { TextStyleProps } from "../Text/Text.types";
+
 export type FilterType = "all" | "available" | "coming-soon" | "sold";
 
 export interface UnitType {
@@ -66,4 +68,18 @@ export interface ProjectsShowcaseProps {
   projects?: ProjectCard[];
   /** Text direction — defaults to `"rtl"` */
   dir?: "rtl" | "ltr";
+  /** Style overrides for filter button labels */
+  filterButtonTextProps?: TextStyleProps;
+  /** Style overrides for status badge text */
+  statusBadgeTextProps?: TextStyleProps;
+  /** Style overrides for project card title */
+  projectTitleTextProps?: TextStyleProps;
+  /** Style overrides for project location */
+  projectLocationTextProps?: TextStyleProps;
+  /** Style overrides for project description */
+  projectDescriptionTextProps?: TextStyleProps;
+  /** Style overrides for unit type labels */
+  unitTypeTextProps?: TextStyleProps;
+  /** Style overrides for card CTA button text */
+  ctaTextProps?: TextStyleProps;
 }

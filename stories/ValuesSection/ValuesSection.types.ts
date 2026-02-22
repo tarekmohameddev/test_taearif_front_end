@@ -2,6 +2,8 @@
 /*  ValuesSection — Type definitions                                  */
 /* ------------------------------------------------------------------ */
 
+import type { TextStyleProps } from "../Text/Text.types";
+
 export interface ValueCard {
   /** Card title (bold text) */
   title: string;
@@ -22,4 +24,12 @@ export interface ValuesSectionProps {
   cards?: ValueCard[];
   /** Text direction — defaults to `"rtl"` */
   dir?: "rtl" | "ltr";
+  /** Style overrides for section heading */
+  headingTextProps?: TextStyleProps;
+  /** Style overrides for section description */
+  descriptionTextProps?: TextStyleProps;
+  /** Style overrides for card titles */
+  cardTitleTextProps?: TextStyleProps;
+  /** Style overrides for card descriptions */
+  cardDescriptionTextProps?: TextStyleProps;
 }

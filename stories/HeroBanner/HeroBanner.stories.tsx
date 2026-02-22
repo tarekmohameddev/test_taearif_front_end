@@ -15,6 +15,24 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
+  args: {
+    titleTextProps: {
+      color: "#deae6d",
+      fontSize: "4.5rem",
+      fontWeight: 400,
+    },
+    subtitleTextProps: {
+      color: "#fff",
+      fontSize: "3rem",
+      fontWeight: 700,
+    },
+    descriptionTextProps: {
+      color: "#fff",
+      fontSize: "1.125rem",
+      lineHeight: "1.6",
+      maxWidth: "36rem",
+    },
+  },
 } satisfies Meta<typeof HeroBanner>;
 
 export default meta;
@@ -67,23 +85,6 @@ export const WithHeader: Story = {
       <div className="relative">
         <Header />
         <Story />
-      </div>
-    ),
-  ],
-};
-
-/* ------------------------------------------------------------------ */
-/*  Combined — Full Page (Header + HeroBanner + ValuesSection + Footer) */
-/* ------------------------------------------------------------------ */
-
-/** Full Page — Complete page with Header, HeroBanner, ValuesSection, ContactForm, and Footer (Arabic) */
-export const FullPage: Story = {
-  decorators: [
-    (Story) => (
-      <div className="relative">
-        <Header />
-        <Story />
-        <Footer />
       </div>
     ),
   ],

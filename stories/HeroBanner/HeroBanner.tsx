@@ -1,6 +1,7 @@
 "use client";
 
 import type { HeroBannerProps } from "./HeroBanner.types";
+import { Text } from "../Text";
 import { ScrollDownIcon } from "../assets/ScrollDownIcon";
 import { DEFAULTS } from "./data";
 
@@ -8,6 +9,9 @@ export const HeroBanner = ({
   title,
   subtitle,
   description,
+  titleTextProps,
+  subtitleTextProps,
+  descriptionTextProps,
   primaryCta,
   secondaryCta,
   videoSrc,
@@ -49,15 +53,19 @@ export const HeroBanner = ({
       {/* ── Content ───────────────────────────────── */}
       <div className="app z-10 flex flex-col gap-6">
         {/* Titles */}
-        <div className="text-5xl font-bold">
-          <h1 className="text-[#deae6d] text-7xl font-normal">{_title}</h1>
-          <h2 className="text-white">{_subtitle}</h2>
+        <div className="flex flex-col gap-2">
+          <Text as="h1" {...titleTextProps}>
+            {_title}
+          </Text>
+          <Text as="h2" {...subtitleTextProps}>
+            {_subtitle}
+          </Text>
         </div>
 
         {/* Description */}
-        <p className="text-lg text-white lg:max-w-xl lg:text-2xl">
+        <Text as="p" {...descriptionTextProps}>
           {_description}
-        </p>
+        </Text>
 
         {/* CTA Buttons */}
         <div className="flex w-fit flex-col gap-4">
