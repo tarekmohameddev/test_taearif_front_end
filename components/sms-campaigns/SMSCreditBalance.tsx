@@ -119,25 +119,25 @@ export function SMSCreditBalance() {
               <p className="text-xs text-muted-foreground mt-1">
                 كريديت واحد = رسالة واحدة
               </p>
-              <Dialog open={isBuyDialogOpen} onOpenChange={setIsBuyDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="mt-3 w-full"
-                    disabled={creditPackages.loading || creditPackages.packages.length === 0}
-                  >
-                    <Plus className="h-4 w-4 ml-2" />
-                    شراء كريديت
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
-                  <DialogHeader>
-                    <DialogTitle>شراء رصيد للرسائل النصية</DialogTitle>
-                    <DialogDescription>
+              <Button
+                size="sm"
+                className="mt-3 w-full"
+                disabled={creditPackages.loading || creditPackages.packages.length === 0}
+                onClick={() => setIsBuyDialogOpen(true)}
+              >
+                <Plus className="h-4 w-4 ml-2" />
+                شراء كريديت
+              </Button>
+              <CustomDialog open={isBuyDialogOpen} onOpenChange={setIsBuyDialogOpen} maxWidth="max-w-2xl">
+                <CustomDialogContent className="max-h-[90vh] overflow-y-auto" dir="rtl">
+                  <CustomDialogClose onClose={() => setIsBuyDialogOpen(false)} />
+                  <CustomDialogHeader>
+                    <CustomDialogTitle>شراء رصيد للرسائل النصية</CustomDialogTitle>
+                    <CustomDialogDescription>
                       اختر الباقة وطريقة الدفع. كل كريديت = رسالة SMS واحدة.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
+                    </CustomDialogDescription>
+                  </CustomDialogHeader>
+                  <div className="px-4 sm:px-6 py-4 space-y-4">
                     {creditPackages.error && (
                       <Alert variant="destructive">
                         <AlertDescription>{creditPackages.error}</AlertDescription>
@@ -210,38 +210,37 @@ export function SMSCreditBalance() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        className="flex-1"
-                        disabled={
-                          !selectedPackage ||
-                          !selectedPaymentMethod ||
-                          isProcessingPayment
-                        }
-                        onClick={handleBuyCredits}
-                      >
-                        {isProcessingPayment ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2" />
-                            جاري التوجيه للدفع...
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard className="h-4 w-4 ml-2" />
-                            تأكيد والدفع
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsBuyDialogOpen(false)}
-                      >
-                        إلغاء
-                      </Button>
-                    </div>
                   </div>
-                </DialogContent>
-              </Dialog>
+                  <CustomDialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsBuyDialogOpen(false)}
+                    >
+                      إلغاء
+                    </Button>
+                    <Button
+                      disabled={
+                        !selectedPackage ||
+                        !selectedPaymentMethod ||
+                        isProcessingPayment
+                      }
+                      onClick={handleBuyCredits}
+                    >
+                      {isProcessingPayment ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2" />
+                          جاري التوجيه للدفع...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-4 w-4 ml-2" />
+                          تأكيد والدفع
+                        </>
+                      )}
+                    </Button>
+                  </CustomDialogFooter>
+                </CustomDialogContent>
+              </CustomDialog>
 
               {/* Payment iframe popup */}
               <Dialog open={isPaymentPopupOpen} onOpenChange={(open) => !open && handlePaymentClose()}>
