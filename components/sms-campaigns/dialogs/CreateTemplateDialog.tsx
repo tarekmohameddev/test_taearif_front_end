@@ -4,13 +4,14 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -61,15 +62,16 @@ export function CreateTemplateDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>قالب جديد</DialogTitle>
-          <DialogDescription>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-lg">
+      <CustomDialogContent className="dir-rtl">
+        <CustomDialogClose onClose={() => onOpenChange(false)} />
+        <CustomDialogHeader>
+          <CustomDialogTitle>قالب جديد</CustomDialogTitle>
+          <CustomDialogDescription>
             أضف قالب رسالة يمكنك استخدامه في حملات متعددة. استخدم [اسم_المتغير] للمتغيرات.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <div className="px-4 sm:px-6 py-4 space-y-4 overflow-y-auto">
           <div className="space-y-2">
             <Label htmlFor="template-name">اسم القالب</Label>
             <Input
@@ -105,7 +107,7 @@ export function CreateTemplateDialog({
             />
           </div>
         </div>
-        <DialogFooter>
+        <CustomDialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
@@ -119,8 +121,8 @@ export function CreateTemplateDialog({
               "إنشاء القالب"
             )}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }
