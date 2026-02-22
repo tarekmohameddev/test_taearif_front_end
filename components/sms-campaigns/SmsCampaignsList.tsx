@@ -2,12 +2,21 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { Send, Clock, Coins, Plus, Loader2 } from "lucide-react";
+import { Send, Clock, Coins, Plus, Loader2, LayoutGrid, Table2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import {
   CustomDialog,
   CustomDialogContent,
@@ -67,6 +76,7 @@ export function SmsCampaignsList({
   const [editDescription, setEditDescription] = useState("");
   const [editMessage, setEditMessage] = useState("");
   const [editSubmitting, setEditSubmitting] = useState(false);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   const openSendDialog = (id: string, name: string) => {
     setSendCampaignId(id);
@@ -199,15 +209,45 @@ export function SmsCampaignsList({
     <>
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>جميع الحملات</CardTitle>
             <CardDescription>إدارة وعرض جميع حملات الرسائل النصية</CardDescription>
           </div>
-          <Button onClick={onNewCampaign}>
-            <Plus className="h-4 w-4 ml-2" />
-            إنشاء حملة جديدة
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center rounded-md bg-muted/60 p-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-10 w-10 p-0 hover:bg-background [&_svg]:!h-5 [&_svg]:!w-5",
+                  viewMode === "cards" && "bg-background"
+                )}
+                onClick={() => setViewMode("cards")}
+                title="عرض البطاقات"
+              >
+                <LayoutGrid />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-10 w-10 p-0 hover:bg-background [&_svg]:!h-5 [&_svg]:!w-5",
+                  viewMode === "table" && "bg-background"
+                )}
+                onClick={() => setViewMode("table")}
+                title="عرض الجدول"
+              >
+                <Table2 />
+              </Button>
+            </div>
+            <Button onClick={onNewCampaign}>
+              <Plus className="h-4 w-4 ml-2" />
+              إنشاء حملة جديدة
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -222,9 +262,9 @@ export function SmsCampaignsList({
             <span className="text-muted-foreground">جاري تحميل الحملات...</span>
           </div>
         )}
+        {!loading && viewMode === "cards" && (
         <div className="space-y-4">
-          {!loading &&
-            campaigns.map((campaign) => (
+          {campaigns.map((campaign) => (
               <Card key={campaign.id}>
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between mb-4">
@@ -352,6 +392,82 @@ export function SmsCampaignsList({
               </Card>
             ))}
         </div>
+        )}
+
+        {!loading && viewMode === "table" && (
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="text-right">الاسم</TableHead>
+                  <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">الوصف</TableHead>
+                  <TableHead className="text-right">الرسالة</TableHead>
+                  <TableHead className="text-right">المستلمين</TableHead>
+                  <TableHead className="text-right">أرسلت</TableHead>
+                  <TableHead className="text-right">وصلت</TableHead>
+                  <TableHead className="text-right">فشل</TableHead>
+                  <TableHead className="text-right">مجدولة / أرسلت</TableHead>
+                  <TableHead className="text-right">بواسطة</TableHead>
+                  <TableHead className="text-center">الإجراءات</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {campaigns.map((campaign) => (
+                  <TableRow key={campaign.id}>
+                    <TableCell className="font-medium text-right">{campaign.name}</TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant="outline" className={getStatusColor(campaign.status)}>
+                        {STATUS_LABELS[campaign.status] ?? campaign.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right max-w-[140px] truncate text-muted-foreground" title={campaign.description ?? ""}>
+                      {campaign.description || "—"}
+                    </TableCell>
+                    <TableCell className="text-right max-w-[180px] truncate" title={campaign.message}>
+                      {campaign.message}
+                    </TableCell>
+                    <TableCell className="text-right">{campaign.recipientCount}</TableCell>
+                    <TableCell className="text-right">{campaign.sentCount}</TableCell>
+                    <TableCell className="text-right text-green-600">{campaign.deliveredCount}</TableCell>
+                    <TableCell className="text-right text-red-600">{campaign.failedCount}</TableCell>
+                    <TableCell className="text-right text-muted-foreground text-sm">
+                      {campaign.scheduledAt
+                        ? new Date(campaign.scheduledAt).toLocaleString("ar-SA")
+                        : campaign.sentAt
+                          ? new Date(campaign.sentAt).toLocaleString("ar-SA")
+                          : "—"}
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground text-sm">{campaign.createdBy || "—"}</TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1 flex-wrap">
+                        <Button variant="outline" size="sm" onClick={() => openEditDialog(campaign)}>
+                          تعديل
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openDeleteDialog(campaign.id, campaign.name)}
+                        >
+                          حذف
+                        </Button>
+                        {(campaign.status === "draft" || campaign.status === "scheduled") && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => openSendDialog(campaign.id, campaign.name)}
+                          >
+                            إرسال
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </CardContent>
     </Card>
 
