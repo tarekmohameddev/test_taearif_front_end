@@ -16,6 +16,7 @@ import { useEditorStore } from "@/context/editorStore";
 import axiosInstance from "@/lib/axiosInstance";
 import { useUrlFilters } from "@/hooks/use-url-filters";
 import { getDefaultGridData } from "@/context/editorStoreFunctions/gridFunctions";
+import { getDefaultCard4Data } from "@/context/editorStoreFunctions/card4Functions";
 
 interface PropertyGridProps {
   emptyMessage?: string;
@@ -1073,7 +1074,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
               </p>
             </div>
             <div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${(mergedData.cardSettings?.theme || "card1") === "card4" ? "items-stretch" : ""}`}
               style={{
                 gap: mergedData.styling?.gridGap || "24px",
               
@@ -1082,7 +1083,7 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
               {properties.map((property: any) => {
                 // Check if this is blogs API - force blogCard1 usage
                 const isBlogsApi = configuredApiUrl?.includes("/posts");
-                
+
                 if (isBlogsApi) {
                   // Convert to blog format and render BlogCard1
                   const blogData = convertPropertyToBlog(property);
@@ -1110,13 +1111,24 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
                     ((property as any).transactionType === "project" ? "project" : "property") ||
                     ((property as any).type === "project" || (property as any).type === "مشروع" ? "project" : "property");
                   
+                  // Build card4Styling from all sources so saved colors appear in Editor and on site
+                  const card4Styling = {
+                    ...getDefaultCard4Data().styling,
+                    ...(defaultData.cardSettings?.card4Styling || {}),
+                    ...(props.cardSettings?.card4Styling || {}),
+                    ...(tenantComponentData?.cardSettings?.card4Styling || {}),
+                    ...(currentStoreData?.cardSettings?.card4Styling || {}),
+                  };
+
                   return (
-                    <Card4
-                      key={property.id || property._id}
-                      property={convertedProperty}
-                      itemType={itemType}
-                      useStore={false}
-                    />
+                    <div key={property.id || property._id} className="h-full">
+                      <Card4
+                        property={convertedProperty}
+                        itemType={itemType}
+                        styling={card4Styling}
+                        useStore={false}
+                      />
+                    </div>
                   );
                 } else if (theme === "card5") {
                   const convertedProperty =
