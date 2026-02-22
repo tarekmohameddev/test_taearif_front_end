@@ -68,8 +68,13 @@ export function SmsLogsList({ logs, loading, error }: SmsLogsListProps) {
                     <p className="text-sm text-muted-foreground mb-2">{log.phone}</p>
                     <div className="bg-muted p-2 rounded text-sm mb-2">{log.message}</div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>الحملة: {log.campaignName}</span>
-                      <span>أرسلت: {new Date(log.sentAt).toLocaleString("ar-SA")}</span>
+                      <span>الحملة: {log.campaignName || (log.campaignId ? `#${log.campaignId}` : "—")}</span>
+                      <span>
+                        أرسلت:{" "}
+                        {log.sentAt
+                          ? new Date(log.sentAt).toLocaleString("ar-SA")
+                          : "لم ترسل بعد"}
+                      </span>
                       {log.deliveredAt && (
                         <span>
                           وصلت: {new Date(log.deliveredAt).toLocaleString("ar-SA")}

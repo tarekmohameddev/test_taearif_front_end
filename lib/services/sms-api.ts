@@ -7,10 +7,10 @@ import axiosInstance from "@/lib/axiosInstance";
 
 const BASE = "/v1/sms";
 
-function getData<T>(res: { data?: { status?: string | boolean; data?: T }; status: number }): T {
+function getData<T>(res: { data?: { status?: string | boolean; data?: T; message?: string }; status: number }): T {
   const body = res.data;
-  if (body?.status === "error" || (res.status >= 400)) {
-    const msg = (body as { message?: string })?.message ?? "Request failed";
+  const msg = (body as { message?: string })?.message ?? "Request failed";
+  if (body?.status === "error" || body?.status === false || (res.status >= 400)) {
     throw new Error(msg);
   }
   return (body?.data ?? body) as T;
@@ -126,9 +126,15 @@ export async function deleteCampaign(id: number): Promise<void> {
   getData<unknown>(res);
 }
 
+/** Body for send campaign: at least one of customer_ids or manual_phones must be present and non-empty. */
+export interface SendCampaignBody {
+  customer_ids?: number[];
+  manual_phones?: string[];
+}
+
 /** Trigger send (now or scheduled). Sends Idempotency-Key to avoid duplicate charges. */
-export async function sendCampaign(id: number): Promise<{ message?: string }> {
-  const res = await axiosInstance.post(`${BASE}/campaigns/${id}/send`, {}, {
+export async function sendCampaign(id: number, body: SendCampaignBody): Promise<{ message?: string }> {
+  const res = await axiosInstance.post(`${BASE}/campaigns/${id}/send`, body, {
     headers: { "Idempotency-Key": crypto.randomUUID() },
   });
   return getData<{ message?: string }>(res);
@@ -208,6 +214,22 @@ export async function deleteTemplate(id: number): Promise<void> {
 
 // --- Logs ---
 
+/** Raw log item from API (Laravel: recipient_phone, recipient_name, customer_id). */
+export interface RawApiSmsLogItem {
+  id: number;
+  campaign_id?: number;
+  customer_id?: number;
+  recipient_phone?: string;
+  recipient_name?: string;
+  message?: string;
+  status?: string;
+  sent_at?: string | null;
+  delivered_at?: string | null;
+  error_message?: string | null;
+  created_at?: string;
+  [key: string]: unknown;
+}
+
 export interface ApiSmsLog {
   id: number | string;
   campaign_id?: number;
@@ -227,6 +249,23 @@ export interface LogsListResponse {
   pagination: Pagination;
 }
 
+/** Normalize Laravel log item (recipient_*) to ApiSmsLog (phone, contact_name, contact_id). */
+function normalizeLogItem(item: RawApiSmsLogItem): ApiSmsLog {
+  return {
+    id: item.id,
+    campaign_id: item.campaign_id,
+    campaign_name: undefined,
+    contact_id: item.customer_id,
+    contact_name: item.recipient_name ?? "",
+    phone: item.recipient_phone ?? "",
+    message: item.message ?? "",
+    status: (item.status as ApiSmsLog["status"]) ?? "pending",
+    sent_at: item.sent_at ?? "",
+    delivered_at: item.delivered_at ?? null,
+    error_message: item.error_message ?? null,
+  };
+}
+
 export async function getLogs(params?: {
   per_page?: number;
   page?: number;
@@ -239,10 +278,17 @@ export async function getLogs(params?: {
   if (params?.campaign_id != null) q.set("campaign_id", String(params.campaign_id));
   if (params?.status) q.set("status", params.status);
   const res = await axiosInstance.get(`${BASE}/logs?${q}`);
-  const data = getData<LogsListResponse>(res);
+  const raw = getData<LaravelPaginatedData<RawApiSmsLogItem>>(res);
+  const list = raw?.data ?? [];
+  const logs = Array.isArray(list) ? list.map(normalizeLogItem) : [];
   return {
-    logs: data.logs ?? [],
-    pagination: data.pagination ?? { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+    logs,
+    pagination: {
+      current_page: raw?.current_page ?? 1,
+      per_page: raw?.per_page ?? 20,
+      total: raw?.total ?? 0,
+      last_page: raw?.last_page ?? 1,
+    },
   };
 }
 

@@ -64,3 +64,24 @@ export const TEMPLATE_CATEGORIES = [
   { value: "notification", label: "إشعار" },
   { value: "follow-up", label: "متابعة" },
 ] as const;
+
+/** ترجمة رسائل أخطاء الباك اند (إنجليزي → عربي) للعرض في الـ toast */
+export const SMS_ERROR_MESSAGES_AR: Record<string, string> = {
+  "Only draft or scheduled campaigns can be updated.":
+    "يمكن تعديل الحملات ذات الحالة مسودة أو مجدولة فقط.",
+  "Only draft or scheduled campaigns can be deleted.":
+    "يمكن حذف الحملات ذات الحالة مسودة أو مجدولة فقط.",
+  "Only draft or scheduled campaigns can be sent.":
+    "يمكن إرسال الحملات ذات الحالة مسودة أو مجدولة فقط.",
+  "Campaign not found.": "الحملة غير موجودة.",
+  "Template not found.": "القالب غير موجود.",
+  "Insufficient credits.": "رصيد الكريديت غير كافٍ.",
+  "Validation failed.": "فشل التحقق من البيانات.",
+  "Idempotency-Key header is required.": "مفتاح منع التكرار مطلوب.",
+};
+
+/** إرجاع الرسالة بالعربي إن وُجدت، وإلا الرسالة الأصلية */
+export function getSmsErrorAr(message: string): string {
+  const trimmed = message?.trim() ?? "";
+  return SMS_ERROR_MESSAGES_AR[trimmed] ?? trimmed;
+}

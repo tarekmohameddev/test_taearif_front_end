@@ -3,9 +3,10 @@
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { getCampaigns, deleteCampaign, sendCampaign, updateCampaign } from "@/lib/services/sms-api";
-import type { UpdateCampaignBody } from "@/lib/services/sms-api";
+import type { UpdateCampaignBody, SendCampaignBody } from "@/lib/services/sms-api";
 import type { SMSCampaign } from "../types";
 import { mapApiCampaignToUI } from "../types";
+import { getSmsErrorAr } from "../constants";
 import useStore from "@/context/Store";
 
 export function useSmsCampaigns() {
@@ -22,7 +23,7 @@ export function useSmsCampaigns() {
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "فشل تحميل الحملات";
       setError(msg);
-      toast.error(msg);
+      toast.error(getSmsErrorAr(msg));
     } finally {
       setLoading(false);
     }
@@ -36,21 +37,24 @@ export function useSmsCampaigns() {
         fetchCampaigns();
         useStore.getState().fetchCreditBalance?.();
       } catch (e: unknown) {
-        toast.error(e instanceof Error ? e.message : "فشل الحذف");
+        const msg = e instanceof Error ? e.message : "فشل الحذف";
+        toast.error(getSmsErrorAr(msg));
       }
     },
     [fetchCampaigns]
   );
 
   const handleSendCampaign = useCallback(
-    async (id: string) => {
+    async (id: string, body: SendCampaignBody) => {
       try {
-        await sendCampaign(Number(id));
+        await sendCampaign(Number(id), body);
         toast.success("تم بدء إرسال الحملة");
         fetchCampaigns();
         useStore.getState().fetchCreditBalance?.();
       } catch (e: unknown) {
-        toast.error(e instanceof Error ? e.message : "فشل الإرسال");
+        const err = e as { response?: { data?: { message?: string } }; message?: string };
+        const msg = err?.response?.data?.message ?? (e instanceof Error ? e.message : "فشل الإرسال");
+        toast.error(getSmsErrorAr(msg));
       }
     },
     [fetchCampaigns]
@@ -63,7 +67,8 @@ export function useSmsCampaigns() {
         toast.success("تم تحديث الحملة");
         fetchCampaigns();
       } catch (e: unknown) {
-        toast.error(e instanceof Error ? e.message : "فشل التحديث");
+        const msg = e instanceof Error ? e.message : "فشل التحديث";
+        toast.error(getSmsErrorAr(msg));
       }
     },
     [fetchCampaigns]

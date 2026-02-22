@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Send, Clock, Coins, Plus, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { CustomersCheckboxesDropdown, type CustomerOption } from "@/components/customComponents/CustomersCheckboxesDropdown";
+import { getCustomersList } from "@/lib/services/customers-hub-list-api";
+import type { SendCampaignBody } from "@/lib/services/sms-api";
 import type { SMSCampaign } from "./types";
 import { getStatusColor, STATUS_LABELS } from "./constants";
 import { CREDITS_PER_SMS } from "./SMSCreditBalance";
@@ -29,7 +33,7 @@ interface SmsCampaignsListProps {
   error: string | null;
   availableCredits: number;
   onNewCampaign: () => void;
-  onSendCampaign: (id: string) => void;
+  onSendCampaign: (id: string, body: SendCampaignBody) => void;
   onDeleteCampaign: (id: string) => void;
   onEditCampaign: (id: string, body: { name: string; description?: string; message: string }) => void;
 }
@@ -47,6 +51,13 @@ export function SmsCampaignsList({
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [sendCampaignId, setSendCampaignId] = useState<string | null>(null);
   const [sendCampaignName, setSendCampaignName] = useState("");
+  const [sendCustomersLoading, setSendCustomersLoading] = useState(false);
+  const [sendCustomersList, setSendCustomersList] = useState<CustomerOption[]>([]);
+  const [sendCustomersPage, setSendCustomersPage] = useState(1);
+  const [sendCustomersHasMore, setSendCustomersHasMore] = useState(false);
+  const [sendCustomersLoadMoreLoading, setSendCustomersLoadMoreLoading] = useState(false);
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<number[]>([]);
+  const [manualPhonesRaw, setManualPhonesRaw] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteCampaignId, setDeleteCampaignId] = useState<string | null>(null);
   const [deleteCampaignName, setDeleteCampaignName] = useState("");
@@ -60,7 +71,68 @@ export function SmsCampaignsList({
   const openSendDialog = (id: string, name: string) => {
     setSendCampaignId(id);
     setSendCampaignName(name);
+    setSelectedCustomerIds([]);
+    setManualPhonesRaw("");
     setSendDialogOpen(true);
+  };
+
+  useEffect(() => {
+    if (!sendDialogOpen) return;
+    setSendCustomersLoading(true);
+    setSendCustomersPage(1);
+    getCustomersList({
+      action: "list",
+      filters: {},
+      pagination: { page: 1, limit: 100 },
+    })
+      .then((res) => {
+        const list = res.data?.customers ?? [];
+        const pagination = res.data?.pagination;
+        setSendCustomersList(
+          list.map((c) => ({
+            id: c.id,
+            name: c.name ?? "",
+            phone: c.phone,
+          }))
+        );
+        setSendCustomersHasMore(
+          Boolean(pagination && pagination.currentPage < pagination.totalPages)
+        );
+      })
+      .catch(() => {
+        toast.error("فشل تحميل قائمة العملاء");
+        setSendCustomersList([]);
+        setSendCustomersHasMore(false);
+      })
+      .finally(() => setSendCustomersLoading(false));
+  }, [sendDialogOpen]);
+
+  const loadMoreSendCustomers = () => {
+    const nextPage = sendCustomersPage + 1;
+    setSendCustomersLoadMoreLoading(true);
+    getCustomersList({
+      action: "list",
+      filters: {},
+      pagination: { page: nextPage, limit: 100 },
+    })
+      .then((res) => {
+        const list = res.data?.customers ?? [];
+        const pagination = res.data?.pagination;
+        setSendCustomersList((prev) => [
+          ...prev,
+          ...list.map((c) => ({
+            id: c.id,
+            name: c.name ?? "",
+            phone: c.phone,
+          })),
+        ]);
+        setSendCustomersPage(nextPage);
+        setSendCustomersHasMore(
+          Boolean(pagination && pagination.currentPage < pagination.totalPages)
+        );
+      })
+      .catch(() => toast.error("فشل تحميل المزيد"))
+      .finally(() => setSendCustomersLoadMoreLoading(false));
   };
   const openDeleteDialog = (id: string, name: string) => {
     setDeleteCampaignId(id);
@@ -90,12 +162,29 @@ export function SmsCampaignsList({
     }
   };
   const handleConfirmSend = () => {
-    if (sendCampaignId) {
-      onSendCampaign(sendCampaignId);
-      setSendDialogOpen(false);
-      setSendCampaignId(null);
-      setSendCampaignName("");
+    if (!sendCampaignId) return;
+    const normalizedManual = manualPhonesRaw
+      .split(/[\n,]+/)
+      .map((s) => s.replace(/\D/g, "").trim())
+      .filter((s) => s.length >= 8 && s.length <= 16);
+    const hasCustomers = selectedCustomerIds.length > 0;
+    const hasManual = normalizedManual.length > 0;
+    if (!hasCustomers && !hasManual) {
+      toast.error("اختر عملاء على الأقل أو أدخل أرقام هواتف يدوياً.");
+      return;
     }
+    const body: SendCampaignBody =
+      hasCustomers && hasManual
+        ? { customer_ids: selectedCustomerIds.map((id) => Number(id)), manual_phones: normalizedManual }
+        : hasCustomers
+          ? { customer_ids: selectedCustomerIds.map((id) => Number(id)) }
+          : { manual_phones: normalizedManual };
+    onSendCampaign(sendCampaignId, body);
+    setSendDialogOpen(false);
+    setSendCampaignId(null);
+    setSendCampaignName("");
+    setSelectedCustomerIds([]);
+    setManualPhonesRaw("");
   };
   const handleConfirmDelete = () => {
     if (deleteCampaignId) {
@@ -270,11 +359,37 @@ export function SmsCampaignsList({
       <CustomDialogContent>
         <CustomDialogClose onClose={() => setSendDialogOpen(false)} />
         <CustomDialogHeader>
-          <CustomDialogTitle>تأكيد إرسال الحملة</CustomDialogTitle>
+          <CustomDialogTitle>تحديد المستلمين وإرسال الحملة</CustomDialogTitle>
           <CustomDialogDescription>
-            هل تريد إرسال الحملة «{sendCampaignName}» الآن؟
+            اختر العملاء الذين تريد إرسال الحملة «{sendCampaignName}» لهم. يمكنك أيضاً إضافة أرقام يدوياً.
           </CustomDialogDescription>
         </CustomDialogHeader>
+        <div className="px-4 sm:px-6 py-4 space-y-4 overflow-y-auto">
+          <div className="space-y-2">
+            <Label>العملاء</Label>
+            <CustomersCheckboxesDropdown
+              customers={sendCustomersList}
+              selectedCustomerIds={selectedCustomerIds}
+              onSelectionChange={setSelectedCustomerIds}
+              isLoading={sendCustomersLoading}
+              placeholder="اختر العملاء..."
+              hasMore={sendCustomersHasMore}
+              onLoadMore={loadMoreSendCustomers}
+              loadMoreLoading={sendCustomersLoadMoreLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="send-manual-phones">أرقام إضافية (اختياري)</Label>
+            <Textarea
+              id="send-manual-phones"
+              value={manualPhonesRaw}
+              onChange={(e) => setManualPhonesRaw(e.target.value)}
+              placeholder="أرقام هاتف، سطر واحد أو مفصولة بفاصلة (8–16 رقم)"
+              rows={2}
+              className="resize-none"
+            />
+          </div>
+        </div>
         <CustomDialogFooter>
           <Button variant="outline" onClick={() => setSendDialogOpen(false)}>
             إلغاء

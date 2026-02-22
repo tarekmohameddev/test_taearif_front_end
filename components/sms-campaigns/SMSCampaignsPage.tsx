@@ -13,6 +13,7 @@ import { SmsTemplatesList } from "./SmsTemplatesList";
 import { SmsLogsList } from "./SmsLogsList";
 import { CreateCampaignDialog, CreateTemplateDialog } from "./dialogs";
 import { useSmsCampaigns, useSmsTemplates, useSmsStats, useSmsLogs } from "./hooks";
+import type { SendCampaignBody } from "@/lib/services/sms-api";
 import useStore from "@/context/Store";
 import { useSmsCampaignsDialogStore } from "@/context/store/dashboard/smsCampaignsDialog";
 
@@ -71,8 +72,8 @@ export function SMSCampaignsPage() {
     }
   }, [authLoading, userData?.token, activeTab, fetchLogs]);
 
-  const onSendCampaign = async (id: string) => {
-    await handleSendCampaign(id);
+  const onSendCampaign = async (id: string, body: SendCampaignBody) => {
+    await handleSendCampaign(id, body);
     fetchStats();
   };
 

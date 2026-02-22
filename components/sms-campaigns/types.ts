@@ -138,7 +138,7 @@ export function mapApiLogToUI(l: {
   phone: string;
   message: string;
   status: string;
-  sent_at: string;
+  sent_at?: string | null;
   delivered_at?: string | null;
   error_message?: string | null;
 }): SMSLog {
@@ -151,7 +151,7 @@ export function mapApiLogToUI(l: {
     phone: l.phone,
     message: l.message,
     status: l.status as SMSLog["status"],
-    sentAt: l.sent_at,
+    sentAt: l.sent_at ?? "",
     deliveredAt: l.delivered_at ?? undefined,
     errorMessage: l.error_message ?? undefined,
   };

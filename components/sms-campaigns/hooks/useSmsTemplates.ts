@@ -6,6 +6,7 @@ import { getTemplates, deleteTemplate, updateTemplate } from "@/lib/services/sms
 import type { UpdateTemplateBody } from "@/lib/services/sms-api";
 import type { SMSTemplate } from "../types";
 import { mapApiTemplateToUI } from "../types";
+import { getSmsErrorAr } from "../constants";
 
 export function useSmsTemplates() {
   const [templates, setTemplates] = useState<SMSTemplate[]>([]);
@@ -21,7 +22,7 @@ export function useSmsTemplates() {
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "فشل تحميل القوالب";
       setError(msg);
-      toast.error(msg);
+      toast.error(getSmsErrorAr(msg));
     } finally {
       setLoading(false);
     }
@@ -34,7 +35,8 @@ export function useSmsTemplates() {
         toast.success("تم حذف القالب");
         fetchTemplates();
       } catch (e: unknown) {
-        toast.error(e instanceof Error ? e.message : "فشل الحذف");
+        const msg = e instanceof Error ? e.message : "فشل الحذف";
+        toast.error(getSmsErrorAr(msg));
       }
     },
     [fetchTemplates]
@@ -47,7 +49,8 @@ export function useSmsTemplates() {
         toast.success("تم تحديث القالب");
         fetchTemplates();
       } catch (e: unknown) {
-        toast.error(e instanceof Error ? e.message : "فشل التحديث");
+        const msg = e instanceof Error ? e.message : "فشل التحديث";
+        toast.error(getSmsErrorAr(msg));
       }
     },
     [fetchTemplates]
