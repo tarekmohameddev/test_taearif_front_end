@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useStore from "@/context/Store";
-import { Coins, Plus, CreditCard, AlertTriangle, XCircle } from "lucide-react";
+import { Coins, Plus, CreditCard, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +15,7 @@ import {
   CustomDialogFooter,
   CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /** 1 credit = 1 SMS (configurable if backend changes) */
@@ -88,6 +88,11 @@ export function SMSCreditBalance() {
     fetchCreditBalance({ silent: true });
   };
 
+  const handlePaymentSuccess = () => {
+    handlePaymentClose();
+    fetchCreditBalance({ silent: false });
+  };
+
   return (
     <>
       <Card>
@@ -129,7 +134,7 @@ export function SMSCreditBalance() {
                 شراء كريديت
               </Button>
               <CustomDialog open={isBuyDialogOpen} onOpenChange={setIsBuyDialogOpen} maxWidth="max-w-2xl">
-                <CustomDialogContent className="max-h-[90vh] overflow-y-auto" dir="rtl">
+                <CustomDialogContent className="max-h-[90vh] overflow-y-auto">
                   <CustomDialogClose onClose={() => setIsBuyDialogOpen(false)} />
                   <CustomDialogHeader>
                     <CustomDialogTitle>شراء رصيد للرسائل النصية</CustomDialogTitle>
@@ -242,26 +247,14 @@ export function SMSCreditBalance() {
                 </CustomDialogContent>
               </CustomDialog>
 
-              {/* Payment iframe popup */}
-              <Dialog open={isPaymentPopupOpen} onOpenChange={(open) => !open && handlePaymentClose()}>
-                <DialogContent className="max-w-4xl h-[80vh] p-0 overflow-hidden" dir="rtl" aria-describedby={undefined}>
-                  <DialogTitle className="sr-only">إتمام الدفع</DialogTitle>
-                  <div className="flex items-center justify-between p-4 border-b">
-                    <h3 className="font-semibold">إتمام الدفع</h3>
-                    <Button variant="ghost" size="icon" onClick={handlePaymentClose}>
-                      <XCircle className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  {paymentUrl && (
-                    <iframe
-                      src={paymentUrl}
-                      className="w-full h-[calc(80vh-60px)] border-0 min-h-[400px]"
-                      title="Payment"
-                      sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
-                    />
-                  )}
-                </DialogContent>
-              </Dialog>
+              {/* نفس ديالوغ بوابة الدفع المستخدم في /dashboard/employees */}
+              {isPaymentPopupOpen && paymentUrl && (
+                <PaymentPopup
+                  paymentUrl={paymentUrl}
+                  onClose={handlePaymentClose}
+                  onPaymentSuccess={handlePaymentSuccess}
+                />
+              )}
             </>
           )}
         </CardContent>
