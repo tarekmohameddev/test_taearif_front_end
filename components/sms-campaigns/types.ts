@@ -79,7 +79,14 @@ export function mapApiCampaignToUI(c: {
   created_by?: string | null;
   user_id?: number | null;
   tags?: string[] | null;
+  creator_display?: { company_name?: string } | null;
+  user?: { basic_setting?: { company_name?: string } } | null;
 }): SMSCampaign {
+  const createdByDisplay =
+    c.creator_display?.company_name ??
+    c.user?.basic_setting?.company_name ??
+    c.created_by ??
+    (c.user_id != null ? String(c.user_id) : "");
   return {
     id: String(c.id),
     name: c.name,
@@ -93,7 +100,7 @@ export function mapApiCampaignToUI(c: {
     scheduledAt: c.scheduled_at ?? undefined,
     sentAt: c.sent_at ?? undefined,
     createdAt: c.created_at,
-    createdBy: c.created_by ?? (c.user_id != null ? String(c.user_id) : ""),
+    createdBy: createdByDisplay,
     tags: c.tags ?? undefined,
   };
 }

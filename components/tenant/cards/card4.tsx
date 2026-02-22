@@ -56,6 +56,10 @@ interface Card4Props {
   itemType?: "property" | "project"; // Type of item: property or project
   styling?: {
     ThemeTwo?: string;
+    unifyColors?: boolean;
+    singleColorUseDefault?: boolean;
+    singleColorGlobalColorType?: string;
+    singleColorValue?: string | { useDefaultColor?: boolean; globalColorType?: string; value?: string };
     cardBackgroundColor?: string;
     cardBorderRadius?: string;
     cardShadow?: string;
@@ -66,6 +70,8 @@ interface Card4Props {
     cityDistrictColor?: string;
     statusColor?: string;
     dividerColor?: string;
+    /** Single color for area/rooms/units/floors icons and values (from grid card4Styling) */
+    detailsColor?: string;
     areaIconColor?: string;
     areaTextColor?: string;
     areaLabelColor?: string;
@@ -136,7 +142,7 @@ interface Card4Props {
 }
 
 // SVG Icons
-const AreaIcon = () => (
+const AreaIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -144,6 +150,7 @@ const AreaIcon = () => (
     height="24"
     width="24"
     className="text-[#896042]"
+    {...props}
   >
     <path
       fill="currentColor"
@@ -153,7 +160,7 @@ const AreaIcon = () => (
   </svg>
 );
 
-const BedIcon = () => (
+const BedIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -161,6 +168,7 @@ const BedIcon = () => (
     height="24"
     width="24"
     className="text-[#896042]"
+    {...props}
   >
     <path
       fill="currentColor"
@@ -170,7 +178,7 @@ const BedIcon = () => (
   </svg>
 );
 
-const BuildingIcon = () => (
+const BuildingIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -178,6 +186,7 @@ const BuildingIcon = () => (
     height="24"
     width="24"
     className="text-[#896042]"
+    {...props}
   >
     <path
       fill="currentColor"
@@ -187,7 +196,7 @@ const BuildingIcon = () => (
   </svg>
 );
 
-const StairsIcon = () => (
+const StairsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -195,6 +204,7 @@ const StairsIcon = () => (
     height="24"
     width="24"
     className="text-[#896042]"
+    {...props}
   >
     <path
       fill="currentColor"
@@ -385,6 +395,77 @@ export default function Card4(props: Card4Props) {
   const typography = mergedData.typography || {};
   const responsive = mergedData.responsive || {};
 
+  // Branding colors for useDefaultColor / globalColorType (from grid card4Styling)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      String(tenantData.WebsiteLayout.branding.colors.primary).trim() !== ""
+        ? String(tenantData.WebsiteLayout.branding.colors.primary).trim()
+        : "#896042",
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      String(tenantData.WebsiteLayout.branding.colors.secondary).trim() !== ""
+        ? String(tenantData.WebsiteLayout.branding.colors.secondary).trim()
+        : "#896042",
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      String(tenantData.WebsiteLayout.branding.colors.accent).trim() !== ""
+        ? String(tenantData.WebsiteLayout.branding.colors.accent).trim()
+        : "#896042",
+  };
+
+  const getColor = (
+    colorField: unknown,
+    fallback: string,
+  ): string => {
+    if (!colorField) return fallback;
+    if (typeof colorField === "object" && !Array.isArray(colorField)) {
+      const obj = colorField as Record<string, unknown>;
+      const useDefault = obj.useDefaultColor;
+      if (useDefault === true) {
+        const type = (obj.globalColorType as string) || "primary";
+        return (
+          (brandingColors as Record<string, string>)[type] || brandingColors.primary
+        );
+      }
+      if (
+        typeof obj.value === "string" &&
+        obj.value.trim() !== "" &&
+        obj.value.startsWith("#")
+      ) {
+        return obj.value.trim();
+      }
+    }
+    if (
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    return fallback;
+  };
+
+  const getDetailsColor = (): string =>
+    getColor(styling.detailsColor, (styling.areaIconColor as string) || "#896042");
+
+  const unifiedColor: string | null =
+    styling.unifyColors === true
+      ? getColor(styling.singleColorValue, "#896042")
+      : null;
+
+  const resolveColor = (colorValue: unknown, fallback: string): string =>
+    unifiedColor ?? getColor(colorValue, fallback);
+  const resolveDetailsColor = (): string => unifiedColor ?? getDetailsColor();
+
+  // لون الخلفية غير مرتبط باللون الموحد: عند التفعيل يكون أبيض
+  const cardBackgroundResolved =
+    unifiedColor !== null ? "#ffffff" : getColor(styling.cardBackgroundColor, "#ffffff");
+
+  // لون نص السعر غير مرتبط باللون الموحد: عند التفعيل يكون أبيض للوضوح على خلفية السعر
+  const priceTextColorResolved =
+    unifiedColor !== null ? "#ffffff" : getColor(styling.priceTextColor, "#ffffff");
+
   const imageHeight = responsive.imageHeight || {};
   const desktopHeight = imageHeight.desktop || "337px";
   const tabletHeight = imageHeight.tablet || "300px";
@@ -394,7 +475,7 @@ export default function Card4(props: Card4Props) {
     <div
       className="h-full flex flex-col relative overflow-hidden transition-shadow duration-300"
       style={{
-        backgroundColor: styling.cardBackgroundColor || "#ffffff",
+        backgroundColor: cardBackgroundResolved,
         borderRadius: styling.cardBorderRadius || "20px",
         boxShadow:
           styling.cardShadow === "sm"
@@ -436,13 +517,13 @@ export default function Card4(props: Card4Props) {
           <div
             className="absolute top-4 left-4 rounded-lg px-3 py-1.5 flex items-center gap-1.5 shadow-md z-10"
             style={{
-              backgroundColor: styling.priceBackgroundColor || "#896042",
+              backgroundColor: resolveColor(styling.priceBackgroundColor, "#896042"),
             }}
           >
             <span
               className="text-sm font-semibold"
               style={{
-                color: styling.priceTextColor || "#ffffff",
+                color: priceTextColorResolved,
               }}
             >
               {props.itemType === "project" ? "مشروع" : "وحدة"}
@@ -454,14 +535,14 @@ export default function Card4(props: Card4Props) {
           <div
             className="absolute top-4 right-4 rounded-lg px-3 py-1.5 flex items-center gap-1.5 shadow-md"
             style={{
-              backgroundColor: styling.featuredBadgeBackground || "#fbbf24",
+              backgroundColor: resolveColor(styling.featuredBadgeBackground, "#fbbf24"),
             }}
           >
             <StarIcon />
             <span
               className="text-sm font-medium"
               style={{
-                color: styling.featuredBadgeTextColor || "#000000",
+                color: resolveColor(styling.featuredBadgeTextColor, "#000000"),
               }}
             >
               مشروع مميز
@@ -481,7 +562,7 @@ export default function Card4(props: Card4Props) {
                 fontSize: typography.title?.fontSize || "xl",
                 fontWeight: typography.title?.fontWeight || "bold",
                 fontFamily: typography.title?.fontFamily || "Tajawal",
-                color: styling.titleColor || "#000000",
+                color: resolveColor(styling.titleColor, "#000000"),
               }}
             >
               {property.title}
@@ -492,7 +573,7 @@ export default function Card4(props: Card4Props) {
                 fontSize: typography.cityDistrict?.fontSize || "sm",
                 fontWeight: typography.cityDistrict?.fontWeight || "normal",
                 fontFamily: typography.cityDistrict?.fontFamily || "Tajawal",
-                color: styling.cityDistrictColor || "#000000",
+                color: resolveColor(styling.cityDistrictColor, "#000000"),
               }}
             >
               <span>في {property.city}</span>
@@ -505,7 +586,7 @@ export default function Card4(props: Card4Props) {
               fontSize: typography.status?.fontSize || "lg",
               fontWeight: typography.status?.fontWeight || "semibold",
               fontFamily: typography.status?.fontFamily || "Tajawal",
-              color: styling.statusColor || "#16a34a",
+              color: resolveColor(styling.statusColor, "#16a34a"),
             }}
           >
             {translateStatus(property.status)}
@@ -516,7 +597,7 @@ export default function Card4(props: Card4Props) {
         <div
           className="border-t"
           style={{
-            borderColor: styling.dividerColor || "#e5e7eb",
+            borderColor: resolveColor(styling.dividerColor, "#e5e7eb"),
           }}
         ></div>
 
@@ -527,7 +608,7 @@ export default function Card4(props: Card4Props) {
             <div className="flex items-center justify-center gap-1 mb-1">
               <AreaIcon
                 style={{
-                  color: styling.areaIconColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               />
               <span
@@ -535,7 +616,7 @@ export default function Card4(props: Card4Props) {
                   fontSize: typography.detailValue?.fontSize || "sm",
                   fontWeight: typography.detailValue?.fontWeight || "medium",
                   fontFamily: typography.detailValue?.fontFamily || "Tajawal",
-                  color: styling.areaTextColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               >
                 {formatNumber(property.area.min)} -{" "}
@@ -559,7 +640,7 @@ export default function Card4(props: Card4Props) {
             <div className="flex items-center justify-center gap-1 mb-1">
               <BedIcon
                 style={{
-                  color: styling.roomsIconColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               />
               <span
@@ -567,7 +648,7 @@ export default function Card4(props: Card4Props) {
                   fontSize: typography.detailValue?.fontSize || "sm",
                   fontWeight: typography.detailValue?.fontWeight || "medium",
                   fontFamily: typography.detailValue?.fontFamily || "Tajawal",
-                  color: styling.roomsTextColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               >
                 {property.rooms.min} - {property.rooms.max}
@@ -590,7 +671,7 @@ export default function Card4(props: Card4Props) {
             <div className="flex items-center justify-center gap-1 mb-1">
               <BuildingIcon
                 style={{
-                  color: styling.unitsIconColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               />
               <span
@@ -598,7 +679,7 @@ export default function Card4(props: Card4Props) {
                   fontSize: typography.detailValue?.fontSize || "sm",
                   fontWeight: typography.detailValue?.fontWeight || "medium",
                   fontFamily: typography.detailValue?.fontFamily || "Tajawal",
-                  color: styling.unitsTextColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               >
                 {property.units}
@@ -621,7 +702,7 @@ export default function Card4(props: Card4Props) {
             <div className="flex items-center justify-center gap-1 mb-1">
               <StairsIcon
                 style={{
-                  color: styling.floorsIconColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               />
               <span
@@ -629,7 +710,7 @@ export default function Card4(props: Card4Props) {
                   fontSize: typography.detailValue?.fontSize || "sm",
                   fontWeight: typography.detailValue?.fontWeight || "medium",
                   fontFamily: typography.detailValue?.fontFamily || "Tajawal",
-                  color: styling.floorsTextColor || "#896042",
+                  color: resolveDetailsColor(),
                 }}
               >
                 {property.floors.min} - {property.floors.max}
@@ -653,7 +734,7 @@ export default function Card4(props: Card4Props) {
       <div
         className="absolute bottom-0 left-0 right-0 rounded-lg mx-4 mb-5 px-4 py-3 text-center"
         style={{
-          backgroundColor: styling.priceBackgroundColor || "#896042",
+          backgroundColor: resolveColor(styling.priceBackgroundColor, "#896042"),
         }}
       >
         <div
@@ -661,7 +742,7 @@ export default function Card4(props: Card4Props) {
             fontSize: typography.price?.fontSize || "base",
             fontWeight: typography.price?.fontWeight || "medium",
             fontFamily: typography.price?.fontFamily || "Tajawal",
-            color: styling.priceTextColor || "#ffffff",
+            color: priceTextColorResolved,
           }}
         >
           {(() => {

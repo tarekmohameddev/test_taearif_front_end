@@ -33,6 +33,7 @@ export interface Pagination {
 /** Backend campaign (snake_case). Map to UI type in component. */
 export interface ApiCampaign {
   id: number;
+  user_id?: number;
   name: string;
   description?: string | null;
   message: string;
@@ -47,6 +48,8 @@ export interface ApiCampaign {
   updated_at?: string;
   created_by?: string | null;
   tags?: string[] | null;
+  creator_display?: { id?: number; type?: string; company_name?: string } | null;
+  user?: { id?: number; basic_setting?: { company_name?: string } } | null;
 }
 
 export interface CampaignListResponse {
