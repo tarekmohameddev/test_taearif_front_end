@@ -2,11 +2,17 @@
 /*  ContactForm — Type definitions                                    */
 /* ------------------------------------------------------------------ */
 
+import type { TextStyleProps } from "../Text/Text.types";
+
 export interface ContactFormProps {
   /** Main heading */
   heading?: string;
   /** Description paragraph */
   description?: string;
+  /** Style overrides for heading */
+  headingTextProps?: TextStyleProps;
+  /** Style overrides for description */
+  descriptionTextProps?: TextStyleProps;
   /** Form field labels */
   fields?: {
     firstName?: string;

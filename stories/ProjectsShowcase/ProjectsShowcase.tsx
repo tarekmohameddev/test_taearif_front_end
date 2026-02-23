@@ -5,6 +5,7 @@ import type {
   ProjectsShowcaseProps,
   FilterType,
 } from "./ProjectsShowcase.types";
+import { Text } from "../Text";
 import { DEFAULT_FILTERS, DEFAULT_PROJECTS } from "./data";
 import { ShareIcon } from "../assets/ShareIcon";
 import { ArrowIcon } from "../assets/ArrowIcon";
@@ -30,6 +31,13 @@ export const ProjectsShowcase = ({
   activeFilter: controlledFilter,
   onFilterChange,
   projects,
+  filterButtonTextProps,
+  statusBadgeTextProps,
+  projectTitleTextProps,
+  projectLocationTextProps,
+  projectDescriptionTextProps,
+  unitTypeTextProps,
+  ctaTextProps,
   dir = "rtl",
 }: ProjectsShowcaseProps) => {
   const _filters = filters ?? DEFAULT_FILTERS;
@@ -76,7 +84,9 @@ export const ProjectsShowcase = ({
               }
               onClick={() => handleFilterChange("all")}
             >
-              {_filters.all}
+              <Text as="span" {...filterButtonTextProps}>
+                {_filters.all}
+              </Text>
             </button>
             <button
               data-slot="button"
@@ -92,7 +102,9 @@ export const ProjectsShowcase = ({
               }
               onClick={() => handleFilterChange("available")}
             >
-              {_filters.available}
+              <Text as="span" {...filterButtonTextProps}>
+                {_filters.available}
+              </Text>
             </button>
             <button
               data-slot="button"
@@ -108,7 +120,9 @@ export const ProjectsShowcase = ({
               }
               onClick={() => handleFilterChange("coming-soon")}
             >
-              {_filters.comingSoon}
+              <Text as="span" {...filterButtonTextProps}>
+                {_filters.comingSoon}
+              </Text>
             </button>
             <button
               data-slot="button"
@@ -124,7 +138,9 @@ export const ProjectsShowcase = ({
               }
               onClick={() => handleFilterChange("sold")}
             >
-              {_filters.sold}
+              <Text as="span" {...filterButtonTextProps}>
+                {_filters.sold}
+              </Text>
             </button>
           </div>
         </div>
@@ -145,10 +161,12 @@ export const ProjectsShowcase = ({
             >
               {/* Status Badge */}
               <div
-                className="absolute top-0 ltr:left-0 rtl:right-0 z-30 flex justify-center items-center text-[14px] w-[55px] h-[55px] rounded-full rtl:translate-x-[10px] -translate-y-[15px] ltr:-translate-x-[10px] border-[3px] border-white ltr:text-xs text-white"
+                className="absolute top-0 ltr:left-0 rtl:right-0 z-30 flex justify-center items-center w-[55px] h-[55px] rounded-full rtl:translate-x-[10px] -translate-y-[15px] ltr:-translate-x-[10px] border-[3px] border-white text-white"
                 style={{ backgroundColor: project.statusColor }}
               >
-                {getStatusLabel(project.status, _filters)}
+                <Text as="span" {...statusBadgeTextProps}>
+                  {getStatusLabel(project.status, _filters)}
+                </Text>
               </div>
 
               {/* Content */}
@@ -170,15 +188,19 @@ export const ProjectsShowcase = ({
                 )}
 
                 {/* Title */}
-                <h2 className="font-saudi line-clamp-1 text-4xl font-bold mt-0">
+                <Text as="h2" {...projectTitleTextProps}>
                   {project.title}
-                </h2>
+                </Text>
 
                 {/* Location */}
-                <span>{project.location}</span>
+                <Text as="span" {...projectLocationTextProps}>
+                  {project.location}
+                </Text>
 
                 {/* Description */}
-                <p className="mt-8 line-clamp-2">{project.description}</p>
+                <Text as="p" {...projectDescriptionTextProps}>
+                  {project.description}
+                </Text>
 
                 {/* Unit Types */}
                 <ul className="mt-5 flex gap-2">
@@ -201,18 +223,22 @@ export const ProjectsShowcase = ({
                           src={unit.iconSrc}
                         />
                       </div>
-                      <span className="text-xs">{unit.label}</span>
+                      <Text as="span" {...unitTypeTextProps}>
+                        {unit.label}
+                      </Text>
                     </li>
                   ))}
                 </ul>
 
                 {/* CTA Button */}
                 <a
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all text-white min-h-9 p-2 w-fit px-10 mt-5 outline-none focus-visible:ring-[3px]"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md transition-all text-white min-h-9 p-2 w-fit px-10 mt-5 outline-none focus-visible:ring-[3px]"
                   href={project.ctaHref}
                   style={{ backgroundColor: project.ctaBgColor }}
                 >
-                  {project.ctaText}
+                  <Text as="span" {...ctaTextProps}>
+                    {project.ctaText}
+                  </Text>
                   <ArrowIcon />
                 </a>
               </div>

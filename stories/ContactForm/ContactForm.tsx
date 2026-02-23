@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ContactFormProps } from "./ContactForm.types";
+import { Text } from "../Text";
 import {
   DEFAULT_HEADING,
   DEFAULT_DESCRIPTION,
@@ -16,6 +17,8 @@ import {
 export const ContactForm = ({
   heading,
   description,
+  headingTextProps,
+  descriptionTextProps,
   fields,
   links,
   submitText,
@@ -49,7 +52,9 @@ export const ContactForm = ({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -64,10 +69,12 @@ export const ContactForm = ({
           {/* ── Form Section ───────────────────────────── */}
           <div className="flex-1">
             <div className="flex flex-col border-transparent">
-              <span className="font-saudi text-5xl leading-[131%] font-bold">
+              <Text as="span" {...headingTextProps}>
                 {_heading}
-              </span>
-              <p className="pt-11 font-bold lg:py-6">{_description}</p>
+              </Text>
+              <Text as="p" {...descriptionTextProps}>
+                {_description}
+              </Text>
             </div>
 
             <form
@@ -125,18 +132,22 @@ export const ContactForm = ({
 
               {/* Links */}
               <div className="flex justify-between text-black lg:justify-start lg:gap-x-3.5">
-                <span className="text-xs">
-                  {_links.investment.text}{" "}
-                  <a className="font-bold" href={_links.investment.href}>
-                    هنا
-                  </a>
-                </span>
-                <span className="text-xs">
-                  {_links.suppliers.text}{" "}
-                  <a className="font-bold" href={_links.suppliers.href}>
-                    هنا
-                  </a>
-                </span>
+                {_links.investment && (
+                  <span className="text-xs">
+                    {_links.investment.text}{" "}
+                    <a className="font-bold" href={_links.investment.href}>
+                      هنا
+                    </a>
+                  </span>
+                )}
+                {_links.suppliers && (
+                  <span className="text-xs">
+                    {_links.suppliers.text}{" "}
+                    <a className="font-bold" href={_links.suppliers.href}>
+                      هنا
+                    </a>
+                  </span>
+                )}
               </div>
 
               {/* Message */}

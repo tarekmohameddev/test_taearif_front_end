@@ -1,4 +1,5 @@
 import type { FooterProps } from "./Footer.types";
+import { Text } from "../Text";
 import { LocationIcon } from "../assets/LocationIcon";
 import { EmailIcon } from "../assets/EmailIcon";
 import {
@@ -19,6 +20,12 @@ export const Footer = ({
   socialLinks,
   socialHeading = "تابعنا",
   copyright,
+  addressLabelTextProps,
+  addressValueTextProps,
+  emailTextProps,
+  linksHeadingTextProps,
+  socialHeadingTextProps,
+  copyrightTextProps,
   dir = "rtl",
 }: FooterProps) => {
   const _logo = logo ?? DEFAULT_LOGO;
@@ -46,20 +53,28 @@ export const Footer = ({
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <LocationIcon />
-          <div className="leading-5 [&>span]:block">
-            <span className="font-bold">{_address.label}</span>
-            <span>{_address.value}</span>
+          <div className="leading-5 flex flex-col">
+            <Text as="span" {...addressLabelTextProps}>
+              {_address.label}
+            </Text>
+            <Text as="span" {...addressValueTextProps}>
+              {_address.value}
+            </Text>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <EmailIcon />
-          <span>{_email}</span>
+          <Text as="span" {...emailTextProps}>
+            {_email}
+          </Text>
         </div>
       </div>
 
       {/* Links */}
       <div>
-        <span className="font-bold">{linksHeading}</span>
+        <Text as="span" {...linksHeadingTextProps}>
+          {linksHeading}
+        </Text>
         <ul className="mt-6 flex flex-col gap-3">
           {_links.map((link, i) => (
             <li key={`${link.href}-${i}`}>
@@ -76,7 +91,9 @@ export const Footer = ({
 
       {/* Social */}
       <div>
-        <span className="font-bold">{socialHeading}</span>
+        <Text as="span" {...socialHeadingTextProps}>
+          {socialHeading}
+        </Text>
         <ul className="mt-6 flex gap-8">
           {_socials.map((social, i) => (
             <li key={`${social.platform}-${i}`}>
@@ -96,7 +113,9 @@ export const Footer = ({
 
       {/* Copyright */}
       <div className="basis-full border-t border-black p-4 text-center">
-        <span>{_copyright}</span>
+        <Text as="span" {...copyrightTextProps}>
+          {_copyright}
+        </Text>
       </div>
     </footer>
   );

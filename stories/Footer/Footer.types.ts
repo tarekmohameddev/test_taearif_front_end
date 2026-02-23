@@ -1,3 +1,5 @@
+import type { TextStyleProps } from "../Text/Text.types";
+
 export interface FooterLink {
   /** Display label */
   label: string;
@@ -40,4 +42,16 @@ export interface FooterProps {
   copyright?: string;
   /** Text direction — defaults to `"rtl"` */
   dir?: "rtl" | "ltr";
+  /** Style overrides for address label */
+  addressLabelTextProps?: TextStyleProps;
+  /** Style overrides for address value */
+  addressValueTextProps?: TextStyleProps;
+  /** Style overrides for email */
+  emailTextProps?: TextStyleProps;
+  /** Style overrides for links heading */
+  linksHeadingTextProps?: TextStyleProps;
+  /** Style overrides for social heading */
+  socialHeadingTextProps?: TextStyleProps;
+  /** Style overrides for copyright */
+  copyrightTextProps?: TextStyleProps;
 }

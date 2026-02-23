@@ -2,6 +2,8 @@
 /*  HeroBanner — Type definitions                                      */
 /* ------------------------------------------------------------------ */
 
+import type { TextStyleProps } from "../Text/Text.types";
+
 export interface HeroBannerProps {
   /** Main title (large golden text) */
   title?: string;
@@ -9,6 +11,12 @@ export interface HeroBannerProps {
   subtitle?: string;
   /** Description paragraph */
   description?: string;
+  /** Style overrides for the title text */
+  titleTextProps?: TextStyleProps;
+  /** Style overrides for the subtitle text */
+  subtitleTextProps?: TextStyleProps;
+  /** Style overrides for the description text */
+  descriptionTextProps?: TextStyleProps;
   /** Primary CTA button */
   primaryCta?: {
     label: string;

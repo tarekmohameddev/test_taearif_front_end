@@ -13,6 +13,15 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
+  args: {
+    navLinkTextProps: { fontWeight: 700 },
+    languageToggleTextProps: {
+      fontSize: "1.25rem",
+      fontWeight: 700,
+      textTransform: "uppercase",
+    },
+    ctaTextProps: { fontSize: "0.875rem", fontWeight: 700 },
+  },
   decorators: [
     (Story) => (
       <div className="relative min-h-[400px] w-full bg-[#111827]">

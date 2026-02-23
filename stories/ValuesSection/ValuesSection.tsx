@@ -1,6 +1,7 @@
 "use client";
 
 import type { ValuesSectionProps } from "./ValuesSection.types";
+import { Text } from "../Text";
 import {
   DEFAULT_HEADING,
   DEFAULT_DESCRIPTION,
@@ -24,6 +25,10 @@ export const ValuesSection = ({
   heading,
   description,
   cards,
+  headingTextProps,
+  descriptionTextProps,
+  cardTitleTextProps,
+  cardDescriptionTextProps,
   dir = "rtl",
 }: ValuesSectionProps) => {
   const _heading = heading ?? DEFAULT_HEADING;
@@ -35,7 +40,7 @@ export const ValuesSection = ({
       <div className="app flex flex-col gap-12 py-12">
         {/* ── Header Section ───────────────────────────── */}
         <div className="items-center gap-28 lg:flex">
-          <h2 className="font-saudi text-[#b28966] text-[40px] font-bold lg:text-center">
+          <Text as="h2" {...headingTextProps}>
             {_heading.split("\n").map((line, index, array) => (
               <span key={index}>
                 {line}
@@ -44,8 +49,10 @@ export const ValuesSection = ({
                 )}
               </span>
             ))}
-          </h2>
-          <p className="text-lg lg:max-w-1/2">{_description}</p>
+          </Text>
+          <Text as="p" {...descriptionTextProps}>
+            {_description}
+          </Text>
         </div>
 
         {/* ── Value Cards ───────────────────────────── */}
@@ -67,9 +74,13 @@ export const ValuesSection = ({
               <div className="shrink-0">{card.icon}</div>
 
               {/* Text Content */}
-              <div className="text-lg text-pretty text-white">
-                <span className="block font-bold">{card.title}</span>
-                <span className="block">{card.description}</span>
+              <div className="text-lg text-pretty text-white flex flex-col">
+                <Text as="span" {...cardTitleTextProps}>
+                  {card.title}
+                </Text>
+                <Text as="span" {...cardDescriptionTextProps}>
+                  {card.description}
+                </Text>
               </div>
             </li>
           ))}

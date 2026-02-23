@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { HeaderProps } from "./Header.types";
+import { Text } from "../Text";
 import { HamburgerIcon } from "../assets/HamburgerIcon";
 import { CloseIcon } from "../assets/CloseIcon";
 import { MobileMenu } from "./MobileMenu";
@@ -17,6 +18,9 @@ export const Header = ({
   navLinks,
   languageToggle,
   cta,
+  navLinkTextProps,
+  languageToggleTextProps,
+  ctaTextProps,
   dir = "rtl",
 }: HeaderProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -52,10 +56,12 @@ export const Header = ({
                 <li key={`${link.href}-${i}`}>
                   <a
                     data-active={link.isActive ? "true" : "false"}
-                    className="data-[active=true]:text-[#c68957] data-[active=false]:hover:text-[#e9dbd1] font-bold text-white transition-colors"
+                    className="data-[active=true]:text-[#c68957] data-[active=false]:hover:text-[#e9dbd1] text-white transition-colors"
                     href={link.href}
                   >
-                    {link.label}
+                    <Text as="span" {...navLinkTextProps}>
+                      {link.label}
+                    </Text>
                   </a>
                 </li>
               ))}
@@ -65,17 +71,21 @@ export const Header = ({
           {/* Language Toggle */}
           <button
             onClick={_lang.onClick}
-            className="flex w-14 items-center justify-center gap-2 whitespace-nowrap rounded-md min-h-9 p-2 px-10 text-xl font-bold text-white transition-all hover:bg-[#e9dbd1] hover:text-[#c68957]"
+            className="flex w-14 items-center justify-center gap-2 whitespace-nowrap rounded-md min-h-9 p-2 px-10 text-white transition-all hover:bg-[#e9dbd1] hover:text-[#c68957]"
           >
-            <span className="uppercase">{_lang.label}</span>
+            <Text as="span" {...languageToggleTextProps}>
+              {_lang.label}
+            </Text>
           </button>
 
           {/* CTA */}
           <a
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm bg-[#d09260] min-h-9 p-2 px-10 text-sm font-bold text-white transition-all hover:bg-[#c68957]"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm bg-[#d09260] min-h-9 p-2 px-10 text-white transition-all hover:bg-[#c68957]"
             href={_cta.href}
           >
-            {_cta.label}
+            <Text as="span" {...ctaTextProps}>
+              {_cta.label}
+            </Text>
           </a>
         </div>
 
@@ -92,7 +102,16 @@ export const Header = ({
       </div>
 
       {/* ── Mobile Panel ─────────────────────────── */}
-      {mobileOpen && <MobileMenu links={_links} lang={_lang} cta={_cta} />}
+      {mobileOpen && (
+        <MobileMenu
+          links={_links}
+          lang={_lang}
+          cta={_cta}
+          navLinkTextProps={navLinkTextProps}
+          languageToggleTextProps={languageToggleTextProps}
+          ctaTextProps={ctaTextProps}
+        />
+      )}
     </header>
   );
 };
