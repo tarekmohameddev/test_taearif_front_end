@@ -28,6 +28,11 @@ import { Badge } from "@/components/ui/badge";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import toast from "react-hot-toast";
 import useStore from "@/context/Store";
+import {
+  ensureRecaptchaReady,
+  RECAPTCHA_LOAD_ERROR_MESSAGE,
+  isRecaptchaError,
+} from "@/lib/recaptcha";
 import { countries } from "./countries";
 
 export function ForgotPasswordPage() {
@@ -257,6 +262,12 @@ export function ForgotPasswordPage() {
       return;
     }
 
+    const recaptchaReady = await ensureRecaptchaReady();
+    if (!recaptchaReady) {
+      toast.error(RECAPTCHA_LOAD_ERROR_MESSAGE);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const recaptchaToken = await executeRecaptcha("forgot_password");
@@ -318,11 +329,13 @@ export function ForgotPasswordPage() {
         setResetUrl(resetUrl);
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "حدث خطأ أثناء الاتصال بالخادم";
-      toast.error(errorMessage);
+      const rawMessage =
+        error instanceof Error ? error.message : String(error);
+      toast.error(
+        isRecaptchaError(rawMessage)
+          ? RECAPTCHA_LOAD_ERROR_MESSAGE
+          : rawMessage || "حدث خطأ أثناء الاتصال بالخادم",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -353,6 +366,12 @@ export function ForgotPasswordPage() {
 
     if (!executeRecaptcha) {
       toast.error("reCAPTCHA غير متاح. يرجى المحاولة لاحقًا.");
+      return;
+    }
+
+    const recaptchaReadyReset = await ensureRecaptchaReady();
+    if (!recaptchaReadyReset) {
+      toast.error(RECAPTCHA_LOAD_ERROR_MESSAGE);
       return;
     }
 
@@ -395,11 +414,13 @@ export function ForgotPasswordPage() {
         router.push("/login");
       }, 2000);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "حدث خطأ أثناء الاتصال بالخادم";
-      toast.error(errorMessage);
+      const rawMessage =
+        error instanceof Error ? error.message : String(error);
+      toast.error(
+        isRecaptchaError(rawMessage)
+          ? RECAPTCHA_LOAD_ERROR_MESSAGE
+          : rawMessage || "حدث خطأ أثناء الاتصال بالخادم",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -410,6 +431,12 @@ export function ForgotPasswordPage() {
 
     if (!executeRecaptcha) {
       toast.error("reCAPTCHA غير متاح. يرجى المحاولة لاحقًا.");
+      return;
+    }
+
+    const recaptchaReadyResend = await ensureRecaptchaReady();
+    if (!recaptchaReadyResend) {
+      toast.error(RECAPTCHA_LOAD_ERROR_MESSAGE);
       return;
     }
 
@@ -465,11 +492,13 @@ export function ForgotPasswordPage() {
         );
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "حدث خطأ أثناء الاتصال بالخادم";
-      toast.error(errorMessage);
+      const rawMessage =
+        error instanceof Error ? error.message : String(error);
+      toast.error(
+        isRecaptchaError(rawMessage)
+          ? RECAPTCHA_LOAD_ERROR_MESSAGE
+          : rawMessage || "حدث خطأ أثناء الاتصال بالخادم",
+      );
     } finally {
       setIsLoading(false);
     }

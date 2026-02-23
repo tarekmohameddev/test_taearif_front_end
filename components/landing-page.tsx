@@ -39,6 +39,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
 import { trackFormSubmission, trackButtonClick, trackEvent } from "@/lib/gtm";
+import {
+  ensureRecaptchaReady,
+  RECAPTCHA_LOAD_ERROR_MESSAGE,
+  isRecaptchaError,
+} from "@/lib/recaptcha";
 
 // Zod schema for form validation
 const registerSchema = z.object({
@@ -217,6 +222,16 @@ export function LandingPage() {
         return;
       }
 
+      const recaptchaReady = await ensureRecaptchaReady();
+      if (!recaptchaReady) {
+        setErrors((prev) => ({
+          ...prev,
+          general: RECAPTCHA_LOAD_ERROR_MESSAGE,
+        }));
+        setIsSubmitting(false);
+        return;
+      }
+
       // Get reCAPTCHA token
       const recaptchaToken = await executeRecaptcha("register");
 
@@ -316,7 +331,11 @@ export function LandingPage() {
           general: translatedMessage,
         }));
       } else {
-        const errorMsg = "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
+        const rawMessage =
+          error instanceof Error ? error.message : String(error);
+        const errorMsg = isRecaptchaError(rawMessage)
+          ? RECAPTCHA_LOAD_ERROR_MESSAGE
+          : rawMessage || "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
         setErrors((prev) => ({
           ...prev,
           general: errorMsg,
