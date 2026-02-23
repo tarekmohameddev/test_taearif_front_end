@@ -66,6 +66,84 @@ interface BlogsSectionsProps {
   id?: string;
 }
 
+// API types (matching backend)
+interface ApiPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  status: string;
+  thumbnail: {
+    id: number;
+    url: string | null;
+    type: string;
+    created_at: string;
+  } | null;
+  categories: Array<{ id: number; name: string; slug: string }>;
+  published_at: string | null;
+}
+
+interface ApiResponse {
+  posts: ApiPost[];
+  pagination: {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+    from: number | null;
+    to: number | null;
+  };
+}
+
+// Mock posts for Live Editor fallback when backend has no posts or request fails
+const MOCK_BLOGS_SECTION_POSTS: ApiPost[] = [
+  {
+    id: 1,
+    title: "مقال تجريبي 1",
+    slug: "test-1",
+    excerpt: "هذا مقال تجريبي للمحرر المباشر",
+    status: "published",
+    thumbnail: {
+      id: 1,
+      url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800",
+      type: "image",
+      created_at: new Date().toISOString(),
+    },
+    categories: [],
+    published_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    title: "مقال تجريبي 2",
+    slug: "test-2",
+    excerpt: "مقال تجريبي آخر للمحرر المباشر",
+    status: "published",
+    thumbnail: {
+      id: 2,
+      url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
+      type: "image",
+      created_at: new Date().toISOString(),
+    },
+    categories: [],
+    published_at: new Date().toISOString(),
+  },
+  {
+    id: 3,
+    title: "مقال تجريبي 3",
+    slug: "test-3",
+    excerpt: "مقال تجريبي آخر للمحرر المباشر",
+    status: "published",
+    thumbnail: {
+      id: 3,
+      url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
+      type: "image",
+      created_at: new Date().toISOString(),
+    },
+    categories: [],
+    published_at: new Date().toISOString(),
+  },
+];
+
 // ═══════════════════════════════════════════════════════════
 // COMPONENT
 // ═══════════════════════════════════════════════════════════
@@ -192,39 +270,6 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
     typeof window !== "undefined" &&
     window.location.pathname.includes("/live-editor");
 
-  // API Response Interface (matching backend API structure)
-  interface ApiPost {
-    id: number;
-    title: string;
-    slug: string;
-    excerpt: string | null;
-    status: string;
-    thumbnail: {
-      id: number;
-      url: string | null;
-      type: string;
-      created_at: string;
-    } | null;
-    categories: Array<{
-      id: number;
-      name: string;
-      slug: string;
-    }>;
-    published_at: string | null;
-  }
-
-  interface ApiResponse {
-    posts: ApiPost[];
-    pagination: {
-      total: number;
-      per_page: number;
-      current_page: number;
-      last_page: number;
-      from: number | null;
-      to: number | null;
-    };
-  }
-
   // Function to format date
   const formatDate = (dateString: string): string => {
     try {
@@ -251,65 +296,20 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
     }));
   }, []);
 
-  // Fetch data from API - Always enabled, data comes from API only
+  // Fetch data from API: backend first; in Live Editor use mock as fallback when empty or on failure
   const fetchBlogsFromApi = useCallback(async () => {
-    // Use mock data in Live Editor
-    if (isLiveEditor) {
-      const mockApiData: ApiPost[] = [
-        {
-          id: 1,
-          title: "مقال تجريبي 1",
-          slug: "test-1",
-          excerpt: "هذا مقال تجريبي للمحرر المباشر",
-          status: "published",
-          thumbnail: {
-            id: 1,
-            url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800",
-            type: "image",
-            created_at: new Date().toISOString(),
-          },
-          categories: [],
-          published_at: new Date().toISOString(),
-        },
-        {
-          id: 2,
-          title: "مقال تجريبي 2",
-          slug: "test-2",
-          excerpt: "مقال تجريبي آخر للمحرر المباشر",
-          status: "published",
-          thumbnail: {
-            id: 2,
-            url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
-            type: "image",
-            created_at: new Date().toISOString(),
-          },
-          categories: [],
-          published_at: new Date().toISOString(),
-        },
-                {
-          id: 3,
-          title: "مقال تجريبي 3",
-          slug: "test-3",
-          excerpt: "مقال تجريبي آخر للمحرر المباشر",
-          status: "published",
-          thumbnail: {
-            id: 3,
-            url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
-            type: "image",
-            created_at: new Date().toISOString(),
-          },
-          categories: [],
-          published_at: new Date().toISOString(),
-        },
-      ];
-      setApiCards(convertApiDataToCards(mockApiData));
-      setLoadingApi(false);
-      return;
-    }
+    const applyMockFallback = () => {
+      setApiCards(convertApiDataToCards(MOCK_BLOGS_SECTION_POSTS));
+      setApiError(null);
+    };
 
-    // Check if tenantId is available
     if (!hookTenantId) {
-      setApiError("لا يمكن تحميل البيانات: معرف المستأجر غير متوفر");
+      if (isLiveEditor) {
+        applyMockFallback();
+      } else {
+        setApiError("لا يمكن تحميل البيانات: معرف المستأجر غير متوفر");
+        setApiCards([]);
+      }
       setLoadingApi(false);
       return;
     }
@@ -318,33 +318,34 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
       setLoadingApi(true);
       setApiError(null);
 
-      // Use the correct public endpoint (no auth required)
       const limit = mergedData.apiSettings?.limit || 10;
       const page = mergedData.apiSettings?.page || 1;
-
-      // Build query parameters
       const params = new URLSearchParams({
         page: page.toString(),
         per_page: limit.toString(),
       });
-
-      // Use the public tenant-website API endpoint
       const url = `/api/v1/tenant-website/${hookTenantId}/posts?${params.toString()}`;
-      
-      // Make request without auth (axiosInstance may add token, but backend ignores it for this endpoint)
       const response = await axiosInstance.get<ApiResponse>(url);
 
-      if (response.data && response.data.posts && Array.isArray(response.data.posts)) {
-        const cards = convertApiDataToCards(response.data.posts);
-        setApiCards(cards);
+      const posts = response.data?.posts;
+      if (posts && Array.isArray(posts) && posts.length > 0) {
+        setApiCards(convertApiDataToCards(posts));
       } else {
-        setApiError("لا توجد بيانات متاحة");
-        setApiCards([]);
+        if (isLiveEditor) {
+          applyMockFallback();
+        } else {
+          setApiError("لا توجد بيانات متاحة");
+          setApiCards([]);
+        }
       }
     } catch (error) {
       console.error("BlogsSections: Error fetching blogs from API:", error);
-      setApiError("حدث خطأ في تحميل البيانات");
-      setApiCards([]);
+      if (isLiveEditor) {
+        applyMockFallback();
+      } else {
+        setApiError("حدث خطأ في تحميل البيانات");
+        setApiCards([]);
+      }
     } finally {
       setLoadingApi(false);
     }
