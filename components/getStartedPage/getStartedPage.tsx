@@ -5,6 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import {
+  ensureRecaptchaReady,
+  RECAPTCHA_LOAD_ERROR_MESSAGE,
+  isRecaptchaError,
+} from "@/lib/recaptcha";
 
 export default function GetStartedPage() {
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -88,6 +93,12 @@ export default function GetStartedPage() {
       return;
     }
 
+    const recaptchaReady = await ensureRecaptchaReady();
+    if (!recaptchaReady) {
+      setMessage(RECAPTCHA_LOAD_ERROR_MESSAGE);
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
@@ -131,7 +142,13 @@ export default function GetStartedPage() {
           setMessage(errorMessage || "حدث خطأ، الرجاء المحاولة مرة أخرى");
         }
       } else {
-        setMessage("حدث خطأ، الرجاء المحاولة مرة أخرى");
+        const rawMessage =
+          error instanceof Error ? error.message : String(error);
+        setMessage(
+          isRecaptchaError(rawMessage)
+            ? RECAPTCHA_LOAD_ERROR_MESSAGE
+            : rawMessage || "حدث خطأ، الرجاء المحاولة مرة أخرى",
+        );
       }
     } finally {
       setLoading(false);

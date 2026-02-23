@@ -14,6 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import toast from "react-hot-toast";
+import {
+  ensureRecaptchaReady,
+  RECAPTCHA_LOAD_ERROR_MESSAGE,
+  isRecaptchaError,
+} from "@/lib/recaptcha";
 
 // تعريف واجهة البيانات الخاصة بالنموذج
 interface FormData {
@@ -237,6 +242,16 @@ export function RegisterPage() {
           return;
         }
 
+        const recaptchaReady = await ensureRecaptchaReady();
+        if (!recaptchaReady) {
+          setErrors((prev) => ({
+            ...prev,
+            general: RECAPTCHA_LOAD_ERROR_MESSAGE,
+          }));
+          setIsSubmitting(false);
+          return;
+        }
+
         // الحصول على رمز reCAPTCHA
         const token = await executeRecaptcha("register");
         const link = `${process.env.NEXT_PUBLIC_Backend_URL}/register`;
@@ -331,9 +346,13 @@ export function RegisterPage() {
             }));
           }
         } else {
+          const rawMessage =
+            error instanceof Error ? error.message : String(error);
           setErrors((prevErrors) => ({
             ...prevErrors,
-            general: "حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.",
+            general: isRecaptchaError(rawMessage)
+              ? RECAPTCHA_LOAD_ERROR_MESSAGE
+              : rawMessage || "حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.",
           }));
         }
       } finally {

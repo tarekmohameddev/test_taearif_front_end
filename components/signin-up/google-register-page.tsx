@@ -13,6 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { trackSignup, trackError, trackFormSubmission } from "@/lib/gtm";
+import {
+  ensureRecaptchaReady,
+  RECAPTCHA_LOAD_ERROR_MESSAGE,
+  isRecaptchaError,
+} from "@/lib/recaptcha";
 
 // تعريف واجهة البيانات الخاصة بالنموذج
 interface FormData {
@@ -190,6 +195,16 @@ export function GoogleRegisterPage() {
           return;
         }
 
+        const recaptchaReady = await ensureRecaptchaReady();
+        if (!recaptchaReady) {
+          setErrors((prev) => ({
+            ...prev,
+            general: RECAPTCHA_LOAD_ERROR_MESSAGE,
+          }));
+          setIsSubmitting(false);
+          return;
+        }
+
         // الحصول على رمز reCAPTCHA
         const recaptchaToken = await executeRecaptcha("google_register");
 
@@ -279,7 +294,11 @@ export function GoogleRegisterPage() {
           }
         } else {
           console.error("❌ Unexpected error:", error);
-          const errorMsg = "حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.";
+          const rawMessage =
+            error instanceof Error ? error.message : String(error);
+          const errorMsg = isRecaptchaError(rawMessage)
+            ? RECAPTCHA_LOAD_ERROR_MESSAGE
+            : rawMessage || "حدث خطأ غير متوقع. يرجى المحاولة لاحقًا.";
           setErrors((prevErrors) => ({
             ...prevErrors,
             general: errorMsg,

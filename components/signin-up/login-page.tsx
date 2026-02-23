@@ -45,6 +45,7 @@ function LoginPageContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [recaptchaReady, setRecaptchaReady] = useState(false);
+  const [recaptchaLoadFailed, setRecaptchaLoadFailed] = useState(false);
   const [googleAuthUrl, setGoogleAuthUrl] = useState<string>("");
   const [redirectUrl, setRedirectUrl] = useState<string>("");
   const [googleToken, setGoogleToken] = useState<string>("");
@@ -103,6 +104,7 @@ function LoginPageContent() {
         clearInterval(interval);
       } else if (retryCount >= maxRetries) {
         clearInterval(interval);
+        setRecaptchaLoadFailed(true);
         console.warn("ReCAPTCHA failed to load after multiple retries");
       }
     }, 500);
@@ -478,7 +480,7 @@ function LoginPageContent() {
     setErrors(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) return;
 
-    // Check if reCAPTCHA is available
+    // Check if reCAPTCHA is available from context
     if (!executeRecaptcha) {
       setErrors((prev) => ({
         ...prev,
@@ -486,6 +488,31 @@ function LoginPageContent() {
           "reCAPTCHA غير متاح بعد. يرجى الانتظار قليلاً والمحاولة مرة أخرى.",
       }));
       return;
+    }
+
+    // Ensure Google reCAPTCHA script is ready before calling executeRecaptcha (avoids window[pf][Kc()] errors)
+    if (typeof window !== "undefined") {
+      const g = (window as any).grecaptcha;
+      if (!g) {
+        setErrors((prev) => ({
+          ...prev,
+          general:
+            "التحقق الأمني غير جاهز بعد. حدّث الصفحة أو تأكد من عدم حظر السكربت (مثل حظر الإعلانات).",
+        }));
+        return;
+      }
+      if (typeof g.ready === "function") {
+        try {
+          await g.ready();
+        } catch {
+          setErrors((prev) => ({
+            ...prev,
+            general:
+              "فشل تحميل التحقق الأمني. حدّث الصفحة أو جرّب تعطيل حظر الإعلانات لهذا الموقع.",
+          }));
+          return;
+        }
+      }
     }
 
     setIsLoading(true);
@@ -505,10 +532,13 @@ function LoginPageContent() {
         router.push("/dashboard");
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "حدث خطأ أثناء الاتصال بالخادم";
+      const rawMessage =
+        error instanceof Error ? error.message : String(error);
+      const isRecaptchaError =
+        /recaptcha|grecaptcha|undefined is not an object/i.test(rawMessage);
+      const errorMessage = isRecaptchaError
+        ? "فشل التحقق الأمني. جرّب تحديث الصفحة أو تعطيل حظر الإعلانات لهذا الموقع."
+        : rawMessage || "حدث خطأ أثناء الاتصال بالخادم";
       setErrors((prev) => ({
         ...prev,
         general: errorMessage,
@@ -646,7 +676,12 @@ function LoginPageContent() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {!recaptchaReady && (
+          {recaptchaLoadFailed && (
+            <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-md text-sm">
+              لم يتم تحميل التحقق الأمني. تأكد من عدم حظر السكربت أو حدّث الصفحة.
+            </div>
+          )}
+          {!recaptchaReady && !recaptchaLoadFailed && (
             <div className="p-2 bg-blue-50 border border-blue-200 text-blue-700 rounded-md flex items-center text-xs">
               <svg
                 className="animate-spin h-3 w-3 ml-2"
