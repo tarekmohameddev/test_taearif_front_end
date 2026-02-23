@@ -14,6 +14,8 @@ interface TextItem {
   type: "heading" | "paragraph" | "blockquote" | "feature";
   text: string;
   shapeType?: "plain" | "badge";
+  breakOut?: boolean;
+  breakOutAlign?: "start" | "center" | "end";
   fontSize?: number;
   color?: string;
 }
@@ -431,7 +433,7 @@ export default function ImageText1(props: ImageTextProps = {}) {
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-4xl px-4 md:px-6 lg:px-8 py-12 md:py-16">
-        <div className="text-center text-white space-y-6 md:space-y-8">
+        <div className="text-center text-white flex flex-col gap-6 md:gap-8 items-stretch">
           {mergedData.texts &&
             Array.isArray(mergedData.texts) &&
             (() => {
@@ -445,39 +447,79 @@ export default function ImageText1(props: ImageTextProps = {}) {
                 return style;
               };
 
+              const renderFeatureInner = (feat: TextItem, fIdx: number) => {
+                const isBadge = feat.shapeType === "badge";
+                return (
+                  <div
+                    key={fIdx}
+                    style={getStyle(feat)}
+                    className={`flex items-center justify-center gap-3 text-base md:text-lg lg:text-xl leading-relaxed text-white/95 transition-all duration-300 ${
+                      isBadge
+                        ? "bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 rounded-xl w-full h-full hover:bg-white/20 hover:scale-[1.02]"
+                        : "w-full py-2"
+                    }`}
+                  >
+                    {!isBadge && (
+                      <span
+                        className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] flex-shrink-0"
+                        style={{ backgroundColor: feat.color || "white" }}
+                      />
+                    )}
+                    <span className="font-medium">{feat.text}</span>
+                  </div>
+                );
+              };
+
               const flushFeatures = (startIndex: number) => {
-                if (currentFeatureGroup.length > 0) {
+                if (currentFeatureGroup.length === 0) return;
+                let gridFeatures: TextItem[] = [];
+                let elKey = startIndex;
+                currentFeatureGroup.forEach((feat, fIdx) => {
+                  if (feat.breakOut) {
+                    if (gridFeatures.length > 0) {
+                      elements.push(
+                        <div
+                          key={`feature-grid-${elKey}`}
+                          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pt-4 w-full"
+                        >
+                          {gridFeatures.map((f, i) => renderFeatureInner(f, i))}
+                        </div>
+                      );
+                      elKey += 1;
+                      gridFeatures = [];
+                    }
+                    const align =
+                      feat.breakOutAlign ?? (mergedData as any).breakOutAlign;
+                    const alignClass =
+                      align === "center"
+                        ? "self-center"
+                        : align === "end"
+                          ? "sm:self-end"
+                          : "sm:self-start";
+                    elements.push(
+                      <div
+                        key={`feature-breakout-${elKey}`}
+                        className={`w-full sm:w-[calc((100%-1.5rem)/2)] pt-4 ${alignClass}`}
+                      >
+                        {renderFeatureInner(feat, fIdx)}
+                      </div>
+                    );
+                    elKey += 1;
+                  } else {
+                    gridFeatures.push(feat);
+                  }
+                });
+                if (gridFeatures.length > 0) {
                   elements.push(
                     <div
-                      key={`feature-group-${startIndex}`}
+                      key={`feature-grid-${elKey}`}
                       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pt-4 w-full"
                     >
-                      {currentFeatureGroup.map((feat, fIdx) => {
-                        const isBadge = feat.shapeType === "badge";
-                        return (
-                          <div
-                            key={fIdx}
-                            style={getStyle(feat)}
-                            className={`flex items-center justify-center gap-3 text-base md:text-lg lg:text-xl leading-relaxed text-white/95 transition-all duration-300 ${
-                              isBadge
-                                ? "bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 rounded-xl w-full h-full hover:bg-white/20 hover:scale-[1.02]"
-                                : "w-full py-2"
-                            }`}
-                          >
-                            {!isBadge && (
-                              <span 
-                                className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] flex-shrink-0" 
-                                style={{ backgroundColor: feat.color || "white" }}
-                              />
-                            )}
-                            <span className="font-medium">{feat.text}</span>
-                          </div>
-                        );
-                      })}
+                      {gridFeatures.map((f, i) => renderFeatureInner(f, i))}
                     </div>
                   );
-                  currentFeatureGroup = [];
                 }
+                currentFeatureGroup = [];
               };
 
               mergedData.texts.forEach((item, index) => {
