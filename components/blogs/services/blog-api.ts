@@ -12,7 +12,7 @@
  * - GET /posts/{id} - تفاصيل مقال
  * - POST /posts - إنشاء مقال
  * - PUT /posts/{slug} - تحديث مقال
- * - DELETE /posts/{id} - حذف مقال
+ * - DELETE /posts/{slug} - حذف مقال
  * 
  * @related
  * - types/blog.types.ts (جميع الأنواع المستخدمة)
@@ -125,12 +125,12 @@ export async function updateBlog(
 
 /**
  * Delete post
- * @param id - Post ID
+ * @param slug - Post slug
  * @returns Promise with success message
  */
-export async function deleteBlog(id: number): Promise<{ message: string }> {
-  // DELETE /posts/{id}
-  const response = await axiosInstance.delete(`/posts/${id}`);
+export async function deleteBlog(slug: string): Promise<{ message: string }> {
+  // DELETE /posts/{slug}
+  const response = await axiosInstance.delete(`/posts/${slug}`);
   return response.data;
 }
 

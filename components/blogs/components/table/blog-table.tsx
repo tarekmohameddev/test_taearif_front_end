@@ -16,7 +16,7 @@
  * - pagination: Pagination | null (معلومات الصفحات)
  * - onPageChange: (page: number) => void (دالة تغيير الصفحة)
  * - onEdit: (id: number) => void (دالة التعديل)
- * - onDelete: (id: number) => void (دالة الحذف)
+ * - onDelete: (blog: { slug: string; title: string }) => void (دالة الحذف)
  * - onView: (id: number) => void (دالة العرض)
  * 
  * @related
@@ -47,7 +47,7 @@ interface BlogTableProps {
   pagination: PaginationType | null;
   onPageChange: (page: number) => void;
   onEdit: (blog: { id: number; slug: string }) => void;
-  onDelete: (id: number) => void;
+  onDelete: (blog: { slug: string; title: string }) => void;
   onView: (blog: { id: number; slug: string }) => void;
 }
 
@@ -80,7 +80,7 @@ export function BlogTable({
                 key={blog.id}
                 blog={blog}
                 onEdit={() => onEdit({ id: blog.id, slug: blog.slug })}
-                onDelete={() => onDelete(blog.id)}
+                onDelete={() => onDelete({ slug: blog.slug, title: blog.title })}
                 onView={() => onView({ id: blog.id, slug: blog.slug })}
               />
             ))}
