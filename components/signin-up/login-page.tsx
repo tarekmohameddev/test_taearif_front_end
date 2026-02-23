@@ -503,7 +503,13 @@ function LoginPageContent() {
       }
       if (typeof g.ready === "function") {
         try {
-          await g.ready();
+          await new Promise<void>((resolve, reject) => {
+            try {
+              g.ready(resolve);
+            } catch (e) {
+              reject(e);
+            }
+          });
         } catch {
           setErrors((prev) => ({
             ...prev,

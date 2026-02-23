@@ -9,7 +9,13 @@ export async function ensureRecaptchaReady(): Promise<boolean> {
   if (!g) return false;
   if (typeof g.ready === "function") {
     try {
-      await g.ready();
+      await new Promise<void>((resolve, reject) => {
+        try {
+          g.ready(resolve);
+        } catch (e) {
+          reject(e);
+        }
+      });
     } catch {
       return false;
     }
