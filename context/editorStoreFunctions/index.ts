@@ -1,6 +1,7 @@
 // تصدير جميع component functions
 export * from "./types";
 export * from "./heroFunctions";
+export * from "./heroBannerFunctions";
 export * from "./headerFunctions";
 export * from "./header2Functions";
 export * from "./footerFunctions";

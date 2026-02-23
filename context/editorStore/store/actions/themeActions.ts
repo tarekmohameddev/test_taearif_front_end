@@ -36,6 +36,7 @@ export const createThemeActions = (
       return {
         // Clear all component type states
         heroStates: {},
+        heroBannerStates: {},
         headerStates: {},
         footerStates: {},
         halfTextHalfImageStates: {},

@@ -5,6 +5,7 @@ import { createDefaultData } from "../../../editorStoreFunctions/types";
 
 // Import all component functions
 import { heroFunctions } from "../../../editorStoreFunctions/heroFunctions";
+import { heroBannerFunctions } from "../../../editorStoreFunctions/heroBannerFunctions";
 import { headerFunctions } from "../../../editorStoreFunctions/headerFunctions";
 import { footerFunctions } from "../../../editorStoreFunctions/footerFunctions";
 import { halfTextHalfImageFunctions } from "../../../editorStoreFunctions/halfTextHalfImageFunctions";
@@ -101,6 +102,9 @@ export const createComponentActions = (
     switch (componentType) {
       case "hero":
         result = heroFunctions.getData(state, variantId);
+        break;
+      case "heroBanner":
+        result = heroBannerFunctions.getData(state, variantId);
         break;
       case "header":
         result = headerFunctions.getData(state, variantId);
@@ -311,6 +315,9 @@ export const createComponentActions = (
       case "hero":
         set(heroFunctions.setData(state, variantId, data));
         break;
+      case "heroBanner":
+        set(heroBannerFunctions.setData(state, variantId, data));
+        break;
       case "header":
         set(headerFunctions.setData(state, variantId, data));
         break;
@@ -482,6 +489,8 @@ export const createComponentActions = (
       switch (componentType) {
         case "hero":
           return currentState.heroStates[variantId];
+        case "heroBanner":
+          return currentState.heroBannerStates[variantId];
         case "header":
           return currentState.headerStates[variantId];
         case "footer":
@@ -608,6 +617,9 @@ export const createComponentActions = (
       switch (componentType) {
         case "hero":
           result = heroFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "heroBanner":
+          result = heroBannerFunctions.ensureVariant(state, variantId, initial);
           break;
         case "header":
           result = headerFunctions.ensureVariant(state, variantId, initial);
@@ -833,6 +845,9 @@ export const createComponentActions = (
     switch (componentType) {
       case "hero":
         set(heroFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "heroBanner":
+        set(heroBannerFunctions.updateByPath(state, variantId, path, value));
         break;
       case "header":
         set(headerFunctions.updateByPath(state, variantId, path, value));

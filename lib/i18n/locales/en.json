@@ -143,6 +143,10 @@
       "display_name": "Hero",
       "description": "Main banner section with compelling headline and call-to-action"
     },
+    "heroBanner": {
+      "display_name": "Hero Banner",
+      "description": "Full-screen hero with video background, title, and CTAs"
+    },
     "header": {
       "display_name": "Header",
       "description": "Navigation bar with logo, menu, and user actions"

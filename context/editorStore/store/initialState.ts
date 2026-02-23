@@ -64,6 +64,7 @@ export const getInitialState = (): Partial<EditorStore> => ({
     {} as Record<string, any>,
   ),
   heroStates: {},
+  heroBannerStates: {},
   headerStates: {},
   footerStates: {},
   halfTextHalfImageStates: {},

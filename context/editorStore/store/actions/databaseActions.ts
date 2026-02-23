@@ -4,6 +4,7 @@ import type { ComponentInstanceWithPosition } from "../../types/types";
 
 // Import all component functions for setData
 import { heroFunctions } from "../../../editorStoreFunctions/heroFunctions";
+import { heroBannerFunctions } from "../../../editorStoreFunctions/heroBannerFunctions";
 import { headerFunctions } from "../../../editorStoreFunctions/headerFunctions";
 import { footerFunctions } from "../../../editorStoreFunctions/footerFunctions";
 import { halfTextHalfImageFunctions } from "../../../editorStoreFunctions/halfTextHalfImageFunctions";
@@ -93,6 +94,9 @@ export const createDatabaseActions = (
                     switch (componentType) {
                       case "hero":
                         Object.assign(newState, heroFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "heroBanner":
+                        Object.assign(newState, heroBannerFunctions.setData(newState, componentId, comp.data));
                         break;
                       case "header":
                         Object.assign(newState, headerFunctions.setData(newState, componentId, comp.data));

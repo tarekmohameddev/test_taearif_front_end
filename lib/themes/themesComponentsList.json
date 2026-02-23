@@ -44,7 +44,8 @@
     "whyChooseUs1",
     "card2",
     "card3",
-    "blogPosts1"
+    "blogPosts1",
+    "heroBanner1"
   ],
   "theme2": [
     "footer2",
@@ -67,5 +68,6 @@
     "propertyDetail2",
     "card4",
     "card5"
-  ]
+  ],
+  "theme3": ["header3"]
 }

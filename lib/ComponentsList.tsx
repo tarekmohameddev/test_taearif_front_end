@@ -22,6 +22,7 @@
 */
 
 import { heroStructure } from "@/componentsStructure/hero";
+import { heroBannerStructure } from "@/componentsStructure/heroBanner";
 import { useEditorT } from "@/context/editorI18nStore";
 import { headerStructure } from "@/componentsStructure/header";
 import { propertiesShowcaseStructure } from "@/componentsStructure/propertiesShowcase";
@@ -98,6 +99,7 @@ export const getSections = (
     components: [
       "header",
       "hero",
+      "heroBanner",
       "halfTextHalfImage",
       "sideBySide",
       "propertySlider",
@@ -140,6 +142,7 @@ export const SECTIONS: Record<string, SectionType> = {
     components: [
       "header",
       "hero",
+      "heroBanner",
       "halfTextHalfImage",
       "sideBySide",
       "propertySlider",
@@ -184,6 +187,18 @@ export const getComponents = (
     icon: "🌟",
     defaultTheme: "hero1",
     ...heroStructure,
+  },
+  heroBanner: {
+    id: "heroBanner",
+    name: "heroBanner",
+    displayName: t("components.heroBanner.display_name"),
+    description: t("components.heroBanner.description"),
+    category: "banner",
+    section: "homepage",
+    subPath: "heroBanner",
+    icon: "🎬",
+    defaultTheme: "heroBanner1",
+    ...heroBannerStructure,
   },
   header: {
     id: "header",
@@ -645,6 +660,18 @@ export const COMPONENTS: Record<string, any> = {
     icon: "🌟",
     defaultTheme: "hero1",
     ...heroStructure,
+  },
+  heroBanner: {
+    id: "heroBanner",
+    name: "heroBanner",
+    displayName: "Hero Banner",
+    description: "Full-screen hero with video background, title, and CTAs",
+    category: "banner",
+    section: "homepage",
+    subPath: "heroBanner",
+    icon: "🎬",
+    defaultTheme: "heroBanner1",
+    ...heroBannerStructure,
   },
   header: {
     id: "header",

@@ -1,4 +1,5 @@
 export { heroStructure } from "./hero";
+export { heroBannerStructure } from "./heroBanner";
 export { headerStructure } from "./header";
 export { halfTextHalfImageStructure } from "./halfTextHalfImage";
 export { sideBySideStructure } from "./sideBySide";

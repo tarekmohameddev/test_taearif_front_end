@@ -184,6 +184,7 @@ export interface EditorStore {
 
   // Legacy specific component states (للتوافق مع الكود الحالي)
   heroStates: Record<string, ComponentData>;
+  heroBannerStates: Record<string, ComponentData>;
   ensureHeroVariant: (variantId: string, initial?: ComponentData) => void;
   getHeroData: (variantId: string) => ComponentData;
   setHeroData: (variantId: string, data: ComponentData) => void;
