@@ -23,4 +23,6 @@ export interface QuoteSectionProps {
   nameTextProps?: TextStyleProps;
   /** Style overrides for role */
   roleTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

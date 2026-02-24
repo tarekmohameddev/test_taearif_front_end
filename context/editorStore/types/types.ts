@@ -185,6 +185,16 @@ export interface EditorStore {
   // Legacy specific component states (للتوافق مع الكود الحالي)
   heroStates: Record<string, ComponentData>;
   heroBannerStates: Record<string, ComponentData>;
+  commitmentSectionStates: Record<string, ComponentData>;
+  creativityTriadSectionStates: Record<string, ComponentData>;
+  essenceSectionStates: Record<string, ComponentData>;
+  featuresSectionStates: Record<string, ComponentData>;
+  journeySectionStates: Record<string, ComponentData>;
+  landInvestmentFormSectionStates: Record<string, ComponentData>;
+  philosophyCtaSectionStates: Record<string, ComponentData>;
+  quoteSectionStates: Record<string, ComponentData>;
+  projectsHeaderStates: Record<string, ComponentData>;
+  valuesSectionStates: Record<string, ComponentData>;
   ensureHeroVariant: (variantId: string, initial?: ComponentData) => void;
   getHeroData: (variantId: string) => ComponentData;
   setHeroData: (variantId: string, data: ComponentData) => void;

@@ -34,4 +34,6 @@ export interface JourneySectionProps {
   stepDurationTextProps?: TextStyleProps;
   /** Style overrides for step description */
   stepDescriptionTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

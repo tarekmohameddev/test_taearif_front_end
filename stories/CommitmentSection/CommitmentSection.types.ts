@@ -29,4 +29,6 @@ export interface CommitmentSectionProps {
   headingTextProps?: TextStyleProps;
   /** Style overrides for quote */
   quoteTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

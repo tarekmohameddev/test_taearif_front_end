@@ -284,6 +284,46 @@
     "contactUsHomePage": {
       "display_name": "نموذج الاتصال - الصفحة الرئيسية",
       "description": "نموذج اتصال كامل مع خلفية صورة وحقول متعددة للتواصل"
+    },
+    "commitmentSection": {
+      "display_name": "قسم الالتزام",
+      "description": "قسم يعرض التزام العلامة التجارية والقيم"
+    },
+    "creativityTriadSection": {
+      "display_name": "قسم الثلاثي الإبداعي",
+      "description": "قسم يعرض ثلاثة أركان إبداعية أو مفاهيم"
+    },
+    "essenceSection": {
+      "display_name": "قسم الجوهر",
+      "description": "قسم ينقل جوهر أو الفلسفة الأساسية"
+    },
+    "featuresSection": {
+      "display_name": "قسم الميزات",
+      "description": "قسم يعرض الميزات والمزايا الرئيسية"
+    },
+    "journeySection": {
+      "display_name": "قسم الرحلة",
+      "description": "قسم يوضح رحلة العلامة التجارية أو العملية"
+    },
+    "landInvestmentFormSection": {
+      "display_name": "قسم نموذج الاستثمار العقاري",
+      "description": "قسم بعنوان ووصف ونموذج الاستثمار العقاري"
+    },
+    "philosophyCtaSection": {
+      "display_name": "قسم دعوة للعمل - الفلسفة",
+      "description": "قسم دعوة للعمل مع رسائل فلسفية"
+    },
+    "quoteSection": {
+      "display_name": "قسم الاقتباس",
+      "description": "قسم يعرض اقتباساً بارزاً أو شهادة"
+    },
+    "projectsHeader": {
+      "display_name": "هيدر المشاريع",
+      "description": "قسم هيدر للمشاريع بعنوان ووصف"
+    },
+    "valuesSection": {
+      "display_name": "قسم القيم",
+      "description": "قسم يعرض قيم الشركة مع أيقونات"
     }
   },
   "components_old": {
@@ -438,6 +478,7 @@
     "colors_tab": "الألوان",
     "theme_1": "الثيم 1",
     "theme_2": "الثيم 2",
+    "theme_3": "الثيم 3",
     "delete_page": "حذف الصفحة",
     "debug": "تصحيح",
     "open_editor": "فتح المحرر",

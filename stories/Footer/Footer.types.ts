@@ -54,4 +54,6 @@ export interface FooterProps {
   socialHeadingTextProps?: TextStyleProps;
   /** Style overrides for copyright */
   copyrightTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

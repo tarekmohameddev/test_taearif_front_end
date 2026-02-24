@@ -44,8 +44,7 @@
     "whyChooseUs1",
     "card2",
     "card3",
-    "blogPosts1",
-    "heroBanner1"
+    "blogPosts1"
   ],
   "theme2": [
     "footer2",
@@ -69,5 +68,18 @@
     "card4",
     "card5"
   ],
-  "theme3": ["header3"]
+  "theme3": [
+    "header3",
+    "heroBanner1",
+    "commitmentSection1",
+    "creativityTriadSection1",
+    "essenceSection1",
+    "featuresSection1",
+    "journeySection1",
+    "landInvestmentFormSection1",
+    "philosophyCtaSection1",
+    "quoteSection1",
+    "projectsHeader1",
+    "valuesSection1"
+  ]
 }

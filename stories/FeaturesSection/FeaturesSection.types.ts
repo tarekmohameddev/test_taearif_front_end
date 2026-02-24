@@ -34,4 +34,6 @@ export interface FeaturesSectionProps {
   featureDescriptionTextProps?: TextStyleProps;
   /** Style overrides for certification text */
   certificationTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

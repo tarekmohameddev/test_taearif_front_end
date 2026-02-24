@@ -5,6 +5,16 @@ import type { ComponentInstanceWithPosition } from "../../types/types";
 // Import all component functions for setData
 import { heroFunctions } from "../../../editorStoreFunctions/heroFunctions";
 import { heroBannerFunctions } from "../../../editorStoreFunctions/heroBannerFunctions";
+import { commitmentSectionFunctions } from "../../../editorStoreFunctions/commitmentSectionFunctions";
+import { creativityTriadSectionFunctions } from "../../../editorStoreFunctions/creativityTriadSectionFunctions";
+import { essenceSectionFunctions } from "../../../editorStoreFunctions/essenceSectionFunctions";
+import { featuresSectionFunctions } from "../../../editorStoreFunctions/featuresSectionFunctions";
+import { journeySectionFunctions } from "../../../editorStoreFunctions/journeySectionFunctions";
+import { landInvestmentFormSectionFunctions } from "../../../editorStoreFunctions/landInvestmentFormSectionFunctions";
+import { philosophyCtaSectionFunctions } from "../../../editorStoreFunctions/philosophyCtaSectionFunctions";
+import { quoteSectionFunctions } from "../../../editorStoreFunctions/quoteSectionFunctions";
+import { projectsHeaderFunctions } from "../../../editorStoreFunctions/projectsHeaderFunctions";
+import { valuesSectionFunctions } from "../../../editorStoreFunctions/valuesSectionFunctions";
 import { headerFunctions } from "../../../editorStoreFunctions/headerFunctions";
 import { footerFunctions } from "../../../editorStoreFunctions/footerFunctions";
 import { halfTextHalfImageFunctions } from "../../../editorStoreFunctions/halfTextHalfImageFunctions";
@@ -97,6 +107,36 @@ export const createDatabaseActions = (
                         break;
                       case "heroBanner":
                         Object.assign(newState, heroBannerFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "commitmentSection":
+                        Object.assign(newState, commitmentSectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "creativityTriadSection":
+                        Object.assign(newState, creativityTriadSectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "essenceSection":
+                        Object.assign(newState, essenceSectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "featuresSection":
+                        Object.assign(newState, featuresSectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "journeySection":
+                        Object.assign(newState, journeySectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "landInvestmentFormSection":
+                        Object.assign(newState, landInvestmentFormSectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "philosophyCtaSection":
+                        Object.assign(newState, philosophyCtaSectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "quoteSection":
+                        Object.assign(newState, quoteSectionFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "projectsHeader":
+                        Object.assign(newState, projectsHeaderFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "valuesSection":
+                        Object.assign(newState, valuesSectionFunctions.setData(newState, componentId, comp.data));
                         break;
                       case "header":
                         Object.assign(newState, headerFunctions.setData(newState, componentId, comp.data));

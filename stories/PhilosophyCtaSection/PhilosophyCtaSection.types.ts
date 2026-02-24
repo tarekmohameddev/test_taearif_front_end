@@ -21,4 +21,6 @@ export interface PhilosophyCtaSectionProps {
   descriptionTextProps?: TextStyleProps;
   /** Style overrides for CTA label */
   ctaTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

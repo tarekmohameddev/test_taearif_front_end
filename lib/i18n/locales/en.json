@@ -284,6 +284,46 @@
     "inputs": {
       "display_name": "Dynamic Form System",
       "description": "Advanced form system with dynamic cards, fields, validation, and API integration"
+    },
+    "commitmentSection": {
+      "display_name": "Commitment Section",
+      "description": "Section displaying brand commitment and values"
+    },
+    "creativityTriadSection": {
+      "display_name": "Creativity Triad Section",
+      "description": "Section showcasing three creative pillars or concepts"
+    },
+    "essenceSection": {
+      "display_name": "Essence Section",
+      "description": "Section conveying the essence or core philosophy"
+    },
+    "featuresSection": {
+      "display_name": "Features Section",
+      "description": "Section displaying key features and benefits"
+    },
+    "journeySection": {
+      "display_name": "Journey Section",
+      "description": "Section illustrating the brand journey or process"
+    },
+    "landInvestmentFormSection": {
+      "display_name": "Land Investment Form Section",
+      "description": "Section with heading, description, and land investment form"
+    },
+    "philosophyCtaSection": {
+      "display_name": "Philosophy CTA Section",
+      "description": "Call-to-action section with philosophical messaging"
+    },
+    "quoteSection": {
+      "display_name": "Quote Section",
+      "description": "Section displaying a prominent quote or testimonial"
+    },
+    "projectsHeader": {
+      "display_name": "Projects Header",
+      "description": "Header section for projects with title and description"
+    },
+    "valuesSection": {
+      "display_name": "Values Section",
+      "description": "Section displaying company values with icons"
     }
   },
   "components_old": {
@@ -436,6 +476,7 @@
     "colors_tab": "Colors",
     "theme_1": "Theme 1",
     "theme_2": "Theme 2",
+    "theme_3": "Theme 3",
     "delete_page": "Delete Page",
     "debug": "Debug",
     "open_editor": "Open Editor",
