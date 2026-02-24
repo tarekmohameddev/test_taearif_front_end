@@ -131,9 +131,11 @@ interface DropdownProps {
   iconColor?: string;
   dropdownWidth?: string;
   maxHeight?: string;
+  /** Use when dropdown is inside an elevated dialog so it appears above (e.g. 10003) */
+  contentZIndex?: number;
 }
 
-export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight }: DropdownProps) => {
+export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight, contentZIndex = 10001 }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -199,10 +201,11 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor,
       <div
         ref={dropdownRef}
         className={cn(
-          "fixed z-[10001] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-auto",
+          "fixed origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-auto",
           dropdownWidth
         )}
         style={{
+          zIndex: contentZIndex,
           top: `${position.top}px`,
           right: `${position.right}px`,
           maxHeight: maxHeight || undefined,

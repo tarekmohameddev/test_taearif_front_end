@@ -27,6 +27,8 @@ interface CustomDialogProps {
   children: ReactNode;
   className?: string;
   maxWidth?: string;
+  /** When true, uses higher z-index so this dialog appears above another open CustomDialog (e.g. nested) */
+  elevated?: boolean;
 }
 
 interface CustomDialogHeaderProps {
@@ -54,13 +56,22 @@ interface CustomDialogTriggerProps {
   asChild?: boolean;
 }
 
+const Z_BASE = 9999;
+const Z_CONTENT = 10000;
+const Z_ELEVATED_BASE = 10001;
+const Z_ELEVATED_CONTENT = 10002;
+
 export function CustomDialog({
   open,
   onOpenChange,
   children,
   className = "",
   maxWidth = "max-w-4xl",
+  elevated = false,
 }: CustomDialogProps) {
+  const zBase = elevated ? Z_ELEVATED_BASE : Z_BASE;
+  const zContent = elevated ? Z_ELEVATED_CONTENT : Z_CONTENT;
+
   // Prevent body scroll when dialog is open
   useEffect(() => {
     if (open) {
@@ -87,7 +98,10 @@ export function CustomDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ zIndex: zBase }}
+    >
       {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-200"
@@ -100,7 +114,7 @@ export function CustomDialog({
       {/* Dialog Content */}
       <div
         className={`
-          relative z-[10000] w-full mx-auto
+          relative w-full mx-auto
           ${maxWidth}
           max-h-[95vh] sm:max-h-[90vh]
           bg-white dark:bg-gray-900 rounded-lg shadow-2xl
@@ -108,10 +122,11 @@ export function CustomDialog({
           ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}
           ${className}
         `}
-        onClick={(e) => e.stopPropagation()}
         style={{
+          zIndex: zContent,
           maxWidth: `min(${getMaxWidthValue(maxWidth)}, calc(100vw - 2rem))`,
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         {children}
       </div>

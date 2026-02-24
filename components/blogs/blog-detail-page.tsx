@@ -27,6 +27,7 @@ import {
   CustomDialogHeader,
   CustomDialogTitle,
   CustomDialogDescription,
+  CustomDialogFooter,
   CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
 import { useBlogDetail } from "./hooks/use-blog-detail";
@@ -68,8 +69,8 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
     
     setDeleting(true);
     try {
-      // DELETE /posts/{id} - حذف مقال
-      await blogApi.deleteBlog(blog.id);
+      // DELETE /posts/{slug} - حذف مقال
+      await blogApi.deleteBlog(blog.slug);
       toast.success("تم حذف المقال بنجاح");
       setDeleteDialogOpen(false);
       router.push("/dashboard/blogs");
@@ -228,30 +229,19 @@ export function BlogDetailPage({ blogId }: BlogDetailPageProps) {
                   سيتم حذف المقال <strong className="text-red-600 dark:text-red-400">"{blog.title}"</strong> بشكل نهائي من النظام.
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  جميع البيانات المرتبطة بهذا المقال (المحتوى، الصور، التصنيفات) سيتم حذفها نهائياً.
+                  جميع البيانات المرتبطة بهذا المقال (المحتوى، الصور) سيتم حذفها نهائياً.
                 </p>
               </div>
             </CustomDialogDescription>
           </CustomDialogHeader>
-          
-          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-4 flex flex-col sm:flex-row gap-3 sm:justify-end">
-            <Button
-              variant="outline"
-              onClick={handleDeleteCancel}
-              disabled={deleting}
-              className="w-full sm:w-auto"
-            >
+          <CustomDialogFooter>
+            <Button variant="outline" onClick={handleDeleteCancel} disabled={deleting} className="w-full sm:w-auto">
               إلغاء
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-              disabled={deleting}
-              className="w-full sm:w-auto"
-            >
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={deleting} className="w-full sm:w-auto">
               {deleting ? "جاري الحذف..." : "حذف نهائي"}
             </Button>
-          </div>
+          </CustomDialogFooter>
         </CustomDialogContent>
       </CustomDialog>
     </div>

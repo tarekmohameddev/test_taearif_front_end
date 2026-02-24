@@ -2,23 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+  CustomDialogClose,
+} from "@/components/customComponents/CustomDialog";
+import { CustomDropdown, DropdownItem } from "@/components/customComponents/customDropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2, Save, X, AlertTriangle } from "lucide-react";
 
 interface CrmFormDialogProps {
@@ -158,13 +153,19 @@ export default function CrmFormDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md" dir="rtl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+    <CustomDialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      maxWidth="max-w-md"
+      elevated
+    >
+      <CustomDialogContent className="p-4 sm:p-6" dir="rtl">
+        <CustomDialogClose onClose={onClose} />
+        <CustomDialogHeader>
+          <CustomDialogTitle className="flex items-center gap-2">
             {getTitle()}
-          </DialogTitle>
-        </DialogHeader>
+          </CustomDialogTitle>
+        </CustomDialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* رسالة الخطأ العامة */}
@@ -233,51 +234,71 @@ export default function CrmFormDialog({
           {/* اللون */}
           <div className="space-y-2">
             <Label>اللون</Label>
-            <Select
-              value={formData.color}
-              onValueChange={(value) =>
-                setFormData({ ...formData, color: value })
+            <CustomDropdown
+              contentZIndex={10003}
+              dropdownWidth="w-56"
+              maxHeight="16rem"
+              trigger={
+                <span className="flex items-center gap-2">
+                  <div
+                    className="w-4 h-4 rounded-full border border-gray-300"
+                    style={{
+                      backgroundColor:
+                        colorOptions.find((c) => c.value === formData.color)
+                          ?.color ?? formData.color,
+                    }}
+                  />
+                  {
+                    colorOptions.find((c) => c.value === formData.color)
+                      ?.label ?? "اختر اللون"
+                  }
+                </span>
               }
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {colorOptions.map((color) => (
-                  <SelectItem key={color.value} value={color.value}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded-full border"
-                        style={{ backgroundColor: color.color }}
-                      />
-                      {color.label}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {colorOptions.map((color) => (
+                <DropdownItem
+                  key={color.value}
+                  onClick={() =>
+                    setFormData({ ...formData, color: color.value })
+                  }
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded-full border"
+                      style={{ backgroundColor: color.color }}
+                    />
+                    {color.label}
+                  </div>
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
           </div>
 
           {/* الأيقونة */}
           <div className="space-y-2">
             <Label>الأيقونة</Label>
-            <Select
-              value={formData.icon}
-              onValueChange={(value) =>
-                setFormData({ ...formData, icon: value })
+            <CustomDropdown
+              contentZIndex={10003}
+              dropdownWidth="w-56"
+              maxHeight="16rem"
+              trigger={
+                <span>
+                  {iconOptions.find((i) => i.value === formData.icon)?.label ??
+                    "اختر الأيقونة"}
+                </span>
               }
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {iconOptions.map((icon) => (
-                  <SelectItem key={icon.value} value={icon.value}>
-                    {icon.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {iconOptions.map((icon) => (
+                <DropdownItem
+                  key={icon.value}
+                  onClick={() =>
+                    setFormData({ ...formData, icon: icon.value })
+                  }
+                >
+                  {icon.label}
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
           </div>
 
           {/* الترتيب */}
@@ -355,7 +376,7 @@ export default function CrmFormDialog({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

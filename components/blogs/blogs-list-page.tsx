@@ -21,7 +21,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Tag } from "lucide-react";
+import { AlertTriangle, Plus, Tag } from "lucide-react";
 import { useBlogsList } from "./hooks/use-blogs-list";
 import { BlogStatsCards } from "./components/stats/blog-stats-cards";
 import { BlogTable } from "./components/table/blog-table";
@@ -34,6 +34,7 @@ import {
   CustomDialogHeader,
   CustomDialogTitle,
   CustomDialogDescription,
+  CustomDialogFooter,
   CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
 import { Input } from "@/components/ui/input";
@@ -50,6 +51,11 @@ export function BlogsListPage() {
   const [categoryName, setCategoryName] = useState("");
   const [creatingCategory, setCreatingCategory] = useState(false);
 
+  // State for delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [blogToDelete, setBlogToDelete] = useState<{ slug: string; title: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const handleEdit = (blog: { id: number; slug: string }) => {
     router.push(`/dashboard/blogs/edit/${blog.slug}`);
   };
@@ -58,20 +64,30 @@ export function BlogsListPage() {
     router.push(`/dashboard/blogs/${blog.slug}`);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("هل أنت متأكد من حذف هذا المقال؟")) {
-      return;
-    }
+  const handleDeleteClick = (blog: { slug: string; title: string }) => {
+    setBlogToDelete(blog);
+    setDeleteDialogOpen(true);
+  };
 
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setBlogToDelete(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!blogToDelete) return;
+    setDeleting(true);
     try {
-      // DELETE /posts/{id} - حذف مقال
-      await blogApi.deleteBlog(id);
+      await blogApi.deleteBlog(blogToDelete.slug);
       toast.success("تم حذف المقال بنجاح");
-      // إعادة تحميل القائمة
+      setDeleteDialogOpen(false);
+      setBlogToDelete(null);
       fetchBlogs(pagination?.current_page || 1);
     } catch (err: any) {
       console.error("Error deleting blog:", err);
       toast.error(err.message || "فشل في حذف المقال");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -144,10 +160,50 @@ export function BlogsListPage() {
           pagination={pagination}
           onPageChange={handlePageChange}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteClick}
           onView={handleView}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <CustomDialog open={deleteDialogOpen} onOpenChange={(open) => !open && handleDeleteCancel()} maxWidth="max-w-md">
+        <CustomDialogContent>
+          <CustomDialogClose onClose={handleDeleteCancel} />
+          <CustomDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <CustomDialogTitle className="text-red-600 dark:text-red-400">
+                تأكيد حذف المقال
+              </CustomDialogTitle>
+            </div>
+            <CustomDialogDescription className="text-base">
+              <div className="space-y-3">
+                <p className="font-semibold text-gray-900 dark:text-gray-100">
+                  هذا الإجراء لا يمكن التراجع عنه.
+                </p>
+                {blogToDelete && (
+                  <p className="text-gray-700 dark:text-gray-300">
+                    سيتم حذف المقال <strong className="text-red-600 dark:text-red-400">"{blogToDelete.title}"</strong> بشكل نهائي من النظام.
+                  </p>
+                )}
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  جميع البيانات المرتبطة بهذا المقال (المحتوى، الصور) سيتم حذفها نهائياً ولن تتمكن من استعادتها.
+                </p>
+              </div>
+            </CustomDialogDescription>
+          </CustomDialogHeader>
+          <CustomDialogFooter>
+            <Button variant="outline" onClick={handleDeleteCancel} disabled={deleting} className="w-full sm:w-auto">
+              إلغاء
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={deleting} className="w-full sm:w-auto">
+              {deleting ? "جاري الحذف..." : "حذف نهائي"}
+            </Button>
+          </CustomDialogFooter>
+        </CustomDialogContent>
+      </CustomDialog>
 
       {/* Category Creation Dialog */}
       <CustomDialog
