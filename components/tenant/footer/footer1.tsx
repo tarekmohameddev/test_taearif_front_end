@@ -49,6 +49,8 @@ type FooterData = {
     companyInfo: {
       enabled: boolean;
       showCompanyName?: boolean;
+      useCustomFooterLogo?: boolean;
+      footerLogo?: string;
       name: string;
       description: string;
       tagline: string;
@@ -149,6 +151,8 @@ const getDefaultFooterData = (): FooterData => ({
   content: {
     companyInfo: {
       enabled: true,
+      useCustomFooterLogo: false,
+      footerLogo: "",
       name: "الشركة العقارية",
       description:
         "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
@@ -705,6 +709,25 @@ export default function Footer(props: FooterProps = {}) {
                   const logoWidth = mergedData.styling?.المقاسات?.logo?.width ?? 100;
                   const logoHeight = mergedData.styling?.المقاسات?.logo?.height ?? 100;
 
+                  const useCustomFooterLogo = mergedData.content.companyInfo.useCustomFooterLogo === true;
+                  const customFooterLogo = mergedData.content.companyInfo.footerLogo?.trim();
+
+                  // When toggle is ON: show custom footer logo only if footerLogo is set
+                  if (useCustomFooterLogo && customFooterLogo) {
+                    return (
+                      <div className="flex">
+                        <Image
+                          src={customFooterLogo}
+                          alt={mergedData.content.companyInfo.name || "لوجو الفوتر"}
+                          width={logoWidth}
+                          height={logoHeight}
+                          className={logoClassName}
+                        />
+                      </div>
+                    );
+                  }
+
+                  // Otherwise: company logo (same priority as before)
                   // 1. Custom Branding (Highest Priority)
                   const brandingLogo = customBranding?.footer?.logo;
                   if (brandingLogo) {

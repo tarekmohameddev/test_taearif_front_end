@@ -136,7 +136,7 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <Toaster />
+          <Toaster containerStyle={{ zIndex: 10050 }} />
           <ClientReCaptchaLoader>
             <ClientLayout>{children}</ClientLayout>
           </ClientReCaptchaLoader>

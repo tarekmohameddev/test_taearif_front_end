@@ -52,6 +52,8 @@ interface Footer2Props {
     companyInfo?: {
       enabled?: boolean;
       showCompanyName?: boolean;
+      useCustomFooterLogo?: boolean;
+      footerLogo?: string;
       name?: string;
       description?: string;
       tagline?: string;
@@ -771,40 +773,67 @@ export default function Footer2(props: Footer2Props) {
             {/* Right Section - Company Info */}
             <div className="w-full lg:w-1/2 xl:w-2/5">
               <div className="flex items-center gap-3 mb-6">
-                {(customBranding?.footer?.logo || mergedData.content?.companyInfo?.logo || tenantData?.branding?.logo) ? (
-                  <div className="flex">
-                    <Image
-                      src={customBranding?.footer?.logo || mergedData.content?.companyInfo?.logo || tenantData?.branding?.logo}
-                      alt={replaceBaheya(
-                        customBranding?.footer?.name ||
-                          mergedData.content?.companyInfo?.name ||
-                          tenantData?.branding?.name ||
-                          tenantData?.websiteName ||
-                          "Baheya Real Estate",
-                      )}
-                      width={mergedData.styling?.المقاسات?.logo?.width ?? 100}
-                      height={mergedData.styling?.المقاسات?.logo?.height ?? 100}
-                      className={(mergedData.styling?.effects?.logoRounded !== false ? "rounded-full " : "") + "object-contain"}
-                    />
-                  </div>
-                ) : (
-                  <Link href="/" className="block">
-                    <div 
-                      className="relative"
-                      style={{
-                        width: mergedData.styling?.المقاسات?.logo?.width ?? 192,
-                        height: mergedData.styling?.المقاسات?.logo?.height ?? 128,
-                      }}
-                    >
-                      <Image
-                        src="/images/main/logo.png"
-                        alt="تعاريف العقارية"
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                  </Link>
-                )}
+                {(() => {
+                  const useCustomFooterLogo = mergedData.content?.companyInfo?.useCustomFooterLogo === true;
+                  const customFooterLogo = mergedData.content?.companyInfo?.footerLogo?.trim();
+                  const logoWidth = mergedData.styling?.المقاسات?.logo?.width ?? 100;
+                  const logoHeight = mergedData.styling?.المقاسات?.logo?.height ?? 100;
+                  const logoClassName = (mergedData.styling?.effects?.logoRounded !== false ? "rounded-full " : "") + "object-contain";
+
+                  if (useCustomFooterLogo && customFooterLogo) {
+                    return (
+                      <div className="flex">
+                        <Image
+                          src={customFooterLogo}
+                          alt={replaceBaheya(mergedData.content?.companyInfo?.name || "لوجو الفوتر")}
+                          width={logoWidth}
+                          height={logoHeight}
+                          className={logoClassName}
+                        />
+                      </div>
+                    );
+                  }
+
+                  const companyLogo = customBranding?.footer?.logo || mergedData.content?.companyInfo?.logo || tenantData?.branding?.logo;
+                  if (companyLogo) {
+                    return (
+                      <div className="flex">
+                        <Image
+                          src={companyLogo}
+                          alt={replaceBaheya(
+                            customBranding?.footer?.name ||
+                              mergedData.content?.companyInfo?.name ||
+                              tenantData?.branding?.name ||
+                              tenantData?.websiteName ||
+                              "Baheya Real Estate",
+                          )}
+                          width={logoWidth}
+                          height={logoHeight}
+                          className={logoClassName}
+                        />
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <Link href="/" className="block">
+                      <div 
+                        className="relative"
+                        style={{
+                          width: mergedData.styling?.المقاسات?.logo?.width ?? 192,
+                          height: mergedData.styling?.المقاسات?.logo?.height ?? 128,
+                        }}
+                      >
+                        <Image
+                          src="/images/main/logo.png"
+                          alt="تعاريف العقارية"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    </Link>
+                  );
+                })()}
                 {(mergedData.content?.companyInfo?.showCompanyName ?? true) && 
                  (customBranding?.footer?.name || mergedData.content?.companyInfo?.name || tenantData?.branding?.name || tenantData?.websiteName) && (
                   <div>

@@ -31,10 +31,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomersCheckboxesDropdown, type CustomerOption } from "@/components/customComponents/CustomersCheckboxesDropdown";
 import { getCustomersList } from "@/lib/services/customers-hub-list-api";
-import type { SendCampaignBody } from "@/lib/services/sms-api";
+import type { SendCampaignBody, ResumeCampaignBody } from "@/lib/services/sms-api";
 import type { SMSCampaign } from "./types";
 import { getStatusColor, STATUS_LABELS } from "./constants";
 import { CREDITS_PER_SMS } from "./SMSCreditBalance";
+import { SMS_USER_MESSAGES } from "./constants";
+import { CampaignActionButtons } from "./CampaignActionButtons";
+import { canSendCampaign } from "./utils";
 
 interface SmsCampaignsListProps {
   campaigns: SMSCampaign[];
@@ -45,6 +48,8 @@ interface SmsCampaignsListProps {
   onSendCampaign: (id: string, body: SendCampaignBody) => void;
   onDeleteCampaign: (id: string) => void;
   onEditCampaign: (id: string, body: { name: string; description?: string; message: string }) => void;
+  onPauseCampaign: (id: string) => void;
+  onResumeCampaign: (id: string, params: ResumeCampaignBody) => void;
 }
 
 export function SmsCampaignsList({
@@ -56,6 +61,8 @@ export function SmsCampaignsList({
   onSendCampaign,
   onDeleteCampaign,
   onEditCampaign,
+  onPauseCampaign,
+  onResumeCampaign,
 }: SmsCampaignsListProps) {
   const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const [sendCampaignId, setSendCampaignId] = useState<string | null>(null);
@@ -77,6 +84,10 @@ export function SmsCampaignsList({
   const [editMessage, setEditMessage] = useState("");
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+  const [pauseLoadingId, setPauseLoadingId] = useState<string | null>(null);
+  const [resumeLoadingId, setResumeLoadingId] = useState<string | null>(null);
+  const [pauseConfirmOpen, setPauseConfirmOpen] = useState(false);
+  const [pauseConfirmCampaign, setPauseConfirmCampaign] = useState<SMSCampaign | null>(null);
 
   const openSendDialog = (id: string, name: string) => {
     setSendCampaignId(id);
@@ -155,6 +166,35 @@ export function SmsCampaignsList({
     setEditDescription(campaign.description ?? "");
     setEditMessage(campaign.message);
     setEditDialogOpen(true);
+  };
+
+  const openPauseConfirmDialog = (id: string) => {
+    const campaign = campaigns.find((c) => c.id === id);
+    if (campaign) {
+      setPauseConfirmCampaign(campaign);
+      setPauseConfirmOpen(true);
+    }
+  };
+
+  const handleConfirmPause = async () => {
+    if (!pauseConfirmCampaign) return;
+    setPauseLoadingId(pauseConfirmCampaign.id);
+    try {
+      await onPauseCampaign(pauseConfirmCampaign.id);
+      setPauseConfirmOpen(false);
+      setPauseConfirmCampaign(null);
+    } finally {
+      setPauseLoadingId(null);
+    }
+  };
+
+  const handleResume = async (id: string, params: ResumeCampaignBody) => {
+    setResumeLoadingId(id);
+    try {
+      await onResumeCampaign(id, params);
+    } finally {
+      setResumeLoadingId(null);
+    }
   };
   const handleConfirmEdit = async () => {
     if (!editCampaign || !editName.trim() || !editMessage.trim()) return;
@@ -281,27 +321,16 @@ export function SmsCampaignsList({
                         </p>
                       )}
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => openEditDialog(campaign)}>
-                        تعديل
-                      </Button>
-                      {(campaign.status === "draft" || campaign.status === "scheduled") && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => openSendDialog(campaign.id, campaign.name)}
-                        >
-                          إرسال
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openDeleteDialog(campaign.id, campaign.name)}
-                      >
-                        حذف
-                      </Button>
-                    </div>
+                    <CampaignActionButtons
+                      campaign={campaign}
+                      onPause={openPauseConfirmDialog}
+                      onResume={handleResume}
+                      onEdit={openEditDialog}
+                      onSend={openSendDialog}
+                      onDelete={openDeleteDialog}
+                      pauseLoading={pauseLoadingId === campaign.id}
+                      resumeLoading={resumeLoadingId === campaign.id}
+                    />
                   </div>
 
                   <div className="bg-muted p-3 rounded-lg mb-4">
@@ -333,13 +362,23 @@ export function SmsCampaignsList({
                       <Coins className="h-4 w-4" />
                       <span>
                         تكلفة الإرسال: {campaign.recipientCount * CREDITS_PER_SMS} كريديت
-                        {availableCredits < campaign.recipientCount * CREDITS_PER_SMS &&
-                          (campaign.status === "draft" || campaign.status === "scheduled") && (
+                        {canSendCampaign(campaign.status) &&
+                          availableCredits < campaign.recipientCount * CREDITS_PER_SMS && (
                             <Badge variant="destructive" className="mr-2">
                               رصيد غير كافٍ
                             </Badge>
                           )}
                       </span>
+                      {campaign.reservedCredits != null && campaign.reservedCredits > 0 && (
+                        <span className="text-amber-600">
+                          • {campaign.reservedCredits} محجوز للمتبقين
+                        </span>
+                      )}
+                      {campaign.pausedCount != null && campaign.pausedCount > 0 && (
+                        <span className="text-muted-foreground">
+                          • {campaign.pausedCount} لم يُرسَل لهم بعد
+                        </span>
+                      )}
                     </div>
                   )}
 
@@ -354,6 +393,16 @@ export function SmsCampaignsList({
                       <Progress
                         value={(campaign.sentCount / campaign.recipientCount) * 100}
                       />
+                      {campaign.reservedCredits != null && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {SMS_USER_MESSAGES.inProgressSummary(
+                            campaign.sentCount,
+                            campaign.recipientCount,
+                            campaign.sentCount,
+                            campaign.reservedCredits
+                          )}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -441,25 +490,17 @@ export function SmsCampaignsList({
                     <TableCell className="text-right text-muted-foreground text-sm">{campaign.createdBy || "—"}</TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1 flex-wrap">
-                        <Button variant="outline" size="sm" onClick={() => openEditDialog(campaign)}>
-                          تعديل
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openDeleteDialog(campaign.id, campaign.name)}
-                        >
-                          حذف
-                        </Button>
-                        {(campaign.status === "draft" || campaign.status === "scheduled") && (
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => openSendDialog(campaign.id, campaign.name)}
-                          >
-                            إرسال
-                          </Button>
-                        )}
+                        <CampaignActionButtons
+                          campaign={campaign}
+                          onPause={openPauseConfirmDialog}
+                          onResume={handleResume}
+                          onEdit={openEditDialog}
+                          onSend={openSendDialog}
+                          onDelete={openDeleteDialog}
+                          pauseLoading={pauseLoadingId === campaign.id}
+                          resumeLoading={resumeLoadingId === campaign.id}
+                          variant="compact"
+                        />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -511,6 +552,38 @@ export function SmsCampaignsList({
             إلغاء
           </Button>
           <Button onClick={handleConfirmSend}>إرسال</Button>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
+
+    <CustomDialog open={pauseConfirmOpen} onOpenChange={setPauseConfirmOpen} maxWidth="max-w-md">
+      <CustomDialogContent>
+        <CustomDialogClose onClose={() => setPauseConfirmOpen(false)} />
+        <CustomDialogHeader>
+          <CustomDialogTitle>تأكيد إيقاف الحملة مؤقتاً</CustomDialogTitle>
+          <CustomDialogDescription>
+            هل تريد إيقاف الحملة «{pauseConfirmCampaign?.name}» مؤقتاً؟
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <div className="px-4 sm:px-6 pb-2 text-sm text-muted-foreground text-right">
+          سيتم إيقاف الإرسال فوراً. الرسائل التي تم إرسالها ({pauseConfirmCampaign?.sentCount ?? 0}) مُحتسبة عليك،
+          أما الكريديت المحجوز للمتبقين (
+          {pauseConfirmCampaign?.reservedCredits ??
+            (pauseConfirmCampaign ? pauseConfirmCampaign.recipientCount - pauseConfirmCampaign.sentCount : 0)}
+          ) فسيُعاد إلى رصيدك. يمكنك لاحقاً «متابعة» الإرسال للمتبقين أو «إعادة من البداية».
+        </div>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setPauseConfirmOpen(false)}>
+            إلغاء
+          </Button>
+          <Button
+            onClick={handleConfirmPause}
+            disabled={pauseConfirmCampaign != null && pauseLoadingId === pauseConfirmCampaign.id}
+          >
+            {pauseConfirmCampaign != null && pauseLoadingId === pauseConfirmCampaign.id
+              ? "جاري الإيقاف..."
+              : "إيقاف مؤقت"}
+          </Button>
         </CustomDialogFooter>
       </CustomDialogContent>
     </CustomDialog>

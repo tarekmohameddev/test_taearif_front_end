@@ -35,6 +35,8 @@ export function SMSCampaignsPage() {
     handleDeleteCampaign,
     handleSendCampaign,
     handleEditCampaign,
+    handlePauseCampaign,
+    handleResumeCampaign,
   } = useSmsCampaigns();
   const {
     templates,
@@ -168,6 +170,8 @@ export function SMSCampaignsPage() {
             onSendCampaign={onSendCampaign}
             onDeleteCampaign={handleDeleteCampaign}
             onEditCampaign={handleEditCampaign}
+            onPauseCampaign={handlePauseCampaign}
+            onResumeCampaign={handleResumeCampaign}
           />
         </TabsContent>
 

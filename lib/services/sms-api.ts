@@ -16,11 +16,29 @@ function getData<T>(res: { data?: { status?: string | boolean; data?: T; message
   return (body?.data ?? body) as T;
 }
 
+/** Extract user-facing error message from SMS API error (Axios or thrown Error). */
+export function getSmsApiErrorMessage(error: unknown): string {
+  const err = error as {
+    response?: { data?: SmsApiErrorBody; status?: number };
+    message?: string;
+  };
+  const data = err?.response?.data;
+  if (data?.message && typeof data.message === "string") return data.message;
+  if (data?.errors && typeof data.errors === "object") {
+    const first = Object.values(data.errors).flat()[0];
+    if (typeof first === "string") return first;
+  }
+  if (err?.message && typeof err.message === "string") return err.message;
+  return "Request failed";
+}
+
 // --- Campaigns ---
 
 export interface CampaignListParams {
   per_page?: number;
   page?: number;
+  /** Filter by status (e.g. paused, in_progress) */
+  status?: string;
 }
 
 export interface Pagination {
@@ -30,6 +48,16 @@ export interface Pagination {
   last_page: number;
 }
 
+/** Backend campaign status (snake_case). */
+export type ApiCampaignStatus =
+  | "draft"
+  | "scheduled"
+  | "in_progress"
+  | "paused"
+  | "sent"
+  | "failed"
+  | "cancelled";
+
 /** Backend campaign (snake_case). Map to UI type in component. */
 export interface ApiCampaign {
   id: number;
@@ -37,11 +65,13 @@ export interface ApiCampaign {
   name: string;
   description?: string | null;
   message: string;
-  status: "draft" | "scheduled" | "sent" | "in_progress";
+  status: ApiCampaignStatus;
   recipient_count: number;
   sent_count: number;
   delivered_count: number;
   failed_count: number;
+  reserved_credits?: number | null;
+  paused_count?: number | null;
   scheduled_at?: string | null;
   sent_at?: string | null;
   created_at: string;
@@ -50,6 +80,42 @@ export interface ApiCampaign {
   tags?: string[] | null;
   creator_display?: { id?: number; type?: string; company_name?: string } | null;
   user?: { id?: number; basic_setting?: { company_name?: string } } | null;
+}
+
+/** Credit info returned by pause/resume endpoints. */
+export interface SmsCreditInfo {
+  consumed?: number;
+  released?: number;
+  reserved?: number;
+  balance_after_release?: number;
+  balance_after_reserve?: number;
+  note?: string;
+}
+
+/** Response from POST /sms/campaigns/{id}/pause (200). */
+export interface PauseCampaignResponse {
+  campaign_id: number;
+  status: "paused";
+  sent_count: number;
+  paused_count: number;
+  credit_info: SmsCreditInfo;
+}
+
+/** Response from POST /sms/campaigns/{id}/resume (202). */
+export interface ResumeCampaignResponse {
+  campaign_id: number;
+  status: "in_progress";
+  mode: "continue" | "restart";
+  recipient_count: number;
+  credit_info: SmsCreditInfo;
+}
+
+/** API error body for SMS endpoints (4xx). */
+export interface SmsApiErrorBody {
+  status?: boolean;
+  code?: string;
+  message?: string;
+  errors?: Record<string, string[]>;
 }
 
 export interface CampaignListResponse {
@@ -70,6 +136,7 @@ export async function getCampaigns(params?: CampaignListParams): Promise<Campaig
   const q = new URLSearchParams();
   if (params?.per_page != null) q.set("per_page", String(params.per_page));
   if (params?.page != null) q.set("page", String(params.page));
+  if (params?.status) q.set("status", params.status);
   const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
   const raw = getData<LaravelPaginatedData<ApiCampaign>>(res);
   const list = raw?.data ?? [];
@@ -138,6 +205,38 @@ export async function sendCampaign(id: number, body: SendCampaignBody): Promise<
     headers: { "Idempotency-Key": crypto.randomUUID() },
   });
   return getData<{ message?: string }>(res);
+}
+
+/** Body for resume: mode required; customer_ids/manual_phones optional for restart only. */
+export interface ResumeCampaignBody {
+  mode: "continue" | "restart";
+  customer_ids?: number[];
+  manual_phones?: string[];
+}
+
+/**
+ * Pause an in_progress or scheduled campaign. Returns credit_info; reserved credits are released.
+ * Throws on 404 (campaign not found) or 422 (invalid status).
+ */
+export async function pauseCampaign(id: number): Promise<PauseCampaignResponse> {
+  const res = await axiosInstance.post(`${BASE}/campaigns/${id}/pause`, {});
+  return getData<PauseCampaignResponse>(res);
+}
+
+/**
+ * Resume a paused campaign. Requires Idempotency-Key header (unique per distinct action).
+ * Use a new key for each user action; same key only when retrying the exact same request.
+ * Throws on 400 (insufficient credits), 404, 409 (idempotency conflict), 422.
+ */
+export async function resumeCampaign(
+  id: number,
+  body: ResumeCampaignBody,
+  idempotencyKey: string
+): Promise<ResumeCampaignResponse> {
+  const res = await axiosInstance.post(`${BASE}/campaigns/${id}/resume`, body, {
+    headers: { "Idempotency-Key": idempotencyKey },
+  });
+  return getData<ResumeCampaignResponse>(res);
 }
 
 // --- Templates ---
