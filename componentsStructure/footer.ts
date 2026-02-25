@@ -165,7 +165,6 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
                 {
                   key: "footerLogoGroup",
                   label: "لوجو الفوتر",
@@ -173,11 +172,20 @@ export const footerStructure: ComponentStructure = {
                   displayAsGroup: true,
                   groupFields: [
                     { key: "content.companyInfo.useCustomFooterLogo", label: "لوجو مخصص للتذييل", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
-                    { key: "content.companyInfo.logo", label: "لوجو الشركة (الشعار)", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
                     { key: "content.companyInfo.footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
                   ],
                 },
-                { key: "name", label: "Company Name", type: "text" },
+                {
+                  key: "companyNameAndLogoGroup",
+                  label: "اسم الشركة",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.companyInfo.showCompanyName", label: "إظهار اسم الشركة", type: "boolean" },
+                    { key: "content.companyInfo.name", label: "اسم الشركة", type: "text" },
+                    { key: "content.companyInfo.logo", label: "الشعار", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
+                  ],
+                },
                 { key: "description", label: "Description", type: "text" },
                 { key: "tagline", label: "Tagline", type: "text" },
               ],
@@ -497,7 +505,6 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
                 {
                   key: "footerLogoGroup",
                   label: "لوجو الفوتر",
@@ -505,13 +512,22 @@ export const footerStructure: ComponentStructure = {
                   displayAsGroup: true,
                   groupFields: [
                     { key: "content.companyInfo.useCustomFooterLogo", label: "لوجو مخصص للتذييل", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
-                    { key: "content.companyInfo.logo", label: "لوجو الشركة (الشعار)", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
+                    { key: "content.companyInfo.logo", label: "الشعار", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
                     { key: "content.companyInfo.footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
                   ],
                 },
-                { key: "name", label: "Company Name", type: "text" },
+                {
+                  key: "companyNameAndLogoGroup",
+                  label: "اسم الشركة",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.companyInfo.showCompanyName", label: "إظهار اسم الشركة", type: "boolean" },
+                    { key: "content.companyInfo.name", label: "اسم الشركة", type: "text" },
+                    { key: "content.companyInfo.tagline", label: "Tagline", type: "text" },
+                  ],
+                },
                 { key: "description", label: "Description", type: "text" },
-                { key: "tagline", label: "Tagline", type: "text" },
               ],
             },
             {
@@ -770,7 +786,6 @@ export const footerStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
-                { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
                 {
                   key: "footerLogoGroup",
                   label: "لوجو الفوتر",
@@ -778,11 +793,21 @@ export const footerStructure: ComponentStructure = {
                   displayAsGroup: true,
                   groupFields: [
                     { key: "content.companyInfo.useCustomFooterLogo", label: "لوجو مخصص للتذييل", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
-                    { key: "content.companyInfo.logo", label: "لوجو الشركة (الشعار)", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
                     { key: "content.companyInfo.footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
+                    { key: "content.companyInfo.logo", label: "الشعار", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
                   ],
                 },
-                { key: "name", label: "Company Name", type: "text" },
+                {
+                  key: "companyNameAndLogoGroup",
+                  label: "اسم الشركة",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.companyInfo.showCompanyName", label: "إظهار اسم الشركة", type: "boolean" },
+                    { key: "content.companyInfo.name", label: "اسم الشركة", type: "text" },
+                    { key: "content.companyInfo.tagline", label: "Tagline", type: "text" },
+                  ],
+                },
                 {
                   key: "descriptionSection",
                   label: "Company Description",
@@ -805,7 +830,6 @@ export const footerStructure: ComponentStructure = {
                     },
                   ],
                 },
-                { key: "tagline", label: "Tagline", type: "text" },
               ],
             },
             {
