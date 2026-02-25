@@ -33,6 +33,8 @@ export const getDefaultFooterData = (): ComponentData => ({
     companyInfo: {
       enabled: true,
       showCompanyName: true,
+      useCustomFooterLogo: false,
+      footerLogo: "",
       name: "الشركة العقارية",
       description:
         "نقدم لك أفضل الحلول العقارية بخبرة واحترافية لتلبية كافة احتياجاتك في البيع والإيجار مع ضمان تجربة مريحة وموثوقة",
@@ -157,6 +159,8 @@ export const getDefaultFooter2Data = (): ComponentData => ({
       enabled: true,
       showCompanyName: true,
       showDescription: true,
+      useCustomFooterLogo: false,
+      footerLogo: "",
       name: "تعاريف العقارية",
       description:
         "نحن هنا لمساعدتك في كل خطوة — من البحث عن العقار المناسب، إلى إتمام المعاملة بكل احترافية وشفافية.",
