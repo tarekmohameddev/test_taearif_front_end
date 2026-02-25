@@ -15,4 +15,6 @@ export interface ProjectsHeaderProps {
   headingTextProps?: TextStyleProps;
   /** Style overrides for description */
   descriptionTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

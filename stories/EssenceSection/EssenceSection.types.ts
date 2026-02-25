@@ -21,4 +21,6 @@ export interface EssenceSectionProps {
   leadTextProps?: TextStyleProps;
   /** Style overrides for body paragraphs */
   bodyTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

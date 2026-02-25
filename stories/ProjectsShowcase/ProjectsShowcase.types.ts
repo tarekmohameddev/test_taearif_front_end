@@ -82,4 +82,6 @@ export interface ProjectsShowcaseProps {
   unitTypeTextProps?: TextStyleProps;
   /** Style overrides for card CTA button text */
   ctaTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

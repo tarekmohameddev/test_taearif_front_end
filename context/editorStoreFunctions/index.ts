@@ -1,6 +1,17 @@
 // تصدير جميع component functions
 export * from "./types";
 export * from "./heroFunctions";
+export * from "./heroBannerFunctions";
+export * from "./commitmentSectionFunctions";
+export * from "./creativityTriadSectionFunctions";
+export * from "./essenceSectionFunctions";
+export * from "./featuresSectionFunctions";
+export * from "./journeySectionFunctions";
+export * from "./landInvestmentFormSectionFunctions";
+export * from "./philosophyCtaSectionFunctions";
+export * from "./quoteSectionFunctions";
+export * from "./projectsHeaderFunctions";
+export * from "./valuesSectionFunctions";
 export * from "./headerFunctions";
 export * from "./header2Functions";
 export * from "./footerFunctions";

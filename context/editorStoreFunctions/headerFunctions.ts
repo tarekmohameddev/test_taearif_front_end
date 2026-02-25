@@ -1,6 +1,12 @@
 import { ComponentData } from "@/lib/types";
 import { ComponentState, createDefaultData, updateDataByPath } from "./types";
 import { getDefaultHeader2Data } from "./header2Functions";
+import {
+  DEFAULT_LOGO,
+  DEFAULT_NAV_LINKS,
+  DEFAULT_LANGUAGE,
+  DEFAULT_CTA,
+} from "@/stories/Header/data";
 
 // Default header data structure
 export const getDefaultHeaderData = (): ComponentData => {
@@ -134,6 +140,29 @@ export const getDefaultHeaderData = (): ComponentData => {
   return data;
 };
 
+// Default header3 data — matches stories/Header types and data (logo, navLinks, languageToggle, cta, dir)
+export const getDefaultHeader3Data = (): ComponentData => ({
+  visible: true,
+  dir: "rtl",
+  logo: {
+    src: DEFAULT_LOGO.src,
+    alt: DEFAULT_LOGO.alt,
+    href: DEFAULT_LOGO.href,
+  },
+  navLinks: DEFAULT_NAV_LINKS.map((link) => ({
+    label: link.label,
+    href: link.href,
+    isActive: link.isActive,
+  })),
+  languageToggle: {
+    label: DEFAULT_LANGUAGE.label,
+  },
+  cta: {
+    label: DEFAULT_CTA.label,
+    href: DEFAULT_CTA.href,
+  },
+});
+
 export const headerFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
@@ -155,7 +184,9 @@ export const headerFunctions = {
     const defaultData =
       variantId === "header2"
         ? getDefaultHeader2Data()
-        : getDefaultHeaderData();
+        : variantId === "header3"
+          ? getDefaultHeader3Data()
+          : getDefaultHeaderData();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;

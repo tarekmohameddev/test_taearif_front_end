@@ -44,4 +44,6 @@ export interface ContactFormProps {
   onSubmit?: (data: FormData) => void;
   /** Text direction — defaults to `"rtl"` */
   dir?: "rtl" | "ltr";
+  // TODO: Add visible prop
+  visible?: boolean;
 }

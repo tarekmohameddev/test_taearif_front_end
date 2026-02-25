@@ -822,5 +822,79 @@ export const headerStructure: ComponentStructure = {
         },
       ],
     },
+    {
+      id: "header3",
+      name: "Header 3 - Stories (Logo + Nav + CTA)",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "dir",
+          label: "Direction",
+          type: "select",
+          options: [
+            { label: "RTL", value: "rtl" },
+            { label: "LTR", value: "ltr" },
+          ],
+        },
+        {
+          key: "logo",
+          label: "Logo",
+          type: "object",
+          fields: [
+            { key: "src", label: "Image URL", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+            { key: "href", label: "Link URL", type: "text" },
+          ],
+        },
+        {
+          key: "navLinks",
+          label: "Navigation Links",
+          type: "array",
+          addLabel: "Add Link",
+          itemLabel: "Link",
+          of: [
+            { key: "label", label: "Label", type: "text" },
+            { key: "href", label: "URL", type: "text" },
+            { key: "isActive", label: "Active", type: "boolean" },
+          ],
+        },
+        {
+          key: "languageToggle",
+          label: "Language Toggle",
+          type: "object",
+          fields: [{ key: "label", label: "Button Label", type: "text" }],
+        },
+        {
+          key: "cta",
+          label: "Call to Action",
+          type: "object",
+          fields: [
+            { key: "label", label: "Button Text", type: "text" },
+            { key: "href", label: "Button URL", type: "text" },
+          ],
+        },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "logo.src", label: "Logo Image", type: "image" },
+        { key: "logo.alt", label: "Logo Alt", type: "text" },
+        { key: "logo.href", label: "Logo Link", type: "text" },
+        {
+          key: "navLinks",
+          label: "Nav Links",
+          type: "array",
+          addLabel: "Add Link",
+          itemLabel: "Link",
+          of: [
+            { key: "label", label: "Label", type: "text" },
+            { key: "href", label: "URL", type: "text" },
+            { key: "isActive", label: "Active", type: "boolean" },
+          ],
+        },
+        { key: "languageToggle.label", label: "Language Toggle", type: "text" },
+        { key: "cta.label", label: "CTA Text", type: "text" },
+        { key: "cta.href", label: "CTA URL", type: "text" },
+      ],
+    },
   ],
 };

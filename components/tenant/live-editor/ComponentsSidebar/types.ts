@@ -1,6 +1,6 @@
 import { ComponentType } from "@/lib/ComponentsList";
 
-export type ThemeTab = "theme1" | "theme2";
+export type ThemeTab = "theme1" | "theme2" | "theme3";
 
 export interface Section {
   type: string;

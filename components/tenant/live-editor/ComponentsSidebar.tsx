@@ -10,6 +10,7 @@ import { DraggableDrawerItem } from "@/services/live-editor/dragDrop";
 import { getComponents, getAllComponentsTranslated, getComponentsByCategoryTranslated, ComponentType } from "@/lib/ComponentsList";
 import themesComponentsList from "@/lib/themes/themesComponentsList.json";
 import { CategoriesList } from "./ComponentsSidebar/components/CategoriesList";
+import type { ThemeTab } from "./ComponentsSidebar/types";
 import { BrandingSettings } from "@/components/tenant/live-editor/EditorSidebar/components/BrandingSettings";
 import { ModernColorPicker } from "@/components/tenant/live-editor/EditorSidebar/components/ModernColorPicker";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -60,7 +61,6 @@ const listItem = {
   show: { y: 0, opacity: 1, transition: { duration: 0.18 } },
 };
 
-type ThemeTab = "theme1" | "theme2";
 type MainTab = "components" | "branding";
 
 // دالة لاستخراج baseName من componentName
@@ -291,6 +291,16 @@ const ComponentsListView = ({
           }`}
         >
           {t("live_editor.theme_2")}
+        </button>
+        <button
+          onClick={() => setActiveTab("theme3")}
+          className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+            activeTab === "theme3"
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          {t("live_editor.theme_3")}
         </button>
       </div>
 

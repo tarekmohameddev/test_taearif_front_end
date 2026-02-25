@@ -1,4 +1,15 @@
 export { heroStructure } from "./hero";
+export { heroBannerStructure } from "./heroBanner";
+export { commitmentSectionStructure } from "./commitmentSection";
+export { creativityTriadSectionStructure } from "./creativityTriadSection";
+export { essenceSectionStructure } from "./essenceSection";
+export { featuresSectionStructure } from "./featuresSection";
+export { journeySectionStructure } from "./journeySection";
+export { landInvestmentFormSectionStructure } from "./landInvestmentFormSection";
+export { philosophyCtaSectionStructure } from "./philosophyCtaSection";
+export { quoteSectionStructure } from "./quoteSection";
+export { projectsHeaderStructure } from "./projectsHeader";
+export { valuesSectionStructure } from "./valuesSection";
 export { headerStructure } from "./header";
 export { halfTextHalfImageStructure } from "./halfTextHalfImage";
 export { sideBySideStructure } from "./sideBySide";

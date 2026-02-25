@@ -5,6 +5,17 @@ import { createDefaultData } from "../../../editorStoreFunctions/types";
 
 // Import all component functions
 import { heroFunctions } from "../../../editorStoreFunctions/heroFunctions";
+import { heroBannerFunctions } from "../../../editorStoreFunctions/heroBannerFunctions";
+import { commitmentSectionFunctions } from "../../../editorStoreFunctions/commitmentSectionFunctions";
+import { creativityTriadSectionFunctions } from "../../../editorStoreFunctions/creativityTriadSectionFunctions";
+import { essenceSectionFunctions } from "../../../editorStoreFunctions/essenceSectionFunctions";
+import { featuresSectionFunctions } from "../../../editorStoreFunctions/featuresSectionFunctions";
+import { journeySectionFunctions } from "../../../editorStoreFunctions/journeySectionFunctions";
+import { landInvestmentFormSectionFunctions } from "../../../editorStoreFunctions/landInvestmentFormSectionFunctions";
+import { philosophyCtaSectionFunctions } from "../../../editorStoreFunctions/philosophyCtaSectionFunctions";
+import { quoteSectionFunctions } from "../../../editorStoreFunctions/quoteSectionFunctions";
+import { projectsHeaderFunctions } from "../../../editorStoreFunctions/projectsHeaderFunctions";
+import { valuesSectionFunctions } from "../../../editorStoreFunctions/valuesSectionFunctions";
 import { headerFunctions } from "../../../editorStoreFunctions/headerFunctions";
 import { footerFunctions } from "../../../editorStoreFunctions/footerFunctions";
 import { halfTextHalfImageFunctions } from "../../../editorStoreFunctions/halfTextHalfImageFunctions";
@@ -101,6 +112,39 @@ export const createComponentActions = (
     switch (componentType) {
       case "hero":
         result = heroFunctions.getData(state, variantId);
+        break;
+      case "heroBanner":
+        result = heroBannerFunctions.getData(state, variantId);
+        break;
+      case "commitmentSection":
+        result = commitmentSectionFunctions.getData(state, variantId);
+        break;
+      case "creativityTriadSection":
+        result = creativityTriadSectionFunctions.getData(state, variantId);
+        break;
+      case "essenceSection":
+        result = essenceSectionFunctions.getData(state, variantId);
+        break;
+      case "featuresSection":
+        result = featuresSectionFunctions.getData(state, variantId);
+        break;
+      case "journeySection":
+        result = journeySectionFunctions.getData(state, variantId);
+        break;
+      case "landInvestmentFormSection":
+        result = landInvestmentFormSectionFunctions.getData(state, variantId);
+        break;
+      case "philosophyCtaSection":
+        result = philosophyCtaSectionFunctions.getData(state, variantId);
+        break;
+      case "quoteSection":
+        result = quoteSectionFunctions.getData(state, variantId);
+        break;
+      case "projectsHeader":
+        result = projectsHeaderFunctions.getData(state, variantId);
+        break;
+      case "valuesSection":
+        result = valuesSectionFunctions.getData(state, variantId);
         break;
       case "header":
         result = headerFunctions.getData(state, variantId);
@@ -311,6 +355,39 @@ export const createComponentActions = (
       case "hero":
         set(heroFunctions.setData(state, variantId, data));
         break;
+      case "heroBanner":
+        set(heroBannerFunctions.setData(state, variantId, data));
+        break;
+      case "commitmentSection":
+        set(commitmentSectionFunctions.setData(state, variantId, data));
+        break;
+      case "creativityTriadSection":
+        set(creativityTriadSectionFunctions.setData(state, variantId, data));
+        break;
+      case "essenceSection":
+        set(essenceSectionFunctions.setData(state, variantId, data));
+        break;
+      case "featuresSection":
+        set(featuresSectionFunctions.setData(state, variantId, data));
+        break;
+      case "journeySection":
+        set(journeySectionFunctions.setData(state, variantId, data));
+        break;
+      case "landInvestmentFormSection":
+        set(landInvestmentFormSectionFunctions.setData(state, variantId, data));
+        break;
+      case "philosophyCtaSection":
+        set(philosophyCtaSectionFunctions.setData(state, variantId, data));
+        break;
+      case "quoteSection":
+        set(quoteSectionFunctions.setData(state, variantId, data));
+        break;
+      case "projectsHeader":
+        set(projectsHeaderFunctions.setData(state, variantId, data));
+        break;
+      case "valuesSection":
+        set(valuesSectionFunctions.setData(state, variantId, data));
+        break;
       case "header":
         set(headerFunctions.setData(state, variantId, data));
         break;
@@ -482,6 +559,28 @@ export const createComponentActions = (
       switch (componentType) {
         case "hero":
           return currentState.heroStates[variantId];
+        case "heroBanner":
+          return currentState.heroBannerStates[variantId];
+        case "commitmentSection":
+          return currentState.commitmentSectionStates[variantId];
+        case "creativityTriadSection":
+          return currentState.creativityTriadSectionStates[variantId];
+        case "essenceSection":
+          return currentState.essenceSectionStates[variantId];
+        case "featuresSection":
+          return currentState.featuresSectionStates[variantId];
+        case "journeySection":
+          return currentState.journeySectionStates[variantId];
+        case "landInvestmentFormSection":
+          return currentState.landInvestmentFormSectionStates[variantId];
+        case "philosophyCtaSection":
+          return currentState.philosophyCtaSectionStates[variantId];
+        case "quoteSection":
+          return currentState.quoteSectionStates[variantId];
+        case "projectsHeader":
+          return currentState.projectsHeaderStates[variantId];
+        case "valuesSection":
+          return currentState.valuesSectionStates[variantId];
         case "header":
           return currentState.headerStates[variantId];
         case "footer":
@@ -608,6 +707,39 @@ export const createComponentActions = (
       switch (componentType) {
         case "hero":
           result = heroFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "heroBanner":
+          result = heroBannerFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "commitmentSection":
+          result = commitmentSectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "creativityTriadSection":
+          result = creativityTriadSectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "essenceSection":
+          result = essenceSectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "featuresSection":
+          result = featuresSectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "journeySection":
+          result = journeySectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "landInvestmentFormSection":
+          result = landInvestmentFormSectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "philosophyCtaSection":
+          result = philosophyCtaSectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "quoteSection":
+          result = quoteSectionFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "projectsHeader":
+          result = projectsHeaderFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "valuesSection":
+          result = valuesSectionFunctions.ensureVariant(state, variantId, initial);
           break;
         case "header":
           result = headerFunctions.ensureVariant(state, variantId, initial);
@@ -833,6 +965,39 @@ export const createComponentActions = (
     switch (componentType) {
       case "hero":
         set(heroFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "heroBanner":
+        set(heroBannerFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "commitmentSection":
+        set(commitmentSectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "creativityTriadSection":
+        set(creativityTriadSectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "essenceSection":
+        set(essenceSectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "featuresSection":
+        set(featuresSectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "journeySection":
+        set(journeySectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "landInvestmentFormSection":
+        set(landInvestmentFormSectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "philosophyCtaSection":
+        set(philosophyCtaSectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "quoteSection":
+        set(quoteSectionFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "projectsHeader":
+        set(projectsHeaderFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "valuesSection":
+        set(valuesSectionFunctions.updateByPath(state, variantId, path, value));
         break;
       case "header":
         set(headerFunctions.updateByPath(state, variantId, path, value));

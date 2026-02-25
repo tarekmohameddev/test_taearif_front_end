@@ -32,4 +32,6 @@ export interface ValuesSectionProps {
   cardTitleTextProps?: TextStyleProps;
   /** Style overrides for card descriptions */
   cardDescriptionTextProps?: TextStyleProps;
+  // TODO: Add visible prop
+  visible?: boolean;
 }

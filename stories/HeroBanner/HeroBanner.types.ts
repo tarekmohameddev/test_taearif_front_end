@@ -37,4 +37,6 @@ export interface HeroBannerProps {
   showScrollIndicator?: boolean;
   /** Scroll indicator click handler */
   onScrollDown?: () => void;
+  // TODO: Add visible prop
+  visible?: boolean;
 }
