@@ -2,11 +2,19 @@
 
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import { getCampaigns, deleteCampaign, sendCampaign, updateCampaign } from "@/lib/services/sms-api";
-import type { UpdateCampaignBody, SendCampaignBody } from "@/lib/services/sms-api";
+import {
+  getCampaigns,
+  deleteCampaign,
+  sendCampaign,
+  updateCampaign,
+  pauseCampaign,
+  resumeCampaign,
+} from "@/lib/services/sms-api";
+import type { UpdateCampaignBody, SendCampaignBody, ResumeCampaignBody } from "@/lib/services/sms-api";
 import type { SMSCampaign } from "../types";
 import { mapApiCampaignToUI } from "../types";
-import { getSmsErrorAr } from "../constants";
+import { SMS_USER_MESSAGES, getSmsCreditNoteAr } from "../constants";
+import { getSmsUserFacingMessage } from "../utils";
 import useStore from "@/context/Store";
 
 export function useSmsCampaigns() {
@@ -21,9 +29,9 @@ export function useSmsCampaigns() {
       const res = await getCampaigns({ per_page: 100 });
       setCampaigns((res.campaigns ?? []).map(mapApiCampaignToUI));
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "فشل تحميل الحملات";
+      const msg = getSmsUserFacingMessage(e);
       setError(msg);
-      toast.error(getSmsErrorAr(msg));
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -37,8 +45,7 @@ export function useSmsCampaigns() {
         fetchCampaigns();
         useStore.getState().fetchCreditBalance?.();
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "فشل الحذف";
-        toast.error(getSmsErrorAr(msg));
+        toast.error(getSmsUserFacingMessage(e));
       }
     },
     [fetchCampaigns]
@@ -52,9 +59,7 @@ export function useSmsCampaigns() {
         fetchCampaigns();
         useStore.getState().fetchCreditBalance?.();
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } }; message?: string };
-        const msg = err?.response?.data?.message ?? (e instanceof Error ? e.message : "فشل الإرسال");
-        toast.error(getSmsErrorAr(msg));
+        toast.error(getSmsUserFacingMessage(e));
       }
     },
     [fetchCampaigns]
@@ -67,8 +72,46 @@ export function useSmsCampaigns() {
         toast.success("تم تحديث الحملة");
         fetchCampaigns();
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "فشل التحديث";
-        toast.error(getSmsErrorAr(msg));
+        toast.error(getSmsUserFacingMessage(e));
+      }
+    },
+    [fetchCampaigns]
+  );
+
+  const handlePauseCampaign = useCallback(
+    async (id: string) => {
+      try {
+        const data = await pauseCampaign(Number(id));
+        const note = data.credit_info?.note;
+        toast.success(getSmsCreditNoteAr(note) ?? note ?? SMS_USER_MESSAGES.afterPause(
+          data.sent_count,
+          data.credit_info?.released ?? 0,
+          data.credit_info?.balance_after_release ?? 0
+        ));
+        fetchCampaigns();
+        useStore.getState().fetchCreditBalance?.();
+      } catch (e: unknown) {
+        toast.error(getSmsUserFacingMessage(e));
+      }
+    },
+    [fetchCampaigns]
+  );
+
+  const handleResumeCampaign = useCallback(
+    async (id: string, params: ResumeCampaignBody) => {
+      const idempotencyKey = crypto.randomUUID();
+      try {
+        const data = await resumeCampaign(Number(id), params, idempotencyKey);
+        const note = data.credit_info?.note;
+        const message = getSmsCreditNoteAr(note) ?? note
+          ?? (data.mode === "continue"
+            ? SMS_USER_MESSAGES.afterResumeContinue(data.recipient_count)
+            : SMS_USER_MESSAGES.afterResumeRestart(data.recipient_count));
+        toast.success(message);
+        fetchCampaigns();
+        useStore.getState().fetchCreditBalance?.();
+      } catch (e: unknown) {
+        toast.error(getSmsUserFacingMessage(e));
       }
     },
     [fetchCampaigns]
@@ -82,5 +125,7 @@ export function useSmsCampaigns() {
     handleDeleteCampaign,
     handleSendCampaign,
     handleEditCampaign,
+    handlePauseCampaign,
+    handleResumeCampaign,
   };
 }
