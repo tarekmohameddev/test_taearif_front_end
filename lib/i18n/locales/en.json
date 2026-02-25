@@ -581,6 +581,8 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "description": "Description",
+      "tagline": "Tagline",
+      "show_description": "Show Description",
       "button_text": "Button Text",
       "button_link": "Button Link",
       "image": "Image",

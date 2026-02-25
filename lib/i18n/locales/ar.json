@@ -605,6 +605,8 @@
       "title": "العنوان",
       "subtitle": "العنوان الفرعي",
       "description": "الوصف",
+      "tagline": "العبارة الترويجية",
+      "show_description": "إظهار الوصف",
       "button_text": "نص الزر",
       "button_link": "رابط الزر",
       "image": "الصورة",

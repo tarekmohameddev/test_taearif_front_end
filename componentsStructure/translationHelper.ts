@@ -17,6 +17,8 @@ export function translateLabel(
     Mobile: "components_structure.basic.mobile",
     Title: "components_structure.basic.title",
     Description: "components_structure.basic.description",
+    Tagline: "components_structure.basic.tagline",
+    "Show Description": "components_structure.basic.show_description",
     Text: "components_structure.basic.text",
     Paragraph: "components_structure.basic.paragraph",
     Blockquote: "components_structure.basic.blockquote",
