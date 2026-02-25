@@ -166,12 +166,20 @@ export const footerStructure: ComponentStructure = {
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
-                { key: "useCustomFooterLogo", label: "لوجو الفوتر: لوجو الشركة / لوجو مخصص", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
+                {
+                  key: "footerLogoGroup",
+                  label: "لوجو الفوتر",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.companyInfo.useCustomFooterLogo", label: "لوجو مخصص للتذييل", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
+                    { key: "content.companyInfo.logo", label: "لوجو الشركة (الشعار)", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
+                    { key: "content.companyInfo.footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
+                  ],
+                },
                 { key: "name", label: "Company Name", type: "text" },
                 { key: "description", label: "Description", type: "text" },
                 { key: "tagline", label: "Tagline", type: "text" },
-                { key: "logo", label: "Logo", type: "image" },
-                { key: "footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
               ],
             },
             {
@@ -490,12 +498,20 @@ export const footerStructure: ComponentStructure = {
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
-                { key: "useCustomFooterLogo", label: "لوجو الفوتر: لوجو الشركة / لوجو مخصص", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
+                {
+                  key: "footerLogoGroup",
+                  label: "لوجو الفوتر",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.companyInfo.useCustomFooterLogo", label: "لوجو مخصص للتذييل", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
+                    { key: "content.companyInfo.logo", label: "لوجو الشركة (الشعار)", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
+                    { key: "content.companyInfo.footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
+                  ],
+                },
                 { key: "name", label: "Company Name", type: "text" },
                 { key: "description", label: "Description", type: "text" },
                 { key: "tagline", label: "Tagline", type: "text" },
-                { key: "logo", label: "Logo", type: "image" },
-                { key: "footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
               ],
             },
             {
@@ -755,7 +771,17 @@ export const footerStructure: ComponentStructure = {
               fields: [
                 { key: "enabled", label: "Enabled", type: "boolean" },
                 { key: "showCompanyName", label: "Show Company Name", type: "boolean" },
-                { key: "useCustomFooterLogo", label: "لوجو الفوتر: لوجو الشركة / لوجو مخصص", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
+                {
+                  key: "footerLogoGroup",
+                  label: "لوجو الفوتر",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.companyInfo.useCustomFooterLogo", label: "لوجو مخصص للتذييل", type: "boolean", description: "عند التفعيل: إظهار لوجو مخصص للفوتر. عند الإلغاء: إظهار لوجو الشركة." },
+                    { key: "content.companyInfo.logo", label: "لوجو الشركة (الشعار)", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
+                    { key: "content.companyInfo.footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
+                  ],
+                },
                 { key: "name", label: "Company Name", type: "text" },
                 {
                   key: "descriptionSection",
@@ -780,8 +806,6 @@ export const footerStructure: ComponentStructure = {
                   ],
                 },
                 { key: "tagline", label: "Tagline", type: "text" },
-                { key: "logo", label: "Logo", type: "image" },
-                { key: "footerLogo", label: "لوجو مخصص للفوتر", type: "image", condition: { field: "useCustomFooterLogo", value: true } },
               ],
             },
             {
