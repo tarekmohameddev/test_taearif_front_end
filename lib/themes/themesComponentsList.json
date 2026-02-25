@@ -67,5 +67,19 @@
     "propertyDetail2",
     "card4",
     "card5"
+  ],
+  "theme3": [
+    "header3",
+    "heroBanner1",
+    "commitmentSection1",
+    "creativityTriadSection1",
+    "essenceSection1",
+    "featuresSection1",
+    "journeySection1",
+    "landInvestmentFormSection1",
+    "philosophyCtaSection1",
+    "quoteSection1",
+    "projectsHeader1",
+    "valuesSection1"
   ]
 }

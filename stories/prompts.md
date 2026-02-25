@@ -1,0 +1,1 @@
+ i need to add the component check the types file and the data file @docs/important/prompts/components/ADD_NEW_COMPONENT.md 

@@ -11,7 +11,11 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
-"format": "prettier --write ."
+    "format": "prettier --write .",
+    "check:cloudflare": "node scripts/check-cloudflare-status.js",
+    "add-indexes": "node scripts/add-tenant-indexes.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@auth/core": "0.34.2",
@@ -154,7 +158,11 @@
     "prettier": "^3.5.3",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.7.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "storybook": "^10.2.8",
+    "@storybook/nextjs": "^10.2.8",
+    "@storybook/addon-a11y": "^10.2.8",
+    "@storybook/addon-docs": "^10.2.8"
   },
   "overrides": {
     "@auth/core": "0.34.2"
