@@ -3,17 +3,10 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import CitySelector from "@/components/CitySelector";
-import DistrictSelector from "@/components/DistrictSelector";
+import { CustomDropdown, DropdownItem } from "@/components/customComponents/customDropdown";
 import { Loader2 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
+import { cn } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
@@ -25,6 +18,16 @@ interface Stage {
   icon: string | null;
   description: string | null;
   order: number;
+}
+
+interface City {
+  id: number;
+  name_ar: string;
+}
+
+interface District {
+  id: number;
+  name_ar: string;
 }
 
 interface CustomerFormData {
@@ -86,6 +89,10 @@ export const CustomerForm = ({
   const [stages, setStages] = useState<Stage[]>([]);
   const [fetchingStages, setFetchingStages] = useState(false);
   const [fetchingFilters, setFetchingFilters] = useState(false);
+  const [cities, setCities] = useState<City[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
   const { filterData, setFilterData } = useCustomersFiltersStore();
   const { userData } = useAuthStore();
 
@@ -148,6 +155,49 @@ export const CustomerForm = ({
       setFetchingStages(false);
     }
   };
+
+  const fetchCities = useCallback(async () => {
+    setLoadingCities(true);
+    try {
+      const response = await axiosInstance.get("/cities?country_id=1");
+      if (response.data?.data) {
+        setCities(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    } finally {
+      setLoadingCities(false);
+    }
+  }, []);
+
+  const fetchDistricts = useCallback(async (cityId: number) => {
+    setLoadingDistricts(true);
+    try {
+      const response = await axiosInstance.get(`/districts?city_id=${cityId}`);
+      if (response.data?.data) {
+        setDistricts(response.data.data);
+      } else {
+        setDistricts([]);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+      setDistricts([]);
+    } finally {
+      setLoadingDistricts(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCities();
+  }, [fetchCities]);
+
+  useEffect(() => {
+    if (formData.city_id) {
+      fetchDistricts(formData.city_id);
+    } else {
+      setDistricts([]);
+    }
+  }, [formData.city_id, fetchDistricts]);
 
   // Helper function to check if field has error
   const hasError = (fieldName: string): boolean => {
@@ -258,43 +308,38 @@ export const CustomerForm = ({
               </span>
             </div>
           ) : (
-            <Select
-              onValueChange={(value) => onChange("type_id", parseInt(value, 10))}
-              value={String(formData.type_id || "")}
+            <CustomDropdown
+              fullWidth
+              trigger={
+                <span>
+                  {filterData?.types?.find((t: any) => t.id === formData.type_id)
+                    ? translateType(
+                        filterData.types.find((t: any) => t.id === formData.type_id)?.name || "",
+                      )
+                    : "اختر النوع"}
+                </span>
+              }
+              triggerClassName={cn(
+                hasError("type_id") ? "border-red-500 focus:border-red-500" : "",
+              )}
+              dropdownWidth="w-56"
+              contentZIndex={10003}
             >
-              <SelectTrigger
-                className={
-                  hasError("type_id") ? "border-red-500 focus:border-red-500" : ""
-                }
-              >
-                <SelectValue placeholder="اختر النوع" />
-              </SelectTrigger>
-              <SelectContent>
-                {filterData?.types
-                  ?.filter((type: any) => type.name !== "Both")
-                  .map((type: any) => (
-                    <SelectItem key={type.id} value={type.id.toString()}>
-                      {translateType(type.name)}
-                    </SelectItem>
-                  )) || [
-                  <SelectItem key="1" value="1">
-                    مشتري
-                  </SelectItem>,
-                  <SelectItem key="2" value="2">
-                    مستثمر
-                  </SelectItem>,
-                  <SelectItem key="3" value="3">
-                    مستأجر
-                  </SelectItem>,
-                  <SelectItem key="4" value="4">
-                    مستأجر
-                  </SelectItem>,
-                  <SelectItem key="5" value="5">
-                    بائع
-                  </SelectItem>,
-                ]}
-              </SelectContent>
-            </Select>
+              {(filterData?.types?.filter((type: any) => type.name !== "Both") || [
+                { id: 1, name: "Rent" },
+                { id: 2, name: "Sale" },
+                { id: 3, name: "Rented" },
+                { id: 4, name: "Sold" },
+                { id: 5, name: "Both" },
+              ].filter((t: any) => t.name !== "Both")).map((type: any) => (
+                <DropdownItem
+                  key={type.id}
+                  onClick={() => onChange("type_id", type.id)}
+                >
+                  {translateType(type.name)}
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
           )}
           {hasError("type_id") && (
             <p className="text-red-500 text-sm mt-1">
@@ -411,35 +456,54 @@ export const CustomerForm = ({
               </span>
             </div>
           ) : (
-            <Select
-              onValueChange={(value) =>
-                onChange(
-                  "stage_id",
-                  value === "none" ? null : parseInt(value, 10),
-                )
+            <CustomDropdown
+              fullWidth
+              trigger={
+                <span className="flex items-center gap-2">
+                  {formData.stage_id != null
+                    ? (() => {
+                        const stage = stages.find((s) => s.id === formData.stage_id);
+                        return stage ? (
+                          <>
+                            {stage.color && (
+                              <div
+                                className="w-3 h-3 rounded-full shrink-0"
+                                style={{ backgroundColor: stage.color }}
+                              />
+                            )}
+                            {stage.stage_name}
+                          </>
+                        ) : (
+                          "اختر المرحلة (اختياري)"
+                        );
+                      })()
+                    : "اختر المرحلة (اختياري)"}
+                </span>
               }
-              value={formData.stage_id?.toString() || "none"}
+              triggerClassName=""
+              dropdownWidth="w-56"
+              contentZIndex={10003}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر المرحلة (اختياري)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">بدون مرحلة</SelectItem>
-                {stages.map((stage) => (
-                  <SelectItem key={stage.id} value={stage.id.toString()}>
-                    <div className="flex items-center gap-2">
-                      {stage.color && (
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: stage.color }}
-                        />
-                      )}
-                      <span>{stage.stage_name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <DropdownItem onClick={() => onChange("stage_id", null)}>
+                بدون مرحلة
+              </DropdownItem>
+              {stages.map((stage) => (
+                <DropdownItem
+                  key={stage.id}
+                  onClick={() => onChange("stage_id", stage.id)}
+                >
+                  <div className="flex items-center gap-2">
+                    {stage.color && (
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: stage.color }}
+                      />
+                    )}
+                    <span>{stage.stage_name}</span>
+                  </div>
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
           )}
         </div>
       </div>
@@ -451,11 +515,44 @@ export const CustomerForm = ({
           >
             المدينة
           </Label>
-          <CitySelector
-            selectedCityId={formData.city_id}
-            onCitySelect={(cityId) => onChange("city_id", cityId)}
-            className={hasError("city_id") ? "border-red-500" : ""}
-          />
+          {loadingCities ? (
+            <div className="flex items-center justify-center py-2 border rounded-md">
+              <Loader2 className="h-4 w-4 animate-spin ml-2" />
+              <span className="text-sm text-muted-foreground">
+                جاري التحميل...
+              </span>
+            </div>
+          ) : (
+            <CustomDropdown
+              fullWidth
+              trigger={
+                <span>
+                  {formData.city_id != null
+                    ? cities.find((c) => c.id === formData.city_id)?.name_ar ||
+                      "اختر مدينة"
+                    : "اختر مدينة"}
+                </span>
+              }
+              triggerClassName={cn(
+                hasError("city_id") ? "border-red-500 focus:border-red-500" : "",
+              )}
+              dropdownWidth="w-56"
+              maxHeight="200px"
+              contentZIndex={10003}
+            >
+              {cities.map((city) => (
+                <DropdownItem
+                  key={city.id}
+                  onClick={() => {
+                    onChange("city_id", city.id);
+                    onChange("district_id", null);
+                  }}
+                >
+                  {city.name_ar}
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
+          )}
           {hasError("city_id") && (
             <p className="text-red-500 text-sm mt-1">
               {getErrorMessage("city_id")}
@@ -469,14 +566,49 @@ export const CustomerForm = ({
           >
             الحي
           </Label>
-          <DistrictSelector
-            selectedCityId={formData.city_id}
-            selectedDistrictId={formData.district_id}
-            onDistrictSelect={(districtId) =>
-              onChange("district_id", districtId)
-            }
-            className={hasError("district_id") ? "border-red-500" : ""}
-          />
+          {loadingDistricts && formData.city_id ? (
+            <div className="flex items-center justify-center py-2 border rounded-md">
+              <Loader2 className="h-4 w-4 animate-spin ml-2" />
+              <span className="text-sm text-muted-foreground">
+                جاري التحميل...
+              </span>
+            </div>
+          ) : (
+            <CustomDropdown
+              fullWidth
+              trigger={
+                <span className={!formData.city_id ? "text-gray-400" : ""}>
+                  {formData.district_id != null
+                    ? districts.find(
+                        (d) => d.id === formData.district_id || d.id === Number(formData.district_id),
+                      )?.name_ar || "اختر المنطقة"
+                    : "اختر المنطقة"}
+                </span>
+              }
+              triggerClassName={cn(
+                hasError("district_id") ? "border-red-500 focus:border-red-500" : "",
+                !formData.city_id && "opacity-70",
+              )}
+              dropdownWidth="w-56"
+              maxHeight="200px"
+              contentZIndex={10003}
+            >
+              {!formData.city_id ? (
+                <DropdownItem onClick={() => {}} className="text-gray-400 cursor-not-allowed">
+                  اختر المدينة أولاً
+                </DropdownItem>
+              ) : (
+                districts.map((district) => (
+                  <DropdownItem
+                    key={district.id}
+                    onClick={() => onChange("district_id", district.id)}
+                  >
+                    {district.name_ar}
+                  </DropdownItem>
+                ))
+              )}
+            </CustomDropdown>
+          )}
           {hasError("district_id") && (
             <p className="text-red-500 text-sm mt-1">
               {getErrorMessage("district_id")}

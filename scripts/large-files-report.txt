@@ -1,0 +1,782 @@
+=== Large Files Report ===
+
+File: componentsStructure\translationHelper.ts
+Lines: 2964
+Characters: 164900
+-----------------------------------
+File: app\dashboard\access-control\page.tsx
+Lines: 2737
+Characters: 98640
+-----------------------------------
+File: lib\mock\customers-hub-data.ts
+Lines: 2676
+Characters: 75171
+-----------------------------------
+File: componentsStructure\whyChooseUs.ts
+Lines: 2623
+Characters: 98132
+-----------------------------------
+File: componentsStructure\sideBySide.ts
+Lines: 2458
+Characters: 81977
+-----------------------------------
+File: componentsStructure\halfTextHalfImage.ts
+Lines: 2423
+Characters: 82078
+-----------------------------------
+File: components\tenant\propertyDetail\propertyDetail2.tsx
+Lines: 2414
+Characters: 97055
+-----------------------------------
+File: components\tenant\inputs\inputs2.tsx
+Lines: 2132
+Characters: 73223
+-----------------------------------
+File: components\purchase-management\services\purchase-flow-service.tsx
+Lines: 2118
+Characters: 72157
+-----------------------------------
+File: components\customers-hub\requests\RequestsCenterPage.tsx
+Lines: 2013
+Characters: 77355
+-----------------------------------
+File: components\property-reservations-page.tsx
+Lines: 1991
+Characters: 74615
+-----------------------------------
+File: components\tenant\inputs\inputs1.tsx
+Lines: 1905
+Characters: 64073
+-----------------------------------
+File: components\customers-hub\requests\RequestDetailPage.tsx
+Lines: 1876
+Characters: 83927
+-----------------------------------
+File: app\dashboard\rental-management\[id]\page.tsx
+Lines: 1856
+Characters: 77545
+-----------------------------------
+File: app\dashboard\crm\[id]\edit\page.tsx
+Lines: 1849
+Characters: 85692
+-----------------------------------
+File: components\reports\platform-reports-page.tsx
+Lines: 1831
+Characters: 75341
+-----------------------------------
+File: components\project-detail.tsx
+Lines: 1808
+Characters: 77799
+-----------------------------------
+File: components\rental-management\rental-details-dialog.tsx
+Lines: 1793
+Characters: 75245
+-----------------------------------
+File: components\property\incomplete-properties-management-page.tsx
+Lines: 1764
+Characters: 65269
+-----------------------------------
+File: components\customers-hub\actions\IncomingActionsCard.tsx
+Lines: 1715
+Characters: 74824
+-----------------------------------
+File: components\customers-hub\detail\CustomerDetailPageSimple.tsx
+Lines: 1641
+Characters: 59095
+-----------------------------------
+File: components\rental-management\payment-collection-dialog.tsx
+Lines: 1600
+Characters: 61972
+-----------------------------------
+File: components\project\edit-project-page.tsx
+Lines: 1595
+Characters: 59257
+-----------------------------------
+File: components\crm\new-deal-form.tsx
+Lines: 1564
+Characters: 62862
+-----------------------------------
+File: components\rental-management\services\rental-maintenance-service.tsx
+Lines: 1518
+Characters: 56209
+-----------------------------------
+File: components\project\add-project-page.tsx
+Lines: 1500
+Characters: 54194
+-----------------------------------
+File: context\store\unified-customers.ts
+Lines: 1456
+Characters: 50636
+-----------------------------------
+File: components\rental-management\services\updated-rental-form.tsx
+Lines: 1433
+Characters: 54382
+-----------------------------------
+File: components\crm\deal-details-page.tsx
+Lines: 1415
+Characters: 57230
+-----------------------------------
+File: app\dashboard\access-control\roles\page.tsx
+Lines: 1392
+Characters: 54960
+-----------------------------------
+File: componentsStructure\hero.ts
+Lines: 1377
+Characters: 48465
+-----------------------------------
+File: lib\ComponentsList.tsx
+Lines: 1355
+Characters: 40204
+-----------------------------------
+File: components\settings-page.tsx
+Lines: 1345
+Characters: 57307
+-----------------------------------
+File: components\signin-up\login-page.tsx
+Lines: 1315
+Characters: 44949
+-----------------------------------
+File: components\crm\dialogs\crm-settings.tsx
+Lines: 1301
+Characters: 44089
+-----------------------------------
+File: components\tenant\propertiesShowcase\propertiesShowcase1.tsx
+Lines: 1301
+Characters: 45311
+-----------------------------------
+File: components\tenant\hero\hero3.tsx
+Lines: 1252
+Characters: 45765
+-----------------------------------
+File: components\tenant\blogDetails\blogDetails1.tsx
+Lines: 1251
+Characters: 46618
+-----------------------------------
+File: components\tenant\grid\grid1.tsx
+Lines: 1250
+Characters: 49294
+-----------------------------------
+File: components\marketing\credit-system.tsx
+Lines: 1238
+Characters: 51550
+-----------------------------------
+File: components\whatsapp-center\page-component.tsx
+Lines: 1202
+Characters: 43732
+-----------------------------------
+File: components\marketing\whatsapp-numbers-management.tsx
+Lines: 1195
+Characters: 45614
+-----------------------------------
+File: components\rental-management\services\rental-agreements-service.tsx
+Lines: 1182
+Characters: 44979
+-----------------------------------
+File: components\signin-up\forgot-password-page.tsx
+Lines: 1161
+Characters: 43283
+-----------------------------------
+File: components\rental-management\dashboard-stats\index.tsx
+Lines: 1155
+Characters: 53280
+-----------------------------------
+File: components\tenant\propertyFilter\propertyFilter2.tsx
+Lines: 1135
+Characters: 42083
+-----------------------------------
+File: components\apps-page.tsx
+Lines: 1130
+Characters: 38772
+-----------------------------------
+File: components\crm\crm-filters.tsx
+Lines: 1126
+Characters: 40069
+-----------------------------------
+File: components\tenant\hero\hero4.tsx
+Lines: 1122
+Characters: 55159
+-----------------------------------
+File: components\matching\ai-matching-page.tsx
+Lines: 1119
+Characters: 46952
+-----------------------------------
+File: components\crm\crm-page.tsx
+Lines: 1116
+Characters: 35267
+-----------------------------------
+File: components\customers\page-components\CustomerTable.tsx
+Lines: 1102
+Characters: 42925
+-----------------------------------
+File: components\content\footer-management-page.tsx
+Lines: 1090
+Characters: 40384
+-----------------------------------
+File: componentsStructure\footer.ts
+Lines: 1086
+Characters: 37475
+-----------------------------------
+File: componentsStructure\contactCards.ts
+Lines: 1082
+Characters: 35742
+-----------------------------------
+File: componentsStructure\card.ts
+Lines: 1057
+Characters: 30006
+-----------------------------------
+File: components\tenant\footer\footer2.tsx
+Lines: 1052
+Characters: 40575
+-----------------------------------
+File: components\tenant\hero\hero1.tsx
+Lines: 1037
+Characters: 37163
+-----------------------------------
+File: components\purchase-management\purchase-detail-page.tsx
+Lines: 1035
+Characters: 35451
+-----------------------------------
+File: context\editorStore\store\actions\componentActions.ts
+Lines: 1032
+Characters: 36868
+-----------------------------------
+File: components\tenant\propertyFilter\propertyFilter1.tsx
+Lines: 1029
+Characters: 36296
+-----------------------------------
+File: components\tenant\header\StaticHeader1.tsx
+Lines: 1023
+Characters: 35296
+-----------------------------------
+File: components\tenant\footer\footer1.tsx
+Lines: 1017
+Characters: 37196
+-----------------------------------
+File: components\content\menu-management-page.tsx
+Lines: 1011
+Characters: 36380
+-----------------------------------
+File: components\tenant\live-editor\EditorSidebar\components\FieldRenderers\ArrayFieldRenderer.tsx
+Lines: 994
+Characters: 40296
+-----------------------------------
+File: components\tenant\whyChooseUs\whyChooseUs1.tsx
+Lines: 994
+Characters: 30925
+-----------------------------------
+File: components\marketing\campaigns-management.tsx
+Lines: 988
+Characters: 34630
+-----------------------------------
+File: components\tenant\contactMapSection\contactMapSection1.tsx
+Lines: 987
+Characters: 32584
+-----------------------------------
+File: componentsStructure\stepsSection.ts
+Lines: 984
+Characters: 32953
+-----------------------------------
+File: components\landing-page.tsx
+Lines: 983
+Characters: 39872
+-----------------------------------
+File: components\rental-management\services\rental-payments-service.tsx
+Lines: 978
+Characters: 36934
+-----------------------------------
+File: components\purchase-management\services\purchase-payments-service.tsx
+Lines: 975
+Characters: 36768
+-----------------------------------
+File: components\purchase-management\services\purchase-agreements-service.tsx
+Lines: 961
+Characters: 36659
+-----------------------------------
+File: components\property\advanced-filter-dialog.tsx
+Lines: 948
+Characters: 34617
+-----------------------------------
+File: components\purchase-management\services\purchase-inspections-service.tsx
+Lines: 946
+Characters: 36172
+-----------------------------------
+File: components\tenant\header\header2.tsx
+Lines: 941
+Characters: 31582
+-----------------------------------
+File: componentsStructure\photosGrid.ts
+Lines: 932
+Characters: 25744
+-----------------------------------
+File: components\property-requests\page-components\PropertyRequestsTable.tsx
+Lines: 929
+Characters: 35122
+-----------------------------------
+File: components\customers-hub\assignment\AssignmentPanel.tsx
+Lines: 924
+Characters: 38447
+-----------------------------------
+File: components\tenant\live-editor\ComponentsSidebar.tsx
+Lines: 915
+Characters: 32431
+-----------------------------------
+File: components\whatsapp-ai-page.tsx
+Lines: 915
+Characters: 46269
+-----------------------------------
+File: componentsStructure\grid.ts
+Lines: 915
+Characters: 30145
+-----------------------------------
+File: app\dashboard\properties\[id]\page.tsx
+Lines: 903
+Characters: 35162
+-----------------------------------
+File: components\purchase-management\services\vendor-management-service.tsx
+Lines: 903
+Characters: 34332
+-----------------------------------
+File: components\crm\customer-card.tsx
+Lines: 902
+Characters: 34159
+-----------------------------------
+File: components\tenant\propertySlider\propertySlider1.tsx
+Lines: 902
+Characters: 30408
+-----------------------------------
+File: components\tenant\halfTextHalfImage\halfTextHalfImage2.tsx
+Lines: 901
+Characters: 29070
+-----------------------------------
+File: app\TenantPageWrapper.tsx
+Lines: 900
+Characters: 30609
+-----------------------------------
+File: lib\api.ts
+Lines: 896
+Characters: 23730
+-----------------------------------
+File: components\tenant\contactUsHomePage\contactUsHomePage1.tsx
+Lines: 891
+Characters: 32088
+-----------------------------------
+File: components\content\banner-section-page.tsx
+Lines: 872
+Characters: 33185
+-----------------------------------
+File: components\tenant\halfTextHalfImage\halfTextHalfImage1.tsx
+Lines: 861
+Characters: 27213
+-----------------------------------
+File: components\property-requests\property-requests-page.tsx
+Lines: 857
+Characters: 29183
+-----------------------------------
+File: components\tenant\footer\StaticFooter1.tsx
+Lines: 848
+Characters: 30193
+-----------------------------------
+File: components\project\projects-management-page.tsx
+Lines: 847
+Characters: 30141
+-----------------------------------
+File: components\tenant\stepsSection\stepsSection1.tsx
+Lines: 847
+Characters: 27749
+-----------------------------------
+File: components\access-control\EmployeeActivityPage.tsx
+Lines: 838
+Characters: 30622
+-----------------------------------
+File: context\AuthContext.js
+Lines: 836
+Characters: 26269
+-----------------------------------
+File: components\marketing\marketing-settings.tsx
+Lines: 831
+Characters: 30355
+-----------------------------------
+File: componentsStructure\header.ts
+Lines: 827
+Characters: 26573
+-----------------------------------
+File: context\store\crm.ts
+Lines: 821
+Characters: 26063
+-----------------------------------
+File: components\tenant\blogDetails\blogDetails2.tsx
+Lines: 818
+Characters: 27785
+-----------------------------------
+File: components\tenant\header\header1.tsx
+Lines: 810
+Characters: 24553
+-----------------------------------
+File: components\tenant\partners\partners2.tsx
+Lines: 802
+Characters: 24923
+-----------------------------------
+File: components\customers-hub\requests\TableRequestsList.tsx
+Lines: 801
+Characters: 30096
+-----------------------------------
+File: types\unified-customer.ts
+Lines: 800
+Characters: 24505
+-----------------------------------
+File: lib\services\customers-hub-requests-api.ts
+Lines: 785
+Characters: 25057
+-----------------------------------
+File: components\crm\inquiry-list.tsx
+Lines: 783
+Characters: 25609
+-----------------------------------
+File: components\tenant\cards\card4.tsx
+Lines: 783
+Characters: 26343
+-----------------------------------
+File: components\tenant\sideBySide\sideBySide2.tsx
+Lines: 782
+Characters: 25816
+-----------------------------------
+File: components\properties-page.tsx
+Lines: 779
+Characters: 30769
+-----------------------------------
+File: components\tenant\live-editor\LiveEditorHandlers.tsx
+Lines: 777
+Characters: 26568
+-----------------------------------
+File: components\tenant\jobForm\jobForm1.tsx
+Lines: 773
+Characters: 27433
+-----------------------------------
+File: components\tenant\live-editor\EditorSidebar\utils.ts
+Lines: 773
+Characters: 21593
+-----------------------------------
+File: app\dashboard\property-requests\[id]\edit\page.tsx
+Lines: 771
+Characters: 31601
+-----------------------------------
+File: components\signin-up\register-page.tsx
+Lines: 768
+Characters: 26128
+-----------------------------------
+File: componentsStructure\projectDetails.ts
+Lines: 768
+Characters: 22142
+-----------------------------------
+File: app\dashboard\crm\deals\[id]\edit\page.tsx
+Lines: 756
+Characters: 27155
+-----------------------------------
+File: context\editorStoreFunctions\sideBySideFunctions.ts
+Lines: 730
+Characters: 20591
+-----------------------------------
+File: componentsStructure\inputs.ts
+Lines: 728
+Characters: 23229
+-----------------------------------
+File: componentsStructure\contactMapSection.ts
+Lines: 720
+Characters: 22131
+-----------------------------------
+File: components\tenant\sideBySide\sideBySide1.tsx
+Lines: 717
+Characters: 23327
+-----------------------------------
+File: componentsStructure\partners.ts
+Lines: 709
+Characters: 20381
+-----------------------------------
+File: componentsStructure\propertySlider.ts
+Lines: 704
+Characters: 21742
+-----------------------------------
+File: components\mainCOMP\dashboard-header.tsx
+Lines: 702
+Characters: 30318
+-----------------------------------
+File: components\rental-management\services\tenant-management-service.tsx
+Lines: 702
+Characters: 26449
+-----------------------------------
+File: components\tenant\live-editor\effects\utils\staticPageHelpers.ts
+Lines: 699
+Characters: 20839
+-----------------------------------
+File: components\rental-management\services\maintenance-request-service.tsx
+Lines: 698
+Characters: 26229
+-----------------------------------
+File: components\signin-up\onboarding-page.tsx
+Lines: 689
+Characters: 23525
+-----------------------------------
+File: app\HomePageWrapper.tsx
+Lines: 688
+Characters: 22665
+-----------------------------------
+File: componentsStructure\contactFormSection.ts
+Lines: 686
+Characters: 22070
+-----------------------------------
+File: components\affiliate\affiliate-dashboard-page.tsx
+Lines: 684
+Characters: 26486
+-----------------------------------
+File: app\dashboard\crm\deals\new\page.tsx
+Lines: 680
+Characters: 24526
+-----------------------------------
+File: components\customers-hub\pipeline\TablePipelineBoard.tsx
+Lines: 679
+Characters: 25747
+-----------------------------------
+File: components\customers\customers-page.tsx
+Lines: 674
+Characters: 23336
+-----------------------------------
+File: components\property\properties-map-view.tsx
+Lines: 673
+Characters: 24623
+-----------------------------------
+File: components\rental-management\services\financial-reporting-service.tsx
+Lines: 670
+Characters: 23408
+-----------------------------------
+File: components\property\properties\PropertiesManagementPage.tsx
+Lines: 667
+Characters: 23686
+-----------------------------------
+File: components\tenant\cards\card5.tsx
+Lines: 663
+Characters: 24374
+-----------------------------------
+File: components\tenant\halfTextHalfImage\halfTextHalfImage3.tsx
+Lines: 656
+Characters: 22392
+-----------------------------------
+File: components\tenant\testimonials\testimonials1.tsx
+Lines: 656
+Characters: 18980
+-----------------------------------
+File: componentsStructure\applicationForm.ts
+Lines: 651
+Characters: 21813
+-----------------------------------
+File: lib\debug\live-editor\utils\fileWriter.ts
+Lines: 651
+Characters: 21026
+-----------------------------------
+File: app\dashboard\access-control\create-employee\page.tsx
+Lines: 647
+Characters: 23918
+-----------------------------------
+File: components\tenant\sideBySide\sideBySide3.tsx
+Lines: 645
+Characters: 22422
+-----------------------------------
+File: context\editorStoreFunctions\halfTextHalfImageFunctions.ts
+Lines: 644
+Characters: 17660
+-----------------------------------
+File: context\editorStore\types\types.ts
+Lines: 639
+Characters: 21617
+-----------------------------------
+File: components\buildings\building-card.tsx
+Lines: 636
+Characters: 22537
+-----------------------------------
+File: app\dashboard\property-requests\[id]\page.tsx
+Lines: 632
+Characters: 25263
+-----------------------------------
+File: services\live-editor\dragDrop\EnhancedLiveEditorDragDropContext.tsx
+Lines: 631
+Characters: 22676
+-----------------------------------
+File: context\store\purchaseManagement.js
+Lines: 629
+Characters: 16463
+-----------------------------------
+File: components\property\property-form\components\PropertyDetailsCard.tsx
+Lines: 620
+Characters: 25346
+-----------------------------------
+File: components\signin-up\google-register-page.tsx
+Lines: 619
+Characters: 20857
+-----------------------------------
+File: context\store\matchingPage.js
+Lines: 618
+Characters: 16734
+-----------------------------------
+File: components\tenant\contactFormSection\contactFormSection1.tsx
+Lines: 617
+Characters: 21410
+-----------------------------------
+File: components\tenant\halfTextHalfImage\halfTextHalfImage7.tsx
+Lines: 616
+Characters: 22281
+-----------------------------------
+File: components\rental-management\services\rental-applications-service\components\AddRentalForm\AddRentalForm.tsx
+Lines: 615
+Characters: 20641
+-----------------------------------
+File: lib\fileLogger.ts
+Lines: 614
+Characters: 14635
+-----------------------------------
+File: componentsStructure\testimonials.ts
+Lines: 611
+Characters: 18894
+-----------------------------------
+File: components\customers-hub\page\CustomersMap.tsx
+Lines: 598
+Characters: 21479
+-----------------------------------
+File: componentsStructure\blogDetails.ts
+Lines: 597
+Characters: 17041
+-----------------------------------
+File: components\tenant\partners\partners1.tsx
+Lines: 596
+Characters: 19946
+-----------------------------------
+File: components\tenant\live-editor\LiveEditorUI\hooks\useComponentHandlers.ts
+Lines: 591
+Characters: 18446
+-----------------------------------
+File: components\sms-campaigns\SmsCampaignsList.tsx
+Lines: 590
+Characters: 24360
+-----------------------------------
+File: services\live-editor\theme-change\themeApplicationService.ts
+Lines: 588
+Characters: 20633
+-----------------------------------
+File: components\customers\page-components\FiltersAndSearch.tsx
+Lines: 580
+Characters: 17771
+-----------------------------------
+File: components\rental-management\services\rent-collection-service.tsx
+Lines: 580
+Characters: 20482
+-----------------------------------
+File: context\store\marketingDashboard.js
+Lines: 580
+Characters: 15271
+-----------------------------------
+File: components\customers-hub\pipeline\ClassicPipelineBoard.tsx
+Lines: 578
+Characters: 27439
+-----------------------------------
+File: components\rental-management\services\daily-followup-service.tsx
+Lines: 578
+Characters: 19029
+-----------------------------------
+File: components\tenant\imageText\imageText1.tsx
+Lines: 574
+Characters: 21533
+-----------------------------------
+File: components\tenant\blogsSections\blogsSections1.tsx
+Lines: 573
+Characters: 18105
+-----------------------------------
+File: hooks\useCustomersHubRequests.ts
+Lines: 572
+Characters: 19844
+-----------------------------------
+File: components\tenant\live-editor\LiveEditorUI\index.tsx
+Lines: 569
+Characters: 19021
+-----------------------------------
+File: components\tenant\live-editor\EditorSidebar\handlers\useSaveHandler.ts
+Lines: 565
+Characters: 18992
+-----------------------------------
+File: components\rental-management\services\contracts-service.tsx
+Lines: 562
+Characters: 20079
+-----------------------------------
+File: componentsStructure\propertyDetail.ts
+Lines: 562
+Characters: 16298
+-----------------------------------
+File: components\rental-management\services\property-listing-service.tsx
+Lines: 560
+Characters: 20235
+-----------------------------------
+File: components\tenant\applicationForm\applicationForm1.tsx
+Lines: 557
+Characters: 21453
+-----------------------------------
+File: components\TaearifLandingPageSimple.tsx
+Lines: 554
+Characters: 22337
+-----------------------------------
+File: context\editorStoreFunctions\contactCardsFunctions.ts
+Lines: 543
+Characters: 13421
+-----------------------------------
+File: components\tenant\halfTextHalfImage\halfTextHalfImage6.tsx
+Lines: 538
+Characters: 20329
+-----------------------------------
+File: components\customers-hub\bulk\BulkActionsBar.tsx
+Lines: 536
+Characters: 18469
+-----------------------------------
+File: components\crm\mobile-customers-view.tsx
+Lines: 535
+Characters: 20241
+-----------------------------------
+File: components\tenant\contactCards\contactCards1.tsx
+Lines: 526
+Characters: 19090
+-----------------------------------
+File: context\editorStoreFunctions\heroFunctions.ts
+Lines: 526
+Characters: 13438
+-----------------------------------
+File: context\editorStoreFunctions\inputs2Functions.ts
+Lines: 525
+Characters: 12339
+-----------------------------------
+File: components\purchase-management\services\purchase-overview-service.tsx
+Lines: 519
+Characters: 18314
+-----------------------------------
+File: components\TaearifUpdatesPage.tsx
+Lines: 515
+Characters: 17723
+-----------------------------------
+File: components\tenant\filterButtons\filterButtons1.tsx
+Lines: 514
+Characters: 18150
+-----------------------------------
+File: components\tenant\sideBySide\sideBySide7.tsx
+Lines: 507
+Characters: 17656
+-----------------------------------
+File: app\dashboard\access-control\edit-employee\[id]\page.tsx
+Lines: 505
+Characters: 18295
+-----------------------------------
+File: app\owner\dashboard\page.tsx
+Lines: 502
+Characters: 17271
+-----------------------------------
+File: components\tenant\live-editor\EditorSidebar\views\EditComponentView.tsx
+Lines: 502
+Characters: 20001
+-----------------------------------
+File: app\dashboard\customers\[id]\page.tsx
+Lines: 440
+Characters: 20951
+-----------------------------------

@@ -133,11 +133,13 @@ interface DropdownProps {
   maxHeight?: string;
   /** Use when dropdown is inside an elevated dialog so it appears above (e.g. 10003) */
   contentZIndex?: number;
+  /** When true, trigger and popup take full width of container. Default: false */
+  fullWidth?: boolean;
 }
 
-export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight, contentZIndex = 10001 }: DropdownProps) => {
+export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight, contentZIndex = 10001, fullWidth = false }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ top: 0, right: 0 });
+  const [position, setPosition] = useState({ top: 0, right: 0, width: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -147,13 +149,14 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor,
     setMounted(true);
   }, []);
 
-  // حساب موضع القائمة
+  // حساب موضع القائمة وعرض الزر (لـ fullWidth)
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setPosition({
-        top: rect.bottom, // ملاصق تماماً بدون مسافة
+        top: rect.bottom,
         right: window.innerWidth - rect.right,
+        width: rect.width,
       });
     }
   }, [isOpen]);
@@ -202,12 +205,14 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor,
         ref={dropdownRef}
         className={cn(
           "fixed origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-auto",
-          dropdownWidth
+          !fullWidth && dropdownWidth
         )}
         style={{
           zIndex: contentZIndex,
           top: `${position.top}px`,
           right: `${position.right}px`,
+          width: fullWidth && position.width > 0 ? position.width : undefined,
+          minWidth: fullWidth && position.width > 0 ? position.width : undefined,
           maxHeight: maxHeight || undefined,
         }}
         dir="rtl"
@@ -219,13 +224,14 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor,
 
   return (
     <>
-      <div className="relative inline-block text-right" dir="rtl">
+      <div className={cn("relative text-right", fullWidth ? "w-full block" : "inline-block")} dir="rtl">
         {/* زر الفتح الرئيسي */}
         <button
           ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
             "flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none",
+            fullWidth && "w-full justify-between",
             triggerClassName
           )}
         >
