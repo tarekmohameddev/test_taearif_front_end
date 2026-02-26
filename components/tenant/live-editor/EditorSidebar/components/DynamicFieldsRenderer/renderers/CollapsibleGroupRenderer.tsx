@@ -30,6 +30,9 @@
  *
  * إذا كانت المجموعة في الجذر (normalizedPath بدون نقطة)، parentPath يكون ""
  * ونمرّر undefined كـ basePath فيبقى المسار = field.key وهو المطلوب.
+ *
+ * تمييز سياق المصفوفة: إذا انتهى parentPath بـ .رقم (مثل texts.0) نستخدم basePath = parentPath
+ * (imageText). وإلا نستخدم basePath = undefined ليكون المسار = field.key (footer، grid، hero).
  */
 import React, { useState } from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
@@ -106,25 +109,30 @@ export const CollapsibleGroupRenderer: React.FC<CollapsibleGroupRendererProps> =
         <div className="p-6 bg-gradient-to-b from-white to-slate-50 space-y-6 border-t border-slate-200">
           {groupFields.map((field: FieldDefinition) => {
             // ─────────────────────────────────────────────────────────────────
-            // قاعدة مسار الحقول الداخلية — ضرورية لعدم تكرار مشكلة "إخراج من الشبكة"
+            // قاعدة مسار الحقول الداخلية — دعم نمطين لتفادي كسر imageText أو footer/grid/hero
             // ─────────────────────────────────────────────────────────────────
-            // normalizedPath هنا = مسار المجموعة نفسها، مثلاً: "texts.0.breakOutGroup".
-            // لا نمرّر أبداً basePath = field.key فقط (مثل "breakOut") لأن ذلك يسبب:
-            //   - كتابة القيمة في جذر البيانات (data.breakOut) بدل (data.texts[0].breakOut).
-            //   - المكوّنات التي تقرأ من texts[i].breakOut لن ترى القيمة → الميزة "لا تخرج".
-            //   ⚠️ في هذه الحالة مكوّن imageText1 سيبوظ (إخراج من الشبكة / منتصف الصف لن يعملا).
-            // نستخرج مسار الأب بإزالة آخر جزء من normalizedPath:
-            //   "texts.0.breakOutGroup" → parentPath = "texts.0"
-            // ثم نمرّر parentPath كـ basePath لـ renderField فيبني المسارات الصحيحة:
-            //   "texts.0.breakOut" و "texts.0.breakOutAlign".
-            // إذا كانت المجموعة في الجذر (مثلاً normalizedPath = "breakOutGroup") فإن
-            // parentPath = "" ونمرّر undefined فيبقى مسار الحقل = field.key (صحيح للجذر).
+            // 1) سياق عنصر مصفوفة (مثل texts.0.breakOutGroup): parentPath ينتهي بـ .رقم (texts.0).
+            //    المكوّن يقرأ من نفس العنصر بمفاتيح مسطحة (texts[i].breakOut). نمرّر basePath = parentPath
+            //    فيصبح المسار texts.0.breakOut → imageText1 يعمل.
+            // 2) سياق كائن فقط (مثل content.companyInfo.footerLogoGroup أو cardSettings.cardDisplayOptions):
+            //    المكوّن يقرأ من مسار كامل من الجذر (content.companyInfo.useCustomFooterLogo).
+            //    نمرّر basePath = undefined فيصبح المسار = field.key → footer / grid / hero يعملون.
             // ─────────────────────────────────────────────────────────────────
             const parentPath =
               normalizedPath && normalizedPath.includes(".")
                 ? normalizedPath.split(".").slice(0, -1).join(".")
                 : "";
-            const basePath = parentPath || undefined;
+            // سياق عنصر مصفوفة: عندما يكون الجزء الأخير من parentPath رقماً (مثل texts.0 أو content.sections.0).
+            // نطبّع المسار أولاً (مثلاً texts[0] → texts.0) لضمان اكتشاف الفهرس.
+            const normalizedParent = (parentPath ?? "").replace(
+              /\[(\d+)\]/g,
+              ".$1"
+            );
+            const segments = normalizedParent.split(".").filter(Boolean);
+            const lastSegment = segments[segments.length - 1];
+            const isArrayItemContext =
+              lastSegment !== undefined && /^\d+$/.test(lastSegment);
+            const basePath = isArrayItemContext ? parentPath : undefined;
 
             return (
               <div key={field.key} className="space-y-2">
