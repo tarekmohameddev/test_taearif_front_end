@@ -22,6 +22,7 @@
  *   • المسار النهائي يصبح "breakOut" في جذر بيانات المكوّن.
  *   • القراءة/الكتابة تحدث عند data.breakOut بدل data.texts[0].breakOut.
  *   • المكوّن (مثل imageText1) يقرأ من texts[i].breakOut فقط → القيمة لا تظهر أبداً.
+ *   ⚠️ في هذه الحالة مكوّن imageText1 سيبوظ: "إخراج من الشبكة" و "منتصف الصف" لن يعملا.
  *
  * عند استخدام parentPath (مثل "texts.0"):
  *   • المسار النهائي يصبح "texts.0.breakOut" و "texts.0.breakOutAlign".
@@ -59,7 +60,8 @@ export const CollapsibleGroupRenderer: React.FC<CollapsibleGroupRendererProps> =
   const isOpen = expanded[key] ?? false;
   const toggle = () => setExpanded((s) => ({ ...s, [key]: !isOpen }));
 
-  // الحقول الملفوفة في الـ group (field واحد أو أكثر)
+  // الحقول المعروضة داخل المجموعة (مثلاً breakOut و breakOutAlign).
+  // تخزينها في الـ store يكون flat تحت مسار الأب — انظر التعليقات عند groupFields.map أدناه.
   const groupFields = (def as any).groupFields || [];
 
   return (
@@ -110,6 +112,7 @@ export const CollapsibleGroupRenderer: React.FC<CollapsibleGroupRendererProps> =
             // لا نمرّر أبداً basePath = field.key فقط (مثل "breakOut") لأن ذلك يسبب:
             //   - كتابة القيمة في جذر البيانات (data.breakOut) بدل (data.texts[0].breakOut).
             //   - المكوّنات التي تقرأ من texts[i].breakOut لن ترى القيمة → الميزة "لا تخرج".
+            //   ⚠️ في هذه الحالة مكوّن imageText1 سيبوظ (إخراج من الشبكة / منتصف الصف لن يعملا).
             // نستخرج مسار الأب بإزالة آخر جزء من normalizedPath:
             //   "texts.0.breakOutGroup" → parentPath = "texts.0"
             // ثم نمرّر parentPath كـ basePath لـ renderField فيبني المسارات الصحيحة:
