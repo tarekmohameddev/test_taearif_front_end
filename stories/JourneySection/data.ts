@@ -3,6 +3,8 @@ const BASE_URL = "https://clusters.sa";
 export const DEFAULT_HEADING =
   "رحلة استثمار أرضك ... 6 مراحل واضحة من البداية وحتى استلام أرباحك";
 
+export const DEFAULT_JOURNEY_LABEL = "رحلتك تبدأ بخطوة";
+
 export const DEFAULT_STEPS = [
   {
     number: 1,

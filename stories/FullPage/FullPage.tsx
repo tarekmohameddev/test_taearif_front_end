@@ -58,21 +58,29 @@ export const FullPage = ({
     <EssenceSection
       dir={dir}
       headingTextProps={{
-        className: "font-saudi whitespace-pre-line lg:flex-1",
+        className: "font-saudi lg:flex-1",
         color: "#d09260",
         fontSize: "40px",
         fontWeight: 700,
+        whiteSpace: "pre-line",
       }}
-      leadTextProps={{ className: "mb-4 block", fontWeight: 700 }}
-      bodyTextProps={{ className: "mt-12 text-lg lg:mt-0", fontSize: "1.125rem" }}
+      leadTextProps={{
+        className: "mb-4 block",
+        fontWeight: 700,
+      }}
+      bodyTextProps={{
+        className: "mt-12 lg:mt-0",
+        fontSize: "1.125rem",
+      }}
     />
     <CreativityTriadSection
       dir={dir}
       headingTextProps={{
-        className: "font-saudi mb-4",
+        className: "font-saudi",
         color: "#B17A4B",
         fontSize: "2.25rem",
         fontWeight: 700,
+        margin: "0 0 1rem 0",
       }}
       cardTitleTextProps={{
         fontSize: "1.875rem",
@@ -84,12 +92,12 @@ export const FullPage = ({
     <CommitmentSection
       dir={dir}
       roleLabelTextProps={{
-        className: "block text-sm",
+        className: "block",
         fontSize: "0.875rem",
         color: "#fff",
       }}
       nameTextProps={{
-        className: "block text-sm",
+        className: "block",
         fontSize: "0.875rem",
         fontWeight: 700,
         color: "#fff",
@@ -101,7 +109,7 @@ export const FullPage = ({
         fontWeight: 700,
       }}
       quoteTextProps={{
-        className: "quote mt-5 block text-lg",
+        className: "quote mt-5 block",
         fontSize: "1.125rem",
         fontStyle: "italic",
       }}
@@ -109,12 +117,16 @@ export const FullPage = ({
     <PhilosophyCtaSection
       dir={dir}
       headingTextProps={{
-        className: "font-saudi whitespace-pre-line",
+        className: "font-saudi",
         color: "#fff",
         fontSize: "3rem",
         fontWeight: 700,
+        whiteSpace: "pre-line",
       }}
-      descriptionTextProps={{ className: "mt-3.5", color: "#fff" }}
+      descriptionTextProps={{
+        margin: "0.875rem 0 0 0",
+        color: "#fff",
+      }}
       ctaTextProps={{
         fontSize: "0.875rem",
         fontWeight: 700,
@@ -124,37 +136,50 @@ export const FullPage = ({
     <QuoteSection
       dir={dir}
       quoteTextProps={{
-        className: "font-saudi grow text-2xl font-medium xl:text-3xl xl:leading-9",
+        className: "font-saudi grow xl:text-3xl xl:leading-9",
+        fontSize: "1.5rem",
+        fontWeight: 500,
       }}
-      nameTextProps={{ fontWeight: 700, color: "#4F4F4F" }}
-      roleTextProps={{ color: "#4F4F4F" }}
+      nameTextProps={{ fontWeight: 700 }}
+      roleTextProps={{}}
     />
     <FeaturesSection
       dir={dir}
       headingTextProps={{
-        className: "font-saudi text-4xl font-bold xl:text-5xl text-center",
+        className: "font-saudi xl:text-5xl",
+        fontSize: "40px",
+        fontWeight: 700,
+        textAlign: "center",
       }}
       featureTitleTextProps={{
-        className: "text-xl font-bold",
+        fontSize: "1.25rem",
+        fontWeight: 700,
         color: "#383838",
       }}
       featureDescriptionTextProps={{
-        className: "text-sm leading-7",
+        fontSize: "0.875rem",
+        lineHeight: "1.75rem",
         color: "#686868",
       }}
     />
     <JourneySection
       dir={dir}
       headingTextProps={{
-        className: "font-saudi text-4xl font-bold xl:text-5xl whitespace-pre-line text-white",
+        className: "font-saudi xl:text-5xl",
+        fontSize: "2.25rem",
+        fontWeight: 700,
+        whiteSpace: "pre-line",
+        color: "#fff",
       }}
     />
     <LandInvestmentFormSection
       dir={dir}
       headingTextProps={{
-        className: "font-saudi text-4xl font-bold xl:text-5xl",
+        className: "font-saudi xl:text-5xl",
+        fontSize: "2.25rem",
+        fontWeight: 700,
       }}
-      descriptionTextProps={{ className: "text-lg" }}
+      descriptionTextProps={{ fontSize: "1.125rem" }}
     />
     <ProjectsHeader
       dir={dir}
@@ -168,7 +193,7 @@ export const FullPage = ({
       descriptionTextProps={{
         fontSize: "1.125rem",
         color: "#1a1a2e",
-        className: "mt-5",
+        margin: "1.25rem 0 0 0",
       }}
     />
     <ProjectsShowcase
@@ -181,7 +206,10 @@ export const FullPage = ({
         fontWeight: 700,
         lineClamp: 1,
       }}
-      projectDescriptionTextProps={{ lineClamp: 2, className: "mt-8" }}
+      projectDescriptionTextProps={{
+        lineClamp: 2,
+        margin: "2rem 0 0 0",
+      }}
       unitTypeTextProps={{ fontSize: "0.75rem" }}
       ctaTextProps={{ fontSize: "0.875rem", fontWeight: 500 }}
     />

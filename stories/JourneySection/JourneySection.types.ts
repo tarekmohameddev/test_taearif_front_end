@@ -18,6 +18,8 @@ export interface JourneyStep {
 export interface JourneySectionProps {
   /** Section heading */
   heading?: string;
+  /** Journey label above steps (e.g. "رحلتك تبدأ بخطوة") */
+  journeyLabel?: string;
   /** 6 steps */
   steps?: JourneyStep[];
   /** Optional decorative flag/image URL */
@@ -28,6 +30,8 @@ export interface JourneySectionProps {
   dir?: "rtl" | "ltr";
   /** Style overrides for heading */
   headingTextProps?: TextStyleProps;
+  /** Style overrides for journey label ("رحلتك تبدأ بخطوة") */
+  journeyLabelTextProps?: TextStyleProps;
   /** Style overrides for step title */
   stepTitleTextProps?: TextStyleProps;
   /** Style overrides for step duration */

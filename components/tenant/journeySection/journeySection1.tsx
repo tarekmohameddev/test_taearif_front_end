@@ -81,11 +81,13 @@ export default function JourneySection1(props: JourneySection1Props) {
   return (
     <JourneySection
       heading={mergedData.heading}
+      journeyLabel={mergedData.journeyLabel}
       steps={mergedData.steps}
       flagImageSrc={mergedData.flagImageSrc}
       flagImageAlt={mergedData.flagImageAlt}
       dir={mergedData.dir}
       headingTextProps={mergedData.headingTextProps}
+      journeyLabelTextProps={mergedData.journeyLabelTextProps}
       stepTitleTextProps={mergedData.stepTitleTextProps}
       stepDurationTextProps={mergedData.stepDurationTextProps}
       stepDescriptionTextProps={mergedData.stepDescriptionTextProps}

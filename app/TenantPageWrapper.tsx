@@ -15,6 +15,7 @@ import Header2 from "@/components/tenant/header/header2";
 import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import Footer1 from "@/components/tenant/footer/footer1";
 import Footer2 from "@/components/tenant/footer/footer2";
+import Footer3 from "@/components/tenant/footer/footer3";
 import PropertyDetail1 from "@/components/tenant/propertyDetail/propertyDetail1";
 import PropertyDetail2 from "@/components/tenant/propertyDetail/propertyDetail2";
 import { I18nProvider } from "@/components/providers/I18nProvider";
@@ -142,6 +143,7 @@ const loadFooterComponent = (componentName: string) => {
   const footerComponentMap: Record<string, any> = {
     footer1: Footer1,
     footer2: Footer2,
+    footer3: Footer3,
   };
 
   if (footerComponentMap[componentName]) {
@@ -432,6 +434,7 @@ export default function TenantPageWrapper({
       StaticFooter1: "StaticFooter1",
       footer1: "footer1",
       footer2: "footer2",
+      footer3: "footer3",
     };
 
     const componentName = componentMap[globalFooterVariant] || "StaticFooter1";

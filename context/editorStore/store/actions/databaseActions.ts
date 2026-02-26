@@ -14,6 +14,8 @@ import { landInvestmentFormSectionFunctions } from "../../../editorStoreFunction
 import { philosophyCtaSectionFunctions } from "../../../editorStoreFunctions/philosophyCtaSectionFunctions";
 import { quoteSectionFunctions } from "../../../editorStoreFunctions/quoteSectionFunctions";
 import { projectsHeaderFunctions } from "../../../editorStoreFunctions/projectsHeaderFunctions";
+import { projectsShowcaseFunctions } from "../../../editorStoreFunctions/projectsShowcaseFunctions";
+import { contactFormFunctions } from "../../../editorStoreFunctions/contactFormFunctions";
 import { valuesSectionFunctions } from "../../../editorStoreFunctions/valuesSectionFunctions";
 import { headerFunctions } from "../../../editorStoreFunctions/headerFunctions";
 import { footerFunctions } from "../../../editorStoreFunctions/footerFunctions";
@@ -134,6 +136,12 @@ export const createDatabaseActions = (
                         break;
                       case "projectsHeader":
                         Object.assign(newState, projectsHeaderFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "projectsShowcase":
+                        Object.assign(newState, projectsShowcaseFunctions.setData(newState, componentId, comp.data));
+                        break;
+                      case "contactForm":
+                        Object.assign(newState, contactFormFunctions.setData(newState, componentId, comp.data));
                         break;
                       case "valuesSection":
                         Object.assign(newState, valuesSectionFunctions.setData(newState, componentId, comp.data));

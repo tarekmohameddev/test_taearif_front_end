@@ -194,6 +194,8 @@ export interface EditorStore {
   philosophyCtaSectionStates: Record<string, ComponentData>;
   quoteSectionStates: Record<string, ComponentData>;
   projectsHeaderStates: Record<string, ComponentData>;
+  projectsShowcaseStates: Record<string, ComponentData>;
+  contactFormStates: Record<string, ComponentData>;
   valuesSectionStates: Record<string, ComponentData>;
   ensureHeroVariant: (variantId: string, initial?: ComponentData) => void;
   getHeroData: (variantId: string) => ComponentData;

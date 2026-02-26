@@ -39,7 +39,7 @@ export const QuoteSection = ({
           {_quote}
         </Text>
       </blockquote>
-      <div className="flex w-full max-w-96 gap-5 rounded-3xl bg-[#ECE3DB]/32 p-4">
+      <div className="flex w-full max-w-96 gap-5 rounded-3xl bg-[#ECE3DB]/35 p-4">
         <div className="relative size-14 shrink-0 overflow-hidden rounded-full bg-black/20">
           <img
             alt={_imageAlt}

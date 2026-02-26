@@ -10,6 +10,7 @@ export const journeySectionStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "dir", label: "Direction", type: "select", options: [{ label: "RTL", value: "rtl" }, { label: "LTR", value: "ltr" }] },
         { key: "heading", label: "Heading", type: "text" },
+        { key: "journeyLabel", label: "Journey Label", type: "text" },
         { key: "flagImageSrc", label: "Flag Image URL", type: "text" },
         { key: "flagImageAlt", label: "Flag Image Alt", type: "text" },
         {

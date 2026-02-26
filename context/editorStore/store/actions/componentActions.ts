@@ -15,6 +15,8 @@ import { landInvestmentFormSectionFunctions } from "../../../editorStoreFunction
 import { philosophyCtaSectionFunctions } from "../../../editorStoreFunctions/philosophyCtaSectionFunctions";
 import { quoteSectionFunctions } from "../../../editorStoreFunctions/quoteSectionFunctions";
 import { projectsHeaderFunctions } from "../../../editorStoreFunctions/projectsHeaderFunctions";
+import { projectsShowcaseFunctions } from "../../../editorStoreFunctions/projectsShowcaseFunctions";
+import { contactFormFunctions } from "../../../editorStoreFunctions/contactFormFunctions";
 import { valuesSectionFunctions } from "../../../editorStoreFunctions/valuesSectionFunctions";
 import { headerFunctions } from "../../../editorStoreFunctions/headerFunctions";
 import { footerFunctions } from "../../../editorStoreFunctions/footerFunctions";
@@ -142,6 +144,12 @@ export const createComponentActions = (
         break;
       case "projectsHeader":
         result = projectsHeaderFunctions.getData(state, variantId);
+        break;
+      case "projectsShowcase":
+        result = projectsShowcaseFunctions.getData(state, variantId);
+        break;
+      case "contactForm":
+        result = contactFormFunctions.getData(state, variantId);
         break;
       case "valuesSection":
         result = valuesSectionFunctions.getData(state, variantId);
@@ -385,6 +393,12 @@ export const createComponentActions = (
       case "projectsHeader":
         set(projectsHeaderFunctions.setData(state, variantId, data));
         break;
+      case "projectsShowcase":
+        set(projectsShowcaseFunctions.setData(state, variantId, data));
+        break;
+      case "contactForm":
+        set(contactFormFunctions.setData(state, variantId, data));
+        break;
       case "valuesSection":
         set(valuesSectionFunctions.setData(state, variantId, data));
         break;
@@ -579,6 +593,10 @@ export const createComponentActions = (
           return currentState.quoteSectionStates[variantId];
         case "projectsHeader":
           return currentState.projectsHeaderStates[variantId];
+        case "projectsShowcase":
+          return currentState.projectsShowcaseStates[variantId];
+        case "contactForm":
+          return currentState.contactFormStates[variantId];
         case "valuesSection":
           return currentState.valuesSectionStates[variantId];
         case "header":
@@ -737,6 +755,12 @@ export const createComponentActions = (
           break;
         case "projectsHeader":
           result = projectsHeaderFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "projectsShowcase":
+          result = projectsShowcaseFunctions.ensureVariant(state, variantId, initial);
+          break;
+        case "contactForm":
+          result = contactFormFunctions.ensureVariant(state, variantId, initial);
           break;
         case "valuesSection":
           result = valuesSectionFunctions.ensureVariant(state, variantId, initial);
@@ -995,6 +1019,12 @@ export const createComponentActions = (
         break;
       case "projectsHeader":
         set(projectsHeaderFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "projectsShowcase":
+        set(projectsShowcaseFunctions.updateByPath(state, variantId, path, value));
+        break;
+      case "contactForm":
+        set(contactFormFunctions.updateByPath(state, variantId, path, value));
         break;
       case "valuesSection":
         set(valuesSectionFunctions.updateByPath(state, variantId, path, value));

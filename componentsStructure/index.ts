@@ -9,6 +9,8 @@ export { landInvestmentFormSectionStructure } from "./landInvestmentFormSection"
 export { philosophyCtaSectionStructure } from "./philosophyCtaSection";
 export { quoteSectionStructure } from "./quoteSection";
 export { projectsHeaderStructure } from "./projectsHeader";
+export { projectsShowcaseStructure } from "./projectsShowcase";
+export { contactFormStructure } from "./contactForm";
 export { valuesSectionStructure } from "./valuesSection";
 export { headerStructure } from "./header";
 export { halfTextHalfImageStructure } from "./halfTextHalfImage";

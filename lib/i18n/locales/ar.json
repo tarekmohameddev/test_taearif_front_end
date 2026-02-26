@@ -321,6 +321,14 @@
       "display_name": "هيدر المشاريع",
       "description": "قسم هيدر للمشاريع بعنوان ووصف"
     },
+    "projectsShowcase": {
+      "display_name": "عرض المشاريع",
+      "description": "قسم عرض المشاريع مع الفلاتر والبطاقات"
+    },
+    "contactForm": {
+      "display_name": "نموذج التواصل",
+      "description": "قسم نموذج التواصل"
+    },
     "valuesSection": {
       "display_name": "قسم القيم",
       "description": "قسم يعرض قيم الشركة مع أيقونات"
