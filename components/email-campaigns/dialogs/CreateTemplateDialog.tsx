@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { createTemplate } from "@/lib/services/email-api";
+import { EmailBodyEditor } from "../EmailBodyEditor";
 
 interface CreateTemplateDialogProps {
   open: boolean;
@@ -64,7 +65,7 @@ export function CreateTemplateDialog({
   };
 
   return (
-    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-lg">
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-2xl">
       <CustomDialogContent className="dir-rtl">
         <CustomDialogClose onClose={() => onOpenChange(false)} />
         <CustomDialogHeader>
@@ -92,16 +93,7 @@ export function CreateTemplateDialog({
               placeholder="مثال: مرحباً بك"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="template-body-html">محتوى HTML</Label>
-            <Textarea
-              id="template-body-html"
-              value={bodyHtml}
-              onChange={(e) => setBodyHtml(e.target.value)}
-              placeholder="<p>مرحباً {{name}}، ...</p>"
-              rows={4}
-            />
-          </div>
+          <EmailBodyEditor value={bodyHtml} onChange={setBodyHtml} label="محتوى HTML" required minHeight="min-h-[240px]" />
           <div className="space-y-2">
             <Label htmlFor="template-body-text">محتوى نصي (اختياري)</Label>
             <Textarea

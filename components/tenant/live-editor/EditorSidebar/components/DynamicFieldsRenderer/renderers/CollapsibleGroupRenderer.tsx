@@ -1,4 +1,35 @@
 "use client";
+/**
+ * CollapsibleGroupRenderer — عرض مجموعة حقول قابلة للطي (مثل "إخراج من الشبكة" في imageText).
+ *
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * تنبيه مهم: قاعدة مسار الحقول الداخلية (groupFields) — لا تعدّلها
+ * ═══════════════════════════════════════════════════════════════════════════════
+ *
+ * الحقول داخل المجموعة (groupFields) تُخزَّن في الـ store بشكل FLAT تحت نفس
+ * العنصر الأب، وليس تحت كائن باسم المجموعة. مثال:
+ *
+ *   • خطأ (لا تفعل): تخزين تحت مفتاح المجموعة
+ *     data.texts[0].breakOutGroup = { breakOut: true, breakOutAlign: "center" }
+ *
+ *   • صحيح: تخزين flat تحت نفس العنصر
+ *     data.texts[0].breakOut = true
+ *     data.texts[0].breakOutAlign = "center"
+ *
+ * لذلك عند استدعاء renderField للحقول الداخلية يجب تمرير مسار الأب (parentPath)
+ * وليس field.key فقط. لو مرّرنا basePath = field.key (مثل "breakOut"):
+ *
+ *   • المسار النهائي يصبح "breakOut" في جذر بيانات المكوّن.
+ *   • القراءة/الكتابة تحدث عند data.breakOut بدل data.texts[0].breakOut.
+ *   • المكوّن (مثل imageText1) يقرأ من texts[i].breakOut فقط → القيمة لا تظهر أبداً.
+ *
+ * عند استخدام parentPath (مثل "texts.0"):
+ *   • المسار النهائي يصبح "texts.0.breakOut" و "texts.0.breakOutAlign".
+ *   • الشرط condition (مثل ظهور "موقع الخروج" عندما breakOut === true) يعمل بشكل صحيح.
+ *
+ * إذا كانت المجموعة في الجذر (normalizedPath بدون نقطة)، parentPath يكون ""
+ * ونمرّر undefined كـ basePath فيبقى المسار = field.key وهو المطلوب.
+ */
 import React, { useState } from "react";
 import { FieldDefinition } from "@/componentsStructure/types";
 import { useEditorLocale, useEditorT } from "@/context/editorI18nStore";
@@ -72,9 +103,25 @@ export const CollapsibleGroupRenderer: React.FC<CollapsibleGroupRendererProps> =
       {isOpen && (
         <div className="p-6 bg-gradient-to-b from-white to-slate-50 space-y-6 border-t border-slate-200">
           {groupFields.map((field: FieldDefinition) => {
-            // استخدام field.key مباشرة للبيانات flat (ليست nested object)
-            // لأن البيانات تبقى flat في الـ store
-            const basePath = field.key;
+            // ─────────────────────────────────────────────────────────────────
+            // قاعدة مسار الحقول الداخلية — ضرورية لعدم تكرار مشكلة "إخراج من الشبكة"
+            // ─────────────────────────────────────────────────────────────────
+            // normalizedPath هنا = مسار المجموعة نفسها، مثلاً: "texts.0.breakOutGroup".
+            // لا نمرّر أبداً basePath = field.key فقط (مثل "breakOut") لأن ذلك يسبب:
+            //   - كتابة القيمة في جذر البيانات (data.breakOut) بدل (data.texts[0].breakOut).
+            //   - المكوّنات التي تقرأ من texts[i].breakOut لن ترى القيمة → الميزة "لا تخرج".
+            // نستخرج مسار الأب بإزالة آخر جزء من normalizedPath:
+            //   "texts.0.breakOutGroup" → parentPath = "texts.0"
+            // ثم نمرّر parentPath كـ basePath لـ renderField فيبني المسارات الصحيحة:
+            //   "texts.0.breakOut" و "texts.0.breakOutAlign".
+            // إذا كانت المجموعة في الجذر (مثلاً normalizedPath = "breakOutGroup") فإن
+            // parentPath = "" ونمرّر undefined فيبقى مسار الحقل = field.key (صحيح للجذر).
+            // ─────────────────────────────────────────────────────────────────
+            const parentPath =
+              normalizedPath && normalizedPath.includes(".")
+                ? normalizedPath.split(".").slice(0, -1).join(".")
+                : "";
+            const basePath = parentPath || undefined;
 
             return (
               <div key={field.key} className="space-y-2">

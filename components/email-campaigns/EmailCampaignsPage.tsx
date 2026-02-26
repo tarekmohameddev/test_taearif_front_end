@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,17 +12,20 @@ import { EmailCampaignsOverview } from "./EmailCampaignsOverview";
 import { EmailCampaignsList } from "./EmailCampaignsList";
 import { EmailTemplatesList } from "./EmailTemplatesList";
 import { EmailLogsList } from "./EmailLogsList";
-import { CreateCampaignDialog, CreateTemplateDialog } from "./dialogs";
+import { CreateTemplateDialog } from "./dialogs";
 import { useEmailCampaigns, useEmailTemplates, useEmailStats, useEmailLogs } from "./hooks";
 import type { SendCampaignBody } from "@/lib/services/email-api";
 import useStore from "@/context/Store";
-import { useEmailCampaignsDialogStore } from "@/context/store/dashboard/emailCampaignsDialog";
 
 export function EmailCampaignsPage() {
+  const router = useRouter();
   const { userData, IsLoading: authLoading } = useAuthStore();
   const [activeTab, setActiveTab] = useState("overview");
   const [createTemplateOpen, setCreateTemplateOpen] = useState(false);
-  const openCreateCampaignDialog = useEmailCampaignsDialogStore((s) => s.openCreateCampaignDialog);
+
+  const goToCreateCampaign = () => router.push("/dashboard/email-campaigns/create");
+  const goToCreateCampaignWithTemplate = (template: { id: string | number; subject: string; body_html: string; body_text?: string }) =>
+    router.push(`/dashboard/email-campaigns/create?templateId=${template.id}`);
 
   const creditBalance = useStore((s) => s.creditBalance);
   const availableCredits = creditBalance.data?.available_credits ?? 0;
@@ -156,7 +160,8 @@ export function EmailCampaignsPage() {
             templatesLoading={templatesLoading}
             campaignsError={campaignsError}
             templatesError={templatesError}
-            onNewCampaign={openCreateCampaignDialog}
+            onNewCampaign={goToCreateCampaign}
+            onNewCampaignWithTemplate={goToCreateCampaignWithTemplate}
           />
         </TabsContent>
 
@@ -166,7 +171,7 @@ export function EmailCampaignsPage() {
             loading={campaignsLoading}
             error={campaignsError}
             availableCredits={availableCredits}
-            onNewCampaign={openCreateCampaignDialog}
+            onNewCampaign={goToCreateCampaign}
             onSendCampaign={onSendCampaign}
             onDeleteCampaign={handleDeleteCampaign}
             onEditCampaign={handleEditCampaign}
@@ -181,6 +186,7 @@ export function EmailCampaignsPage() {
             loading={templatesLoading}
             error={templatesError}
             onNewTemplate={() => setCreateTemplateOpen(true)}
+            onNewCampaignWithTemplate={goToCreateCampaignWithTemplate}
             onDeleteTemplate={handleDeleteTemplate}
             onEditTemplate={handleEditTemplate}
           />
@@ -191,7 +197,6 @@ export function EmailCampaignsPage() {
         </TabsContent>
       </Tabs>
 
-      <CreateCampaignDialog onSuccess={onCampaignCreated} />
       <CreateTemplateDialog
         open={createTemplateOpen}
         onOpenChange={setCreateTemplateOpen}

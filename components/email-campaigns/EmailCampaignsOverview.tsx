@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useEmailCampaignsDialogStore } from "@/context/store/dashboard/emailCampaignsDialog";
 import type { EmailCampaign, EmailTemplate } from "./types";
 import { getStatusColor, STATUS_LABELS } from "./constants";
 
@@ -18,6 +17,7 @@ interface EmailCampaignsOverviewProps {
   campaignsError: string | null;
   templatesError: string | null;
   onNewCampaign: () => void;
+  onNewCampaignWithTemplate?: (template: { id: string; subject: string; body_html: string; body_text?: string }) => void;
 }
 
 export function EmailCampaignsOverview({
@@ -28,10 +28,8 @@ export function EmailCampaignsOverview({
   campaignsError,
   templatesError,
   onNewCampaign,
+  onNewCampaignWithTemplate,
 }: EmailCampaignsOverviewProps) {
-  const openCreateCampaignWithTemplate = useEmailCampaignsDialogStore(
-    (s) => s.openCreateCampaignWithTemplate
-  );
   // عرض أحدث الحملات (بما فيها المسودات) في النظرة العامة
   const activeCampaigns = campaigns.slice(0, 5);
   const activeTemplates = templates.filter((t) => t.isActive).slice(0, 4);
@@ -123,20 +121,22 @@ export function EmailCampaignsOverview({
                     </div>
                     <p className="text-xs text-muted-foreground">{template.subject}</p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      openCreateCampaignWithTemplate({
-                        id: template.id,
-                        subject: template.subject,
-                        body_html: template.bodyHtml,
-                        body_text: template.bodyText ?? undefined,
-                      })
-                    }
-                  >
-                    استخدم
-                  </Button>
+                  {onNewCampaignWithTemplate && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        onNewCampaignWithTemplate({
+                          id: template.id,
+                          subject: template.subject,
+                          body_html: template.bodyHtml,
+                          body_text: template.bodyText ?? undefined,
+                        })
+                      }
+                    >
+                      استخدم
+                    </Button>
+                  )}
                 </div>
               ))}
           </div>

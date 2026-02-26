@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useEmailCampaignsDialogStore } from "@/context/store/dashboard/emailCampaignsDialog";
+import { EmailBodyEditor } from "./EmailBodyEditor";
 import type { EmailTemplate } from "./types";
 
 interface EmailTemplatesListProps {
@@ -26,6 +26,7 @@ interface EmailTemplatesListProps {
   loading: boolean;
   error: string | null;
   onNewTemplate: () => void;
+  onNewCampaignWithTemplate?: (template: { id: string; subject: string; body_html: string; body_text?: string }) => void;
   onDeleteTemplate: (id: string) => void;
   onEditTemplate: (
     id: string,
@@ -38,6 +39,7 @@ export function EmailTemplatesList({
   loading,
   error,
   onNewTemplate,
+  onNewCampaignWithTemplate,
   onDeleteTemplate,
   onEditTemplate,
 }: EmailTemplatesListProps) {
@@ -51,9 +53,6 @@ export function EmailTemplatesList({
   const [editBodyHtml, setEditBodyHtml] = useState("");
   const [editBodyText, setEditBodyText] = useState("");
   const [editSubmitting, setEditSubmitting] = useState(false);
-  const openCreateCampaignWithTemplate = useEmailCampaignsDialogStore(
-    (s) => s.openCreateCampaignWithTemplate
-  );
 
   const openDeleteDialog = (id: string, name: string) => {
     setDeleteTemplateId(id);
@@ -151,7 +150,7 @@ export function EmailTemplatesList({
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          openCreateCampaignWithTemplate({
+                          onNewCampaignWithTemplate?.({
                             id: template.id,
                             subject: template.subject,
                             body_html: template.bodyHtml,
@@ -200,7 +199,7 @@ export function EmailTemplatesList({
       </CustomDialogContent>
     </CustomDialog>
 
-    <CustomDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} maxWidth="max-w-lg">
+    <CustomDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} maxWidth="max-w-2xl">
       <CustomDialogContent>
         <CustomDialogClose onClose={() => setEditDialogOpen(false)} />
         <CustomDialogHeader>
@@ -228,16 +227,7 @@ export function EmailTemplatesList({
               placeholder="موضوع البريد"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="edit-template-body-html">محتوى HTML</Label>
-            <Textarea
-              id="edit-template-body-html"
-              value={editBodyHtml}
-              onChange={(e) => setEditBodyHtml(e.target.value)}
-              placeholder="محتوى HTML..."
-              rows={4}
-            />
-          </div>
+          <EmailBodyEditor value={editBodyHtml} onChange={setEditBodyHtml} label="محتوى HTML" required minHeight="min-h-[240px]" />
           <div className="space-y-2">
             <Label htmlFor="edit-template-body-text">محتوى نصي (اختياري)</Label>
             <Textarea

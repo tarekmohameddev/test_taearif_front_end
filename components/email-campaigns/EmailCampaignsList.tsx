@@ -30,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { EmailBodyEditor } from "./EmailBodyEditor";
 import { CustomersCheckboxesDropdown, type CustomerOption } from "@/components/customComponents/CustomersCheckboxesDropdown";
 import { getCustomersList } from "@/lib/services/customers-hub-list-api";
 import type { SendCampaignBody, ResumeCampaignBody } from "@/lib/services/email-api";
@@ -633,7 +634,7 @@ export function EmailCampaignsList({
       </CustomDialogContent>
     </CustomDialog>
 
-    <CustomDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} maxWidth="max-w-lg">
+    <CustomDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} maxWidth="max-w-2xl">
       <CustomDialogContent>
         <CustomDialogClose onClose={() => setEditDialogOpen(false)} />
         <CustomDialogHeader>
@@ -670,16 +671,7 @@ export function EmailCampaignsList({
               placeholder="موضوع الرسالة"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="edit-campaign-body-html">محتوى HTML</Label>
-            <Textarea
-              id="edit-campaign-body-html"
-              value={editBodyHtml}
-              onChange={(e) => setEditBodyHtml(e.target.value)}
-              placeholder="محتوى البريد..."
-              rows={4}
-            />
-          </div>
+          <EmailBodyEditor value={editBodyHtml} onChange={setEditBodyHtml} label="محتوى HTML" required minHeight="min-h-[240px]" />
           <div className="space-y-2">
             <Label htmlFor="edit-campaign-body-text">محتوى نصي (اختياري)</Label>
             <Textarea
