@@ -1,8 +1,8 @@
 === Large Files Report ===
 
 File: componentsStructure\translationHelper.ts
-Lines: 2964
-Characters: 164900
+Lines: 2966
+Characters: 165022
 -----------------------------------
 File: app\dashboard\access-control\page.tsx
 Lines: 2737
@@ -35,10 +35,6 @@ Characters: 73223
 File: components\purchase-management\services\purchase-flow-service.tsx
 Lines: 2118
 Characters: 72157
------------------------------------
-File: components\customers-hub\requests\RequestsCenterPage.tsx
-Lines: 2013
-Characters: 77355
 -----------------------------------
 File: components\property-reservations-page.tsx
 Lines: 1991
@@ -79,6 +75,10 @@ Characters: 65269
 File: components\customers-hub\actions\IncomingActionsCard.tsx
 Lines: 1715
 Characters: 74824
+-----------------------------------
+File: lib\ComponentsList.tsx
+Lines: 1652
+Characters: 51398
 -----------------------------------
 File: components\customers-hub\detail\CustomerDetailPageSimple.tsx
 Lines: 1641
@@ -124,10 +124,6 @@ File: componentsStructure\hero.ts
 Lines: 1377
 Characters: 48465
 -----------------------------------
-File: lib\ComponentsList.tsx
-Lines: 1355
-Characters: 40204
------------------------------------
 File: components\settings-page.tsx
 Lines: 1345
 Characters: 57307
@@ -164,6 +160,10 @@ File: components\whatsapp-center\page-component.tsx
 Lines: 1202
 Characters: 43732
 -----------------------------------
+File: context\editorStore\store\actions\componentActions.ts
+Lines: 1197
+Characters: 45764
+-----------------------------------
 File: components\marketing\whatsapp-numbers-management.tsx
 Lines: 1195
 Characters: 45614
@@ -179,6 +179,10 @@ Characters: 43283
 File: components\rental-management\dashboard-stats\index.tsx
 Lines: 1155
 Characters: 53280
+-----------------------------------
+File: componentsStructure\footer.ts
+Lines: 1140
+Characters: 40499
 -----------------------------------
 File: components\tenant\propertyFilter\propertyFilter2.tsx
 Lines: 1135
@@ -212,21 +216,21 @@ File: components\content\footer-management-page.tsx
 Lines: 1090
 Characters: 40384
 -----------------------------------
-File: componentsStructure\footer.ts
-Lines: 1086
-Characters: 37475
------------------------------------
 File: componentsStructure\contactCards.ts
 Lines: 1082
 Characters: 35742
+-----------------------------------
+File: components\tenant\footer\footer2.tsx
+Lines: 1081
+Characters: 41744
 -----------------------------------
 File: componentsStructure\card.ts
 Lines: 1057
 Characters: 30006
 -----------------------------------
-File: components\tenant\footer\footer2.tsx
-Lines: 1052
-Characters: 40575
+File: components\tenant\footer\footer1.tsx
+Lines: 1040
+Characters: 38225
 -----------------------------------
 File: components\tenant\hero\hero1.tsx
 Lines: 1037
@@ -236,10 +240,6 @@ File: components\purchase-management\purchase-detail-page.tsx
 Lines: 1035
 Characters: 35451
 -----------------------------------
-File: context\editorStore\store\actions\componentActions.ts
-Lines: 1032
-Characters: 36868
------------------------------------
 File: components\tenant\propertyFilter\propertyFilter1.tsx
 Lines: 1029
 Characters: 36296
@@ -247,10 +247,6 @@ Characters: 36296
 File: components\tenant\header\StaticHeader1.tsx
 Lines: 1023
 Characters: 35296
------------------------------------
-File: components\tenant\footer\footer1.tsx
-Lines: 1017
-Characters: 37196
 -----------------------------------
 File: components\content\menu-management-page.tsx
 Lines: 1011
@@ -312,13 +308,13 @@ File: components\property-requests\page-components\PropertyRequestsTable.tsx
 Lines: 929
 Characters: 35122
 -----------------------------------
+File: components\tenant\live-editor\ComponentsSidebar.tsx
+Lines: 925
+Characters: 33747
+-----------------------------------
 File: components\customers-hub\assignment\AssignmentPanel.tsx
 Lines: 924
 Characters: 38447
------------------------------------
-File: components\tenant\live-editor\ComponentsSidebar.tsx
-Lines: 915
-Characters: 32431
 -----------------------------------
 File: components\whatsapp-ai-page.tsx
 Lines: 915
@@ -347,6 +343,10 @@ Characters: 30408
 File: components\tenant\halfTextHalfImage\halfTextHalfImage2.tsx
 Lines: 901
 Characters: 29070
+-----------------------------------
+File: componentsStructure\header.ts
+Lines: 901
+Characters: 29892
 -----------------------------------
 File: app\TenantPageWrapper.tsx
 Lines: 900
@@ -395,10 +395,6 @@ Characters: 26269
 File: components\marketing\marketing-settings.tsx
 Lines: 831
 Characters: 30355
------------------------------------
-File: componentsStructure\header.ts
-Lines: 827
-Characters: 26573
 -----------------------------------
 File: context\store\crm.ts
 Lines: 821
@@ -552,6 +548,10 @@ File: components\property\properties\PropertiesManagementPage.tsx
 Lines: 667
 Characters: 23686
 -----------------------------------
+File: components\sms-campaigns\SmsCampaignsList.tsx
+Lines: 663
+Characters: 27583
+-----------------------------------
 File: components\tenant\cards\card5.tsx
 Lines: 663
 Characters: 24374
@@ -572,6 +572,10 @@ File: lib\debug\live-editor\utils\fileWriter.ts
 Lines: 651
 Characters: 21026
 -----------------------------------
+File: context\editorStore\types\types.ts
+Lines: 650
+Characters: 22255
+-----------------------------------
 File: app\dashboard\access-control\create-employee\page.tsx
 Lines: 647
 Characters: 23918
@@ -584,10 +588,6 @@ File: context\editorStoreFunctions\halfTextHalfImageFunctions.ts
 Lines: 644
 Characters: 17660
 -----------------------------------
-File: context\editorStore\types\types.ts
-Lines: 639
-Characters: 21617
------------------------------------
 File: components\buildings\building-card.tsx
 Lines: 636
 Characters: 22537
@@ -595,6 +595,10 @@ Characters: 22537
 File: app\dashboard\property-requests\[id]\page.tsx
 Lines: 632
 Characters: 25263
+-----------------------------------
+File: components\customers\page-components\CustomerForm.tsx
+Lines: 632
+Characters: 19688
 -----------------------------------
 File: services\live-editor\dragDrop\EnhancedLiveEditorDragDropContext.tsx
 Lines: 631
@@ -651,10 +655,6 @@ Characters: 19946
 File: components\tenant\live-editor\LiveEditorUI\hooks\useComponentHandlers.ts
 Lines: 591
 Characters: 18446
------------------------------------
-File: components\sms-campaigns\SmsCampaignsList.tsx
-Lines: 590
-Characters: 24360
 -----------------------------------
 File: services\live-editor\theme-change\themeApplicationService.ts
 Lines: 588
