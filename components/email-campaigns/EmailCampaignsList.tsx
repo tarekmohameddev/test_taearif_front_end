@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Send, Clock, Coins, Plus, Loader2, LayoutGrid, Table2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,6 +91,12 @@ export function EmailCampaignsList({
   const [resumeLoadingId, setResumeLoadingId] = useState<string | null>(null);
   const [pauseConfirmOpen, setPauseConfirmOpen] = useState(false);
   const [pauseConfirmCampaign, setPauseConfirmCampaign] = useState<EmailCampaign | null>(null);
+
+  const router = useRouter();
+
+  const openCampaignDetail = (id: string) => {
+    router.push(`/dashboard/email-campaigns/${id}`);
+  };
 
   const openSendDialog = (id: string, name: string) => {
     setSendCampaignId(id);
@@ -312,7 +319,11 @@ export function EmailCampaignsList({
         {!loading && viewMode === "cards" && (
         <div className="space-y-4">
           {campaigns.map((campaign) => (
-              <Card key={campaign.id}>
+              <Card
+                key={campaign.id}
+                className="cursor-pointer transition-colors hover:bg-muted/50"
+                onClick={() => openCampaignDetail(campaign.id)}
+              >
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -328,16 +339,18 @@ export function EmailCampaignsList({
                         </p>
                       )}
                     </div>
-                    <CampaignActionButtons
-                      campaign={campaign}
-                      onPause={openPauseConfirmDialog}
-                      onResume={handleResume}
-                      onEdit={openEditDialog}
-                      onSend={openSendDialog}
-                      onDelete={openDeleteDialog}
-                      pauseLoading={pauseLoadingId === campaign.id}
-                      resumeLoading={resumeLoadingId === campaign.id}
-                    />
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <CampaignActionButtons
+                        campaign={campaign}
+                        onPause={openPauseConfirmDialog}
+                        onResume={handleResume}
+                        onEdit={openEditDialog}
+                        onSend={openSendDialog}
+                        onDelete={openDeleteDialog}
+                        pauseLoading={pauseLoadingId === campaign.id}
+                        resumeLoading={resumeLoadingId === campaign.id}
+                      />
+                    </div>
                   </div>
 
                   <p className="text-sm font-medium text-muted-foreground mb-1">الموضوع: {campaign.subject}</p>
@@ -471,7 +484,11 @@ export function EmailCampaignsList({
               </TableHeader>
               <TableBody>
                 {campaigns.map((campaign) => (
-                  <TableRow key={campaign.id}>
+                  <TableRow
+                    key={campaign.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => openCampaignDetail(campaign.id)}
+                  >
                     <TableCell className="font-medium text-right">{campaign.name}</TableCell>
                     <TableCell className="text-right">
                       <Badge variant="outline" className={getStatusColor(campaign.status)}>
@@ -496,7 +513,7 @@ export function EmailCampaignsList({
                           : "—"}
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground text-sm">{campaign.createdBy || "—"}</TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1 flex-wrap">
                         <CampaignActionButtons
                           campaign={campaign}
