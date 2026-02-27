@@ -1,5 +1,12 @@
 import { ComponentData } from "@/lib/types";
 import { ComponentState, createDefaultData, updateDataByPath } from "./types";
+import {
+  DEFAULT_LOGO,
+  DEFAULT_ADDRESS,
+  DEFAULT_EMAIL,
+  DEFAULT_LINKS,
+  DEFAULT_COPYRIGHT,
+} from "@/stories/Footer/data";
 
 // Default footer data structure
 export const getDefaultFooterData = (): ComponentData => ({
@@ -251,6 +258,28 @@ export const getDefaultFooter2Data = (): ComponentData => ({
   },
 });
 
+// Default footer3 data (stories/Footer - theme3)
+export const getDefaultFooter3Data = (): ComponentData => ({
+  visible: true,
+  dir: "rtl",
+  logo: DEFAULT_LOGO,
+  address: DEFAULT_ADDRESS,
+  email: DEFAULT_EMAIL,
+  links: DEFAULT_LINKS,
+  linksHeading: "الروابط",
+  socialLinks: [
+    { platform: "instagram", href: "https://www.instagram.com/Clusters_ksa" },
+    {
+      platform: "linkedin",
+      href: "https://www.linkedin.com/company/clusters-realestate-development-co-/",
+    },
+    { platform: "tiktok", href: "https://www.tiktok.com/@clusters_ksa" },
+    { platform: "x", href: "https://x.com/Clusters_KSA" },
+  ],
+  socialHeading: "تابعنا",
+  copyright: DEFAULT_COPYRIGHT,
+});
+
 export const footerFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
@@ -272,7 +301,9 @@ export const footerFunctions = {
     const defaultData =
       variantId === "footer2"
         ? getDefaultFooter2Data()
-        : getDefaultFooterData();
+        : variantId === "footer3"
+          ? getDefaultFooter3Data()
+          : getDefaultFooterData();
 
     // Use provided initial data, else tempData, else defaults
     const data: ComponentData = initial || state.tempData || defaultData;

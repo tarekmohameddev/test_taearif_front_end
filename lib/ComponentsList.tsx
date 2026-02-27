@@ -32,6 +32,8 @@ import { landInvestmentFormSectionStructure } from "@/componentsStructure/landIn
 import { philosophyCtaSectionStructure } from "@/componentsStructure/philosophyCtaSection";
 import { quoteSectionStructure } from "@/componentsStructure/quoteSection";
 import { projectsHeaderStructure } from "@/componentsStructure/projectsHeader";
+import { projectsShowcaseStructure } from "@/componentsStructure/projectsShowcase";
+import { contactFormStructure } from "@/componentsStructure/contactForm";
 import { valuesSectionStructure } from "@/componentsStructure/valuesSection";
 import { useEditorT } from "@/context/editorI18nStore";
 import { headerStructure } from "@/componentsStructure/header";
@@ -119,7 +121,9 @@ export const getSections = (
       "philosophyCtaSection",
       "quoteSection",
       "projectsHeader",
+      "projectsShowcase",
       "valuesSection",
+      "contactForm",
       "halfTextHalfImage",
       "sideBySide",
       "propertySlider",
@@ -172,7 +176,9 @@ export const SECTIONS: Record<string, SectionType> = {
       "philosophyCtaSection",
       "quoteSection",
       "projectsHeader",
+      "projectsShowcase",
       "valuesSection",
+      "contactForm",
       "halfTextHalfImage",
       "sideBySide",
       "propertySlider",
@@ -337,6 +343,30 @@ export const getComponents = (
     icon: "📑",
     defaultTheme: "projectsHeader1",
     ...projectsHeaderStructure,
+  },
+  projectsShowcase: {
+    id: "projectsShowcase",
+    name: "projectsShowcase",
+    displayName: t("components.projectsShowcase.display_name"),
+    description: t("components.projectsShowcase.description"),
+    category: "content",
+    section: "homepage",
+    subPath: "projectsShowcase",
+    icon: "🏗️",
+    defaultTheme: "projectsShowcase1",
+    ...projectsShowcaseStructure,
+  },
+  contactForm: {
+    id: "contactForm",
+    name: "contactForm",
+    displayName: t("components.contactForm.display_name"),
+    description: t("components.contactForm.description"),
+    category: "forms",
+    section: "homepage",
+    subPath: "contactForm",
+    icon: "📧",
+    defaultTheme: "contactForm1",
+    ...contactFormStructure,
   },
   valuesSection: {
     id: "valuesSection",
@@ -930,6 +960,30 @@ export const COMPONENTS: Record<string, any> = {
     icon: "📑",
     defaultTheme: "projectsHeader1",
     ...projectsHeaderStructure,
+  },
+  projectsShowcase: {
+    id: "projectsShowcase",
+    name: "projectsShowcase",
+    displayName: "Projects Showcase",
+    description: "Projects showcase with filters",
+    category: "content",
+    section: "homepage",
+    subPath: "projectsShowcase",
+    icon: "🏗️",
+    defaultTheme: "projectsShowcase1",
+    ...projectsShowcaseStructure,
+  },
+  contactForm: {
+    id: "contactForm",
+    name: "contactForm",
+    displayName: "Contact Form",
+    description: "Contact form section",
+    category: "forms",
+    section: "homepage",
+    subPath: "contactForm",
+    icon: "📧",
+    defaultTheme: "contactForm1",
+    ...contactFormStructure,
   },
   valuesSection: {
     id: "valuesSection",

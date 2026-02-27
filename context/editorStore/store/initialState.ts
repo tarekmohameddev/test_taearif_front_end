@@ -74,6 +74,8 @@ export const getInitialState = (): Partial<EditorStore> => ({
   philosophyCtaSectionStates: {},
   quoteSectionStates: {},
   projectsHeaderStates: {},
+  projectsShowcaseStates: {},
+  contactFormStates: {},
   valuesSectionStates: {},
   headerStates: {},
   footerStates: {},

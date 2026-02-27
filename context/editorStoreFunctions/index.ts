@@ -11,6 +11,8 @@ export * from "./landInvestmentFormSectionFunctions";
 export * from "./philosophyCtaSectionFunctions";
 export * from "./quoteSectionFunctions";
 export * from "./projectsHeaderFunctions";
+export * from "./projectsShowcaseFunctions";
+export * from "./contactFormFunctions";
 export * from "./valuesSectionFunctions";
 export * from "./headerFunctions";
 export * from "./header2Functions";

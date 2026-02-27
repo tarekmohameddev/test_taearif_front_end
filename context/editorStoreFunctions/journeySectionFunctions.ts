@@ -2,6 +2,7 @@ import { ComponentData } from "@/lib/types";
 import { updateDataByPath } from "./types";
 import {
   DEFAULT_HEADING,
+  DEFAULT_JOURNEY_LABEL,
   DEFAULT_STEPS,
   DEFAULT_FLAG_IMAGE_SRC,
   DEFAULT_FLAG_IMAGE_ALT,
@@ -11,6 +12,7 @@ export const getDefaultJourneySectionData = (): ComponentData => ({
   visible: true,
   dir: "rtl",
   heading: DEFAULT_HEADING,
+  journeyLabel: DEFAULT_JOURNEY_LABEL,
   steps: DEFAULT_STEPS,
   flagImageSrc: DEFAULT_FLAG_IMAGE_SRC,
   flagImageAlt: DEFAULT_FLAG_IMAGE_ALT,

@@ -321,6 +321,14 @@
       "display_name": "Projects Header",
       "description": "Header section for projects with title and description"
     },
+    "projectsShowcase": {
+      "display_name": "Projects Showcase",
+      "description": "Projects showcase with filters and cards"
+    },
+    "contactForm": {
+      "display_name": "Contact Form",
+      "description": "Contact form section"
+    },
     "valuesSection": {
       "display_name": "Values Section",
       "description": "Section displaying company values with icons"

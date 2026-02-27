@@ -2,7 +2,6 @@
 /*  LandInvestmentFormSection — Type definitions (form CTA + image)    */
 /* ------------------------------------------------------------------ */
 
-import type { ReactNode } from "react";
 import type { TextStyleProps } from "../Text/Text.types";
 
 export interface LandInvestmentFormSectionProps {
@@ -12,8 +11,6 @@ export interface LandInvestmentFormSectionProps {
   heading?: string;
   /** Description below heading */
   description?: string;
-  /** Form content or CTA — rendered in the form area */
-  children?: ReactNode;
   /** Bottom decorative image URL */
   bottomImageSrc?: string;
   /** Bottom image alt */
@@ -24,6 +21,7 @@ export interface LandInvestmentFormSectionProps {
   headingTextProps?: TextStyleProps;
   /** Style overrides for description */
   descriptionTextProps?: TextStyleProps;
-  // TODO: Add visible prop
+  /** Form submit handler */
+  onFormSubmit?: (data: Record<string, string>) => void;
   visible?: boolean;
 }

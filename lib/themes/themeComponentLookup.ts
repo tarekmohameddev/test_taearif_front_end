@@ -20,6 +20,11 @@ export function findThemeForComponent(componentName: string): string | null {
   if (themesComponentsList.theme2?.includes(componentName)) {
     return 'theme2';
   }
+
+  // البحث في theme3
+  if (themesComponentsList.theme3?.includes(componentName)) {
+    return 'theme3';
+  }
   
   return null; // لم يتم العثور عليه - يعتبر مجاني
 }

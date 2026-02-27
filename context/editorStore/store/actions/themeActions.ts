@@ -46,6 +46,8 @@ export const createThemeActions = (
         philosophyCtaSectionStates: {},
         quoteSectionStates: {},
         projectsHeaderStates: {},
+        projectsShowcaseStates: {},
+        contactFormStates: {},
         valuesSectionStates: {},
         headerStates: {},
         footerStates: {},

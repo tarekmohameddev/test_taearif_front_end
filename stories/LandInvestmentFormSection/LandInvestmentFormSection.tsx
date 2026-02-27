@@ -1,6 +1,7 @@
 "use client";
 
 import type { LandInvestmentFormSectionProps } from "./LandInvestmentFormSection.types";
+import { cn } from "@/lib/utils";
 import { Text } from "../Text";
 import {
   DEFAULT_HEADING,
@@ -8,16 +9,17 @@ import {
   DEFAULT_BOTTOM_IMAGE_SRC,
   DEFAULT_BOTTOM_IMAGE_ALT,
 } from "./data";
+import { LandInvestmentForm } from "./LandInvestmentForm";
 
 export const LandInvestmentFormSection = ({
   id = "form-section",
   heading,
   description,
-  children,
   bottomImageSrc,
   bottomImageAlt,
   headingTextProps,
   descriptionTextProps,
+  onFormSubmit,
   dir = "rtl",
 }: LandInvestmentFormSectionProps) => {
   const _heading = heading ?? DEFAULT_HEADING;
@@ -33,15 +35,17 @@ export const LandInvestmentFormSection = ({
             <Text as="h2" {...headingTextProps}>
               {_heading}
             </Text>
-            <Text as="p" {...descriptionTextProps} className="mt-4 lg:mt-0">
+            <Text
+              as="p"
+              {...descriptionTextProps}
+              className={cn("mt-4 text-lg lg:mt-0 whitespace-pre-line", descriptionTextProps?.className)}
+            >
               {_description}
             </Text>
           </div>
-          {children && (
-            <div className="flex flex-1 flex-col gap-6">
-              {children}
-            </div>
-          )}
+          <div className="flex flex-1 flex-col gap-6">
+            <LandInvestmentForm onSubmit={onFormSubmit} />
+          </div>
         </div>
         {_imageSrc && (
           <img

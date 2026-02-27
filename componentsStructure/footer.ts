@@ -1135,5 +1135,73 @@ export const footerStructure: ComponentStructure = {
         { key: "content.contactInfo.address", label: "Address", type: "text" },
       ],
     },
+    {
+      id: "footer3",
+      name: "Footer 3 - Theme3 (Stories)",
+      fields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        {
+          key: "dir",
+          label: "Direction",
+          type: "select",
+          options: [
+            { label: "RTL", value: "rtl" },
+            { label: "LTR", value: "ltr" },
+          ],
+        },
+        {
+          key: "logo",
+          label: "Logo",
+          type: "object",
+          fields: [
+            { key: "src", label: "Image URL", type: "text" },
+            { key: "alt", label: "Alt Text", type: "text" },
+            { key: "href", label: "Link URL", type: "text" },
+          ],
+        },
+        {
+          key: "address",
+          label: "Address",
+          type: "object",
+          fields: [
+            { key: "label", label: "Label", type: "text" },
+            { key: "value", label: "Value", type: "text" },
+          ],
+        },
+        { key: "email", label: "Email", type: "text" },
+        {
+          key: "links",
+          label: "Links",
+          type: "array",
+          addLabel: "Add Link",
+          itemLabel: "Link",
+          of: [
+            { key: "label", label: "Label", type: "text" },
+            { key: "href", label: "URL", type: "text" },
+          ],
+        },
+        { key: "linksHeading", label: "Links Heading", type: "text" },
+        {
+          key: "socialLinks",
+          label: "Social Links",
+          type: "array",
+          addLabel: "Add Social",
+          itemLabel: "Social",
+          of: [
+            { key: "platform", label: "Platform", type: "text" },
+            { key: "href", label: "URL", type: "text" },
+          ],
+        },
+        { key: "socialHeading", label: "Social Heading", type: "text" },
+        { key: "copyright", label: "Copyright", type: "text" },
+      ],
+      simpleFields: [
+        { key: "visible", label: "Visible", type: "boolean" },
+        { key: "logo.src", label: "Logo URL", type: "text" },
+        { key: "address.value", label: "Address", type: "text" },
+        { key: "email", label: "Email", type: "text" },
+        { key: "copyright", label: "Copyright", type: "text" },
+      ],
+    },
   ],
 };
