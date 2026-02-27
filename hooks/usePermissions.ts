@@ -35,7 +35,7 @@ export const usePermissions = () => {
     return segments.length > 0 ? segments[0] : "";
   };
 
-  // Map page slugs to permission names
+  // Map page slugs to permission names (must match backend permission names from /api/user)
   const getPermissionName = (slug: string): string => {
     const permissionMap: { [key: string]: string } = {
       customers: "customers.view",
@@ -52,7 +52,7 @@ export const usePermissions = () => {
       websites: "websites.view",
       "activity-logs": "activity.logs.view",
       "purchase-management": "purchase.management",
-      "rental-management": "rental.management",
+      "rental-management": "rentals.view",
       "financial-reporting": "financial.reporting",
       affiliate: "affiliate.view",
       "help-center": "help.center",
@@ -61,6 +61,10 @@ export const usePermissions = () => {
       blogs: "blogs.view",
       messages: "messages.view",
       "whatsapp-ai": "whatsapp.ai",
+      buildings: "buildings.view",
+      "job-applications": "job_applications.view",
+      "property-requests": "property_requests.view",
+      matching: "property_requests.view",
     };
 
     return permissionMap[slug] || `${slug}.view`;

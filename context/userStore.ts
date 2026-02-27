@@ -151,7 +151,7 @@ export const useUserStore = create<UserState & UserActions>()(
           return true;
         }
 
-        // Map page slugs to permission names
+        // Map page slugs to permission names (must match backend permission names from /api/user)
         const permissionMap: { [key: string]: string } = {
           customers: "customers.view",
           live_editor: "live_editor.view",
@@ -167,7 +167,7 @@ export const useUserStore = create<UserState & UserActions>()(
           websites: "websites.view",
           "activity-logs": "activity.logs.view",
           "purchase-management": "purchase.management",
-          "rental-management": "rental.management",
+          "rental-management": "rentals.view",
           "financial-reporting": "financial.reporting",
           affiliate: "affiliate.view",
           "help-center": "help.center",
@@ -176,6 +176,10 @@ export const useUserStore = create<UserState & UserActions>()(
           blogs: "blogs.view",
           messages: "messages.view",
           "whatsapp-ai": "whatsapp.ai",
+          buildings: "buildings.view",
+          "job-applications": "job_applications.view",
+          "property-requests": "property_requests.view",
+          matching: "property_requests.view",
         };
 
         const requiredPermission =

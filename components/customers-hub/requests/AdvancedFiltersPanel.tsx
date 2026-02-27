@@ -1,0 +1,441 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  Filter,
+  ChevronDown,
+  AlertTriangle,
+  ListTodo,
+  UserPlus,
+  Timer,
+  MapPin,
+  DollarSign,
+  Building2,
+} from "lucide-react";
+import { SourceBadge } from "../actions/SourceBadge";
+import {
+  priorityLabels,
+  actionTypeLabels,
+  PROPERTY_TYPE_OPTIONS,
+  SAUDI_REGIONS,
+} from "./constants";
+import type { CustomerSource, CustomerActionType, Priority } from "@/types/unified-customer";
+
+export interface AdvancedFiltersPanelProps {
+  selectedSources: string[];
+  setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
+  selectedPriorities: string[];
+  setSelectedPriorities: (v: string[] | ((prev: string[]) => string[])) => void;
+  selectedTypes: string[];
+  setSelectedTypes: (v: string[] | ((prev: string[]) => string[])) => void;
+  selectedAssignees: string[];
+  setSelectedAssignees: (v: string[] | ((prev: string[]) => string[])) => void;
+  dueDateFilter: string;
+  setDueDateFilter: (v: string) => void;
+  selectedCities: string[];
+  setSelectedCities: (v: string[] | ((prev: string[]) => string[])) => void;
+  selectedStates: string[];
+  setSelectedStates: (v: string[] | ((prev: string[]) => string[])) => void;
+  budgetMin: string;
+  budgetMax: string;
+  setBudgetMin: (v: string) => void;
+  setBudgetMax: (v: string) => void;
+  selectedPropertyTypes: string[];
+  setSelectedPropertyTypes: (v: string[] | ((prev: string[]) => string[])) => void;
+  uniqueAssignees: { id: string; name: string }[];
+  uniqueCities: string[];
+  tempBudgetMin: string;
+  tempBudgetMax: string;
+  setTempBudgetMin: (v: string) => void;
+  setTempBudgetMax: (v: string) => void;
+  isBudgetDialogOpen: boolean;
+  setIsBudgetDialogOpen: (v: boolean) => void;
+}
+
+const SOURCES: CustomerSource[] = [
+  "whatsapp",
+  "inquiry",
+  "manual",
+  "referral",
+  "import",
+];
+const PRIORITIES: Priority[] = ["urgent", "high", "medium", "low"];
+
+export function AdvancedFiltersPanel({
+  selectedSources,
+  setSelectedSources,
+  selectedPriorities,
+  setSelectedPriorities,
+  selectedTypes,
+  setSelectedTypes,
+  selectedAssignees,
+  setSelectedAssignees,
+  dueDateFilter,
+  setDueDateFilter,
+  selectedCities,
+  setSelectedCities,
+  selectedStates,
+  setSelectedStates,
+  budgetMin,
+  budgetMax,
+  setBudgetMin,
+  setBudgetMax,
+  selectedPropertyTypes,
+  setSelectedPropertyTypes,
+  uniqueAssignees,
+  uniqueCities,
+  tempBudgetMin,
+  tempBudgetMax,
+  setTempBudgetMin,
+  setTempBudgetMax,
+  isBudgetDialogOpen,
+  setIsBudgetDialogOpen,
+}: AdvancedFiltersPanelProps) {
+  const btnClass =
+    "gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700";
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 border-t pt-4">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className={btnClass}>
+            <Filter className="h-4 w-4" />
+            المصدر
+            {selectedSources.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedSources.length}
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>المصدر</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {SOURCES.map((source) => (
+            <DropdownMenuCheckboxItem
+              key={source}
+              checked={selectedSources.includes(source)}
+              onCheckedChange={(checked) =>
+                setSelectedSources((prev) =>
+                  checked ? [...prev, source] : prev.filter((s) => s !== source)
+                )
+              }
+            >
+              <SourceBadge source={source} className="text-xs" />
+            </DropdownMenuCheckboxItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className={btnClass}>
+            <AlertTriangle className="h-4 w-4" />
+            الأولوية
+            {selectedPriorities.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedPriorities.length}
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>الأولوية</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {PRIORITIES.map((p) => (
+            <DropdownMenuCheckboxItem
+              key={p}
+              checked={selectedPriorities.includes(p)}
+              onCheckedChange={(checked) =>
+                setSelectedPriorities((prev) =>
+                  checked ? [...prev, p] : prev.filter((x) => x !== p)
+                )
+              }
+            >
+              {priorityLabels[p as Priority]}
+            </DropdownMenuCheckboxItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className={btnClass}>
+            <ListTodo className="h-4 w-4" />
+            النوع
+            {selectedTypes.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedTypes.length}
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>نوع الطلب</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {(Object.keys(actionTypeLabels) as CustomerActionType[]).map((type) => (
+            <DropdownMenuCheckboxItem
+              key={type}
+              checked={selectedTypes.includes(type)}
+              onCheckedChange={(checked) =>
+                setSelectedTypes((prev) =>
+                  checked ? [...prev, type] : prev.filter((t) => t !== type)
+                )
+              }
+            >
+              {actionTypeLabels[type]}
+            </DropdownMenuCheckboxItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {uniqueAssignees.length > 0 && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className={btnClass}>
+              <UserPlus className="h-4 w-4" />
+              الموظف
+              {selectedAssignees.length > 0 && (
+                <Badge variant="secondary" className="mr-1">
+                  {selectedAssignees.length}
+                </Badge>
+              )}
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>الموظف المعين</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {uniqueAssignees.map((a) => (
+              <DropdownMenuCheckboxItem
+                key={a.id}
+                checked={selectedAssignees.includes(a.id)}
+                onCheckedChange={(checked) =>
+                  setSelectedAssignees((prev) =>
+                    checked ? [...prev, a.id] : prev.filter((x) => x !== a.id)
+                  )
+                }
+              >
+                {a.name}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className={btnClass}>
+            <Timer className="h-4 w-4" />
+            الموعد
+            {dueDateFilter !== "all" && (
+              <Badge variant="secondary" className="mr-1">
+                1
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>الموعد</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setDueDateFilter("all")}>الكل</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setDueDateFilter("overdue")}>
+            <span className="text-red-600">متأخر</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setDueDateFilter("today")}>اليوم</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setDueDateFilter("week")}>
+            هذا الأسبوع
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setDueDateFilter("no_date")}>
+            بدون تاريخ
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {uniqueCities.length > 0 && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className={btnClass}>
+              <MapPin className="h-4 w-4" />
+              المدينة
+              {selectedCities.length > 0 && (
+                <Badge variant="secondary" className="mr-1">
+                  {selectedCities.length}
+                </Badge>
+              )}
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>المدينة</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {uniqueCities.map((city) => (
+              <DropdownMenuCheckboxItem
+                key={city}
+                checked={selectedCities.includes(city)}
+                onCheckedChange={(checked) =>
+                  setSelectedCities((prev) =>
+                    checked ? [...prev, city] : prev.filter((c) => c !== city)
+                  )
+                }
+              >
+                {city}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className={btnClass}>
+            <MapPin className="h-4 w-4" />
+            المنطقة
+            {selectedStates.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedStates.length}
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>المنطقة (الولاية)</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {SAUDI_REGIONS.map((region) => (
+            <DropdownMenuCheckboxItem
+              key={region}
+              checked={selectedStates.includes(region)}
+              onCheckedChange={(checked) =>
+                setSelectedStates((prev) =>
+                  checked ? [...prev, region] : prev.filter((r) => r !== region)
+                )
+              }
+            >
+              {region}
+            </DropdownMenuCheckboxItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu
+        open={isBudgetDialogOpen}
+        onOpenChange={(open) => {
+          setIsBudgetDialogOpen(open);
+          if (open) {
+            setTempBudgetMin(budgetMin);
+            setTempBudgetMax(budgetMax);
+          }
+        }}
+      >
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className={btnClass}>
+            <DollarSign className="h-4 w-4" />
+            الميزانية
+            {(budgetMin !== "" || budgetMax !== "") && (
+              <Badge variant="secondary" className="mr-1">
+                1
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-64 p-3">
+          <DropdownMenuLabel>نطاق الميزانية (ر.س)</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <div className="grid grid-cols-2 gap-2 py-2">
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">من</label>
+              <Input
+                type="number"
+                placeholder="الحد الأدنى"
+                value={tempBudgetMin}
+                onChange={(e) => setTempBudgetMin(e.target.value)}
+                className="h-8"
+                min={0}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">إلى</label>
+              <Input
+                type="number"
+                placeholder="الحد الأقصى"
+                value={tempBudgetMax}
+                onChange={(e) => setTempBudgetMax(e.target.value)}
+                className="h-8"
+                min={0}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button
+              size="sm"
+              className="flex-1"
+              onClick={() => {
+                setBudgetMin(tempBudgetMin);
+                setBudgetMax(tempBudgetMax);
+                setIsBudgetDialogOpen(false);
+              }}
+            >
+              تطبيق
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setTempBudgetMin("");
+                setTempBudgetMax("");
+                setBudgetMin("");
+                setBudgetMax("");
+                setIsBudgetDialogOpen(false);
+              }}
+            >
+              إعادة تعيين
+            </Button>
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className={btnClass}>
+            <Building2 className="h-4 w-4" />
+            نوع العقار
+            {selectedPropertyTypes.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedPropertyTypes.length}
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>نوع العقار</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {PROPERTY_TYPE_OPTIONS.map((opt) => (
+            <DropdownMenuCheckboxItem
+              key={opt.value}
+              checked={selectedPropertyTypes.includes(opt.value)}
+              onCheckedChange={(checked) =>
+                setSelectedPropertyTypes((prev) =>
+                  checked
+                    ? [...prev, opt.value]
+                    : prev.filter((t) => t !== opt.value)
+                )
+              }
+            >
+              {opt.label}
+            </DropdownMenuCheckboxItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}

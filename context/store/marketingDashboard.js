@@ -223,10 +223,13 @@ export default (set, get) => ({
         `${process.env.NEXT_PUBLIC_Backend_URL}/v1/credits/packages?locale=ar`,
       );
 
+      // API: { status: true, message: "...", data: [ { id, name, credits, price, ... } ] }
+      const raw = response?.data;
+      const list = Array.isArray(raw?.data) ? raw.data : Array.isArray(raw) ? raw : [];
       set((state) => ({
         creditPackages: {
           ...state.creditPackages,
-          packages: response.data.data || [],
+          packages: list,
           loading: false,
         },
       }));
