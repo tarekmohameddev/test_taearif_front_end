@@ -810,7 +810,7 @@ export default function Footer(props: FooterProps = {}) {
                   fontSize: `var(--${mergedData.styling.typography.titleSize})`,
                 }}
               >
-                عن الشركة
+                {mergedData.content.companyInfo.descriptionTitle || "عن الشركة"}
               </h4>
               <p
                 className={`text-${mergedData.styling.typography.bodySize} font-${mergedData.styling.typography.bodyWeight} leading-7 text-white/90`}
