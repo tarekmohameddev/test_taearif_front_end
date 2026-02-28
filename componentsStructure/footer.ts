@@ -186,7 +186,21 @@ export const footerStructure: ComponentStructure = {
                     { key: "content.companyInfo.logo", label: "الشعار", type: "image", condition: { field: "useCustomFooterLogo", value: false } },
                   ],
                 },
-                { key: "description", label: "Description", type: "text" },
+                {
+                  key: "descriptionGroup",
+                  label: "عن الشركة",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "content.companyInfo.descriptionTitle",
+                      label: "عنوان قسم «عن الشركة»",
+                      type: "text",
+                      placeholder: "عن الشركة",
+                    },
+                    { key: "content.companyInfo.description", label: "Description", type: "text" },
+                  ],
+                },
                 { key: "tagline", label: "Tagline", type: "text" },
               ],
             },
