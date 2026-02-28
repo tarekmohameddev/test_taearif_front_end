@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useEditorStore } from "@/context/editorStore";
+import { deepMerge } from "@/context/editorStore/utils/deepMerge";
 import { normalizePath } from "../../../utils";
 import { COMPONENTS } from "@/lib/ComponentsList";
 import { useEventDebug } from "@/lib/debug/live-editor/hooks/useEventDebug";
@@ -56,12 +57,17 @@ export const useValueHelpers = ({
         return undefined;
       }
 
-      // Use currentData first, then fall back to other sources
+      // Use currentData first, then fall back to other sources.
+      // When both currentData and tempData exist, merge tempData over currentData so condition checks
+      // (e.g. useCustomFooterLogo) see the latest toggle/edits immediately.
       let cursor: any = {};
 
       // Use currentData if provided (unified system)
       if (currentData && Object.keys(currentData).length > 0) {
-        cursor = currentData;
+        cursor =
+          tempData && Object.keys(tempData).length > 0
+            ? deepMerge(currentData, tempData)
+            : currentData;
       } else if (variantId === "global-header") {
         // Use globalComponentsData for global header
         cursor = globalComponentsData?.header || tempData || {};
@@ -342,17 +348,16 @@ export const useValueHelpers = ({
       }
 
       if (onUpdateByPath) {
-        // For regular components, prioritize tempData updates for immediate UI feedback
+        // For regular components, update tempData + component store AND notify parent so currentData stays in sync
         if (
           componentType &&
           variantId &&
           variantId !== "global-header" &&
           variantId !== "global-footer"
         ) {
-          // Use updateByPath to update tempData for immediate UI feedback
           updateByPath(path, value);
-          // Also update component store to ensure data persists when saving
           updateComponentByPath(componentType, variantId, path, value);
+          onUpdateByPath(path, value);
         } else {
           // Use the unified update function for global components
           onUpdateByPath(path, value);

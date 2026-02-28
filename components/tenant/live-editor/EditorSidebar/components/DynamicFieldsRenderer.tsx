@@ -119,11 +119,31 @@ export function DynamicFieldsRenderer({
           }
         }
       } else {
-        conditionPath = def.condition.field;
+        // لا يوجد basePath (مثل groupFields في footer: content.companyInfo.footerLogoGroup).
+        // إذا كان def.key مساراً كاملاً (يحتوي نقطة)، نقرأ شرط الحقل من نفس الأب حتى لا يُقرأ من جذر البيانات.
+        if (def.condition.field.includes(".")) {
+          conditionPath = def.condition.field;
+        } else if (def.key.includes(".")) {
+          const parentPath = def.key.split(".").slice(0, -1).join(".");
+          conditionPath = parentPath
+            ? `${parentPath}.${def.condition.field}`
+            : def.condition.field;
+        } else {
+          conditionPath = def.condition.field;
+        }
       }
       
       const conditionFieldValue = getValueByPath(conditionPath);
-      if (conditionFieldValue !== def.condition.value) {
+      const expected = def.condition.value;
+      // تطبيع القيمة: دعم boolean و string ("true"/"false") و undefined حتى يعمل الشرط بشكل صحيح
+      const normalized =
+        typeof expected === "boolean"
+          ? conditionFieldValue === true ||
+            conditionFieldValue === "true" ||
+            conditionFieldValue === 1
+          : conditionFieldValue;
+      const conditionMet = expected === false ? !normalized : !!normalized;
+      if (!conditionMet) {
         return null; // لا تعرض الحقل إذا لم تتحقق الشروط
       }
     }
