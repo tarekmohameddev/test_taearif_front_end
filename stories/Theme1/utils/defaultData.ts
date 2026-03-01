@@ -38,6 +38,7 @@ import { getDefaultPropertySliderData } from "@/context/editorStoreFunctions/pro
 import { getDefaultStepsSectionData } from "@/context/editorStoreFunctions/stepsSectionFunctions";
 import { getDefaultTestimonialsData } from "@/context/editorStoreFunctions/testimonialsFunctions";
 import { getDefaultWhyChooseUsData } from "@/context/editorStoreFunctions/whyChooseUsFunctions";
+import { mergeDefaultWithStructure } from "./mergeDefaultWithStructure";
 
 type DefaultDataGetter = () => Record<string, unknown>;
 
@@ -85,6 +86,17 @@ export function getDefaultDataForTheme1Component(
   const getter = theme1DefaultGetters[componentName];
   if (!getter) return undefined;
   return getter() as Record<string, unknown>;
+}
+
+/**
+ * Returns merged default data + structure keys (empty by type) for Storybook overrideData.
+ * Default data wins. Use in Theme1 stories for full structure visibility.
+ */
+export function getMergedDefaultDataForStory(
+  componentName: string
+): Record<string, unknown> | undefined {
+  const defaultData = getDefaultDataForTheme1Component(componentName);
+  return mergeDefaultWithStructure(componentName, defaultData);
 }
 
 export { getDefaultHeaderData, getDefaultFooterData, getDefaultHeroData, getDefaultHero2Data };

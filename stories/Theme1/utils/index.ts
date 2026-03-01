@@ -5,6 +5,7 @@ export {
 } from "./theme1StoryUtils";
 export {
   getDefaultDataForTheme1Component,
+  getMergedDefaultDataForStory,
   getDefaultHeaderData,
   getDefaultFooterData,
   getDefaultHeroData,

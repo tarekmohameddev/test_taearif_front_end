@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import PropertyFilter1 from "@/components/tenant/propertyFilter/propertyFilter1";
 import { Theme1Decorator } from "../decorators";
-import { getDefaultDataForTheme1Component } from "../utils/defaultData";
+import { getMergedDefaultDataForStory } from "../utils/defaultData";
 
-const defaultData = (getDefaultDataForTheme1Component("propertyFilter1") ?? {}) as Record<string, unknown>;
+const defaultData = (getMergedDefaultDataForStory("propertyFilter1") ?? {}) as Record<string, unknown>;
 
 const meta: Meta<typeof PropertyFilter1> = {
   title: "Theme1/PropertyFilter/PropertyFilter1",

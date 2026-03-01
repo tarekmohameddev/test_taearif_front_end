@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import BlogCard1 from "@/components/tenant/blogCard/blogCard1";
 import { Theme1Decorator } from "../decorators";
-import { getDefaultDataForTheme1Component } from "../utils/defaultData";
+import { getMergedDefaultDataForStory } from "../utils/defaultData";
 
-const defaultData = (getDefaultDataForTheme1Component("blogCard1") ?? {}) as Record<string, unknown>;
+const defaultData = (getMergedDefaultDataForStory("blogCard1") ?? {}) as Record<string, unknown>;
 
 const meta: Meta<typeof BlogCard1> = {
   title: "Theme1/BlogCard/BlogCard1",

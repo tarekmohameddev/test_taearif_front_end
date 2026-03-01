@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import ApplicationForm1 from "@/components/tenant/applicationForm/applicationForm1";
 import { Theme1Decorator } from "../decorators";
-import { getDefaultDataForTheme1Component } from "../utils/defaultData";
+import { getMergedDefaultDataForStory } from "../utils/defaultData";
 
-const defaultData = (getDefaultDataForTheme1Component("applicationForm1") ?? {}) as Record<string, unknown>;
+const defaultData = (getMergedDefaultDataForStory("applicationForm1") ?? {}) as Record<string, unknown>;
 
 const meta: Meta<typeof ApplicationForm1> = {
   title: "Theme1/ApplicationForm/ApplicationForm1",

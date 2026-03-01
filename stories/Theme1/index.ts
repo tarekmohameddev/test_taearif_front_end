@@ -5,4 +5,5 @@ export {
   getTheme1ComponentMeta,
   getTheme1ComponentsMeta,
   getDefaultDataForTheme1Component,
+  getMergedDefaultDataForStory,
 } from "./utils";

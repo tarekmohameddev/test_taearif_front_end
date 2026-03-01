@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import SideBySide2 from "@/components/tenant/sideBySide/sideBySide2";
 import { Theme1Decorator } from "../decorators";
-import { getDefaultDataForTheme1Component } from "../utils/defaultData";
+import { getMergedDefaultDataForStory } from "../utils/defaultData";
 
-const defaultData = (getDefaultDataForTheme1Component("sideBySide2") ?? {}) as Record<string, unknown>;
+const defaultData = (getMergedDefaultDataForStory("sideBySide2") ?? {}) as Record<string, unknown>;
 
 const meta: Meta<typeof SideBySide2> = {
   title: "Theme1/SideBySide/SideBySide2",
