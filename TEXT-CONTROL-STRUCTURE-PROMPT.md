@@ -6,6 +6,15 @@ When **creating a new component** or **editing an existing one**, apply the foll
 
 ---
 
+## إجباري: ربط الـ Structure بالمكوّن
+
+**مع كل تعديل على الـ structure يجب التأكد أن الربط مع المكوّن كامل.**
+
+- أي تغيير في الـ structure (إضافة حقل، حذف، تغيير مسار، تغيير نوع أو قيمة افتراضية) **يُلزم** التحقق من أن المكوّن المقابل في `components/tenant` يقرأ ويطبّق هذه القيم فعلياً (من الـ store أو الـ props).
+- تأكد من: مسارات القراءة في المكوّن تطابق مسارات الحقول في الـ structure، وأن الحقول الخاصة بالألوان (مع `useDefaultColor` / `globalColorType`) تُحلّ في المكوّن عبر دالة موحّدة (مثل `getColor`) وليس بقراءة القيمة الخام فقط، وأن البيانات الافتراضية في المكوّن وفي الـ store (مثل `getDefaultXData`) متوافقة مع الـ structure.
+
+---
+
 ## Important: Do not change the place of the field
 
 **لا تغيّر مكان الحقل في الـ structure.**
@@ -77,10 +86,11 @@ So: **place in structure does not change** — `content.title` stays under `cont
 
 ---
 
-## 8) Consistency with the Component
+## 8) Consistency with the Component (إجباري)
 
-- Paths in the structure (e.g. `content.title`, `content.font.title.color`) must match exactly the data consumed by the component in `components/tenant` (from props or store).
+- Paths in the structure (e.g. `content.title`, `content.font.title.color`) must match **exactly** the data consumed by the component in `components/tenant` (from props or store).
 - Every visible text must have a corresponding definition in the structure (content plus at least color; prefer size, weight, margin, and blur/badge where applicable).
+- **مع كل تعديل على الـ structure:** تحقق أن المكوّن مربوط بشكل كامل — أي أن كل حقل جديد أو معدّل يُقرأ ويُطبَّق في المكوّن (والبيانات الافتراضية محدَّثة إن لزم).
 
 ---
 

@@ -1,0 +1,169 @@
+================================================================================
+  Text Control Structure — Guide for Developers
+================================================================================
+
+The project is a Website Builder and CRM. Tenant components live in
+components/tenant and are defined in componentsStructure. Every component has
+at least one text (title, subtitle, description, label, badge, etc.). All
+these texts must follow a fixed control structure so the Live Editor can
+control them in a consistent way.
+
+This file explains the rules when creating a new component or editing an
+existing one, for every text element (title, subtitle, description, label,
+badge, or any user-facing text).
+
+--------------------------------------------------------------------------------
+Mandatory rule: Keep the structure fully linked to the component
+--------------------------------------------------------------------------------
+
+With every change to the structure you must ensure the link to the component
+is complete.
+
+That means: any change in the structure (adding a field, removing a field,
+changing a path, changing a field type or default value) requires you to
+check that the corresponding component in components/tenant actually reads
+and applies these values (from the store or from props).
+
+What should you check?
+  - The paths used when reading in the component match the field paths in the
+    structure.
+  - Color fields that use useDefaultColor and globalColorType are resolved in
+    the component through a single helper (e.g. getColor), not by reading the
+    raw value only; otherwise the color may stay black or branding color may
+    not work.
+  - Default data in the component and in the store (e.g. getDefaultXData) is
+    in sync with the structure.
+
+--------------------------------------------------------------------------------
+Do not change the place of the field
+--------------------------------------------------------------------------------
+
+Do not move the field in the structure.
+
+The text field (e.g. content.title or content.description) must stay in its
+original place. For example: keep content as an object and inside it keep
+title and description (and any other content fields) as they are. Do not
+move them out of content or remove them from content.
+
+In addition, we add the same field (by path) inside an extra field group so
+that the editor shows all title/subtitle settings in one place. We use
+displayAsGroup: true and in groupFields we include the same path (e.g.
+content.title) so the user can edit it from the group too.
+
+In short: the field's place in the structure does not change. content.title
+stays under content. We only add a reference to content.title inside the
+Title group's groupFields for the UI. Example: in propertySlider, content has
+title, description, viewAllText, viewAllUrl; the Title and Subtitle groups
+then reuse content.title and content.description in their groupFields
+without moving them out of content.
+
+--------------------------------------------------------------------------------
+1) Content
+--------------------------------------------------------------------------------
+
+The text field itself: type text or textarea as appropriate.
+Use clear paths, e.g. content.title, content.subtitle, content.description,
+or content.badge.
+If the text is optional, add a visibility field such as showTitle or
+showSubtitle (boolean), preferably inside a group (displayAsGroup and
+groupFields) as in the hero component.
+
+--------------------------------------------------------------------------------
+2) Color
+--------------------------------------------------------------------------------
+
+Every visible text must have a color control.
+In the structure add a field under a suitable group (e.g. styling, font, or
+typography) with type color.
+Prefer supporting branding colors via:
+  useDefaultColor: true
+  globalColorType: primary, secondary, or accent
+Example: hero title color at content.font.title.color with useDefaultColor:
+true and globalColorType: secondary.
+
+--------------------------------------------------------------------------------
+3) Font size
+--------------------------------------------------------------------------------
+
+There must be a way to control font size; responsive size (mobile, tablet,
+desktop) is preferred.
+Use an object with three fields: desktop, tablet, mobile. Each field must be
+type number with unit: "px" (fixed to pixels). The user enters a number and
+the unit is always px.
+Example: typography.title.fontSize with fields desktop, tablet, mobile, each
+type number, unit "px", and a numeric default (e.g. 24, 20, 18).
+The path should be consistent, e.g. content.font.title.size or under
+typography.title.fontSize with desktop, tablet, and mobile keys.
+
+--------------------------------------------------------------------------------
+4) Font weight
+--------------------------------------------------------------------------------
+
+Control font weight (normal, bold, etc.) with a single field such as
+fontWeight or weight (type text, e.g. "400", "700").
+Place it in the same typography group as that text (e.g. title or subtitle).
+
+--------------------------------------------------------------------------------
+5) Margin around the text
+--------------------------------------------------------------------------------
+
+Control spacing around the text (top, bottom, left, right as needed).
+Either one object like spacing.margin with top, bottom, left, right, or
+separate fields like marginTop, marginBottom (as in whyChooseUs,
+stepsSection, halfTextHalfImage).
+Values can be type text (e.g. "mb-10", "24px") or type number with
+unit: "px".
+
+--------------------------------------------------------------------------------
+6) Blur and badge
+--------------------------------------------------------------------------------
+
+Blur: If the text or its container should have a blur/backdrop effect, add a
+boolean field such as blur or blurBackdrop (as in header) and wire it in the
+component to the right CSS (e.g. backdrop-filter).
+
+Badge: If the text is shown as a badge:
+  Either a separate content field like content.badge with showBadge
+  (boolean), and badge colors in styling (e.g. badgeColor,
+  badgeBackgroundColor, badgeTextColor as in projectDetails and partners).
+  Or a shape option for the text, e.g. shapeType: "plain" or "badge" (as in
+  imageText) to choose normal text or box/badge.
+In the structure make it clear which texts can be shown as blur or badge via
+these fields.
+
+--------------------------------------------------------------------------------
+7) Extra styling (optional)
+--------------------------------------------------------------------------------
+
+Typography: Add letterSpacing under that text's typography group when needed
+(as in title.ts).
+Alignment: textAlign (select: left, center, right) or alignment when
+relevant.
+
+--------------------------------------------------------------------------------
+8) Consistency with the component (mandatory)
+--------------------------------------------------------------------------------
+
+Field paths in the structure (e.g. content.title, content.font.title.color)
+must match exactly the data consumed by the component in components/tenant
+(from props or store).
+Every visible text must have a corresponding definition in the structure
+(content plus at least color; prefer size, weight, margin, and blur/badge
+where applicable).
+With every change to the structure: verify that the component is fully
+linked. That is, every new or changed field is read and applied in the
+component, and default data is updated if needed.
+
+--------------------------------------------------------------------------------
+References in the project
+--------------------------------------------------------------------------------
+
+Full text structure (color, size, weight, spacing): componentsStructure/title.ts
+Text with grouped font (title/subtitle) and branding colors:
+  componentsStructure/hero.ts (e.g. content.font.title, content.font.subtitle)
+Text with badge and colors: componentsStructure/partners.ts,
+  componentsStructure/projectDetails.ts
+Blur: componentsStructure/header.ts
+Margin around text: halfTextHalfImage, whyChooseUs, stepsSection
+
+================================================================================
