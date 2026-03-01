@@ -449,63 +449,24 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
         : "#059669", // fallback to primary
   };
 
-  // Helper function to get color based on useDefaultColor and globalColorType
+  // Helper: resolve color from path (يدعم useDefaultColor و globalColorType من الـ structure)
+  const resolveColorAt = (root: any, path: string): any => {
+    let cur = root;
+    for (const part of path.split(".")) {
+      if (cur == null || typeof cur !== "object" || Array.isArray(cur)) return undefined;
+      cur = cur[part];
+    }
+    return cur;
+  };
+
   const getColor = (
     fieldPath: string,
     defaultColor: string = "#059669",
   ): string => {
-    // Get styling/typography data from mergedData
-    const styling = mergedData.styling || {};
-    const typography = mergedData.typography || {};
-
-    // Navigate to the field using the path (e.g., "typography.link.color")
-    const pathParts = fieldPath.split(".");
-    let fieldData: any = { ...styling, ...typography };
-    for (const part of pathParts) {
-      if (
-        fieldData &&
-        typeof fieldData === "object" &&
-        !Array.isArray(fieldData)
-      ) {
-        fieldData = fieldData[part];
-      } else {
-        fieldData = undefined;
-        break;
-      }
-    }
-
-    // Also check for useDefaultColor and globalColorType at the same path level
-    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
-    const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split(".");
-    let useDefaultColorValue: any = { ...styling, ...typography };
-    for (const part of useDefaultColorPathParts) {
-      if (
-        useDefaultColorValue &&
-        typeof useDefaultColorValue === "object" &&
-        !Array.isArray(useDefaultColorValue)
-      ) {
-        useDefaultColorValue = useDefaultColorValue[part];
-      } else {
-        useDefaultColorValue = undefined;
-        break;
-      }
-    }
-
-    const globalColorTypePathParts = globalColorTypePath.split(".");
-    let globalColorTypeValue: any = { ...styling, ...typography };
-    for (const part of globalColorTypePathParts) {
-      if (
-        globalColorTypeValue &&
-        typeof globalColorTypeValue === "object" &&
-        !Array.isArray(globalColorTypeValue)
-      ) {
-        globalColorTypeValue = globalColorTypeValue[part];
-      } else {
-        globalColorTypeValue = undefined;
-        break;
-      }
-    }
+    // Navigate from mergedData so path "typography.title.color" works
+    const fieldData = resolveColorAt(mergedData, fieldPath);
+    const useDefaultColorValue = resolveColorAt(mergedData, `${fieldPath}.useDefaultColor`);
+    const globalColorTypeValue = resolveColorAt(mergedData, `${fieldPath}.globalColorType`);
 
     // Check useDefaultColor value (default is true if not specified)
     const useDefaultColor =
@@ -572,12 +533,14 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     return brandingColor;
   };
 
-  // Get colors using getColor function
+  // Get colors using getColor function (يدعم useDefaultColor و globalColorType من الـ structure)
   const linkColor = getColor("typography.link.color", "#059669");
   const linkHoverColor = getColor(
     "typography.link.hoverColor",
     getDarkerColor(linkColor, 20),
   );
+  const titleColor = getColor("typography.title.color", "#1f2937");
+  const subtitleColor = getColor("typography.subtitle.color", "#6b7280");
 
   // Use linkColor as primaryColor for backward compatibility
   const primaryColor = linkColor;
@@ -623,7 +586,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const titleStyles = {
     fontSize: toFontSizePx(titleFontSize, 24),
     fontWeight: titleExtra?.fontWeight || mergedData.typography?.title?.fontWeight || "extrabold",
-    color: mergedData.typography?.title?.color || "#1f2937",
+    color: titleColor,
     letterSpacing: titleExtra?.letterSpacing || mergedData.typography?.title?.letterSpacing || "0",
     marginBottom: titleExtra?.marginBottom || mergedData.typography?.title?.marginBottom || "8px",
   };
@@ -633,7 +596,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const subtitleStyles = {
     fontSize: toFontSizePx(subtitleFontSize, 18),
     fontWeight: subtitleExtra?.fontWeight || mergedData.typography?.subtitle?.fontWeight || "normal",
-    color: mergedData.typography?.subtitle?.color || "#6b7280",
+    color: subtitleColor,
     letterSpacing: subtitleExtra?.letterSpacing || mergedData.typography?.subtitle?.letterSpacing || "0",
     marginTop: subtitleExtra?.marginTop || mergedData.typography?.subtitle?.marginTop || "0",
     marginBottom: subtitleExtra?.marginBottom || mergedData.typography?.subtitle?.marginBottom || "0",
@@ -642,7 +605,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   const linkFontSize = mergedData.typography?.link?.fontSize;
   const linkStyles = {
     fontSize: typeof linkFontSize === "number" ? `${linkFontSize}px` : (linkFontSize || "14px"),
-    color: mergedData.typography?.link?.color || primaryColor,
+    color: linkColor,
   };
 
   const sectionStyles = {
@@ -757,11 +720,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
                 className="section-title font-bold"
                 style={{
                   ...titleStyles,
-                  color:
-                    mergedData.styling?.textColor ||
-                    mergedData.colors?.textColor ||
-                    mergedData.typography?.title?.color ||
-                    "#1f2937",
+                  color: mergedData.styling?.textColor || mergedData.colors?.textColor || titleColor,
                 }}
               >
                 {mergedData.content?.title || "أحدث العقارات للإيجار"}
@@ -772,11 +731,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
               className="hover:underline text-sm"
               style={{
                 fontSize: linkStyles.fontSize,
-                color:
-                  mergedData.styling?.textColor ||
-                  mergedData.colors?.textColor ||
-                  mergedData.typography?.link?.color ||
-                  primaryColorHover,
+                color: mergedData.styling?.textColor || mergedData.colors?.textColor || linkHoverColor,
               }}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
@@ -791,11 +746,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
                   className="section-title font-bold"
                   style={{
                     ...titleStyles,
-                    color:
-                      mergedData.styling?.textColor ||
-                      mergedData.colors?.textColor ||
-                      mergedData.typography?.title?.color ||
-                      "#1f2937",
+                    color: mergedData.styling?.textColor || mergedData.colors?.textColor || titleColor,
                   }}
                 >
                   {mergedData.content?.title || "أحدث العقارات للإيجار"}
@@ -806,11 +757,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
                   className="section-subtitle"
                   style={{
                     ...subtitleStyles,
-                    color:
-                      mergedData.styling?.textColor ||
-                      mergedData.colors?.textColor ||
-                      mergedData.typography?.subtitle?.color ||
-                      "#6b7280",
+                    color: mergedData.styling?.textColor || mergedData.colors?.textColor || subtitleColor,
                   }}
                 >
                   {mergedData.content?.description ||
@@ -823,7 +770,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
               className="hover:underline"
               style={{
                 ...linkStyles,
-                color: mergedData.typography?.link?.color || primaryColorHover,
+                color: mergedData.styling?.textColor || mergedData.colors?.textColor || linkHoverColor,
               }}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
