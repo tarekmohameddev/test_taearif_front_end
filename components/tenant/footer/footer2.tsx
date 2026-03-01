@@ -769,7 +769,7 @@ export default function Footer2(props: Footer2Props) {
         )}
         <div className="container mx-auto px-4 max-w-[1400px] relative z-10" style={{ color: textAndLinksColor }}>
           {/* Main Content Section */}
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-8 mb-12">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-8">
             {/* Right Section - Company Info */}
             <div className="w-full lg:w-1/2 xl:w-2/5">
               <div className="flex items-center gap-3 mb-6">
