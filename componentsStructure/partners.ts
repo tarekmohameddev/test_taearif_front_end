@@ -27,26 +27,17 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1600px",
+              type: "number",
+              placeholder: "1600",
+              unit: "px",
             },
             {
               key: "padding",
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "5rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "5rem",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "80", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "80", unit: "px" },
               ],
             },
           ],
@@ -384,26 +375,17 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1600px",
+              type: "number",
+              placeholder: "1600",
+              unit: "px",
             },
             {
               key: "padding",
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "5rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "5rem",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "80", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "80", unit: "px" },
               ],
             },
             {
@@ -421,8 +403,9 @@ export const partnersStructure: ComponentStructure = {
             {
               key: "gap",
               label: "Gap",
-              type: "text",
-              placeholder: "2",
+              type: "number",
+              placeholder: "32",
+              unit: "px",
             },
             {
               key: "cardsPerSlide",

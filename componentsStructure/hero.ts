@@ -111,7 +111,7 @@ export const heroStructure: ComponentStructure = {
                 { key: "content.subtitle", label: "Subtitle", type: "text" },
               ],
             },
-            { key: "paddingTop", label: "Padding Top", type: "text" },
+            { key: "paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
             {
               key: "font",
               label: "Font Settings",
@@ -395,24 +395,9 @@ export const heroStructure: ComponentStructure = {
           label: "Height",
           type: "object",
           fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "229px",
-            },
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
           ],
         },
         {
@@ -420,24 +405,9 @@ export const heroStructure: ComponentStructure = {
           label: "Minimum Height",
           type: "object",
           fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "229px",
-            },
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
           ],
         },
         {
@@ -640,24 +610,9 @@ export const heroStructure: ComponentStructure = {
           label: "Height",
           type: "object",
           fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "90vh",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "80vh",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "70vh",
-            },
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "90", unit: "vh" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "80", unit: "vh" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "70", unit: "vh" },
           ],
         },
         {
@@ -723,7 +678,7 @@ export const heroStructure: ComponentStructure = {
               type: "text",
               displayAsGroup: true,
               groupFields: [
-                { key: "content.paddingTop", label: "Padding Top", type: "text" },
+                { key: "content.paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
                 { key: "content.alignment", label: "Alignment", type: "text" },
                 { key: "content.maxWidth", label: "Max Width", type: "text" },
               ],

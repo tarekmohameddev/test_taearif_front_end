@@ -22,6 +22,7 @@ import {
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultInputsData } from "@/context/editorStoreFunctions/inputsFunctions";
+import { toDimension } from "@/lib/utils";
 import { useTenantId } from "@/hooks/useTenantId";
 
 // Generate random ID function
@@ -1445,17 +1446,18 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
           mergedData.background?.color ||
           mergedData.styling?.bgColor ||
           "transparent",
-        paddingTop: mergedData.layout?.padding?.top || "2rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "2rem",
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "32px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "32px"),
       }}
     >
       <div
         className="mx-auto px-4"
         style={{
-          maxWidth:
-            mergedData.layout?.maxWidth ||
-            mergedData.styling?.maxWidth ||
+          maxWidth: toDimension(
+            mergedData.layout?.maxWidth ?? mergedData.styling?.maxWidth,
+            "px",
             "1600px",
+          ),
         }}
       >
         <style jsx>{`

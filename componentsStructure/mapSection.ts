@@ -63,8 +63,9 @@ export const mapSectionStructure: ComponentStructure = {
             {
               key: "mapHeight",
               label: "Map Height",
-              type: "text",
-              placeholder: "400px",
+              type: "number",
+              placeholder: "400",
+              unit: "px",
             },
           ],
         },
@@ -78,24 +79,9 @@ export const mapSectionStructure: ComponentStructure = {
               label: "Padding Top",
               type: "object",
               fields: [
-                {
-                  key: "mobile",
-                  label: "Mobile",
-                  type: "text",
-                  placeholder: "pt-12",
-                },
-                {
-                  key: "tablet",
-                  label: "Tablet",
-                  type: "text",
-                  placeholder: "pt-14",
-                },
-                {
-                  key: "desktop",
-                  label: "Desktop",
-                  type: "text",
-                  placeholder: "pt-16",
-                },
+                { key: "mobile", label: "Mobile", type: "number", placeholder: "48", unit: "px" },
+                { key: "tablet", label: "Tablet", type: "number", placeholder: "56", unit: "px" },
+                { key: "desktop", label: "Desktop", type: "number", placeholder: "64", unit: "px" },
               ],
             },
             {
@@ -103,24 +89,9 @@ export const mapSectionStructure: ComponentStructure = {
               label: "Padding Bottom",
               type: "object",
               fields: [
-                {
-                  key: "mobile",
-                  label: "Mobile",
-                  type: "text",
-                  placeholder: "pb-8",
-                },
-                {
-                  key: "tablet",
-                  label: "Tablet",
-                  type: "text",
-                  placeholder: "pb-10",
-                },
-                {
-                  key: "desktop",
-                  label: "Desktop",
-                  type: "text",
-                  placeholder: "pb-12",
-                },
+                { key: "mobile", label: "Mobile", type: "number", placeholder: "32", unit: "px" },
+                { key: "tablet", label: "Tablet", type: "number", placeholder: "40", unit: "px" },
+                { key: "desktop", label: "Desktop", type: "number", placeholder: "48", unit: "px" },
               ],
             },
           ],

@@ -733,8 +733,8 @@ export const headerStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "18px" },
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "18px" },
+                    { key: "desktop", label: "Desktop", type: "number", placeholder: "18", unit: "px" },
+                    { key: "mobile", label: "Mobile", type: "number", placeholder: "18", unit: "px" },
                   ],
                 },
               ],
@@ -773,7 +773,9 @@ export const headerStructure: ComponentStructure = {
                 {
                   key: "horizontal",
                   label: "Horizontal Padding",
-                  type: "text",
+                  type: "number",
+                  placeholder: "16",
+                  unit: "px",
                 },
               ],
             },

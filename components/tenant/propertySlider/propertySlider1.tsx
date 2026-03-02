@@ -11,6 +11,7 @@ import PropertyCard3 from "@/components/tenant/cards/card3";
 import Link from "next/link";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
+import { toDimension } from "@/lib/utils";
 
 /**
  * PropertySlider Component
@@ -592,7 +593,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     fontWeight: titleExtra?.fontWeight || mergedData.typography?.title?.fontWeight || "extrabold",
     color: titleColor,
     letterSpacing: titleExtra?.letterSpacing || mergedData.typography?.title?.letterSpacing || "0",
-    marginBottom: titleExtra?.marginBottom || mergedData.typography?.title?.marginBottom || "8px",
+    marginBottom: toDimension(titleExtra?.marginBottom ?? mergedData.typography?.title?.marginBottom, "px", "8px"),
   };
 
   const subtitleExtra = mergedData.typography?.subtitle?.extraSettings;
@@ -602,8 +603,8 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     fontWeight: subtitleExtra?.fontWeight || mergedData.typography?.subtitle?.fontWeight || "normal",
     color: subtitleColor,
     letterSpacing: subtitleExtra?.letterSpacing || mergedData.typography?.subtitle?.letterSpacing || "0",
-    marginTop: subtitleExtra?.marginTop || mergedData.typography?.subtitle?.marginTop || "0",
-    marginBottom: subtitleExtra?.marginBottom || mergedData.typography?.subtitle?.marginBottom || "0",
+    marginTop: toDimension(subtitleExtra?.marginTop ?? mergedData.typography?.subtitle?.marginTop, "px", "0"),
+    marginBottom: toDimension(subtitleExtra?.marginBottom ?? mergedData.typography?.subtitle?.marginBottom, "px", "0"),
   };
 
   const linkFontSize = mergedData.typography?.link?.fontSize;
@@ -614,16 +615,16 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
   const sectionStyles = {
     backgroundColor: mergedData.background?.color || "transparent",
-    paddingTop: mergedData.layout?.padding?.top || "56px",
-    paddingBottom: mergedData.layout?.padding?.bottom || "56px",
+    paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "56px"),
+    paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "56px"),
   };
 
   const containerStyles = {
-    maxWidth: mergedData.layout?.maxWidth || "1600px",
+    maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1600px"),
   };
 
-  const titleBottomMargin = mergedData.spacing?.titleBottom || "24px";
-  const slideGap = mergedData.spacing?.slideGap || "16px";
+  const titleBottomMargin = toDimension(mergedData.spacing?.titleBottom, "px", "24px");
+  const slideGap = toDimension(mergedData.spacing?.slideGap, "px", "16px");
 
   // Check if component should be visible
   if (!mergedData.visible) {
@@ -702,7 +703,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
       <div
         className="mx-auto"
         style={{
-          maxWidth: mergedData.layout?.maxWidth || "1600px",
+          maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1600px"),
           gridTemplateColumns: mergedData.grid?.columns?.desktop
             ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
             : undefined,

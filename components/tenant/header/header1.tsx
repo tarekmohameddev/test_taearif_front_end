@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -644,7 +644,7 @@ const Header1 = (props: HeaderProps = {}) => {
             "#ffffff",
       opacity: mergedData.background?.opacity || "0.8",
       backdropFilter: mergedData.background?.blur ? "blur(8px)" : undefined,
-      height: `${mergedData.height?.desktop || 96}px`,
+      height: toDimension(mergedData.height?.desktop, "px", "96px"),
       borderBottom: `1px solid ${resolvedColors.border}`,
       // Nav link colors (used by scoped CSS for default / hover / active)
       ["--header-link" as string]: mergedData.styling?.textColor || resolvedColors.link,

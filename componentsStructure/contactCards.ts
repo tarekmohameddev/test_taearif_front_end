@@ -407,18 +407,8 @@ export const contactCardsStructure: ComponentStructure = {
                   label: "Height",
                   type: "object",
                   fields: [
-                    {
-                      key: "mobile",
-                      label: "Mobile",
-                      type: "text",
-                      placeholder: "h-[182px]",
-                    },
-                    {
-                      key: "desktop",
-                      label: "Desktop",
-                      type: "text",
-                      placeholder: "md:h-[210px]",
-                    },
+                    { key: "mobile", label: "Mobile", type: "number", placeholder: "182", unit: "px" },
+                    { key: "desktop", label: "Desktop", type: "number", placeholder: "210", unit: "px" },
                   ],
                 },
                 {
@@ -986,18 +976,8 @@ export const contactCardsStructure: ComponentStructure = {
                   label: "Height",
                   type: "object",
                   fields: [
-                    {
-                      key: "mobile",
-                      label: "Mobile",
-                      type: "text",
-                      placeholder: "h-[182px]",
-                    },
-                    {
-                      key: "desktop",
-                      label: "Desktop",
-                      type: "text",
-                      placeholder: "md:h-[210px]",
-                    },
+                    { key: "mobile", label: "Mobile", type: "number", placeholder: "182", unit: "px" },
+                    { key: "desktop", label: "Desktop", type: "number", placeholder: "210", unit: "px" },
                   ],
                 },
                 {

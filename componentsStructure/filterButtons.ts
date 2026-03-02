@@ -88,7 +88,9 @@ export const filterButtonsStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
+                  type: "number",
+                  placeholder: "12",
+                  unit: "px",
                 },
                 {
                   key: "fontSize",
@@ -143,7 +145,9 @@ export const filterButtonsStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
+                  type: "number",
+                  placeholder: "12",
+                  unit: "px",
                 },
                 {
                   key: "fontSize",
@@ -153,7 +157,9 @@ export const filterButtonsStructure: ComponentStructure = {
                 {
                   key: "gap",
                   label: "Gap Between Buttons",
-                  type: "text",
+                  type: "number",
+                  placeholder: "8",
+                  unit: "px",
                 },
               ],
             },
@@ -187,23 +193,17 @@ export const filterButtonsStructure: ComponentStructure = {
             {
               key: "inspectionButtonWidth",
               label: "Inspection Button Width",
-              type: "text",
+              type: "number",
+              placeholder: "200",
+              unit: "px",
             },
             {
               key: "spacing",
               label: "Spacing",
               type: "object",
               fields: [
-                {
-                  key: "marginBottom",
-                  label: "Margin Bottom",
-                  type: "text",
-                },
-                {
-                  key: "gap",
-                  label: "Gap Between Elements",
-                  type: "text",
-                },
+                { key: "marginBottom", label: "Margin Bottom", type: "number", placeholder: "24", unit: "px" },
+                { key: "gap", label: "Gap Between Elements", type: "number", placeholder: "12", unit: "px" },
               ],
             },
           ],

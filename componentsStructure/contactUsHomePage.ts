@@ -329,24 +329,9 @@ export const contactUsHomePageStructure: ComponentStructure = {
               label: "Padding",
               type: "object",
               fields: [
-                {
-                  key: "mobile",
-                  label: "Mobile Padding",
-                  type: "text",
-                  placeholder: "1rem",
-                },
-                {
-                  key: "tablet",
-                  label: "Tablet Padding",
-                  type: "text",
-                  placeholder: "2rem",
-                },
-                {
-                  key: "desktop",
-                  label: "Desktop Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
+                { key: "mobile", label: "Mobile Padding", type: "number", placeholder: "16", unit: "px" },
+                { key: "tablet", label: "Tablet Padding", type: "number", placeholder: "32", unit: "px" },
+                { key: "desktop", label: "Desktop Padding", type: "number", placeholder: "48", unit: "px" },
               ],
             },
             {
@@ -354,24 +339,9 @@ export const contactUsHomePageStructure: ComponentStructure = {
               label: "Gap",
               type: "object",
               fields: [
-                {
-                  key: "mobile",
-                  label: "Mobile Gap",
-                  type: "text",
-                  placeholder: "1rem",
-                },
-                {
-                  key: "tablet",
-                  label: "Tablet Gap",
-                  type: "text",
-                  placeholder: "1.5rem",
-                },
-                {
-                  key: "desktop",
-                  label: "Desktop Gap",
-                  type: "text",
-                  placeholder: "1.5rem",
-                },
+                { key: "mobile", label: "Mobile Gap", type: "number", placeholder: "16", unit: "px" },
+                { key: "tablet", label: "Tablet Gap", type: "number", placeholder: "24", unit: "px" },
+                { key: "desktop", label: "Desktop Gap", type: "number", placeholder: "24", unit: "px" },
               ],
             },
           ],

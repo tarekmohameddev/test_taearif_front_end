@@ -10,6 +10,7 @@ import {
   logTenantStore,
 } from "@/lib/debugLogger";
 import { getDefaultSideBySide3Data } from "@/context/editorStoreFunctions/sideBySideFunctions";
+import { toDimension } from "@/lib/utils";
 
 interface SideBySide3Props {
   visible?: boolean;
@@ -562,7 +563,7 @@ export default function SideBySide3(props: SideBySide3Props = {}) {
 
   return (
     <div
-      className={`${spacing.padding?.y || "py-[24px]"} ${spacing.padding?.lgY || "lg:py-[52px]"} max-w-[${layout.maxWidth || "1600px"}] mx-auto ${spacing.padding?.x || "px-4"} sm:px-0`}
+      className={`${spacing.padding?.y || "py-[24px]"} ${spacing.padding?.lgY || "lg:py-[52px]"} max-w-[${toDimension(layout.maxWidth, "px", "1600px")}] mx-auto ${spacing.padding?.x || "px-4"} sm:px-0`}
       dir={layout.direction || "rtl"}
     >
       <div

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultResponsiveImageData } from "@/context/editorStoreFunctions/responsiveImageFunctions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -245,23 +246,26 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
   const shadowKey = (mergedData.styling?.shadow ||
     "none") as keyof typeof shadowClasses;
 
-  // Build responsive width styles
+  // Build responsive width styles (values can be number + unit or legacy string)
   const enforcedMaxWidth = "1200px";
+  const widthMobile = toDimension(mergedData.width?.mobile, "%", "100%");
+  const widthTablet = toDimension(mergedData.width?.tablet, "%", "80%");
+  const widthDesktop = toDimension(mergedData.width?.desktop, "%", "70%");
   const widthStyles: React.CSSProperties = {
-    width: mergedData.width?.mobile || "100%",
+    width: widthMobile,
     maxWidth: `min(${enforcedMaxWidth}, 100%)`,
   };
 
   // Build container styles
   const containerStyles: React.CSSProperties = {
-    marginTop: mergedData.spacing?.margin?.top || "0",
-    marginBottom: mergedData.spacing?.margin?.bottom || "0",
+    marginTop: toDimension(mergedData.spacing?.margin?.top, "px", "0"),
+    marginBottom: toDimension(mergedData.spacing?.margin?.bottom, "px", "0"),
     marginLeft: mergedData.spacing?.margin?.left || "auto",
     marginRight: mergedData.spacing?.margin?.right || "auto",
-    paddingTop: mergedData.spacing?.padding?.top || "0",
-    paddingBottom: mergedData.spacing?.padding?.bottom || "0",
-    paddingLeft: mergedData.spacing?.padding?.left || "0",
-    paddingRight: mergedData.spacing?.padding?.right || "0",
+    paddingTop: toDimension(mergedData.spacing?.padding?.top, "px", "0"),
+    paddingBottom: toDimension(mergedData.spacing?.padding?.bottom, "px", "0"),
+    paddingLeft: toDimension(mergedData.spacing?.padding?.left, "px", "0"),
+    paddingRight: toDimension(mergedData.spacing?.padding?.right, "px", "0"),
   };
 
   // Build image styles
@@ -291,14 +295,14 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
       <div className="responsive-image-wrapper" style={widthStyles}>
         <style jsx>{`
           .responsive-image-wrapper {
-            width: ${mergedData.width?.mobile || "100%"};
+            width: ${widthMobile};
             max-width: min(${enforcedMaxWidth}, 100%);
           }
 
           @media (min-width: ${mergedData.responsive?.tabletBreakpoint ||
             "1024px"}) {
             .responsive-image-wrapper {
-              width: ${mergedData.width?.tablet || "80%"};
+              width: ${widthTablet};
               max-width: min(${enforcedMaxWidth}, 100%);
             }
           }
@@ -306,7 +310,7 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
           @media (min-width: ${mergedData.responsive?.desktopBreakpoint ||
             "1280px"}) {
             .responsive-image-wrapper {
-              width: ${mergedData.width?.desktop || "70%"};
+              width: ${widthDesktop};
               max-width: min(${enforcedMaxWidth}, 100%);
             }
           }

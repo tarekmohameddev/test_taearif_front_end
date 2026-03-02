@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultTitleData } from "@/context/editorStoreFunctions/titleFunctions";
+import { toDimension } from "@/lib/utils";
 
 interface TitleProps {
   visible?: boolean;
@@ -159,10 +160,10 @@ export default function Title1(props: TitleProps = {}) {
     <section
       style={{
         backgroundColor: mergedData.styling?.backgroundColor,
-        paddingTop: padding.top,
-        paddingBottom: padding.bottom,
-        paddingLeft: padding.left,
-        paddingRight: padding.right,
+        paddingTop: toDimension(padding.top, "px", "24px"),
+        paddingBottom: toDimension(padding.bottom, "px", "24px"),
+        paddingLeft: toDimension(padding.left, "px", "0px"),
+        paddingRight: toDimension(padding.right, "px", "0px"),
       }}
     >
       <div

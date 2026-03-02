@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultSideBySide6Data } from "@/context/editorStoreFunctions/sideBySideFunctions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -290,7 +291,7 @@ export default function SideBySide6(props: SideBySide6Props) {
       <div
         className="w-full mx-auto px-4 md:px-6 lg:px-8"
         style={{
-          maxWidth: mergedData.layout?.maxWidth || "1280px",
+          maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1280px"),
         }}
       >
         <div className=" rounded-2xl overflow-hidden">

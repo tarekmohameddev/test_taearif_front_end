@@ -18,7 +18,7 @@ import {
   MapPin,
   Search,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -842,31 +842,10 @@ const Hero1 = (props: HeroProps = {}) => {
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
 
-  // Helper function to normalize height values
-  const normalizeHeight = (value: string | number | undefined, fallback: string): string => {
-    if (value === undefined || value === null) return fallback;
-    // Accept number from structure (e.g. 90 → "90vh")
-    if (typeof value === "number" && !Number.isNaN(value)) {
-      return `${value}vh`;
-    }
-    const trimmed = String(value).trim();
-    if (!trimmed) return fallback;
-    // Check if it's a number only (no units like vh, px, %, etc.)
-    if (/^\d+(\.\d+)?$/.test(trimmed)) {
-      return `${trimmed}vh`;
-    }
-    // Convert percentage (%) to vh
-    if (/^\d+(\.\d+)?%$/.test(trimmed)) {
-      return trimmed.replace('%', 'vh');
-    }
-    // If it already has a unit (vh, px, etc.), return as is
-    return trimmed;
-  };
-
-  // Normalize height values
-  const heightDesktop = normalizeHeight(mergedData.height?.desktop, "90vh");
-  const heightTablet = normalizeHeight(mergedData.height?.tablet, heightDesktop);
-  const heightMobile = normalizeHeight(mergedData.height?.mobile, heightDesktop);
+  // Normalize height values (number → "90vh", string preserved for backward compat)
+  const heightDesktop = toDimension(mergedData.height?.desktop, "vh", "90vh");
+  const heightTablet = toDimension(mergedData.height?.tablet, "vh", heightDesktop);
+  const heightMobile = toDimension(mergedData.height?.mobile, "vh", heightDesktop);
 
   // Generate dynamic styles with responsive height
   const sectionStyles = {
@@ -977,7 +956,7 @@ const Hero1 = (props: HeroProps = {}) => {
         {/* Desktop/Tablet Layout */}
         <div
           className="hidden md:block"
-          style={{ paddingTop: mergedData.content?.paddingTop || "200px" }}
+          style={{ paddingTop: toDimension(mergedData.content?.paddingTop, "px", "200px") }}
         >
           {mergedData.showTitle !== false && (
             <h1

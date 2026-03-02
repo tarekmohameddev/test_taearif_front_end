@@ -180,6 +180,7 @@ export const imageTextStructure: ComponentStructure = {
               label: "Height (px)",
               type: "number",
               placeholder: "500",
+              unit: "px",
             },
           ],
         },

@@ -13,6 +13,7 @@ import useTenantStore from "@/context/tenantStore";
 import { getDefaultHeader2Data } from "@/context/editorStoreFunctions/header2Functions";
 import { CustomDropdown, DropdownItem, DropdownSubMenu } from "@/components/customComponents/customDropdownWithSUB";
 import SidebarMenu from "./SidebarMenu";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -395,27 +396,6 @@ export default function Header2(props: Header2Props) {
   const [lang, setLang] = useState(i18n.language);
   const router = useRouter();
 
-  // Helper function to ensure fontSize has a unit (adds "px" if no unit exists)
-  const ensureFontSizeUnit = (fontSize: string | undefined, defaultSize: string = "18px"): string => {
-    if (!fontSize) return defaultSize;
-    
-    // Check if the value already has a unit (px, em, rem, %, vw, vh, etc.)
-    const hasUnit = /^\d+(\.\d+)?(px|em|rem|%|vw|vh|pt|pc|in|cm|mm|ex|ch|vmin|vmax)$/i.test(fontSize.trim());
-    
-    if (hasUnit) {
-      return fontSize;
-    }
-    
-    // If it's just a number, add "px"
-    const numericValue = parseFloat(fontSize.trim());
-    if (!isNaN(numericValue)) {
-      return `${numericValue}px`;
-    }
-    
-    // If it's not a valid number, return default
-    return defaultSize;
-  };
-
   // Use merged data for links
   const links = mergedData.links || [];
 
@@ -468,7 +448,7 @@ export default function Header2(props: Header2Props) {
           trigger={
             <span className={buttonClass} style={{ 
               color: mergedData.styling?.linkColor || "#f3f4f6",
-              fontSize: ensureFontSizeUnit(mergedData.sizes?.links?.fontSize?.desktop, "18px"),
+              fontSize: toDimension(mergedData.sizes?.links?.fontSize?.desktop, "px", "18px"),
             }}>
               {link.name}
             </span>
@@ -489,7 +469,7 @@ export default function Header2(props: Header2Props) {
         className={buttonClass}
         style={{
           color: mergedData.styling?.linkColor || "#f3f4f6",
-          fontSize: ensureFontSizeUnit(mergedData.sizes?.links?.fontSize?.desktop, "18px"),
+          fontSize: toDimension(mergedData.sizes?.links?.fontSize?.desktop, "px", "18px"),
         }}
         onMouseEnter={() => setIsHovered(index)}
         onMouseLeave={() => setIsHovered(null)}
@@ -641,7 +621,7 @@ export default function Header2(props: Header2Props) {
               color: isActive
                 ? mergedData.styling?.mobileLinkActiveColor || "#7c3aed"
                 : mergedData.styling?.mobileLinkColor || "#111827",
-              fontSize: ensureFontSizeUnit(mergedData.sizes?.links?.fontSize?.mobile, "18px"),
+              fontSize: toDimension(mergedData.sizes?.links?.fontSize?.mobile, "px", "18px"),
             }}
             onClick={() => setIsMenuOpen(false)}
           >
@@ -664,7 +644,7 @@ export default function Header2(props: Header2Props) {
             color: isActive
               ? mergedData.styling?.mobileLinkActiveColor || "#7c3aed"
               : mergedData.styling?.mobileLinkColor || "#111827",
-            fontSize: ensureFontSizeUnit(mergedData.sizes?.links?.fontSize?.mobile, "18px"),
+            fontSize: toDimension(mergedData.sizes?.links?.fontSize?.mobile, "px", "18px"),
           }}
         >
           <span>{link.name}</span>

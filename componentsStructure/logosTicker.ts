@@ -27,26 +27,17 @@ export const logosTickerStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1600px",
+              type: "number",
+              placeholder: "1600",
+              unit: "px",
             },
             {
               key: "padding",
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "4rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "4rem",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "64", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "64", unit: "px" },
               ],
             },
           ],

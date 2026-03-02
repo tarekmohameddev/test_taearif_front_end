@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
+import { toDimension } from "@/lib/utils";
 
 interface HeroSection2Props {
   title?: string;
@@ -207,8 +208,34 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
 
   if (!visible) return null;
 
+  const heightMobile = toDimension(height?.mobile, "px", "229px");
+  const heightTablet = toDimension(height?.tablet, "px", heightMobile);
+  const heightDesktop = toDimension(height?.desktop, "px", heightTablet);
+  const minHMobile = toDimension(minHeight?.mobile, "px", "229px");
+  const minHTablet = toDimension(minHeight?.tablet, "px", minHMobile);
+  const minHDesktop = toDimension(minHeight?.desktop, "px", minHTablet);
+
   return (
-    <section className="relative w-full min-h-[229px] md:min-h-[368px] flex items-center justify-center overflow-hidden">
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          [data-hero2-section] { height: var(--hero2-h-mobile); min-height: var(--hero2-min-mobile); }
+          @media (min-width: 768px) { [data-hero2-section] { height: var(--hero2-h-tablet); min-height: var(--hero2-min-tablet); } }
+          @media (min-width: 1024px) { [data-hero2-section] { height: var(--hero2-h-desktop); min-height: var(--hero2-min-desktop); } }
+        `,
+      }} />
+    <section
+      data-hero2-section
+      className="relative w-full flex items-center justify-center overflow-hidden"
+      style={{
+        ["--hero2-h-mobile" as string]: heightMobile,
+        ["--hero2-h-tablet" as string]: heightTablet,
+        ["--hero2-h-desktop" as string]: heightDesktop,
+        ["--hero2-min-mobile" as string]: minHMobile,
+        ["--hero2-min-tablet" as string]: minHTablet,
+        ["--hero2-min-desktop" as string]: minHDesktop,
+      }}
+    >
       <Image
         src={background.image || imageSrc}
         alt={background.alt || imageAlt}
@@ -237,5 +264,6 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
         )}
       </div>
     </section>
+    </>
   );
 }

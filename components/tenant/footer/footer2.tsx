@@ -10,6 +10,7 @@ import { FaWhatsapp, FaYoutube, FaSnapchat, FaTiktok } from "react-icons/fa";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultFooter2Data } from "@/context/editorStoreFunctions/footerFunctions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -679,23 +680,15 @@ export default function Footer2(props: Footer2Props) {
   const backgroundStyle = getBackgroundStyle();
   const bgType = mergedData.background?.type || "color";
 
-  // Get dynamic padding values from mergedData
-  // These values come from the paddingYGroup fields in componentsStructure/footer.ts (lines 962-990)
-  // The fields use full paths: styling.spacing.paddingYMobile/Tablet/Desktop
-  const paddingYMobile = mergedData.styling?.spacing?.paddingYMobile || "16";
-  const paddingYTablet = mergedData.styling?.spacing?.paddingYTablet || "20";
-  const paddingYDesktop = mergedData.styling?.spacing?.paddingYDesktop || "24";
-
-  // Convert padding values to rem (Tailwind: 16 = 4rem, 20 = 5rem, 24 = 6rem)
-  const convertToRem = (value: string): string => {
-    const numValue = parseInt(value) || 16;
-    return `${numValue * 0.25}rem`;
-  };
+  // Get dynamic padding values from mergedData (number + unit or legacy string)
+  const paddingYMobile = toDimension(mergedData.styling?.spacing?.paddingYMobile, "px", "16px");
+  const paddingYTablet = toDimension(mergedData.styling?.spacing?.paddingYTablet, "px", "20px");
+  const paddingYDesktop = toDimension(mergedData.styling?.spacing?.paddingYDesktop, "px", "24px");
 
   // Build dynamic style for padding (mobile first)
   const paddingStyle: React.CSSProperties = {
-    paddingTop: convertToRem(paddingYMobile),
-    paddingBottom: convertToRem(paddingYMobile),
+    paddingTop: paddingYMobile,
+    paddingBottom: paddingYMobile,
     ...backgroundStyle,
   };
 
@@ -710,20 +703,17 @@ export default function Footer2(props: Footer2Props) {
       document.head.appendChild(styleElement);
     }
     
-    const pyTablet = convertToRem(paddingYTablet);
-    const pyDesktop = convertToRem(paddingYDesktop);
-    
     styleElement.textContent = `
       @media (min-width: 768px) {
         footer[data-footer-id="${uniqueId}"] {
-          padding-top: ${pyTablet} !important;
-          padding-bottom: ${pyTablet} !important;
+          padding-top: ${paddingYTablet} !important;
+          padding-bottom: ${paddingYTablet} !important;
         }
       }
       @media (min-width: 1024px) {
         footer[data-footer-id="${uniqueId}"] {
-          padding-top: ${pyDesktop} !important;
-          padding-bottom: ${pyDesktop} !important;
+          padding-top: ${paddingYDesktop} !important;
+          padding-bottom: ${paddingYDesktop} !important;
         }
       }
     `;

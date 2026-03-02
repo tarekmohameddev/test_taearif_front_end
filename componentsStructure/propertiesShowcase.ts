@@ -56,18 +56,8 @@ export const propertiesShowcaseStructure: ComponentStructure = {
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "48", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "48", unit: "px" },
               ],
             },
           ],

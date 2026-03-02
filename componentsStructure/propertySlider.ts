@@ -185,7 +185,7 @@ export const propertySliderStructure: ComponentStructure = {
                   fields: [
                     { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "extrabold" },
                     { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0" },
-                    { key: "marginBottom", label: "Margin Bottom", type: "text", defaultValue: "8px" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 8, unit: "px" },
                   ],
                 },
               ],
@@ -235,8 +235,8 @@ export const propertySliderStructure: ComponentStructure = {
                   fields: [
                     { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "normal" },
                     { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0" },
-                    { key: "marginTop", label: "Margin Top", type: "text", defaultValue: "0" },
-                    { key: "marginBottom", label: "Margin Bottom", type: "text", defaultValue: "0" },
+                    { key: "marginTop", label: "Margin Top", type: "number", defaultValue: 0, unit: "px" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 0, unit: "px" },
                   ],
                 },
               ],
@@ -361,7 +361,7 @@ export const propertySliderStructure: ComponentStructure = {
                   fields: [
                     { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "extrabold", description: "Font weight for title" },
                     { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0", description: "Letter spacing for title" },
-                    { key: "marginBottom", label: "Margin Bottom", type: "text", defaultValue: "8px", description: "Margin below title" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 8, unit: "px", description: "Margin below title" },
                   ],
                 },
               ],
@@ -397,8 +397,8 @@ export const propertySliderStructure: ComponentStructure = {
                   fields: [
                     { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "normal", description: "Font weight for subtitle" },
                     { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0", description: "Letter spacing for subtitle" },
-                    { key: "marginTop", label: "Margin Top", type: "text", defaultValue: "0", description: "Margin above subtitle" },
-                    { key: "marginBottom", label: "Margin Bottom", type: "text", defaultValue: "0", description: "Margin below subtitle" },
+                    { key: "marginTop", label: "Margin Top", type: "number", defaultValue: 0, unit: "px", description: "Margin above subtitle" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 0, unit: "px", description: "Margin below subtitle" },
                   ],
                 },
               ],

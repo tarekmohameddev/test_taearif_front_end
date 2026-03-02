@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -605,7 +605,7 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
 
   // Generate dynamic styles
   const sectionStyles = {
-    maxWidth: mergedData.layout?.maxWidth || "1600px",
+    maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1600px"),
   };
 
   // Don't render if not visible

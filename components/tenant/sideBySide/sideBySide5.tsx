@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultSideBySide5Data } from "@/context/editorStoreFunctions/sideBySideFunctions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -240,7 +241,7 @@ export default function SideBySide5(props: SideBySide5Props) {
       <div
         className="w-full mx-auto px-4 md:px-6 lg:px-8"
         style={{
-          maxWidth: mergedData.layout?.maxWidth || "1152px",
+          maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1152px"),
         }}
       >
         <div className="flex flex-col md:flex-row gap-6 md:gap-8">

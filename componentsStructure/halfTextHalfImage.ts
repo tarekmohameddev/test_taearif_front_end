@@ -39,7 +39,9 @@ export const halfTextHalfImageStructure: ComponentStructure = {
             {
               key: "minHeight",
               label: "Minimum Height",
-              type: "text",
+              type: "number",
+              placeholder: "400",
+              unit: "px",
             },
           ],
         },
@@ -53,10 +55,10 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               label: "Padding",
               type: "object",
               fields: [
-                { key: "top", label: "Top", type: "number" },
-                { key: "bottom", label: "Bottom", type: "number" },
-                { key: "left", label: "Left", type: "number" },
-                { key: "right", label: "Right", type: "number" },
+                { key: "top", label: "Top", type: "number", unit: "px" },
+                { key: "bottom", label: "Bottom", type: "number", unit: "px" },
+                { key: "left", label: "Left", type: "number", unit: "px" },
+                { key: "right", label: "Right", type: "number", unit: "px" },
               ],
             },
             {
@@ -64,10 +66,10 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               label: "Margin",
               type: "object",
               fields: [
-                { key: "top", label: "Top", type: "number" },
-                { key: "bottom", label: "Bottom", type: "number" },
-                { key: "left", label: "Left", type: "number" },
-                { key: "right", label: "Right", type: "number" },
+                { key: "top", label: "Top", type: "number", unit: "px" },
+                { key: "bottom", label: "Bottom", type: "number", unit: "px" },
+                { key: "left", label: "Left", type: "number", unit: "px" },
+                { key: "right", label: "Right", type: "number", unit: "px" },
               ],
             },
           ],
@@ -492,8 +494,9 @@ export const halfTextHalfImageStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1600px",
+              type: "number",
+              placeholder: "1600",
+              unit: "px",
             },
             {
               key: "gridCols",

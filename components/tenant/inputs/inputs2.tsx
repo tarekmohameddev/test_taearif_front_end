@@ -47,7 +47,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 
 // Generate random ID function
 const generateRandomId = (prefix: string = "id"): string => {
@@ -1883,17 +1883,18 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
           mergedData.background?.color ||
           mergedData.styling?.bgColor ||
           "transparent",
-        paddingTop: mergedData.layout?.padding?.top || "2rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "2rem",
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "32px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "32px"),
       }}
     >
       <div
         className="mx-auto px-4"
         style={{
-          maxWidth:
-            mergedData.layout?.maxWidth ||
-            mergedData.styling?.maxWidth ||
+          maxWidth: toDimension(
+            mergedData.layout?.maxWidth ?? mergedData.styling?.maxWidth,
+            "px",
             "1600px",
+          ),
         }}
       >
         <style jsx>{`
