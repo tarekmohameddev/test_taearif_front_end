@@ -8,7 +8,7 @@ const meta: Meta<typeof PropertiesPage1> = {
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [Theme1Decorator],
-  args: { useStore: false },
+  args: { useStore: false, tenantId: "demo" },
 };
 
 export default meta;

@@ -119,6 +119,8 @@ interface PropertySliderProps {
   useStore?: boolean;
   variant?: string;
   id?: string;
+  /** Override tenant ID (e.g. for Storybook when useStore is false) */
+  tenantId?: string;
 }
 
 // Helper function to convert old API URLs to new format
@@ -203,8 +205,10 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "propertySlider1";
 
-  // Tenant ID hook
-  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+  // Tenant ID hook (skip when tenantId override provided, e.g. Storybook)
+  const hookResult = useTenantId();
+  const currentTenantId = props.tenantId ?? hookResult.tenantId;
+  const tenantLoading = props.tenantId ? false : hookResult.isLoading;
 
   // State for API data
   const [apiProperties, setApiProperties] = useState<Property[]>([]);

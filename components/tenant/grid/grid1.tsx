@@ -36,6 +36,11 @@ interface PropertyGridProps {
   useStore?: boolean;
   variant?: string;
   id?: string;
+  /**
+   * Override tenant id (useful for Storybook/demo environments).
+   * When provided, the component will not wait for useTenantId() to resolve.
+   */
+  tenantId?: string;
 }
 
 export default function PropertyGrid(props: PropertyGridProps = {}) {
@@ -63,8 +68,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     });
   }, [pathname, isRealEstatePage]);
 
-  // Tenant ID hook
-  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+  // Tenant ID hook (skip when tenantId override provided, e.g. Storybook)
+  const hookResult = useTenantId();
+  const currentTenantId = props.tenantId ?? hookResult.tenantId;
+  const tenantLoading = props.tenantId ? false : hookResult.isLoading;
 
   // URL filters hook - automatically applies URL params when they change
   useUrlFilters();
