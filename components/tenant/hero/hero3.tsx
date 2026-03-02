@@ -987,6 +987,14 @@ function Hero3(props: HeroProps) {
     opacity: mergedData.background?.overlay?.opacity || "0.45",
   };
 
+  const searchFormOffset = mergedData.searchForm?.offset || "md";
+  const searchFormOffsetMarginClass =
+    searchFormOffset === "sm"
+      ? "mt-4"
+      : searchFormOffset === "lg"
+        ? "mt-12"
+        : "mt-8";
+
   // Extract YouTube video ID
   const getYouTubeVideoId = (url: string) => {
     const match = url.match(
@@ -1157,7 +1165,12 @@ function Hero3(props: HeroProps) {
             )}
             {/* Hero Search Form for Desktop/Tablet */}
             {mergedData.searchForm?.enabled && (
-              <div className="w-full pointer-events-auto flex items-center justify-center">
+              <div
+                className={cn(
+                  "w-full pointer-events-auto flex items-center justify-center",
+                  searchFormOffsetMarginClass,
+                )}
+              >
                 <SearchForm
                   config={mergedData.searchForm}
                   savedConfig={savedSearchForm}
@@ -1198,7 +1211,12 @@ function Hero3(props: HeroProps) {
             )}
             {/* Hero Search Form for Mobile */}
             {mergedData.searchForm?.enabled && (
-              <div className="w-full px-4 pointer-events-auto">
+              <div
+                className={cn(
+                  "w-full px-4 pointer-events-auto",
+                  searchFormOffsetMarginClass,
+                )}
+              >
                 <SearchForm
                   config={mergedData.searchForm}
                   savedConfig={savedSearchForm}

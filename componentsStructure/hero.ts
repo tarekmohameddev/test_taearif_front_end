@@ -194,7 +194,21 @@ export const heroStructure: ComponentStructure = {
                 allowUnset: true,
               },
             },
-            { key: "offset", label: "Offset", type: "text" },
+            {
+              key: "offset",
+              label: "Offset",
+              type: "badge-select",
+              options: [
+                { label: "Small Offset", value: "sm" },
+                { label: "Default Offset", value: "md" },
+                { label: "Large Offset", value: "lg" },
+              ],
+              badgeConfig: {
+                mode: "single",
+                requiredAtLeastOne: false,
+                allowUnset: true,
+              },
+            },
             {
               key: "background",
               label: "Form Background",
@@ -297,9 +311,49 @@ export const heroStructure: ComponentStructure = {
               label: "Responsive Layout",
               type: "object",
               fields: [
-                { key: "desktop", label: "Desktop", type: "text" },
-                { key: "tablet", label: "Tablet", type: "text" },
-                { key: "mobile", label: "Mobile", type: "text" },
+                {
+                  key: "desktop",
+                  label: "Desktop Layout",
+                  type: "badge-select",
+                  options: [
+                    { label: "all-in-row", value: "all-in-row" },
+                    { label: "two-rows", value: "two-rows" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: true,
+                    allowUnset: false,
+                  },
+                },
+                {
+                  key: "tablet",
+                  label: "Tablet Layout",
+                  type: "badge-select",
+                  options: [
+                    { label: "all-in-row", value: "all-in-row" },
+                    { label: "two-rows", value: "two-rows" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: true,
+                    allowUnset: false,
+                  },
+                },
+                {
+                  key: "mobile",
+                  label: "Mobile Layout",
+                  type: "badge-select",
+                  options: [
+                    { label: "all-in-row", value: "all-in-row" },
+                    { label: "two-rows", value: "two-rows" },
+                    { label: "stacked", value: "stacked" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: true,
+                    allowUnset: false,
+                  },
+                },
               ],
             },
           ],
@@ -770,7 +824,21 @@ export const heroStructure: ComponentStructure = {
               displayAsGroup: true,
               groupFields: [
                 { key: "searchForm.position", label: "الموضع", type: "text" },
-                { key: "searchForm.offset", label: "Offset", type: "text" },
+                {
+                  key: "searchForm.offset",
+                  label: "Offset",
+                  type: "badge-select",
+                  options: [
+                    { label: "Small Offset", value: "sm" },
+                    { label: "Default Offset", value: "md" },
+                    { label: "Large Offset", value: "lg" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: false,
+                    allowUnset: true,
+                  },
+                },
               ],
             },
             {

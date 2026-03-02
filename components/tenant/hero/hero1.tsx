@@ -894,12 +894,25 @@ const Hero1 = (props: HeroProps = {}) => {
   }, [mergedData.background?.color, brandingColors]);
 
   const searchFormPosition = mergedData.searchForm?.position || "bottom";
+  const searchFormOffset = mergedData.searchForm?.offset || "md";
+  const searchFormOffsetTopClass =
+    searchFormOffset === "sm"
+      ? "top-24"
+      : searchFormOffset === "lg"
+        ? "top-40"
+        : "top-32";
+  const searchFormOffsetBottomClass =
+    searchFormOffset === "sm"
+      ? "bottom-24"
+      : searchFormOffset === "lg"
+        ? "bottom-40"
+        : "bottom-32";
   const searchFormDesktopPositionClass =
     searchFormPosition === "top"
-      ? "top-32"
+      ? searchFormOffsetTopClass
       : searchFormPosition === "center"
         ? "top-1/2 -translate-y-1/2"
-        : "bottom-32";
+        : searchFormOffsetBottomClass;
 
   // Don't render if not visible
   if (!mergedData.visible) {
