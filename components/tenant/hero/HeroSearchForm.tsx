@@ -248,13 +248,28 @@ export default function HeroSearchForm({
 
   if (!config?.enabled) return null;
 
+  const responsiveLayout = config?.responsive || {};
+  const desktopLayout = responsiveLayout.desktop || "all-in-row";
+  const tabletLayout = responsiveLayout.tablet || "two-rows";
+  const mobileLayout = responsiveLayout.mobile || "stacked";
+
+  const gridClasses = [
+    "grid gap-3",
+    // Mobile: حالياً دائماً عمود واحد، لكن نحافظ على المفتاح للمرونة المستقبلية
+    "grid-cols-1",
+    // Tablet
+    tabletLayout === "all-in-row" ? "sm:grid-cols-3" : "sm:grid-cols-2",
+    // Desktop
+    desktopLayout === "all-in-row" ? "lg:grid-cols-5" : "lg:grid-cols-3",
+  ].join(" ");
+
   return (
     <form
       onSubmit={handleSubmit}
       className="w-full rounded-lg bg-white p-3 sm:p-4 lg:p-5 shadow-2xl"
       aria-label="نموذج البحث عن العقارات"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className={gridClasses}>
         {/* Purpose Toggle - Always visible (full width on mobile, one column on lg+) */}
         <div className="sm:col-span-2 lg:col-span-1 flex items-center justify-center">
           <div className="inline-flex overflow-hidden rounded-lg border bg-gray-50 p-1 w-full">

@@ -1375,7 +1375,12 @@
       "offset": "Offset",
       "shadow": "Shadow",
       "border": "Border",
-      "border_radius": "Border Radius"
+      "border_radius": "Border Radius",
+      "search_form_button_background_color": "Search Form Button Background Color",
+      "search_form_button_text_color": "Search Form Button Text Color",
+      "search_form_button_hover_color": "Search Form Button Hover Color",
+      "purpose_toggle_active_background_color": "Purpose Toggle Active Background Color",
+      "purpose_toggle_active_text_color": "Purpose Toggle Active Text Color"
     },
     "testimonials_specific": {
       "testimonials_1_swiper_carousel": "Testimonials 1 - Swiper Carousel",
