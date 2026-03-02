@@ -24,6 +24,7 @@ export interface FieldDefinitionBase {
     iconLibrary?: "lucide" | "react-icons";
   }[]; // for select
   showIcons?: boolean; // for select fields: show icons in dropdown
+  displayAsSwitch?: boolean; // for select with 2 options: render as switch (same stored values)
   defaultValue?: any; // default value for the field
   description?: string; // description for the field
   condition?: {

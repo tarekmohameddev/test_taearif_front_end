@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
 import { ChevronDown, Check } from "lucide-react";
 
 interface SelectFieldRendererProps {
@@ -58,6 +59,41 @@ export const SelectFieldRenderer: React.FC<SelectFieldRendererProps> = ({
   const selectedIcon = selectedOption?.iconLibrary
     ? getIconComponent(selectedOption.value, selectedOption.iconLibrary)
     : null;
+
+  // عرض كـ Switch مع الاحتفاظ بنفس القيم (navigate / none)
+  const displayAsSwitch = (def as any).displayAsSwitch && def.options?.length === 2;
+  if (displayAsSwitch && def.options) {
+    const [onOpt, offOpt] = [def.options[0], def.options[1]];
+    const checked = value === onOpt.value;
+    return (
+      <div
+        className="group p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <label className="flex items-center space-x-3 mb-3">
+          <div className="flex-1">
+            <span className="text-sm font-semibold text-slate-700">
+              {def.label}
+            </span>
+            {def.description && (
+              <p className="text-xs text-slate-500 mt-1">{def.description}</p>
+            )}
+          </div>
+        </label>
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm text-slate-600">
+            {checked ? onOpt.label : offOpt.label}
+          </span>
+          <Switch
+            checked={checked}
+            onCheckedChange={(checked) =>
+              updateValue(normalizedPath, checked ? onOpt.value : offOpt.value)
+            }
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 

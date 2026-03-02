@@ -135,14 +135,18 @@ export function DynamicFieldsRenderer({
       
       const conditionFieldValue = getValueByPath(conditionPath);
       const expected = def.condition.value;
-      // تطبيع القيمة: دعم boolean و string ("true"/"false") و undefined حتى يعمل الشرط بشكل صحيح
-      const normalized =
-        typeof expected === "boolean"
-          ? conditionFieldValue === true ||
-            conditionFieldValue === "true" ||
-            conditionFieldValue === 1
-          : conditionFieldValue;
-      const conditionMet = expected === false ? !normalized : !!normalized;
+      let conditionMet: boolean;
+      if (Array.isArray(expected)) {
+        conditionMet = expected.includes(conditionFieldValue);
+      } else if (typeof expected === "boolean") {
+        const normalized =
+          conditionFieldValue === true ||
+          conditionFieldValue === "true" ||
+          conditionFieldValue === 1;
+        conditionMet = expected === false ? !normalized : !!normalized;
+      } else {
+        conditionMet = conditionFieldValue === expected;
+      }
       if (!conditionMet) {
         return null; // لا تعرض الحقل إذا لم تتحقق الشروط
       }
