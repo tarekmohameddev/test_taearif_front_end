@@ -843,9 +843,14 @@ const Hero1 = (props: HeroProps = {}) => {
   const error = useTenantStore((s) => s.error);
 
   // Helper function to normalize height values
-  const normalizeHeight = (value: string | undefined, fallback: string): string => {
-    if (!value) return fallback;
-    const trimmed = value.trim();
+  const normalizeHeight = (value: string | number | undefined, fallback: string): string => {
+    if (value === undefined || value === null) return fallback;
+    // Accept number from structure (e.g. 90 → "90vh")
+    if (typeof value === "number" && !Number.isNaN(value)) {
+      return `${value}vh`;
+    }
+    const trimmed = String(value).trim();
+    if (!trimmed) return fallback;
     // Check if it's a number only (no units like vh, px, %, etc.)
     if (/^\d+(\.\d+)?$/.test(trimmed)) {
       return `${trimmed}vh`;
