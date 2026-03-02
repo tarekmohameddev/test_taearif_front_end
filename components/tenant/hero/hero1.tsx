@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,8 +40,10 @@ interface HeroProps {
     mobile?: string;
   };
   background?: {
+    type?: "image" | "color";
     image?: string;
     alt?: string;
+    color?: string;
     overlay?: {
       enabled?: boolean;
       opacity?: string;
@@ -887,6 +889,26 @@ const Hero1 = (props: HeroProps = {}) => {
     opacity: mergedData.background?.overlay?.opacity || "0.45",
   };
 
+  const editorWebsiteLayout = useEditorStore((s) => s.WebsiteLayout);
+  const brandingColors =
+    editorWebsiteLayout?.branding?.colors ??
+    tenantData?.WebsiteLayout?.branding?.colors;
+  const resolvedBackgroundColor = useMemo(() => {
+    const raw = mergedData.background?.color;
+    if (raw == null) return "#059669";
+    if (typeof raw === "string" && raw.trim().length > 0) return raw;
+    if (typeof raw === "object" && !Array.isArray(raw)) {
+      const o = raw as Record<string, unknown>;
+      if (o.useDefaultColor && typeof o.globalColorType === "string" && brandingColors) {
+        const hex = brandingColors[o.globalColorType as keyof typeof brandingColors];
+        if (typeof hex === "string") return hex;
+      }
+      const v = o.value ?? o.color;
+      if (typeof v === "string") return v;
+    }
+    return "#059669";
+  }, [mergedData.background?.color, brandingColors]);
+
   // Don't render if not visible
   if (!mergedData.visible) {
     return null;
@@ -920,22 +942,29 @@ const Hero1 = (props: HeroProps = {}) => {
         style={sectionStyles}
         data-debug="hero-component"
       >
-      {/* Background Image */}
-      <Image
-        src={
-          mergedData.background?.image ||
-          "https://dalel-lovat.vercel.app/images/hero.webp"
-        }
-        alt={mergedData.background?.alt || "صورة خلفية لغرفة معيشة حديثة"}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
-
-      {/* Overlay */}
-      {mergedData.background?.overlay?.enabled && (
-        <div className="absolute inset-0" style={overlayStyles} />
+      {/* Background: Image or Solid Color */}
+      {mergedData.background?.type === "color" ? (
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: resolvedBackgroundColor }}
+        />
+      ) : (
+        <>
+          <Image
+            src={
+              mergedData.background?.image ||
+              "https://dalel-lovat.vercel.app/images/hero.webp"
+            }
+            alt={mergedData.background?.alt || "صورة خلفية لغرفة معيشة حديثة"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          {mergedData.background?.overlay?.enabled && (
+            <div className="absolute inset-0" style={overlayStyles} />
+          )}
+        </>
       )}
 
       {/* Content */}

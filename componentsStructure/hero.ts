@@ -37,22 +37,49 @@ export const heroStructure: ComponentStructure = {
           label: "Background",
           type: "object",
           fields: [
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "alt", label: "Alt Text", type: "text" },
             {
-              key: "overlay",
-              label: "Overlay",
-              type: "object",
-              fields: [
-                { key: "enabled", label: "Enabled", type: "boolean" },
-                {
-                  key: "opacity",
-                  label: "Opacity",
-                  type: "text",
-                  placeholder: "0.45",
-                },
-                { key: "color", label: "Color", type: "color" },
+              key: "type",
+              label: "Background Type",
+              type: "select",
+              options: [
+                { label: "Image", value: "image" },
+                { label: "Color", value: "color" },
               ],
+            },
+            {
+              key: "imageGroup",
+              label: "Image Settings",
+              type: "text",
+              displayAsGroup: true,
+              condition: { field: "type", value: "image" },
+              groupFields: [
+                { key: "background.image", label: "Image URL", type: "image" },
+                { key: "background.alt", label: "Alt Text", type: "text" },
+                {
+                  key: "background.overlay",
+                  label: "Overlay",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    {
+                      key: "opacity",
+                      label: "Opacity",
+                      type: "text",
+                      placeholder: "0.45",
+                    },
+                    { key: "color", label: "Color", type: "color" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "color",
+              label: "Background Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary",
+              condition: { field: "type", value: "color" },
+              description: "لون الخلفية. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
             },
           ],
         },
