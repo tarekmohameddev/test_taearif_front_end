@@ -84,6 +84,8 @@ interface InputsProps {
   variant?: string;
   useStore?: boolean;
   id?: string;
+  // Override tenant ID (e.g. for Storybook when useStore is false)
+  tenantId?: string;
   // API endpoint for form submission
   apiEndpoint?: string;
   // Additional props for store integration
@@ -269,8 +271,10 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
   const variantId = props.variant || "inputs1";
   const uniqueId = props.id || variantId;
 
-  // Tenant ID hook
-  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+  // Tenant ID hook (skip when tenantId override provided, e.g. Storybook)
+  const hookResult = useTenantId();
+  const currentTenantId = props.tenantId ?? hookResult.tenantId;
+  const tenantLoading = props.tenantId ? false : hookResult.isLoading;
 
   // Subscribe to editor store updates for this inputs variant
   const ensureComponentVariant = useEditorStore(

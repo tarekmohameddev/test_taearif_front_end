@@ -1,17 +1,19 @@
 "use client";
 
 import React from "react";
+import { AuthProvider } from "@/context/AuthContext";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 
 /**
- * Wraps Theme1 stories with I18nProvider so tenant components
- * that depend on locale/dir context render correctly.
- * No store or app logic is modified.
+ * Wraps Theme1 stories with AuthProvider and I18nProvider so tenant components
+ * that depend on useAuth, locale/dir context render correctly in Storybook.
  */
 export function Theme1Decorator(Story: React.ComponentType) {
   return (
-    <I18nProvider>
-      <Story />
-    </I18nProvider>
+    <AuthProvider>
+      <I18nProvider>
+        <Story />
+      </I18nProvider>
+    </AuthProvider>
   );
 }

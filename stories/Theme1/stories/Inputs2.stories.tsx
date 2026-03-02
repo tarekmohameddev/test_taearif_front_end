@@ -11,7 +11,7 @@ const meta: Meta<typeof Inputs2> = {
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [Theme1Decorator],
-  args: { useStore: false, ...defaultData },
+  args: { useStore: false, tenantId: "demo", ...defaultData },
 };
 
 export default meta;

@@ -17,4 +17,25 @@ const meta: Meta<typeof HalfTextHalfImage1> = {
 export default meta;
 type Story = StoryObj<typeof HalfTextHalfImage1>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    image: {
+      "visible": true,
+      "src": "https://dalel-lovat.vercel.app/images/trusted-partner-section/house.webp",
+      "alt": "صورة شريك موثوق",
+
+      "style": {
+        "aspectRatio": "800/500",
+        "objectFit": "contain",
+        "borderRadius": "0"
+      },
+
+      "background": {
+        "enabled": true,
+        "color": "#059669",
+        "width": 54,
+        "borderRadius": "5px"
+      }
+    }
+  }
+};
