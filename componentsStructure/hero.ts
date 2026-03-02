@@ -119,7 +119,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -146,7 +145,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Subtitle Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -501,7 +499,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -543,7 +540,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Description Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -740,7 +736,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -767,7 +762,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Subtitle Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -1145,7 +1139,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
