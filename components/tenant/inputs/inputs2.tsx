@@ -2060,7 +2060,9 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 backgroundColor: primaryColor,
                 color: "#ffffff",
                 borderRadius: submitButton.borderRadius || "8px",
-                padding: submitButton.padding || "12px 24px",
+                padding: typeof submitButton.padding === "object" && submitButton.padding !== null
+                ? `${toDimension((submitButton.padding as { y?: number; x?: number }).y, "px", "12")} ${toDimension((submitButton.padding as { y?: number; x?: number }).x, "px", "24")}`
+                : (submitButton.padding as string) || "12px 24px",
                 width: "100%",
                 justifyContent: "center",
               }}

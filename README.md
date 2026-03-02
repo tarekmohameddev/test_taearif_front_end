@@ -46,6 +46,7 @@ Read: docs/CURSOR_AI_SETUP.md (3-minute setup)
 - **Create:** `docs/important/components/ADD_NEW_COMPONENT.md`
 - **Fix:** `docs/important/components/FIX_COMPONENT_PROMPT.md`
 - **Overview:** `docs/important/components/README.md`
+- **Rule:** In component structures, **padding, height, width, margin, maxWidth, maxHeight** must be **`type: "number"`** with **`unit`**, not `text`; use **`toDimension()`** in components when applying to `style`. See `AGENTS.md` and `docs/live-editor/componentsStructure/README.md`.
 
 ### **⚡ Live Editor:**
 

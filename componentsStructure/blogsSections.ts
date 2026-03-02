@@ -127,26 +127,17 @@ export const blogsSectionsStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1280px",
+              type: "number",
+              placeholder: "1280",
+              unit: "px",
             },
             {
               key: "padding",
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "48", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "48", unit: "px" },
               ],
             },
             {

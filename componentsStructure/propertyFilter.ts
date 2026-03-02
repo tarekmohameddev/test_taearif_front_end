@@ -114,12 +114,16 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
+                  type: "number",
+                  placeholder: "16",
+                  unit: "px",
                 },
                 {
                   key: "gap",
                   label: "Gap Between Fields",
-                  type: "text",
+                  type: "number",
+                  placeholder: "12",
+                  unit: "px",
                 },
               ],
             },
@@ -158,12 +162,16 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
+                  type: "number",
+                  placeholder: "12",
+                  unit: "px",
                 },
                 {
                   key: "height",
                   label: "Height",
-                  type: "text",
+                  type: "number",
+                  placeholder: "40",
+                  unit: "px",
                 },
                 {
                   key: "fontSize",
@@ -209,7 +217,9 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "maxHeight",
                   label: "Max Height",
-                  type: "text",
+                  type: "number",
+                  placeholder: "300",
+                  unit: "px",
                 },
                 {
                   key: "shadow",
@@ -252,7 +262,9 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
+                  type: "number",
+                  placeholder: "12",
+                  unit: "px",
                 },
                 {
                   key: "fontSize",
@@ -309,26 +321,10 @@ export const propertyFilterStructure: ComponentStructure = {
               label: "Field Widths",
               type: "object",
               fields: [
-                {
-                  key: "searchWidth",
-                  label: "Search Field Width",
-                  type: "text",
-                },
-                {
-                  key: "typeWidth",
-                  label: "Type Field Width",
-                  type: "text",
-                },
-                {
-                  key: "priceWidth",
-                  label: "Price Field Width",
-                  type: "text",
-                },
-                {
-                  key: "buttonWidth",
-                  label: "Button Width",
-                  type: "text",
-                },
+                { key: "searchWidth", label: "Search Field Width", type: "number", placeholder: "200", unit: "px" },
+                { key: "typeWidth", label: "Type Field Width", type: "number", placeholder: "150", unit: "px" },
+                { key: "priceWidth", label: "Price Field Width", type: "number", placeholder: "120", unit: "px" },
+                { key: "buttonWidth", label: "Button Width", type: "number", placeholder: "120", unit: "px" },
               ],
             },
             {
@@ -336,16 +332,8 @@ export const propertyFilterStructure: ComponentStructure = {
               label: "Spacing",
               type: "object",
               fields: [
-                {
-                  key: "marginBottom",
-                  label: "Margin Bottom",
-                  type: "text",
-                },
-                {
-                  key: "gap",
-                  label: "Gap Between Fields",
-                  type: "text",
-                },
+                { key: "marginBottom", label: "Margin Bottom", type: "number", placeholder: "24", unit: "px" },
+                { key: "gap", label: "Gap Between Fields", type: "number", placeholder: "12", unit: "px" },
               ],
             },
           ],

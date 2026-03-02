@@ -25,26 +25,17 @@ export const whyChooseUsStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1600px",
+              type: "number",
+              placeholder: "1600",
+              unit: "px",
             },
             {
               key: "padding",
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "y",
-                  label: "Vertical Padding",
-                  type: "text",
-                  placeholder: "py-14",
-                },
-                {
-                  key: "smY",
-                  label: "Small Vertical Padding",
-                  type: "text",
-                  placeholder: "sm:py-16",
-                },
+                { key: "y", label: "Vertical Padding", type: "number", placeholder: "56", unit: "px" },
+                { key: "smY", label: "Small Vertical Padding", type: "number", placeholder: "64", unit: "px" },
               ],
             },
           ],
@@ -59,8 +50,9 @@ export const whyChooseUsStructure: ComponentStructure = {
             {
               key: "marginBottom",
               label: "Margin Bottom",
-              type: "text",
-              placeholder: "mb-10",
+              type: "number",
+              placeholder: "40",
+              unit: "px",
             },
             {
               key: "textAlign",
@@ -71,8 +63,9 @@ export const whyChooseUsStructure: ComponentStructure = {
             {
               key: "paddingX",
               label: "Horizontal Padding",
-              type: "text",
-              placeholder: "px-5",
+              type: "number",
+              placeholder: "20",
+              unit: "px",
             },
             {
               key: "typography",
@@ -1005,8 +998,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                 {
                   key: "paddingX",
                   label: "Horizontal Padding",
-                  type: "text",
-                  placeholder: "px-4",
+                  type: "number",
+                  placeholder: "16",
+                  unit: "px",
                 },
               ],
             },
@@ -1043,8 +1037,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
-                  placeholder: "p-6",
+                  type: "number",
+                  placeholder: "24",
+                  unit: "px",
                 },
                 {
                   key: "shadow",
@@ -1117,14 +1112,16 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "height",
                       label: "Height",
-                      type: "text",
-                      placeholder: "h-[7rem]",
+                      type: "number",
+                      placeholder: "112",
+                      unit: "px",
                     },
                     {
                       key: "width",
                       label: "Width",
-                      type: "text",
-                      placeholder: "w-[7rem]",
+                      type: "number",
+                      placeholder: "112",
+                      unit: "px",
                     },
                   ],
                 },
@@ -1150,8 +1147,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "marginTop",
                       label: "Margin Top",
-                      type: "text",
-                      placeholder: "mt-6",
+                      type: "number",
+                      placeholder: "24",
+                      unit: "px",
                     },
                     {
                       key: "textAlign",
@@ -1194,8 +1192,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "marginTop",
                       label: "Margin Top",
-                      type: "text",
-                      placeholder: "mt-3",
+                      type: "number",
+                      placeholder: "12",
+                      unit: "px",
                     },
                     {
                       key: "textAlign",
@@ -1240,8 +1239,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
-                  placeholder: "py-14",
+                  type: "number",
+                  placeholder: "56",
+                  unit: "px",
                 },
                 {
                   key: "gridCols",
@@ -1259,8 +1259,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
-                  placeholder: "sm:py-16",
+                  type: "number",
+                  placeholder: "64",
+                  unit: "px",
                 },
                 {
                   key: "gridCols",
@@ -2394,8 +2395,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                 {
                   key: "paddingX",
                   label: "Horizontal Padding",
-                  type: "text",
-                  placeholder: "px-4",
+                  type: "number",
+                  placeholder: "16",
+                  unit: "px",
                 },
               ],
             },
@@ -2432,8 +2434,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                 {
                   key: "padding",
                   label: "Padding",
-                  type: "text",
-                  placeholder: "p-6",
+                  type: "number",
+                  placeholder: "24",
+                  unit: "px",
                 },
                 {
                   key: "shadow",
@@ -2506,14 +2509,16 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "height",
                       label: "Height",
-                      type: "text",
-                      placeholder: "h-[7rem]",
+                      type: "number",
+                      placeholder: "112",
+                      unit: "px",
                     },
                     {
                       key: "width",
                       label: "Width",
-                      type: "text",
-                      placeholder: "w-[7rem]",
+                      type: "number",
+                      placeholder: "112",
+                      unit: "px",
                     },
                   ],
                 },
@@ -2539,8 +2544,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "marginTop",
                       label: "Margin Top",
-                      type: "text",
-                      placeholder: "mt-6",
+                      type: "number",
+                      placeholder: "24",
+                      unit: "px",
                     },
                     {
                       key: "textAlign",
@@ -2583,8 +2589,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "marginTop",
                       label: "Margin Top",
-                      type: "text",
-                      placeholder: "mt-3",
+                      type: "number",
+                      placeholder: "12",
+                      unit: "px",
                     },
                     {
                       key: "textAlign",

@@ -7,6 +7,7 @@ import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultBlogsSectionsData } from "@/context/editorStoreFunctions/blogsSectionsFunctions";
 import axiosInstance from "@/lib/axiosInstance";
+import { toDimension } from "@/lib/utils";
 import { useTenantId } from "@/hooks/useTenantId";
 
 // ═══════════════════════════════════════════════════════════
@@ -380,13 +381,13 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
       className="w-full py-12 md:py-16"
       style={{
         backgroundColor: mergedData.styling?.backgroundColor || "#8b5f46",
-        paddingTop: mergedData.layout?.padding?.top || "3rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "3rem",
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "48px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "48px"),
       }}
     >
       <div
         className="w-full mx-auto px-4 md:px-6 lg:px-8"
-        style={{ maxWidth: mergedData.layout?.maxWidth || "1280px" }}
+        style={{ maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1280px") }}
       >
         {/* Header Section - Two Paragraphs */}
         <div

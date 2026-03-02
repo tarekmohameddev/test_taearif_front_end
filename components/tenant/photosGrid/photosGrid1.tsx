@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
+import { toDimension } from "@/lib/utils";
 import { getDefaultPhotosGridData } from "@/context/editorStoreFunctions/photosGridFunctions";
 
 interface PhotosGridProps {
@@ -239,15 +240,15 @@ export default function PhotosGrid1(props: PhotosGridProps) {
     <section
       style={{
         backgroundColor: mergedData.styling?.backgroundColor,
-        paddingTop: mergedData.layout?.padding?.top,
-        paddingBottom: mergedData.layout?.padding?.bottom,
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "48px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "48px"),
       }}
     >
       <style>{gridStyles}</style>
 
       <div
         className="container mx-auto px-4"
-        style={{ maxWidth: mergedData.layout?.maxWidth }}
+        style={{ maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1280px") }}
       >
         {/* Header */}
         <div className="text-center mb-10 space-y-3">

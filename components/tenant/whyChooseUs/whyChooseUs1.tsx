@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import type React from "react";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
+import { toDimension } from "@/lib/utils";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";
@@ -817,17 +818,22 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
           mergedData.styling?.bgColor ||
           mergedData.colors?.background ||
           "#ffffff",
-        paddingTop: mergedData.layout?.padding?.y || "py-14",
-        paddingBottom: mergedData.layout?.padding?.smY || "sm:py-16",
+        paddingTop: toDimension(mergedData.layout?.padding?.y, "px", "56px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.smY, "px", "64px"),
       }}
     >
       <div
         className="mx-auto"
-        style={{ maxWidth: mergedData.layout?.maxWidth || "1600px" }}
+        style={{ maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1600px") }}
         dir={mergedData.layout?.direction || "rtl"}
       >
         <header
-          className={`${mergedData.header?.marginBottom || "mb-10"} ${mergedData.header?.textAlign || "text-right"} ${mergedData.header?.paddingX || "px-5"}`}
+          className={`${mergedData.header?.textAlign || "text-right"}`}
+          style={{
+            marginBottom: toDimension(mergedData.header?.marginBottom, "px", "40px"),
+            paddingLeft: toDimension(mergedData.header?.paddingX, "px", "20px"),
+            paddingRight: toDimension(mergedData.header?.paddingX, "px", "20px"),
+          }}
         >
           <h2
             className={
@@ -863,7 +869,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
         </header>
 
         <div
-          className={` py-5 grid ${mergedData.features?.grid?.gap || "gap-6"} ${mergedData.features?.grid?.columns?.sm || "sm:grid-cols-2"} ${mergedData.features?.grid?.columns?.xl || "xl:grid-cols-3"} ${mergedData.features?.grid?.paddingX || "px-4"}`}
+          className={`py-5 grid ${mergedData.features?.grid?.columns?.sm || "sm:grid-cols-2"} ${mergedData.features?.grid?.columns?.xl || "xl:grid-cols-3"}`}
           style={{
             gridTemplateColumns: mergedData.grid?.columns?.desktop
               ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
@@ -871,7 +877,9 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
             gap:
               mergedData.grid?.gapX || mergedData.grid?.gapY
                 ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
-                : undefined,
+                : toDimension(mergedData.features?.grid?.gap, "px", "24px"),
+            paddingLeft: toDimension(mergedData.features?.grid?.paddingX, "px", "16px"),
+            paddingRight: toDimension(mergedData.features?.grid?.paddingX, "px", "16px"),
           }}
         >
           {(mergedData.features?.list || []).map((f: any, i: number) => (
@@ -879,24 +887,27 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
               key={i}
               className={
                 mergedData.features?.card?.className ||
-                "rounded-2xl border bg-white p-6 shadow-sm ring-1"
+                "rounded-2xl border bg-white shadow-sm ring-1"
               }
               style={
                 {
                   backgroundColor:
                     mergedData.colors?.cardBackground || "#ffffff",
-                  borderColor: "#e5e7eb", // Always gray (gray-200)
+                  borderColor: "#e5e7eb",
                   "--tw-ring-color": ringColor,
+                  padding: toDimension(mergedData.features?.card?.padding, "px", "24px"),
                 } as React.CSSProperties
               }
             >
               <div
                 className={
                   mergedData.features?.icon?.container?.className ||
-                  "mx-auto flex size-20 items-center justify-center"
+                  "mx-auto flex items-center justify-center"
                 }
                 style={{
                   color: iconColor,
+                  width: toDimension(mergedData.features?.icon?.image?.width ?? f.icon?.width, "px", "80px"),
+                  height: toDimension(mergedData.features?.icon?.image?.height ?? f.icon?.height, "px", "80px"),
                 }}
               >
                 {(() => {

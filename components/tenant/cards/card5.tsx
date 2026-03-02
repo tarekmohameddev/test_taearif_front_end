@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultCard5Data } from "@/context/editorStoreFunctions/card5Functions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -347,7 +348,7 @@ export default function Card5(props: Card5Props) {
   const responsive = mergedData.responsive || {};
 
   const imageHeight = responsive.imageHeight || {};
-  const desktopHeight = imageHeight.desktop || "337px";
+  const desktopHeight = toDimension(imageHeight.desktop, "px", "337px");
 
   // Generate WhatsApp link
   const whatsappMessage = encodeURIComponent(

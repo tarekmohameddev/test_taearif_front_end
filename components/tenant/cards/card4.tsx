@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultCard4Data } from "@/context/editorStoreFunctions/card4Functions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -467,9 +468,9 @@ export default function Card4(props: Card4Props) {
     unifiedColor !== null ? "#ffffff" : getColor(styling.priceTextColor, "#ffffff");
 
   const imageHeight = responsive.imageHeight || {};
-  const desktopHeight = imageHeight.desktop || "337px";
-  const tabletHeight = imageHeight.tablet || "300px";
-  const mobileHeight = imageHeight.mobile || "250px";
+  const desktopHeight = toDimension(imageHeight.desktop, "px", "337px");
+  const tabletHeight = toDimension(imageHeight.tablet, "px", "300px");
+  const mobileHeight = toDimension(imageHeight.mobile, "px", "250px");
 
   const CardContent = (
     <div

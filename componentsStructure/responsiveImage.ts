@@ -175,8 +175,9 @@ export const responsiveImageStructure: ComponentStructure = {
                 {
                   key: "width",
                   label: "Border Width",
-                  type: "text",
-                  placeholder: "1px",
+                  type: "number",
+                  placeholder: "1",
+                  unit: "px",
                 },
                 {
                   key: "color",
@@ -236,7 +237,7 @@ export const responsiveImageStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "image.src", label: "Image URL", type: "image" },
         { key: "image.alt", label: "Alt Text", type: "text" },
-        { key: "width.desktop", label: "Desktop Width", type: "text" },
+        { key: "width.desktop", label: "Desktop Width", type: "number", placeholder: "70", unit: "%" },
         { key: "alignment", label: "Alignment", type: "select" },
       ],
     },

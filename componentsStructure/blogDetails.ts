@@ -372,8 +372,9 @@ export const blogDetailsStructure: ComponentStructure = {
             {
               key: "height",
               label: "Hero Height",
-              type: "text",
-              placeholder: "500px",
+              type: "number",
+              placeholder: "500",
+              unit: "px",
             },
             {
               key: "overlayOpacity",

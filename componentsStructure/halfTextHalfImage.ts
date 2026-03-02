@@ -135,8 +135,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
                       useDefaultColor: true,
                       globalColorType: "primary", // Button hover text uses primary color
                     },
-                    { key: "width", label: "Width", type: "text" },
-                    { key: "height", label: "Height", type: "text" },
+                    { key: "width", label: "Width", type: "number", placeholder: "119", unit: "px" },
+                    { key: "height", label: "Height", type: "number", placeholder: "46", unit: "px" },
                     {
                       key: "borderRadius",
                       label: "Border Radius",
@@ -369,8 +369,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "textOrder", label: "Text Order", type: "number" },
                 { key: "imageOrder", label: "Image Order", type: "number" },
-                { key: "textWidth", label: "Text Width", type: "text" },
-                { key: "imageWidth", label: "Image Width", type: "text" },
+                { key: "textWidth", label: "Text Width", type: "number", placeholder: "50", unit: "%" },
+                { key: "imageWidth", label: "Image Width", type: "number", placeholder: "50", unit: "%" },
                 {
                   key: "marginBottom",
                   label: "Image Margin Bottom",
@@ -385,8 +385,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "textOrder", label: "Text Order", type: "number" },
                 { key: "imageOrder", label: "Image Order", type: "number" },
-                { key: "textWidth", label: "Text Width", type: "text" },
-                { key: "imageWidth", label: "Image Width", type: "text" },
+                { key: "textWidth", label: "Text Width", type: "number", placeholder: "50", unit: "%" },
+                { key: "imageWidth", label: "Image Width", type: "number", placeholder: "50", unit: "%" },
                 {
                   key: "marginBottom",
                   label: "Image Margin Bottom",
@@ -401,8 +401,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "textOrder", label: "Text Order", type: "number" },
                 { key: "imageOrder", label: "Image Order", type: "number" },
-                { key: "textWidth", label: "Text Width", type: "text" },
-                { key: "imageWidth", label: "Image Width", type: "text" },
+                { key: "textWidth", label: "Text Width", type: "number", placeholder: "50", unit: "%" },
+                { key: "imageWidth", label: "Image Width", type: "number", placeholder: "50", unit: "%" },
                 {
                   key: "marginBottom",
                   label: "Image Margin Bottom",
@@ -1541,8 +1541,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               type: "object",
               fields: [
                 { key: "color", label: "Color", type: "color" },
-                { key: "width", label: "Width", type: "text" },
-                { key: "height", label: "Height", type: "text" },
+                { key: "width", label: "Width", type: "number", placeholder: "96", unit: "px" },
+                { key: "height", label: "Height", type: "number", placeholder: "2", unit: "px" },
               ],
             },
             {
@@ -1597,9 +1597,9 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "textOrder", label: "Text Order", type: "number" },
                 { key: "imageOrder", label: "Image Order", type: "number" },
-                { key: "textWidth", label: "Text Width", type: "text" },
-                { key: "imageWidth", label: "Image Width", type: "text" },
-                { key: "imageHeight", label: "Image Height", type: "text" },
+                { key: "textWidth", label: "Text Width", type: "number", placeholder: "50", unit: "%" },
+                { key: "imageWidth", label: "Image Width", type: "number", placeholder: "50", unit: "%" },
+                { key: "imageHeight", label: "Image Height", type: "number", placeholder: "400", unit: "px" },
               ],
             },
             {
@@ -1609,8 +1609,8 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "textOrder", label: "Text Order", type: "number" },
                 { key: "imageOrder", label: "Image Order", type: "number" },
-                { key: "textWidth", label: "Text Width", type: "text" },
-                { key: "imageWidth", label: "Image Width", type: "text" },
+                { key: "textWidth", label: "Text Width", type: "number", placeholder: "50", unit: "%" },
+                { key: "imageWidth", label: "Image Width", type: "number", placeholder: "50", unit: "%" },
                 { key: "imageHeight", label: "Image Height", type: "text" },
               ],
             },
@@ -2183,7 +2183,7 @@ export const halfTextHalfImageStructure: ComponentStructure = {
               fields: [
                 { key: "imageOrder", label: "Image Order", type: "number" },
                 { key: "textOrder", label: "Text Order", type: "number" },
-                { key: "imageHeight", label: "Image Height", type: "text" },
+                { key: "imageHeight", label: "Image Height", type: "number", placeholder: "400", unit: "px" },
               ],
             },
             {

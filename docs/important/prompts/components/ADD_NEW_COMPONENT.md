@@ -878,6 +878,12 @@ export const pricingStructure: ComponentStructure = {
 5. **Nested objects** use `type: "object"` with `fields: [...]`
 6. **Arrays** use `type: "array"` with `of: [...]`
 
+### ⚠️ Mandatory: Dimension fields (padding, height, width, margin, maxWidth, maxHeight)
+
+- **Any field** in the structure that represents **padding**, **height**, **width**, **margin**, **maxWidth**, or **maxHeight** **must** use **`type: "number"`** with a **`unit`** property (e.g. `"px"`, `"vh"`, `"%"`), **not** `type: "text"`.
+- Example: `{ key: "height", label: "Height", type: "number", placeholder: "90", unit: "vh" }`. Same for `maxWidth`, `maxHeight`.
+- In the React component, when applying these values to `style`, use **`toDimension(value, unit, fallback)`** from `lib/utils.ts` so both number and legacy string values work.
+
 ---
 
 ## 🔧 Step 3: Update EditorStore
@@ -1778,6 +1784,28 @@ const finalData =
 ---
 
 ## 🚨 Common Mistakes to Avoid
+
+### Mistake 0: Using `type: "text"` for dimensions
+
+❌ **Wrong**:
+
+```typescript
+{ key: "padding", label: "Padding", type: "text", placeholder: "16px" }
+{ key: "height", label: "Height", type: "text", placeholder: "90vh" }
+{ key: "maxWidth", label: "Max Width", type: "text", placeholder: "1200px" }
+```
+
+✅ **Correct**:
+
+```typescript
+{ key: "padding", label: "Padding", type: "number", placeholder: "16", unit: "px" }
+{ key: "height", label: "Height", type: "number", placeholder: "90", unit: "vh" }
+{ key: "maxWidth", label: "Max Width", type: "number", placeholder: "1200", unit: "px" }
+```
+
+**Rule:** Padding, height, width, margin, maxWidth, and maxHeight must always be **`type: "number"`** with **`unit`**. In the component, use **`toDimension(value, unit, fallback)`** when setting `style`.
+
+---
 
 ### Mistake 1: Wrong Component Type Name
 

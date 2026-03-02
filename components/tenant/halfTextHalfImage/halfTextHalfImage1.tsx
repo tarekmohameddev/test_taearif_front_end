@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
@@ -697,8 +697,8 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   const buttonStyles = {
     backgroundColor: buttonBgColor,
     color: buttonTextColor,
-    width: mergedData.content?.button?.style?.width || "119px",
-    height: mergedData.content?.button?.style?.height || "46px",
+    width: toDimension(mergedData.content?.button?.style?.width, "px", "119px"),
+    height: toDimension(mergedData.content?.button?.style?.height, "px", "46px"),
     borderRadius: mergedData.content?.button?.style?.borderRadius || "10px",
   };
 

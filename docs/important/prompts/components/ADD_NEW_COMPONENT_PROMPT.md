@@ -6,6 +6,13 @@ Copy-paste these prompts directly into Cursor AI to automatically create new com
 
 ---
 
+## ⚠️ قاعدة إجبارية: حقول الأبعاد (Dimensions)
+
+- **إجباري:** أي حقل في الـ structure يمثل **padding** أو **height** أو **width** أو **margin** أو **maxWidth** أو **maxHeight** يجب أن يكون **`type: "number"`** مع **`unit`** (مثل `"px"`, `"vh"`, `"%"`)، **وليس** `type: "text"`.
+- في المكون (TSX) استخدم **`toDimension(value, unit, fallback)`** من `lib/utils.ts` عند تطبيق هذه القيم على `style`.
+
+---
+
 ## 📋 Prompt Template 1: Simple Component (Single Variant)
 
 ```

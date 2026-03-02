@@ -170,7 +170,7 @@ export const heroStructure: ComponentStructure = {
                 },
               ],
             },
-            { key: "maxWidth", label: "Max Width", type: "text" },
+            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
           ],
         },
         {
@@ -460,7 +460,7 @@ export const heroStructure: ComponentStructure = {
               ],
             },
             { key: "alignment", label: "Alignment", type: "text" },
-            { key: "maxWidth", label: "Max Width", type: "text" },
+            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
             {
               key: "font",
               label: "Font Settings",
@@ -680,7 +680,7 @@ export const heroStructure: ComponentStructure = {
               groupFields: [
                 { key: "content.paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
                 { key: "content.alignment", label: "Alignment", type: "text" },
-                { key: "content.maxWidth", label: "Max Width", type: "text" },
+                { key: "content.maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
               ],
             },
             {
@@ -1085,7 +1085,7 @@ export const heroStructure: ComponentStructure = {
           fields: [
             { key: "title", label: "Title", type: "text" },
             { key: "alignment", label: "Alignment", type: "text" },
-            { key: "maxWidth", label: "Max Width", type: "text" },
+            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
             {
               key: "font",
               label: "Font Settings",

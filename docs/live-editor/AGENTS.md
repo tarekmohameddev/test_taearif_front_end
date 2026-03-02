@@ -19,6 +19,13 @@
 
 ---
 
+## Component structure: dimensions (padding, height, width, margin, maxWidth, maxHeight)
+
+- **Mandatory:** In component structures (`componentsStructure/`), any field that represents **padding**, **height**, **width**, **margin**, **maxWidth**, or **maxHeight** must use **`type: "number"`** with a **`unit`** (e.g. `"px"`, `"vh"`, `"%"`), **not** `type: "text"`.
+- In Tenant components, apply these values via **`toDimension(value, unit, fallback)`** from `lib/utils.ts` when setting `style` (so both number and legacy string values work).
+
+---
+
 ## Summary
 
 | Step | Action |

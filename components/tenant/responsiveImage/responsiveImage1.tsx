@@ -278,7 +278,7 @@ export default function ResponsiveImage1(props: ResponsiveImageProps = {}) {
       mergedData.styling?.border?.enabled &&
       mergedData.styling?.border?.width &&
       mergedData.styling?.border?.color
-        ? `${mergedData.styling.border.width} ${mergedData.styling.border.style || "solid"} ${mergedData.styling.border.color}`
+        ? `${toDimension(mergedData.styling.border.width, "px", "1px")} ${mergedData.styling.border.style || "solid"} ${mergedData.styling.border.color}`
         : "none",
   };
 

@@ -596,7 +596,7 @@ export default function SideBySide3(props: SideBySide3Props = {}) {
           </p>
           {content.button?.enabled && (
             <button
-              className={`transition-colors duration-300 hover:text-emerald-600 hover:bg-white flex items-center justify-center ${content.button.style?.width || "w-[119px] md:w-[148px]"} ${content.button.style?.height || "h-[46px] md:h-[52px]"} ${content.button.style?.borderRadius || "rounded-[10px]"} ${content.font?.button?.size || "text-sm md:text-base xl:text-xl"} ${content.font?.button?.weight || "font-normal"}`}
+              className={`transition-colors duration-300 hover:text-emerald-600 hover:bg-white flex items-center justify-center ${typeof content.button.style?.width !== "number" ? (content.button.style?.width || "w-[119px] md:w-[148px]") : ""} ${typeof content.button.style?.height !== "number" ? (content.button.style?.height || "h-[46px] md:h-[52px]") : ""} ${content.button.style?.borderRadius || "rounded-[10px]"} ${content.font?.button?.size || "text-sm md:text-base xl:text-xl"} ${content.font?.button?.weight || "font-normal"}`}
               style={{
                 backgroundColor:
                   content.button.style?.backgroundColor || "#059669",
@@ -604,6 +604,12 @@ export default function SideBySide3(props: SideBySide3Props = {}) {
                   content.button.style?.textColor ||
                   content.font?.button?.color ||
                   "#ffffff",
+                ...(typeof content.button.style?.width === "number" || typeof content.button.style?.height === "number"
+                  ? {
+                      width: toDimension(content.button.style?.width, "px", "119px"),
+                      height: toDimension(content.button.style?.height, "px", "46px"),
+                    }
+                  : {}),
               }}
               onClick={() => {
                 if (content.button?.url) {

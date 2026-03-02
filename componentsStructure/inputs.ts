@@ -133,8 +133,11 @@ export const inputsStructure: ComponentStructure = {
             {
               key: "padding",
               label: "Padding",
-              type: "text",
-              defaultValue: "12px 24px",
+              type: "object",
+              fields: [
+                { key: "y", label: "Vertical Padding", type: "number", defaultValue: 12, unit: "px" },
+                { key: "x", label: "Horizontal Padding", type: "number", defaultValue: 24, unit: "px" },
+              ],
             },
             {
               key: "apiEndpoint",

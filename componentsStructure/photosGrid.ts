@@ -23,8 +23,9 @@ export const photosGridStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1400px",
+              type: "number",
+              placeholder: "1400",
+              unit: "px",
             },
             {
               key: "columns",
@@ -62,18 +63,8 @@ export const photosGridStructure: ComponentStructure = {
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "48", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "48", unit: "px" },
               ],
             },
             {
@@ -493,8 +484,9 @@ export const photosGridStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              placeholder: "1400px",
+              type: "number",
+              placeholder: "1400",
+              unit: "px",
             },
             {
               key: "columns",
@@ -532,18 +524,8 @@ export const photosGridStructure: ComponentStructure = {
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "3rem",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "48", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "48", unit: "px" },
               ],
             },
             {

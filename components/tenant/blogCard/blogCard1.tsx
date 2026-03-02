@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultBlogCardData } from "@/context/editorStoreFunctions/blogCardFunctions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -174,8 +175,8 @@ export default function BlogCard1(props: BlogCard1Props) {
   const responsive = mergedData.responsive || {};
 
   const imageHeight = responsive.imageHeight || {};
-  const desktopHeight = imageHeight.desktop || "280px";
-  const mobileHeight = imageHeight.mobile || "250px";
+  const desktopHeight = toDimension(imageHeight.desktop, "px", "280px");
+  const mobileHeight = toDimension(imageHeight.mobile, "px", "250px");
 
   return (
     <div
