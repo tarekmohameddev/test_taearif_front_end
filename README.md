@@ -29,11 +29,17 @@ Read: docs/CURSOR_AI_SETUP.md (3-minute setup)
 
 ## 📚 Documentation
 
+### **📋 Previous changes and updates**
+
+- **All implementation notes and change history:** `docs/updates/`  
+  Use this folder when you need to know what was done before (dashboard, tenantWebsite, backend, landing pages, etc.).
+
 ### **🎯 Start Here:**
 
 - **Setup Guide:** `docs/CURSOR_AI_SETUP.md` - Visual setup guide
 - **Complete Index:** `docs/important/INDEX.md` - All 56+ docs mapped
 - **Cursor Rules:** `.cursorrules` - AI instruction file
+- **Agent instructions:** `AGENTS.md` - Rules for AI (e.g. docs/updates, docs/live-editor)
 
 ### **🎨 Component Work:**
 
@@ -43,6 +49,7 @@ Read: docs/CURSOR_AI_SETUP.md (3-minute setup)
 
 ### **⚡ Live Editor:**
 
+- **Logic and docs (read before editing):** `docs/live-editor/` — agents must read this before any Live Editor or Tenant work
 - **Architecture:** `docs/important/liveEditor/COMPONENT_ARCHITECTURE.md`
 - **State:** `docs/important/liveEditor/STATE_MANAGEMENT.md`
 - **Overview:** `docs/important/liveEditor/README.md`
@@ -84,6 +91,7 @@ Just ask naturally:
 
 ```
 project/
+├── AGENTS.md                 ← AI agent rules (docs/updates, docs/live-editor)
 ├── .cursorrules              ← AI instruction file
 ├── app/                      ← Next.js app directory
 ├── components/               ← React components
@@ -93,6 +101,8 @@ project/
 ├── componentsStructure/      ← Component structure definitions
 ├── lib-liveeditor/          ← Live Editor utilities
 ├── docs/                     ← Documentation
+│   ├── updates/             ← Change history & implementation notes
+│   ├── live-editor/         ← Live Editor logic & docs (read before editing)
 │   ├── CURSOR_AI_SETUP.md   ← Start here for Cursor
 │   ├── SETUP_COMPLETE.md    ← Setup overview
 │   └── important/           ← Complete documentation (56+ files)
@@ -232,8 +242,11 @@ npm run type-check
 - **Completion:** [docs/SETUP_COMPLETE.md](docs/SETUP_COMPLETE.md)
 - **Index:** [docs/important/INDEX.md](docs/important/INDEX.md)
 - **Components:** [docs/important/components/README.md](docs/important/components/README.md)
-- **Live Editor:** [docs/important/liveEditor/README.md](docs/important/liveEditor/README.md)
+- **Live Editor (logic first):** [docs/live-editor/](docs/live-editor/)
+- **Live Editor (detailed):** [docs/important/liveEditor/README.md](docs/important/liveEditor/README.md)
+- **Previous updates:** [docs/updates/](docs/updates/)
 - **Cursor Rules:** [.cursorrules](.cursorrules)
+- **Agent rules:** [AGENTS.md](AGENTS.md)
 
 ---
 
