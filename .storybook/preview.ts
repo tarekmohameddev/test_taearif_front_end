@@ -6,7 +6,11 @@ import '../app/globals.css'
 const preview: Preview = {
   decorators: [
     (Story) =>
-      React.createElement(AuthProvider, null, React.createElement(Story)),
+      React.createElement(
+        AuthProvider,
+        null,
+        React.createElement(Story, null)
+      ),
   ],
   parameters: {
     nextjs: {
