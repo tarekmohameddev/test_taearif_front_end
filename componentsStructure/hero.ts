@@ -167,7 +167,6 @@ export const heroStructure: ComponentStructure = {
                 },
               ],
             },
-            { key: "alignment", label: "Alignment", type: "text" },
             { key: "maxWidth", label: "Max Width", type: "text" },
           ],
         },
