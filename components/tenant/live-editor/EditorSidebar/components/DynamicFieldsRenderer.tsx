@@ -24,6 +24,7 @@ import { useIconHelpers } from "./DynamicFieldsRenderer/hooks/useIconHelpers";
 import { TextFieldRenderer } from "./DynamicFieldsRenderer/renderers/TextFieldRenderer";
 import { TextareaFieldRenderer } from "./DynamicFieldsRenderer/renderers/TextareaFieldRenderer";
 import { SelectFieldRenderer } from "./DynamicFieldsRenderer/renderers/SelectFieldRenderer";
+import { BadgeSelectFieldRenderer } from "./DynamicFieldsRenderer/renderers/BadgeSelectFieldRenderer";
 import { ColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/ColorFieldRendererWithToggle";
 import { BackgroundColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/BackgroundColorFieldRendererWithToggle";
 import { BackgroundColorObjectRenderer } from "./DynamicFieldsRenderer/renderers/BackgroundColorObjectRenderer";
@@ -277,6 +278,16 @@ export function DynamicFieldsRenderer({
             updateValue={updateValue}
             getIconComponent={getIconComponent}
             isReactIcon={isReactIcon}
+          />
+        );
+      }
+      case "badge-select": {
+        return (
+          <BadgeSelectFieldRenderer
+            def={def}
+            normalizedPath={normalizedPath}
+            value={value}
+            updateValue={updateValue}
           />
         );
       }

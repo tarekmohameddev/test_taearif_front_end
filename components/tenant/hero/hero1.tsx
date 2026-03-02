@@ -893,6 +893,14 @@ const Hero1 = (props: HeroProps = {}) => {
     return "#059669";
   }, [mergedData.background?.color, brandingColors]);
 
+  const searchFormPosition = mergedData.searchForm?.position || "bottom";
+  const searchFormDesktopPositionClass =
+    searchFormPosition === "top"
+      ? "top-32"
+      : searchFormPosition === "center"
+        ? "top-1/2 -translate-y-1/2"
+        : "bottom-32";
+
   // Don't render if not visible
   if (!mergedData.visible) {
     return null;
@@ -1031,7 +1039,8 @@ const Hero1 = (props: HeroProps = {}) => {
       {mergedData.searchForm?.enabled && (
         <div
           className={cn(
-            "pointer-events-auto absolute inset-x-0 z-10 mx-auto px-4 sm:px-6 lg:px-8 bottom-32 max-w-[1600px] hidden md:block",
+            "pointer-events-auto absolute inset-x-0 z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-[1600px] hidden md:block",
+            searchFormDesktopPositionClass,
           )}
         >
           <HeroSearchForm

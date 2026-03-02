@@ -179,7 +179,21 @@ export const heroStructure: ComponentStructure = {
           type: "object",
           fields: [
             { key: "enabled", label: "Enabled", type: "boolean" },
-            { key: "position", label: "Position", type: "text" },
+            {
+              key: "position",
+              label: "Position",
+              type: "badge-select",
+              options: [
+                { label: "Top", value: "top" },
+                { label: "Center", value: "center" },
+                { label: "Bottom", value: "bottom" },
+              ],
+              badgeConfig: {
+                mode: "single",
+                requiredAtLeastOne: false,
+                allowUnset: true,
+              },
+            },
             { key: "offset", label: "Offset", type: "text" },
             {
               key: "background",
