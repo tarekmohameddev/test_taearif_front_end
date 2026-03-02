@@ -16,7 +16,7 @@ This folder is the **canonical place for Live Editor logic and documentation**. 
 | Purpose | Location |
 |--------|----------|
 | Agent rules (read first, update after logic changes) | `docs/live-editor/AGENTS.md` |
-| **Component Structure: `condition`** (شرط إظهار/إخفاء الحقول) | `docs/live-editor/components-structure-condition.md` |
+| **Component Structure: `condition`** (شرط إظهار/إخفاء الحقول) | `docs/live-editor/componentsStructure/components-structure-condition.md` |
 | Full Live Editor docs (architecture, state, sidebar, context) | `docs/important/liveEditor/` |
 | Quick start and core concepts | `docs/important/liveEditor/QUICK_START.md`, `CORE_CONCEPTS.md` |
 | Component architecture | `docs/important/liveEditor/COMPONENT_ARCHITECTURE.md` |
@@ -32,8 +32,8 @@ This folder is the **canonical place for Live Editor logic and documentation**. 
 docs/live-editor/
 ├── AGENTS.md
 ├── README.md
-├── components-structure-condition.md
 ├── componentsStructure/       ← تعريفات وشروحات Component Structure
+│   └── components-structure-condition.md
 ├── editorFunctions/          ← دوال ومنطق الـ Live Editor
 ├── TenantComponents/         ← مكونات Tenant المرتبطة بالمحرر
 ├── editorSidebar/            ← الشريط الجانبي الأيمن (التحرير)
