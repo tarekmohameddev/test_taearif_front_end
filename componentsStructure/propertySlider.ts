@@ -411,8 +411,9 @@ export const propertySliderStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  defaultValue: "sm",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                   description: "Font size for link",
                 },
                 {

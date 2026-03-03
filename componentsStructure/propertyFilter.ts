@@ -176,7 +176,9 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
               ],
             },
@@ -269,7 +271,9 @@ export const propertyFilterStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
                 {
                   key: "fontWeight",

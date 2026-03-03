@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPERTY INTERFACE
@@ -937,7 +938,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
             <h1
               className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-md text-right"
               style={{
-                fontSize: mergedData.typography?.title?.fontSize?.desktop,
+                fontSize: toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "36px"),
               }}
             >
               {property.title}

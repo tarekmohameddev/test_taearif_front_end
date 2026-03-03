@@ -247,6 +247,7 @@ export default function ApplicationFormSection(
                     mergedData.styling?.textColor ||
                     mergedData.styling?.focusColor ||
                     "#059669",
+                  fontSize: toDimension(mergedData.header?.typography?.title?.fontSize, "px", "24px"),
                 }}
               >
                 {mergedData.header?.title || "نموذج طلب معاينة"}
@@ -256,6 +257,9 @@ export default function ApplicationFormSection(
                   mergedData.header?.typography?.description?.className ||
                   "font-normal text-[16px] leading-[17.86px] text-gray-600 md:text-[20px] md:leading-[22.32px] text-center"
                 }
+                style={{
+                  fontSize: toDimension(mergedData.header?.typography?.description?.fontSize, "px", "18px"),
+                }}
               >
                 {mergedData.header?.description ||
                   "املأ البيانات المطلوبة لتقديم طلب المعاينة. سيتم التواصل معك قريبًا لترتيب موعد لزيارة العقار ومعاينته بشكل دقيق."}

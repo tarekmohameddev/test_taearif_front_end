@@ -95,7 +95,9 @@ export const filterButtonsStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
               ],
             },
@@ -152,7 +154,9 @@ export const filterButtonsStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
                 {
                   key: "gap",

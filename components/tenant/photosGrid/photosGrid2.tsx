@@ -264,7 +264,7 @@ export default function PhotosGrid2(props: PhotosGridProps) {
             <h2
               style={{
                 color: mergedData.styling?.titleColor,
-                fontSize: mergedData.typography?.title?.fontSize?.desktop,
+                fontSize: toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "36px"),
                 fontWeight: mergedData.typography?.title?.fontWeight,
                 fontFamily: mergedData.typography?.title?.fontFamily,
               }}
@@ -276,7 +276,7 @@ export default function PhotosGrid2(props: PhotosGridProps) {
             <p
               style={{
                 color: mergedData.styling?.subtitleColor,
-                fontSize: mergedData.typography?.subtitle?.fontSize?.desktop,
+                fontSize: toDimension(mergedData.typography?.subtitle?.fontSize?.desktop, "px", "24px"),
                 fontWeight: mergedData.typography?.subtitle?.fontWeight,
                 fontFamily: mergedData.typography?.subtitle?.fontFamily,
               }}
@@ -289,7 +289,7 @@ export default function PhotosGrid2(props: PhotosGridProps) {
               className="max-w-2xl mx-auto"
               style={{
                 color: mergedData.styling?.descriptionColor,
-                fontSize: mergedData.typography?.caption?.fontSize?.desktop,
+                fontSize: toDimension(mergedData.typography?.caption?.fontSize?.desktop, "px", "16px"),
                 fontWeight: mergedData.typography?.caption?.fontWeight,
                 fontFamily: mergedData.typography?.caption?.fontFamily,
               }}

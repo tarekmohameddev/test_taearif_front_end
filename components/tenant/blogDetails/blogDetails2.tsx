@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultBlogDetails2Data } from "@/context/editorStoreFunctions/blogDetailsFunctions";
+import { toDimension } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -604,7 +605,7 @@ export default function blogDetails2(props: blogDetails2Props) {
             <h1
               className="text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-md text-right"
               style={{
-                fontSize: mergedData.typography?.title?.fontSize?.desktop,
+                fontSize: toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "36px"),
               }}
             >
               {blog.title}

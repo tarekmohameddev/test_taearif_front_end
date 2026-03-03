@@ -127,7 +127,7 @@ const getDefaultcontactMapSectionData = () => ({
         useDefaultColor: true,
         globalColorType: "secondary",
       },
-      fontSize: "text-lg",
+      fontSize: 18,
       fontWeight: "font-semibold",
       borderRadius: "rounded-xl",
     },
@@ -945,12 +945,13 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                     type={
                       (mergedData.form?.submitButton?.type as any) || "submit"
                     }
-                    className={`rounded-xl ${mergedData.form?.submitButton?.fontSize || "text-lg"} ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"} transition-colors`}
+                    className={`rounded-xl ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"} transition-colors`}
                     style={{
                       backgroundColor: submitButtonBgColor,
                       color: submitButtonTextColor,
                       width: toDimension(mergedData.form?.submitButton?.width, "%", "100%"),
                       height: toDimension(mergedData.form?.submitButton?.height, "px", "48px"),
+                      fontSize: toDimension(mergedData.form?.submitButton?.fontSize, "px", "18px"),
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor =

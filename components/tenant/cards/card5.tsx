@@ -406,7 +406,7 @@ export default function Card5(props: Card5Props) {
           <h4
             className="text-xl font-bold"
             style={{
-              fontSize: typography.title?.fontSize || "xl",
+              fontSize: toDimension(typography.title?.fontSize, "px", "20px"),
               fontWeight: typography.title?.fontWeight || "bold",
               fontFamily: typography.title?.fontFamily || "Tajawal",
               color: styling.titleColor || "#000000",
@@ -416,7 +416,7 @@ export default function Card5(props: Card5Props) {
           </h4>
           <div
             style={{
-              fontSize: typography.status?.fontSize || "lg",
+              fontSize: toDimension(typography.status?.fontSize, "px", "18px"),
               fontWeight: typography.status?.fontWeight || "semibold",
               fontFamily: typography.status?.fontFamily || "Tajawal",
               color: styling.statusColor || "#16a34a",
@@ -430,7 +430,7 @@ export default function Card5(props: Card5Props) {
         <div
           className="flex items-center gap-2 text-sm"
           style={{
-            fontSize: typography.cityDistrict?.fontSize || "sm",
+            fontSize: toDimension(typography.cityDistrict?.fontSize, "px", "14px"),
             fontWeight: typography.cityDistrict?.fontWeight || "normal",
             fontFamily: typography.cityDistrict?.fontFamily || "Tajawal",
             color: styling.cityDistrictColor || "#000000",
@@ -461,7 +461,7 @@ export default function Card5(props: Card5Props) {
               />
               <span
                 style={{
-                  fontSize: typography.detailValue?.fontSize || "sm",
+                  fontSize: toDimension(typography.detailValue?.fontSize, "px", "14px"),
                   fontWeight: typography.detailValue?.fontWeight || "medium",
                   fontFamily: typography.detailValue?.fontFamily || "Tajawal",
                   color: styling.areaTextColor || "#896042",
@@ -474,7 +474,7 @@ export default function Card5(props: Card5Props) {
             </div>
             <span
               style={{
-                fontSize: typography.detailLabel?.fontSize || "xs",
+                fontSize: toDimension(typography.detailLabel?.fontSize, "px", "12px"),
                 fontWeight: typography.detailLabel?.fontWeight || "normal",
                 fontFamily: typography.detailLabel?.fontFamily || "Tajawal",
                 color: styling.areaLabelColor || "#6b7280",
@@ -494,7 +494,7 @@ export default function Card5(props: Card5Props) {
               />
               <span
                 style={{
-                  fontSize: typography.detailValue?.fontSize || "sm",
+                  fontSize: toDimension(typography.detailValue?.fontSize, "px", "14px"),
                   fontWeight: typography.detailValue?.fontWeight || "medium",
                   fontFamily: typography.detailValue?.fontFamily || "Tajawal",
                   color: styling.floorsTextColor || "#896042",
@@ -507,7 +507,7 @@ export default function Card5(props: Card5Props) {
             </div>
             <span
               style={{
-                fontSize: typography.detailLabel?.fontSize || "xs",
+                fontSize: toDimension(typography.detailLabel?.fontSize, "px", "12px"),
                 fontWeight: typography.detailLabel?.fontWeight || "normal",
                 fontFamily: typography.detailLabel?.fontFamily || "Tajawal",
                 color: styling.floorsLabelColor || "#6b7280",
@@ -527,7 +527,7 @@ export default function Card5(props: Card5Props) {
               />
               <span
                 style={{
-                  fontSize: typography.detailValue?.fontSize || "sm",
+                  fontSize: toDimension(typography.detailValue?.fontSize, "px", "14px"),
                   fontWeight: typography.detailValue?.fontWeight || "medium",
                   fontFamily: typography.detailValue?.fontFamily || "Tajawal",
                   color: styling.roomsTextColor || "#896042",
@@ -540,7 +540,7 @@ export default function Card5(props: Card5Props) {
             </div>
             <span
               style={{
-                fontSize: typography.detailLabel?.fontSize || "xs",
+                fontSize: toDimension(typography.detailLabel?.fontSize, "px", "12px"),
                 fontWeight: typography.detailLabel?.fontWeight || "normal",
                 fontFamily: typography.detailLabel?.fontFamily || "Tajawal",
                 color: styling.roomsLabelColor || "#6b7280",
@@ -561,7 +561,7 @@ export default function Card5(props: Card5Props) {
                 />
                 <span
                   style={{
-                    fontSize: typography.detailValue?.fontSize || "sm",
+                    fontSize: toDimension(typography.detailValue?.fontSize, "px", "14px"),
                     fontWeight: typography.detailValue?.fontWeight || "medium",
                     fontFamily: typography.detailValue?.fontFamily || "Tajawal",
                     color: styling.bathroomsTextColor || "#896042",
@@ -574,7 +574,7 @@ export default function Card5(props: Card5Props) {
               </div>
               <span
                 style={{
-                  fontSize: typography.detailLabel?.fontSize || "xs",
+                  fontSize: toDimension(typography.detailLabel?.fontSize, "px", "12px"),
                   fontWeight: typography.detailLabel?.fontWeight || "normal",
                   fontFamily: typography.detailLabel?.fontFamily || "Tajawal",
                   color: styling.bathroomsLabelColor || "#6b7280",
@@ -598,7 +598,7 @@ export default function Card5(props: Card5Props) {
         <div className="text-center">
           <div
             style={{
-              fontSize: typography.price?.fontSize || "base",
+              fontSize: toDimension(typography.price?.fontSize, "px", "16px"),
               fontWeight: typography.price?.fontWeight || "bold",
               fontFamily: typography.price?.fontFamily || "Tajawal",
               color: styling.priceTextColor || "#896042",
@@ -625,7 +625,7 @@ export default function Card5(props: Card5Props) {
           style={{
             backgroundColor: styling.whatsappButtonBackground || "#25D366",
             color: styling.whatsappButtonTextColor || "#ffffff",
-            fontSize: typography.whatsappButton?.fontSize || "base",
+            fontSize: toDimension(typography.whatsappButton?.fontSize, "px", "16px"),
             fontWeight: typography.whatsappButton?.fontWeight || "semibold",
             fontFamily: typography.whatsappButton?.fontFamily || "Tajawal",
           }}

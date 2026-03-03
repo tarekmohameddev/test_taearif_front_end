@@ -322,8 +322,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "xl",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 20,
                 },
                 {
                   key: "fontWeight",
@@ -347,8 +348,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "sm",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
                 {
                   key: "fontWeight",
@@ -372,8 +374,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "lg",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 18,
                 },
                 {
                   key: "fontWeight",
@@ -397,8 +400,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "xs",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 12,
                 },
                 {
                   key: "fontWeight",
@@ -422,8 +426,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "sm",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
                 {
                   key: "fontWeight",
@@ -447,8 +452,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "base",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 16,
                 },
                 {
                   key: "fontWeight",
@@ -836,8 +842,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "xl",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 20,
                 },
                 {
                   key: "fontWeight",
@@ -861,8 +868,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "sm",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
                 {
                   key: "fontWeight",
@@ -886,8 +894,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "lg",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 18,
                 },
                 {
                   key: "fontWeight",
@@ -911,8 +920,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "xs",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 12,
                 },
                 {
                   key: "fontWeight",
@@ -936,8 +946,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "sm",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                 },
                 {
                   key: "fontWeight",
@@ -961,8 +972,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "base",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 16,
                 },
                 {
                   key: "fontWeight",
@@ -986,8 +998,9 @@ export const cardStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "base",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 16,
                 },
                 {
                   key: "fontWeight",

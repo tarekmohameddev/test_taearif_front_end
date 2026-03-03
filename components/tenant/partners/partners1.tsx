@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultPartnersData } from "@/context/editorStoreFunctions/partnersFunctions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -517,6 +518,7 @@ export default function Partners1(props: PartnersProps = {}) {
             className="font-bold mb-8 leading-tight text-2xl lg:text-3xl"
             style={{
               color: titleColor,
+              fontSize: toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "30px"),
               fontWeight: mergedData.typography?.title?.fontWeight || "bold",
               fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
               lineHeight: mergedData.typography?.title?.lineHeight || "tight",

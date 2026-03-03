@@ -588,15 +588,9 @@ export const gridStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "select",
-                      defaultValue: "lg",
-                      options: [
-                        { value: "sm", label: "Small" },
-                        { value: "base", label: "Base" },
-                        { value: "lg", label: "Large" },
-                        { value: "xl", label: "Extra Large" },
-                        { value: "2xl", label: "2X Large" },
-                      ],
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                       description: "Font size for the title",
                     },
                     {
@@ -632,15 +626,9 @@ export const gridStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "select",
-                      defaultValue: "xl",
-                      options: [
-                        { value: "sm", label: "Small" },
-                        { value: "base", label: "Base" },
-                        { value: "lg", label: "Large" },
-                        { value: "xl", label: "Extra Large" },
-                        { value: "2xl", label: "2X Large" },
-                      ],
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 20,
                       description: "Font size for the price",
                     },
                     {

@@ -457,8 +457,9 @@ export const contactMapSectionStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  placeholder: "text-lg",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 18,
                 },
                 {
                   key: "fontWeight",

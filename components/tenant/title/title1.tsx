@@ -175,7 +175,7 @@ export default function Title1(props: TitleProps = {}) {
         <h1
           style={{
             color: mergedData.styling?.color,
-            fontSize: fontSizeDesktop,
+            fontSize: toDimension(fontSizeDesktop, "px", "40px"),
             fontWeight: mergedData.typography?.fontWeight,
             fontFamily: mergedData.typography?.fontFamily,
             lineHeight: mergedData.typography?.lineHeight,

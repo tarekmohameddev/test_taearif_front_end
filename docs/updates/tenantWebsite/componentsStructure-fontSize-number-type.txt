@@ -1,0 +1,18 @@
+2025-03-02
+Update Type: Normalization
+توحيد حقول fontSize (وحقول font size ذات الغاية نفسها) في componentsStructure لاستخدام النوع number مع unit (مثل "px") بدل text أو select. تحديث مكوّنات التينانت لاستخدام toDimension عند تطبيق القيم على style لضمان توافق مع القيم القديمة (نصية) والجديدة (رقمية).
+
+المكوّنات المتأثرة:
+- propertySlider (link.fontSize)
+- grid (titleStyle.fontSize, priceStyle.fontSize)
+- card (جميع typography fontSize في card4 و card5)
+- whyChooseUs (header و features typography fontSize)
+- header (كانت بالفعل object بأرقام)
+- propertyFilter, filterButtons (input/searchButton/filterButtons fontSize)
+- applicationForm, contactFormSection, contactMapSection (typography fontSize)
+- logosTicker, partners, photosGrid (typography fontSize كـ object desktop/tablet/mobile)
+- blogDetails, propertiesShowcase, propertyDetail, projectDetails (typography fontSize)
+- title (typography.fontSize object)
+- imageText (كانت بالفعل number)
+
+الملفات المعدّلة: componentsStructure/*.ts، components/tenant/**/*.tsx، context/editorStoreFunctions/*.ts

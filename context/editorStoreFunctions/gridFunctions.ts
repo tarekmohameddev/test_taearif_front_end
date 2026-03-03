@@ -70,12 +70,12 @@ export const getDefaultGridData = (): ComponentData => ({
     },
     contentSettings: {
       titleStyle: {
-        fontSize: "lg",
+        fontSize: 18,
         fontWeight: "bold",
         color: "#1f2937",
       },
       priceStyle: {
-        fontSize: "xl",
+        fontSize: 20,
         color: "#059669",
         currency: "ريال",
       },

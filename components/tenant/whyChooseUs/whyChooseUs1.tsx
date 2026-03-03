@@ -185,7 +185,7 @@ const getDefaultWhyChooseUsData = () => ({
         className: "mt-6 text-center text-lg font-bold text-emerald-700",
         marginTop: "mt-6",
         textAlign: "text-center",
-        fontSize: "text-lg",
+        fontSize: 18,
         fontWeight: "font-bold",
         color: "text-emerald-700",
       },
@@ -193,7 +193,7 @@ const getDefaultWhyChooseUsData = () => ({
         className: "mt-3 text-center text-lg leading-7 text-gray-600",
         marginTop: "mt-3",
         textAlign: "text-center",
-        fontSize: "text-lg",
+        fontSize: 18,
         lineHeight: "leading-7",
         color: "text-gray-600",
       },
@@ -844,6 +844,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
             }
             style={{
               ...(headerTitleColor ? { color: headerTitleColor } : {}),
+              fontSize: toDimension(mergedData.header?.typography?.title?.fontSize, "px", "18px"),
             }}
           >
             {mergedData.header?.title || "لماذا تختارنا؟"}
@@ -861,6 +862,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                 mergedData.styling?.textColor ||
                 mergedData.colors?.textColor ||
                 undefined,
+              fontSize: toDimension(mergedData.header?.typography?.description?.fontSize, "px", "18px"),
             }}
           >
             {mergedData.header?.description ||
@@ -980,7 +982,10 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                   mergedData.features?.typography?.title?.className ||
                   "mt-6 text-center text-lg font-bold"
                 }
-                style={{ color: titleColor }}
+                style={{
+                  color: titleColor,
+                  fontSize: toDimension(mergedData.features?.typography?.title?.fontSize, "px", "18px"),
+                }}
               >
                 {f.title}
               </h3>
@@ -991,6 +996,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
                 }
                 style={{
                   color: descriptionColor,
+                  fontSize: toDimension(mergedData.features?.typography?.description?.fontSize, "px", "18px"),
                 }}
               >
                 {f.desc}

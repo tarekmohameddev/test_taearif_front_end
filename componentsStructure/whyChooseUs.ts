@@ -1160,8 +1160,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      placeholder: "text-lg",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                     },
                     {
                       key: "fontWeight",
@@ -1205,8 +1206,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      placeholder: "text-lg",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                     },
                     {
                       key: "lineHeight",
@@ -2557,8 +2559,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      placeholder: "text-lg",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                     },
                     {
                       key: "fontWeight",
@@ -2602,8 +2605,9 @@ export const whyChooseUsStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      placeholder: "text-lg",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                     },
                     {
                       key: "lineHeight",

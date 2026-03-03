@@ -609,7 +609,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
   const linkFontSize = mergedData.typography?.link?.fontSize;
   const linkStyles = {
-    fontSize: typeof linkFontSize === "number" ? `${linkFontSize}px` : (linkFontSize || "14px"),
+    fontSize: toDimension(linkFontSize, "px", "14px"),
     color: linkColor,
   };
 

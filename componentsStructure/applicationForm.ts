@@ -102,8 +102,9 @@ export const applicationFormStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      defaultValue: "text-[20px] md:text-[32px]",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 24,
                     },
                     {
                       key: "fontWeight",
@@ -134,8 +135,9 @@ export const applicationFormStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      defaultValue: "text-[16px] md:text-[20px]",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                     },
                     {
                       key: "fontWeight",
