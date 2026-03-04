@@ -68,6 +68,7 @@ import {
 import { RequestDetailHeader } from "./detail/RequestDetailHeader";
 import { RequestInfoCard } from "./detail/RequestInfoCard";
 import { PropertyOrPreferencesCard } from "./detail/PropertyOrPreferencesCard";
+import { RequestPropertiesCard } from "./detail/RequestPropertiesCard";
 import { AIMatchingCard } from "./detail/AIMatchingCard";
 import { RequestActionsCard } from "./detail/RequestActionsCard";
 import { AssignEmployeeDialog } from "./detail/AssignEmployeeDialog";
@@ -593,6 +594,19 @@ export function RequestDetailPage({
     }
   };
 
+  const propertyRequestNumericId =
+    action.objectType === "property_request"
+      ? (action.metadata?.propertyRequestId as number | undefined) ??
+        (action as { property_request_id?: number }).property_request_id ??
+        (requestId && /^property_request_(\d+)$/.test(requestId)
+          ? parseInt(requestId.replace(/^property_request_/, ""), 10)
+          : undefined)
+      : undefined;
+  const showRequestPropertiesCard =
+    action.objectType === "property_request" &&
+    propertyRequestNumericId != null &&
+    !Number.isNaN(propertyRequestNumericId);
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900" dir="rtl">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -607,10 +621,22 @@ export function RequestDetailPage({
           <div className="lg:col-span-2 space-y-6">
             <RequestInfoCard action={action} />
 
-            <PropertyOrPreferencesCard
-              propertyInfo={propertyInfo}
-              customerPreferences={customerPreferences}
-            />
+            {showRequestPropertiesCard ? (
+              <RequestPropertiesCard
+                propertyRequestId={propertyRequestNumericId!}
+                propertyIds={
+                  (action as { propertyIds?: number[] }).propertyIds ??
+                  (action.metadata?.propertyIds as number[] | undefined) ??
+                  []
+                }
+                onRefetch={onRefetch}
+              />
+            ) : (
+              <PropertyOrPreferencesCard
+                propertyInfo={propertyInfo}
+                customerPreferences={customerPreferences}
+              />
+            )}
 
             {customer && (
               <AIMatchingCard

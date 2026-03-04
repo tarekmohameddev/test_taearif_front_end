@@ -18,6 +18,7 @@ import {
 import SwiperCarousel from "@/components/ui/swiper-carousel2";
 import Link from "next/link";
 import { toDimension } from "@/lib/utils";
+import { PropertyInterestForm } from "./components/PropertyInterestForm";
 
 // ═══════════════════════════════════════════════════════════
 // PROPERTY INTERFACE
@@ -436,16 +437,8 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   const [mainImage, setMainImage] = useState<string>("");
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
 
-  // Form states
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    message: "",
-  });
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [formSuccess, setFormSuccess] = useState(false);
+  // Property interest collapsible (Property Request API)
+  const [showInterestForm, setShowInterestForm] = useState(false);
 
   // FAQ states
   const [expandedFaqs, setExpandedFaqs] = useState<Set<number>>(new Set());
@@ -460,105 +453,6 @@ export default function propertyDetail2(props: propertyDetail2Props) {
         newSet.add(faqId);
       }
       return newSet;
-    });
-  };
-
-  // Form handlers
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormLoading(true);
-    setFormError(null);
-    setFormSuccess(false);
-
-    try {
-      if (!finalTenantId) {
-        setFormError("لم يتم العثور على معرف المستأجر");
-        return;
-      }
-
-      if (!property?.slug) {
-        setFormError("لم يتم العثور على معرف العقار");
-        return;
-      }
-
-      // Validation
-      if (!formData.name.trim()) {
-        setFormError("يرجى إدخال اسمك");
-        return;
-      }
-
-      if (!formData.phone.trim()) {
-        setFormError("يرجى إدخال رقم الهاتف");
-        return;
-      }
-
-      // Validate phone format
-      const phoneRegex = /^\+?\d{7,15}$/;
-      if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
-        setFormError("يرجى إدخال رقم هاتف صحيح (مثال: +966501234567)");
-        return;
-      }
-
-      const payload: any = {
-        propertySlug: property.slug,
-        customerName: formData.name.trim(),
-        customerPhone: formData.phone.trim(),
-      };
-
-      if (formData.email.trim()) {
-        payload.customerEmail = formData.email.trim();
-      }
-      if (formData.message.trim()) {
-        payload.message = formData.message.trim();
-      }
-
-      const response = await axiosInstance.post(
-        `/api/v1/tenant-website/${finalTenantId}/reservations`,
-        payload,
-      );
-
-      if (response.data.success) {
-        setFormSuccess(true);
-        // Reset form
-        setFormData({
-          name: "",
-          phone: "",
-          email: "",
-          message: "",
-        });
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-          setFormSuccess(false);
-        }, 3000);
-      }
-    } catch (err: any) {
-      // Handle validation errors from backend
-      if (err.response?.data?.errors) {
-        const errors = err.response.data.errors;
-        const errorMessage =
-          errors.customerName?.[0] ||
-          errors.customerPhone?.[0] ||
-          errors.message?.[0] ||
-          err.response?.data?.message ||
-          "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى";
-        setFormError(errorMessage);
-      } else {
-        setFormError(
-          err.response?.data?.message ||
-            "حدث خطأ أثناء إرسال الاستفسار. يرجى المحاولة مرة أخرى",
-        );
-      }
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
     });
   };
 
@@ -839,13 +733,6 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   const primaryColorHover = getDarkerColor(primaryColor, 20);
 
   const textColor = mergedData.styling?.textColor || "#967152";
-  const formBackgroundColor =
-    mergedData.styling?.formBackgroundColor || "#8b5f46";
-  const formTextColor = mergedData.styling?.formTextColor || "#ffffff";
-  const formButtonBackgroundColor =
-    mergedData.styling?.formButtonBackgroundColor || "#d4b996";
-  const formButtonTextColor =
-    mergedData.styling?.formButtonTextColor || "#7a5c43";
 
   // Show skeleton loading while tenant or property is loading
   if (tenantLoading || loadingProperty) {
@@ -2168,100 +2055,6 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                 </div>
               </section>
             )}
-
-            {/* Contact Form - COMMENTED OUT */}
-            {/* {mergedData.displaySettings?.showContactForm !== false && (
-              <section
-                className="text-white p-8 rounded-lg h-fit"
-                data-purpose="contact-form"
-                style={{
-                  backgroundColor: formBackgroundColor,
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                }}
-              >
-                <h2
-                  className="text-2xl font-bold mb-2 text-right"
-                  style={{ color: formTextColor }}
-                >
-                  {mergedData.content?.contactFormTitle ||
-                    "استفسر عن هذا العقار"}
-                </h2>
-                <p
-                  className="text-sm mb-6 text-right"
-                  style={{ color: formTextColor, opacity: 0.8 }}
-                >
-                  {mergedData.content?.contactFormDescription ||
-                    "استفسر عن المنزل واملأ البيانات لهذا العقار"}
-                </p>
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <input
-                        className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                        placeholder="اسم العميل"
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <input
-                        className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                        placeholder="رقم الهاتف"
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <input
-                        className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                        placeholder="البريد الإلكتروني"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <textarea
-                      className="w-full bg-white text-gray-800 rounded px-4 py-3 border-none focus:ring-2 focus:ring-brand-gold outline-none"
-                      placeholder="الرسالة"
-                      rows={4}
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                    ></textarea>
-                  </div>
-                  {formError && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                      {formError}
-                    </div>
-                  )}
-                  {formSuccess && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                      تم إرسال استفسارك بنجاح! سنتواصل معك قريباً.
-                    </div>
-                  )}
-                  <button
-                    className="w-full font-bold py-3 rounded transition-colors shadow-md text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    type="submit"
-                    disabled={formLoading}
-                    style={{
-                      backgroundColor: formButtonBackgroundColor,
-                      color: formButtonTextColor,
-                    }}
-                  >
-                    {formLoading
-                      ? "جاري الإرسال..."
-                      : mergedData.content?.submitButtonText || "أرسل استفسارك"}
-                  </button>
-                </form>
-              </section>
-            )} */}
           </div>
           {/* END Right Column */}
 
@@ -2358,6 +2151,43 @@ export default function propertyDetail2(props: propertyDetail2Props) {
                   </div>
                 </section>
               )}
+
+            {/* Property Interest → Property Request (أنا مهتم بهذا العقار) - Collapsible */}
+            {mergedData.displaySettings?.showContactForm !== false &&
+              finalTenantId &&
+              property?.id != null && (
+                <section
+                  className="bg-transparent rounded-lg overflow-hidden shadow-md border border-gray-200 dark:border-gray-700"
+                  data-purpose="property-interest-cta"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShowInterestForm((prev) => !prev)}
+                    className="w-full font-bold py-3 px-6 rounded-lg transition-colors shadow-md text-lg hover:opacity-90 disabled:opacity-50 text-white flex items-center justify-center gap-2"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    أنا مهتم بهذا العقار
+                    {showInterestForm ? (
+                      <ChevronUpIcon className="w-5 h-5" />
+                    ) : (
+                      <ChevronDownIcon className="w-5 h-5" />
+                    )}
+                  </button>
+                  {showInterestForm && (
+                    <div className="p-4 bg-muted/30 border-t border-gray-200 dark:border-gray-700">
+                      <PropertyInterestForm
+                        propertyId={Number(property.id)}
+                        tenantUsername={finalTenantId}
+                        primaryColor={primaryColor}
+                        submitButtonText={
+                          mergedData.content?.submitButtonText || "إرسال الطلب"
+                        }
+                        onSuccess={() => setShowInterestForm(false)}
+                      />
+                    </div>
+                  )}
+                </section>
+              )}
           </div>
           {/* END Left Column */}
         </div>
@@ -2409,6 +2239,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
           )}
         </DialogContent>
       </Dialog>
+
     </main>
   );
 }

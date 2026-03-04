@@ -24,6 +24,7 @@ import { ImageDialog } from "./components/ImageDialog";
 import { ShareDialog } from "./components/ShareDialog";
 import { SkeletonLoader } from "./components/SkeletonLoader";
 import { ErrorState } from "./components/ErrorState";
+import { PropertyInterestModal } from "./components/PropertyInterestModal";
 import { fetchPropertyData } from "./services/property.api";
 
 export default function propertyDetail({
@@ -34,6 +35,7 @@ export default function propertyDetail({
 }: propertyDetailProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [showInterestModal, setShowInterestModal] = useState(false);
   const [expandedFaqs, setExpandedFaqs] = useState<Set<number>>(new Set());
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -208,6 +210,23 @@ export default function propertyDetail({
               buttonText={whatsAppData.buttonText}
             />
 
+            {/* Property Interest → Property Request (أنا مهتم بهذا العقار) */}
+            {displaySettings?.showContactForm !== false && tenantId && property?.id != null && (
+              <section
+                className="bg-transparent"
+                data-purpose="property-interest-cta"
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowInterestModal(true)}
+                  className="w-full font-bold py-3 px-6 rounded-lg transition-colors shadow-md text-lg hover:opacity-90 disabled:opacity-50 text-white"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  أنا مهتم بهذا العقار
+                </button>
+              </section>
+            )}
+
             <PropertyFAQs
               faqs={property.faqs}
               expandedFaqs={expandedFaqs}
@@ -274,6 +293,18 @@ export default function propertyDetail({
         primaryColor={primaryColor}
         primaryColorHover={primaryColorHover}
       />
+
+      {/* Property Interest modal (Property Request API) */}
+      {tenantId && property?.id != null && (
+        <PropertyInterestModal
+          open={showInterestModal}
+          onClose={() => setShowInterestModal(false)}
+          propertyId={Number(property.id)}
+          tenantUsername={tenantId}
+          primaryColor={primaryColor}
+          submitButtonText={content?.submitButtonText || "إرسال الطلب"}
+        />
+      )}
     </section>
   );
 }
