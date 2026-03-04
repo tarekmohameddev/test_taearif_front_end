@@ -709,22 +709,6 @@ export function RequestDetailPage({
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                      <Calendar className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500">تاريخ الإنشاء</div>
-                      <div className="font-medium">
-                        {new Date(action.createdAt).toLocaleDateString("ar-SA", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
                   {action.assignedToName && (
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg">
