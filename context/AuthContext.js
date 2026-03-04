@@ -38,6 +38,30 @@ const useAuthStore = create((set, get) => ({
   googleUrlFetched: false,
   googleAuthUrl: null,
 
+  // تهيئة الـ store من localStorage لعرض بيانات المستخدم فوراً في الـ sidebar (قبل وصول استجابة API)
+  hydrateUserFromStorage: () => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored = localStorage.getItem("user");
+      if (!stored) return;
+      const parsed = JSON.parse(stored);
+      if (!parsed || (!parsed.token && !parsed.email)) return;
+      const currentState = get();
+      const merged = {
+        ...currentState.userData,
+        ...parsed,
+        token: parsed.token ?? currentState.userData?.token ?? null,
+      };
+      set({
+        userData: merged,
+        UserIslogged: true,
+        authenticated: true,
+      });
+    } catch (error) {
+      console.error("Error hydrating user from localStorage:", error);
+    }
+  },
+
   clickedONSubButton: async () => {
     set({ clickedOnSubButton: "subscription" });
   },
@@ -96,14 +120,18 @@ const useAuthStore = create((set, get) => ({
           subscriptionDATA.membership?.package?.real_estate_limit_number ||
           currentState.userData?.real_estate_limit_number ||
           null,
-        // بيانات إضافية
+        // بيانات إضافية (دعم القيم من جذر الاستجابة أو من data.user)
         domain:
-          subscriptionDATA.domain || currentState.userData?.domain || null,
+          subscriptionDATA.domain ??
+          userData.domain ??
+          currentState.userData?.domain ??
+          null,
         message:
           subscriptionDATA.message || currentState.userData?.message || null,
         company_name:
-          subscriptionDATA.company_name ||
-          currentState.userData?.company_name ||
+          subscriptionDATA.company_name ??
+          userData.company_name ??
+          currentState.userData?.company_name ??
           null,
         onboarding_completed:
           subscriptionDATA.onboarding_completed ??
@@ -564,7 +592,16 @@ const useAuthStore = create((set, get) => ({
   setOnboardingCompleted: (boolean) => set({ onboarding_completed: boolean }),
   setErrorLogin: (error) => set({ errorLogin: error }),
   setAuthenticated: (value) => set({ authenticated: value }),
-  setUserData: (data) => set({ userData: data }),
+  setUserData: (data) => {
+    set({ userData: data });
+    if (typeof window !== "undefined" && data && (data.token || data.email)) {
+      try {
+        localStorage.setItem("user", JSON.stringify(data));
+      } catch (error) {
+        console.error("Error persisting user data to localStorage:", error);
+      }
+    }
+  },
   setUserIsLogged: (isLogged) => set({ UserIslogged: isLogged }),
   setIsLoading: (loading) => set({ IsLoading: loading }),
   setHasAttemptedLogin: (attempted) => set({ hasAttemptedLogin: attempted }),

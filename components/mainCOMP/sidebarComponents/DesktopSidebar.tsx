@@ -35,6 +35,26 @@ const useScreenHeight = () => {
   return { isShortScreen, isVeryShortScreen };
 };
 
+const USER_STORAGE_KEY = "user";
+
+function getStoredUserFromStorage(): {
+  company_name: string | null;
+  domain: string | null;
+} {
+  if (typeof window === "undefined") return { company_name: null, domain: null };
+  try {
+    const raw = localStorage.getItem(USER_STORAGE_KEY);
+    if (!raw) return { company_name: null, domain: null };
+    const parsed = JSON.parse(raw);
+    return {
+      company_name: parsed?.company_name ?? null,
+      domain: parsed?.domain ?? null,
+    };
+  } catch {
+    return { company_name: null, domain: null };
+  }
+}
+
 interface DesktopSidebarProps {
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
@@ -51,7 +71,22 @@ export function DesktopSidebar({
   );
   const { isShortScreen, isVeryShortScreen } = useScreenHeight();
 
-  const { userData } = useAuthStore();
+  const userData = useAuthStore((s) => s.userData);
+
+  // state من API: تُملأ عند وصول بيانات المستخدم من الـ API
+  const [apiUserDisplay, setApiUserDisplay] = useState<{
+    company_name: string | null;
+    domain: string | null;
+  }>({ company_name: null, domain: null });
+
+  // انتظار بيانات الـ user من الـ API ثم تعيينها في الـ state
+  useEffect(() => {
+    if (!userData) return;
+    setApiUserDisplay({
+      company_name: userData.company_name ?? null,
+      domain: userData.domain ?? null,
+    });
+  }, [userData?.company_name, userData?.domain]);
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";
@@ -152,18 +187,22 @@ export function DesktopSidebar({
   };
 
   const SidebarContent = () => {
-    const userData = useAuthStore.getState().userData;
+    const stored = getStoredUserFromStorage();
+    const displayCompanyName =
+      apiUserDisplay.company_name || stored.company_name || "";
+    const displayDomain =
+      apiUserDisplay.domain || stored.domain || "";
 
     return (
       <div className="flex h-full flex-col gap-2 overflow-hidden">
         <div className="flex h-14 items-center border-b px-4 md:h-[60px] flex-shrink-0">
           <div className="flex flex-col w-full">
             <span className="text-lg font-semibold truncate">
-              {userData?.company_name}
+              {displayCompanyName}
             </span>
-            {userData?.domain && userData.domain.trim() !== "" && (
+            {displayDomain.trim() !== "" && (
               <span className="text-xs text-gray-500 truncate">
-                {userData.domain}
+                {displayDomain}
               </span>
             )}
           </div>
@@ -177,18 +216,7 @@ export function DesktopSidebar({
                   size="sm"
                   className="w-full justify-start gap-2 border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-foreground transition-all duration-200"
                   onClick={() => {
-                    const userData = useAuthStore.getState().userData;
-                    console.log("🔗 Full userData:", userData);
-                    console.log("🔗 Domain from userData:", userData?.domain);
-
-                    // التحقق من وجود userData
-                    if (!userData) {
-                      console.warn("userData is null or undefined");
-                      alert("يرجى تسجيل الدخول أولاً");
-                      return;
-                    }
-
-                    const domain = userData?.domain || "";
+                    const domain = displayDomain;
 
                     // التحقق من صحة الـ domain
                     if (!domain || domain.trim() === "") {
