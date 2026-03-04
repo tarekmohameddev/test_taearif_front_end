@@ -40,6 +40,7 @@ import {
   Check,
   Video,
   XCircle,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -62,6 +63,11 @@ import {
   CustomDropdown,
   DropdownItem,
 } from "@/components/customComponents/customDropdown";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Loader2 } from "lucide-react";
 
 interface RequestDetailPageProps {
@@ -233,6 +239,7 @@ export function RequestDetailPage({
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
+  const [actionsCardOpen, setActionsCardOpen] = useState(true);
 
   // Fetch employees when opening assign dialog
   useEffect(() => {
@@ -1374,10 +1381,15 @@ export function RequestDetailPage({
 
             {/* Action Buttons */}
             {action.status !== "completed" && action.status !== "dismissed" && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">إجراءات</CardTitle>
-                </CardHeader>
+              <Collapsible open={actionsCardOpen} onOpenChange={setActionsCardOpen}>
+                <Card>
+                  <CollapsibleTrigger asChild>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg">
+                      <CardTitle className="text-base">إجراءات</CardTitle>
+                      <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform duration-200", actionsCardOpen && "rotate-180")} />
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
                 <CardContent className="space-y-3">
                   <Button
                     className="w-full gap-2 bg-green-600 hover:bg-green-700"
@@ -1830,7 +1842,9 @@ export function RequestDetailPage({
                     </CustomDialogContent>
                   </CustomDialog>
                 </CardContent>
-              </Card>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
             )}
 
             {/* Completed/Dismissed Message */}

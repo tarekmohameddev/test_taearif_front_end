@@ -1,4 +1,9 @@
 2026-03-04
+Update Type: Feature
+جعل كارد "إجراءات" في صفحة تفاصيل طلب العقار (RequestDetailPage) قابلاً للطي (collapsible): استيراد Collapsible و CollapsibleTrigger و CollapsibleContent من @/components/ui/collapsible، إضافة state actionsCardOpen (افتراضي true)، جعل CardHeader عنوان "إجراءات" قابلاً للنقر مع أيقونة ChevronDown تدور عند الفتح/الإغلاق، المحتوى (CardContent) داخل CollapsibleContent.
+components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-03-04
 Update Type: Update (UI wording and hidden sections)
 إخفاء أقسام في صفحة تفاصيل الطلب واستبدال مصطلحات موعد→إجراء: (1) تم إخفاء قائمة التذكيرات (Reminders Section) باستخدام شرط false &&. (2) تم إخفاء كارد الملاحظات بالكامل (Notes Section) باستخدام false &&. (3) تم إخفاء زر "إضافة تذكير" ونموذج إضافة التذكير (Add Reminder Form) باستخدام false &&. للاستعادة: أزل الشرط false && من كل من المواضع المذكورة. (4) استبدال نصوص الواجهة: موعد→إجراء، المواعيد→الإجراءات في RequestDetailPage.tsx (toasts، عنوان القسم، زر جدولة إجراء، نوع الإجراء، الإجراء المستهدف، حالة "مجدول") وفي AdvancedFiltersPanel.tsx (زر الفلتر وعنوان القائمة: الموعد→الإجراء).
 components/customers-hub/requests/RequestDetailPage.tsx, components/customers-hub/requests/AdvancedFiltersPanel.tsx
