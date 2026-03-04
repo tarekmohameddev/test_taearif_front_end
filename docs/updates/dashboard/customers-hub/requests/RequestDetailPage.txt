@@ -1,6 +1,6 @@
 2026-03-04
 Update Type: Feature
-جعل كارد "إجراءات" في صفحة تفاصيل طلب العقار (RequestDetailPage) قابلاً للطي (collapsible): استيراد Collapsible و CollapsibleTrigger و CollapsibleContent من @/components/ui/collapsible، إضافة state actionsCardOpen (افتراضي true)، جعل CardHeader عنوان "إجراءات" قابلاً للنقر مع أيقونة ChevronDown تدور عند الفتح/الإغلاق، المحتوى (CardContent) داخل CollapsibleContent.
+جعل كارد "إجراءات" في صفحة تفاصيل طلب العقار (RequestDetailPage) قابلاً للطي (collapsible): استيراد Collapsible و CollapsibleTrigger و CollapsibleContent من @/components/ui/collapsible، إضافة state actionsCardOpen (افتراضي false — مغلق)، جعل CardHeader عنوان "إجراءات" قابلاً للنقر مع أيقونة ChevronDown تدور عند الفتح/الإغلاق، المحتوى (CardContent) داخل CollapsibleContent.
 components/customers-hub/requests/RequestDetailPage.tsx
 
 2026-03-04

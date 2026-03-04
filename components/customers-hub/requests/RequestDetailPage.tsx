@@ -239,7 +239,7 @@ export function RequestDetailPage({
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
-  const [actionsCardOpen, setActionsCardOpen] = useState(true);
+  const [actionsCardOpen, setActionsCardOpen] = useState(false);
 
   // Fetch employees when opening assign dialog
   useEffect(() => {
