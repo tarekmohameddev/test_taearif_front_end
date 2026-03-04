@@ -159,7 +159,7 @@ export function RequestPropertiesCard({
             <div className="p-2 bg-primary/10 rounded-lg">
               <Building className="h-5 w-5 text-primary" />
             </div>
-            <CardTitle className="text-lg">عقارات العميل</CardTitle>
+            <CardTitle className="text-lg">عقارات الطلب</CardTitle>
             <button
               data-add-button
               onClick={(e) => {
