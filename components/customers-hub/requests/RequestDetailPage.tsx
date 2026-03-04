@@ -404,7 +404,7 @@ export function RequestDetailPage({
       return;
     }
     
-    const toastId = toast.loading("جاري جدولة الموعد...");
+    const toastId = toast.loading("جاري جدولة الإجراء...");
     try {
       // Use addAppointmentForRequest for property_request and inquiry, fallback to old method for others
       if ((action?.objectType === 'property_request' || action?.objectType === 'inquiry') && action?.id) {
@@ -416,13 +416,13 @@ export function RequestDetailPage({
           title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label,
           priority: 'medium',
         });
-        toast.success("تم جدولة الموعد بنجاح", { id: toastId });
+        toast.success("تم جدولة الإجراء بنجاح", { id: toastId });
       } else if (customer) {
         // Fallback to old method for non-property_request actions
         const now = new Date().toISOString();
         const appointment: Appointment = {
           id: `apt_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-          title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "موعد",
+          title: APPOINTMENT_TYPES.find((t) => t.value === aptType)?.label ?? "إجراء",
           type: aptType,
           date: datetime,
           time: aptTime,
@@ -435,9 +435,9 @@ export function RequestDetailPage({
           updatedAt: now,
         };
         addAppointment(customer.id, appointment);
-        toast.success("تم جدولة الموعد بنجاح", { id: toastId });
+        toast.success("تم جدولة الإجراء بنجاح", { id: toastId });
       } else {
-        toast.error("لا يمكن جدولة الموعد: بيانات غير صحيحة", { id: toastId });
+        toast.error("لا يمكن جدولة الإجراء: بيانات غير صحيحة", { id: toastId });
         return;
       }
       
@@ -454,7 +454,7 @@ export function RequestDetailPage({
     } catch (err: any) {
       console.error("Error scheduling appointment:", err);
       toast.error(
-        err.message || err.response?.data?.message || "حدث خطأ أثناء جدولة الموعد",
+        err.message || err.response?.data?.message || "حدث خطأ أثناء جدولة الإجراء",
         { id: toastId }
       );
     }
@@ -713,7 +713,7 @@ export function RequestDetailPage({
                         />
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">الموعد المستهدف</div>
+                        <div className="text-xs text-gray-500">الإجراء المستهدف</div>
                         <div className={cn("font-medium", isOverdue && "text-red-600")}>
                           {new Date(action.dueDate).toLocaleDateString("ar-SA", {
                             year: "numeric",
@@ -959,7 +959,7 @@ export function RequestDetailPage({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-blue-500" />
-                    المواعيد
+                    الإجراءات
                     <Badge variant="secondary" className="text-blue-600 dark:text-blue-400">
                       {action.appointments.length}
                     </Badge>
@@ -998,7 +998,7 @@ export function RequestDetailPage({
                         };
                         const getStatusBadge = () => {
                           const config = {
-                            scheduled: { variant: "secondary" as any, label: "مجدولة" },
+                            scheduled: { variant: "secondary" as any, label: "مجدول" },
                             confirmed: { variant: "default" as any, label: "مؤكدة" },
                             completed: { variant: "default" as any, label: "مكتملة" },
                             cancelled: { variant: "destructive" as any, label: "ملغاة" },
@@ -1079,8 +1079,8 @@ export function RequestDetailPage({
               </Card>
             )}
 
-            {/* Reminders Section */}
-            {action.reminders && action.reminders.length > 0 && (
+            {/* قائمة التذكيرات - مخفية (للاستعادة أزل الشرط false &&) */}
+            {false && action.reminders && action.reminders.length > 0 && (
               <Card className="border-amber-200 dark:border-amber-800/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -1215,7 +1215,8 @@ export function RequestDetailPage({
               </Card>
             )}
 
-            {/* Notes Section */}
+            {/* ملاحظات - مخفية (للاستعادة أزل الشرط false &&) */}
+            {false && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -1305,6 +1306,7 @@ export function RequestDetailPage({
                 )}
               </CardContent>
             </Card>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -1329,16 +1331,6 @@ export function RequestDetailPage({
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg">{customer.name}</h3>
-                        <Badge
-                          variant="outline"
-                          className="text-xs"
-                          style={{
-                            borderColor: getStageColor(customer.stage),
-                            color: getStageColor(customer.stage),
-                          }}
-                        >
-                          {getStageNameAr(customer.stage)}
-                        </Badge>
                       </div>
                       <Eye className="h-4 w-4 text-gray-400" />
                     </div>
@@ -1376,11 +1368,6 @@ export function RequestDetailPage({
                       )}
                     </div>
                   </div>
-
-                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg max-w-[8rem]">
-                    <div className="text-xl font-bold">{customer.totalInteractions || 0}</div>
-                    <div className="text-xs text-gray-500">تفاعلات</div>
-                  </div>
                 </CardContent>
               </Card>
             )}
@@ -1406,9 +1393,11 @@ export function RequestDetailPage({
                     onClick={() => setShowScheduleForm(!showScheduleForm)}
                   >
                     <Calendar className="h-4 w-4" />
-                    جدولة موعد
+                    جدولة إجراء
                   </Button>
 
+                  {/* إضافة تذكير - مخفى (للاستعادة أزل false &&) */}
+                  {false && (
                   <Button
                     variant="outline"
                     className="w-full gap-2"
@@ -1417,6 +1406,7 @@ export function RequestDetailPage({
                     <AlarmClock className="h-4 w-4" />
                     إضافة تذكير
                   </Button>
+                  )}
 
                   <Button
                     variant="outline"
@@ -1491,7 +1481,7 @@ export function RequestDetailPage({
                   {showScheduleForm && (
                     <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
                       <div className="space-y-2">
-                        <Label className="text-sm">نوع الموعد</Label>
+                        <Label className="text-sm">نوع الإجراء</Label>
                         <Select
                           value={aptType}
                           onValueChange={(v) => setAptType(v as Appointment["type"])}
@@ -1564,8 +1554,8 @@ export function RequestDetailPage({
                     </div>
                   )}
 
-                  {/* Add Reminder Form */}
-                  {showReminderForm && (
+                  {/* نموذج إضافة تذكير - مخفى (للاستعادة أزل false &&) */}
+                  {false && showReminderForm && (
                     <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
                       <div className="space-y-2">
                         <Label className="text-sm">عنوان التذكير *</Label>

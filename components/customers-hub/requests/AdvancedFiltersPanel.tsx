@@ -237,7 +237,7 @@ export function AdvancedFiltersPanel({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className={btnClass}>
             <Timer className="h-4 w-4" />
-            الموعد
+            الإجراء
             {dueDateFilter !== "all" && (
               <Badge variant="secondary" className="mr-1">
                 1
@@ -247,7 +247,7 @@ export function AdvancedFiltersPanel({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>الموعد</DropdownMenuLabel>
+          <DropdownMenuLabel>الإجراء</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setDueDateFilter("all")}>الكل</DropdownMenuItem>
           <DropdownMenuItem onClick={() => setDueDateFilter("overdue")}>
