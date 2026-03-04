@@ -630,13 +630,41 @@ export function RequestDetailPage({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge className={statusConfig[action.status].color}>
-              {statusConfig[action.status].label}
-            </Badge>
-            <Badge className={priorityConfig[action.priority].color}>
-              {priorityConfig[action.priority].label}
-            </Badge>
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-2">
+              <Badge className={statusConfig[action.status].color}>
+                {statusConfig[action.status].label}
+              </Badge>
+              <Badge className={priorityConfig[action.priority].color}>
+                {priorityConfig[action.priority].label}
+              </Badge>
+            </div>
+            <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs text-gray-500">
+              {action.dueDate && (
+                <span className={cn("flex items-center gap-1", isOverdue && "text-red-600")}>
+                  <Clock className="h-3 w-3" />
+                  {new Date(action.dueDate).toLocaleDateString("ar-SA", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                  {isOverdue && (
+                    <Badge variant="destructive" className="ml-1 text-[10px]">
+                      متأخر
+                    </Badge>
+                  )}
+                </span>
+              )}
+              {action.source && (
+                <span className="flex items-center gap-1">
+                  <SourceBadge source={action.source} />
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -675,18 +703,6 @@ export function RequestDetailPage({
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="p-2 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                      <SourceBadge source={action.source} />
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500">المصدر</div>
-                      <div className="font-medium">
-                        <SourceBadge source={action.source} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
                     <div className="p-2 bg-green-50 dark:bg-green-950/30 rounded-lg">
                       <Calendar className="h-4 w-4 text-green-600" />
                     </div>
@@ -701,45 +717,6 @@ export function RequestDetailPage({
                       </div>
                     </div>
                   </div>
-
-                  {action.dueDate && (
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={cn(
-                          "p-2 rounded-lg",
-                          isOverdue
-                            ? "bg-red-50 dark:bg-red-950/30"
-                            : "bg-orange-50 dark:bg-orange-950/30"
-                        )}
-                      >
-                        <Clock
-                          className={cn(
-                            "h-4 w-4",
-                            isOverdue ? "text-red-600" : "text-orange-600"
-                          )}
-                        />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-500">الإجراء المستهدف</div>
-                        <div className={cn("font-medium", isOverdue && "text-red-600")}>
-                          {new Date(action.dueDate).toLocaleDateString("ar-SA", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}{" "}
-                          {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                          {isOverdue && (
-                            <Badge variant="destructive" className="mr-2 text-xs">
-                              متأخر
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {action.assignedToName && (
                     <div className="flex items-start gap-3">
