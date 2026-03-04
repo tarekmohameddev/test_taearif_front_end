@@ -166,7 +166,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     new Set()
   );
   const [viewMode, setViewMode] = useState<"compact" | "grid" | "table">(
-    "grid"
+    "compact"
   );
   const [quickViewAction, setQuickViewAction] =
     useState<CustomerAction | null>(null);
