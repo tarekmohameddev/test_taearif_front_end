@@ -30,7 +30,6 @@ import {
   Building2,
   MapPin,
   DollarSign,
-  AlertCircle,
   CheckCircle,
   Eye,
   UserPlus,
@@ -71,6 +70,17 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Loader2 } from "lucide-react";
+import { AppointmentsCard } from "./detail/AppointmentsCard";
+import { CustomerSummaryCard } from "./detail/CustomerSummaryCard";
+import { CompletedDismissedMessage } from "./detail/CompletedDismissedMessage";
+import {
+  RequestDetailLoading,
+  RequestDetailError,
+  RequestDetailNotFound,
+} from "./detail/RequestDetailStates";
+import { RequestDetailHeader } from "./detail/RequestDetailHeader";
+import { RequestInfoCard } from "./detail/RequestInfoCard";
+import { APPOINTMENT_TYPES } from "./constants";
 
 interface RequestDetailPageProps {
   requestId: string;
@@ -84,42 +94,6 @@ interface RequestDetailPageProps {
   onAssignAction?: (employeeId: number) => Promise<boolean>;
   onRefetch?: () => Promise<void>;
 }
-
-const priorityConfig = {
-  urgent: { label: "عاجل", color: "bg-red-500 text-white", borderColor: "border-red-500" },
-  high: { label: "مهم", color: "bg-orange-500 text-white", borderColor: "border-orange-500" },
-  medium: { label: "متوسط", color: "bg-yellow-500 text-white", borderColor: "border-yellow-500" },
-  low: { label: "منخفض", color: "bg-green-500 text-white", borderColor: "border-green-500" },
-};
-
-const statusConfig = {
-  pending: { label: "معلق", color: "bg-gray-500 text-white" },
-  in_progress: { label: "جاري العمل", color: "bg-blue-500 text-white" },
-  completed: { label: "مكتمل", color: "bg-green-500 text-white" },
-  dismissed: { label: "تم الرفض", color: "bg-gray-400 text-white" },
-  snoozed: { label: "مؤجل", color: "bg-purple-500 text-white" },
-};
-
-const actionTypeLabels: Record<string, string> = {
-  new_inquiry: "استفسار جديد",
-  callback_request: "طلب اتصال",
-  property_match: "مطابقة عقار",
-  follow_up: "متابعة",
-  document_required: "مستندات مطلوبة",
-  payment_due: "دفع مستحق",
-  site_visit: "معاينة عقار",
-  whatsapp_incoming: "رسالة واتساب",
-  ai_recommended: "موصى به بالذكاء الاصطناعي",
-};
-
-const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
-  { value: "site_visit", label: "معاينة عقار" },
-  { value: "office_meeting", label: "اجتماع مكتب" },
-  { value: "phone_call", label: "مكالمة هاتفية" },
-  { value: "video_call", label: "مكالمة فيديو" },
-  { value: "contract_signing", label: "توقيع عقد" },
-  { value: "other", label: "أخرى" },
-];
 
 export function RequestDetailPage({
   requestId,
@@ -283,48 +257,21 @@ export function RequestDetailPage({
     }
   }, [showAssignEmployeeDialog, action?.assignedTo]);
 
-  // Show loading state
   if (propLoading && !action) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-        <p className="text-gray-600 dark:text-gray-400">جاري تحميل تفاصيل الطلب...</p>
-      </div>
-    );
+    return <RequestDetailLoading />;
   }
 
-  // Show error state
   if (propError && !action) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
-        <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-        <div className="text-2xl font-bold text-gray-400">حدث خطأ</div>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">{propError}</p>
-        <div className="flex gap-2">
-          <Button onClick={() => onRefetch?.()}>إعادة المحاولة</Button>
-          <Link href="/ar/dashboard/customers-hub/requests">
-            <Button variant="outline">
-              <ArrowRight className="ml-2 h-4 w-4" />
-              العودة للطلبات
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <RequestDetailError
+        error={propError}
+        onRetry={onRefetch ? () => onRefetch() : undefined}
+      />
     );
   }
 
   if (!action) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4" dir="rtl">
-        <div className="text-2xl font-bold text-gray-400">الطلب غير موجود</div>
-        <Link href="/ar/dashboard/customers-hub/requests">
-          <Button>
-            <ArrowRight className="ml-2 h-4 w-4" />
-            العودة للطلبات
-          </Button>
-        </Link>
-      </div>
-    );
+    return <RequestDetailNotFound />;
   }
 
   const isOverdue = action.dueDate && new Date(action.dueDate) < new Date();
@@ -620,124 +567,27 @@ export function RequestDetailPage({
     customer.aiInsights?.propertyMatches?.includes(p.propertyId)
   ) ?? [];
 
+  const handleStatusClick = () => {
+    if (action.objectType === "property_request" && (action as { property_request_id?: number }).property_request_id) {
+      setShowStatusDialog(true);
+    } else {
+      toast.error("يمكن تغيير حالة طلب العقار فقط لطلبات العقار.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900" dir="rtl">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/ar/dashboard/customers-hub/requests">
-              <Button variant="outline" size="sm" className="gap-2">
-                <ArrowRight className="h-4 w-4" />
-                العودة للطلبات
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">تفاصيل الطلب</h1>
-              <p className="text-gray-500 text-sm mt-1">
-                {actionTypeLabels[action.type] || action.type}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (action.objectType === "property_request" && (action as any).property_request_id) {
-                  setShowStatusDialog(true);
-                } else {
-                  toast.error("يمكن تغيير حالة طلب العقار فقط لطلبات العقار.");
-                }
-              }}
-              className="focus:outline-none"
-            >
-              <Badge className={`${statusConfig[action.status].color} cursor-pointer hover:opacity-90 transition-opacity`}>
-                {statusConfig[action.status].label}
-              </Badge>
-            </button>
-            <Badge className={priorityConfig[action.priority].color}>
-              {priorityConfig[action.priority].label}
-            </Badge>
-            <Badge variant="outline" className="text-xs font-normal text-gray-700 dark:text-gray-200">
-              {new Date(action.createdAt).toLocaleDateString("ar-SA", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </Badge>
-            {action.dueDate && (
-              <span className={cn("flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400", isOverdue && "text-red-600")}>
-                <Clock className="h-3 w-3" />
-                {new Date(action.dueDate).toLocaleDateString("ar-SA", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}{" "}
-                {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-                {isOverdue && (
-                  <Badge variant="destructive" className="mr-1 text-[10px]">
-                    متأخر
-                  </Badge>
-                )}
-              </span>
-            )}
-            {action.source && (
-              <SourceBadge source={action.source} />
-            )}
-          </div>
-        </div>
+        <RequestDetailHeader
+          action={action}
+          isOverdue={!!isOverdue}
+          onStatusClick={handleStatusClick}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Request Info Card */}
-            <Card className={cn("border-r-4", priorityConfig[action.priority].borderColor)}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  معلومات الطلب
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">{action.title}</h3>
-                  {action.description && (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                      {action.description}
-                    </p>
-                  )}
-                </div>
-
-                <Separator />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                      <FileText className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500">نوع الطلب</div>
-                      <div className="font-medium">{actionTypeLabels[action.type]}</div>
-                    </div>
-                  </div>
-
-                  {action.assignedToName && (
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg">
-                        <UserPlus className="h-4 w-4 text-indigo-600" />
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-500">معين إلى</div>
-                        <div className="font-medium">{action.assignedToName}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <RequestInfoCard action={action} />
 
             {/* Property/Preferences Info */}
             {(propertyInfo || customerPreferences) && (
@@ -945,128 +795,7 @@ export function RequestDetailPage({
 
             {/* Appointments Section */}
             {action.appointments && action.appointments.length > 0 && (
-              <Card className="border-blue-200 dark:border-blue-800/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-500" />
-                    الإجراءات
-                    <Badge variant="secondary" className="text-blue-600 dark:text-blue-400">
-                      {action.appointments.length}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {action.appointments
-                      .sort((a, b) => new Date(a.datetime || a.date).getTime() - new Date(b.datetime || b.date).getTime())
-                      .map((appointment) => {
-                        const appointmentDate = appointment.datetime 
-                          ? new Date(appointment.datetime)
-                          : new Date(appointment.date);
-                        const isUpcoming = appointmentDate > new Date();
-                        const getTypeIcon = () => {
-                          const icons = {
-                            site_visit: <Building2 className="h-4 w-4 text-blue-600" />,
-                            office_meeting: <User className="h-4 w-4 text-purple-600" />,
-                            phone_call: <Phone className="h-4 w-4 text-green-600" />,
-                            video_call: <Video className="h-4 w-4 text-indigo-600" />,
-                            contract_signing: <CheckCircle className="h-4 w-4 text-emerald-600" />,
-                            other: <Calendar className="h-4 w-4 text-gray-600" />,
-                          };
-                          return icons[appointment.type] || icons.other;
-                        };
-                        const getTypeName = () => {
-                          const names: Record<string, string> = {
-                            site_visit: "معاينة عقار",
-                            office_meeting: "اجتماع مكتب",
-                            phone_call: "مكالمة هاتفية",
-                            video_call: "مكالمة فيديو",
-                            contract_signing: "توقيع عقد",
-                            other: "أخرى",
-                          };
-                          return names[appointment.type] || appointment.type;
-                        };
-                        const getStatusBadge = () => {
-                          const config = {
-                            scheduled: { variant: "secondary" as any, label: "مجدول" },
-                            confirmed: { variant: "default" as any, label: "مؤكدة" },
-                            completed: { variant: "default" as any, label: "مكتملة" },
-                            cancelled: { variant: "destructive" as any, label: "ملغاة" },
-                            no_show: { variant: "destructive" as any, label: "لم يحضر" },
-                          };
-                          const { variant, label } = config[appointment.status] || config.scheduled;
-                          return <Badge variant={variant}>{label}</Badge>;
-                        };
-                        const getPriorityBadge = () => {
-                          if (appointment.priority === "urgent") return <Badge variant="destructive" className="text-xs">عاجل</Badge>;
-                          if (appointment.priority === "high") return <Badge variant="default" className="text-xs">عالي</Badge>;
-                          if (appointment.priority === "medium") return <Badge variant="secondary" className="text-xs">متوسط</Badge>;
-                          return <Badge variant="outline" className="text-xs">منخفض</Badge>;
-                        };
-
-                        return (
-                          <Card
-                            key={appointment.id}
-                            className={`border-l-4 hover:shadow-md transition-shadow ${
-                              appointment.priority === "urgent" ? "border-l-red-500" :
-                              appointment.priority === "high" ? "border-l-orange-500" :
-                              "border-l-blue-500"
-                            }`}
-                          >
-                            <CardContent className="p-4">
-                              <div className="space-y-3">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex items-start gap-3 flex-1">
-                                    {getTypeIcon()}
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2 flex-wrap">
-                                        <h4 className="font-semibold">{appointment.title}</h4>
-                                        {getPriorityBadge()}
-                                      </div>
-                                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                        {getTypeName()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  {getStatusBadge()}
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                    <Calendar className="h-4 w-4" />
-                                    <span>
-                                      {appointmentDate.toLocaleDateString("ar-SA", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                      })}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                    <Clock className="h-4 w-4" />
-                                    <span>
-                                      {appointmentDate.toLocaleTimeString("ar-SA", {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })}
-                                      {appointment.duration && ` (${appointment.duration} دقيقة)`}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {appointment.notes && (
-                                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-2 rounded">
-                                    {appointment.notes}
-                                  </div>
-                                )}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                  </div>
-                </CardContent>
-              </Card>
+              <AppointmentsCard appointments={action.appointments} />
             )}
 
             {/* قائمة التذكيرات - مخفية (للاستعادة أزل الشرط false &&) */}
@@ -1302,64 +1031,17 @@ export function RequestDetailPage({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Customer Summary Card */}
-            {customer && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    معلومات العميل
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div 
-                    className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg hover:from-primary/10 hover:to-primary/20 transition-all border border-primary/20 cursor-pointer"
-                    onClick={() => router.push(`/ar/dashboard/customers-hub/${customer.id}`)}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg font-bold text-primary">
-                        {customer.name.charAt(0)}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{customer.name}</h3>
-                      </div>
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <a
-                        href={`tel:${customer.phone}`}
-                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Phone className="h-4 w-4" />
-                        <span dir="ltr">{customer.phone}</span>
-                      </a>
-                      {customer.whatsapp && (
-                        <a
-                          href={`https://wa.me/${customer.whatsapp.replace(/\D/g, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-green-600 transition-colors"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MessageSquare className="h-4 w-4" />
-                          <span>واتساب</span>
-                        </a>
-                      )}
-                      {customer.email && (
-                        <a
-                          href={`mailto:${customer.email}`}
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Mail className="h-4 w-4" />
-                          <span className="truncate">{customer.email}</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {customer && customer.id != null && (
+              <CustomerSummaryCard
+                customer={{
+                  id: customer.id,
+                  name: customer.name,
+                  phone: customer.phone,
+                  email: customer.email,
+                  whatsapp: "whatsapp" in customer ? (customer as { whatsapp?: string }).whatsapp : undefined,
+                }}
+                onViewCustomer={(id) => router.push(`/ar/dashboard/customers-hub/${id}`)}
+              />
             )}
 
             {/* Action Buttons */}
@@ -1994,27 +1676,10 @@ export function RequestDetailPage({
 
             {/* Completed/Dismissed Message */}
             {(action.status === "completed" || action.status === "dismissed") && (
-              <Card className="border-green-200 dark:border-green-800">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                    <CheckCircle className="h-5 w-5" />
-                    <span className="font-medium">
-                      {action.status === "completed" ? "تم إتمام الطلب" : "تم رفض الطلب"}
-                    </span>
-                  </div>
-                  {action.completedAt && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      {new Date(action.completedAt).toLocaleDateString("ar-SA", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+              <CompletedDismissedMessage
+                status={action.status}
+                completedAt={action.completedAt}
+              />
             )}
           </div>
         </div>
