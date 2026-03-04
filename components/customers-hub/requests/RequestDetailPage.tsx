@@ -41,7 +41,6 @@ import {
   Check,
   Video,
   XCircle,
-  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -60,15 +59,6 @@ import {
   CustomDialogTitle,
   CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
-import {
-  CustomDropdown,
-  DropdownItem,
-} from "@/components/customComponents/customDropdown";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Loader2 } from "lucide-react";
 import { AppointmentsCard } from "./detail/AppointmentsCard";
 import { CustomerSummaryCard } from "./detail/CustomerSummaryCard";
@@ -80,6 +70,10 @@ import {
 } from "./detail/RequestDetailStates";
 import { RequestDetailHeader } from "./detail/RequestDetailHeader";
 import { RequestInfoCard } from "./detail/RequestInfoCard";
+import { PropertyOrPreferencesCard } from "./detail/PropertyOrPreferencesCard";
+import { AIMatchingCard } from "./detail/AIMatchingCard";
+import { RequestActionsCard } from "./detail/RequestActionsCard";
+import { AssignEmployeeDialog } from "./detail/AssignEmployeeDialog";
 import { APPOINTMENT_TYPES } from "./constants";
 
 interface RequestDetailPageProps {
@@ -589,208 +583,17 @@ export function RequestDetailPage({
           <div className="lg:col-span-2 space-y-6">
             <RequestInfoCard action={action} />
 
-            {/* Property/Preferences Info */}
-            {(propertyInfo || customerPreferences) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5" />
-                    {propertyInfo ? "معلومات العقار" : "تفضيلات العميل"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {propertyInfo ? (
-                      <>
-                        {propertyInfo.title && (
-                          <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-gray-500" />
-                            <span className="font-medium">{propertyInfo.title}</span>
-                          </div>
-                        )}
-                        {propertyInfo.type && (
-                          <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-gray-500" />
-                            <span>{propertyInfo.type}</span>
-                          </div>
-                        )}
-                        {propertyInfo.price && (
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-gray-500" />
-                            <span>{propertyInfo.price.toLocaleString("ar-SA")} ر.س</span>
-                          </div>
-                        )}
-                        {propertyInfo.location && (
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-gray-500" />
-                            <span>{propertyInfo.location}</span>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      customerPreferences && (
-                        <>
-                          {customerPreferences.type && (
-                            <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-gray-500" />
-                              <div>
-                                <div className="text-xs text-gray-500">نوع العقار</div>
-                                <div className="font-medium">{customerPreferences.type}</div>
-                              </div>
-                            </div>
-                          )}
-                          {customerPreferences.budget && (
-                            <div className="flex items-center gap-2">
-                              <DollarSign className="h-4 w-4 text-gray-500" />
-                              <div>
-                                <div className="text-xs text-gray-500">الميزانية</div>
-                                <div className="font-medium">{customerPreferences.budget}</div>
-                              </div>
-                            </div>
-                          )}
-                          {customerPreferences.location && (
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-gray-500" />
-                              <div>
-                                <div className="text-xs text-gray-500">المناطق المفضلة</div>
-                                <div className="font-medium">{customerPreferences.location}</div>
-                              </div>
-                            </div>
-                          )}
-                          {customerPreferences.bedrooms && (
-                            <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-gray-500" />
-                              <div>
-                                <div className="text-xs text-gray-500">غرف النوم</div>
-                                <div className="font-medium">{customerPreferences.bedrooms}+</div>
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      )
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            <PropertyOrPreferencesCard
+              propertyInfo={propertyInfo}
+              customerPreferences={customerPreferences}
+            />
 
-            {/* مطابقة الذكاء الاصطناعي - Separate section with full matched property details */}
             {customer && (
-              <Card className="border-violet-200 dark:border-violet-800/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-violet-500" />
-                    مطابقة الذكاء الاصطناعي
-                    {aiMatching.matchCount > 0 && (
-                      <Badge variant="secondary" className="text-violet-600 dark:text-violet-400">
-                        {aiMatching.matchCount} عقار
-                      </Badge>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {aiMatching.canMatch ? (
-                    matchedProperties.length > 0 ? (
-                      <div className="space-y-4">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          عقارات مطابقة لتفضيلات العميل حسب الذكاء الاصطناعي:
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {matchedProperties.map((property) => (
-                            <Card
-                              key={property.id}
-                              className="overflow-hidden hover:shadow-md transition-shadow border-violet-100 dark:border-violet-900/30"
-                            >
-                              {property.propertyImage && (
-                                <div
-                                  className="h-36 bg-cover bg-center"
-                                  style={{
-                                    backgroundImage: `url(${property.propertyImage})`,
-                                  }}
-                                />
-                              )}
-                              <CardContent className="p-4 space-y-3">
-                                <div>
-                                  <h4 className="font-semibold text-base">{property.propertyTitle}</h4>
-                                  {property.propertyLocation && (
-                                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-                                      <MapPin className="h-3.5 w-3.5 shrink-0" />
-                                      {property.propertyLocation}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {property.propertyType && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {property.propertyType}
-                                    </Badge>
-                                  )}
-                                  {property.status && (
-                                    <Badge
-                                      variant={
-                                        property.status === "viewing_scheduled" || property.status === "liked"
-                                          ? "default"
-                                          : "secondary"
-                                      }
-                                      className="text-xs"
-                                    >
-                                      {property.status === "interested"
-                                        ? "مهتم"
-                                        : property.status === "viewing_scheduled"
-                                          ? "معاينة مجدولة"
-                                          : property.status === "viewed"
-                                            ? "تمت المعاينة"
-                                            : property.status === "liked"
-                                              ? "معجب"
-                                              : property.status === "rejected"
-                                                ? "مرفوض"
-                                                : property.status === "offer_made"
-                                                  ? "عرض مقدم"
-                                                  : property.status}
-                                    </Badge>
-                                  )}
-                                </div>
-                                {property.propertyPrice != null && (
-                                  <div className="flex items-center gap-1.5 text-base font-bold text-green-600 dark:text-green-400">
-                                    <DollarSign className="h-4 w-4" />
-                                    {(property.propertyPrice / 1000).toFixed(0)}k ر.س
-                                  </div>
-                                )}
-                                {property.addedAt && (
-                                  <p className="text-xs text-gray-500">
-                                    أضيف:{" "}
-                                    {new Date(property.addedAt).toLocaleDateString("ar-SA", {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    })}
-                                  </p>
-                                )}
-                                <Button variant="outline" size="sm" className="w-full gap-1.5">
-                                  <Eye className="h-3.5 w-3.5" />
-                                  عرض التفاصيل
-                                </Button>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 py-2">
-                        <Sparkles className="h-4 w-4" />
-                        <span>
-                          {aiMatching.matchCount} عقار مطابق — أضف العقارات للعميل لعرض التفاصيل هنا
-                        </span>
-                      </div>
-                    )
-                  ) : (
-                    <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 py-2">
-                      <Sparkles className="h-4 w-4 opacity-70" />
-                      <span>أكمِل تفضيلات العميل لتفعيل المطابقة بالذكاء الاصطناعي</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <AIMatchingCard
+                canMatch={aiMatching.canMatch}
+                matchCount={aiMatching.matchCount}
+                matchedProperties={matchedProperties}
+              />
             )}
 
             {/* Appointments Section */}
@@ -1046,470 +849,64 @@ export function RequestDetailPage({
 
             {/* Action Buttons */}
             {action.status !== "completed" && action.status !== "dismissed" && (
-              <Collapsible open={actionsCardOpen} onOpenChange={setActionsCardOpen}>
-                <Card>
-                  <CollapsibleTrigger asChild>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 cursor-pointer hover:bg-muted/50 transition-colors rounded-t-lg">
-                      <CardTitle className="text-base">إجراءات</CardTitle>
-                      <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform duration-200", actionsCardOpen && "rotate-180")} />
-                    </CardHeader>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                <CardContent className="space-y-3">
-                  <Button
-                    className="w-full gap-2 bg-green-600 hover:bg-green-700"
-                    onClick={handleComplete}
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                    إتمام الطلب
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2"
-                    onClick={() => setShowScheduleForm(!showScheduleForm)}
-                  >
-                    <Calendar className="h-4 w-4" />
-                    جدولة إجراء
-                  </Button>
-
-                  {/* إضافة تذكير - مخفى (للاستعادة أزل false &&) */}
-                  {false && (
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2"
-                    onClick={() => setShowReminderForm(!showReminderForm)}
-                  >
-                    <AlarmClock className="h-4 w-4" />
-                    إضافة تذكير
-                  </Button>
-                  )}
-
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2"
-                    onClick={() => setShowSnoozeForm(!showSnoozeForm)}
-                  >
-                    <Bell className="h-4 w-4" />
-                    تأجيل
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2"
-                    onClick={() => setShowAssignEmployeeDialog(true)}
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    تعيين موظف
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={handleDismiss}
-                  >
-                    <X className="h-4 w-4" />
-                    رفض الطلب
-                  </Button>
-
-                  {/* Snooze Form */}
-                  {showSnoozeForm && (
-                    <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
-                      <Label className="text-sm font-medium">تأجيل حتى:</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          type="date"
-                          value={snoozeDate}
-                          onChange={(e) => setSnoozeDate(e.target.value)}
-                          className="text-sm"
-                        />
-                        <Input
-                          type="time"
-                          value={snoozeTime}
-                          onChange={(e) => setSnoozeTime(e.target.value)}
-                          className="text-sm"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleSnooze}
-                          disabled={!snoozeDate}
-                          className="flex-1"
-                        >
-                          تأكيد
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setShowSnoozeForm(false);
-                            setSnoozeDate("");
-                            setSnoozeTime("10:00");
-                          }}
-                        >
-                          إلغاء
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Schedule Appointment Form */}
-                  {showScheduleForm && (
-                    <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
-                      <div className="space-y-2">
-                        <Label className="text-sm">نوع الإجراء</Label>
-                        <Select
-                          value={aptType}
-                          onValueChange={(v) => setAptType(v as Appointment["type"])}
-                        >
-                          <SelectTrigger className="h-9">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {APPOINTMENT_TYPES.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-2">
-                          <Label className="text-sm">التاريخ</Label>
-                          <Input
-                            type="date"
-                            value={aptDate}
-                            onChange={(e) => setAptDate(e.target.value)}
-                            className="h-9"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-sm">الوقت</Label>
-                          <Input
-                            type="time"
-                            value={aptTime}
-                            onChange={(e) => setAptTime(e.target.value)}
-                            className="h-9"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">ملاحظات</Label>
-                        <Textarea
-                          value={aptNotes}
-                          onChange={(e) => setAptNotes(e.target.value)}
-                          placeholder="ملاحظات اختيارية"
-                          rows={2}
-                          className="text-sm"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleScheduleAppointment}
-                          disabled={!aptDate || !aptTime}
-                          className="flex-1"
-                        >
-                          جدولة
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setShowScheduleForm(false);
-                            setAptType("office_meeting");
-                            setAptDate("");
-                            setAptTime("10:00");
-                            setAptNotes("");
-                          }}
-                        >
-                          إلغاء
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* نموذج إضافة تذكير - مخفى (للاستعادة أزل false &&) */}
-                  {false && showReminderForm && (
-                    <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
-                      <div className="space-y-2">
-                        <Label className="text-sm">عنوان التذكير *</Label>
-                        <Input
-                          value={reminderTitle}
-                          onChange={(e) => setReminderTitle(e.target.value)}
-                          placeholder="مثال: متابعة طلب العقار"
-                          className="h-9"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">الوصف</Label>
-                        <Textarea
-                          value={reminderDescription}
-                          onChange={(e) => setReminderDescription(e.target.value)}
-                          placeholder="وصف اختياري للتذكير"
-                          rows={2}
-                          className="text-sm"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-2">
-                          <Label className="text-sm">التاريخ *</Label>
-                          <Input
-                            type="date"
-                            value={reminderDate}
-                            onChange={(e) => setReminderDate(e.target.value)}
-                            className="h-9"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-sm">الوقت *</Label>
-                          <Input
-                            type="time"
-                            value={reminderTime}
-                            onChange={(e) => setReminderTime(e.target.value)}
-                            className="h-9"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-2">
-                          <Label className="text-sm">الأولوية *</Label>
-                          <Select
-                            value={reminderPriority}
-                            onValueChange={(v) => setReminderPriority(v as "low" | "medium" | "high" | "urgent")}
-                          >
-                            <SelectTrigger className="h-9">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="low">منخفض</SelectItem>
-                              <SelectItem value="medium">متوسط</SelectItem>
-                              <SelectItem value="high">مهم</SelectItem>
-                              <SelectItem value="urgent">عاجل</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-sm">النوع *</Label>
-                          <Select
-                            value={reminderType}
-                            onValueChange={(v) => setReminderType(v as "follow_up" | "payment_due" | "document_required" | "other")}
-                          >
-                            <SelectTrigger className="h-9">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="follow_up">متابعة</SelectItem>
-                              <SelectItem value="payment_due">دفع مستحق</SelectItem>
-                              <SelectItem value="document_required">مستندات مطلوبة</SelectItem>
-                              <SelectItem value="other">أخرى</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">ملاحظات</Label>
-                        <Textarea
-                          value={reminderNotes}
-                          onChange={(e) => setReminderNotes(e.target.value)}
-                          placeholder="ملاحظات اختيارية"
-                          rows={2}
-                          className="text-sm"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleAddReminder}
-                          disabled={!reminderTitle.trim() || !reminderDate || !reminderTime}
-                          className="flex-1"
-                        >
-                          إضافة
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setShowReminderForm(false);
-                            setReminderTitle("");
-                            setReminderDescription("");
-                            setReminderDate("");
-                            setReminderTime("10:00");
-                            setReminderPriority("medium");
-                            setReminderType("follow_up");
-                            setReminderNotes("");
-                          }}
-                        >
-                          إلغاء
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Assign Employee Dialog */}
-                  <CustomDialog open={showAssignEmployeeDialog} onOpenChange={setShowAssignEmployeeDialog} maxWidth="max-w-md">
-                    <CustomDialogContent className="p-3">
-                      <CustomDialogHeader>
-                        <CustomDialogTitle className="flex items-center gap-3">
-                          <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
-                            <UserPlus className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <div className="text-lg font-semibold">تعيين الموظف المسؤول</div>
-                            <div className="text-sm text-muted-foreground font-normal">
-                              اختر الموظف المسؤول عن طلب العقار
-                            </div>
-                          </div>
-                        </CustomDialogTitle>
-                        <CustomDialogClose
-                          onClose={() => {
-                            setShowAssignEmployeeDialog(false);
-                            setSelectedEmployeeId(null);
-                          }}
-                        />
-                      </CustomDialogHeader>
-
-                      <div className="space-y-6">
-                        {/* معلومات طلب العقار */}
-                        <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
-                          <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
-                            <User className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <div className="font-medium">{action.customerName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {action.objectType === 'property_request' && action.sourceId
-                                ? `طلب عقار رقم #${action.sourceId}`
-                                : action.title}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* اختيار الموظف */}
-                        <div className="space-y-3">
-                          <Label className="text-sm font-medium">اختر الموظف:</Label>
-                          {loadingEmployees ? (
-                            <div className="flex items-center justify-center py-8">
-                              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                              <span className="mr-2 text-sm text-muted-foreground">
-                                جاري تحميل الموظفين...
-                              </span>
-                            </div>
-                          ) : (
-                            <div className="space-y-2">
-                              <CustomDropdown
-                                trigger={
-                                  <span className="flex items-center gap-2">
-                                    {selectedEmployeeId ? (
-                                      (() => {
-                                        const selectedEmployee = employees.find(
-                                          (emp) => emp.id === selectedEmployeeId
-                                        );
-                                        if (!selectedEmployee) return "اختر الموظف";
-                                        
-                                        // Get employee name - prioritize name field, then fallback to other fields
-                                        let employeeName = "";
-                                        if (selectedEmployee.name && selectedEmployee.name.trim()) {
-                                          employeeName = selectedEmployee.name.trim();
-                                        } else if ((selectedEmployee as any).first_name || (selectedEmployee as any).last_name) {
-                                          const firstName = (selectedEmployee as any).first_name?.trim() || "";
-                                          const lastName = (selectedEmployee as any).last_name?.trim() || "";
-                                          employeeName = `${firstName} ${lastName}`.trim();
-                                        } else if ((selectedEmployee as any).email && (selectedEmployee as any).email.trim()) {
-                                          employeeName = (selectedEmployee as any).email.trim();
-                                        } else {
-                                          employeeName = `موظف #${selectedEmployee.id}`;
-                                        }
-                                        
-                                        const phone = selectedEmployee.phone 
-                                          ? selectedEmployee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
-                                          : null;
-                                        
-                                        return phone ? `${employeeName} (${phone})` : employeeName;
-                                      })()
-                                    ) : (
-                                      "اختر الموظف"
-                                    )}
-                                  </span>
-                                }
-                                triggerClassName="w-full justify-between"
-                              >
-                                <DropdownItem
-                                  onClick={() => setSelectedEmployeeId(null)}
-                                >
-                                  لا يوجد موظف
-                                </DropdownItem>
-                                {employees.map((employee) => {
-                                  // Get employee name - prioritize name field, then fallback to other fields
-                                  let employeeName = "";
-                                  if (employee.name && employee.name.trim()) {
-                                    employeeName = employee.name.trim();
-                                  } else if ((employee as any).first_name || (employee as any).last_name) {
-                                    const firstName = (employee as any).first_name?.trim() || "";
-                                    const lastName = (employee as any).last_name?.trim() || "";
-                                    employeeName = `${firstName} ${lastName}`.trim();
-                                  } else if ((employee as any).email && (employee as any).email.trim()) {
-                                    employeeName = (employee as any).email.trim();
-                                  } else {
-                                    employeeName = `موظف #${employee.id}`;
-                                  }
-                                  
-                                  const phone = employee.phone 
-                                    ? employee.phone.replace(/^\+20/, "0").replace(/^\+966/, "0").replace(/^\+/, "")
-                                    : null;
-
-                                  return (
-                                    <DropdownItem
-                                      key={employee.id}
-                                      onClick={() => setSelectedEmployeeId(employee.id)}
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <span>{phone ? `${employeeName} (${phone})` : employeeName}</span>
-                                      </div>
-                                    </DropdownItem>
-                                  );
-                                })}
-                              </CustomDropdown>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* أزرار الحفظ والإلغاء */}
-                      <div className="flex justify-end gap-2 pt-4 border-t">
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setShowAssignEmployeeDialog(false);
-                            setSelectedEmployeeId(null);
-                          }}
-                          disabled={savingEmployee}
-                        >
-                          إلغاء
-                        </Button>
-                        <Button
-                          onClick={handleAssignEmployee}
-                          disabled={savingEmployee || loadingEmployees}
-                          className="min-w-[100px]"
-                        >
-                          {savingEmployee ? (
-                            <>
-                              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                              جاري الحفظ...
-                            </>
-                          ) : (
-                            "حفظ"
-                          )}
-                        </Button>
-                      </div>
-                    </CustomDialogContent>
-                  </CustomDialog>
-                </CardContent>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
+              <RequestActionsCard
+                open={actionsCardOpen}
+                onOpenChange={setActionsCardOpen}
+                onComplete={handleComplete}
+                onDismiss={handleDismiss}
+                onAssignClick={() => setShowAssignEmployeeDialog(true)}
+                onSnoozeFormToggle={() => setShowSnoozeForm((v) => !v)}
+                onScheduleFormToggle={() => setShowScheduleForm((v) => !v)}
+                showSnoozeForm={showSnoozeForm}
+                snoozeDate={snoozeDate}
+                snoozeTime={snoozeTime}
+                onSnoozeDateChange={setSnoozeDate}
+                onSnoozeTimeChange={setSnoozeTime}
+                onSnoozeSubmit={handleSnooze}
+                onSnoozeCancel={() => {
+                  setShowSnoozeForm(false);
+                  setSnoozeDate("");
+                  setSnoozeTime("10:00");
+                }}
+                showScheduleForm={showScheduleForm}
+                aptType={aptType}
+                aptDate={aptDate}
+                aptTime={aptTime}
+                aptNotes={aptNotes}
+                onAptTypeChange={setAptType}
+                onAptDateChange={setAptDate}
+                onAptTimeChange={setAptTime}
+                onAptNotesChange={setAptNotes}
+                onScheduleSubmit={handleScheduleAppointment}
+                onScheduleCancel={() => {
+                  setShowScheduleForm(false);
+                  setAptType("office_meeting");
+                  setAptDate("");
+                  setAptTime("10:00");
+                  setAptNotes("");
+                }}
+              >
+                <AssignEmployeeDialog
+                  open={showAssignEmployeeDialog}
+                  onOpenChange={setShowAssignEmployeeDialog}
+                  action={{
+                    customerName: action.customerName,
+                    title: action.title,
+                    objectType: action.objectType,
+                    sourceId: action.sourceId,
+                  }}
+                  employees={employees}
+                  selectedEmployeeId={selectedEmployeeId}
+                  onSelectEmployee={setSelectedEmployeeId}
+                  onAssign={handleAssignEmployee}
+                  onClose={() => {
+                    setShowAssignEmployeeDialog(false);
+                    setSelectedEmployeeId(null);
+                  }}
+                  loadingEmployees={loadingEmployees}
+                  savingEmployee={savingEmployee}
+                />
+              </RequestActionsCard>
             )}
 
             {/* Property Request Status Dialog */}
