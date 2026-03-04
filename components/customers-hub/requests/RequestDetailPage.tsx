@@ -631,12 +631,19 @@ export function RequestDetailPage({
             </div>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <Badge className={statusConfig[action.status].color}>
                 {statusConfig[action.status].label}
               </Badge>
               <Badge className={priorityConfig[action.priority].color}>
                 {priorityConfig[action.priority].label}
+              </Badge>
+              <Badge variant="outline" className="text-xs font-normal text-gray-700 dark:text-gray-200">
+                {new Date(action.createdAt).toLocaleDateString("ar-SA", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
               </Badge>
             </div>
             <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs text-gray-500">
