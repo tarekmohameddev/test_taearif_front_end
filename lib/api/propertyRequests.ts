@@ -86,7 +86,7 @@ export interface DetachPropertyResponse {
 
 /**
  * Attach property IDs to a property request (append).
- * POST /api/v1/property-requests/{requestId}/properties
+ * PUT /api/v1/property-requests/{requestId}/properties
  */
 export async function attachPropertiesToRequest(
   requestId: number,

@@ -607,6 +607,27 @@ export function RequestDetailPage({
     propertyRequestNumericId != null &&
     !Number.isNaN(propertyRequestNumericId);
 
+  // Normalize property_ids: API may return array or string like "[1747]"
+  const requestPropertyIds = ((): number[] => {
+    if (!showRequestPropertiesCard) return [];
+    const raw =
+      (action as { propertyIds?: number[] }).propertyIds ??
+      (action.metadata?.propertyIds as number[] | string | undefined) ??
+      (action as { property_ids?: number[] | string }).property_ids;
+    if (Array.isArray(raw)) return raw.filter((id) => typeof id === "number");
+    if (typeof raw === "string") {
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed)
+          ? parsed.filter((id: unknown) => typeof id === "number")
+          : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  })();
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900" dir="rtl">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -624,11 +645,7 @@ export function RequestDetailPage({
             {showRequestPropertiesCard ? (
               <RequestPropertiesCard
                 propertyRequestId={propertyRequestNumericId!}
-                propertyIds={
-                  (action as { propertyIds?: number[] }).propertyIds ??
-                  (action.metadata?.propertyIds as number[] | undefined) ??
-                  []
-                }
+                propertyIds={requestPropertyIds}
                 onRefetch={onRefetch}
               />
             ) : (

@@ -307,11 +307,11 @@ export function RequestPropertiesCard({
               لم يتم ربط أي عقارات بهذا الطلب. استخدم زر (+) لإضافة عقار.
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="flex flex-col gap-3">
               {linkedProperties.map((prop) => (
                 <Card
                   key={prop.id}
-                  className="overflow-hidden hover:shadow-md transition-shadow"
+                  className="overflow-hidden hover:shadow-md transition-shadow w-full"
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start justify-between gap-2 mb-2">
