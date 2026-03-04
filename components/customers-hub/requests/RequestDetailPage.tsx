@@ -914,24 +914,31 @@ export function RequestDetailPage({
               <CustomDialog
                 open={showStatusDialog}
                 onOpenChange={(open) => {
+                  if (open && !userData?.token) {
+                    toast.error("يجب تسجيل الدخول أولاً");
+                    return;
+                  }
                   setShowStatusDialog(open);
                   if (open) {
-                    // Fetch available statuses when dialog opens
-                    if (!userData?.token) {
-                      toast.error("يجب تسجيل الدخول أولاً");
-                      return;
-                    }
                     setLoadingStatuses(true);
+                    setStatusOptions([]);
                     axiosInstance
                       .get<{
-                        status: string;
-                        data: { status?: { id: number; name_ar: string; name_en: string }[] };
+                        status?: string;
+                        data?: { status?: { id: number; name_ar: string; name_en: string }[] };
                       }>("/v1/property-requests/filters")
                       .then((response) => {
-                        const statuses = response.data.data.status || [];
+                        const raw = response?.data;
+                        const statuses = Array.isArray(raw?.data?.status)
+                          ? raw.data.status
+                          : Array.isArray((raw as any)?.status)
+                            ? (raw as any).status
+                            : [];
                         setStatusOptions(statuses);
                         if (statuses.length > 0) {
                           setSelectedStatusId(statuses[0].id);
+                        } else {
+                          setSelectedStatusId(null);
                         }
                       })
                       .catch((error) => {
@@ -989,7 +996,7 @@ export function RequestDetailPage({
                         <Select
                           value={selectedStatusId?.toString() || ""}
                           onValueChange={(value) => setSelectedStatusId(Number(value))}
-                          disabled={savingStatus || statusOptions.length === 0}
+                          disabled={savingStatus}
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="اختر الحالة" />
