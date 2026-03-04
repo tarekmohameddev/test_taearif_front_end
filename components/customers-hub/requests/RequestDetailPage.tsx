@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
+import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import {
   Clock,
   Calendar,
   User,
+  Tag,
   Building2,
   MapPin,
   DollarSign,
@@ -240,6 +242,13 @@ export function RequestDetailPage({
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
   const [actionsCardOpen, setActionsCardOpen] = useState(false);
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [statusOptions, setStatusOptions] = useState<
+    { id: number; name_ar: string; name_en: string }[]
+  >([]);
+  const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
+  const [loadingStatuses, setLoadingStatuses] = useState(false);
+  const [savingStatus, setSavingStatus] = useState(false);
 
   // Fetch employees when opening assign dialog
   useEffect(() => {
@@ -631,9 +640,21 @@ export function RequestDetailPage({
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <Badge className={statusConfig[action.status].color}>
-              {statusConfig[action.status].label}
-            </Badge>
+            <button
+              type="button"
+              onClick={() => {
+                if (action.objectType === "property_request" && (action as any).property_request_id) {
+                  setShowStatusDialog(true);
+                } else {
+                  toast.error("يمكن تغيير حالة طلب العقار فقط لطلبات العقار.");
+                }
+              }}
+              className="focus:outline-none"
+            >
+              <Badge className={`${statusConfig[action.status].color} cursor-pointer hover:opacity-90 transition-opacity`}>
+                {statusConfig[action.status].label}
+              </Badge>
+            </button>
             <Badge className={priorityConfig[action.priority].color}>
               {priorityConfig[action.priority].label}
             </Badge>
@@ -1807,6 +1828,168 @@ export function RequestDetailPage({
                   </CollapsibleContent>
                 </Card>
               </Collapsible>
+            )}
+
+            {/* Property Request Status Dialog */}
+            {action.objectType === "property_request" && (action as any).property_request_id && (
+              <CustomDialog
+                open={showStatusDialog}
+                onOpenChange={(open) => {
+                  setShowStatusDialog(open);
+                  if (open) {
+                    // Fetch available statuses when dialog opens
+                    if (!userData?.token) {
+                      toast.error("يجب تسجيل الدخول أولاً");
+                      return;
+                    }
+                    setLoadingStatuses(true);
+                    axiosInstance
+                      .get<{
+                        status: string;
+                        data: { status?: { id: number; name_ar: string; name_en: string }[] };
+                      }>("/v1/property-requests/filters")
+                      .then((response) => {
+                        const statuses = response.data.data.status || [];
+                        setStatusOptions(statuses);
+                        if (statuses.length > 0) {
+                          setSelectedStatusId(statuses[0].id);
+                        }
+                      })
+                      .catch((error) => {
+                        console.error("Error fetching property request statuses:", error);
+                        toast.error("حدث خطأ أثناء تحميل حالات طلب العقار");
+                      })
+                      .finally(() => {
+                        setLoadingStatuses(false);
+                      });
+                  }
+                }}
+                maxWidth="max-w-md"
+              >
+                <CustomDialogContent className="p-3">
+                  <CustomDialogHeader>
+                    <CustomDialogTitle className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                        <Tag className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="text-lg font-semibold">تغيير حالة طلب العقار</div>
+                        <div className="text-sm text-muted-foreground font-normal">
+                          اختر الحالة الجديدة لطلب العقار رقم #{(action as any).property_request_id}
+                        </div>
+                      </div>
+                    </CustomDialogTitle>
+                    <CustomDialogClose
+                      onClose={() => {
+                        setShowStatusDialog(false);
+                        setSelectedStatusId(null);
+                      }}
+                    />
+                  </CustomDialogHeader>
+
+                  <div className="space-y-6 p-4">
+                    {/* معلومات أساسية عن الطلب */}
+                    <div className="p-3 bg-muted/30 rounded-lg space-y-1">
+                      <div className="text-sm font-medium">{action.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        العميل: {action.customerName} — طلب عقار رقم #{(action as any).property_request_id}
+                      </div>
+                    </div>
+
+                    {/* اختيار الحالة */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">اختر الحالة:</Label>
+                      {loadingStatuses ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          <span className="mr-2 text-sm text-muted-foreground">
+                            جاري تحميل الحالات...
+                          </span>
+                        </div>
+                      ) : (
+                        <Select
+                          value={selectedStatusId?.toString() || ""}
+                          onValueChange={(value) => setSelectedStatusId(Number(value))}
+                          disabled={savingStatus || statusOptions.length === 0}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="اختر الحالة" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {statusOptions.map((status) => (
+                              <SelectItem key={status.id} value={status.id.toString()}>
+                                {status.name_ar}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 px-4 pb-4 border-t">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowStatusDialog(false);
+                        setSelectedStatusId(null);
+                      }}
+                      disabled={savingStatus}
+                    >
+                      إلغاء
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        if (!selectedStatusId) return;
+                        if (!userData?.token) {
+                          toast.error("يجب تسجيل الدخول أولاً");
+                          return;
+                        }
+                        const propertyRequestId = (action as any).property_request_id;
+                        if (!propertyRequestId) {
+                          toast.error("لم يتم العثور على معرف طلب العقار");
+                          return;
+                        }
+                        setSavingStatus(true);
+                        try {
+                          await axiosInstance.put(`/v1/property-requests/${propertyRequestId}/status`, {
+                            status_id: selectedStatusId,
+                          });
+                          toast.success("تم تحديث حالة طلب العقار بنجاح");
+                          setShowStatusDialog(false);
+                          if (onRefetch) {
+                            await onRefetch();
+                          }
+                        } catch (error: any) {
+                          console.error("Error updating property request status:", error);
+                          toast.error(
+                            error?.response?.data?.message ||
+                              "حدث خطأ أثناء تحديث حالة طلب العقار"
+                          );
+                        } finally {
+                          setSavingStatus(false);
+                        }
+                      }}
+                      disabled={
+                        savingStatus ||
+                        loadingStatuses ||
+                        !selectedStatusId ||
+                        statusOptions.length === 0
+                      }
+                      className="min-w-[120px]"
+                    >
+                      {savingStatus ? (
+                        <>
+                          <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                          جاري الحفظ...
+                        </>
+                      ) : (
+                        "حفظ"
+                      )}
+                    </Button>
+                  </div>
+                </CustomDialogContent>
+              </CustomDialog>
             )}
 
             {/* Completed/Dismissed Message */}
