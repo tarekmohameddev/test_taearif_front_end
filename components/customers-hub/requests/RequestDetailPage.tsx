@@ -630,48 +630,42 @@ export function RequestDetailPage({
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <Badge className={statusConfig[action.status].color}>
-                {statusConfig[action.status].label}
-              </Badge>
-              <Badge className={priorityConfig[action.priority].color}>
-                {priorityConfig[action.priority].label}
-              </Badge>
-              <Badge variant="outline" className="text-xs font-normal text-gray-700 dark:text-gray-200">
-                {new Date(action.createdAt).toLocaleDateString("ar-SA", {
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Badge className={statusConfig[action.status].color}>
+              {statusConfig[action.status].label}
+            </Badge>
+            <Badge className={priorityConfig[action.priority].color}>
+              {priorityConfig[action.priority].label}
+            </Badge>
+            <Badge variant="outline" className="text-xs font-normal text-gray-700 dark:text-gray-200">
+              {new Date(action.createdAt).toLocaleDateString("ar-SA", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </Badge>
+            {action.dueDate && (
+              <span className={cn("flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400", isOverdue && "text-red-600")}>
+                <Clock className="h-3 w-3" />
+                {new Date(action.dueDate).toLocaleDateString("ar-SA", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
+                })}{" "}
+                {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
-              </Badge>
-            </div>
-            <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs text-gray-500">
-              {action.dueDate && (
-                <span className={cn("flex items-center gap-1", isOverdue && "text-red-600")}>
-                  <Clock className="h-3 w-3" />
-                  {new Date(action.dueDate).toLocaleDateString("ar-SA", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}{" "}
-                  {new Date(action.dueDate).toLocaleTimeString("ar-SA", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  {isOverdue && (
-                    <Badge variant="destructive" className="ml-1 text-[10px]">
-                      متأخر
-                    </Badge>
-                  )}
-                </span>
-              )}
-              {action.source && (
-                <span className="flex items-center gap-1">
-                  <SourceBadge source={action.source} />
-                </span>
-              )}
-            </div>
+                {isOverdue && (
+                  <Badge variant="destructive" className="mr-1 text-[10px]">
+                    متأخر
+                  </Badge>
+                )}
+              </span>
+            )}
+            {action.source && (
+              <SourceBadge source={action.source} />
+            )}
           </div>
         </div>
 
