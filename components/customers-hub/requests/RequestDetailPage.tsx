@@ -10,13 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowRight,
@@ -59,6 +52,10 @@ import {
   CustomDialogTitle,
   CustomDialogClose,
 } from "@/components/customComponents/CustomDialog";
+import {
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import { Loader2 } from "lucide-react";
 import { AppointmentsCard } from "./detail/AppointmentsCard";
 import { CustomerSummaryCard } from "./detail/CustomerSummaryCard";
@@ -250,6 +247,33 @@ export function RequestDetailPage({
       setSelectedEmployeeId(null);
     }
   }, [showAssignEmployeeDialog, action?.assignedTo]);
+
+  // Fetch property request statuses as soon as page loads (for status change dialog)
+  useEffect(() => {
+    if (!userData?.token || !requestId) return;
+    setLoadingStatuses(true);
+    axiosInstance
+      .get<{
+        status?: string;
+        data?: { status?: { id: number; name_ar: string; name_en: string }[] };
+      }>("/v1/property-requests/filters")
+      .then((response) => {
+        const raw = response?.data;
+        const statuses = Array.isArray(raw?.data?.status)
+          ? raw.data.status
+          : Array.isArray((raw as any)?.status)
+            ? (raw as any).status
+            : [];
+        setStatusOptions(statuses);
+      })
+      .catch((error) => {
+        console.error("Error fetching property request statuses:", error);
+        toast.error("حدث خطأ أثناء تحميل حالات طلب العقار");
+      })
+      .finally(() => {
+        setLoadingStatuses(false);
+      });
+  }, [userData?.token, requestId]);
 
   if (propLoading && !action) {
     return <RequestDetailLoading />;
@@ -919,35 +943,11 @@ export function RequestDetailPage({
                     return;
                   }
                   setShowStatusDialog(open);
-                  if (open) {
-                    setLoadingStatuses(true);
-                    setStatusOptions([]);
-                    axiosInstance
-                      .get<{
-                        status?: string;
-                        data?: { status?: { id: number; name_ar: string; name_en: string }[] };
-                      }>("/v1/property-requests/filters")
-                      .then((response) => {
-                        const raw = response?.data;
-                        const statuses = Array.isArray(raw?.data?.status)
-                          ? raw.data.status
-                          : Array.isArray((raw as any)?.status)
-                            ? (raw as any).status
-                            : [];
-                        setStatusOptions(statuses);
-                        if (statuses.length > 0) {
-                          setSelectedStatusId(statuses[0].id);
-                        } else {
-                          setSelectedStatusId(null);
-                        }
-                      })
-                      .catch((error) => {
-                        console.error("Error fetching property request statuses:", error);
-                        toast.error("حدث خطأ أثناء تحميل حالات طلب العقار");
-                      })
-                      .finally(() => {
-                        setLoadingStatuses(false);
-                      });
+                  if (open && statusOptions.length > 0 && selectedStatusId === null) {
+                    setSelectedStatusId(statusOptions[0].id);
+                  }
+                  if (!open) {
+                    setSelectedStatusId(null);
                   }
                 }}
                 maxWidth="max-w-md"
@@ -993,22 +993,30 @@ export function RequestDetailPage({
                           </span>
                         </div>
                       ) : (
-                        <Select
-                          value={selectedStatusId?.toString() || ""}
-                          onValueChange={(value) => setSelectedStatusId(Number(value))}
-                          disabled={savingStatus}
+                        <CustomDropdown
+                          fullWidth
+                          contentZIndex={10003}
+                          trigger={
+                            <span className="flex items-center gap-2">
+                              {selectedStatusId != null
+                                ? statusOptions.find((s) => s.id === selectedStatusId)?.name_ar ?? "اختر الحالة"
+                                : "اختر الحالة"}
+                            </span>
+                          }
+                          triggerClassName={cn(
+                            "w-full justify-between",
+                            savingStatus && "pointer-events-none opacity-60"
+                          )}
                         >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="اختر الحالة" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statusOptions.map((status) => (
-                              <SelectItem key={status.id} value={status.id.toString()}>
-                                {status.name_ar}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          {statusOptions.map((status) => (
+                            <DropdownItem
+                              key={status.id}
+                              onClick={() => setSelectedStatusId(status.id)}
+                            >
+                              {status.name_ar}
+                            </DropdownItem>
+                          ))}
+                        </CustomDropdown>
                       )}
                     </div>
                   </div>
