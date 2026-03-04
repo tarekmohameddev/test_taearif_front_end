@@ -333,6 +333,10 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     // Use mergedData if it has fieldsLayout, otherwise use defaultData
     const baseData = mergedData.fieldsLayout ? mergedData : defaultData;
 
+    const defaultApiEndpoint = process.env.NEXT_PUBLIC_Backend_URLWithOutApi
+      ? `${process.env.NEXT_PUBLIC_Backend_URLWithOutApi.replace(/\/+$/, "")}/api/v1/property-requests/public`
+      : defaultData.submitButton.apiEndpoint;
+
     const {
       cards = defaultData.cards,
       theme = defaultData.theme,
@@ -343,7 +347,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       colors = defaultData.colors,
       settings = defaultData.settings,
       layout = defaultData.layout,
-      apiEndpoint = defaultData.submitButton.apiEndpoint,
+      apiEndpoint = defaultApiEndpoint,
       className = "",
       visible = defaultData.visible,
     } = baseData;
