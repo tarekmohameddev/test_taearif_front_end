@@ -20,6 +20,7 @@ export interface RequestsListFilters {
   property_types?: string[]; // Sector: Residential, Commercial, Industrial, Agricultural (property requests only)
   cities?: string[]; // Changed from "city" to "cities"
   states?: string[]; // Changed from "state" to "states"
+  stages?: number[]; // Pipeline stage IDs (property_request_statuses.id) – filter list by stage
   budget_min?: number; // Changed from "budgetMin" to "budget_min"
   budget_max?: number; // Changed from "budgetMax" to "budget_max"
   date_from?: string; // New field (ISO date string)

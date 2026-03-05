@@ -155,6 +155,8 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     setDueDateFilter,
     setSelectedCities,
     setSelectedStates,
+    selectedStageIds,
+    setSelectedStageIds,
     setBudgetMin,
     setBudgetMax,
     setSelectedPropertyTypes,
@@ -256,9 +258,26 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     setDueDateFilter("all");
     setSelectedCities([]);
     setSelectedStates([]);
+    setSelectedStageIds([]);
     setBudgetMin("");
     setBudgetMax("");
     setSelectedPropertyTypes([]);
+  };
+
+  const handleStageDistributionClick = (stageId: string) => {
+    const stage = storeStages?.find((s) => s.stage_id === stageId);
+    if (!stage) return;
+    const numericId = stage.id;
+    if (selectedStageIds.includes(numericId)) {
+      setSelectedStageIds([]);
+    } else {
+      setSelectedStageIds([numericId]);
+    }
+  };
+
+  const isStageSelected = (stageId: string) => {
+    const stage = storeStages?.find((s) => s.stage_id === stageId);
+    return stage ? selectedStageIds.includes(stage.id) : false;
   };
 
   const hasActiveFilters =
@@ -271,6 +290,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     filterHooks.dueDateFilter !== "all" ||
     filterHooks.selectedCities.length > 0 ||
     filterHooks.selectedStates.length > 0 ||
+    filterHooks.selectedStageIds.length > 0 ||
     filterHooks.budgetMin !== "" ||
     filterHooks.budgetMax !== "" ||
     filterHooks.selectedPropertyTypes.length > 0;
@@ -285,6 +305,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     (filterHooks.dueDateFilter !== "all" ? 1 : 0) +
     (filterHooks.selectedCities.length > 0 ? 1 : 0) +
     (filterHooks.selectedStates.length > 0 ? 1 : 0) +
+    (filterHooks.selectedStageIds.length > 0 ? 1 : 0) +
     (filterHooks.budgetMin !== "" || filterHooks.budgetMax !== "" ? 1 : 0) +
     (filterHooks.selectedPropertyTypes.length > 0 ? 1 : 0);
 
@@ -369,5 +390,8 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     hasActiveFilters,
     activeFiltersCount,
     newFilters,
+    selectedStageIds,
+    handleStageDistributionClick,
+    isStageSelected,
   };
 }

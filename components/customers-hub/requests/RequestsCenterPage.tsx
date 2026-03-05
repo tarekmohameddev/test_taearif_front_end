@@ -42,6 +42,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
         <StageDistributionCard
           apiStages={apiStages}
           apiLoading={apiLoading}
+          onStageClick={ctx.handleStageDistributionClick}
+          isStageSelected={ctx.isStageSelected}
         />
         <RequestsCenterFilters
           searchQuery={ctx.searchQuery}

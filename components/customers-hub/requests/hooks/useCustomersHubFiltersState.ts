@@ -19,6 +19,7 @@ export const useCustomersHubFiltersState = () => {
   const [dueDateFilter, setDueDateFilter] = useState<"all" | "overdue" | "today" | "week" | "no_date">("all");
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [selectedStageIds, setSelectedStageIds] = useState<number[]>([]);
   const [budgetMin, setBudgetMin] = useState<string>("");
   const [budgetMax, setBudgetMax] = useState<string>("");
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
@@ -136,6 +137,11 @@ export const useCustomersHubFiltersState = () => {
       filters.states = selectedStates;
     }
 
+    // Pipeline stages filter (property_request_statuses.id)
+    if (selectedStageIds.length > 0) {
+      filters.stages = selectedStageIds;
+    }
+
     // Budget filters (changed from budgetMin/budgetMax to budget_min/budget_max)
     if (budgetMin) {
       filters.budget_min = Number(budgetMin);
@@ -175,6 +181,7 @@ export const useCustomersHubFiltersState = () => {
     dueDateFilter,
     selectedCities,
     selectedStates,
+    selectedStageIds,
     budgetMin,
     budgetMax,
     selectedPropertyTypes,
@@ -193,6 +200,7 @@ export const useCustomersHubFiltersState = () => {
     setDueDateFilter("all");
     setSelectedCities([]);
     setSelectedStates([]);
+    setSelectedStageIds([]);
     setBudgetMin("");
     setBudgetMax("");
     setSelectedPropertyTypes([]);
@@ -224,6 +232,8 @@ export const useCustomersHubFiltersState = () => {
     setSelectedCities,
     selectedStates,
     setSelectedStates,
+    selectedStageIds,
+    setSelectedStageIds,
     budgetMin,
     setBudgetMin,
     budgetMax,
