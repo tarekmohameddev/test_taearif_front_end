@@ -4,7 +4,7 @@ import type { CustomerAction, CustomerActionType, CustomerSource, Priority } fro
 const BASE_URL = "/v2/customers-hub/requests";
 
 // Flat structure matching new API format
-export type ObjectType = "inquiry" | "property_request" | "property_interest" | "reminder" | "appointment" | "customer_reminder";
+export type ObjectType = "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder";
 
 export interface RequestsListFilters {
   tab?: "inbox" | "followups" | "all" | "completed";
@@ -328,15 +328,16 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       offset: legacyParams.pagination ? (legacyParams.pagination.page - 1) * legacyParams.pagination.limit : 0,
     };
     
-    // ALWAYS ensure objectTypes includes inquiry, property_request and property_interest
+    // ALWAYS ensure objectTypes includes inquiry and property_request
     if (!requestBody.objectTypes || requestBody.objectTypes.length === 0) {
-      requestBody.objectTypes = ["inquiry", "property_request", "property_interest"];
+      requestBody.objectTypes = ["inquiry", "property_request"];
     } else {
-      const required = ["inquiry", "property_request", "property_interest"] as const;
-      for (const t of required) {
-        if (!requestBody.objectTypes!.includes(t)) {
-          requestBody.objectTypes = [...requestBody.objectTypes!, t];
-        }
+      // Ensure both inquiry and property_request are included
+      if (!requestBody.objectTypes.includes("inquiry")) {
+        requestBody.objectTypes = ["inquiry", ...requestBody.objectTypes];
+      }
+      if (!requestBody.objectTypes.includes("property_request")) {
+        requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
       }
     }
     
@@ -364,15 +365,16 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       requestBody.sort_dir = "desc";
     }
     
-    // ALWAYS ensure objectTypes includes inquiry, property_request and property_interest
+    // ALWAYS ensure objectTypes includes inquiry and property_request
     if (!requestBody.objectTypes || requestBody.objectTypes.length === 0) {
-      requestBody.objectTypes = ["inquiry", "property_request", "property_interest"];
+      requestBody.objectTypes = ["inquiry", "property_request"];
     } else {
-      const required = ["inquiry", "property_request", "property_interest"] as const;
-      for (const t of required) {
-        if (!requestBody.objectTypes!.includes(t)) {
-          requestBody.objectTypes = [...requestBody.objectTypes!, t];
-        }
+      // Ensure both inquiry and property_request are included
+      if (!requestBody.objectTypes.includes("inquiry")) {
+        requestBody.objectTypes = ["inquiry", ...requestBody.objectTypes];
+      }
+      if (!requestBody.objectTypes.includes("property_request")) {
+        requestBody.objectTypes = [...requestBody.objectTypes, "property_request"];
       }
     }
     

@@ -24,7 +24,7 @@ export type CustomerActionType =
 
 export type CustomerActionStatus = 'pending' | 'in_progress' | 'completed' | 'dismissed' | 'snoozed';
 
-export type ObjectType = "inquiry" | "property_request" | "property_interest" | "reminder" | "appointment" | "customer_reminder";
+export type ObjectType = "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder";
 
 export interface CustomerAction {
   id: string;
