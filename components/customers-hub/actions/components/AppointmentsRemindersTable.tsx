@@ -39,7 +39,7 @@ export function AppointmentsRemindersTable({
   return (
     <div
       className={cn(
-        "mt-3 p-2.5 rounded-xl max-w-[250px]",
+        "mt-3 p-2.5 rounded-xl w-full max-w-[350px]",
         "bg-white/85 dark:bg-gray-800/90 border border-gray-200/90 dark:border-gray-600/90",
         "border-r-2 border-r-slate-300/80 dark:border-r-slate-600/80",
         "shadow-sm",
