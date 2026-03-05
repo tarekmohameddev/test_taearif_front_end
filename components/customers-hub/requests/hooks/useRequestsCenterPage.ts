@@ -150,7 +150,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     setSelectedSources,
     selectedObjectTypes,
     setSelectedPriorities,
-    setSelectedTypes,
+    setSelectedAppointmentTypes,
     setSelectedAssignees,
     setDueDateFilter,
     setSelectedCities,
@@ -233,7 +233,6 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     appliedSearchQuery,
     selectedSources,
     selectedPriorities: filterHooks.selectedPriorities,
-    selectedTypes: filterHooks.selectedTypes,
     selectedAssignees: filterHooks.selectedAssignees,
     dueDateFilter: filterHooks.dueDateFilter,
     selectedCities: filterHooks.selectedCities,
@@ -253,7 +252,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     setSearchQuery("");
     setSelectedSources([]);
     setSelectedPriorities([]);
-    setSelectedTypes([]);
+    setSelectedAppointmentTypes([]);
     setSelectedAssignees([]);
     setDueDateFilter("all");
     setSelectedCities([]);
@@ -285,7 +284,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     selectedSources.length > 0 ||
     selectedObjectTypes.length > 0 ||
     filterHooks.selectedPriorities.length > 0 ||
-    filterHooks.selectedTypes.length > 0 ||
+    filterHooks.selectedAppointmentTypes.length > 0 ||
     filterHooks.selectedAssignees.length > 0 ||
     filterHooks.dueDateFilter !== "all" ||
     filterHooks.selectedCities.length > 0 ||
@@ -300,7 +299,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     (selectedSources.length > 0 ? 1 : 0) +
     (selectedObjectTypes.length > 0 ? 1 : 0) +
     (filterHooks.selectedPriorities.length > 0 ? 1 : 0) +
-    (filterHooks.selectedTypes.length > 0 ? 1 : 0) +
+    (filterHooks.selectedAppointmentTypes.length > 0 ? 1 : 0) +
     (filterHooks.selectedAssignees.length > 0 ? 1 : 0) +
     (filterHooks.dueDateFilter !== "all" ? 1 : 0) +
     (filterHooks.selectedCities.length > 0 ? 1 : 0) +
@@ -342,11 +341,14 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     clearFilters,
   });
 
+  const appointmentTypes = props?.filterOptions?.data?.appointmentTypes;
+
   return {
     ...filterHooks,
     ...data,
     ...handlers,
     props,
+    appointmentTypes,
     apiStages,
     apiLoading,
     apiError,

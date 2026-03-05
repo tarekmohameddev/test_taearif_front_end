@@ -60,8 +60,9 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           setSelectedSources={ctx.setSelectedSources}
           selectedPriorities={ctx.selectedPriorities}
           setSelectedPriorities={ctx.setSelectedPriorities}
-          selectedTypes={ctx.selectedTypes}
-          setSelectedTypes={ctx.setSelectedTypes}
+          selectedAppointmentTypes={ctx.selectedAppointmentTypes}
+          setSelectedAppointmentTypes={ctx.setSelectedAppointmentTypes}
+          appointmentTypes={ctx.appointmentTypes}
           selectedAssignees={ctx.selectedAssignees}
           setSelectedAssignees={ctx.setSelectedAssignees}
           dueDateFilter={ctx.dueDateFilter}

@@ -221,16 +221,16 @@ export function IncomingActionsCardCompact({
             ) : (
               <span className="font-medium text-sm truncate max-w-[150px]">{action.customerName}</span>
             )}
-            {resolvedCustomer?.phone && (
+            {(action.customerPhone || resolvedCustomer?.phone) && (
               <a
-                href={`tel:${resolvedCustomer.phone}`}
+                href={`tel:${action.customerPhone || resolvedCustomer?.phone}`}
                 className="text-xs text-gray-600 hover:text-blue-600 flex items-center gap-1 dir-ltr"
                 dir="ltr"
                 data-interactive="true"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Phone className="h-3.5 w-3.5 shrink-0" />
-                {resolvedCustomer.phone}
+                {action.customerPhone || resolvedCustomer?.phone}
               </a>
             )}
             <SourceBadge source={action.source} className="text-xs" />

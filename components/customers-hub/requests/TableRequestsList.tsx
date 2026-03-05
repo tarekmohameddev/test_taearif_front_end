@@ -559,14 +559,23 @@ export function TableRequestsList({
 
                       {/* Customer Name & Phone */}
                       <TableCell>
-                        <div>
-                          <div className="font-semibold text-gray-900 dark:text-white">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className="font-semibold text-gray-900 dark:text-white">
                             {action.customerName}
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                            <Phone className="h-3 w-3" />
-                            {action.customerPhone || customer?.phone || "-"}
-                          </div>
+                          </span>
+                          {(action.customerPhone || customer?.phone) && (
+                            <span className="flex items-center gap-1 text-xs text-gray-500">
+                              <Phone className="h-3 w-3 shrink-0" />
+                              <a
+                                href={`tel:${action.customerPhone || customer?.phone}`}
+                                className="hover:text-blue-600 dir-ltr"
+                                dir="ltr"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {action.customerPhone || customer?.phone}
+                              </a>
+                            </span>
+                          )}
                         </div>
                       </TableCell>
 

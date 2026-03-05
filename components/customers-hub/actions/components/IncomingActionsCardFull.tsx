@@ -132,6 +132,18 @@ export function IncomingActionsCardFull({
               ) : (
                 <span className="font-semibold text-lg">{action.customerName}</span>
               )}
+              {(action.customerPhone || resolvedCustomer?.phone) && (
+                <a
+                  href={`tel:${action.customerPhone || resolvedCustomer?.phone}`}
+                  className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-blue-600 dir-ltr"
+                  dir="ltr"
+                  data-interactive="true"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Phone className="h-4 w-4 shrink-0" />
+                  {action.customerPhone || resolvedCustomer?.phone}
+                </a>
+              )}
               {onQuickView && (
                 <Button
                   size="sm"

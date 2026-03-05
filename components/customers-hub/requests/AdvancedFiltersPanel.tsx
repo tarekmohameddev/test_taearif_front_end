@@ -16,7 +16,7 @@ import {
   Filter,
   ChevronDown,
   AlertTriangle,
-  ListTodo,
+  Calendar,
   UserPlus,
   Timer,
   MapPin,
@@ -26,19 +26,26 @@ import {
 import { SourceBadge } from "../actions/SourceBadge";
 import {
   priorityLabels,
-  actionTypeLabels,
+  APPOINTMENT_TYPES,
   PROPERTY_TYPE_OPTIONS,
   SAUDI_REGIONS,
 } from "./constants";
-import type { CustomerSource, CustomerActionType, Priority } from "@/types/unified-customer";
+import type { CustomerSource, Priority } from "@/types/unified-customer";
+
+export interface AppointmentTypeOption {
+  id: string;
+  label: string;
+  labelEn?: string;
+}
 
 export interface AdvancedFiltersPanelProps {
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
   selectedPriorities: string[];
   setSelectedPriorities: (v: string[] | ((prev: string[]) => string[])) => void;
-  selectedTypes: string[];
-  setSelectedTypes: (v: string[] | ((prev: string[]) => string[])) => void;
+  selectedAppointmentTypes: string[];
+  setSelectedAppointmentTypes: (v: string[] | ((prev: string[]) => string[])) => void;
+  appointmentTypes?: AppointmentTypeOption[];
   selectedAssignees: string[];
   setSelectedAssignees: (v: string[] | ((prev: string[]) => string[])) => void;
   dueDateFilter: string;
@@ -72,13 +79,20 @@ const SOURCES: CustomerSource[] = [
 ];
 const PRIORITIES: Priority[] = ["urgent", "high", "medium", "low"];
 
+const DEFAULT_APPOINTMENT_OPTIONS: AppointmentTypeOption[] = APPOINTMENT_TYPES.map((t) => ({
+  id: t.value,
+  label: t.label,
+  labelEn: t.label,
+}));
+
 export function AdvancedFiltersPanel({
   selectedSources,
   setSelectedSources,
   selectedPriorities,
   setSelectedPriorities,
-  selectedTypes,
-  setSelectedTypes,
+  selectedAppointmentTypes,
+  setSelectedAppointmentTypes,
+  appointmentTypes,
   selectedAssignees,
   setSelectedAssignees,
   dueDateFilter,
@@ -172,30 +186,30 @@ export function AdvancedFiltersPanel({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className={btnClass}>
-            <ListTodo className="h-4 w-4" />
-            النوع
-            {selectedTypes.length > 0 && (
+            <Calendar className="h-4 w-4" />
+            نوع الموعد
+            {selectedAppointmentTypes.length > 0 && (
               <Badge variant="secondary" className="mr-1">
-                {selectedTypes.length}
+                {selectedAppointmentTypes.length}
               </Badge>
             )}
             <ChevronDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>نوع الطلب</DropdownMenuLabel>
+          <DropdownMenuLabel>نوع الموعد</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {(Object.keys(actionTypeLabels) as CustomerActionType[]).map((type) => (
+          {(appointmentTypes && appointmentTypes.length > 0 ? appointmentTypes : DEFAULT_APPOINTMENT_OPTIONS).map((opt) => (
             <DropdownMenuCheckboxItem
-              key={type}
-              checked={selectedTypes.includes(type)}
+              key={opt.id}
+              checked={selectedAppointmentTypes.includes(opt.id)}
               onCheckedChange={(checked) =>
-                setSelectedTypes((prev) =>
-                  checked ? [...prev, type] : prev.filter((t) => t !== type)
+                setSelectedAppointmentTypes((prev) =>
+                  checked ? [...prev, opt.id] : prev.filter((t) => t !== opt.id)
                 )
               }
             >
-              {actionTypeLabels[type]}
+              {opt.label}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>

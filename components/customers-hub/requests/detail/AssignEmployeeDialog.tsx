@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { User, UserPlus } from "lucide-react";
+import { User, UserPlus, Phone } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import {
   CustomDialog,
@@ -23,6 +23,7 @@ interface AssignEmployeeDialogProps {
   onOpenChange: (open: boolean) => void;
   action: {
     customerName: string;
+    customerPhone?: string | null;
     title: string;
     objectType?: string;
     sourceId?: string | number;
@@ -105,7 +106,20 @@ export function AssignEmployeeDialog({
               <User className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <div className="font-medium">{action.customerName}</div>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="font-medium">{action.customerName}</span>
+                {action.customerPhone && (
+                  <a
+                    href={`tel:${action.customerPhone}`}
+                    className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary dir-ltr"
+                    dir="ltr"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Phone className="h-3.5 w-3.5 shrink-0" />
+                    {action.customerPhone}
+                  </a>
+                )}
+              </div>
               <div className="text-sm text-muted-foreground">
                 {action.objectType === "property_request" && action.sourceId != null
                   ? `طلب عقار رقم #${action.sourceId}`

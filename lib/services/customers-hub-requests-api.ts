@@ -6,12 +6,21 @@ const BASE_URL = "/v2/customers-hub/requests";
 // Flat structure matching new API format
 export type ObjectType = "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder";
 
+/** Appointment type filter: property_request only if it has ≥1 appointment of selected type(s). Other action types unaffected. */
+export type AppointmentTypeFilter =
+  | "site_visit"
+  | "office_meeting"
+  | "phone_call"
+  | "video_call"
+  | "contract_signing"
+  | "other";
+
 export interface RequestsListFilters {
   tab?: "inbox" | "followups" | "all" | "completed";
-  types?: CustomerActionType[]; // Changed from "type" to "types"
   status?: ("pending" | "in_progress" | "completed" | "dismissed" | "snoozed")[]; // Changed from "statuses" to "status"
   sources?: CustomerSource[]; // Changed from "source" to "sources"
-  objectTypes?: ObjectType[]; // New field: Kind of record (inquiry, property_request, reminder, appointment, customer_reminder)
+  objectTypes?: ObjectType[]; // Kind of record (inquiry, property_request, reminder, appointment, customer_reminder)
+  appointment_types?: AppointmentTypeFilter[]; // Optional: filter property_request by appointment type (property_request_appointments)
   priorities?: Priority[]; // Changed from "priority" to "priorities"
   assignees?: number[]; // Changed from "assignedTo" (string[]) to "assignees" (number[])
   due_date_bucket?: "overdue" | "today" | "week" | "no_date"; // Changed from "dueDate" to "due_date_bucket"
@@ -116,6 +125,7 @@ export interface FilterOptionsResponse {
     statuses: Array<{ value: string; label: string }>;
     sources?: Array<{ value: string; label: string }>; // Optional: Origin options
     objectTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filtering by kind of record
+    appointmentTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filter "نوع الموعد" (from GET filter-options)
     employees: Array<{ id: number; name: string }>;
   };
   timestamp: string;
@@ -310,7 +320,6 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
     
     requestBody = {
       tab,
-      types: legacyFilters.type ? legacyFilters.type : undefined,
       status,
       sources: legacyFilters.source,
       priorities: legacyFilters.priority,

@@ -88,36 +88,6 @@ export function RequestsCenterTabs({
 
   return (
     <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v)}>
-      <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 max-w-2xl">
-        <TabsTrigger value="all" className="gap-2">
-          <ListTodo className="h-4 w-4" />
-          الكل
-          <Badge variant="secondary" className="mr-1">
-            {stats.pending}
-          </Badge>
-        </TabsTrigger>
-        <TabsTrigger value="inbox" className="gap-2">
-          <Inbox className="h-4 w-4" />
-          طلبات واردة
-          <Badge variant="secondary" className="mr-1">
-            {stats.inbox}
-          </Badge>
-        </TabsTrigger>
-        <TabsTrigger value="followups" className="gap-2">
-          <CalendarClock className="h-4 w-4" />
-          متابعات
-          <Badge variant="secondary" className="mr-1">
-            {stats.followups}
-          </Badge>
-        </TabsTrigger>
-        <TabsTrigger value="completed" className="gap-2">
-          <CheckCircle2 className="h-4 w-4" />
-          مكتمل
-          <Badge variant="secondary" className="mr-1">
-            {stats.completed}
-          </Badge>
-        </TabsTrigger>
-      </TabsList>
 
       <TabsContent value="inbox" className="mt-6">
         {viewMode === "table" ? (

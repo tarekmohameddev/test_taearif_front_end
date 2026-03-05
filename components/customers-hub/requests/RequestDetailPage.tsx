@@ -958,6 +958,7 @@ export function RequestDetailPage({
                   onOpenChange={setShowAssignEmployeeDialog}
                   action={{
                     customerName: action.customerName,
+                    customerPhone: action.customerPhone,
                     title: action.title,
                     objectType: action.objectType,
                     sourceId: action.sourceId,
