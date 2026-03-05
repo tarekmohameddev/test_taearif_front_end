@@ -50,7 +50,7 @@ export function StageDistributionCard({
         <CardTitle>توزيع طلبات العملاء حسب المرحلة</CardTitle>
       </CardHeader>
       <CardContent>
-        {apiLoading ? (
+        {apiLoading && (!apiStages || apiStages.length === 0) ? (
           <div className="text-center py-8 text-gray-500">
             جاري تحميل البيانات...
           </div>
