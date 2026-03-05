@@ -110,6 +110,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           onRestore={ctx.handleRestore}
           stagesForCards={ctx.stagesForCards}
           completingActionIds={ctx.completingActionIds}
+          onStageChangeSuccess={ctx.onStageChangeSuccess}
         />
         {props?.onFetchRequests &&
           props?.pagination &&

@@ -67,6 +67,12 @@ interface UseStageChangeHandlerArgs {
   updateCustomerStage: (customerId: string, stage: CustomerLifecycleStage) => void;
   setOptimisticStage: (s: CustomerLifecycleStage | null) => void;
   setActionStageId: (s: string | number | null) => void;
+  /** Called after stage is updated successfully (e.g. to update local stage distribution without refetch). */
+  onStageChangeSuccess?: (
+    actionId: string,
+    newStageId: string,
+    previousStageId: string
+  ) => void;
 }
 
 export function useStageChangeHandler({
@@ -78,6 +84,7 @@ export function useStageChangeHandler({
   updateCustomerStage,
   setOptimisticStage,
   setActionStageId,
+  onStageChangeSuccess,
 }: UseStageChangeHandlerArgs) {
   const [isUpdatingStage, setIsUpdatingStage] = useState(false);
 
@@ -122,6 +129,7 @@ export function useStageChangeHandler({
         }
         if (resolvedCustomer) (resolvedCustomer as { stage?: string }).stage = newStage;
         setActionStageId(newStage);
+        onStageChangeSuccess?.(action.id, newStage, previous);
         toast.success("تم تحديث المرحلة بنجاح");
         setOptimisticStage(null);
       } catch (err: unknown) {
@@ -150,6 +158,7 @@ export function useStageChangeHandler({
       updateCustomerStage,
       setOptimisticStage,
       setActionStageId,
+      onStageChangeSuccess,
     ]
   );
 

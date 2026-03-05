@@ -33,6 +33,11 @@ export interface RequestsCenterTabsProps {
   onRestore: (id: string) => void;
   stagesForCards?: RequestsListStage[] | undefined;
   completingActionIds: Set<string>;
+  onStageChangeSuccess?: (
+    actionId: string,
+    newStageId: string,
+    previousStageId: string
+  ) => void;
 }
 
 export function RequestsCenterTabs({
@@ -59,6 +64,7 @@ export function RequestsCenterTabs({
   onRestore,
   stagesForCards,
   completingActionIds,
+  onStageChangeSuccess,
 }: RequestsCenterTabsProps) {
   const tableProps = {
     getCustomerById: getCustomerForCard,
@@ -84,6 +90,7 @@ export function RequestsCenterTabs({
     onQuickView,
     stages: stagesForCards,
     completingActionIds,
+    onStageChangeSuccess,
   };
 
   return (

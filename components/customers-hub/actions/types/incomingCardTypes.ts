@@ -51,6 +51,12 @@ export interface IncomingActionsCardProps {
   isCompleting?: boolean;
   /** Called when inline schedule form opens/closes (for grid height) */
   onScheduleFormOpenChange?: (open: boolean) => void;
+  /** Called after stage is updated successfully (e.g. to update local stage distribution without refetch). */
+  onStageChangeSuccess?: (
+    actionId: string,
+    newStageId: string,
+    previousStageId: string
+  ) => void;
 }
 
 /** Result of getAIMatchingStatus for display */

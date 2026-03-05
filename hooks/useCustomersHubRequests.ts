@@ -494,6 +494,36 @@ export function useCustomersHubRequests() {
     [userData?.token, authLoading, getCurrentUserId]
   );
 
+  /** Update local actions and stage distribution after a request's stage is changed (e.g. from card). No loading, no refetch. */
+  const applyStageChangeLocally = useCallback(
+    (actionId: string, fromStageId: string, toStageId: string) => {
+      setActions((prev) =>
+        prev.map((a) =>
+          a.id === actionId ? { ...a, stage_id: toStageId } : a
+        )
+      );
+      setStages((prev) => {
+        if (!prev || prev.length === 0) return prev;
+        const fromStage = prev.find((s) => s.stage_id === fromStageId);
+        const toStage = prev.find((s) => s.stage_id === toStageId);
+        if (!fromStage || !toStage) return prev;
+        const total = prev.reduce((sum, s) => sum + (s.requestCount ?? 0), 0);
+        if (total <= 0) return prev;
+        return prev.map((s) => {
+          let newCount = s.requestCount ?? 0;
+          if (s.stage_id === fromStageId) newCount = Math.max(0, newCount - 1);
+          if (s.stage_id === toStageId) newCount = newCount + 1;
+          return {
+            ...s,
+            requestCount: newCount,
+            percentage: (newCount / total) * 100,
+          };
+        });
+      });
+    },
+    []
+  );
+
   // Add bulk change priority function
   const changeMultipleActionsPriority = useCallback(
     async (actionIds: string[], priority: Priority) => {
@@ -567,5 +597,6 @@ export function useCustomersHubRequests() {
     assignMultipleActions,
     changeMultipleActionsPriority,
     setActions,
+    applyStageChangeLocally,
   };
 }

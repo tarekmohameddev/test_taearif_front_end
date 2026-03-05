@@ -31,6 +31,7 @@ export function IncomingActionsCard({
   className,
   isCompleting = false,
   onScheduleFormOpenChange,
+  onStageChangeSuccess,
 }: IncomingActionsCardProps) {
   const router = useRouter();
   const { addAppointment, addAppointmentForRequest, updateCustomerStage, getCustomerById } =
@@ -92,6 +93,7 @@ export function IncomingActionsCard({
     updateCustomerStage,
     setOptimisticStage,
     setActionStageId,
+    onStageChangeSuccess,
   });
 
   const scheduleForm = useScheduleForm({

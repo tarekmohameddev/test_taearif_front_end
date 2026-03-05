@@ -395,5 +395,9 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     selectedStageIds,
     handleStageDistributionClick,
     isStageSelected,
+    onStageChangeSuccess: props?.onStageChangeApplied
+      ? (actionId: string, newStageId: string, previousStageId: string) =>
+          props.onStageChangeApplied!(actionId, previousStageId, newStageId)
+      : undefined,
   };
 }

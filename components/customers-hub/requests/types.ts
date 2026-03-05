@@ -45,4 +45,10 @@ export interface RequestsCenterPageProps {
     actionIds: string[],
     priority: Priority
   ) => Promise<boolean>;
+  /** Called when a request's stage is changed (e.g. from card). Use to update local stage distribution without refetch. */
+  onStageChangeApplied?: (
+    actionId: string,
+    fromStageId: string,
+    toStageId: string
+  ) => void;
 }
