@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { UserPlus, UserMinus, ChevronDown } from "lucide-react";
+import { UserMinus, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 interface AssignmentDropdownProps {
@@ -82,10 +82,7 @@ export function AssignmentDropdown({
           {currentEmployeeName ? (
             <span className="text-xs truncate max-w-[80px]">{currentEmployeeName}</span>
           ) : (
-            <>
-              <UserPlus className="h-3.5 w-3.5" />
-              <span className="text-xs">تعيين</span>
-            </>
+            <span className="text-xs text-gray-500">لا يوجد</span>
           )}
           <ChevronDown className="h-3 w-3" />
         </Button>

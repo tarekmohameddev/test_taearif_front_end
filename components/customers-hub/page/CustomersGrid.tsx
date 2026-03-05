@@ -159,13 +159,13 @@ export function CustomersGrid() {
                 )}
 
                 {/* Assigned Employee */}
-                {customer.assignedEmployee?.name && (
-                  <div className="flex items-center gap-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2.5 text-gray-700 dark:text-gray-300 text-xs">
-                    <User className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                    <span>المسؤول:</span>
-                    <span className="font-medium">{customer.assignedEmployee.name}</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 p-2.5 text-gray-700 dark:text-gray-300 text-xs">
+                  <User className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <span>المسؤول:</span>
+                  <span className="font-medium">
+                    {customer.assignedEmployee?.name ?? "لا يوجد"}
+                  </span>
+                </div>
               </div>
 
               {/* Property Requests Count */}
