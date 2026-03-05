@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { 
-  Search, X, DollarSign, Calendar, Home, Users, Clock, MapPin, ChevronDown
+  Search, X, Home, Users, Clock, MapPin, ChevronDown
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -50,9 +50,6 @@ const priorityLabels: Record<string, string> = {
 export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersBarProps) {
   const { filters, setFilters, clearFilters, applyFilters } = useUnifiedCustomersStore();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
-  const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
-  const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
   
   // Use stages from Zustand store (fetched once, shared across all components)
   const { stages: dynamicStages } = useCustomersHubStagesStore();
@@ -170,10 +167,6 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
     (filters.priority && filters.priority.length > 0) ||
     (filters.propertyType && filters.propertyType.length > 0) ||
     (filters.source && filters.source.length > 0) ||
-    filters.budgetMin ||
-    filters.budgetMax ||
-    filters.createdFrom ||
-    filters.createdTo ||
     filters.search;
 
   return (
@@ -329,147 +322,6 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                       {type.label}
                     </DropdownMenuCheckboxItem>
                   ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Budget Dropdown */}
-              <DropdownMenu open={isBudgetDialogOpen} onOpenChange={(open) => {
-                setIsBudgetDialogOpen(open);
-                if (open) {
-                  setTempBudgetMin(filters.budgetMin?.toString() || "");
-                  setTempBudgetMax(filters.budgetMax?.toString() || "");
-                }
-              }}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    الميزانية
-                    {(filters.budgetMin || filters.budgetMax) && (
-                      <Badge variant="secondary" className="mr-1">
-                        1
-                      </Badge>
-                    )}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64 p-3">
-                  <DropdownMenuLabel>نطاق الميزانية (ر.س)</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <div className="grid grid-cols-2 gap-2 py-2">
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">من</label>
-                      <Input
-                        type="number"
-                        placeholder="الحد الأدنى"
-                        value={tempBudgetMin}
-                        onChange={(e) => setTempBudgetMin(e.target.value)}
-                        className="h-8"
-                        min={0}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">إلى</label>
-                      <Input
-                        type="number"
-                        placeholder="الحد الأقصى"
-                        value={tempBudgetMax}
-                        onChange={(e) => setTempBudgetMax(e.target.value)}
-                        className="h-8"
-                        min={0}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        setFilters({
-                          budgetMin: tempBudgetMin ? parseInt(tempBudgetMin) : undefined,
-                          budgetMax: tempBudgetMax ? parseInt(tempBudgetMax) : undefined,
-                        });
-                        setIsBudgetDialogOpen(false);
-                        if (onApplyFilters) {
-                          onApplyFilters();
-                        } else {
-                          applyFilters();
-                        }
-                      }}
-                    >
-                      تطبيق
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setTempBudgetMin("");
-                        setTempBudgetMax("");
-                        setFilters({ budgetMin: undefined, budgetMax: undefined });
-                        setIsBudgetDialogOpen(false);
-                        if (onApplyFilters) {
-                          onApplyFilters();
-                        } else {
-                          applyFilters();
-                        }
-                      }}
-                    >
-                      إعادة تعيين
-                    </Button>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Date Range Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Calendar className="h-4 w-4" />
-                    تاريخ الإضافة
-                    {(filters.createdFrom || filters.createdTo) && (
-                      <Badge variant="secondary" className="mr-1">
-                        1
-                      </Badge>
-                    )}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64 p-3">
-                  <DropdownMenuLabel>تاريخ الإضافة</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <div className="grid grid-cols-2 gap-2 py-2">
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">من</label>
-                      <Input
-                        type="date"
-                        value={filters.createdFrom || ""}
-                        onChange={(e) => {
-                          setFilters({ createdFrom: e.target.value || undefined });
-                          if (onApplyFilters) {
-                            onApplyFilters();
-                          } else {
-                            applyFilters();
-                          }
-                        }}
-                        className="h-8"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">إلى</label>
-                      <Input
-                        type="date"
-                        value={filters.createdTo || ""}
-                        onChange={(e) => {
-                          setFilters({ createdTo: e.target.value || undefined });
-                          if (onApplyFilters) {
-                            onApplyFilters();
-                          } else {
-                            applyFilters();
-                          }
-                        }}
-                        className="h-8"
-                      />
-                    </div>
-                  </div>
                 </DropdownMenuContent>
               </DropdownMenu>
 

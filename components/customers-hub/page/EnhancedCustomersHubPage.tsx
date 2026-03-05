@@ -288,10 +288,6 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
                   const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
                   return cityOption?.id || 0;
                 }).filter(id => id > 0),
-                dateRange: filters.createdFrom || filters.createdTo ? {
-                  start: filters.createdFrom || "",
-                  end: filters.createdTo || "",
-                } : undefined,
               },
               pagination: apiPagination ? {
                 page: apiPagination.currentPage,
@@ -331,10 +327,6 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
                   const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
                   return cityOption?.id || 0;
                 }).filter(id => id > 0),
-                dateRange: filters.createdFrom || filters.createdTo ? {
-                  start: filters.createdFrom || "",
-                  end: filters.createdTo || "",
-                } : undefined,
               },
               pagination: apiPagination ? {
                 page: apiPagination.currentPage,
