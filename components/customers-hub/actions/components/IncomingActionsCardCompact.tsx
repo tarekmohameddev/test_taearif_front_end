@@ -86,14 +86,14 @@ function CompactPropertyBlockStitch({ action }: { action: CustomerAction }) {
 
   return (
     <>
-      <div className="flex-1 flex items-center gap-3 min-w-0">
+      <div className="w-full md:flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 min-w-0">
         <div
           role={src ? "button" : undefined}
           tabIndex={src ? 0 : undefined}
           onClick={handleImageClick}
           onKeyDown={src ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPopupOpen(true); } } : undefined}
           className={cn(
-            "w-14 h-14 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-800",
+            "w-full sm:w-14 h-32 sm:h-14 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-800",
             src && "cursor-pointer hover:opacity-90 transition-opacity"
           )}
         >
@@ -104,9 +104,9 @@ function CompactPropertyBlockStitch({ action }: { action: CustomerAction }) {
             <Home className="h-6 w-6 text-slate-400" />
           </div>
         </div>
-        <div className="min-w-0">
-          <p className="text-sm font-bold truncate max-w-[150px] text-slate-900 dark:text-white">{first.title ?? "—"}</p>
-          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold truncate max-w-full sm:max-w-[150px] text-slate-900 dark:text-white">{first.title ?? "—"}</p>
+          <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
             <span>{propType}</span>
             <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
             <span className="tabular-nums">{area}</span>
@@ -161,7 +161,7 @@ function CompactNextActionStitch({
     return withDate[0] ?? null;
   }, [appointments, reminders]);
 
-  if (!next) return <div className="w-56 shrink-0" />;
+  if (!next) return <div className="w-full md:w-56 shrink-0" />;
 
   const isPrimary = next.type === "site_visit" || next.type === "office_meeting";
   const Icon =
@@ -172,7 +172,7 @@ function CompactNextActionStitch({
         : FileText;
 
   return (
-    <div className="w-56 shrink-0 flex items-center gap-3 border-r border-slate-100 dark:border-slate-800 pr-6">
+    <div className="w-full md:w-36 xl:w-56 shrink-0 flex items-center gap-3 border-r-0 md:border-r border-slate-100 dark:border-slate-800 pr-0 md:pr-6">
       <div
         className={cn(
           "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
@@ -280,122 +280,195 @@ export function IncomingActionsCardCompact({
 
   return (
     <>
-      {/* Stitch card: exact layout from Google Stitch HTML */}
+      {/* Desktop: original Stitch row layout (unchanged) */}
       <div
         className={cn(
-          "w-full bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-row flex-wrap items-center gap-4 md:gap-6 hover:shadow-md hover:border-primary/30 transition-all group cursor-pointer",
+          "w-full bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-800",
+          "hover:shadow-md hover:border-primary/30 transition-all group cursor-pointer",
           isOverdue && "border-red-500/50",
           isSelected && "ring-2 ring-primary bg-primary/5",
           className
         )}
         onClick={onCardClick}
       >
-        {/* Checkbox */}
-        {showCheckbox && (
-          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-            <Checkbox
-              checked={isSelected}
-              onCheckedChange={(c) => onSelect?.(action.id, c as boolean)}
-              className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-              data-interactive="true"
+        {/* Desktop layout: exactly as before (hidden on mobile) */}
+        <div className="hidden md:flex flex-row flex-wrap items-center gap-6">
+          {showCheckbox && (
+            <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={(c) => onSelect?.(action.id, c as boolean)}
+                className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                data-interactive="true"
+              />
+            </div>
+          )}
+          <div className="w-48 shrink-0 min-w-0">
+            {customerIdForLink ? (
+              <Link
+                href={`/ar/dashboard/customers-hub/${customerIdForLink}`}
+                className="font-bold text-slate-900 dark:text-white hover:text-primary transition-colors block truncate"
+                data-interactive="true"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {action.customerName}
+              </Link>
+            ) : (
+              <p className="font-bold text-slate-900 dark:text-white truncate">{action.customerName}</p>
+            )}
+            <p className="text-sm text-slate-500 dark:text-slate-400 tabular-nums dir-ltr" dir="ltr">
+              {(action.customerPhone ?? resolvedCustomer?.phone) ?? "—"}
+            </p>
+          </div>
+          <div className="w-10 shrink-0">
+            <span className={cn("inline-block", priorityStitchPillClass[action.priority])}>
+              {priorityStitchLabels[action.priority]}
+            </span>
+          </div>
+          <div className="w-36 shrink-0">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-[10px] font-medium">
+              <SourceIcon className="h-3.5 w-3.5 shrink-0" />
+              <span>{sourceStitch.labelEn}</span>
+            </div>
+          </div>
+          <div className="w-36 shrink-0" onClick={(e) => e.stopPropagation()}>
+            <StageDropdown
+              availableStages={availableStages}
+              displayStage={displayStage}
+              isUpdatingStage={isUpdatingStage}
+              onStageChange={onStageChange}
+              getStageColor={getStageColor}
+              getStageNameAr={getStageNameAr}
+              compact
+              stitchStyle
             />
           </div>
-        )}
-
-        {/* Customer - w-48 */}
-        <div className="w-48 shrink-0 min-w-0">
-          {customerIdForLink ? (
-            <Link
-              href={`/ar/dashboard/customers-hub/${customerIdForLink}`}
-              className="font-bold text-slate-900 dark:text-white hover:text-primary transition-colors block truncate"
-              data-interactive="true"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {action.customerName}
-            </Link>
+          {action.properties?.length ? (
+            <CompactPropertyBlockStitch action={action} />
           ) : (
-            <p className="font-bold text-slate-900 dark:text-white truncate">{action.customerName}</p>
+            <div className="flex-1 min-w-0" />
           )}
-          <p className="text-sm text-slate-500 dark:text-slate-400 tabular-nums dir-ltr" dir="ltr">
-            {(action.customerPhone ?? resolvedCustomer?.phone) ?? "—"}
-          </p>
-        </div>
-
-        {/* Priority - w-24 */}
-        <div className="w-24 shrink-0">
-          <span className={cn("inline-block", priorityStitchPillClass[action.priority])}>
-            {priorityStitchLabels[action.priority]}
-          </span>
-        </div>
-
-        {/* Source - w-32 */}
-        <div className="w-32 shrink-0">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-medium">
-            <SourceIcon className="h-3.5 w-3.5 shrink-0" />
-            <span>{sourceStitch.labelEn}</span>
+          <CompactNextActionStitch appointments={action.appointments} reminders={action.reminders} />
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
+                  data-interactive="true"
+                >
+                  <MoreVertical className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[180px]">
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onComplete?.(action.id); }} disabled={isCompleting} className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  إتمام الطلب
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowScheduleForm(true); }} className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  جدولة إجراء
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowSnoozeForm(true); }} className="flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  تأجيل
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowAssignEmployeeDialog(true); }} className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  تعيين موظف
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDismiss?.(action.id); }} className="flex items-center gap-2 text-red-600 focus:text-red-600">
+                  <X className="h-4 w-4" />
+                  رفض الطلب
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        {/* Status Dropdown - w-40 */}
-        <div className="w-40 shrink-0" onClick={(e) => e.stopPropagation()}>
-          <StageDropdown
-            availableStages={availableStages}
-            displayStage={displayStage}
-            isUpdatingStage={isUpdatingStage}
-            onStageChange={onStageChange}
-            getStageColor={getStageColor}
-            getStageNameAr={getStageNameAr}
-            compact
-            stitchStyle
-          />
-        </div>
-
-        {/* Property block - flex-1 */}
-        {action.properties?.length ? (
-          <CompactPropertyBlockStitch action={action} />
-        ) : (
-          <div className="flex-1 min-w-0" />
-        )}
-
-        {/* Next Action - w-56 border-r */}
-        <CompactNextActionStitch appointments={action.appointments} reminders={action.reminders} />
-
-        {/* Menu - 3 dots */}
-        <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
-                data-interactive="true"
-              >
-                <MoreVertical className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[180px]">
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onComplete?.(action.id); }} disabled={isCompleting} className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                إتمام الطلب
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowScheduleForm(true); }} className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                جدولة إجراء
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowSnoozeForm(true); }} className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                تأجيل
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowAssignEmployeeDialog(true); }} className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4" />
-                تعيين موظف
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDismiss?.(action.id); }} className="flex items-center gap-2 text-red-600 focus:text-red-600">
-                <X className="h-4 w-4" />
-                رفض الطلب
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Mobile layout: stacked card (visible only on mobile) */}
+        <div className="flex flex-col gap-3 md:hidden">
+          <div className="flex flex-row items-center gap-2 w-full min-w-0">
+            {showCheckbox && (
+              <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={(c) => onSelect?.(action.id, c as boolean)}
+                  className="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  data-interactive="true"
+                />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              {customerIdForLink ? (
+                <Link
+                  href={`/ar/dashboard/customers-hub/${customerIdForLink}`}
+                  className="font-bold text-slate-900 dark:text-white hover:text-primary transition-colors block truncate"
+                  data-interactive="true"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {action.customerName}
+                </Link>
+              ) : (
+                <p className="font-bold text-slate-900 dark:text-white truncate">{action.customerName}</p>
+              )}
+              <p className="text-sm text-slate-500 dark:text-slate-400 tabular-nums dir-ltr" dir="ltr">
+                {(action.customerPhone ?? resolvedCustomer?.phone) ?? "—"}
+              </p>
+            </div>
+            <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary" data-interactive="true">
+                    <MoreVertical className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[180px]">
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onComplete?.(action.id); }} disabled={isCompleting} className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    إتمام الطلب
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowScheduleForm(true); }} className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    جدولة إجراء
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowSnoozeForm(true); }} className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    تأجيل
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowAssignEmployeeDialog(true); }} className="flex items-center gap-2">
+                    <UserPlus className="h-4 w-4" />
+                    تعيين موظف
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDismiss?.(action.id); }} className="flex items-center gap-2 text-red-600 focus:text-red-600">
+                    <X className="h-4 w-4" />
+                    رفض الطلب
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <div className="flex flex-row flex-wrap items-center gap-2">
+            <span className={cn("inline-block", priorityStitchPillClass[action.priority])}>
+              {priorityStitchLabels[action.priority]}
+            </span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-xs font-medium">
+              <SourceIcon className="h-3.5 w-3.5 shrink-0" />
+              <span>{sourceStitch.labelEn}</span>
+            </div>
+            <div className="w-full min-w-0" onClick={(e) => e.stopPropagation()}>
+              <StageDropdown availableStages={availableStages} displayStage={displayStage} isUpdatingStage={isUpdatingStage} onStageChange={onStageChange} getStageColor={getStageColor} getStageNameAr={getStageNameAr} compact stitchStyle />
+            </div>
+          </div>
+          {action.properties?.length ? (
+            <div className="w-full min-w-0">
+              <CompactPropertyBlockStitch action={action} />
+            </div>
+          ) : null}
+          <div className="w-full min-w-0">
+            <CompactNextActionStitch appointments={action.appointments} reminders={action.reminders} />
+          </div>
         </div>
       </div>
 
