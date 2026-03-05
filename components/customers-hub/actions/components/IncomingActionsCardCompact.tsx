@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,77 @@ import { AssignEmployeeDialog } from "./AssignEmployeeDialog";
 import { ScheduleAppointmentForm } from "./ScheduleAppointmentForm";
 import { SnoozeFormInline } from "./SnoozeFormInline";
 import { priorityColors, priorityLabels } from "../constants/incomingCardConstants";
-import { Clock, Phone, MoreVertical, CheckCircle, Calendar, Bell, UserPlus, X } from "lucide-react";
+import { Clock, Phone, MoreVertical, CheckCircle, Calendar, Bell, UserPlus, X, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer } from "@/types/unified-customer";
 import type { CustomerLifecycleStage } from "@/types/unified-customer";
 import type { StageOption, AIMatchingStatus, EmployeeOption } from "../types/incomingCardTypes";
+
+/** First property from action.properties for compact card thumbnail (same image system as /properties list view). Click opens image in popup. */
+function CompactPropertyImage({ action }: { action: CustomerAction }) {
+  const [popupOpen, setPopupOpen] = useState(false);
+  const first = action.properties?.[0];
+  const src = first?.featuredImage || null;
+  const alt = first?.title ?? "";
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    if (!src) return;
+    e.stopPropagation();
+    setPopupOpen(true);
+  };
+
+  return (
+    <>
+      <div
+        role={src ? "button" : undefined}
+        tabIndex={src ? 0 : undefined}
+        onClick={handleImageClick}
+        onKeyDown={src ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPopupOpen(true); } } : undefined}
+        className={cn(
+          "relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800",
+          src && "cursor-pointer hover:opacity-90 transition-opacity"
+        )}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={alt}
+            className="h-full w-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              const next = e.currentTarget.nextElementSibling as HTMLElement | null;
+              if (next) next.style.display = "flex";
+            }}
+          />
+        ) : null}
+        <div
+          className={cn(
+            "w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700",
+            src ? "hidden" : ""
+          )}
+          aria-hidden
+        >
+          <Home className="h-8 w-8 text-gray-400" />
+        </div>
+      </div>
+      {src && (
+        <CustomDialog open={popupOpen} onOpenChange={setPopupOpen}>
+          <CustomDialogContent className="max-w-[90vw] max-h-[90vh] w-auto p-2 bg-black/90 border-gray-700">
+            <CustomDialogClose onClose={() => setPopupOpen(false)} className="absolute top-2 left-2 z-10 rounded-full bg-white/10 hover:bg-white/20 text-white p-1.5" />
+            <div className="relative flex items-center justify-center min-h-[200px]">
+              <img
+                src={src}
+                alt={alt}
+                className="max-w-full max-h-[85vh] w-auto h-auto object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </CustomDialogContent>
+        </CustomDialog>
+      )}
+    </>
+  );
+}
 
 export interface IncomingActionsCardCompactProps {
   action: CustomerAction;
@@ -131,16 +197,18 @@ export function IncomingActionsCardCompact({
         )}
         onClick={onCardClick}
       >
-        {showCheckbox && (
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={(c) => onSelect?.(action.id, c as boolean)}
-            className="h-4 w-4 data-[state=checked]:bg-blue-600"
-            data-interactive="true"
-          />
-        )}
+        {action.properties?.length ? <CompactPropertyImage action={action} /> : null}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
           <div className="flex items-center gap-3 flex-wrap">
+            {showCheckbox && (
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={(c) => onSelect?.(action.id, c as boolean)}
+                className="h-4 w-4 flex-shrink-0 data-[state=checked]:bg-blue-600"
+                data-interactive="true"
+                onClick={(e) => e.stopPropagation()}
+              />
+            )}
             {customerIdForLink ? (
               <Link
                 href={`/ar/dashboard/customers-hub/${customerIdForLink}`}

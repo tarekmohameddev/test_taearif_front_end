@@ -70,6 +70,17 @@ export interface CustomerAction {
   reminders?: Reminder[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
   // Notes (populated for property_request and inquiry)
   notes?: Note[]; // Array of notes for this action
+  // Properties linked to this action (e.g. from property_request; list view uses first item for thumbnail)
+  properties?: Array<{
+    id: number;
+    title?: string;
+    address?: string;
+    slug?: string;
+    price?: number;
+    featuredImage?: string;
+    district?: string;
+    city?: string;
+  }>;
 }
 
 // CustomerLifecycleStage is now a string type to support dynamic stages from API
