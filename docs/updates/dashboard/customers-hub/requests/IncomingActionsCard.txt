@@ -2,3 +2,9 @@
 Update Type: Enhancement
 إضافة disabled state لزر "تم" وإظهار react hot toast عند الضغط عليه في list view
 components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/actions/IncomingActionsCard.tsx
+
+---
+2026-03-05
+Update Type: UI Change (Compact View)
+تعديل compact view في صفحة /dashboard/customers-hub/requests: إزالة زر العين (Quick View) وزر "تم"، واستبدالهما بأيقونة ثلاث نقاط (MoreVertical) تفتح قائمة بنفس إجراءات card الإجراءات في صفحة تفاصيل الطلب: إتمام الطلب، جدولة إجراء، تأجيل، تعيين موظف، رفض الطلب. إضافة نموذجَي جدولة وتأجيل مضمنين في compact عند اختيارهما من القائمة.
+components/customers-hub/actions/IncomingActionsCard.tsx

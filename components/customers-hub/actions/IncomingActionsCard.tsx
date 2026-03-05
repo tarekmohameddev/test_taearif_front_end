@@ -36,7 +36,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AlertTriangle, User, Eye, Phone, Building2, MapPin, DollarSign, Clock, ChevronDown, UserPlus, Loader2 } from "lucide-react";
+import { AlertTriangle, User, Eye, Phone, Building2, MapPin, DollarSign, Clock, ChevronDown, UserPlus, Loader2, MoreVertical, CheckCircle, Calendar, Bell, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -363,6 +363,10 @@ export function IncomingActionsCard({
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
+  /** Compact view: snooze form (تأجيل) */
+  const [showSnoozeForm, setShowSnoozeForm] = useState(false);
+  const [snoozeDate, setSnoozeDate] = useState("");
+  const [snoozeTime, setSnoozeTime] = useState("10:00");
   // Optimistic stage update - tracks stage changes immediately before API response
   const [optimisticStage, setOptimisticStage] = useState<CustomerLifecycleStage | null>(null);
   // Stages now use string stage_id, no mapping needed
@@ -759,6 +763,16 @@ export function IncomingActionsCard({
     }
   }, [showScheduleForm, aptDate]);
 
+  // Set default date when opening compact snooze form
+  React.useEffect(() => {
+    if (isCompact && showSnoozeForm && !snoozeDate) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setSnoozeDate(tomorrow.toISOString().slice(0, 10));
+      setSnoozeTime("10:00");
+    }
+  }, [isCompact, showSnoozeForm, snoozeDate]);
+
   // Fetch employees when opening assign dialog
   React.useEffect(() => {
     if (showAssignEmployeeDialog && userData?.token && employees.length === 0) {
@@ -1081,35 +1095,217 @@ export function IncomingActionsCard({
             reminders={action.reminders}
           />
         </div>
-        <div className="flex items-center gap-1">
-          {onQuickView && (
+        <div className="flex items-center gap-1 shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 w-8 p-0"
+                onClick={(e) => e.stopPropagation()}
+                data-interactive="true"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[180px]">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onComplete?.(action.id);
+                }}
+                disabled={isCompleting}
+                className="flex items-center gap-2"
+              >
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                إتمام الطلب
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowScheduleForm(true);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Calendar className="h-4 w-4" />
+                جدولة إجراء
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowSnoozeForm(true);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Bell className="h-4 w-4" />
+                تأجيل
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAssignEmployeeDialog(true);
+                }}
+                className="flex items-center gap-2"
+              >
+                <UserPlus className="h-4 w-4" />
+                تعيين موظف
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDismiss?.(action.id);
+                }}
+                className="flex items-center gap-2 text-red-600 focus:text-red-600"
+              >
+                <X className="h-4 w-4" />
+                رفض الطلب
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Compact: جدولة موعد popup */}
+      {isCompact && (
+        <CustomDialog open={showScheduleForm} onOpenChange={setShowScheduleForm} maxWidth="max-w-md">
+          <CustomDialogContent className="p-3">
+            <CustomDialogHeader>
+              <CustomDialogTitle className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                  <Calendar className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-lg font-semibold">جدولة موعد</div>
+                  <div className="text-sm text-muted-foreground font-normal">
+                    حدد نوع الموعد والتاريخ والوقت
+                  </div>
+                </div>
+              </CustomDialogTitle>
+              <CustomDialogClose
+                onClose={() => {
+                  setShowScheduleForm(false);
+                  resetScheduleForm();
+                }}
+              />
+            </CustomDialogHeader>
+            <form onSubmit={handleScheduleSubmit} className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label className="text-sm">نوع الموعد</Label>
+                <Select value={aptType} onValueChange={(v) => setAptType(v as Appointment["type"])}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {APPOINTMENT_TYPES.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label className="text-sm">التاريخ</Label>
+                  <Input
+                    type="date"
+                    value={aptDate}
+                    onChange={(e) => setAptDate(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">الوقت</Label>
+                  <Input
+                    type="time"
+                    value={aptTime}
+                    onChange={(e) => setAptTime(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm">ملاحظات (اختياري)</Label>
+                <Textarea
+                  value={aptNotes}
+                  onChange={(e) => setAptNotes(e.target.value)}
+                  placeholder="تفاصيل إضافية"
+                  rows={2}
+                  className="resize-none text-sm"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowScheduleForm(false);
+                    resetScheduleForm();
+                  }}
+                >
+                  إلغاء
+                </Button>
+                <Button type="submit" disabled={isSubmittingApt}>
+                  {isSubmittingApt ? "جاري الحفظ..." : "جدولة الموعد"}
+                </Button>
+              </div>
+            </form>
+          </CustomDialogContent>
+        </CustomDialog>
+      )}
+
+      {/* Compact: inline snooze form (تأجيل) */}
+      {isCompact && showSnoozeForm && (
+        <div
+          className="mt-2 p-3 border rounded-lg bg-gray-50 dark:bg-gray-800/50 space-y-3"
+          onClick={(e) => e.stopPropagation()}
+          data-interactive="true"
+        >
+          <Label className="text-sm font-medium">تأجيل حتى:</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Input
+              type="date"
+              value={snoozeDate}
+              onChange={(e) => setSnoozeDate(e.target.value)}
+              className="text-sm h-9"
+            />
+            <Input
+              type="time"
+              value={snoozeTime}
+              onChange={(e) => setSnoozeTime(e.target.value)}
+              className="text-sm h-9"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={() => {
+                if (!snoozeDate) return;
+                const until = new Date(`${snoozeDate}T${snoozeTime}`).toISOString();
+                onSnooze?.(action.id, until);
+                setShowSnoozeForm(false);
+                setSnoozeDate("");
+                setSnoozeTime("10:00");
+              }}
+              disabled={!snoozeDate}
+              className="flex-1"
+            >
+              تأكيد
+            </Button>
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 w-7 p-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                onQuickView(action.id);
+              onClick={() => {
+                setShowSnoozeForm(false);
+                setSnoozeDate("");
+                setSnoozeTime("10:00");
               }}
-              data-interactive="true"
             >
-              <Eye className="h-4 w-4" />
+              إلغاء
             </Button>
-          )}
-          <Button
-            size="sm"
-            className="h-7 px-2 bg-green-600 hover:bg-green-700"
-            onClick={(e) => {
-              e.stopPropagation();
-              onComplete?.(action.id);
-            }}
-            disabled={isCompleting}
-            data-interactive="true"
-          >
-            {isCompleting ? "جاري..." : "تم"}
-          </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Assign Employee Dialog */}
       <CustomDialog open={showAssignEmployeeDialog} onOpenChange={setShowAssignEmployeeDialog} maxWidth="max-w-md">
