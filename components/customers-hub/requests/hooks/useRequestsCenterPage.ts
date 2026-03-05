@@ -204,16 +204,8 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
       prevFiltersRef.current = currentFiltersString;
       const fetchWithFilters = async () => {
         try {
-          console.log(
-            "🔄 Filters changed, fetching requests with filters:",
-            newFilters
-          );
           const requestParams = newFilters as RequestsListFilters;
-          console.log(
-            "📤 Sending API request with flat params:",
-            JSON.stringify(requestParams, null, 2)
-          );
-          await props.onFetchRequests!(requestParams);
+          await props.onFetchRequests!(requestParams, { silent: true });
         } catch (err) {
           console.error("Error fetching requests with filters:", err);
         }

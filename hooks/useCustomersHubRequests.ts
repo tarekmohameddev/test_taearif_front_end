@@ -35,16 +35,23 @@ export function useCustomersHubRequests() {
     itemsPerPage: 20,
   });
 
-  // Fetch requests list
+  // Fetch requests list. When options.silent is true (e.g. filter change), do not set loading state so the page does not show full-page loading.
   const fetchRequests = useCallback(
-    async (params: RequestsListFilters | RequestsListParams) => {
+    async (
+      params: RequestsListFilters | RequestsListParams,
+      options?: { silent?: boolean }
+    ) => {
       if (authLoading || !userData?.token) {
         return;
       }
 
+      const silent = options?.silent === true;
+
       try {
-        setLoading(true);
-        setError(null);
+        if (!silent) {
+          setLoading(true);
+          setError(null);
+        }
         const response = await getRequestsList(params);
         
         if (response.status === "success") {
@@ -124,7 +131,7 @@ export function useCustomersHubRequests() {
           err.response?.data?.message || "An error occurred while loading requests"
         );
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
     },
     [userData?.token, authLoading]

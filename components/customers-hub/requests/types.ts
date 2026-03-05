@@ -14,7 +14,8 @@ export interface RequestsCenterPageProps {
   error?: string | null;
   pagination?: any;
   onFetchRequests?: (
-    params: RequestsListFilters | RequestsListParams
+    params: RequestsListFilters | RequestsListParams,
+    options?: { silent?: boolean }
   ) => Promise<void>;
   onCompleteAction?: (actionId: string, notes?: string) => Promise<boolean>;
   onDismissAction?: (actionId: string, reason?: string) => Promise<boolean>;
