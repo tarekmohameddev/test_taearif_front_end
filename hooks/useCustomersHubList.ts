@@ -67,6 +67,7 @@ export function useCustomersHubList() {
             leadScore: customer.leadScore || 0,
             source: customer.source || "manual",
             totalPropertyRequests: customer.totalPropertyRequests ?? customer.propertyRequestsCount ?? 0,
+            lastPropertyRequest: customer.lastPropertyRequest ?? undefined,
             createdAt: customer.createdAt || new Date().toISOString(),
             updatedAt: customer.updatedAt || new Date().toISOString(),
           }));

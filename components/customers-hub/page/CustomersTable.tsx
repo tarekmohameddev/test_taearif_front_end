@@ -28,7 +28,10 @@ import {
   ChevronRight,
   Eye,
   Phone,
+  MapPin,
+  Home,
 } from "lucide-react";
+import type { LastPropertyRequest } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor, LIFECYCLE_STAGES } from "@/types/unified-customer";
 import Link from "next/link";
 import { AssignmentDropdown } from "../assignment";
@@ -93,6 +96,44 @@ export function CustomersTable() {
     );
   };
 
+  const hasLastRequest = (req: LastPropertyRequest | null | undefined): boolean =>
+    req != null && (
+      [req.city, req.district, req.propertyType, req.listingTypeLabel].some(
+        (v) => v != null && String(v).trim() !== ""
+      )
+    );
+
+  const renderLastPropertyRequest = (req: LastPropertyRequest | null | undefined) => {
+    if (!hasLastRequest(req)) {
+      return <span className="text-gray-400 text-sm">—</span>;
+    }
+    const r = req!;
+    const city = r.city?.trim();
+    const district = r.district?.trim();
+    const propertyType = r.propertyType?.trim();
+    const listingType = r.listingTypeLabel?.trim();
+    const locationParts = [district, city].filter(Boolean);
+    const location = locationParts.length > 0 ? locationParts.join("، ") : null;
+    const typeParts = [propertyType, listingType].filter(Boolean);
+    const typeLine = typeParts.length > 0 ? typeParts.join(" · ") : null;
+    return (
+      <div className="text-right text-sm space-y-0.5 min-w-[140px]">
+        {location && (
+          <div className="flex items-center gap-1 justify-start text-gray-700 dark:text-gray-300">
+            <MapPin className="h-3.5 w-3.5 text-gray-400 " />
+            <span>{location}</span>
+          </div>
+        )}
+        {typeLine && (
+          <div className="flex items-center gap-1 justify-start text-gray-600 dark:text-gray-400 text-xs">
+            <Home className="h-3.5 w-3.5 text-gray-400 " />
+            <span>{typeLine}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card>
 
@@ -106,6 +147,7 @@ export function CustomersTable() {
               <TableHead className="text-right">الأولوية</TableHead>
               <TableHead className="text-right">المصدر</TableHead>
               <TableHead className="text-right">الموظف المسؤول</TableHead>
+              <TableHead className="text-right">آخر طلب عقاري</TableHead>
               <TableHead className="text-right">آخر تواصل</TableHead>
               <TableHead className="text-right">الإجراءات</TableHead>
             </TableRow>
@@ -113,7 +155,7 @@ export function CustomersTable() {
           <TableBody>
             {paginatedCustomers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                   لا توجد نتائج
                 </TableCell>
               </TableRow>
@@ -151,6 +193,9 @@ export function CustomersTable() {
                       currentEmployeeId={customer.assignedEmployeeId}
                       currentEmployeeName={customer.assignedEmployee?.name}
                     />
+                  </TableCell>
+                  <TableCell>
+                    {renderLastPropertyRequest(customer.lastPropertyRequest)}
                   </TableCell>
                   <TableCell>
                     {customer.lastContactAt ? (

@@ -488,6 +488,14 @@ export interface KSACompliance {
   paymentSchedule?: PaymentSchedule[];
 }
 
+/** آخر طلب عقاري للعميل (من API قائمة العملاء) */
+export interface LastPropertyRequest {
+  district?: string | null;
+  city?: string | null;
+  propertyType?: string | null;
+  listingTypeLabel?: string | null;
+}
+
 export interface UnifiedCustomer {
   // Core Identity
   id: string;
@@ -561,6 +569,9 @@ export interface UnifiedCustomer {
   totalPropertyRequests?: number;  // Total property requests count
   responseRate?: number;  // 0-100
   avgResponseTime?: number;  // in hours
+
+  /** آخر طلب عقاري (الحي، المدينة، نوع العقار، بيع/إيجار) */
+  lastPropertyRequest?: LastPropertyRequest | null;
   
   // Pipeline-specific fields (for customers-hub pipeline)
   // These fields are set by the pipeline API to distinguish between requests and inquiries
