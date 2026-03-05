@@ -326,7 +326,7 @@ export function IncomingActionsCardCompact({
               {(action.customerPhone ?? resolvedCustomer?.phone) ?? "—"}
             </p>
           </div>
-          <div className="w-12 shrink-0">
+          <div className="w-15 shrink-0">
             <span className={cn("inline-block", priorityStitchPillClass[action.priority])}>
               {priorityStitchLabels[action.priority]}
             </span>
