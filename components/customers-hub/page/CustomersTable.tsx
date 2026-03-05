@@ -56,12 +56,14 @@ export function CustomersTable() {
   const endIndex = startIndex + pageSize;
   const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
 
-  // Normalize customer.stage to always be a string (handle API objects)
+  // Normalize customer.stage to always be a string (handle API objects; id: null → بدون مرحلة)
   const normalizeStage = (stage: any): string => {
     if (!stage) return "new_lead";
-    if (typeof stage === 'string') return stage;
-    if (typeof stage === 'object' && stage !== null) {
-      return (stage as any).id || (stage as any).name || "new_lead";
+    if (typeof stage === "string") return stage;
+    if (typeof stage === "object" && stage !== null) {
+      const id = (stage as any).id;
+      if (id == null || id === "") return "no_stage";
+      return id || (stage as any).name || "new_lead";
     }
     return String(stage);
   };

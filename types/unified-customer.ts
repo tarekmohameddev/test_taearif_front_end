@@ -674,10 +674,23 @@ export const LIFECYCLE_STAGES: LifecycleStageInfo[] = [
 // These functions now work with dynamic stages from API
 // If stages array is provided, use it; otherwise fall back to LIFECYCLE_STAGES
 
+/** قيمة المرحلة عندما يكون العميل بدون مرحلة (stage.id = null من API) */
+export const NO_STAGE_ID = "no_stage";
+
 export const getStageInfo = (
   stageId: CustomerLifecycleStage,
   stages?: Stage[]
 ): LifecycleStageInfo | undefined => {
+  if (stageId === NO_STAGE_ID || stageId == null || stageId === "") {
+    return {
+      id: NO_STAGE_ID,
+      nameAr: "بدون مرحلة",
+      nameEn: "No stage",
+      description: "",
+      color: "#9ca3af",
+      order: 0,
+    };
+  }
   // If dynamic stages are provided, use them
   if (stages && stages.length > 0) {
     const stage = stages.find(s => s.stage_id === stageId);
@@ -785,6 +798,10 @@ export interface CustomerFilters {
   source?: CustomerSource[];
   priority?: Priority[];
   assignedEmployee?: string[];
+  /** أولوية (معرفات من filter-options - للإرسال المباشر للـ API) */
+  priorityIds?: number[];
+  /** نوع العقار (معرفات من filter-options - للإرسال المباشر للـ API) */
+  typeIds?: number[];
   /** مدينة (معرفات من filter-options) */
   city?: number[];
   /** حي (معرفات من filter-options) */
