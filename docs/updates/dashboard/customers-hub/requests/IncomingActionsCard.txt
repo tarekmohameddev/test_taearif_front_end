@@ -1,3 +1,9 @@
+2026-03-05
+Update Type: Refactor (Clean Code)
+Refactoring IncomingActionsCard.tsx (1911 lines) into multiple files (max 200 lines each): constants/incomingCardConstants.ts, types/incomingCardTypes.ts, utils/propertyUtils.ts, utils/dateTimeUtils.ts, components/AppointmentsRemindersTable.tsx, StageDropdown.tsx, AIMatchingBadge.tsx, AssignEmployeeDialog.tsx, ScheduleAppointmentForm.tsx, SnoozeFormInline.tsx, IncomingActionsCardCompact.tsx, IncomingActionsCardFull.tsx, hooks/useStageResolution.ts, useStageChangeHandler.ts, useScheduleForm.ts, useAssignEmployee.ts. Main IncomingActionsCard.tsx is now orchestration only (~196 lines). Removed all agent-log fetch calls. Single AssignEmployeeDialog reused for compact and full views.
+components/customers-hub/actions/
+
+---
 2026-02-08 17:27:30
 Update Type: Enhancement
 إضافة disabled state لزر "تم" وإظهار react hot toast عند الضغط عليه في list view
