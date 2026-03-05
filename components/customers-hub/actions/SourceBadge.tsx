@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Globe, UserPlus, Upload, Users } from "lucide-react";
+import { MessageSquare, Globe, UserPlus, Upload, Users, Home, FileEdit } from "lucide-react";
 import type { CustomerSource } from "@/types/unified-customer";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +41,24 @@ const sourceConfig = {
     labelEn: "Referral",
     icon: Users,
     color: "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300",
+  },
+  property_interest: {
+    label: "من صفحة العقار",
+    labelEn: "Property page",
+    icon: Home,
+    color: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
+  },
+  public_form: {
+    label: "من صفحة اطلب عقارك",
+    labelEn: "Request property form",
+    icon: FileEdit,
+    color: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
+  },
+  website: {
+    label: "من موقع العميل",
+    labelEn: "Customer website",
+    icon: Globe,
+    color: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
   },
 } as const;
 

@@ -23,7 +23,7 @@ import { ScheduleAppointmentForm } from "./ScheduleAppointmentForm";
 import { SnoozeFormInline } from "./SnoozeFormInline";
 import { priorityStitchLabels, priorityStitchPillClass } from "../constants/incomingCardConstants";
 import { formatNextActionDatetime } from "../utils/dateTimeUtils";
-import { MessageSquare, Globe, LayoutDashboard, MoreVertical, CheckCircle, Calendar, Bell, UserPlus, X, Home, CalendarDays, Phone, FileText } from "lucide-react";
+import { MessageSquare, Globe, LayoutDashboard, MoreVertical, CheckCircle, Calendar, Bell, UserPlus, X, Home, CalendarDays, Phone, FileText, FileEdit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer } from "@/types/unified-customer";
 import type { StageOption, AIMatchingStatus, EmployeeOption } from "../types/incomingCardTypes";
@@ -36,6 +36,9 @@ const sourceStitchConfig: Record<string, { labelEn: string; Icon: typeof Message
   inquiry: { labelEn: "Website", Icon: Globe },
   import: { labelEn: "Import", Icon: LayoutDashboard },
   referral: { labelEn: "Referral", Icon: Globe },
+  property_interest: { labelEn: "من صفحة العقار", Icon: Home },
+  public_form: { labelEn: "من صفحة اطلب عقارك", Icon: FileEdit },
+  website: { labelEn: "من موقع العميل", Icon: Globe },
 };
 
 function getSourceStitch(source: string | undefined | null) {
