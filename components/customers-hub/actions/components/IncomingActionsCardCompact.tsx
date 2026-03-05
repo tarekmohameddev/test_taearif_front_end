@@ -46,6 +46,12 @@ function getSourceStitch(source: string | undefined | null) {
   return sourceStitchConfig[s ?? ""] ?? { labelEn: "—", Icon: Globe };
 }
 
+/** Show property block only when source is property_interest (first property in array) */
+function isPropertyInterestSource(source: CustomerAction["source"]): boolean {
+  const s = typeof source === "object" && source !== null ? (source as { id?: string }).id : source;
+  return s === "property_interest";
+}
+
 /** Appointment/reminder type to Arabic label and icon for next-action block */
 const nextActionLabelByType: Record<string, string> = {
   site_visit: "موعد معاينة",
@@ -320,7 +326,7 @@ export function IncomingActionsCardCompact({
               {(action.customerPhone ?? resolvedCustomer?.phone) ?? "—"}
             </p>
           </div>
-          <div className="w-10 shrink-0">
+          <div className="w-12 shrink-0">
             <span className={cn("inline-block", priorityStitchPillClass[action.priority])}>
               {priorityStitchLabels[action.priority]}
             </span>
@@ -343,7 +349,7 @@ export function IncomingActionsCardCompact({
               stitchStyle
             />
           </div>
-          {action.properties?.length ? (
+          {isPropertyInterestSource(action.source) && action.properties?.length ? (
             <CompactPropertyBlockStitch action={action} />
           ) : (
             <div className="flex-1 min-w-0" />
@@ -461,7 +467,7 @@ export function IncomingActionsCardCompact({
               <StageDropdown availableStages={availableStages} displayStage={displayStage} isUpdatingStage={isUpdatingStage} onStageChange={onStageChange} getStageColor={getStageColor} getStageNameAr={getStageNameAr} compact stitchStyle />
             </div>
           </div>
-          {action.properties?.length ? (
+          {isPropertyInterestSource(action.source) && action.properties?.length ? (
             <div className="w-full min-w-0">
               <CompactPropertyBlockStitch action={action} />
             </div>
