@@ -110,24 +110,31 @@ export function InlineFiltersRow({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      {uniqueAssignees.length > 0 && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className={btnClass}>
-              <UserPlus className="h-4 w-4" />
-              الموظف
-              {selectedAssignees.length > 0 && (
-                <Badge variant="secondary" className="mr-1">
-                  {selectedAssignees.length}
-                </Badge>
-              )}
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>الموظف المعين</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {uniqueAssignees.map((a) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={btnClass}
+            disabled={uniqueAssignees.length === 0}
+          >
+            <UserPlus className="h-4 w-4" />
+            الموظف
+            {selectedAssignees.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedAssignees.length}
+              </Badge>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>الموظف المعين</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {uniqueAssignees.length === 0 ? (
+            <div className="px-4 py-2 text-sm text-muted-foreground">لا يوجد موظفين</div>
+          ) : (
+            uniqueAssignees.map((a) => (
               <DropdownMenuCheckboxItem
                 key={a.id}
                 checked={selectedAssignees.includes(a.id)}
@@ -139,10 +146,10 @@ export function InlineFiltersRow({
               >
                 {a.name}
               </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+            ))
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

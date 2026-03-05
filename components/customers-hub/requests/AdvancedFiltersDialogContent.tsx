@@ -288,26 +288,29 @@ export function AdvancedFiltersDialogContent({
         })}
       </CustomDropdown>
 
-      {/* الموظف - multi-select */}
-      {uniqueAssignees.length > 0 && (
-        <CustomDropdown
-          contentZIndex={10003}
-          dropdownWidth="w-48"
-          maxHeight="300px"
-          triggerClassName={btnClass}
-          trigger={
-            <>
-              <UserPlus className="h-4 w-4" />
-              <span>الموظف</span>
-              {selectedAssignees.length > 0 && (
-                <Badge variant="secondary" className="mr-1">
-                  {selectedAssignees.length}
-                </Badge>
-              )}
-            </>
-          }
-        >
-          {uniqueAssignees.map((a) => {
+      {/* الموظف - multi-select (always visible, disabled when no assignees) */}
+      <CustomDropdown
+        contentZIndex={10003}
+        dropdownWidth="w-48"
+        maxHeight="300px"
+        triggerClassName={btnClass}
+        disabled={uniqueAssignees.length === 0}
+        trigger={
+          <>
+            <UserPlus className="h-4 w-4" />
+            <span>الموظف</span>
+            {selectedAssignees.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedAssignees.length}
+              </Badge>
+            )}
+          </>
+        }
+      >
+        {uniqueAssignees.length === 0 ? (
+          <div className="px-4 py-2 text-sm text-muted-foreground">لا يوجد موظفين</div>
+        ) : (
+          uniqueAssignees.map((a) => {
             const checked = selectedAssignees.includes(a.id);
             return (
               <div
@@ -326,9 +329,9 @@ export function AdvancedFiltersDialogContent({
                 {a.name}
               </div>
             );
-          })}
-        </CustomDropdown>
-      )}
+          })
+        )}
+      </CustomDropdown>
 
       {/* نوع الموعد - multi-select */}
       <CustomDropdown
@@ -398,26 +401,29 @@ export function AdvancedFiltersDialogContent({
         ))}
       </CustomDropdown>
 
-      {/* المدينة - multi-select */}
-      {uniqueCities.length > 0 && (
-        <CustomDropdown
-          contentZIndex={10003}
-          dropdownWidth="w-48"
-          maxHeight="300px"
-          triggerClassName={btnClass}
-          trigger={
-            <>
-              <MapPin className="h-4 w-4" />
-              <span>المدينة</span>
-              {selectedCities.length > 0 && (
-                <Badge variant="secondary" className="mr-1">
-                  {selectedCities.length}
-                </Badge>
-              )}
-            </>
-          }
-        >
-          {uniqueCities.map((city) => {
+      {/* المدينة - multi-select (always visible, disabled when no cities) */}
+      <CustomDropdown
+        contentZIndex={10003}
+        dropdownWidth="w-48"
+        maxHeight="300px"
+        triggerClassName={btnClass}
+        disabled={uniqueCities.length === 0}
+        trigger={
+          <>
+            <MapPin className="h-4 w-4" />
+            <span>المدينة</span>
+            {selectedCities.length > 0 && (
+              <Badge variant="secondary" className="mr-1">
+                {selectedCities.length}
+              </Badge>
+            )}
+          </>
+        }
+      >
+        {uniqueCities.length === 0 ? (
+          <div className="px-4 py-2 text-sm text-muted-foreground">لا توجد مدن</div>
+        ) : (
+          uniqueCities.map((city) => {
             const checked = selectedCities.includes(city);
             return (
               <div
@@ -436,9 +442,9 @@ export function AdvancedFiltersDialogContent({
                 {city}
               </div>
             );
-          })}
-        </CustomDropdown>
-      )}
+          })
+        )}
+      </CustomDropdown>
 
       {/* المنطقة - multi-select */}
       <CustomDropdown
