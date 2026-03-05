@@ -43,7 +43,7 @@ export function ActionPropertiesTable({
   return (
     <div
       className={cn(
-        "mt-3 p-2.5 rounded-lg w-full max-w-[500px] overflow-x-auto",
+        "mt-3 p-2.5 rounded-lg w-full max-w-[600px] overflow-x-auto",
         "bg-white/85 dark:bg-gray-800/90 border border-gray-200/90 dark:border-gray-600/90",
         "border-r-2 border-r-stone-400/80 dark:border-r-stone-600/80",
         "shadow-sm",
