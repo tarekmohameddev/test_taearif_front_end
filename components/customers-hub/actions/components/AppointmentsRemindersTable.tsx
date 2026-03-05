@@ -39,15 +39,18 @@ export function AppointmentsRemindersTable({
   return (
     <div
       className={cn(
-        "mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 max-w-[250px]",
+        "mt-3 p-2.5 rounded-xl max-w-[250px]",
+        "bg-white/85 dark:bg-gray-800/90 border border-gray-200/90 dark:border-gray-600/90",
+        "border-r-2 border-r-slate-300/80 dark:border-r-slate-600/80",
+        "shadow-sm",
         className
       )}
     >
       <table className="w-full text-xs border-collapse">
         <thead>
-          <tr className="text-muted-foreground border-b border-gray-200 dark:border-gray-700">
-            <th className="text-right py-1 px-1.5 font-medium">النوع</th>
-            <th className="text-right py-1 px-1.5 font-medium">التاريخ والوقت</th>
+          <tr className="text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">
+            <th className="text-right py-1.5 px-1.5 font-semibold">العنوان</th>
+            <th className="text-right py-1.5 px-1.5 font-semibold">التاريخ والوقت</th>
           </tr>
         </thead>
         <tbody className="text-xs">
