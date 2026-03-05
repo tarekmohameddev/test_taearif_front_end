@@ -5,8 +5,8 @@ import { createPortal } from "react-dom";
 import { ChevronDown, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils"; // تأكد أن لديك دالة cn أو استخدم classNames العادية
 
-// Context لإغلاق dropdown
-const DropdownContext = createContext<{ closeDropdown: () => void } | null>(null);
+// Context لإغلاق dropdown (exported for consumers that need to close from inside, e.g. budget form)
+export const DropdownContext = createContext<{ closeDropdown: () => void } | null>(null);
 
 // --- المكونات الفرعية ---
 
