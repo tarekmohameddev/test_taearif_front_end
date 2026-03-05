@@ -163,7 +163,7 @@ export function CustomersGrid() {
                   <User className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                   <span>المسؤول:</span>
                   <span className="font-medium">
-                    {customer.assignedEmployee?.name ?? "لا يوجد"}
+                    {customer.assignedEmployee?.name?.trim() || "لا يوجد"}
                   </span>
                 </div>
               </div>

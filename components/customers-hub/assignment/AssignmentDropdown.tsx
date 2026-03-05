@@ -79,12 +79,12 @@ export function AssignmentDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size={size} className="gap-1 h-8 px-2">
-          {currentEmployeeName ? (
-            <span className="text-xs truncate max-w-[80px]">{currentEmployeeName}</span>
+            <ChevronDown className="h-3 w-3" />
+          {currentEmployeeName?.trim() ? (
+            <span className="text-xs truncate max-w-[80px]">{currentEmployeeName.trim()}</span>
           ) : (
             <span className="text-xs text-gray-500">لا يوجد</span>
           )}
-          <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">

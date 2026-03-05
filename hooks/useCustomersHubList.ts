@@ -41,13 +41,17 @@ export function useCustomersHubList() {
           const transformedCustomers = response.data.customers.map((customer: any) => ({
             ...customer,
             id: customer.id?.toString() || customer.id,
-            assignedEmployeeId: customer.assignedTo?.id?.toString() || customer.assignedTo?.toString(),
-            assignedEmployee: customer.assignedTo ? {
-              id: customer.assignedTo.id?.toString() || customer.assignedTo.toString(),
-              name: customer.assignedTo.name || "",
-              email: customer.assignedTo.email,
-              phone: customer.assignedTo.phone,
-            } : undefined,
+            assignedEmployeeId: (customer.assignedTo?.id != null && String(customer.assignedTo?.name ?? "").trim())
+              ? (customer.assignedTo.id?.toString() ?? customer.assignedTo?.toString())
+              : undefined,
+            assignedEmployee: (customer.assignedTo?.id != null && String(customer.assignedTo?.name ?? "").trim())
+              ? {
+                  id: customer.assignedTo.id?.toString() || String(customer.assignedTo.id),
+                  name: String(customer.assignedTo.name ?? "").trim(),
+                  email: customer.assignedTo.email,
+                  phone: customer.assignedTo.phone,
+                }
+              : undefined,
             // Use stage_id (string) from API response
             stage: customer.stage?.id || customer.stage?.stage_id || customer.stage || "new_lead",
             priority: customer.priority?.name?.toLowerCase() || customer.priority || "medium",
