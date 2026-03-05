@@ -46,6 +46,9 @@ export function AppointmentsRemindersTable({
         className
       )}
     >
+      <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 pb-1 border-b border-gray-200 dark:border-gray-600">
+        الاجراءات
+      </p>
       <table className="w-full text-xs border-collapse">
         <thead>
           <tr className="text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">
