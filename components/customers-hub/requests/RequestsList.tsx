@@ -108,7 +108,7 @@ export function RequestsList({
       {actions.map((action) => (
         <div
           key={action.id}
-          className={isCompactView ? undefined : "h-full min-h-0"}
+          className={isCompactView ? "w-full min-w-0" : "h-full min-h-0"}
           style={
             !isCompactView && maxCardHeight != null
               ? { minHeight: maxCardHeight }
