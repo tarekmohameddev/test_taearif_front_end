@@ -39,7 +39,7 @@ export function AppointmentsRemindersTable({
   return (
     <div
       className={cn(
-        "mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50",
+        "mt-3 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 max-w-[250px]",
         className
       )}
     >

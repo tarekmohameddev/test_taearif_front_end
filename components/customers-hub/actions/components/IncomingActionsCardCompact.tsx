@@ -20,6 +20,7 @@ import {
 } from "@/components/customComponents/CustomDialog";
 import { SourceBadge } from "../SourceBadge";
 import { AppointmentsRemindersTable } from "./AppointmentsRemindersTable";
+import { ActionPropertiesTable } from "./ActionPropertiesTable";
 import { StageDropdown } from "./StageDropdown";
 import { AIMatchingBadge } from "./AIMatchingBadge";
 import { AssignEmployeeDialog } from "./AssignEmployeeDialog";
@@ -281,10 +282,13 @@ export function IncomingActionsCardCompact({
               </div>
             )}
           </div>
+        <div className="flex flex-row gap-1 shrink-0">
           <AppointmentsRemindersTable
             appointments={action.appointments}
             reminders={action.reminders}
           />
+          <ActionPropertiesTable properties={action.properties} />
+        </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <DropdownMenu>
