@@ -94,17 +94,13 @@ export const useCustomersHubFiltersState = () => {
     }
 
     // ObjectTypes filter (new field: Kind of record)
-    // ALWAYS include property_request - it's required for all requests
+    // ALWAYS include property_request and property_interest - required for all requests
+    const requiredObjectTypes = ["property_request", "property_interest"] as const;
     if (selectedObjectTypes.length > 0) {
-      // Ensure property_request is always included, even if user selects other types
-      if (!selectedObjectTypes.includes("property_request")) {
-        filters.objectTypes = [...selectedObjectTypes, "property_request"];
-      } else {
-        filters.objectTypes = selectedObjectTypes;
-      }
+      const missing = requiredObjectTypes.filter((t) => !selectedObjectTypes.includes(t));
+      filters.objectTypes = missing.length ? [...selectedObjectTypes, ...missing] : selectedObjectTypes;
     } else {
-      // Default to property_request if no objectTypes selected
-      filters.objectTypes = ["property_request"];
+      filters.objectTypes = ["property_request", "property_interest"];
     }
 
     // Priorities filter (changed from priority to priorities)
