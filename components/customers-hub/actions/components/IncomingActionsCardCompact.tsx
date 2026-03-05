@@ -23,6 +23,7 @@ import { ScheduleAppointmentForm } from "./ScheduleAppointmentForm";
 import { SnoozeFormInline } from "./SnoozeFormInline";
 import { priorityStitchLabels, priorityStitchPillClass } from "../constants/incomingCardConstants";
 import { formatNextActionDatetime } from "../utils/dateTimeUtils";
+import { translatePropertyType } from "../utils/propertyUtils";
 import { MessageSquare, Globe, LayoutDashboard, MoreVertical, CheckCircle, Calendar, Bell, UserPlus, X, Home, CalendarDays, Phone, FileText, FileEdit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer } from "@/types/unified-customer";
@@ -74,7 +75,7 @@ function CompactPropertyBlockStitch({ action }: { action: CustomerAction }) {
   if (!first) return null;
   const src = first.featuredImage || null;
   const alt = first.title ?? "";
-  const propType = first.propertyType ?? "—";
+  const propType = first.propertyType ? translatePropertyType(first.propertyType) : "—";
   const area = first.size ?? (first.area != null ? `${first.area} م²` : "—");
   const listing = first.listingTypeLabel ?? "—";
   const listingAr =

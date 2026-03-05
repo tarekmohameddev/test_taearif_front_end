@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import type { LastPropertyRequest } from "@/types/unified-customer";
 import { getStageNameAr, getStageColor, LIFECYCLE_STAGES } from "@/types/unified-customer";
+import { translatePropertyType } from "@/components/customers-hub/actions/utils/propertyUtils";
 import Link from "next/link";
 import { AssignmentDropdown } from "../assignment";
 
@@ -112,11 +113,11 @@ export function CustomersTable() {
     const r = req!;
     const city = r.city?.trim();
     const district = r.district?.trim();
-    const propertyType = r.propertyType?.trim();
+    const propertyTypeAr = translatePropertyType(r.propertyType);
     const listingType = r.listingTypeLabel?.trim();
     const locationParts = [district, city].filter(Boolean);
     const location = locationParts.length > 0 ? locationParts.join("، ") : null;
-    const typeParts = [propertyType, listingType].filter(Boolean);
+    const typeParts = [propertyTypeAr, listingType].filter(Boolean);
     const typeLine = typeParts.length > 0 ? typeParts.join(" · ") : null;
     return (
       <div className="text-right text-sm space-y-0.5 min-w-[140px]">

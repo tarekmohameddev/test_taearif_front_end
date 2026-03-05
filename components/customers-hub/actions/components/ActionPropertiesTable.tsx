@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { translatePropertyType } from "@/components/customers-hub/actions/utils/propertyUtils";
 
 export interface ActionPropertyRow {
   id: number;
@@ -86,7 +87,7 @@ export function ActionPropertiesTable({
             >
               <td className="py-1 px-1.5 max-w-[120px] truncate" title={prop.title ?? undefined}>{prop.title ?? "—"}</td>
               <td className="py-1 px-1.5 max-w-[120px] truncate" title={prop.address ?? undefined}>{prop.address ?? "—"}</td>
-              <td className="py-1 px-1.5 whitespace-nowrap">{prop.propertyType ?? "—"}</td>
+              <td className="py-1 px-1.5 whitespace-nowrap">{prop.propertyType ? translatePropertyType(prop.propertyType) : "—"}</td>
               <td className="py-1 px-1.5 dir-ltr whitespace-nowrap">{displaySize(prop) ?? "—"}</td>
               <td className="py-1 px-1.5 whitespace-nowrap">{prop.listingTypeLabel ?? "—"}</td>
               <td className="py-1 px-1.5 whitespace-nowrap">{prop.city ?? "—"}</td>

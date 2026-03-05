@@ -3,16 +3,21 @@ import type { PropertyBlock } from "../types/incomingCardTypes";
 import { AI_MATCHING_REQUIRED } from "../constants/incomingCardConstants";
 import type { AIMatchingStatus } from "../types/incomingCardTypes";
 
+/** خريطة ترجمة نوع العقار إلى العربية (المفتاح lowercase للتوافق مع API) */
 const PROPERTY_TYPE_MAP: Record<string, string> = {
-  Residential: "سكني",
-  Industrial: "صناعي",
-  Agricultural: "زراعي",
-  Commercial: "تجاري",
+  residential: "سكني",
+  industrial: "صناعي",
+  agricultural: "زراعي",
+  commercial: "تجاري",
+  apartment: "شقة",
+  land: "أرض",
+  villa: "فيلا",
 };
 
 export function translatePropertyType(propertyType: string | null | undefined): string {
-  if (!propertyType) return "";
-  return PROPERTY_TYPE_MAP[propertyType] || propertyType;
+  if (!propertyType || typeof propertyType !== "string") return "";
+  const key = propertyType.trim().toLowerCase();
+  return PROPERTY_TYPE_MAP[key] ?? propertyType;
 }
 
 export function getPropertyFromMetadata(
