@@ -418,14 +418,6 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
         onOpenChange={setShowExportDialog}
         customers={filteredCustomers}
       />
-
-      {/* Keyboard Shortcuts Hint */}
-      <div className="fixed bottom-6 right-6 z-40">
-        <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
-          <kbd className="px-2 py-1 bg-gray-800 rounded">?</kbd>
-          <span>اضغط لعرض الاختصارات</span>
-        </div>
-      </div>
       </div>
     </div>
   );
