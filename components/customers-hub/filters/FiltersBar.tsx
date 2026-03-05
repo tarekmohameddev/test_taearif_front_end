@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { 
-  Search, X, Home, Users, Clock, MapPin, ChevronDown
+  Search, X, Home, Users, Clock, MapPin, ChevronDown, Building2, UserCircle
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -18,9 +18,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import { LIFECYCLE_STAGES, getStageNameAr, getStageInfo } from "@/types/unified-customer";
+import { LIFECYCLE_STAGES, getStageNameAr } from "@/types/unified-customer";
 import type { CustomerFilters } from "@/types/unified-customer";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
+import { useCustomersHubAssignment } from "@/hooks/useCustomersHubAssignment";
 
 interface FiltersBarProps {
   filterOptions?: {
@@ -35,6 +36,7 @@ interface FiltersBarProps {
     priorities?: Array<{ id: number; name: string }>;
     types?: Array<{ id: number; name: string }>;
     cities?: Array<{ id: number; name: string }>;
+    districts?: Array<{ id: number; name: string; cityId: number }>;
   };
   onSearch?: (query: string) => void;
   onApplyFilters?: () => void;
@@ -50,9 +52,13 @@ const priorityLabels: Record<string, string> = {
 export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersBarProps) {
   const { filters, setFilters, clearFilters, applyFilters } = useUnifiedCustomersStore();
   const [searchQuery, setSearchQuery] = useState("");
+  const { employees } = useCustomersHubAssignment();
   
   // Use stages from Zustand store (fetched once, shared across all components)
   const { stages: dynamicStages } = useCustomersHubStagesStore();
+  
+  const cities = filterOptions?.cities ?? [];
+  const districts = filterOptions?.districts ?? [];
   
   // Use filterOptions.stages if provided, otherwise use dynamic stages, otherwise fallback to LIFECYCLE_STAGES
   const displayStages = filterOptions?.stages && filterOptions.stages.length > 0
@@ -162,11 +168,38 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
     }
   };
 
+  const handleCityToggle = (cityId: number) => {
+    const current = filters.city || [];
+    const next = current.includes(cityId) ? current.filter((id) => id !== cityId) : [...current, cityId];
+    setFilters({ city: next.length > 0 ? next : undefined });
+    if (onApplyFilters) onApplyFilters();
+    else applyFilters();
+  };
+
+  const handleDistrictToggle = (districtId: number) => {
+    const current = filters.district || [];
+    const next = current.includes(districtId) ? current.filter((id) => id !== districtId) : [...current, districtId];
+    setFilters({ district: next.length > 0 ? next : undefined });
+    if (onApplyFilters) onApplyFilters();
+    else applyFilters();
+  };
+
+  const handleEmployeeToggle = (employeeId: string) => {
+    const current = filters.assignedEmployee || [];
+    const next = current.includes(employeeId) ? current.filter((id) => id !== employeeId) : [...current, employeeId];
+    setFilters({ assignedEmployee: next.length > 0 ? next : undefined });
+    if (onApplyFilters) onApplyFilters();
+    else applyFilters();
+  };
+
   const hasActiveFilters = 
     (filters.stage && filters.stage.length > 0) ||
     (filters.priority && filters.priority.length > 0) ||
     (filters.propertyType && filters.propertyType.length > 0) ||
     (filters.source && filters.source.length > 0) ||
+    (filters.city && filters.city.length > 0) ||
+    (filters.district && filters.district.length > 0) ||
+    (filters.assignedEmployee && filters.assignedEmployee.length > 0) ||
     filters.search;
 
   return (
@@ -203,12 +236,12 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
 
             {/* Filters Dropdowns */}
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Stages Dropdown */}
+              {/* مرحلة (Stages) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
                     <Users className="h-4 w-4" />
-                    جميع المراحل
+                    مرحلة
                     {filters.stage && filters.stage.length > 0 && (
                       <Badge variant="secondary" className="mr-1">
                         {filters.stage.length}
@@ -218,7 +251,7 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 max-h-[400px] overflow-y-auto">
-                  <DropdownMenuLabel>المراحل</DropdownMenuLabel>
+                  <DropdownMenuLabel>المرحلة</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {displayStages.map((stage) => (
                     <DropdownMenuCheckboxItem
@@ -237,6 +270,99 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              {/* مدينة (City) */}
+              {cities.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Building2 className="h-4 w-4" />
+                      مدينة
+                      {filters.city && filters.city.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.city.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 max-h-[300px] overflow-y-auto">
+                    <DropdownMenuLabel>المدينة</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {cities.map((city) => (
+                      <DropdownMenuCheckboxItem
+                        key={city.id}
+                        checked={filters.city?.includes(city.id)}
+                        onCheckedChange={() => handleCityToggle(city.id)}
+                      >
+                        {city.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* حي (District) */}
+              {districts.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <MapPin className="h-4 w-4" />
+                      حي
+                      {filters.district && filters.district.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.district.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 max-h-[300px] overflow-y-auto">
+                    <DropdownMenuLabel>الحي</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {districts.map((d) => (
+                      <DropdownMenuCheckboxItem
+                        key={d.id}
+                        checked={filters.district?.includes(d.id)}
+                        onCheckedChange={() => handleDistrictToggle(d.id)}
+                      >
+                        {d.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* موظف (Employee) */}
+              {employees.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <UserCircle className="h-4 w-4" />
+                      موظف
+                      {filters.assignedEmployee && filters.assignedEmployee.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.assignedEmployee.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 max-h-[300px] overflow-y-auto">
+                    <DropdownMenuLabel>الموظف المسؤول</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {employees.filter((e) => e.isActive).map((emp) => (
+                      <DropdownMenuCheckboxItem
+                        key={emp.id}
+                        checked={filters.assignedEmployee?.includes(emp.id)}
+                        onCheckedChange={() => handleEmployeeToggle(emp.id)}
+                      >
+                        {emp.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
               {/* Priority Dropdown */}
               <DropdownMenu>

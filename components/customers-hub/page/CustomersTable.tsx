@@ -186,7 +186,13 @@ export function CustomersTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>{getPriorityBadge(customer.priority)}</TableCell>
-                  <TableCell>{getSourceBadge(customer.source)}</TableCell>
+                  <TableCell>
+                    {customer.sourceAr ? (
+                      <Badge variant="outline" className="text-xs">{customer.sourceAr}</Badge>
+                    ) : (
+                      getSourceBadge(customer.source)
+                    )}
+                  </TableCell>
                   <TableCell>
                     <AssignmentDropdown
                       customerId={customer.id}

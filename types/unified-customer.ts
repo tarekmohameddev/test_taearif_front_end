@@ -511,6 +511,8 @@ export interface UnifiedCustomer {
   
   // Source Tracking
   source: CustomerSource;
+  /** الترجمة العربية للمصدر من API (مثل: واتساب، يدوي، لوحة الموظف) */
+  sourceAr?: string;
   sourceDetails?: SourceDetails;
   
   // Lifecycle
@@ -783,6 +785,10 @@ export interface CustomerFilters {
   source?: CustomerSource[];
   priority?: Priority[];
   assignedEmployee?: string[];
+  /** مدينة (معرفات من filter-options) */
+  city?: number[];
+  /** حي (معرفات من filter-options) */
+  district?: number[];
   leadScoreMin?: number;
   leadScoreMax?: number;
   budgetMin?: number;

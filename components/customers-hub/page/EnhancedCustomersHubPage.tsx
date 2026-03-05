@@ -272,22 +272,20 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
               includeStats: true,
               filters: {
                 search: query || undefined,
-                stage: filters.stage?.map(s => {
-                  const stageOption = apiFilterOptions?.stages?.find(st => st.name === s);
-                  return stageOption?.id || 0;
-                }).filter(id => id > 0),
+                stage: (filters.stage?.length ? filters.stage : undefined) as string[] | undefined,
                 priority: filters.priority?.map(p => {
                   const priorityOption = apiFilterOptions?.priorities?.find(pr => pr.name === p);
-                  return priorityOption?.id || 0;
+                  return priorityOption?.id ?? 0;
                 }).filter(id => id > 0),
                 type: filters.propertyType?.map(t => {
                   const typeOption = apiFilterOptions?.types?.find(ty => ty.name === t);
-                  return typeOption?.id || 0;
+                  return typeOption?.id ?? 0;
                 }).filter(id => id > 0),
-                city: filters.city?.map(c => {
-                  const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
-                  return cityOption?.id || 0;
-                }).filter(id => id > 0),
+                city: (filters.city?.length ? filters.city : undefined),
+                district: (filters.district?.length ? filters.district : undefined),
+                assignedTo: (filters.assignedEmployee?.length
+                  ? filters.assignedEmployee.map(id => parseInt(String(id), 10)).filter(n => !isNaN(n))
+                  : undefined),
               },
               pagination: apiPagination ? {
                 page: apiPagination.currentPage,
@@ -311,22 +309,20 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
               includeStats: true,
               filters: {
                 search: filters.search,
-                stage: filters.stage?.map(s => {
-                  const stageOption = apiFilterOptions?.stages?.find(st => st.name === s);
-                  return stageOption?.id || 0;
-                }).filter(id => id > 0),
+                stage: (filters.stage?.length ? filters.stage : undefined) as string[] | undefined,
                 priority: filters.priority?.map(p => {
                   const priorityOption = apiFilterOptions?.priorities?.find(pr => pr.name === p);
-                  return priorityOption?.id || 0;
+                  return priorityOption?.id ?? 0;
                 }).filter(id => id > 0),
                 type: filters.propertyType?.map(t => {
                   const typeOption = apiFilterOptions?.types?.find(ty => ty.name === t);
-                  return typeOption?.id || 0;
+                  return typeOption?.id ?? 0;
                 }).filter(id => id > 0),
-                city: filters.city?.map(c => {
-                  const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
-                  return cityOption?.id || 0;
-                }).filter(id => id > 0),
+                city: (filters.city?.length ? filters.city : undefined),
+                district: (filters.district?.length ? filters.district : undefined),
+                assignedTo: (filters.assignedEmployee?.length
+                  ? filters.assignedEmployee.map(id => parseInt(String(id), 10)).filter(n => !isNaN(n))
+                  : undefined),
               },
               pagination: apiPagination ? {
                 page: apiPagination.currentPage,
