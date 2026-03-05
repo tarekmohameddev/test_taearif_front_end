@@ -47,7 +47,6 @@ export function AppointmentsRemindersTable({
         <thead>
           <tr className="text-muted-foreground border-b border-gray-200 dark:border-gray-700">
             <th className="text-right py-1 px-1.5 font-medium">النوع</th>
-            <th className="text-right py-1 px-1.5 font-medium">العنوان</th>
             <th className="text-right py-1 px-1.5 font-medium">التاريخ والوقت</th>
           </tr>
         </thead>
@@ -58,7 +57,6 @@ export function AppointmentsRemindersTable({
                 key={apt.id ?? `apt-${i}`}
                 className="border-b border-gray-100 dark:border-gray-700/50"
               >
-                <td className="py-1 px-1.5">موعد</td>
                 <td className="py-1 px-1.5">{apt.title ?? "—"}</td>
                 <td className="py-1 px-1.5 dir-ltr">
                   {formatAppointmentDatetime(apt.datetime)}
@@ -71,7 +69,6 @@ export function AppointmentsRemindersTable({
                 key={rem.id ?? `rem-${i}`}
                 className="border-b border-gray-100 dark:border-gray-700/50"
               >
-                <td className="py-1 px-1.5">تذكير</td>
                 <td className="py-1 px-1.5">{rem.title ?? rem.description ?? "—"}</td>
                 <td className="py-1 px-1.5 dir-ltr">
                   {formatAppointmentDatetime(rem.datetime)}
