@@ -592,7 +592,10 @@ export default function blogDetails2(props: blogDetails2Props) {
 
   const primaryColorHover = getDarkerColor(primaryColor, 20);
 
-  const textColor = mergedData.styling?.textColor || "#967152";
+  const textColor = getColorFromField(
+    mergedData.styling?.textColor,
+    brandingColors.primary,
+  );
   const formBackgroundColor =
     mergedData.styling?.formBackgroundColor || "#8b5f46";
   const formTextColor = mergedData.styling?.formTextColor || "#ffffff";

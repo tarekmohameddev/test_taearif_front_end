@@ -26,7 +26,7 @@ export const getDefaultpropertyDetail2Data = (): ComponentData => ({
       globalColorType: "primary", // primary, secondary, or accent
       // color value is not stored when useDefaultColor = true
     },
-    textColor: "#967152",
+    textColor: { useDefaultColor: true, globalColorType: "primary" },
     secondaryTextColor: "#6b7280",
     formBackgroundColor: "#8b5f46",
     formTextColor: "#ffffff",

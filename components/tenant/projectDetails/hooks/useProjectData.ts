@@ -278,6 +278,12 @@ export const useProjectData = (props: ProjectDetails2Props) => {
         ? mergedData.hero.overlayOpacity
         : 0.8;
 
+  // Resolved text color (useDefaultColor/globalColorType or custom hex)
+  const textColor = getColorFromField(
+    mergedData.styling?.textColor,
+    brandingColors.primary,
+  );
+
   // Get logo image from tenantData
   const { loadingTenantData } = useTenantStore();
   const logoImage = loadingTenantData
@@ -288,6 +294,7 @@ export const useProjectData = (props: ProjectDetails2Props) => {
   return {
     mergedData,
     primaryColor,
+    textColor,
     logoImage,
     tenantData,
     heroBackgroundType,

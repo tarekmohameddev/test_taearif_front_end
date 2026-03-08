@@ -135,7 +135,7 @@ export const getDefaultProjectDetails2Data = (): ComponentData => ({
       globalColorType: "primary", // primary, secondary, or accent
       // color value is not stored when useDefaultColor = true
     },
-    textColor: "#967152",
+    textColor: { useDefaultColor: true, globalColorType: "primary" },
     secondaryTextColor: "#6b7280",
     cardBackgroundColor: "#8b5f46",
     borderColor: "#e5e7eb",

@@ -71,7 +71,7 @@ export const getDefaultBlogDetails2Data = (): ComponentData => ({
   styling: {
     backgroundColor: "#ffffff",
     primaryColor: "#8b5f46", // Brown color
-    textColor: "#967152",
+    textColor: { useDefaultColor: true, globalColorType: "primary" },
     secondaryTextColor: "#6b7280",
     formBackgroundColor: "#8b5f46",
     formTextColor: "#ffffff",

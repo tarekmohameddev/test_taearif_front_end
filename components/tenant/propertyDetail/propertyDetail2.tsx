@@ -804,7 +804,10 @@ export default function propertyDetail2(props: propertyDetail2Props) {
         ? mergedData.hero.overlayOpacity
         : 0.8;
 
-  const textColor = mergedData.styling?.textColor || "#967152";
+  const textColor = getColorFromField(
+    mergedData.styling?.textColor,
+    brandingColors.primary,
+  );
 
   // Show skeleton loading while tenant or property is loading
   if (tenantLoading || loadingProperty) {
