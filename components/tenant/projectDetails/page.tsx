@@ -20,7 +20,17 @@ import type { ProjectDetails2Props } from "./types";
 
 export default function ProjectDetails2(props: ProjectDetails2Props) {
   // Get merged data from store
-  const { mergedData, primaryColor, logoImage } = useProjectData(props);
+  const {
+    mergedData,
+    primaryColor,
+    textColor,
+    logoImage,
+    heroBackgroundType,
+    heroImageSrc,
+    getHeroBackgroundColor,
+    getHeroOverlayColor,
+    heroOverlayOpacity,
+  } = useProjectData(props);
 
   // Early return if not visible
   if (!mergedData.visible) {
@@ -55,7 +65,11 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   if (tenantLoading || loadingProject) {
     return (
       <LoadingSkeleton
-        heroHeight={mergedData.hero?.height || "500px"}
+        heroHeight={
+          typeof mergedData.hero?.height === "number"
+            ? `${mergedData.hero.height}px`
+            : (mergedData.hero?.height || "500px")
+        }
         maxWidth={mergedData.layout?.maxWidth}
       />
     );
@@ -78,9 +92,18 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
       {/* Top Hero Image Section */}
       <HeroSection
         project={project}
-        heroHeight={mergedData.hero?.height || "500px"}
+        heroHeight={
+          typeof mergedData.hero?.height === "number"
+            ? `${mergedData.hero.height}px`
+            : (mergedData.hero?.height || "500px")
+        }
         maxWidth={mergedData.layout?.maxWidth}
         primaryColor={primaryColor}
+        heroBackgroundType={heroBackgroundType}
+        heroImageSrc={heroImageSrc}
+        getHeroBackgroundColor={getHeroBackgroundColor}
+        getHeroOverlayColor={getHeroOverlayColor}
+        heroOverlayOpacity={heroOverlayOpacity}
       />
 
       {/* Main Content Container */}
@@ -123,7 +146,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
             <DescriptionSection
               description={project.description}
               title={mergedData.content?.descriptionTitle}
-              textColor={mergedData.styling?.textColor}
+              textColor={textColor}
               primaryColor={primaryColor}
               showDescription={mergedData.displaySettings?.showDescription}
             />
@@ -132,7 +155,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
             <SpecsSection
               project={project}
               title={mergedData.content?.specsTitle}
-              textColor={mergedData.styling?.textColor}
+              textColor={textColor}
               primaryColor={primaryColor}
               showSpecs={mergedData.displaySettings?.showSpecs}
             />
@@ -140,7 +163,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
             {/* Amenities Section */}
             <AmenitiesSection
               project={project}
-              textColor={mergedData.styling?.textColor}
+              textColor={textColor}
               primaryColor={primaryColor}
             />
           </div>
@@ -165,7 +188,7 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
         {/* Related Properties Grid */}
         <RelatedPropertiesSection
           project={project}
-          textColor={mergedData.styling?.textColor}
+          textColor={textColor}
           primaryColor={primaryColor}
         />
       </div>

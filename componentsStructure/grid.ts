@@ -345,21 +345,9 @@ export const gridStructure: ComponentStructure = {
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                },
-                {
-                  key: "horizontal",
-                  label: "Horizontal Padding",
-                  type: "text",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "48", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "48", unit: "px" },
+                { key: "horizontal", label: "Horizontal Padding", type: "number", placeholder: "24", unit: "px" },
               ],
             },
           ],
@@ -600,15 +588,9 @@ export const gridStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "select",
-                      defaultValue: "lg",
-                      options: [
-                        { value: "sm", label: "Small" },
-                        { value: "base", label: "Base" },
-                        { value: "lg", label: "Large" },
-                        { value: "xl", label: "Extra Large" },
-                        { value: "2xl", label: "2X Large" },
-                      ],
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                       description: "Font size for the title",
                     },
                     {
@@ -644,15 +626,9 @@ export const gridStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "select",
-                      defaultValue: "xl",
-                      options: [
-                        { value: "sm", label: "Small" },
-                        { value: "base", label: "Base" },
-                        { value: "lg", label: "Large" },
-                        { value: "xl", label: "Extra Large" },
-                        { value: "2xl", label: "2X Large" },
-                      ],
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 20,
                       description: "Font size for the price",
                     },
                     {
@@ -796,27 +772,9 @@ export const gridStructure: ComponentStructure = {
               label: "Section Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  defaultValue: "56px",
-                  description: "Top padding for the section",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  defaultValue: "56px",
-                  description: "Bottom padding for the section",
-                },
-                {
-                  key: "horizontal",
-                  label: "Horizontal Padding",
-                  type: "text",
-                  defaultValue: "24px",
-                  description: "Horizontal padding for the section",
-                },
+                { key: "top", label: "Top Padding", type: "number", defaultValue: 56, unit: "px", description: "Top padding for the section" },
+                { key: "bottom", label: "Bottom Padding", type: "number", defaultValue: 56, unit: "px", description: "Bottom padding for the section" },
+                { key: "horizontal", label: "Horizontal Padding", type: "number", defaultValue: 24, unit: "px", description: "Horizontal padding for the section" },
               ],
             },
           ],

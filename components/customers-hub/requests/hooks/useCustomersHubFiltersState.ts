@@ -1,8 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import type { CustomerSource, Priority, CustomerActionType, ObjectType } from "@/types/unified-customer";
-
-const REQUEST_TYPES: CustomerActionType[] = ["new_inquiry", "callback_request", "whatsapp_incoming"];
-const FOLLOWUP_TYPES: CustomerActionType[] = ["follow_up", "site_visit"];
+import type { CustomerSource, Priority, ObjectType } from "@/types/unified-customer";
+import type { AppointmentTypeFilter } from "@/lib/services/customers-hub-requests-api";
 
 export const useCustomersHubFiltersState = () => {
   // Filter states - local state like Properties
@@ -12,13 +10,14 @@ export const useCustomersHubFiltersState = () => {
   // Default to empty sources (property_request moved to objectTypes)
   const [selectedSources, setSelectedSources] = useState<CustomerSource[]>([]);
   // Default to property_request objectType only (moved from sources)
-  const [selectedObjectTypes, setSelectedObjectTypes] = useState<ObjectType[]>(["property_request"]); // New field: Kind of record
+  const [selectedObjectTypes, setSelectedObjectTypes] = useState<ObjectType[]>(["property_request"]); // Kind of record
   const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<CustomerActionType[]>([]);
+  const [selectedAppointmentTypes, setSelectedAppointmentTypes] = useState<AppointmentTypeFilter[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [dueDateFilter, setDueDateFilter] = useState<"all" | "overdue" | "today" | "week" | "no_date">("all");
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
+  const [selectedStageIds, setSelectedStageIds] = useState<number[]>([]);
   const [budgetMin, setBudgetMin] = useState<string>("");
   const [budgetMax, setBudgetMax] = useState<string>("");
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
@@ -111,9 +110,9 @@ export const useCustomersHubFiltersState = () => {
       filters.priorities = selectedPriorities;
     }
 
-    // Types filter (changed from type to types, overrides tab type if selected)
-    if (selectedTypes.length > 0) {
-      filters.types = selectedTypes;
+    // Appointment types filter: property_request only if has ≥1 appointment of selected type(s)
+    if (selectedAppointmentTypes.length > 0) {
+      filters.appointment_types = selectedAppointmentTypes;
     }
 
     // Assignees filter (changed from assignedTo to assignees, convert to numbers)
@@ -134,6 +133,11 @@ export const useCustomersHubFiltersState = () => {
     // States filter (changed from state to states)
     if (selectedStates.length > 0) {
       filters.states = selectedStates;
+    }
+
+    // Pipeline stages filter (property_request_statuses.id)
+    if (selectedStageIds.length > 0) {
+      filters.stages = selectedStageIds;
     }
 
     // Budget filters (changed from budgetMin/budgetMax to budget_min/budget_max)
@@ -159,7 +163,7 @@ export const useCustomersHubFiltersState = () => {
       activeTab,
       selectedSources,
       selectedPriorities,
-      selectedTypes,
+      selectedAppointmentTypes,
       filters,
     });
 
@@ -170,11 +174,12 @@ export const useCustomersHubFiltersState = () => {
     selectedSources,
     selectedObjectTypes,
     selectedPriorities,
-    selectedTypes,
+    selectedAppointmentTypes,
     selectedAssignees,
     dueDateFilter,
     selectedCities,
     selectedStates,
+    selectedStageIds,
     budgetMin,
     budgetMax,
     selectedPropertyTypes,
@@ -188,11 +193,12 @@ export const useCustomersHubFiltersState = () => {
     setSelectedSources([]); // Reset to empty (property_request moved to objectTypes)
     setSelectedObjectTypes(["property_request"]); // Reset to property_request default
     setSelectedPriorities([]);
-    setSelectedTypes([]);
+    setSelectedAppointmentTypes([]);
     setSelectedAssignees([]);
     setDueDateFilter("all");
     setSelectedCities([]);
     setSelectedStates([]);
+    setSelectedStageIds([]);
     setBudgetMin("");
     setBudgetMax("");
     setSelectedPropertyTypes([]);
@@ -214,8 +220,8 @@ export const useCustomersHubFiltersState = () => {
     setSelectedObjectTypes,
     selectedPriorities,
     setSelectedPriorities,
-    selectedTypes,
-    setSelectedTypes,
+    selectedAppointmentTypes,
+    setSelectedAppointmentTypes,
     selectedAssignees,
     setSelectedAssignees,
     dueDateFilter,
@@ -224,6 +230,8 @@ export const useCustomersHubFiltersState = () => {
     setSelectedCities,
     selectedStates,
     setSelectedStates,
+    selectedStageIds,
+    setSelectedStageIds,
     budgetMin,
     setBudgetMin,
     budgetMax,

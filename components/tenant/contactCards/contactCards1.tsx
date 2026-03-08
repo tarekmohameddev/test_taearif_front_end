@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultContactCardsData } from "@/context/editorStoreFunctions/contactCardsFunctions";
+import { toDimension } from "@/lib/utils";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";
@@ -405,7 +406,7 @@ const ContactCards1: React.FC<ContactCardsProps> = ({
             return (
               <div
                 key={`card-${index}-${processedCard.icon?.type || processedCard.icon?.name || index}`}
-                className={`w-full flex flex-col ${processedCard.cardStyle.alignment.horizontal} ${processedCard.cardStyle.alignment.vertical} ${processedCard.cardStyle.height.mobile} ${processedCard.cardStyle.height.desktop} ${processedCard.cardStyle.gap.main}`}
+                className={`w-full flex flex-col ${processedCard.cardStyle.alignment.horizontal} ${processedCard.cardStyle.alignment.vertical} h-[${toDimension(processedCard.cardStyle.height?.mobile, "px", "182px")}] md:h-[${toDimension(processedCard.cardStyle.height?.desktop, "px", "210px")}] ${processedCard.cardStyle.gap.main}`}
                 style={
                   processedCard.cardStyle.shadow.enabled
                     ? { boxShadow: processedCard.cardStyle.shadow.value }

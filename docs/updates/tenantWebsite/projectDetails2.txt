@@ -7,3 +7,8 @@ components/tenant/projectDetails/hooks/useProjectData.ts, components/tenant/proj
 Update Type: Enhancement
 إضافة دعم اختيار لون مخصص في primaryColor من EditorSidebar مع دالة helper getPrimaryColor() للتحقق من useDefaultColor و globalColorType. تحديث البيانات الافتراضية لتكون object مع useDefaultColor: true
 components/tenant/projectDetails/hooks/useProjectData.ts, context/editorStoreFunctions/projectDetailsFunctions.ts
+
+2026-03-08
+Update Type: Feature
+القسم الأعلى (Hero): تطبيق نفس تعديلات propertyDetail2 — كائن "الخلفية" داخل hero مع badge-select (لون فقط | صورة ولون | صورة فقط)، صورة الخلفية (condition عند imageOnly أو imageAndColor)، لون الخلفية عند "لون فقط"، overlay (لون + شفافية number) عند "صورة ولون" مع ربط الألوان بالألوان العامة أو مخصص. تحديث updateByPath ليكتب في tempData و projectDetailsStates للمعاينة المباشرة.
+componentsStructure/projectDetails.ts, context/editorStoreFunctions/projectDetailsFunctions.ts, components/tenant/projectDetails/hooks/useProjectData.ts, components/tenant/projectDetails/components/HeroSection.tsx, components/tenant/projectDetails/page.tsx, components/tenant/projectDetails/types/project.types.ts

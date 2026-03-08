@@ -41,15 +41,21 @@ export function useCustomersHubList() {
           const transformedCustomers = response.data.customers.map((customer: any) => ({
             ...customer,
             id: customer.id?.toString() || customer.id,
-            assignedEmployeeId: customer.assignedTo?.id?.toString() || customer.assignedTo?.toString(),
-            assignedEmployee: customer.assignedTo ? {
-              id: customer.assignedTo.id?.toString() || customer.assignedTo.toString(),
-              name: customer.assignedTo.name || "",
-              email: customer.assignedTo.email,
-              phone: customer.assignedTo.phone,
-            } : undefined,
-            // Use stage_id (string) from API response
-            stage: customer.stage?.id || customer.stage?.stage_id || customer.stage || "new_lead",
+            assignedEmployeeId: (customer.assignedTo?.id != null && String(customer.assignedTo?.name ?? "").trim())
+              ? (customer.assignedTo.id?.toString() ?? customer.assignedTo?.toString())
+              : undefined,
+            assignedEmployee: (customer.assignedTo?.id != null && String(customer.assignedTo?.name ?? "").trim())
+              ? {
+                  id: customer.assignedTo.id?.toString() || String(customer.assignedTo.id),
+                  name: String(customer.assignedTo.name ?? "").trim(),
+                  email: customer.assignedTo.email,
+                  phone: customer.assignedTo.phone,
+                }
+              : undefined,
+            // Use stage_id (string) from API; when stage is object with id: null → "no_stage" (بدون مرحلة)
+            stage: (typeof customer.stage === "object" && customer.stage !== null && (customer.stage as any).id == null)
+              ? "no_stage"
+              : (customer.stage?.id ?? (customer.stage as any)?.stage_id ?? (typeof customer.stage === "string" ? customer.stage : null)) || "new_lead",
             priority: customer.priority?.name?.toLowerCase() || customer.priority || "medium",
             preferences: customer.preferences || {},
             stageHistory: customer.stageHistory || [],
@@ -63,6 +69,7 @@ export function useCustomersHubList() {
             leadScore: customer.leadScore || 0,
             source: customer.source || "manual",
             totalPropertyRequests: customer.totalPropertyRequests ?? customer.propertyRequestsCount ?? 0,
+            lastPropertyRequest: customer.lastPropertyRequest ?? undefined,
             createdAt: customer.createdAt || new Date().toISOString(),
             updatedAt: customer.updatedAt || new Date().toISOString(),
           }));

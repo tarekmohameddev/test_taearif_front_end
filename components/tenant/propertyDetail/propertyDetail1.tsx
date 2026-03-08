@@ -24,6 +24,7 @@ import { ImageDialog } from "./components/ImageDialog";
 import { ShareDialog } from "./components/ShareDialog";
 import { SkeletonLoader } from "./components/SkeletonLoader";
 import { ErrorState } from "./components/ErrorState";
+import { PropertyInterestCollapsible } from "./components/PropertyInterestCollapsible";
 import { fetchPropertyData } from "./services/property.api";
 
 export default function propertyDetail({
@@ -208,6 +209,16 @@ export default function propertyDetail({
               buttonText={whatsAppData.buttonText}
             />
 
+            {/* Property Interest → Property Request (أنا مهتم بهذا العقار) - collapsible */}
+            {displaySettings?.showContactForm !== false && tenantId && property?.id != null && (
+              <PropertyInterestCollapsible
+                propertyId={Number(property.id)}
+                tenantUsername={tenantId}
+                primaryColor={primaryColor}
+                submitButtonText={content?.submitButtonText || "إرسال الطلب"}
+              />
+            )}
+
             <PropertyFAQs
               faqs={property.faqs}
               expandedFaqs={expandedFaqs}
@@ -274,6 +285,7 @@ export default function propertyDetail({
         primaryColor={primaryColor}
         primaryColorHover={primaryColorHover}
       />
+
     </section>
   );
 }

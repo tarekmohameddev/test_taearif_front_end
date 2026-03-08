@@ -31,26 +31,17 @@ export const applicationFormStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              defaultValue: "800px",
+              type: "number",
+              defaultValue: 800,
+              unit: "px",
             },
             {
               key: "padding",
               label: "Padding",
               type: "object",
               fields: [
-                {
-                  key: "y",
-                  label: "Vertical Padding",
-                  type: "text",
-                  defaultValue: "py-8",
-                },
-                {
-                  key: "smY",
-                  label: "Small Vertical Padding",
-                  type: "text",
-                  defaultValue: "sm:py-12",
-                },
+                { key: "y", label: "Vertical Padding", type: "number", defaultValue: 32, unit: "px" },
+                { key: "smY", label: "Small Vertical Padding", type: "number", defaultValue: 48, unit: "px" },
               ],
             },
           ],
@@ -87,8 +78,9 @@ export const applicationFormStructure: ComponentStructure = {
             {
               key: "marginBottom",
               label: "Margin Bottom",
-              type: "text",
-              defaultValue: "mb-8",
+              type: "number",
+              defaultValue: 32,
+              unit: "px",
             },
             {
               key: "typography",
@@ -110,8 +102,9 @@ export const applicationFormStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      defaultValue: "text-[20px] md:text-[32px]",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 24,
                     },
                     {
                       key: "fontWeight",
@@ -142,8 +135,9 @@ export const applicationFormStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      defaultValue: "text-[16px] md:text-[20px]",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 18,
                     },
                     {
                       key: "fontWeight",

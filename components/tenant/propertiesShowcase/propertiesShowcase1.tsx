@@ -6,7 +6,7 @@ import Link from "next/link";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
 import { getDefaultPropertiesShowcaseData } from "@/context/editorStoreFunctions/propertiesShowcaseFunctions";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
 import { useBrandingColors } from "@/hooks/useBrandingColors";
@@ -1154,15 +1154,13 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
         <div className="flex items-center justify-between mb-8">
           <div className="text-right">
             <h3
-              className={cn(
-                "font-bold mb-3",
-                `text-${mergedData.typography?.title?.fontSize?.mobile || "xl"} md:text-${mergedData.typography?.title?.fontSize?.tablet || "2xl"} lg:text-${mergedData.typography?.title?.fontSize?.desktop || "3xl"}`,
-              )}
+              className="font-bold mb-3"
               style={{
                 color: mergedData.styling?.titleColor || "#1f2937",
                 fontFamily:
                   mergedData.typography?.title?.fontFamily || "Tajawal",
                 fontWeight: mergedData.typography?.title?.fontWeight || "bold",
+                fontSize: toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "30px"),
               }}
             >
               {mergedData.content?.title || "المشاريع والعقارات"}

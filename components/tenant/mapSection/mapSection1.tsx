@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultMapSectionData } from "@/context/editorStoreFunctions/mapSectionFunctions";
+import { toDimension } from "@/lib/utils";
 
 // ═══════════════════════════════════════════════════════════
 // PROPS INTERFACE
@@ -204,7 +205,7 @@ export default function MapSection1(props: MapSectionProps) {
     <section
       className="w-full"
       style={{
-        paddingTop: mergedData.spacing?.paddingTop?.desktop || "4rem",
+        paddingTop: toDimension(mergedData.spacing?.paddingTop?.desktop, "px", "64px"),
       }}
     >
       {/* Title */}
@@ -223,7 +224,7 @@ export default function MapSection1(props: MapSectionProps) {
       <div
         className="w-full"
         style={{
-          height: mergedData.styling?.mapHeight || "400px",
+          height: toDimension(mergedData.styling?.mapHeight, "px", "400px"),
         }}
       >
         <iframe

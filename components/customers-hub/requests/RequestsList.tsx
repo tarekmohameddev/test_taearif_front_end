@@ -28,6 +28,11 @@ export interface RequestsListProps {
   onQuickView: (id: string) => void;
   stages?: RequestsListStage[];
   completingActionIds: Set<string>;
+  onStageChangeSuccess?: (
+    actionId: string,
+    newStageId: string,
+    previousStageId: string
+  ) => void;
 }
 
 export function RequestsList({
@@ -43,6 +48,7 @@ export function RequestsList({
   onQuickView,
   stages,
   completingActionIds,
+  onStageChangeSuccess,
 }: RequestsListProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const [maxCardHeight, setMaxCardHeight] = useState<number | null>(null);
@@ -102,7 +108,7 @@ export function RequestsList({
       {actions.map((action) => (
         <div
           key={action.id}
-          className={isCompactView ? undefined : "h-full min-h-0"}
+          className={isCompactView ? "w-full min-w-0" : "h-full min-h-0"}
           style={
             !isCompactView && maxCardHeight != null
               ? { minHeight: maxCardHeight }
@@ -125,6 +131,7 @@ export function RequestsList({
             isCompleting={completingActionIds.has(action.id)}
             className={isCompactView ? undefined : "h-full"}
             onScheduleFormOpenChange={handleScheduleFormOpenChange}
+            onStageChangeSuccess={onStageChangeSuccess}
           />
         </div>
       ))}

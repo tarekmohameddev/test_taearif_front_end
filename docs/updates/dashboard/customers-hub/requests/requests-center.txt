@@ -97,3 +97,18 @@ components/customers-hub/actions/IncomingActionsCard.tsx
 Update Type: Enhancement
 إضافة إغلاق تلقائي لـ dropdown عند النقر على عنصر - إضافة React Context (DropdownContext) في CustomDropdown لتمرير دالة closeDropdown إلى DropdownItem - تحديث DropdownItem لاستخدام Context وإغلاق dropdown تلقائياً بعد تنفيذ onClick - إضافة Provider للـ Context في dropdownContent لضمان توفر closeDropdown لجميع DropdownItem - الآن عند النقر على أي موظف في dropdown، يتم إغلاق dropdown تلقائياً
 components/customComponents/customDropdown.tsx
+
+2026-03-05
+Update Type: Feature
+جعل كارد "توزيع طلبات العملاء حسب المرحلة" قابلاً للنقر: عند الضغط على مرحلة يتم تطبيق فلتر على القائمة أسفله (عرض الطلبات في تلك المرحلة فقط). الضغط مرة أخرى على نفس المرحلة يلغي الفلتر. إضافة stages إلى RequestsListFilters و useCustomersHubFiltersState (selectedStageIds)، وربط StageDistributionCard بـ onStageClick و isStageSelected.
+lib/services/customers-hub-requests-api.ts, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, components/customers-hub/requests/hooks/useRequestsCenterPage.ts, components/customers-hub/requests/StageDistributionCard.tsx, components/customers-hub/requests/RequestsCenterPage.tsx
+
+2026-03-05
+Update Type: Feature
+استبدال فلتر "نوع الطلب" بفلتر "نوع الموعد" في قائمة الطلبات. الفلتر اختياري: عند عدم تمريره تظهر كل النتائج؛ عند تمرير appointment_types (مثلاً site_visit, office_meeting, phone_call, video_call, contract_signing, other) يُعرض طلب العقار فقط إذا كان له موعد واحد على الأقل من أحد الأنواع المختارة؛ أنواع الإجراءات الأخرى لا تتأثر. التعديلات: إزالة types و selectedTypes من الفلاتر والواجهة؛ إضافة appointment_types إلى RequestsListFilters و appointmentTypes إلى FilterOptionsResponse؛ إضافة selectedAppointmentTypes في useCustomersHubFiltersState؛ استبدال dropdown "نوع الطلب" بـ "نوع الموعد" في AdvancedFiltersPanel (خيارات من filter-options أو APPOINTMENT_TYPES)؛ إزالة فلتر selectedTypes من useRequestsCenterData (التصفية من جانب الـ API).
+lib/services/customers-hub-requests-api.ts, components/customers-hub/requests/hooks/useCustomersHubFiltersState.ts, components/customers-hub/requests/AdvancedFiltersPanel.tsx, components/customers-hub/requests/hooks/useRequestsCenterPage.ts, components/customers-hub/requests/RequestsCenterPage.tsx, components/customers-hub/requests/hooks/useRequestsCenterData.ts
+
+2026-03-05
+Update Type: Enhancement
+تعديل عرض فلاتر صفحة طلبات مركز العملاء (/dashboard/customers-hub/requests): جعل فلاتر الموظف والمصدر والأولوية ظاهرة دائماً في صف واحد (بدون collapsible). نقل باقي الفلاتر (نوع الموعد، الإجراء، المدينة، المنطقة، الميزانية، نوع العقار) إلى نافذة منبثقة (CustomDialog) تُفتح بزر "تصفية متقدمة". إزالة ChevronDown من زر تصفية متقدمة. الملفات: InlineFiltersRow.tsx (جديد)، AdvancedFiltersDialogContent.tsx (جديد)، RequestsCenterFilters.tsx، RequestsCenterFiltersBar.tsx.
+components/customers-hub/requests/InlineFiltersRow.tsx, components/customers-hub/requests/AdvancedFiltersDialogContent.tsx, components/customers-hub/requests/RequestsCenterFilters.tsx, components/customers-hub/requests/RequestsCenterFiltersBar.tsx

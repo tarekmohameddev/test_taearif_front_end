@@ -153,14 +153,24 @@ export const headerStructure: ComponentStructure = {
                 { label: "Text Only", value: "text" },
               ],
             },
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "text", label: "Text", type: "text" },
+            {
+              key: "image",
+              label: "Image URL",
+              type: "image",
+              condition: { field: "type", value: ["image", "image+text"] },
+            },
+            {
+              key: "text",
+              label: "Text",
+              type: "text",
+              condition: { field: "type", value: ["text", "image+text"] },
+            },
             {
               key: "font",
               label: "Font",
               type: "object",
+              condition: { field: "type", value: ["text", "image+text"] },
               fields: [
-                { key: "family", label: "Family", type: "text" },
                 { key: "size", label: "Size (px)", type: "number" },
                 {
                   key: "weight",
@@ -175,14 +185,28 @@ export const headerStructure: ComponentStructure = {
                 },
               ],
             },
-            { key: "url", label: "URL", type: "text" },
             {
-              key: "clickAction",
-              label: "Click Action",
-              type: "select",
-              options: [
-                { label: "Navigate", value: "navigate" },
-                { label: "None", value: "none" },
+              key: "linkGroup",
+              label: "URL / Click Action",
+              type: "text",
+              displayAsGroup: true,
+              condition: { field: "type", value: ["image", "image+text", "text"] },
+              groupFields: [
+                {
+                  key: "logo.url",
+                  label: "URL",
+                  type: "text",
+                },
+                {
+                  key: "logo.clickAction",
+                  label: "Click Action",
+                  type: "select",
+                  displayAsSwitch: true,
+                  options: [
+                    { label: "Navigate", value: "navigate" },
+                    { label: "None", value: "none" },
+                  ],
+                },
               ],
             },
           ],
@@ -709,8 +733,8 @@ export const headerStructure: ComponentStructure = {
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    { key: "desktop", label: "Desktop", type: "text", placeholder: "18px" },
-                    { key: "mobile", label: "Mobile", type: "text", placeholder: "18px" },
+                    { key: "desktop", label: "Desktop", type: "number", placeholder: "18", unit: "px" },
+                    { key: "mobile", label: "Mobile", type: "number", placeholder: "18", unit: "px" },
                   ],
                 },
               ],
@@ -749,7 +773,9 @@ export const headerStructure: ComponentStructure = {
                 {
                   key: "horizontal",
                   label: "Horizontal Padding",
-                  type: "text",
+                  type: "number",
+                  placeholder: "16",
+                  unit: "px",
                 },
               ],
             },

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultApplicationFormData } from "@/context/editorStoreFunctions/applicationFormFunctions";
+import { toDimension } from "@/lib/utils";
 
 interface ApplicationFormProps {
   id?: string;
@@ -220,20 +221,21 @@ export default function ApplicationFormSection(
           className="w-full bg-background"
           style={{
             backgroundColor: mergedData.styling?.bgColor || "#ffffff",
-            paddingTop: mergedData.layout?.padding?.y || "py-8",
-            paddingBottom: mergedData.layout?.padding?.smY || "sm:py-12",
+            paddingTop: toDimension(mergedData.layout?.padding?.y, "px", "32px"),
+            paddingBottom: toDimension(mergedData.layout?.padding?.smY, "px", "48px"),
           }}
         >
           <div
             className="flex flex-col mx-auto mt-10"
             style={{
-              maxWidth: mergedData.layout?.maxWidth || "800px",
+              maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "800px"),
               width: "91%",
             }}
           >
             {/* العنوان والوصف */}
             <div
-              className={`flex flex-col gap-y-4 ${mergedData.header?.textAlign || "text-center"} ${mergedData.header?.marginBottom || "mb-8"}`}
+              className={`flex flex-col gap-y-4 ${mergedData.header?.textAlign || "text-center"}`}
+              style={{ marginBottom: toDimension(mergedData.header?.marginBottom, "px", "32px") }}
             >
               <h1
                 className={
@@ -245,6 +247,7 @@ export default function ApplicationFormSection(
                     mergedData.styling?.textColor ||
                     mergedData.styling?.focusColor ||
                     "#059669",
+                  fontSize: toDimension(mergedData.header?.typography?.title?.fontSize, "px", "24px"),
                 }}
               >
                 {mergedData.header?.title || "نموذج طلب معاينة"}
@@ -254,6 +257,9 @@ export default function ApplicationFormSection(
                   mergedData.header?.typography?.description?.className ||
                   "font-normal text-[16px] leading-[17.86px] text-gray-600 md:text-[20px] md:leading-[22.32px] text-center"
                 }
+                style={{
+                  fontSize: toDimension(mergedData.header?.typography?.description?.fontSize, "px", "18px"),
+                }}
               >
                 {mergedData.header?.description ||
                   "املأ البيانات المطلوبة لتقديم طلب المعاينة. سيتم التواصل معك قريبًا لترتيب موعد لزيارة العقار ومعاينته بشكل دقيق."}

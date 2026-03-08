@@ -27,6 +27,7 @@ export default function CustomersHubRequestsPage() {
     snoozeMultipleActions,
     assignMultipleActions,
     changeMultipleActionsPriority,
+    applyStageChangeLocally,
   } = useCustomersHubRequests();
 
   const [initialLoad, setInitialLoad] = useState(false);
@@ -85,6 +86,7 @@ export default function CustomersHubRequestsPage() {
       onSnoozeMultipleActions={snoozeMultipleActions}
       onAssignMultipleActions={assignMultipleActions}
       onChangeMultipleActionsPriority={changeMultipleActionsPriority}
+      onStageChangeApplied={applyStageChangeLocally}
     />
   );
 }

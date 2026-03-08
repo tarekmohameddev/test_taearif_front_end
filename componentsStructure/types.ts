@@ -6,8 +6,26 @@ export type FieldType =
   | "color"
   | "image"
   | "select"
+  | "badge-select"
   | "array"
   | "object";
+
+/** Config for badge-select field: badges as buttons (rounded-full), data output like dropdown (string value). */
+export interface BadgeSelectConfig {
+  /** single = one value (string), multi = multiple values stored as comma-separated string */
+  mode?: "single" | "multi";
+  /** If true, at least one badge must be selected before valid. */
+  requiredAtLeastOne?: boolean;
+  /** Specific option values that must be selected (e.g. ["navigate"]). */
+  requiredValues?: string[];
+  /** If true (and not required), user can clear selection. Default true when not required. */
+  allowUnset?: boolean;
+  /** Override default styles. Default: unselected = transparent bg + gray border; selected = black bg + white text. */
+  styles?: {
+    unselected?: { bg?: string; border?: string; text?: string };
+    selected?: { bg?: string; text?: string };
+  };
+}
 
 export interface FieldDefinitionBase {
   key: string; // dot path, e.g. "texts.title" or "slides[0].title" (0 for template)
@@ -24,6 +42,7 @@ export interface FieldDefinitionBase {
     iconLibrary?: "lucide" | "react-icons";
   }[]; // for select
   showIcons?: boolean; // for select fields: show icons in dropdown
+  displayAsSwitch?: boolean; // for select with 2 options: render as switch (same stored values)
   defaultValue?: any; // default value for the field
   description?: string; // description for the field
   condition?: {
@@ -41,6 +60,8 @@ export interface FieldDefinitionBase {
   // For displaying fields as object wrapper (flat data structure, not nested object)
   displayAsObject?: boolean; // if true, display fields in wrappedFields as object wrapper
   wrappedFields?: FieldDefinition[]; // fields to display in the object wrapper
+  // For badge-select: render options as rounded-full badge buttons; data output like dropdown (string)
+  badgeConfig?: BadgeSelectConfig;
 }
 
 export interface ObjectFieldDefinition extends FieldDefinitionBase {

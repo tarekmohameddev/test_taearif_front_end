@@ -7,6 +7,7 @@ import { useImageGallery } from "./hooks/useImageGallery";
 import { useContactForm } from "./hooks/useContactForm";
 import { useFAQs } from "./hooks/useFAQs";
 import { getDarkerColor } from "./utils/helpers";
+import { toDimension } from "@/lib/utils";
 import { getAllImages } from "./utils/imageUtils";
 import {
   TopHeroSection,
@@ -111,9 +112,7 @@ export default function PropertyDetail2(props: propertyDetail2Props) {
         property={property}
         primaryColor={primaryColor}
         heroHeight={mergedData.hero?.height || "500px"}
-        titleFontSize={
-          mergedData.typography?.title?.fontSize?.desktop as string
-        }
+        titleFontSize={toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "36px")}
       />
 
       {/* Main Content Container */}

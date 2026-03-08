@@ -10,6 +10,8 @@ export interface CustomersListFilters {
   city?: number[];
   district?: number[];
   assignedTo?: number[];
+  /** مصدر العميل (مثل: whatsapp, manual, inquiry) */
+  source?: string[];
   search?: string;
   dateRange?: {
     start: string;

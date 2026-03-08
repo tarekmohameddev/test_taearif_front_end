@@ -47,7 +47,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 
 // Generate random ID function
 const generateRandomId = (prefix: string = "id"): string => {
@@ -120,6 +120,8 @@ interface InputsProps {
   variant?: string;
   useStore?: boolean;
   id?: string;
+  // Override tenant ID (e.g. for Storybook when useStore is false)
+  tenantId?: string;
   // API endpoint for form submission
   apiEndpoint?: string;
   // Additional props for store integration
@@ -148,8 +150,10 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   const variantId = props.variant || "inputs2";
   const uniqueId = props.id || variantId;
 
-  // Tenant ID hook
-  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+  // Tenant ID hook (skip when tenantId override provided, e.g. Storybook)
+  const hookResult = useTenantId();
+  const currentTenantId = props.tenantId ?? hookResult.tenantId;
+  const tenantLoading = props.tenantId ? false : hookResult.isLoading;
 
   // Subscribe to editor store updates for this inputs variant
   const ensureComponentVariant = useEditorStore(
@@ -329,6 +333,10 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     // Use mergedData if it has fieldsLayout, otherwise use defaultData
     const baseData = mergedData.fieldsLayout ? mergedData : defaultData;
 
+    const defaultApiEndpoint = process.env.NEXT_PUBLIC_Backend_URLWithOutApi
+      ? `${process.env.NEXT_PUBLIC_Backend_URLWithOutApi.replace(/\/+$/, "")}/api/v1/property-requests/public`
+      : defaultData.submitButton.apiEndpoint;
+
     const {
       cards = defaultData.cards,
       theme = defaultData.theme,
@@ -339,7 +347,7 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       colors = defaultData.colors,
       settings = defaultData.settings,
       layout = defaultData.layout,
-      apiEndpoint = defaultData.submitButton.apiEndpoint,
+      apiEndpoint = defaultApiEndpoint,
       className = "",
       visible = defaultData.visible,
     } = baseData;
@@ -1879,17 +1887,18 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
           mergedData.background?.color ||
           mergedData.styling?.bgColor ||
           "transparent",
-        paddingTop: mergedData.layout?.padding?.top || "2rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "2rem",
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "32px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "32px"),
       }}
     >
       <div
         className="mx-auto px-4"
         style={{
-          maxWidth:
-            mergedData.layout?.maxWidth ||
-            mergedData.styling?.maxWidth ||
+          maxWidth: toDimension(
+            mergedData.layout?.maxWidth ?? mergedData.styling?.maxWidth,
+            "px",
             "1600px",
+          ),
         }}
       >
         <style jsx>{`
@@ -2055,7 +2064,9 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
                 backgroundColor: primaryColor,
                 color: "#ffffff",
                 borderRadius: submitButton.borderRadius || "8px",
-                padding: submitButton.padding || "12px 24px",
+                padding: typeof submitButton.padding === "object" && submitButton.padding !== null
+                ? `${toDimension((submitButton.padding as { y?: number; x?: number }).y, "px", "12")} ${toDimension((submitButton.padding as { y?: number; x?: number }).x, "px", "24")}`
+                : (submitButton.padding as string) || "12px 24px",
                 width: "100%",
                 justifyContent: "center",
               }}

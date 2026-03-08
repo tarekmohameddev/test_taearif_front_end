@@ -406,6 +406,16 @@ export function translateLabel(
     "Form Background": "components_structure.hero_specific.form_background",
     "Background Video": "components_structure.hero_specific.background_video",
     "Search Buttons": "components_structure.hero_specific.search_buttons",
+    "Search Form Button Background Color":
+      "components_structure.hero_specific.search_form_button_background_color",
+    "Search Form Button Text Color":
+      "components_structure.hero_specific.search_form_button_text_color",
+    "Search Form Button Hover Color":
+      "components_structure.hero_specific.search_form_button_hover_color",
+    "Purpose Toggle Active Background Color":
+      "components_structure.hero_specific.purpose_toggle_active_background_color",
+    "Purpose Toggle Active Text Color":
+      "components_structure.hero_specific.purpose_toggle_active_text_color",
     "Status Field": "components_structure.hero_specific.status_field",
     Offset: "components_structure.hero_specific.offset",
 

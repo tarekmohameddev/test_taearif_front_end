@@ -5,8 +5,8 @@ import { createPortal } from "react-dom";
 import { ChevronDown, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils"; // تأكد أن لديك دالة cn أو استخدم classNames العادية
 
-// Context لإغلاق dropdown
-const DropdownContext = createContext<{ closeDropdown: () => void } | null>(null);
+// Context لإغلاق dropdown (exported for consumers that need to close from inside, e.g. budget form)
+export const DropdownContext = createContext<{ closeDropdown: () => void } | null>(null);
 
 // --- المكونات الفرعية ---
 
@@ -135,9 +135,11 @@ interface DropdownProps {
   contentZIndex?: number;
   /** When true, trigger and popup take full width of container. Default: false */
   fullWidth?: boolean;
+  /** When true, trigger is disabled and dropdown cannot open */
+  disabled?: boolean;
 }
 
-export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight, contentZIndex = 10001, fullWidth = false }: DropdownProps) => {
+export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor, dropdownWidth = "w-56", maxHeight, contentZIndex = 10001, fullWidth = false, disabled = false }: DropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, right: 0, width: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -228,10 +230,13 @@ export const CustomDropdown = ({ trigger, children, triggerClassName, iconColor,
         {/* زر الفتح الرئيسي */}
         <button
           ref={buttonRef}
-          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+          disabled={disabled}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
           className={cn(
             "flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none",
             fullWidth && "w-full justify-between",
+            disabled && "opacity-60 cursor-not-allowed",
             triggerClassName
           )}
         >

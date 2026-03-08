@@ -16,6 +16,8 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
     slideGap: "16px",
   },
   content: {
+    showTitle: true,
+    showDescription: true,
     title: "أحدث العقارات للإيجار",
     description: "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع",
     viewAllText: "عرض الكل",
@@ -23,24 +25,23 @@ export const getDefaultPropertySliderData = (): ComponentData => ({
   },
   typography: {
     title: {
-      fontFamily: "Tajawal",
-      fontSize: {
-        desktop: "2xl",
-        tablet: "xl",
-        mobile: "lg",
-      },
-      fontWeight: "extrabold",
+      fontSize: { desktop: 24, tablet: 20, mobile: 18 },
       color: "#1f2937",
+      extraSettings: {
+        fontWeight: "extrabold",
+        letterSpacing: "0",
+        marginBottom: "8px",
+      },
     },
     subtitle: {
-      fontFamily: "Tajawal",
-      fontSize: {
-        desktop: "lg",
-        tablet: "base",
-        mobile: "sm",
-      },
-      fontWeight: "normal",
+      fontSize: { desktop: 18, tablet: 16, mobile: 14 },
       color: "#6b7280",
+      extraSettings: {
+        fontWeight: "normal",
+        letterSpacing: "0",
+        marginTop: "0",
+        marginBottom: "0",
+      },
     },
     link: {
       fontSize: "sm",

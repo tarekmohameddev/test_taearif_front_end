@@ -396,8 +396,9 @@ export const contactFormSectionStructure: ComponentStructure = {
                     {
                       key: "fontSize",
                       label: "Font Size",
-                      type: "text",
-                      placeholder: "text-[14px] md:text-[20px]",
+                      type: "number",
+                      unit: "px",
+                      defaultValue: 16,
                     },
                     {
                       key: "hover",

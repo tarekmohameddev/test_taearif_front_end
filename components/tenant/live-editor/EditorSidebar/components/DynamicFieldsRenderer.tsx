@@ -24,6 +24,7 @@ import { useIconHelpers } from "./DynamicFieldsRenderer/hooks/useIconHelpers";
 import { TextFieldRenderer } from "./DynamicFieldsRenderer/renderers/TextFieldRenderer";
 import { TextareaFieldRenderer } from "./DynamicFieldsRenderer/renderers/TextareaFieldRenderer";
 import { SelectFieldRenderer } from "./DynamicFieldsRenderer/renderers/SelectFieldRenderer";
+import { BadgeSelectFieldRenderer } from "./DynamicFieldsRenderer/renderers/BadgeSelectFieldRenderer";
 import { ColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/ColorFieldRendererWithToggle";
 import { BackgroundColorFieldRendererWithToggle } from "./DynamicFieldsRenderer/renderers/BackgroundColorFieldRendererWithToggle";
 import { BackgroundColorObjectRenderer } from "./DynamicFieldsRenderer/renderers/BackgroundColorObjectRenderer";
@@ -135,14 +136,18 @@ export function DynamicFieldsRenderer({
       
       const conditionFieldValue = getValueByPath(conditionPath);
       const expected = def.condition.value;
-      // تطبيع القيمة: دعم boolean و string ("true"/"false") و undefined حتى يعمل الشرط بشكل صحيح
-      const normalized =
-        typeof expected === "boolean"
-          ? conditionFieldValue === true ||
-            conditionFieldValue === "true" ||
-            conditionFieldValue === 1
-          : conditionFieldValue;
-      const conditionMet = expected === false ? !normalized : !!normalized;
+      let conditionMet: boolean;
+      if (Array.isArray(expected)) {
+        conditionMet = expected.includes(conditionFieldValue);
+      } else if (typeof expected === "boolean") {
+        const normalized =
+          conditionFieldValue === true ||
+          conditionFieldValue === "true" ||
+          conditionFieldValue === 1;
+        conditionMet = expected === false ? !normalized : !!normalized;
+      } else {
+        conditionMet = conditionFieldValue === expected;
+      }
       if (!conditionMet) {
         return null; // لا تعرض الحقل إذا لم تتحقق الشروط
       }
@@ -273,6 +278,16 @@ export function DynamicFieldsRenderer({
             updateValue={updateValue}
             getIconComponent={getIconComponent}
             isReactIcon={isReactIcon}
+          />
+        );
+      }
+      case "badge-select": {
+        return (
+          <BadgeSelectFieldRenderer
+            def={def}
+            normalizedPath={normalizedPath}
+            value={value}
+            updateValue={updateValue}
           />
         );
       }

@@ -58,11 +58,13 @@ export const ctaValuationStructure: ComponentStructure = {
               key: "width",
               label: "Image Width",
               type: "number",
+              unit: "px",
             },
             {
               key: "height",
               label: "Image Height",
               type: "number",
+              unit: "px",
             },
           ],
         },

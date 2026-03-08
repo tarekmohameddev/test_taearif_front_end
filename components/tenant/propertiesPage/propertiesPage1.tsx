@@ -8,9 +8,10 @@ import { usePropertiesStore } from "@/context/propertiesStore";
 
 interface PropertiesPageProps {
   className?: string;
+  tenantId?: string;
 }
 
-export default function PropertiesPage({ className }: PropertiesPageProps) {
+export default function PropertiesPage({ className, tenantId }: PropertiesPageProps) {
   // Store state
   const { transactionType, setTransactionType } = usePropertiesStore();
 
@@ -30,7 +31,7 @@ export default function PropertiesPage({ className }: PropertiesPageProps) {
       </div>
 
       {/* شبكة العقارات */}
-      <PropertyGrid />
+      <PropertyGrid tenantId={tenantId} />
     </div>
   );
 }

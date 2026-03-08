@@ -6,6 +6,7 @@ import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorT } from "@/context/editorI18nStore";
 import { getDefaultSideBySide7Data } from "@/context/editorStoreFunctions/sideBySideFunctions";
+import { toDimension } from "@/lib/utils";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import * as ReactIconsFa from "react-icons/fa";
@@ -338,7 +339,7 @@ export default function SideBySide7(props: SideBySide7Props) {
       <div
         className="w-full mx-auto px-4 md:px-6 lg:px-8"
         style={{
-          maxWidth: mergedData.layout?.maxWidth || "1350px",
+          maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1350px"),
         }}
       >
         <div className="rounded-2xl overflow-hidden">

@@ -16,7 +16,6 @@ export interface UseRequestsCenterDataParams {
   appliedSearchQuery: string;
   selectedSources: string[];
   selectedPriorities: string[];
-  selectedTypes: string[];
   selectedAssignees: string[];
   dueDateFilter: string;
   selectedCities: string[];
@@ -37,7 +36,6 @@ export function useRequestsCenterData({
   appliedSearchQuery,
   selectedSources,
   selectedPriorities,
-  selectedTypes,
   selectedAssignees,
   dueDateFilter,
   selectedCities,
@@ -119,8 +117,6 @@ export function useRequestsCenterData({
       filtered = filtered.filter((a) => selectedSources.includes(a.source));
     if (selectedPriorities.length > 0)
       filtered = filtered.filter((a) => selectedPriorities.includes(a.priority));
-    if (selectedTypes.length > 0)
-      filtered = filtered.filter((a) => selectedTypes.includes(a.type));
     if (selectedAssignees.length > 0)
       filtered = filtered.filter(
         (a) => a.assignedTo && selectedAssignees.includes(a.assignedTo)
@@ -203,7 +199,6 @@ export function useRequestsCenterData({
     appliedSearchQuery,
     selectedSources,
     selectedPriorities,
-    selectedTypes,
     selectedAssignees,
     dueDateFilter,
     selectedCities,

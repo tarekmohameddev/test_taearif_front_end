@@ -173,8 +173,8 @@ function CustomerInfoCard({ customer }: { customer: UnifiedCustomer }) {
         return String(name);
       }
       
-      // If all properties are null or invalid, return default
-      return "new_lead";
+      // If all properties are null or invalid (e.g. stage: { id: null, name: null })
+      return "no_stage";
     }
     
     // Last resort: convert to string, but if it's an object, return default

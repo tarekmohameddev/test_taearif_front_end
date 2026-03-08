@@ -15,20 +15,23 @@ export const heroStructure: ComponentStructure = {
             {
               key: "desktop",
               label: "Desktop",
-              type: "text",
-              placeholder: "90vh",
+              type: "number",
+              placeholder: "90",
+              unit: "vh",
             },
             {
               key: "tablet",
               label: "Tablet",
-              type: "text",
-              placeholder: "80vh",
+              type: "number",
+              placeholder: "80",
+              unit: "vh",
             },
             {
               key: "mobile",
               label: "Mobile",
-              type: "text",
-              placeholder: "70vh",
+              type: "number",
+              placeholder: "70",
+              unit: "vh",
             },
           ],
         },
@@ -37,22 +40,49 @@ export const heroStructure: ComponentStructure = {
           label: "Background",
           type: "object",
           fields: [
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "alt", label: "Alt Text", type: "text" },
             {
-              key: "overlay",
-              label: "Overlay",
-              type: "object",
-              fields: [
-                { key: "enabled", label: "Enabled", type: "boolean" },
-                {
-                  key: "opacity",
-                  label: "Opacity",
-                  type: "text",
-                  placeholder: "0.45",
-                },
-                { key: "color", label: "Color", type: "color" },
+              key: "type",
+              label: "Background Type",
+              type: "select",
+              options: [
+                { label: "Image", value: "image" },
+                { label: "Color", value: "color" },
               ],
+            },
+            {
+              key: "imageGroup",
+              label: "Image Settings",
+              type: "text",
+              displayAsGroup: true,
+              condition: { field: "type", value: "image" },
+              groupFields: [
+                { key: "background.image", label: "Image URL", type: "image" },
+                { key: "background.alt", label: "Alt Text", type: "text" },
+                {
+                  key: "background.overlay",
+                  label: "Overlay",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    {
+                      key: "opacity",
+                      label: "Opacity",
+                      type: "text",
+                      placeholder: "0.45",
+                    },
+                    { key: "color", label: "Color", type: "color" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "color",
+              label: "Background Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary",
+              condition: { field: "type", value: "color" },
+              description: "لون الخلفية. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
             },
           ],
         },
@@ -81,7 +111,7 @@ export const heroStructure: ComponentStructure = {
                 { key: "content.subtitle", label: "Subtitle", type: "text" },
               ],
             },
-            { key: "paddingTop", label: "Padding Top", type: "text" },
+            { key: "paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
             {
               key: "font",
               label: "Font Settings",
@@ -92,7 +122,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -119,7 +148,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Subtitle Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -142,8 +170,7 @@ export const heroStructure: ComponentStructure = {
                 },
               ],
             },
-            { key: "alignment", label: "Alignment", type: "text" },
-            { key: "maxWidth", label: "Max Width", type: "text" },
+            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
           ],
         },
         {
@@ -152,8 +179,36 @@ export const heroStructure: ComponentStructure = {
           type: "object",
           fields: [
             { key: "enabled", label: "Enabled", type: "boolean" },
-            { key: "position", label: "Position", type: "text" },
-            { key: "offset", label: "Offset", type: "text" },
+            {
+              key: "position",
+              label: "Position",
+              type: "badge-select",
+              options: [
+                { label: "Top", value: "top" },
+                { label: "Center", value: "center" },
+                { label: "Bottom", value: "bottom" },
+              ],
+              badgeConfig: {
+                mode: "single",
+                requiredAtLeastOne: false,
+                allowUnset: true,
+              },
+            },
+            {
+              key: "offset",
+              label: "Offset",
+              type: "badge-select",
+              options: [
+                { label: "Small Offset", value: "sm" },
+                { label: "Default Offset", value: "md" },
+                { label: "Large Offset", value: "lg" },
+              ],
+              badgeConfig: {
+                mode: "single",
+                requiredAtLeastOne: false,
+                allowUnset: true,
+              },
+            },
             {
               key: "background",
               label: "Form Background",
@@ -256,9 +311,49 @@ export const heroStructure: ComponentStructure = {
               label: "Responsive Layout",
               type: "object",
               fields: [
-                { key: "desktop", label: "Desktop", type: "text" },
-                { key: "tablet", label: "Tablet", type: "text" },
-                { key: "mobile", label: "Mobile", type: "text" },
+                {
+                  key: "desktop",
+                  label: "Desktop Layout",
+                  type: "badge-select",
+                  options: [
+                    { label: "all-in-row", value: "all-in-row" },
+                    { label: "two-rows", value: "two-rows" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: true,
+                    allowUnset: false,
+                  },
+                },
+                {
+                  key: "tablet",
+                  label: "Tablet Layout",
+                  type: "badge-select",
+                  options: [
+                    { label: "all-in-row", value: "all-in-row" },
+                    { label: "two-rows", value: "two-rows" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: true,
+                    allowUnset: false,
+                  },
+                },
+                {
+                  key: "mobile",
+                  label: "Mobile Layout",
+                  type: "badge-select",
+                  options: [
+                    { label: "all-in-row", value: "all-in-row" },
+                    { label: "two-rows", value: "two-rows" },
+                    { label: "stacked", value: "stacked" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: true,
+                    allowUnset: false,
+                  },
+                },
               ],
             },
           ],
@@ -368,24 +463,9 @@ export const heroStructure: ComponentStructure = {
           label: "Height",
           type: "object",
           fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "229px",
-            },
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
           ],
         },
         {
@@ -393,24 +473,9 @@ export const heroStructure: ComponentStructure = {
           label: "Minimum Height",
           type: "object",
           fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "229px",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "229px",
-            },
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
           ],
         },
         {
@@ -463,7 +528,7 @@ export const heroStructure: ComponentStructure = {
               ],
             },
             { key: "alignment", label: "Alignment", type: "text" },
-            { key: "maxWidth", label: "Max Width", type: "text" },
+            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
             {
               key: "font",
               label: "Font Settings",
@@ -474,7 +539,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -516,7 +580,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Description Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -615,24 +678,9 @@ export const heroStructure: ComponentStructure = {
           label: "Height",
           type: "object",
           fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "text",
-              placeholder: "90vh",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "text",
-              placeholder: "80vh",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "text",
-              placeholder: "70vh",
-            },
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "90", unit: "vh" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "80", unit: "vh" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "70", unit: "vh" },
           ],
         },
         {
@@ -698,9 +746,9 @@ export const heroStructure: ComponentStructure = {
               type: "text",
               displayAsGroup: true,
               groupFields: [
-                { key: "content.paddingTop", label: "Padding Top", type: "text" },
+                { key: "content.paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
                 { key: "content.alignment", label: "Alignment", type: "text" },
-                { key: "content.maxWidth", label: "Max Width", type: "text" },
+                { key: "content.maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
               ],
             },
             {
@@ -713,7 +761,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -740,7 +787,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Subtitle Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",
@@ -778,7 +824,21 @@ export const heroStructure: ComponentStructure = {
               displayAsGroup: true,
               groupFields: [
                 { key: "searchForm.position", label: "الموضع", type: "text" },
-                { key: "searchForm.offset", label: "Offset", type: "text" },
+                {
+                  key: "searchForm.offset",
+                  label: "Offset",
+                  type: "badge-select",
+                  options: [
+                    { label: "Small Offset", value: "sm" },
+                    { label: "Default Offset", value: "md" },
+                    { label: "Large Offset", value: "lg" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: false,
+                    allowUnset: true,
+                  },
+                },
               ],
             },
             {
@@ -1107,7 +1167,7 @@ export const heroStructure: ComponentStructure = {
           fields: [
             { key: "title", label: "Title", type: "text" },
             { key: "alignment", label: "Alignment", type: "text" },
-            { key: "maxWidth", label: "Max Width", type: "text" },
+            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
             {
               key: "font",
               label: "Font Settings",
@@ -1118,7 +1178,6 @@ export const heroStructure: ComponentStructure = {
                   label: "Title Font",
                   type: "object",
                   fields: [
-                    { key: "family", label: "Family", type: "text" },
                     {
                       key: "size",
                       label: "Size",

@@ -1,4 +1,27 @@
 import type { CustomerActionType, Priority } from "@/types/unified-customer";
+import type { Appointment } from "@/types/unified-customer";
+
+/** Used in request detail header/cards: label, badge color, border color */
+export const priorityConfig: Record<
+  Priority,
+  { label: string; color: string; borderColor: string }
+> = {
+  urgent: { label: "عاجل", color: "bg-red-500 text-white", borderColor: "border-red-500" },
+  high: { label: "مهم", color: "bg-orange-500 text-white", borderColor: "border-orange-500" },
+  medium: { label: "متوسط", color: "bg-yellow-500 text-white", borderColor: "border-yellow-500" },
+  low: { label: "منخفض", color: "bg-green-500 text-white", borderColor: "border-green-500" },
+};
+
+export const statusConfig: Record<
+  string,
+  { label: string; color: string }
+> = {
+  pending: { label: "معلق", color: "bg-gray-500 text-white" },
+  in_progress: { label: "جاري العمل", color: "bg-blue-500 text-white" },
+  completed: { label: "مكتمل", color: "bg-green-500 text-white" },
+  dismissed: { label: "تم الرفض", color: "bg-gray-400 text-white" },
+  snoozed: { label: "مؤجل", color: "bg-purple-500 text-white" },
+};
 
 export const priorityLabels: Record<Priority, string> = {
   urgent: "عاجل",
@@ -24,6 +47,28 @@ export const actionTypeLabels: Record<CustomerActionType, string> = {
   site_visit: "معاينة",
   whatsapp_incoming: "واتساب",
   ai_recommended: "موصى به",
+};
+
+export const APPOINTMENT_TYPES: { value: Appointment["type"]; label: string }[] = [
+  { value: "site_visit", label: "معاينة عقار" },
+  { value: "office_meeting", label: "اجتماع مكتب" },
+  { value: "phone_call", label: "مكالمة هاتفية" },
+  { value: "video_call", label: "مكالمة فيديو" },
+  { value: "contract_signing", label: "توقيع عقد" },
+  { value: "other", label: "أخرى" },
+];
+
+/** Longer labels for request detail page */
+export const requestDetailActionTypeLabels: Record<string, string> = {
+  new_inquiry: "استفسار جديد",
+  callback_request: "طلب اتصال",
+  property_match: "مطابقة عقار",
+  follow_up: "متابعة",
+  document_required: "مستندات مطلوبة",
+  payment_due: "دفع مستحق",
+  site_visit: "معاينة عقار",
+  whatsapp_incoming: "رسالة واتساب",
+  ai_recommended: "موصى به بالذكاء الاصطناعي",
 };
 
 export const PROPERTY_TYPE_OPTIONS: { value: string; label: string }[] = [

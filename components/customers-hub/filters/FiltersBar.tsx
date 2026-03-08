@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { 
-  Search, X, DollarSign, Calendar, Home, Users, Clock, MapPin, ChevronDown
+  Search, X, Home, Users, Clock, MapPin, ChevronDown, Building2, UserCircle
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -18,9 +18,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import { LIFECYCLE_STAGES, getStageNameAr, getStageInfo } from "@/types/unified-customer";
+import { LIFECYCLE_STAGES, getStageNameAr } from "@/types/unified-customer";
 import type { CustomerFilters } from "@/types/unified-customer";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
+import { useCustomersHubAssignment } from "@/hooks/useCustomersHubAssignment";
 
 interface FiltersBarProps {
   filterOptions?: {
@@ -35,29 +36,36 @@ interface FiltersBarProps {
     priorities?: Array<{ id: number; name: string }>;
     types?: Array<{ id: number; name: string }>;
     cities?: Array<{ id: number; name: string }>;
+    districts?: Array<{ id: number; name: string; cityId: number }>;
   };
   onSearch?: (query: string) => void;
-  onApplyFilters?: () => void;
+  /** عند تغيير أي فلتر يُستدعى مع التحديث ليرسل مباشرة في params الـ API */
+  onApplyFilters?: (filtersOverride?: Partial<CustomerFilters>) => void;
 }
 
-const priorityLabels: Record<string, string> = {
-  urgent: "عاجل",
-  high: "عالي",
-  medium: "متوسط",
-  low: "منخفض",
-};
+/** خيارات المصدر (قيم تُرسل للـ API كما هي) */
+const SOURCE_OPTIONS = [
+  { value: "inquiry", label: "استفسار موقع" },
+  { value: "manual", label: "يدوي" },
+  { value: "whatsapp", label: "واتساب" },
+  { value: "import", label: "استيراد" },
+  { value: "referral", label: "إحالة" },
+  { value: "employee_dashboard", label: "لوحة الموظف" },
+] as const;
 
 export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersBarProps) {
   const { filters, setFilters, clearFilters, applyFilters } = useUnifiedCustomersStore();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
-  const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
-  const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
+  const { employees } = useCustomersHubAssignment();
   
-  // Use stages from Zustand store (fetched once, shared across all components)
   const { stages: dynamicStages } = useCustomersHubStagesStore();
+  const cities = filterOptions?.cities ?? [];
+  const districts = filterOptions?.districts ?? [];
+  /** أولويات من الباكند (id + name) */
+  const apiPriorities = filterOptions?.priorities ?? [];
+  /** أنواع العقار من الباكند (id + name) */
+  const apiTypes = filterOptions?.types ?? [];
   
-  // Use filterOptions.stages if provided, otherwise use dynamic stages, otherwise fallback to LIFECYCLE_STAGES
   const displayStages = filterOptions?.stages && filterOptions.stages.length > 0
     ? filterOptions.stages.map(s => ({
         id: s.id,
@@ -76,105 +84,102 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
       }))
     : LIFECYCLE_STAGES;
 
-  const propertyTypes = [
-    { value: "villa", label: "فيلا" },
-    { value: "apartment", label: "شقة" },
-    { value: "land", label: "أرض" },
-    { value: "commercial", label: "تجاري" },
-  ];
-
-  const priorities = [
-    { value: "urgent", label: "عاجل" },
-    { value: "high", label: "عالي" },
-    { value: "medium", label: "متوسط" },
-    { value: "low", label: "منخفض" },
-  ];
-
-  const sources = [
-    { value: "inquiry", label: "استفسار موقع" },
-    { value: "manual", label: "يدوي" },
-    { value: "whatsapp", label: "واتساب" },
-    { value: "import", label: "استيراد" },
-    { value: "referral", label: "إحالة" },
-  ];
-
   const handleSearch = () => {
-    setFilters({ search: searchQuery || undefined });
-    if (onSearch) {
-      onSearch(searchQuery);
-    } else if (onApplyFilters) {
-      onApplyFilters();
-    } else {
-      applyFilters();
-    }
+    const search = searchQuery || undefined;
+    setFilters({ search });
+    if (onSearch) onSearch(searchQuery);
+    else onApplyFilters?.({ search });
+    if (!onApplyFilters && !onSearch) applyFilters();
   };
 
   const handleStageToggle = (stageId: string) => {
-    const currentStages = filters.stage || [];
-    const newStages = currentStages.includes(stageId as any)
-      ? currentStages.filter(s => s !== stageId)
-      : [...currentStages, stageId as any];
-    
-    setFilters({ stage: newStages.length > 0 ? newStages : undefined });
-    if (onApplyFilters) {
-      onApplyFilters();
-    } else {
-      applyFilters();
-    }
+    const current = filters.stage || [];
+    const newStages = current.includes(stageId as any) ? current.filter((s) => s !== stageId) : [...current, stageId as any];
+    const update = { stage: newStages.length > 0 ? newStages : undefined };
+    setFilters(update);
+    onApplyFilters?.(update);
+    if (!onApplyFilters) applyFilters();
   };
 
-  const handlePropertyTypeToggle = (type: string) => {
-    const currentTypes = filters.propertyType || [];
-    const newTypes = currentTypes.includes(type)
-      ? currentTypes.filter(t => t !== type)
-      : [...currentTypes, type];
-    
-    setFilters({ propertyType: newTypes.length > 0 ? newTypes : undefined });
-    if (onApplyFilters) {
-      onApplyFilters();
-    } else {
-      applyFilters();
-    }
+  const handlePriorityToggle = (priorityId: number) => {
+    const current = filters.priorityIds || [];
+    const next = current.includes(priorityId) ? current.filter((id) => id !== priorityId) : [...current, priorityId];
+    const update = { priorityIds: next.length > 0 ? next : undefined };
+    setFilters(update);
+    onApplyFilters?.(update);
+    if (!onApplyFilters) applyFilters();
   };
 
-  const handlePriorityToggle = (priority: string) => {
-    const currentPriorities = filters.priority || [];
-    const newPriorities = currentPriorities.includes(priority as any)
-      ? currentPriorities.filter(p => p !== priority)
-      : [...currentPriorities, priority as any];
-    
-    setFilters({ priority: newPriorities.length > 0 ? newPriorities : undefined });
-    if (onApplyFilters) {
-      onApplyFilters();
-    } else {
-      applyFilters();
-    }
+  const handleSourceToggle = (sourceValue: string) => {
+    const current = filters.source || [];
+    const next = current.includes(sourceValue as any) ? current.filter((s) => s !== sourceValue) : [...current, sourceValue as any];
+    const update = { source: next.length > 0 ? next : undefined };
+    setFilters(update);
+    onApplyFilters?.(update);
+    if (!onApplyFilters) applyFilters();
   };
 
-  const handleSourceToggle = (source: string) => {
-    const currentSources = filters.source || [];
-    const newSources = currentSources.includes(source as any)
-      ? currentSources.filter(s => s !== source)
-      : [...currentSources, source as any];
-    
-    setFilters({ source: newSources.length > 0 ? newSources : undefined });
-    if (onApplyFilters) {
-      onApplyFilters();
-    } else {
-      applyFilters();
-    }
+  const handlePropertyTypeToggle = (typeId: number) => {
+    const current = filters.typeIds || [];
+    const next = current.includes(typeId) ? current.filter((id) => id !== typeId) : [...current, typeId];
+    const update = { typeIds: next.length > 0 ? next : undefined };
+    setFilters(update);
+    onApplyFilters?.(update);
+    if (!onApplyFilters) applyFilters();
   };
 
-  const hasActiveFilters = 
+  const handleCityToggle = (cityId: number) => {
+    const current = filters.city || [];
+    const next = current.includes(cityId) ? current.filter((id) => id !== cityId) : [...current, cityId];
+    const update = { city: next.length > 0 ? next : undefined };
+    setFilters(update);
+    onApplyFilters?.(update);
+    if (!onApplyFilters) applyFilters();
+  };
+
+  const handleDistrictToggle = (districtId: number) => {
+    const current = filters.district || [];
+    const next = current.includes(districtId) ? current.filter((id) => id !== districtId) : [...current, districtId];
+    const update = { district: next.length > 0 ? next : undefined };
+    setFilters(update);
+    onApplyFilters?.(update);
+    if (!onApplyFilters) applyFilters();
+  };
+
+  const handleEmployeeToggle = (employeeId: string) => {
+    const current = filters.assignedEmployee || [];
+    const next = current.includes(employeeId) ? current.filter((id) => id !== employeeId) : [...current, employeeId];
+    const update = { assignedEmployee: next.length > 0 ? next : undefined };
+    setFilters(update);
+    onApplyFilters?.(update);
+    if (!onApplyFilters) applyFilters();
+  };
+
+  const clearAllAndRefetch = () => {
+    clearFilters();
+    setSearchQuery("");
+    onApplyFilters?.({
+      search: undefined,
+      stage: undefined,
+      priorityIds: undefined,
+      typeIds: undefined,
+      source: undefined,
+      assignedEmployee: undefined,
+      city: undefined,
+      district: undefined,
+    });
+    if (!onApplyFilters) applyFilters();
+  };
+
+  const hasActiveFilters =
     (filters.stage && filters.stage.length > 0) ||
-    (filters.priority && filters.priority.length > 0) ||
-    (filters.propertyType && filters.propertyType.length > 0) ||
+    (filters.priorityIds && filters.priorityIds.length > 0) ||
+    (filters.typeIds && filters.typeIds.length > 0) ||
     (filters.source && filters.source.length > 0) ||
-    filters.budgetMin ||
-    filters.budgetMax ||
-    filters.createdFrom ||
-    filters.createdTo ||
-    filters.search;
+    (filters.city && filters.city.length > 0) ||
+    (filters.district && filters.district.length > 0) ||
+    (filters.assignedEmployee && filters.assignedEmployee.length > 0) ||
+    !!filters.search;
 
   return (
     <Card>
@@ -210,12 +215,12 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
 
             {/* Filters Dropdowns */}
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Stages Dropdown */}
+              {/* مرحلة (Stages) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
                     <Users className="h-4 w-4" />
-                    جميع المراحل
+                    مرحلة
                     {filters.stage && filters.stage.length > 0 && (
                       <Badge variant="secondary" className="mr-1">
                         {filters.stage.length}
@@ -225,7 +230,7 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 max-h-[400px] overflow-y-auto">
-                  <DropdownMenuLabel>المراحل</DropdownMenuLabel>
+                  <DropdownMenuLabel>المرحلة</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {displayStages.map((stage) => (
                     <DropdownMenuCheckboxItem
@@ -245,36 +250,131 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Priority Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Clock className="h-4 w-4" />
-                    جميع الأولويات
-                    {filters.priority && filters.priority.length > 0 && (
-                      <Badge variant="secondary" className="mr-1">
-                        {filters.priority.length}
-                      </Badge>
-                    )}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>الأولوية</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {priorities.map((priority) => (
-                    <DropdownMenuCheckboxItem
-                      key={priority.value}
-                      checked={filters.priority?.includes(priority.value as any)}
-                      onCheckedChange={() => handlePriorityToggle(priority.value)}
-                    >
-                      {priorityLabels[priority.value] || priority.label}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* مدينة (City) */}
+              {cities.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Building2 className="h-4 w-4" />
+                      مدينة
+                      {filters.city && filters.city.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.city.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 max-h-[300px] overflow-y-auto">
+                    <DropdownMenuLabel>المدينة</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {cities.map((city) => (
+                      <DropdownMenuCheckboxItem
+                        key={city.id}
+                        checked={filters.city?.includes(city.id)}
+                        onCheckedChange={() => handleCityToggle(city.id)}
+                      >
+                        {city.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
-              {/* Source Dropdown */}
+              {/* حي (District) */}
+              {districts.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <MapPin className="h-4 w-4" />
+                      حي
+                      {filters.district && filters.district.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.district.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 max-h-[300px] overflow-y-auto">
+                    <DropdownMenuLabel>الحي</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {districts.map((d) => (
+                      <DropdownMenuCheckboxItem
+                        key={d.id}
+                        checked={filters.district?.includes(d.id)}
+                        onCheckedChange={() => handleDistrictToggle(d.id)}
+                      >
+                        {d.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* موظف (Employee) */}
+              {employees.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <UserCircle className="h-4 w-4" />
+                      موظف
+                      {filters.assignedEmployee && filters.assignedEmployee.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.assignedEmployee.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 max-h-[300px] overflow-y-auto">
+                    <DropdownMenuLabel>الموظف المسؤول</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {employees.filter((e) => e.isActive).map((emp) => (
+                      <DropdownMenuCheckboxItem
+                        key={emp.id}
+                        checked={filters.assignedEmployee?.includes(emp.id)}
+                        onCheckedChange={() => handleEmployeeToggle(emp.id)}
+                      >
+                        {emp.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* جميع الأولويات — من الباكند */}
+              {apiPriorities.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Clock className="h-4 w-4" />
+                      جميع الأولويات
+                      {filters.priorityIds && filters.priorityIds.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.priorityIds.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>الأولوية</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {apiPriorities.map((p) => (
+                      <DropdownMenuCheckboxItem
+                        key={p.id}
+                        checked={filters.priorityIds?.includes(p.id)}
+                        onCheckedChange={() => handlePriorityToggle(p.id)}
+                      >
+                        {p.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* المصدر — القيم تُرسل مباشرة في params */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
@@ -291,10 +391,10 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>المصدر</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {sources.map((source) => (
+                  {SOURCE_OPTIONS.map((source) => (
                     <DropdownMenuCheckboxItem
                       key={source.value}
-                      checked={filters.source?.includes(source.value as any)}
+                      checked={filters.source?.includes(source.value)}
                       onCheckedChange={() => handleSourceToggle(source.value)}
                     >
                       {source.label}
@@ -303,187 +403,39 @@ export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersB
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Property Type Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Home className="h-4 w-4" />
-                    نوع العقار
-                    {filters.propertyType && filters.propertyType.length > 0 && (
-                      <Badge variant="secondary" className="mr-1">
-                        {filters.propertyType.length}
-                      </Badge>
-                    )}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>نوع العقار</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {propertyTypes.map((type) => (
-                    <DropdownMenuCheckboxItem
-                      key={type.value}
-                      checked={filters.propertyType?.includes(type.value)}
-                      onCheckedChange={() => handlePropertyTypeToggle(type.value)}
-                    >
-                      {type.label}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Budget Dropdown */}
-              <DropdownMenu open={isBudgetDialogOpen} onOpenChange={(open) => {
-                setIsBudgetDialogOpen(open);
-                if (open) {
-                  setTempBudgetMin(filters.budgetMin?.toString() || "");
-                  setTempBudgetMax(filters.budgetMax?.toString() || "");
-                }
-              }}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    الميزانية
-                    {(filters.budgetMin || filters.budgetMax) && (
-                      <Badge variant="secondary" className="mr-1">
-                        1
-                      </Badge>
-                    )}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64 p-3">
-                  <DropdownMenuLabel>نطاق الميزانية (ر.س)</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <div className="grid grid-cols-2 gap-2 py-2">
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">من</label>
-                      <Input
-                        type="number"
-                        placeholder="الحد الأدنى"
-                        value={tempBudgetMin}
-                        onChange={(e) => setTempBudgetMin(e.target.value)}
-                        className="h-8"
-                        min={0}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">إلى</label>
-                      <Input
-                        type="number"
-                        placeholder="الحد الأقصى"
-                        value={tempBudgetMax}
-                        onChange={(e) => setTempBudgetMax(e.target.value)}
-                        className="h-8"
-                        min={0}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        setFilters({
-                          budgetMin: tempBudgetMin ? parseInt(tempBudgetMin) : undefined,
-                          budgetMax: tempBudgetMax ? parseInt(tempBudgetMax) : undefined,
-                        });
-                        setIsBudgetDialogOpen(false);
-                        if (onApplyFilters) {
-                          onApplyFilters();
-                        } else {
-                          applyFilters();
-                        }
-                      }}
-                    >
-                      تطبيق
+              {/* نوع العقار — من الباكند */}
+              {apiTypes.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Home className="h-4 w-4" />
+                      نوع العقار
+                      {filters.typeIds && filters.typeIds.length > 0 && (
+                        <Badge variant="secondary" className="mr-1">
+                          {filters.typeIds.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setTempBudgetMin("");
-                        setTempBudgetMax("");
-                        setFilters({ budgetMin: undefined, budgetMax: undefined });
-                        setIsBudgetDialogOpen(false);
-                        if (onApplyFilters) {
-                          onApplyFilters();
-                        } else {
-                          applyFilters();
-                        }
-                      }}
-                    >
-                      إعادة تعيين
-                    </Button>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>نوع العقار</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {apiTypes.map((t) => (
+                      <DropdownMenuCheckboxItem
+                        key={t.id}
+                        checked={filters.typeIds?.includes(t.id)}
+                        onCheckedChange={() => handlePropertyTypeToggle(t.id)}
+                      >
+                        {t.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
 
-              {/* Date Range Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Calendar className="h-4 w-4" />
-                    تاريخ الإضافة
-                    {(filters.createdFrom || filters.createdTo) && (
-                      <Badge variant="secondary" className="mr-1">
-                        1
-                      </Badge>
-                    )}
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64 p-3">
-                  <DropdownMenuLabel>تاريخ الإضافة</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <div className="grid grid-cols-2 gap-2 py-2">
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">من</label>
-                      <Input
-                        type="date"
-                        value={filters.createdFrom || ""}
-                        onChange={(e) => {
-                          setFilters({ createdFrom: e.target.value || undefined });
-                          if (onApplyFilters) {
-                            onApplyFilters();
-                          } else {
-                            applyFilters();
-                          }
-                        }}
-                        className="h-8"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">إلى</label>
-                      <Input
-                        type="date"
-                        value={filters.createdTo || ""}
-                        onChange={(e) => {
-                          setFilters({ createdTo: e.target.value || undefined });
-                          if (onApplyFilters) {
-                            onApplyFilters();
-                          } else {
-                            applyFilters();
-                          }
-                        }}
-                        className="h-8"
-                      />
-                    </div>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Clear Filters Button */}
               {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={() => {
-                  clearFilters();
-                  setSearchQuery("");
-                  if (onApplyFilters) {
-                    onApplyFilters();
-                  } else {
-                    applyFilters();
-                  }
-                }} className="gap-1">
+                <Button variant="ghost" size="sm" onClick={clearAllAndRefetch} className="gap-1">
                   <X className="h-4 w-4" />
                   مسح الفلاتر
                 </Button>

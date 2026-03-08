@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
+import { toDimension } from "@/lib/utils";
 import { getDefaultPhotosGridData } from "@/context/editorStoreFunctions/photosGridFunctions";
 
 interface PhotosGridProps {
@@ -239,15 +240,15 @@ export default function PhotosGrid1(props: PhotosGridProps) {
     <section
       style={{
         backgroundColor: mergedData.styling?.backgroundColor,
-        paddingTop: mergedData.layout?.padding?.top,
-        paddingBottom: mergedData.layout?.padding?.bottom,
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "48px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "48px"),
       }}
     >
       <style>{gridStyles}</style>
 
       <div
         className="container mx-auto px-4"
-        style={{ maxWidth: mergedData.layout?.maxWidth }}
+        style={{ maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1280px") }}
       >
         {/* Header */}
         <div className="text-center mb-10 space-y-3">
@@ -265,7 +266,7 @@ export default function PhotosGrid1(props: PhotosGridProps) {
             <h2
               style={{
                 color: mergedData.styling?.titleColor,
-                fontSize: mergedData.typography?.title?.fontSize?.desktop,
+                fontSize: toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "36px"),
                 fontWeight: mergedData.typography?.title?.fontWeight,
                 fontFamily: mergedData.typography?.title?.fontFamily,
               }}
@@ -277,7 +278,7 @@ export default function PhotosGrid1(props: PhotosGridProps) {
             <p
               style={{
                 color: mergedData.styling?.subtitleColor,
-                fontSize: mergedData.typography?.subtitle?.fontSize?.desktop,
+                fontSize: toDimension(mergedData.typography?.subtitle?.fontSize?.desktop, "px", "24px"),
                 fontWeight: mergedData.typography?.subtitle?.fontWeight,
                 fontFamily: mergedData.typography?.subtitle?.fontFamily,
               }}
@@ -344,8 +345,7 @@ export default function PhotosGrid1(props: PhotosGridProps) {
                   <p
                     style={{
                       color: mergedData.styling?.captionColor,
-                      fontSize:
-                        mergedData.typography?.caption?.fontSize?.desktop,
+                      fontSize: toDimension(mergedData.typography?.caption?.fontSize?.desktop, "px", "16px"),
                       fontWeight: mergedData.typography?.caption?.fontWeight,
                       fontFamily: mergedData.typography?.caption?.fontFamily,
                     }}
@@ -356,8 +356,7 @@ export default function PhotosGrid1(props: PhotosGridProps) {
                     <span
                       style={{
                         color: mergedData.styling?.descriptionColor,
-                        fontSize:
-                          mergedData.typography?.caption?.fontSize?.mobile,
+                        fontSize: toDimension(mergedData.typography?.caption?.fontSize?.mobile, "px", "14px"),
                       }}
                     >
                       {photo.alt}

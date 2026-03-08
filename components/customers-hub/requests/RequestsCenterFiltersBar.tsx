@@ -2,8 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, ChevronDown, LayoutGrid, LayoutList, Table2 } from "lucide-react";
+import { Search, Filter, LayoutGrid, LayoutList, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { InlineFiltersRow } from "./InlineFiltersRow";
+import type { InlineFiltersRowProps } from "./InlineFiltersRow";
 
 export interface RequestsCenterFiltersBarProps {
   searchQuery: string;
@@ -16,6 +18,8 @@ export interface RequestsCenterFiltersBarProps {
   activeFiltersCount: number;
   viewMode: "compact" | "grid" | "table";
   setViewMode: (v: "compact" | "grid" | "table") => void;
+  /** When provided, المصدر / الأولوية / الموظف are shown next to the search button */
+  inlineFilters?: InlineFiltersRowProps;
 }
 
 export function RequestsCenterFiltersBar({
@@ -29,12 +33,13 @@ export function RequestsCenterFiltersBar({
   activeFiltersCount,
   viewMode,
   setViewMode,
+  inlineFilters,
 }: RequestsCenterFiltersBarProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <div className="relative flex-1 max-w-md flex gap-2 order-2 md:order-1">
-          <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0 flex flex-wrap items-center gap-2 order-2 md:order-1">
+          <div className="relative flex-1 min-w-[200px] max-w-md">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="بحث عن اسم العميل، رقم الهاتف، أو المرجع..."
@@ -49,10 +54,21 @@ export function RequestsCenterFiltersBar({
               className="pr-10 rounded-xl"
             />
           </div>
-          <Button onClick={applySearch} size="sm" className="gap-2 rounded-xl">
+          <Button onClick={applySearch} size="sm" className="gap-2 rounded-xl shrink-0">
             <Search className="h-4 w-4" />
             بحث
           </Button>
+          {inlineFilters && (
+            <InlineFiltersRow
+              selectedSources={inlineFilters.selectedSources}
+              setSelectedSources={inlineFilters.setSelectedSources}
+              selectedPriorities={inlineFilters.selectedPriorities}
+              setSelectedPriorities={inlineFilters.setSelectedPriorities}
+              selectedAssignees={inlineFilters.selectedAssignees}
+              setSelectedAssignees={inlineFilters.setSelectedAssignees}
+              uniqueAssignees={inlineFilters.uniqueAssignees}
+            />
+          )}
         </div>
         <div className="flex items-center gap-2 flex-wrap order-1 md:order-2">
           {hasActiveFilters && (
@@ -70,7 +86,7 @@ export function RequestsCenterFiltersBar({
             variant="default"
             size="sm"
             className="gap-2 relative rounded-xl"
-            onClick={() => setShowAdvancedFilters((v) => !v)}
+            onClick={() => setShowAdvancedFilters(true)}
           >
             <Filter className="h-4 w-4" />
             تصفية متقدمة
@@ -79,12 +95,6 @@ export function RequestsCenterFiltersBar({
                 {activeFiltersCount}
               </span>
             )}
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 transition-transform",
-                showAdvancedFilters && "rotate-180"
-              )}
-            />
           </Button>
           <div className="flex items-center rounded-md bg-muted/60 p-1">
             <Button

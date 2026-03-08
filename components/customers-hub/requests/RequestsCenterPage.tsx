@@ -42,6 +42,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
         <StageDistributionCard
           apiStages={apiStages}
           apiLoading={apiLoading}
+          onStageClick={ctx.handleStageDistributionClick}
+          isStageSelected={ctx.isStageSelected}
         />
         <RequestsCenterFilters
           searchQuery={ctx.searchQuery}
@@ -58,8 +60,9 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           setSelectedSources={ctx.setSelectedSources}
           selectedPriorities={ctx.selectedPriorities}
           setSelectedPriorities={ctx.setSelectedPriorities}
-          selectedTypes={ctx.selectedTypes}
-          setSelectedTypes={ctx.setSelectedTypes}
+          selectedAppointmentTypes={ctx.selectedAppointmentTypes}
+          setSelectedAppointmentTypes={ctx.setSelectedAppointmentTypes}
+          appointmentTypes={ctx.appointmentTypes}
           selectedAssignees={ctx.selectedAssignees}
           setSelectedAssignees={ctx.setSelectedAssignees}
           dueDateFilter={ctx.dueDateFilter}
@@ -107,6 +110,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           onRestore={ctx.handleRestore}
           stagesForCards={ctx.stagesForCards}
           completingActionIds={ctx.completingActionIds}
+          onStageChangeSuccess={ctx.onStageChangeSuccess}
         />
         {props?.onFetchRequests &&
           props?.pagination &&

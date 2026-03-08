@@ -31,26 +31,17 @@ export const inputsStructure: ComponentStructure = {
             {
               key: "maxWidth",
               label: "Max Width",
-              type: "text",
-              defaultValue: "1600px",
+              type: "number",
+              defaultValue: 1600,
+              unit: "px",
             },
             {
               key: "padding",
               label: "Padding",
               type: "object",
               fields: [
-                {
-                  key: "y",
-                  label: "Vertical Padding",
-                  type: "text",
-                  defaultValue: "py-14",
-                },
-                {
-                  key: "smY",
-                  label: "Small Vertical Padding",
-                  type: "text",
-                  defaultValue: "sm:py-16",
-                },
+                { key: "y", label: "Vertical Padding", type: "number", defaultValue: 56, unit: "px" },
+                { key: "smY", label: "Small Vertical Padding", type: "number", defaultValue: 64, unit: "px" },
               ],
             },
           ],
@@ -142,8 +133,11 @@ export const inputsStructure: ComponentStructure = {
             {
               key: "padding",
               label: "Padding",
-              type: "text",
-              defaultValue: "12px 24px",
+              type: "object",
+              fields: [
+                { key: "y", label: "Vertical Padding", type: "number", defaultValue: 12, unit: "px" },
+                { key: "x", label: "Horizontal Padding", type: "number", defaultValue: 24, unit: "px" },
+              ],
             },
             {
               key: "apiEndpoint",

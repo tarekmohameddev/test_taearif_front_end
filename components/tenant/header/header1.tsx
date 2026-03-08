@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -435,6 +435,47 @@ const Header1 = (props: HeaderProps = {}) => {
     customBranding,
   ]);
 
+  // Resolve branding colors: when editor stores { useDefaultColor, globalColorType }, resolve to actual hex
+  // Prefer editor store (live preview) then tenantData (saved site)
+  const editorWebsiteLayout = useEditorStore((s) => s.WebsiteLayout);
+  const brandingColors =
+    editorWebsiteLayout?.branding?.colors ??
+    tenantData?.WebsiteLayout?.branding?.colors;
+  const resolveColor = useCallback(
+    (raw: unknown, fallback: string): string => {
+      if (raw == null) return fallback;
+      if (typeof raw === "string" && raw.trim().length > 0) return raw;
+      if (typeof raw === "object" && !Array.isArray(raw)) {
+        const o = raw as Record<string, unknown>;
+        if (o.useDefaultColor && typeof o.globalColorType === "string" && brandingColors) {
+          const hex =
+            brandingColors[o.globalColorType as keyof typeof brandingColors];
+          if (typeof hex === "string") return hex;
+        }
+        const v = o.value ?? o.color;
+        if (typeof v === "string") return v;
+      }
+      return fallback;
+    },
+    [brandingColors],
+  );
+
+  const resolvedColors = useMemo(() => {
+    const c = mergedData.colors;
+    const def = (key: keyof NonNullable<typeof c>, fallback: string) =>
+      resolveColor(c?.[key], fallback);
+    return {
+      text: def("text", "#1f2937"),
+      link: def("link", "#374151"),
+      linkHover: def("linkHover", "#1f2937"),
+      linkActive: def("linkActive", "#059669"),
+      icon: def("icon", "#374151"),
+      iconHover: def("iconHover", "#1f2937"),
+      border: def("border", "#e5e7eb"),
+      accent: def("accent", "#059669"),
+    };
+  }, [mergedData.colors, resolveColor]);
+
   // Force re-render when globalHeaderData changes
   useEffect(() => {
     if (globalHeaderData) {
@@ -539,22 +580,15 @@ const Header1 = (props: HeaderProps = {}) => {
           key={item.id || `menu-item-${index}`}
           trigger={
             <span
-              className={cn(
-                "relative pb-2 text-xl font-medium transition-colors",
-                isActive ? "text-emerald-700" : "text-muted-foreground hover:text-foreground"
-              )}
-              style={{
-                color: isActive
-                  ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
-                  : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
-              }}
+              className={cn("header1-nav-link relative pb-2 text-xl font-medium transition-colors", isActive && "font-semibold")}
+              {...(isActive ? { "aria-current": "page" as const } : {})}
             >
               {item.name}
               {isActive && (
                 <span
                   className="pointer-events-none absolute inset-x-0 -bottom-[6px] mx-auto block h-[2px] w-8 rounded-full"
                   style={{
-                    backgroundColor: mergedData.colors?.accent || "#059669",
+                    backgroundColor: resolvedColors.accent,
                   }}
                 />
               )}
@@ -562,9 +596,7 @@ const Header1 = (props: HeaderProps = {}) => {
           }
           triggerClassName="bg-transparent border-0 ring-0 shadow-none hover:bg-transparent p-0"
           iconColor={
-            isActive
-              ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
-              : mergedData.colors?.link || mergedData.styling?.textColor || "#374151"
+            mergedData.styling?.textColor || (isActive ? resolvedColors.linkActive : resolvedColors.link)
           }
         >
           {item.submenu.map((submenuSection: any) => {
@@ -583,28 +615,20 @@ const Header1 = (props: HeaderProps = {}) => {
         key={item.id || `menu-item-${index}`}
         href={href}
         aria-current={isActive ? "page" : undefined}
-        className={cn(
-          "relative pb-2 text-xl font-medium transition-colors",
-          isActive ? "text-emerald-700" : "text-muted-foreground hover:text-foreground"
-        )}
-        style={{
-          color: isActive
-            ? mergedData.colors?.linkActive || mergedData.styling?.textColor || "#059669"
-            : mergedData.colors?.link || mergedData.styling?.textColor || "#374151",
-        }}
+        className={cn("header1-nav-link relative pb-2 text-xl font-medium transition-colors", isActive && "font-semibold")}
       >
         {item.name}
         {isActive && (
           <span
             className="pointer-events-none absolute inset-x-0 -bottom-[6px] mx-auto block h-[2px] w-8 rounded-full"
             style={{
-              backgroundColor: mergedData.colors?.accent || "#059669",
+              backgroundColor: resolvedColors.accent,
             }}
           />
         )}
       </Link>
     );
-  }, [pathname, mergedData, renderMenuItem]);
+  }, [pathname, mergedData, resolvedColors, renderMenuItem]);
 
   // Generate dynamic styles
   const headerStyles = useMemo(
@@ -620,10 +644,14 @@ const Header1 = (props: HeaderProps = {}) => {
             "#ffffff",
       opacity: mergedData.background?.opacity || "0.8",
       backdropFilter: mergedData.background?.blur ? "blur(8px)" : undefined,
-      height: `${mergedData.height?.desktop || 96}px`,
-      borderBottom: `1px solid ${mergedData.colors?.border || "#e5e7eb"}`,
+      height: toDimension(mergedData.height?.desktop, "px", "96px"),
+      borderBottom: `1px solid ${resolvedColors.border}`,
+      // Nav link colors (used by scoped CSS for default / hover / active)
+      ["--header-link" as string]: mergedData.styling?.textColor || resolvedColors.link,
+      ["--header-link-hover" as string]: mergedData.styling?.textColor || resolvedColors.linkHover,
+      ["--header-link-active" as string]: resolvedColors.linkActive,
     }),
-    [mergedData],
+    [mergedData, resolvedColors.border, resolvedColors.link, resolvedColors.linkHover, resolvedColors.linkActive],
   );
 
 
@@ -632,16 +660,17 @@ const Header1 = (props: HeaderProps = {}) => {
       fontFamily: mergedData.logo?.font?.family || "Tajawal",
       fontWeight: mergedData.logo?.font?.weight || "600",
       fontSize: `${mergedData.logo?.font?.size || 24}px`,
-      color:
-        mergedData.colors?.text || mergedData.styling?.textColor || "#1f2937",
+      color: mergedData.styling?.textColor || resolvedColors.text,
     }),
-    [mergedData],
+    [mergedData, resolvedColors.text],
   );
 
   // Don't render if not visible
   if (!mergedData.visible) {
     return null;
   }
+
+  const navLinkScope = `header1-nav-${uniqueId}`;
 
   return (
     <>
@@ -652,16 +681,16 @@ const Header1 = (props: HeaderProps = {}) => {
         dir="rtl"
         data-debug="header-component"
       >
+        <style dangerouslySetInnerHTML={{
+          __html: `[data-header-nav="${navLinkScope}"] .header1-nav-link{color:var(--header-link);transition:color .2s}[data-header-nav="${navLinkScope}"] .header1-nav-link:hover{color:var(--header-link-hover)}[data-header-nav="${navLinkScope}"] .header1-nav-link[aria-current="page"]{color:var(--header-link-active)}`,
+        }} />
         <div className="mx-auto flex h-full max-w-[1600px] items-center gap-4 px-4">
           {/* Logo */}
           <Link
             href={mergedData.logo?.url || "/"}
             className="flex items-center gap-2"
             style={{
-              color:
-                mergedData.colors?.text ||
-                mergedData.styling?.textColor ||
-                "#1f2937",
+              color: mergedData.styling?.textColor || resolvedColors.text,
             }}
           >
             {mergedData.logo?.type !== "text" && (customBranding?.header?.logo || mergedData.logo?.image || tenantData?.branding?.logo) && (
@@ -689,7 +718,7 @@ const Header1 = (props: HeaderProps = {}) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="mx-auto hidden items-center gap-6 md:flex">
+          <nav className="mx-auto hidden items-center gap-6 md:flex" data-header-nav={navLinkScope}>
             {navLinks.map((link: any, i: number) => renderDesktopMenuItem(link, i))}
           </nav>
 
@@ -701,10 +730,7 @@ const Header1 = (props: HeaderProps = {}) => {
                 href="/account"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80"
                 style={{
-                  color:
-                    mergedData.colors?.icon ||
-                    mergedData.styling?.textColor ||
-                    "#374151",
+                  color: mergedData.styling?.textColor || resolvedColors.icon,
                 }}
               >
                 <svg
@@ -729,10 +755,7 @@ const Header1 = (props: HeaderProps = {}) => {
                 href="/cart"
                 className="p-1.5 md:p-2 transition-colors hover:opacity-80 relative"
                 style={{
-                  color:
-                    mergedData.colors?.icon ||
-                    mergedData.styling?.textColor ||
-                    "#374151",
+                  color: mergedData.styling?.textColor || resolvedColors.icon,
                 }}
               >
                 <svg
@@ -763,10 +786,7 @@ const Header1 = (props: HeaderProps = {}) => {
               className="md:hidden bg-transparent border-none shadow-none hover:bg-stone-100"
               onClick={() => setIsMenuOpen(true)}
               style={{
-                color:
-                  mergedData.colors?.icon ||
-                  mergedData.styling?.textColor ||
-                  "#374151",
+                color: mergedData.styling?.textColor || resolvedColors.icon,
               }}
             >
               <Menu className="size-6" />
@@ -786,8 +806,8 @@ const Header1 = (props: HeaderProps = {}) => {
           url: mergedData.logo?.url || "/"
         }}
         branding={{
-          accent: mergedData.colors?.accent || "#059669",
-          text: mergedData.colors?.text || "#1f2937",
+          accent: resolvedColors.accent,
+          text: resolvedColors.text,
           background: mergedData.background?.colors?.from || "#ffffff"
         }}
         actions={{

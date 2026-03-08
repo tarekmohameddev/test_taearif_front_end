@@ -117,6 +117,32 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
     setFilters(newFilters);
   };
 
+  /** بناء params الطلب للـ API من الفلاتر الحالية (مرحلة، موظف، أولويات، مصدر، نوع العقار تُرسل مباشرة) */
+  const buildListParams = (effective: CustomerFilters): CustomersListParams => ({
+    action: "list",
+    includeStats: true,
+    filters: {
+      search: effective.search || undefined,
+      stage: (effective.stage?.length ? effective.stage : undefined) as string[] | undefined,
+      priority: (effective.priorityIds?.length ? effective.priorityIds : undefined) ?? (effective.priority?.length
+        ? effective.priority.map((p) => (typeof p === "number" ? p : (apiFilterOptions?.priorities?.find((pr) => pr.name === p)?.id ?? 0))).filter((id) => id > 0)
+        : undefined),
+      type: (effective.typeIds?.length ? effective.typeIds : undefined) ?? (effective.propertyType?.length
+        ? effective.propertyType.map((t) => (typeof t === "number" ? t : (apiFilterOptions?.types?.find((ty) => ty.name === t)?.id ?? 0))).filter((id) => id > 0)
+        : undefined),
+      city: effective.city?.length ? effective.city : undefined,
+      district: effective.district?.length ? effective.district : undefined,
+      assignedTo: effective.assignedEmployee?.length
+        ? effective.assignedEmployee.map((id) => parseInt(String(id), 10)).filter((n) => !isNaN(n))
+        : undefined,
+      source: effective.source?.length ? effective.source : undefined,
+    },
+    pagination: apiPagination
+      ? { page: apiPagination.currentPage, limit: apiPagination.itemsPerPage }
+      : { page: 1, limit: 50 },
+    sorting: { field: "created_at", order: "desc" },
+  });
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="flex flex-col gap-6 p-6" dir="rtl">
@@ -261,94 +287,21 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
       {/* Dashboard Statistics */}
       <CustomersDashboard stats={apiStats} />
 
-      {/* Filters Bar */}
+      {/* Filters Bar — الفلاتر تُرسل مباشرة في params الـ API عند كل تغيير */}
       <FiltersBar 
         filterOptions={apiFilterOptions}
         onSearch={(query) => {
           setFilters({ search: query || undefined });
+          const effective = { ...filters, search: query || undefined };
           if (props?.onFetchCustomers) {
-            const params: CustomersListParams = {
-              action: "list",
-              includeStats: true,
-              filters: {
-                search: query || undefined,
-                stage: filters.stage?.map(s => {
-                  const stageOption = apiFilterOptions?.stages?.find(st => st.name === s);
-                  return stageOption?.id || 0;
-                }).filter(id => id > 0),
-                priority: filters.priority?.map(p => {
-                  const priorityOption = apiFilterOptions?.priorities?.find(pr => pr.name === p);
-                  return priorityOption?.id || 0;
-                }).filter(id => id > 0),
-                type: filters.propertyType?.map(t => {
-                  const typeOption = apiFilterOptions?.types?.find(ty => ty.name === t);
-                  return typeOption?.id || 0;
-                }).filter(id => id > 0),
-                city: filters.city?.map(c => {
-                  const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
-                  return cityOption?.id || 0;
-                }).filter(id => id > 0),
-                dateRange: filters.createdFrom || filters.createdTo ? {
-                  start: filters.createdFrom || "",
-                  end: filters.createdTo || "",
-                } : undefined,
-              },
-              pagination: apiPagination ? {
-                page: apiPagination.currentPage,
-                limit: apiPagination.itemsPerPage,
-              } : {
-                page: 1,
-                limit: 50,
-              },
-              sorting: {
-                field: "created_at",
-                order: "desc",
-              },
-            };
-            props.onFetchCustomers(params);
+            props.onFetchCustomers(buildListParams(effective));
           }
         }}
-        onApplyFilters={() => {
+        onApplyFilters={(override?: Partial<CustomerFilters>) => {
+          if (override) setFilters(override);
+          const effective = { ...filters, ...override };
           if (props?.onFetchCustomers) {
-            const params: CustomersListParams = {
-              action: "list",
-              includeStats: true,
-              filters: {
-                search: filters.search,
-                stage: filters.stage?.map(s => {
-                  const stageOption = apiFilterOptions?.stages?.find(st => st.name === s);
-                  return stageOption?.id || 0;
-                }).filter(id => id > 0),
-                priority: filters.priority?.map(p => {
-                  const priorityOption = apiFilterOptions?.priorities?.find(pr => pr.name === p);
-                  return priorityOption?.id || 0;
-                }).filter(id => id > 0),
-                type: filters.propertyType?.map(t => {
-                  const typeOption = apiFilterOptions?.types?.find(ty => ty.name === t);
-                  return typeOption?.id || 0;
-                }).filter(id => id > 0),
-                city: filters.city?.map(c => {
-                  const cityOption = apiFilterOptions?.cities?.find(ci => ci.name === c);
-                  return cityOption?.id || 0;
-                }).filter(id => id > 0),
-                dateRange: filters.createdFrom || filters.createdTo ? {
-                  start: filters.createdFrom || "",
-                  end: filters.createdTo || "",
-                } : undefined,
-              },
-              pagination: apiPagination ? {
-                page: apiPagination.currentPage,
-                limit: apiPagination.itemsPerPage,
-              } : {
-                page: 1,
-                limit: 50,
-              },
-              sorting: {
-                field: "created_at",
-                order: "desc",
-              },
-            };
-            props.onFetchCustomers(params);
+            props.onFetchCustomers(buildListParams(effective));
           }
         }}
       />
@@ -426,14 +379,6 @@ export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) 
         onOpenChange={setShowExportDialog}
         customers={filteredCustomers}
       />
-
-      {/* Keyboard Shortcuts Hint */}
-      <div className="fixed bottom-6 right-6 z-40">
-        <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
-          <kbd className="px-2 py-1 bg-gray-800 rounded">?</kbd>
-          <span>اضغط لعرض الاختصارات</span>
-        </div>
-      </div>
       </div>
     </div>
   );

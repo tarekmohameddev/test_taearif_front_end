@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,7 @@ import {
   MapPin,
   Search,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, toDimension } from "@/lib/utils";
 import useStore from "@/context/Store";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -40,8 +40,10 @@ interface HeroProps {
     mobile?: string;
   };
   background?: {
+    type?: "image" | "color";
     image?: string;
     alt?: string;
+    color?: string;
     overlay?: {
       enabled?: boolean;
       opacity?: string;
@@ -840,26 +842,10 @@ const Hero1 = (props: HeroProps = {}) => {
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
 
-  // Helper function to normalize height values
-  const normalizeHeight = (value: string | undefined, fallback: string): string => {
-    if (!value) return fallback;
-    const trimmed = value.trim();
-    // Check if it's a number only (no units like vh, px, %, etc.)
-    if (/^\d+(\.\d+)?$/.test(trimmed)) {
-      return `${trimmed}vh`;
-    }
-    // Convert percentage (%) to vh
-    if (/^\d+(\.\d+)?%$/.test(trimmed)) {
-      return trimmed.replace('%', 'vh');
-    }
-    // If it already has a unit (vh, px, etc.), return as is
-    return trimmed;
-  };
-
-  // Normalize height values
-  const heightDesktop = normalizeHeight(mergedData.height?.desktop, "90vh");
-  const heightTablet = normalizeHeight(mergedData.height?.tablet, heightDesktop);
-  const heightMobile = normalizeHeight(mergedData.height?.mobile, heightDesktop);
+  // Normalize height values (number → "90vh", string preserved for backward compat)
+  const heightDesktop = toDimension(mergedData.height?.desktop, "vh", "90vh");
+  const heightTablet = toDimension(mergedData.height?.tablet, "vh", heightDesktop);
+  const heightMobile = toDimension(mergedData.height?.mobile, "vh", heightDesktop);
 
   // Generate dynamic styles with responsive height
   const sectionStyles = {
@@ -886,6 +872,47 @@ const Hero1 = (props: HeroProps = {}) => {
     backgroundColor: mergedData.background?.overlay?.color || "#000000",
     opacity: mergedData.background?.overlay?.opacity || "0.45",
   };
+
+  const editorWebsiteLayout = useEditorStore((s) => s.WebsiteLayout);
+  const brandingColors =
+    editorWebsiteLayout?.branding?.colors ??
+    tenantData?.WebsiteLayout?.branding?.colors;
+  const resolvedBackgroundColor = useMemo(() => {
+    const raw = mergedData.background?.color;
+    if (raw == null) return "#059669";
+    if (typeof raw === "string" && raw.trim().length > 0) return raw;
+    if (typeof raw === "object" && !Array.isArray(raw)) {
+      const o = raw as Record<string, unknown>;
+      if (o.useDefaultColor && typeof o.globalColorType === "string" && brandingColors) {
+        const hex = brandingColors[o.globalColorType as keyof typeof brandingColors];
+        if (typeof hex === "string") return hex;
+      }
+      const v = o.value ?? o.color;
+      if (typeof v === "string") return v;
+    }
+    return "#059669";
+  }, [mergedData.background?.color, brandingColors]);
+
+  const searchFormPosition = mergedData.searchForm?.position || "bottom";
+  const searchFormOffset = mergedData.searchForm?.offset || "md";
+  const searchFormOffsetTopClass =
+    searchFormOffset === "sm"
+      ? "top-24"
+      : searchFormOffset === "lg"
+        ? "top-40"
+        : "top-32";
+  const searchFormOffsetBottomClass =
+    searchFormOffset === "sm"
+      ? "bottom-24"
+      : searchFormOffset === "lg"
+        ? "bottom-40"
+        : "bottom-32";
+  const searchFormDesktopPositionClass =
+    searchFormPosition === "top"
+      ? searchFormOffsetTopClass
+      : searchFormPosition === "center"
+        ? "top-1/2 -translate-y-1/2"
+        : searchFormOffsetBottomClass;
 
   // Don't render if not visible
   if (!mergedData.visible) {
@@ -920,22 +947,29 @@ const Hero1 = (props: HeroProps = {}) => {
         style={sectionStyles}
         data-debug="hero-component"
       >
-      {/* Background Image */}
-      <Image
-        src={
-          mergedData.background?.image ||
-          "https://dalel-lovat.vercel.app/images/hero.webp"
-        }
-        alt={mergedData.background?.alt || "صورة خلفية لغرفة معيشة حديثة"}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
-
-      {/* Overlay */}
-      {mergedData.background?.overlay?.enabled && (
-        <div className="absolute inset-0" style={overlayStyles} />
+      {/* Background: Image or Solid Color */}
+      {mergedData.background?.type === "color" ? (
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: resolvedBackgroundColor }}
+        />
+      ) : (
+        <>
+          <Image
+            src={
+              mergedData.background?.image ||
+              "https://dalel-lovat.vercel.app/images/hero.webp"
+            }
+            alt={mergedData.background?.alt || "صورة خلفية لغرفة معيشة حديثة"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          {mergedData.background?.overlay?.enabled && (
+            <div className="absolute inset-0" style={overlayStyles} />
+          )}
+        </>
       )}
 
       {/* Content */}
@@ -943,7 +977,7 @@ const Hero1 = (props: HeroProps = {}) => {
         {/* Desktop/Tablet Layout */}
         <div
           className="hidden md:block"
-          style={{ paddingTop: mergedData.content?.paddingTop || "200px" }}
+          style={{ paddingTop: toDimension(mergedData.content?.paddingTop, "px", "200px") }}
         >
           {mergedData.showTitle !== false && (
             <h1
@@ -1018,7 +1052,8 @@ const Hero1 = (props: HeroProps = {}) => {
       {mergedData.searchForm?.enabled && (
         <div
           className={cn(
-            "pointer-events-auto absolute inset-x-0 z-10 mx-auto px-4 sm:px-6 lg:px-8 bottom-32 max-w-[1600px] hidden md:block",
+            "pointer-events-auto absolute inset-x-0 z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-[1600px] hidden md:block",
+            searchFormDesktopPositionClass,
           )}
         >
           <HeroSearchForm

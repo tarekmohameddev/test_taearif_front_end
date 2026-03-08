@@ -1,0 +1,4 @@
+2026-03-08
+Update Type: Feature
+القسم الأعلى (Hero): تطبيق نفس تعديلات propertyDetail2 — كائن "الخلفية" داخل hero مع badge-select (لون فقط | صورة ولون | صورة فقط)، صورة الخلفية (condition عند imageOnly أو imageAndColor)، لون الخلفية عند "لون فقط"، overlay (لون + شفافية number) عند "صورة ولون" مع ربط الألوان بالألوان العامة أو مخصص. تحديث updateByPath ليكتب في tempData و blogDetailsStates للمعاينة المباشرة. primaryColor يحسب عبر getColorFromField لدعم useDefaultColor/globalColorType.
+componentsStructure/blogDetails.ts, context/editorStoreFunctions/blogDetailsFunctions.ts, components/tenant/blogDetails/blogDetails2.tsx

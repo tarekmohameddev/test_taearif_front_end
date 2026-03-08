@@ -142,6 +142,120 @@ export const propertySliderStructure: ComponentStructure = {
           type: "object",
           fields: [
             {
+              key: "titleGroup",
+              label: "Title",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                {
+                  key: "content.showTitle",
+                  label: "إظهار العنوان",
+                  type: "boolean",
+                  defaultValue: true,
+                },
+                {
+                  key: "content.title",
+                  label: "Title",
+                  type: "text",
+                  defaultValue: "أحدث العقارات للإيجار",
+                  description: "Main section title",
+                },
+                {
+                  key: "typography.title.color",
+                  label: "Color",
+                  type: "color",
+                  defaultValue: "#1f2937",
+                  useDefaultColor: true,
+                  globalColorType: "secondary",
+                },
+                {
+                  key: "typography.title.fontSize",
+                  label: "Font Size",
+                  type: "object",
+                  fields: [
+                    { key: "desktop", label: "Desktop", type: "number", unit: "px", defaultValue: 24 },
+                    { key: "tablet", label: "Tablet", type: "number", unit: "px", defaultValue: 20 },
+                    { key: "mobile", label: "Mobile", type: "number", unit: "px", defaultValue: 18 },
+                  ],
+                },
+                {
+                  key: "typography.title.extraSettings",
+                  label: "إعدادات إضافية",
+                  type: "object",
+                  fields: [
+                    { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "extrabold" },
+                    { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 8, unit: "px" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "subtitleGroup",
+              label: "Subtitle",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                {
+                  key: "content.showDescription",
+                  label: "إظهار الوصف",
+                  type: "boolean",
+                  defaultValue: true,
+                },
+                {
+                  key: "content.description",
+                  label: "Description",
+                  type: "text",
+                  defaultValue:
+                    "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع",
+                  description: "Section description text",
+                },
+                {
+                  key: "typography.subtitle.color",
+                  label: "Color",
+                  type: "color",
+                  defaultValue: "#6b7280",
+                  useDefaultColor: true,
+                  globalColorType: "secondary",
+                },
+                {
+                  key: "typography.subtitle.fontSize",
+                  label: "Font Size",
+                  type: "object",
+                  fields: [
+                    { key: "desktop", label: "Desktop", type: "number", unit: "px", defaultValue: 18 },
+                    { key: "tablet", label: "Tablet", type: "number", unit: "px", defaultValue: 16 },
+                    { key: "mobile", label: "Mobile", type: "number", unit: "px", defaultValue: 14 },
+                  ],
+                },
+                {
+                  key: "typography.subtitle.extraSettings",
+                  label: "إعدادات إضافية",
+                  type: "object",
+                  fields: [
+                    { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "normal" },
+                    { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0" },
+                    { key: "marginTop", label: "Margin Top", type: "number", defaultValue: 0, unit: "px" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 0, unit: "px" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "showTitle",
+              label: "Show Title",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show the section title",
+            },
+            {
+              key: "showDescription",
+              label: "Show Description",
+              type: "boolean",
+              defaultValue: true,
+              description: "Whether to show the section description",
+            },
+            {
               key: "title",
               label: "Title",
               type: "text",
@@ -222,46 +336,14 @@ export const propertySliderStructure: ComponentStructure = {
               type: "object",
               fields: [
                 {
-                  key: "fontFamily",
-                  label: "Font Family",
-                  type: "text",
-                  defaultValue: "Tajawal",
-                  description: "Font family for title",
-                },
-                {
                   key: "fontSize",
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    {
-                      key: "desktop",
-                      label: "Desktop",
-                      type: "text",
-                      defaultValue: "2xl",
-                      description: "Desktop font size",
-                    },
-                    {
-                      key: "tablet",
-                      label: "Tablet",
-                      type: "text",
-                      defaultValue: "xl",
-                      description: "Tablet font size",
-                    },
-                    {
-                      key: "mobile",
-                      label: "Mobile",
-                      type: "text",
-                      defaultValue: "lg",
-                      description: "Mobile font size",
-                    },
+                    { key: "desktop", label: "Desktop", type: "number", unit: "px", defaultValue: 24, description: "Desktop font size (px)" },
+                    { key: "tablet", label: "Tablet", type: "number", unit: "px", defaultValue: 20, description: "Tablet font size (px)" },
+                    { key: "mobile", label: "Mobile", type: "number", unit: "px", defaultValue: 18, description: "Mobile font size (px)" },
                   ],
-                },
-                {
-                  key: "fontWeight",
-                  label: "Font Weight",
-                  type: "text",
-                  defaultValue: "extrabold",
-                  description: "Font weight for title",
                 },
                 {
                   key: "color",
@@ -272,6 +354,16 @@ export const propertySliderStructure: ComponentStructure = {
                   useDefaultColor: true,
                   globalColorType: "secondary", // Title uses secondary color
                 },
+                {
+                  key: "extraSettings",
+                  label: "إعدادات إضافية",
+                  type: "object",
+                  fields: [
+                    { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "extrabold", description: "Font weight for title" },
+                    { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0", description: "Letter spacing for title" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 8, unit: "px", description: "Margin below title" },
+                  ],
+                },
               ],
             },
             {
@@ -280,46 +372,14 @@ export const propertySliderStructure: ComponentStructure = {
               type: "object",
               fields: [
                 {
-                  key: "fontFamily",
-                  label: "Font Family",
-                  type: "text",
-                  defaultValue: "Tajawal",
-                  description: "Font family for subtitle",
-                },
-                {
                   key: "fontSize",
                   label: "Font Size",
                   type: "object",
                   fields: [
-                    {
-                      key: "desktop",
-                      label: "Desktop",
-                      type: "text",
-                      defaultValue: "lg",
-                      description: "Desktop font size",
-                    },
-                    {
-                      key: "tablet",
-                      label: "Tablet",
-                      type: "text",
-                      defaultValue: "base",
-                      description: "Tablet font size",
-                    },
-                    {
-                      key: "mobile",
-                      label: "Mobile",
-                      type: "text",
-                      defaultValue: "sm",
-                      description: "Mobile font size",
-                    },
+                    { key: "desktop", label: "Desktop", type: "number", unit: "px", defaultValue: 18, description: "Desktop font size (px)" },
+                    { key: "tablet", label: "Tablet", type: "number", unit: "px", defaultValue: 16, description: "Tablet font size (px)" },
+                    { key: "mobile", label: "Mobile", type: "number", unit: "px", defaultValue: 14, description: "Mobile font size (px)" },
                   ],
-                },
-                {
-                  key: "fontWeight",
-                  label: "Font Weight",
-                  type: "text",
-                  defaultValue: "normal",
-                  description: "Font weight for subtitle",
                 },
                 {
                   key: "color",
@@ -329,6 +389,17 @@ export const propertySliderStructure: ComponentStructure = {
                   description: "Subtitle color",
                   useDefaultColor: true,
                   globalColorType: "secondary", // Subtitle uses secondary color
+                },
+                {
+                  key: "extraSettings",
+                  label: "إعدادات إضافية",
+                  type: "object",
+                  fields: [
+                    { key: "fontWeight", label: "Font Weight", type: "text", defaultValue: "normal", description: "Font weight for subtitle" },
+                    { key: "letterSpacing", label: "Letter Spacing", type: "text", defaultValue: "0", description: "Letter spacing for subtitle" },
+                    { key: "marginTop", label: "Margin Top", type: "number", defaultValue: 0, unit: "px", description: "Margin above subtitle" },
+                    { key: "marginBottom", label: "Margin Bottom", type: "number", defaultValue: 0, unit: "px", description: "Margin below subtitle" },
+                  ],
                 },
               ],
             },
@@ -340,8 +411,9 @@ export const propertySliderStructure: ComponentStructure = {
                 {
                   key: "fontSize",
                   label: "Font Size",
-                  type: "text",
-                  defaultValue: "sm",
+                  type: "number",
+                  unit: "px",
+                  defaultValue: 14,
                   description: "Font size for link",
                 },
                 {
@@ -554,76 +626,6 @@ export const propertySliderStructure: ComponentStructure = {
           type: "object",
           fields: [
             {
-              key: "title",
-              label: "Title Animation",
-              type: "object",
-              fields: [
-                {
-                  key: "enabled",
-                  label: "Enabled",
-                  type: "boolean",
-                  defaultValue: true,
-                  description: "Whether title animation is enabled",
-                },
-                {
-                  key: "type",
-                  label: "Type",
-                  type: "text",
-                  defaultValue: "fade-up",
-                  description: "Animation type for title",
-                },
-                {
-                  key: "duration",
-                  label: "Duration",
-                  type: "number",
-                  defaultValue: 600,
-                  description: "Animation duration in milliseconds",
-                },
-                {
-                  key: "delay",
-                  label: "Delay",
-                  type: "number",
-                  defaultValue: 200,
-                  description: "Animation delay in milliseconds",
-                },
-              ],
-            },
-            {
-              key: "subtitle",
-              label: "Subtitle Animation",
-              type: "object",
-              fields: [
-                {
-                  key: "enabled",
-                  label: "Enabled",
-                  type: "boolean",
-                  defaultValue: true,
-                  description: "Whether subtitle animation is enabled",
-                },
-                {
-                  key: "type",
-                  label: "Type",
-                  type: "text",
-                  defaultValue: "fade-up",
-                  description: "Animation type for subtitle",
-                },
-                {
-                  key: "duration",
-                  label: "Duration",
-                  type: "number",
-                  defaultValue: 600,
-                  description: "Animation duration in milliseconds",
-                },
-                {
-                  key: "delay",
-                  label: "Delay",
-                  type: "number",
-                  defaultValue: 400,
-                  description: "Animation delay in milliseconds",
-                },
-              ],
-            },
-            {
               key: "carousel",
               label: "Carousel Animation",
               type: "object",
@@ -668,6 +670,20 @@ export const propertySliderStructure: ComponentStructure = {
           type: "boolean",
           defaultValue: true,
           description: "Whether the component is visible",
+        },
+        {
+          key: "content.showTitle",
+          label: "Show Title",
+          type: "boolean",
+          defaultValue: true,
+          description: "Whether to show the section title",
+        },
+        {
+          key: "content.showDescription",
+          label: "Show Description",
+          type: "boolean",
+          defaultValue: true,
+          description: "Whether to show the section description",
         },
         {
           key: "content.title",

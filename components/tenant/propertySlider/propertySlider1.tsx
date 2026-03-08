@@ -11,6 +11,7 @@ import PropertyCard3 from "@/components/tenant/cards/card3";
 import Link from "next/link";
 import axiosInstance from "@/lib/axiosInstance";
 import { useTenantId } from "@/hooks/useTenantId";
+import { toDimension } from "@/lib/utils";
 
 /**
  * PropertySlider Component
@@ -63,6 +64,8 @@ const getDefaultPropertySliderData = () => ({
     slideGap: "16px",
   },
   content: {
+    showTitle: true,
+    showDescription: true,
     title: "أحدث العقارات للإيجار",
     description: "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع",
     viewAllText: "عرض الكل",
@@ -70,27 +73,26 @@ const getDefaultPropertySliderData = () => ({
   },
   typography: {
     title: {
-      fontFamily: "Tajawal",
-      fontSize: {
-        desktop: "2xl",
-        tablet: "xl",
-        mobile: "lg",
-      },
-      fontWeight: "extrabold",
+      fontSize: { desktop: 24, tablet: 20, mobile: 18 },
       color: "#1f2937",
+      extraSettings: {
+        fontWeight: "extrabold",
+        letterSpacing: "0",
+        marginBottom: "8px",
+      },
     },
     subtitle: {
-      fontFamily: "Tajawal",
-      fontSize: {
-        desktop: "lg",
-        tablet: "base",
-        mobile: "sm",
-      },
-      fontWeight: "normal",
+      fontSize: { desktop: 18, tablet: 16, mobile: 14 },
       color: "#6b7280",
+      extraSettings: {
+        fontWeight: "normal",
+        letterSpacing: "0",
+        marginTop: "0",
+        marginBottom: "0",
+      },
     },
     link: {
-      fontSize: "sm",
+      fontSize: 14,
       color: "#059669", // Will be overridden by primaryColor in component
       hoverColor: "#047857", // Will be overridden by primaryColorHover in component
     },
@@ -118,6 +120,8 @@ interface PropertySliderProps {
   useStore?: boolean;
   variant?: string;
   id?: string;
+  /** Override tenant ID (e.g. for Storybook when useStore is false) */
+  tenantId?: string;
 }
 
 // Helper function to convert old API URLs to new format
@@ -202,8 +206,10 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   // Initialize variant id early so hooks can depend on it
   const variantId = props.variant || "propertySlider1";
 
-  // Tenant ID hook
-  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+  // Tenant ID hook (skip when tenantId override provided, e.g. Storybook)
+  const hookResult = useTenantId();
+  const currentTenantId = props.tenantId ?? hookResult.tenantId;
+  const tenantLoading = props.tenantId ? false : hookResult.isLoading;
 
   // State for API data
   const [apiProperties, setApiProperties] = useState<Property[]>([]);
@@ -448,63 +454,24 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
         : "#059669", // fallback to primary
   };
 
-  // Helper function to get color based on useDefaultColor and globalColorType
+  // Helper: resolve color from path (يدعم useDefaultColor و globalColorType من الـ structure)
+  const resolveColorAt = (root: any, path: string): any => {
+    let cur = root;
+    for (const part of path.split(".")) {
+      if (cur == null || typeof cur !== "object" || Array.isArray(cur)) return undefined;
+      cur = cur[part];
+    }
+    return cur;
+  };
+
   const getColor = (
     fieldPath: string,
     defaultColor: string = "#059669",
   ): string => {
-    // Get styling/typography data from mergedData
-    const styling = mergedData.styling || {};
-    const typography = mergedData.typography || {};
-
-    // Navigate to the field using the path (e.g., "typography.link.color")
-    const pathParts = fieldPath.split(".");
-    let fieldData: any = { ...styling, ...typography };
-    for (const part of pathParts) {
-      if (
-        fieldData &&
-        typeof fieldData === "object" &&
-        !Array.isArray(fieldData)
-      ) {
-        fieldData = fieldData[part];
-      } else {
-        fieldData = undefined;
-        break;
-      }
-    }
-
-    // Also check for useDefaultColor and globalColorType at the same path level
-    const useDefaultColorPath = `${fieldPath}.useDefaultColor`;
-    const globalColorTypePath = `${fieldPath}.globalColorType`;
-    const useDefaultColorPathParts = useDefaultColorPath.split(".");
-    let useDefaultColorValue: any = { ...styling, ...typography };
-    for (const part of useDefaultColorPathParts) {
-      if (
-        useDefaultColorValue &&
-        typeof useDefaultColorValue === "object" &&
-        !Array.isArray(useDefaultColorValue)
-      ) {
-        useDefaultColorValue = useDefaultColorValue[part];
-      } else {
-        useDefaultColorValue = undefined;
-        break;
-      }
-    }
-
-    const globalColorTypePathParts = globalColorTypePath.split(".");
-    let globalColorTypeValue: any = { ...styling, ...typography };
-    for (const part of globalColorTypePathParts) {
-      if (
-        globalColorTypeValue &&
-        typeof globalColorTypeValue === "object" &&
-        !Array.isArray(globalColorTypeValue)
-      ) {
-        globalColorTypeValue = globalColorTypeValue[part];
-      } else {
-        globalColorTypeValue = undefined;
-        break;
-      }
-    }
+    // Navigate from mergedData so path "typography.title.color" works
+    const fieldData = resolveColorAt(mergedData, fieldPath);
+    const useDefaultColorValue = resolveColorAt(mergedData, `${fieldPath}.useDefaultColor`);
+    const globalColorTypeValue = resolveColorAt(mergedData, `${fieldPath}.globalColorType`);
 
     // Check useDefaultColor value (default is true if not specified)
     const useDefaultColor =
@@ -571,12 +538,14 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     return brandingColor;
   };
 
-  // Get colors using getColor function
+  // Get colors using getColor function (يدعم useDefaultColor و globalColorType من الـ structure)
   const linkColor = getColor("typography.link.color", "#059669");
   const linkHoverColor = getColor(
     "typography.link.hoverColor",
     getDarkerColor(linkColor, 20),
   );
+  const titleColor = getColor("typography.title.color", "#1f2937");
+  const subtitleColor = getColor("typography.subtitle.color", "#6b7280");
 
   // Use linkColor as primaryColor for backward compatibility
   const primaryColor = linkColor;
@@ -604,38 +573,58 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
     ? apiProperties
     : mergedData.items || mergedData.properties || [];
 
-  // Generate dynamic styles
+  // Visibility: showTitle / showDescription (default true)
+  const showTitle = mergedData.content?.showTitle !== false;
+  const showDescription = mergedData.content?.showDescription !== false;
+
+  // Font size: number → "Npx", string (legacy) → as-is
+  const toFontSizePx = (val: number | string | undefined, fallbackPx: number): string => {
+    if (typeof val === "number") return `${val}px`;
+    if (typeof val === "string" && /^\d+$/.test(val.trim())) return `${val.trim()}px`;
+    if (typeof val === "string" && val) return val;
+    return `${fallbackPx}px`;
+  };
+
+  // Generate dynamic styles (إعدادات إضافية: fontWeight, letterSpacing, margin)
+  const titleExtra = mergedData.typography?.title?.extraSettings;
+  const titleFontSize = mergedData.typography?.title?.fontSize?.desktop ?? 24;
   const titleStyles = {
-    fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
-    fontSize: mergedData.typography?.title?.fontSize?.desktop || "2xl",
-    fontWeight: mergedData.typography?.title?.fontWeight || "extrabold",
-    color: mergedData.typography?.title?.color || "#1f2937",
+    fontSize: toFontSizePx(titleFontSize, 24),
+    fontWeight: titleExtra?.fontWeight || mergedData.typography?.title?.fontWeight || "extrabold",
+    color: titleColor,
+    letterSpacing: titleExtra?.letterSpacing || mergedData.typography?.title?.letterSpacing || "0",
+    marginBottom: toDimension(titleExtra?.marginBottom ?? mergedData.typography?.title?.marginBottom, "px", "8px"),
   };
 
+  const subtitleExtra = mergedData.typography?.subtitle?.extraSettings;
+  const subtitleFontSize = mergedData.typography?.subtitle?.fontSize?.desktop ?? 18;
   const subtitleStyles = {
-    fontFamily: mergedData.typography?.subtitle?.fontFamily || "Tajawal",
-    fontSize: mergedData.typography?.subtitle?.fontSize?.desktop || "lg",
-    fontWeight: mergedData.typography?.subtitle?.fontWeight || "normal",
-    color: mergedData.typography?.subtitle?.color || "#6b7280",
+    fontSize: toFontSizePx(subtitleFontSize, 18),
+    fontWeight: subtitleExtra?.fontWeight || mergedData.typography?.subtitle?.fontWeight || "normal",
+    color: subtitleColor,
+    letterSpacing: subtitleExtra?.letterSpacing || mergedData.typography?.subtitle?.letterSpacing || "0",
+    marginTop: toDimension(subtitleExtra?.marginTop ?? mergedData.typography?.subtitle?.marginTop, "px", "0"),
+    marginBottom: toDimension(subtitleExtra?.marginBottom ?? mergedData.typography?.subtitle?.marginBottom, "px", "0"),
   };
 
+  const linkFontSize = mergedData.typography?.link?.fontSize;
   const linkStyles = {
-    fontSize: mergedData.typography?.link?.fontSize || "sm",
-    color: mergedData.typography?.link?.color || primaryColor,
+    fontSize: toDimension(linkFontSize, "px", "14px"),
+    color: linkColor,
   };
 
   const sectionStyles = {
     backgroundColor: mergedData.background?.color || "transparent",
-    paddingTop: mergedData.layout?.padding?.top || "56px",
-    paddingBottom: mergedData.layout?.padding?.bottom || "56px",
+    paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "56px"),
+    paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "56px"),
   };
 
   const containerStyles = {
-    maxWidth: mergedData.layout?.maxWidth || "1600px",
+    maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1600px"),
   };
 
-  const titleBottomMargin = mergedData.spacing?.titleBottom || "24px";
-  const slideGap = mergedData.spacing?.slideGap || "16px";
+  const titleBottomMargin = toDimension(mergedData.spacing?.titleBottom, "px", "24px");
+  const slideGap = toDimension(mergedData.spacing?.slideGap, "px", "16px");
 
   // Check if component should be visible
   if (!mergedData.visible) {
@@ -714,7 +703,7 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
       <div
         className="mx-auto"
         style={{
-          maxWidth: mergedData.layout?.maxWidth || "1600px",
+          maxWidth: toDimension(mergedData.layout?.maxWidth, "px", "1600px"),
           gridTemplateColumns: mergedData.grid?.columns?.desktop
             ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
             : undefined,
@@ -731,34 +720,23 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
         >
           {/* Mobile Layout - Button on left side */}
           <div className="flex items-center justify-between md:hidden">
-            <h2
-              className="section-title font-bold"
-              style={{
-                fontFamily:
-                  mergedData.typography?.title?.fontFamily || "Tajawal",
-                fontSize:
-                  mergedData.typography?.title?.fontSize?.desktop || "2xl",
-                fontWeight:
-                  mergedData.typography?.title?.fontWeight || "extrabold",
-                color:
-                  mergedData.styling?.textColor ||
-                  mergedData.colors?.textColor ||
-                  mergedData.typography?.title?.color ||
-                  "#1f2937",
-              }}
-            >
-              {mergedData.content?.title || "أحدث العقارات للإيجار"}
-            </h2>
+            {showTitle && (
+              <h2
+                className="section-title font-bold"
+                style={{
+                  ...titleStyles,
+                  color: mergedData.styling?.textColor || mergedData.colors?.textColor || titleColor,
+                }}
+              >
+                {mergedData.content?.title || "أحدث العقارات للإيجار"}
+              </h2>
+            )}
             <Link
               href={mergedData.content?.viewAllUrl || "#"}
               className="hover:underline text-sm"
               style={{
-                fontSize: mergedData.typography?.link?.fontSize || "sm",
-                color:
-                  mergedData.styling?.textColor ||
-                  mergedData.colors?.textColor ||
-                  mergedData.typography?.link?.color ||
-                  primaryColorHover,
+                fontSize: linkStyles.fontSize,
+                color: mergedData.styling?.textColor || mergedData.colors?.textColor || linkHoverColor,
               }}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
@@ -768,50 +746,36 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
           {/* Desktop Layout - Button on right side */}
           <div className="hidden md:flex items-end justify-between">
             <div>
-              <h2
-                className="section-title font-bold"
-                style={{
-                  fontFamily:
-                    mergedData.typography?.title?.fontFamily || "Tajawal",
-                  fontSize:
-                    mergedData.typography?.title?.fontSize?.desktop || "2xl",
-                  fontWeight:
-                    mergedData.typography?.title?.fontWeight || "extrabold",
-                  color:
-                    mergedData.styling?.textColor ||
-                    mergedData.colors?.textColor ||
-                    mergedData.typography?.title?.color ||
-                    "#1f2937",
-                }}
-              >
-                {mergedData.content?.title || "أحدث العقارات للإيجار"}
-              </h2>
-              <p
-                className="section-subtitle"
-                style={{
-                  fontFamily:
-                    mergedData.typography?.subtitle?.fontFamily || "Tajawal",
-                  fontSize:
-                    mergedData.typography?.subtitle?.fontSize?.desktop || "lg",
-                  fontWeight:
-                    mergedData.typography?.subtitle?.fontWeight || "normal",
-                  color:
-                    mergedData.styling?.textColor ||
-                    mergedData.colors?.textColor ||
-                    mergedData.typography?.subtitle?.color ||
-                    "#6b7280",
-                }}
-              >
-                {mergedData.content?.description ||
-                  "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
-              </p>
+              {showTitle && (
+                <h2
+                  className="section-title font-bold"
+                  style={{
+                    ...titleStyles,
+                    color: mergedData.styling?.textColor || mergedData.colors?.textColor || titleColor,
+                  }}
+                >
+                  {mergedData.content?.title || "أحدث العقارات للإيجار"}
+                </h2>
+              )}
+              {showDescription && (
+                <p
+                  className="section-subtitle"
+                  style={{
+                    ...subtitleStyles,
+                    color: mergedData.styling?.textColor || mergedData.colors?.textColor || subtitleColor,
+                  }}
+                >
+                  {mergedData.content?.description ||
+                    "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
+                </p>
+              )}
             </div>
             <Link
               href={mergedData.content?.viewAllUrl || "#"}
               className="hover:underline"
               style={{
                 ...linkStyles,
-                color: mergedData.typography?.link?.color || primaryColorHover,
+                color: mergedData.styling?.textColor || mergedData.colors?.textColor || linkHoverColor,
               }}
             >
               {mergedData.content?.viewAllText || "عرض الكل"}
@@ -819,11 +783,13 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
           </div>
 
           {/* Description for mobile */}
-          <p className="section-subtitle md:hidden" style={subtitleStyles}>
-            {mergedData.description ||
-              mergedData.content?.description ||
-              "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
-          </p>
+          {showDescription && (
+            <p className="section-subtitle md:hidden" style={subtitleStyles}>
+              {mergedData.description ||
+                mergedData.content?.description ||
+                "اكتشف أفضل العقارات المتاحة للإيجار في أفضل المواقع"}
+            </p>
+          )}
         </div>
 
         <div className="">

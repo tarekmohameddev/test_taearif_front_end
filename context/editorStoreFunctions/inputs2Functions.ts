@@ -9,6 +9,8 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
  * fine-grained control over which cards and fields are visible.
  */
 export const getDefaultInputs2Data = (): ComponentData => ({
+  // NOTE: keep endpoint derived from NEXT_PUBLIC_Backend_URLWithOutApi
+  // so tenant deployments can switch backend without code changes.
   visible: true,
   texts: {
     title: "Advanced Inputs System Title",
@@ -46,7 +48,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     hoverColor: "#067a55",
     borderRadius: "8px",
     padding: "12px 24px",
-    apiEndpoint: "https://api.taearif.com/api/v1/property-requests/public",
+    apiEndpoint: `${(process.env.NEXT_PUBLIC_Backend_URLWithOutApi ||
+      "https://api.taearif.com")
+      .replace(/\/+$/, "")}/api/v1/property-requests/public`,
   },
   cardsLayout: {
     columns: "1",

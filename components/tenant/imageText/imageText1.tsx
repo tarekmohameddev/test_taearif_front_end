@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultImageTextData } from "@/context/editorStoreFunctions/imageTextFunctions";
+import { toDimension } from "@/lib/utils";
 import { useClientT } from "@/context/clientI18nStore";
 
 // ═══════════════════════════════════════════════════════════
@@ -398,7 +399,7 @@ export default function ImageText1(props: ImageTextProps = {}) {
     <section
       className="relative w-full flex items-center justify-center overflow-hidden"
       style={{
-        height: `${mergedData.styling?.height ?? 500}px`,
+        height: toDimension(mergedData.styling?.height, "px", "500px"),
       }}
     >
       {/* Background Color Layer (only if type is "color") */}

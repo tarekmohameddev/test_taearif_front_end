@@ -150,11 +150,13 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     setSelectedSources,
     selectedObjectTypes,
     setSelectedPriorities,
-    setSelectedTypes,
+    setSelectedAppointmentTypes,
     setSelectedAssignees,
     setDueDateFilter,
     setSelectedCities,
     setSelectedStates,
+    selectedStageIds,
+    setSelectedStageIds,
     setBudgetMin,
     setBudgetMax,
     setSelectedPropertyTypes,
@@ -166,7 +168,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     new Set()
   );
   const [viewMode, setViewMode] = useState<"compact" | "grid" | "table">(
-    "grid"
+    "compact"
   );
   const [quickViewAction, setQuickViewAction] =
     useState<CustomerAction | null>(null);
@@ -202,16 +204,8 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
       prevFiltersRef.current = currentFiltersString;
       const fetchWithFilters = async () => {
         try {
-          console.log(
-            "🔄 Filters changed, fetching requests with filters:",
-            newFilters
-          );
           const requestParams = newFilters as RequestsListFilters;
-          console.log(
-            "📤 Sending API request with flat params:",
-            JSON.stringify(requestParams, null, 2)
-          );
-          await props.onFetchRequests!(requestParams);
+          await props.onFetchRequests!(requestParams, { silent: true });
         } catch (err) {
           console.error("Error fetching requests with filters:", err);
         }
@@ -231,7 +225,6 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     appliedSearchQuery,
     selectedSources,
     selectedPriorities: filterHooks.selectedPriorities,
-    selectedTypes: filterHooks.selectedTypes,
     selectedAssignees: filterHooks.selectedAssignees,
     dueDateFilter: filterHooks.dueDateFilter,
     selectedCities: filterHooks.selectedCities,
@@ -251,14 +244,31 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     setSearchQuery("");
     setSelectedSources([]);
     setSelectedPriorities([]);
-    setSelectedTypes([]);
+    setSelectedAppointmentTypes([]);
     setSelectedAssignees([]);
     setDueDateFilter("all");
     setSelectedCities([]);
     setSelectedStates([]);
+    setSelectedStageIds([]);
     setBudgetMin("");
     setBudgetMax("");
     setSelectedPropertyTypes([]);
+  };
+
+  const handleStageDistributionClick = (stageId: string) => {
+    const stage = storeStages?.find((s) => s.stage_id === stageId);
+    if (!stage) return;
+    const numericId = stage.id;
+    if (selectedStageIds.includes(numericId)) {
+      setSelectedStageIds([]);
+    } else {
+      setSelectedStageIds([numericId]);
+    }
+  };
+
+  const isStageSelected = (stageId: string) => {
+    const stage = storeStages?.find((s) => s.stage_id === stageId);
+    return stage ? selectedStageIds.includes(stage.id) : false;
   };
 
   const hasActiveFilters =
@@ -266,11 +276,12 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     selectedSources.length > 0 ||
     selectedObjectTypes.length > 0 ||
     filterHooks.selectedPriorities.length > 0 ||
-    filterHooks.selectedTypes.length > 0 ||
+    filterHooks.selectedAppointmentTypes.length > 0 ||
     filterHooks.selectedAssignees.length > 0 ||
     filterHooks.dueDateFilter !== "all" ||
     filterHooks.selectedCities.length > 0 ||
     filterHooks.selectedStates.length > 0 ||
+    filterHooks.selectedStageIds.length > 0 ||
     filterHooks.budgetMin !== "" ||
     filterHooks.budgetMax !== "" ||
     filterHooks.selectedPropertyTypes.length > 0;
@@ -280,11 +291,12 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     (selectedSources.length > 0 ? 1 : 0) +
     (selectedObjectTypes.length > 0 ? 1 : 0) +
     (filterHooks.selectedPriorities.length > 0 ? 1 : 0) +
-    (filterHooks.selectedTypes.length > 0 ? 1 : 0) +
+    (filterHooks.selectedAppointmentTypes.length > 0 ? 1 : 0) +
     (filterHooks.selectedAssignees.length > 0 ? 1 : 0) +
     (filterHooks.dueDateFilter !== "all" ? 1 : 0) +
     (filterHooks.selectedCities.length > 0 ? 1 : 0) +
     (filterHooks.selectedStates.length > 0 ? 1 : 0) +
+    (filterHooks.selectedStageIds.length > 0 ? 1 : 0) +
     (filterHooks.budgetMin !== "" || filterHooks.budgetMax !== "" ? 1 : 0) +
     (filterHooks.selectedPropertyTypes.length > 0 ? 1 : 0);
 
@@ -321,11 +333,14 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     clearFilters,
   });
 
+  const appointmentTypes = props?.filterOptions?.data?.appointmentTypes;
+
   return {
     ...filterHooks,
     ...data,
     ...handlers,
     props,
+    appointmentTypes,
     apiStages,
     apiLoading,
     apiError,
@@ -369,5 +384,12 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     hasActiveFilters,
     activeFiltersCount,
     newFilters,
+    selectedStageIds,
+    handleStageDistributionClick,
+    isStageSelected,
+    onStageChangeSuccess: props?.onStageChangeApplied
+      ? (actionId: string, newStageId: string, previousStageId: string) =>
+          props.onStageChangeApplied!(actionId, previousStageId, newStageId)
+      : undefined,
   };
 }

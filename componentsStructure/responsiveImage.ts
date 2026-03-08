@@ -46,24 +46,9 @@ export const responsiveImageStructure: ComponentStructure = {
           label: "Width",
           type: "object",
           fields: [
-            {
-              key: "mobile",
-              label: "Mobile Width",
-              type: "text",
-              placeholder: "100%",
-            },
-            {
-              key: "tablet",
-              label: "Tablet Width",
-              type: "text",
-              placeholder: "80%",
-            },
-            {
-              key: "desktop",
-              label: "Desktop Width",
-              type: "text",
-              placeholder: "70%",
-            },
+            { key: "mobile", label: "Mobile Width", type: "number", placeholder: "100", unit: "%" },
+            { key: "tablet", label: "Tablet Width", type: "number", placeholder: "80", unit: "%" },
+            { key: "desktop", label: "Desktop Width", type: "number", placeholder: "70", unit: "%" },
           ],
         },
 
@@ -75,24 +60,9 @@ export const responsiveImageStructure: ComponentStructure = {
           label: "Max Width",
           type: "object",
           fields: [
-            {
-              key: "mobile",
-              label: "Mobile Max Width",
-              type: "text",
-              placeholder: "100%",
-            },
-            {
-              key: "tablet",
-              label: "Tablet Max Width",
-              type: "text",
-              placeholder: "800px",
-            },
-            {
-              key: "desktop",
-              label: "Desktop Max Width",
-              type: "text",
-              placeholder: "1200px",
-            },
+            { key: "mobile", label: "Mobile Max Width", type: "number", placeholder: "100", unit: "%" },
+            { key: "tablet", label: "Tablet Max Width", type: "number", placeholder: "800", unit: "px" },
+            { key: "desktop", label: "Desktop Max Width", type: "number", placeholder: "1200", unit: "px" },
           ],
         },
 
@@ -123,18 +93,8 @@ export const responsiveImageStructure: ComponentStructure = {
               label: "Margin",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Margin",
-                  type: "text",
-                  placeholder: "0",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Margin",
-                  type: "text",
-                  placeholder: "0",
-                },
+                { key: "top", label: "Top Margin", type: "number", placeholder: "0", unit: "px" },
+                { key: "bottom", label: "Bottom Margin", type: "number", placeholder: "0", unit: "px" },
                 {
                   key: "left",
                   label: "Left Margin",
@@ -154,30 +114,10 @@ export const responsiveImageStructure: ComponentStructure = {
               label: "Padding",
               type: "object",
               fields: [
-                {
-                  key: "top",
-                  label: "Top Padding",
-                  type: "text",
-                  placeholder: "0",
-                },
-                {
-                  key: "bottom",
-                  label: "Bottom Padding",
-                  type: "text",
-                  placeholder: "0",
-                },
-                {
-                  key: "left",
-                  label: "Left Padding",
-                  type: "text",
-                  placeholder: "0",
-                },
-                {
-                  key: "right",
-                  label: "Right Padding",
-                  type: "text",
-                  placeholder: "0",
-                },
+                { key: "top", label: "Top Padding", type: "number", placeholder: "0", unit: "px" },
+                { key: "bottom", label: "Bottom Padding", type: "number", placeholder: "0", unit: "px" },
+                { key: "left", label: "Left Padding", type: "number", placeholder: "0", unit: "px" },
+                { key: "right", label: "Right Padding", type: "number", placeholder: "0", unit: "px" },
               ],
             },
           ],
@@ -235,8 +175,9 @@ export const responsiveImageStructure: ComponentStructure = {
                 {
                   key: "width",
                   label: "Border Width",
-                  type: "text",
-                  placeholder: "1px",
+                  type: "number",
+                  placeholder: "1",
+                  unit: "px",
                 },
                 {
                   key: "color",
@@ -296,7 +237,7 @@ export const responsiveImageStructure: ComponentStructure = {
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "image.src", label: "Image URL", type: "image" },
         { key: "image.alt", label: "Alt Text", type: "text" },
-        { key: "width.desktop", label: "Desktop Width", type: "text" },
+        { key: "width.desktop", label: "Desktop Width", type: "number", placeholder: "70", unit: "%" },
         { key: "alignment", label: "Alignment", type: "select" },
       ],
     },

@@ -55,8 +55,16 @@ export default function DashboardLayout({
   const router = useRouter();
   const [isValidDomain, setIsValidDomain] = useState<boolean | null>(null);
   const fetchUserFromAPI = useAuthStore((state) => state.fetchUserFromAPI);
+  const hydrateUserFromStorage = useAuthStore(
+    (state) => state.hydrateUserFromStorage,
+  );
   const userData = useAuthStore((state) => state.userData);
   const hasFetchedUserRef = useRef(false);
+
+  // تهيئة الـ store من localStorage فوراً لعرض اسم الـ tenant والرابط في الـ sidebar قبل وصول استجابة API
+  useEffect(() => {
+    hydrateUserFromStorage?.();
+  }, [hydrateUserFromStorage]);
 
   // قراءة حالة التحقق من sessionStorage مباشرة في initial state
   const [hasValidatedSession, setHasValidatedSession] = useState<boolean>(

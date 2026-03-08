@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
 import useTenantStore from "@/context/tenantStore";
 import { useEditorStore } from "@/context/editorStore";
+import { toDimension } from "@/lib/utils";
 
 // Default contact map section data
 const getDefaultcontactMapSectionData = () => ({
@@ -26,13 +27,13 @@ const getDefaultcontactMapSectionData = () => ({
     },
   },
   spacing: {
-    paddingY: "py-14 sm:py-16",
-    maxWidth: "max-w-[1600px]",
-    paddingX: "px-4",
-    headerMarginBottom: "mb-10",
-    gridGap: "gap-8",
-    formGap: "space-y-6",
-    inputGap: "gap-4",
+    paddingY: 56,
+    maxWidth: 1600,
+    paddingX: 16,
+    headerMarginBottom: 40,
+    gridGap: 32,
+    formGap: 24,
+    inputGap: 16,
   },
   header: {
     alignment: "text-right",
@@ -49,7 +50,7 @@ const getDefaultcontactMapSectionData = () => ({
       weight: "font-normal",
       maxWidth: "max-w-4xl",
       lineHeight: "leading-7",
-      marginTop: "mt-4",
+      marginTop: 16,
     },
   },
   layout: {
@@ -69,7 +70,7 @@ const getDefaultcontactMapSectionData = () => ({
         placeholder: "أدخل اسمك",
         required: true,
         type: "text",
-        height: "h-12",
+        height: 48,
       },
       country: {
         enabled: true,
@@ -77,7 +78,7 @@ const getDefaultcontactMapSectionData = () => ({
         placeholder: "أدخل بلدك",
         required: true,
         type: "text",
-        height: "h-12",
+        height: 48,
       },
       feedback: {
         enabled: true,
@@ -112,8 +113,8 @@ const getDefaultcontactMapSectionData = () => ({
       enabled: true,
       text: "إرسال",
       type: "submit",
-      width: "w-full",
-      height: "py-6",
+      width: 100,
+      height: 48,
       backgroundColor: {
         useDefaultColor: true,
         globalColorType: "primary",
@@ -126,7 +127,7 @@ const getDefaultcontactMapSectionData = () => ({
         useDefaultColor: true,
         globalColorType: "secondary",
       },
-      fontSize: "text-lg",
+      fontSize: 18,
       fontWeight: "font-semibold",
       borderRadius: "rounded-xl",
     },
@@ -135,8 +136,8 @@ const getDefaultcontactMapSectionData = () => ({
     enabled: true,
     title: "خريطة الرياض",
     src: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.6829087747!2d46.3249!3d24.7136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f03890d489399%3A0xba974d1c98e79fd5!2sRiyadh%20Saudi%20Arabia!5e0!3m2!1sen!2s!4v1635000000000!5m2!1sen!2s",
-    width: "100%",
-    height: "h-[400px] lg:h-[500px]",
+    width: 100,
+    height: 400,
     borderRadius: "rounded-xl",
     border: "border",
     overflow: "overflow-hidden",
@@ -148,7 +149,7 @@ const getDefaultcontactMapSectionData = () => ({
     labelColor: "#374151",
     labelSize: "text-sm",
     labelWeight: "font-medium",
-    labelMarginBottom: "mb-2",
+    labelMarginBottom: 8,
   },
   responsive: {
     mobileLayout: "stacked",
@@ -714,30 +715,38 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
 
   return (
     <section
-      className={`w-full bg-background ${mergedData.spacing?.paddingY || "py-14 sm:py-16"}`}
+      className="w-full bg-background"
       style={{
         backgroundColor:
           mergedData.background?.color ||
           mergedData.styling?.bgColor ||
           "transparent",
+        paddingTop: toDimension(mergedData.spacing?.paddingY, "px", "56px"),
+        paddingBottom: toDimension(mergedData.spacing?.paddingY, "px", "56px"),
       }}
     >
       <div
-        className={`mx-auto ${mergedData.spacing?.maxWidth || "max-w-[1600px]"} ${mergedData.spacing?.paddingX || "px-4"}`}
+        className="mx-auto"
         dir="rtl"
         style={{
+          maxWidth: toDimension(mergedData.spacing?.maxWidth, "px", "1600px"),
+          paddingLeft: toDimension(mergedData.spacing?.paddingX, "px", "16px"),
+          paddingRight: toDimension(mergedData.spacing?.paddingX, "px", "16px"),
           gridTemplateColumns: mergedData.grid?.columns?.desktop
             ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
             : undefined,
           gap:
             mergedData.grid?.gapX || mergedData.grid?.gapY
               ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
-              : undefined,
+              : toDimension(mergedData.spacing?.gridGap, "px", "32px"),
         }}
       >
         {/* العنوان والوصف */}
         <header
-          className={`${mergedData.spacing?.headerMarginBottom || "mb-10"} ${mergedData.header?.alignment || "text-right"}`}
+          className={mergedData.header?.alignment || "text-right"}
+          style={{
+            marginBottom: toDimension(mergedData.spacing?.headerMarginBottom, "px", "40px"),
+          }}
         >
           <h2
             className={mergedData.header?.title?.className || "section-title"}
@@ -751,12 +760,13 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
             {mergedData.title}
           </h2>
           <p
-            className={`${mergedData.header?.description?.className || "section-subtitle"} ${mergedData.header?.description?.maxWidth || "max-w-4xl"} ${mergedData.header?.description?.lineHeight || "leading-7"} ${mergedData.header?.description?.marginTop || "mt-4"}`}
+            className={`${mergedData.header?.description?.className || "section-subtitle"} ${mergedData.header?.description?.maxWidth || "max-w-4xl"} ${mergedData.header?.description?.lineHeight || "leading-7"}`}
             style={{
               color:
                 mergedData.styling?.textColor ||
                 mergedData.colors?.textColor ||
                 undefined,
+              marginTop: toDimension(mergedData.header?.description?.marginTop, "px", "16px"),
             }}
           >
             {mergedData.description}
@@ -765,15 +775,12 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
 
         {/* التقسيم 50/50 */}
         <div
-          className={`grid ${mergedData.spacing?.gridGap || "gap-8"} ${mergedData.layout?.gridCols || "grid-cols-1 lg:grid-cols-2"}`}
+          className={`grid ${mergedData.layout?.gridCols || "grid-cols-1 lg:grid-cols-2"}`}
           style={{
             gridTemplateColumns: mergedData.grid?.columns?.desktop
               ? `repeat(${mergedData.grid.columns.desktop}, 1fr)`
               : undefined,
-            gap:
-              mergedData.grid?.gapX || mergedData.grid?.gapY
-                ? `${mergedData.grid.gapY || "40px"} ${mergedData.grid.gapX || "40px"}`
-                : undefined,
+            gap: toDimension(mergedData.spacing?.gridGap, "px", "32px"),
           }}
         >
           {/* النموذج - الجانب الأيمن */}
@@ -783,17 +790,19 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
             >
               <form
                 onSubmit={handleSubmit}
-                className={mergedData.spacing?.formGap || "space-y-6"}
+                className="flex flex-col"
+                style={{ gap: toDimension(mergedData.spacing?.formGap, "px", "24px") }}
               >
                 <div
-                  className={`grid grid-cols-1 ${mergedData.spacing?.inputGap || "gap-4"} sm:grid-cols-2`}
+                  className="grid grid-cols-1 sm:grid-cols-2"
+                  style={{ gap: toDimension(mergedData.spacing?.inputGap, "px", "16px") }}
                 >
                   {mergedData.form?.fields?.name?.enabled !== false && (
                     <div>
                       <label
                         htmlFor="name"
-                        className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"}`}
-                        style={{ color: labelColor }}
+                        className={`block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"}`}
+                        style={{ color: labelColor, marginBottom: toDimension(mergedData.labels?.labelMarginBottom, "px", "8px") }}
                       >
                         {mergedData.form?.fields?.name?.label || "اسمك"}
                       </label>
@@ -808,9 +817,9 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                         onChange={(e) =>
                           handleInputChange("name", e.target.value)
                         }
-                        className={
-                          mergedData.form?.fields?.name?.height || "h-12"
-                        }
+                        style={{
+                          height: toDimension(mergedData.form?.fields?.name?.height, "px", "48px"),
+                        }}
                         required={
                           mergedData.form?.fields?.name?.required || true
                         }
@@ -821,7 +830,8 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                     <div>
                       <label
                         htmlFor="country"
-                        className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                        className={`block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                        style={{ marginBottom: toDimension(mergedData.labels?.labelMarginBottom, "px", "8px") }}
                       >
                         {mergedData.form?.fields?.country?.label || "بلدك"}
                       </label>
@@ -836,9 +846,9 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                         onChange={(e) =>
                           handleInputChange("country", e.target.value)
                         }
-                        className={
-                          mergedData.form?.fields?.country?.height || "h-12"
-                        }
+                        style={{
+                          height: toDimension(mergedData.form?.fields?.country?.height, "px", "48px"),
+                        }}
                         required={
                           mergedData.form?.fields?.country?.required || true
                         }
@@ -851,7 +861,8 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                   <div>
                     <label
                       htmlFor="feedback"
-                      className={`${mergedData.labels?.labelMarginBottom || "mb-2"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                      className={`block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"} text-foreground`}
+                      style={{ marginBottom: toDimension(mergedData.labels?.labelMarginBottom, "px", "8px") }}
                     >
                       {mergedData.form?.fields?.feedback?.label || "تعليقك"}
                     </label>
@@ -877,8 +888,8 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                 {mergedData.form?.rating?.enabled !== false && (
                   <div>
                     <label
-                      className={`${mergedData.labels?.labelMarginBottom || "mb-3"} block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"}`}
-                      style={{ color: labelColor }}
+                      className={`block ${mergedData.labels?.labelSize || "text-sm"} ${mergedData.labels?.labelWeight || "font-medium"}`}
+                      style={{ color: labelColor, marginBottom: toDimension(mergedData.labels?.labelMarginBottom, "px", "8px") }}
                     >
                       {mergedData.form?.rating?.label || "التقييم"}
                     </label>
@@ -934,10 +945,13 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
                     type={
                       (mergedData.form?.submitButton?.type as any) || "submit"
                     }
-                    className={`${mergedData.form?.submitButton?.width || "w-full"} rounded-xl ${mergedData.form?.submitButton?.height || "py-6"} ${mergedData.form?.submitButton?.fontSize || "text-lg"} ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"} transition-colors`}
+                    className={`rounded-xl ${mergedData.form?.submitButton?.fontWeight || "font-semibold"} ${mergedData.form?.submitButton?.borderRadius || "rounded-xl"} transition-colors`}
                     style={{
                       backgroundColor: submitButtonBgColor,
                       color: submitButtonTextColor,
+                      width: toDimension(mergedData.form?.submitButton?.width, "%", "100%"),
+                      height: toDimension(mergedData.form?.submitButton?.height, "px", "48px"),
+                      fontSize: toDimension(mergedData.form?.submitButton?.fontSize, "px", "18px"),
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor =
@@ -961,11 +975,15 @@ export default function contactMapSection(props: contactMapSectionProps = {}) {
               className={mergedData.layout?.mapOrder || "order-2 lg:order-2"}
             >
               <div
-                className={`${mergedData.map.height || "h-[400px] lg:h-[500px]"} w-full ${mergedData.map.overflow || "overflow-hidden"} ${mergedData.map.borderRadius || "rounded-xl"} ${mergedData.map.border || "border"}`}
+                className={`w-full ${mergedData.map.overflow || "overflow-hidden"} ${mergedData.map.borderRadius || "rounded-xl"} ${mergedData.map.border || "border"}`}
+                style={{
+                  width: toDimension(mergedData.map?.width, "%", "100%"),
+                  height: toDimension(mergedData.map?.height, "px", "400px"),
+                }}
               >
                 <iframe
                   src={mergedData.map.src}
-                  width={mergedData.map.width || "100%"}
+                  width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen={mergedData.map.allowFullScreen}

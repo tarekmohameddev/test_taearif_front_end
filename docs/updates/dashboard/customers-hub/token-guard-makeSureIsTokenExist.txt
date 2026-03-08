@@ -1,0 +1,7 @@
+2026-03-04
+Update Type: Bug Fix / Infrastructure
+Applied "makeSureIsTokenExist" pattern to Customers Hub to fix 401 Unauthorized when entering hub pages. Root cause: usePermissions was calling userStore.fetchUserData() before Auth token was ready, so axiosInstance.get("/user") ran without Authorization header.
+- usePermissions: Now waits for Auth token (useAuthStore: !authLoading && userData?.token) before calling userStore.fetchUserData(); added authLoading and authUserData?.token to useEffect deps; permission loading state includes authLoading so dashboard does not show content before token is ready.
+- customers-hub layout: Added app/dashboard/customers-hub/layout.tsx as a token guard that shows "جاري التحقق من تسجيل الدخول..." until !authLoading && userData?.token, then renders children. All hub routes (main, list, add, pipeline, requests, request detail, analytics, ai-assistant, customer detail) are protected by this single guard.
+Reference: docs/important/prompts/makeSureIsTokenExist.txt
+hooks/usePermissions.ts, app/dashboard/customers-hub/layout.tsx

@@ -1,9 +1,0 @@
-2026-02-17 03:45:00
-Update Type: Feature
-Created Antigravity AI Debug System - Complete implementation of debug system similar to Cursor Debug Mode
-scripts/antigravity-ingest-server.ts, scripts/antigravity-codemod.js, scripts/antigravity-cleanup.js, scripts/antigravity-example.sh, .antigravity/README.md, .antigravity/antigravity-config.json, .antigravity/.gitkeep, docs/important/ANTIGRAVITY_DEBUG_SYSTEM.md, .gitignore, package.json
-
-2026-02-17 04:00:00
-Update Type: Feature
-Added Antigravity AI Automation Layer - Created automation script and integration files for automatic usage by Antigravity AI
-scripts/antigravity-automation.js, .antigravity/ANTIGRAVITY_AI_INSTRUCTIONS.md, .antigravity/antigravity-prompt.txt, docs/important/ANTIGRAVITY_AI_INTEGRATION.md, package.json

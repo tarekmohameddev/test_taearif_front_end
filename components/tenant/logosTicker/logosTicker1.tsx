@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultLogosTickerData } from "@/context/editorStoreFunctions/logosTickerFunctions";
+import { toDimension } from "@/lib/utils";
 import {
   TrustedBrandsScroller,
   TrustedBrandsScrollerReverse,
@@ -433,8 +434,7 @@ export default function LogosTicker1(props: LogosTickerProps) {
             className="section-title font-bold mb-6"
             style={{
               color: getColor("titleColor", brandingColors.primary),
-              fontSize:
-                mergedData.typography?.title?.fontSize?.desktop || "3xl",
+              fontSize: toDimension(mergedData.typography?.title?.fontSize?.desktop, "px", "30px"),
               fontWeight: mergedData.typography?.title?.fontWeight || "bold",
               fontFamily: mergedData.typography?.title?.fontFamily || "Tajawal",
             }}
@@ -448,8 +448,7 @@ export default function LogosTicker1(props: LogosTickerProps) {
             className="section-subtitle text-gray-600 max-w-3xl mx-auto leading-relaxed"
             style={{
               color: mergedData.styling?.subtitleColor || "#6b7280",
-              fontSize:
-                mergedData.typography?.subtitle?.fontSize?.desktop || "lg",
+              fontSize: toDimension(mergedData.typography?.subtitle?.fontSize?.desktop, "px", "18px"),
               fontWeight:
                 mergedData.typography?.subtitle?.fontWeight || "normal",
               fontFamily:

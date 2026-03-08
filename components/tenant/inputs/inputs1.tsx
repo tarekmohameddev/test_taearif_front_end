@@ -22,6 +22,7 @@ import {
 import { useEditorStore } from "@/context/editorStore";
 import useTenantStore from "@/context/tenantStore";
 import { getDefaultInputsData } from "@/context/editorStoreFunctions/inputsFunctions";
+import { toDimension } from "@/lib/utils";
 import { useTenantId } from "@/hooks/useTenantId";
 
 // Generate random ID function
@@ -84,6 +85,8 @@ interface InputsProps {
   variant?: string;
   useStore?: boolean;
   id?: string;
+  // Override tenant ID (e.g. for Storybook when useStore is false)
+  tenantId?: string;
   // API endpoint for form submission
   apiEndpoint?: string;
   // Additional props for store integration
@@ -269,8 +272,10 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
   const variantId = props.variant || "inputs1";
   const uniqueId = props.id || variantId;
 
-  // Tenant ID hook
-  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+  // Tenant ID hook (skip when tenantId override provided, e.g. Storybook)
+  const hookResult = useTenantId();
+  const currentTenantId = props.tenantId ?? hookResult.tenantId;
+  const tenantLoading = props.tenantId ? false : hookResult.isLoading;
 
   // Subscribe to editor store updates for this inputs variant
   const ensureComponentVariant = useEditorStore(
@@ -1441,17 +1446,18 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
           mergedData.background?.color ||
           mergedData.styling?.bgColor ||
           "transparent",
-        paddingTop: mergedData.layout?.padding?.top || "2rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "2rem",
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "32px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "32px"),
       }}
     >
       <div
         className="mx-auto px-4"
         style={{
-          maxWidth:
-            mergedData.layout?.maxWidth ||
-            mergedData.styling?.maxWidth ||
+          maxWidth: toDimension(
+            mergedData.layout?.maxWidth ?? mergedData.styling?.maxWidth,
+            "px",
             "1600px",
+          ),
         }}
       >
         <style jsx>{`
@@ -1835,7 +1841,9 @@ const Inputs1: React.FC<InputsProps> = (props = {}) => {
                 backgroundColor: submitButton.backgroundColor || "#3b82f6",
                 color: submitButton.textColor || "#ffffff",
                 borderRadius: submitButton.borderRadius || "8px",
-                padding: submitButton.padding || "12px 24px",
+                padding: typeof submitButton.padding === "object" && submitButton.padding !== null
+                  ? `${toDimension((submitButton.padding as { y?: number; x?: number }).y, "px", "12")} ${toDimension((submitButton.padding as { y?: number; x?: number }).x, "px", "24")}`
+                  : (submitButton.padding as string) || "12px 24px",
                 width: "100%",
                 justifyContent: "center",
               }}

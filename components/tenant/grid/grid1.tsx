@@ -17,6 +17,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useUrlFilters } from "@/hooks/use-url-filters";
 import { getDefaultGridData } from "@/context/editorStoreFunctions/gridFunctions";
 import { getDefaultCard4Data } from "@/context/editorStoreFunctions/card4Functions";
+import { toDimension } from "@/lib/utils";
 
 interface PropertyGridProps {
   emptyMessage?: string;
@@ -36,6 +37,11 @@ interface PropertyGridProps {
   useStore?: boolean;
   variant?: string;
   id?: string;
+  /**
+   * Override tenant id (useful for Storybook/demo environments).
+   * When provided, the component will not wait for useTenantId() to resolve.
+   */
+  tenantId?: string;
 }
 
 export default function PropertyGrid(props: PropertyGridProps = {}) {
@@ -63,8 +69,10 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
     });
   }, [pathname, isRealEstatePage]);
 
-  // Tenant ID hook
-  const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
+  // Tenant ID hook (skip when tenantId override provided, e.g. Storybook)
+  const hookResult = useTenantId();
+  const currentTenantId = props.tenantId ?? hookResult.tenantId;
+  const tenantLoading = props.tenantId ? false : hookResult.isLoading;
 
   // URL filters hook - automatically applies URL params when they change
   useUrlFilters();
@@ -1000,8 +1008,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
           mergedData.background?.color ||
           mergedData.styling?.bgColor ||
           "transparent",
-        paddingTop: mergedData.layout?.padding?.top || "2rem",
-        paddingBottom: mergedData.layout?.padding?.bottom || "2rem",
+        paddingTop: toDimension(mergedData.layout?.padding?.top, "px", "48px"),
+        paddingBottom: toDimension(mergedData.layout?.padding?.bottom, "px", "48px"),
       }}
     >
       <div

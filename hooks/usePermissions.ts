@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useUserStore } from "@/context/userStore";
+import useAuthStore from "@/context/AuthContext";
 
 interface PermissionCheck {
   hasPermission: boolean;
@@ -11,6 +12,9 @@ interface PermissionCheck {
 
 export const usePermissions = () => {
   const pathname = usePathname();
+
+  // Wait for Auth token before calling userStore.fetchUserData (avoids 401 on /user)
+  const { userData: authUserData, IsLoading: authLoading } = useAuthStore();
 
   // Get state and actions from Zustand store
   const {
@@ -70,21 +74,24 @@ export const usePermissions = () => {
     return permissionMap[slug] || `${slug}.view`;
   };
 
-  // Initialize user data on first load
+  // Initialize user data on first load — only after Auth token is ready to avoid 401
   useEffect(() => {
+    if (authLoading || !authUserData?.token) {
+      return;
+    }
     if (!isInitialized) {
       fetchUserData();
     }
-  }, [isInitialized, fetchUserData]);
+  }, [isInitialized, fetchUserData, authLoading, authUserData?.token]);
 
   // Get current page slug and check permission
   const pageSlug = pathname ? getPageSlug(pathname) : "";
   const hasPermission = pageSlug ? hasAccessToPage(pageSlug) : true;
 
-  // Create permission check object
+  // Consider loading while Auth is still loading (so we don't show content before token is ready)
   const permissionCheck: PermissionCheck = {
     hasPermission,
-    loading,
+    loading: loading || authLoading,
     userData,
     error,
   };
