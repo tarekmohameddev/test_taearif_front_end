@@ -6,6 +6,11 @@ interface HeroSectionProps {
   heroHeight?: string;
   maxWidth?: string;
   primaryColor: string;
+  heroBackgroundType?: "colorOnly" | "imageAndColor" | "imageOnly";
+  heroImageSrc?: string;
+  getHeroBackgroundColor?: () => string;
+  getHeroOverlayColor?: () => string;
+  heroOverlayOpacity?: number;
 }
 
 export const HeroSection = ({
@@ -13,28 +18,42 @@ export const HeroSection = ({
   heroHeight = "500px",
   maxWidth,
   primaryColor,
+  heroBackgroundType = "imageAndColor",
+  heroImageSrc = "/images/placeholders/projectDetails2/hero.jpg",
+  getHeroBackgroundColor,
+  getHeroOverlayColor,
+  heroOverlayOpacity = 0.8,
 }: HeroSectionProps) => {
   return (
     <section
       className="relative w-full overflow-hidden"
       style={{ height: heroHeight }}
     >
-      <Image
-        src="/images/placeholders/projectDetails2/hero.jpg"
-        alt={project.title || "صورة المشروع"}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
-      {/* Overlay */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundColor: primaryColor,
-          opacity: 0.8,
-        }}
-      />
+      {heroBackgroundType === "colorOnly" && getHeroBackgroundColor && (
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: getHeroBackgroundColor() }}
+        />
+      )}
+      {(heroBackgroundType === "imageOnly" || heroBackgroundType === "imageAndColor") && (
+        <Image
+          src={heroImageSrc}
+          alt={project.title || "صورة المشروع"}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+      )}
+      {heroBackgroundType === "imageAndColor" && getHeroOverlayColor && (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: getHeroOverlayColor(),
+            opacity: heroOverlayOpacity,
+          }}
+        />
+      )}
 
       {/* Overlay Text */}
       <div className="container mx-auto px-4 absolute top-[13rem] left-0 right-0">

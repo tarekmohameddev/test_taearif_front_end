@@ -20,7 +20,16 @@ import type { ProjectDetails2Props } from "./types";
 
 export default function ProjectDetails2(props: ProjectDetails2Props) {
   // Get merged data from store
-  const { mergedData, primaryColor, logoImage } = useProjectData(props);
+  const {
+    mergedData,
+    primaryColor,
+    logoImage,
+    heroBackgroundType,
+    heroImageSrc,
+    getHeroBackgroundColor,
+    getHeroOverlayColor,
+    heroOverlayOpacity,
+  } = useProjectData(props);
 
   // Early return if not visible
   if (!mergedData.visible) {
@@ -55,7 +64,11 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
   if (tenantLoading || loadingProject) {
     return (
       <LoadingSkeleton
-        heroHeight={mergedData.hero?.height || "500px"}
+        heroHeight={
+          typeof mergedData.hero?.height === "number"
+            ? `${mergedData.hero.height}px`
+            : (mergedData.hero?.height || "500px")
+        }
         maxWidth={mergedData.layout?.maxWidth}
       />
     );
@@ -78,9 +91,18 @@ export default function ProjectDetails2(props: ProjectDetails2Props) {
       {/* Top Hero Image Section */}
       <HeroSection
         project={project}
-        heroHeight={mergedData.hero?.height || "500px"}
+        heroHeight={
+          typeof mergedData.hero?.height === "number"
+            ? `${mergedData.hero.height}px`
+            : (mergedData.hero?.height || "500px")
+        }
         maxWidth={mergedData.layout?.maxWidth}
         primaryColor={primaryColor}
+        heroBackgroundType={heroBackgroundType}
+        heroImageSrc={heroImageSrc}
+        getHeroBackgroundColor={getHeroBackgroundColor}
+        getHeroOverlayColor={getHeroOverlayColor}
+        heroOverlayOpacity={heroOverlayOpacity}
       />
 
       {/* Main Content Container */}

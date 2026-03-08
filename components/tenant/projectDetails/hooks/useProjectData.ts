@@ -215,6 +215,69 @@ export const useProjectData = (props: ProjectDetails2Props) => {
   // Get primary color using the helper function
   const primaryColor = getPrimaryColor();
 
+  // Helper to resolve a color field (useDefaultColor + globalColorType or custom hex)
+  const getColorFromField = (
+    colorField: unknown,
+    fallback: string,
+  ): string => {
+    if (!colorField) return fallback;
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    if (
+      typeof colorField === "object" &&
+      colorField !== null &&
+      !Array.isArray(colorField)
+    ) {
+      useDefaultColorValue = (colorField as any).useDefaultColor;
+      globalColorTypeValue = (colorField as any).globalColorType;
+    }
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      return brandingColors[globalColorType] || brandingColors.primary;
+    }
+    if (
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    if (
+      typeof colorField === "object" &&
+      colorField !== null &&
+      !Array.isArray(colorField) &&
+      (colorField as any).value &&
+      typeof (colorField as any).value === "string" &&
+      (colorField as any).value.startsWith("#")
+    ) {
+      return (colorField as any).value.trim();
+    }
+    return fallback;
+  };
+
+  const heroBackgroundType = mergedData.hero?.background?.type ?? "imageAndColor";
+  const defaultHeroImage = "/images/placeholders/projectDetails2/hero.jpg";
+  const heroImageSrc =
+    mergedData.hero?.background?.image?.trim() ||
+    defaultHeroImage;
+
+  const getHeroBackgroundColor = (): string =>
+    getColorFromField(mergedData.hero?.background?.color, brandingColors.primary);
+
+  const getHeroOverlayColor = (): string =>
+    getColorFromField(
+      mergedData.hero?.background?.overlay?.color,
+      brandingColors.primary,
+    );
+
+  const heroOverlayOpacity =
+    typeof mergedData.hero?.background?.overlay?.opacity === "number"
+      ? mergedData.hero.background.overlay.opacity
+      : typeof mergedData.hero?.overlayOpacity === "number"
+        ? mergedData.hero.overlayOpacity
+        : 0.8;
+
   // Get logo image from tenantData
   const { loadingTenantData } = useTenantStore();
   const logoImage = loadingTenantData
@@ -227,5 +290,10 @@ export const useProjectData = (props: ProjectDetails2Props) => {
     primaryColor,
     logoImage,
     tenantData,
+    heroBackgroundType,
+    heroImageSrc,
+    getHeroBackgroundColor,
+    getHeroOverlayColor,
+    heroOverlayOpacity,
   };
 };
