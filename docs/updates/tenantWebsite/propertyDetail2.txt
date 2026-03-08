@@ -7,3 +7,8 @@ components/tenant/propertyDetail/propertyDetail2.tsx
 Update Type: Enhancement
 إضافة دعم اختيار لون مخصص في primaryColor من EditorSidebar مع دالة helper getPrimaryColor() للتحقق من useDefaultColor و globalColorType. تحديث البيانات الافتراضية لتكون object مع useDefaultColor: true
 components/tenant/propertyDetail/propertyDetail2.tsx, context/editorStoreFunctions/propertyDetailFunctions.ts
+
+2026-03-08
+Update Type: Feature
+القسم الأعلى (Hero): إضافة كائن "الخلفية" داخل hero مع badge-select (لون فقط | صورة ولون | صورة فقط)، حقل صورة الخلفية، لون الخلفية عند "لون فقط" و overlay (لون + شفافية number) عند "صورة ولون" مع ربط الألوان بالألوان العامة أو مخصص (connectWithPrimaryColor). القيمة الافتراضية: imageAndColor، صورة افتراضية من default data.
+components/tenant/propertyDetail/propertyDetail2.tsx, componentsStructure/propertyDetail.ts, context/editorStoreFunctions/propertyDetailFunctions.ts, lib/i18n/locales/ar.json, lib/i18n/locales/en.json, components/tenant/propertyDetail/types/types.ts

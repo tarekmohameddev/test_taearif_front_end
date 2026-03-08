@@ -124,6 +124,15 @@ export interface propertyDetail2Props {
   hero?: {
     height?: string;
     overlayOpacity?: number;
+    background?: {
+      type?: "colorOnly" | "imageAndColor" | "imageOnly";
+      image?: string;
+      color?: { useDefaultColor?: boolean; globalColorType?: string } | string;
+      overlay?: {
+        color?: { useDefaultColor?: boolean; globalColorType?: string } | string;
+        opacity?: number;
+      };
+    };
   };
   gallery?: {
     showThumbnails?: boolean;

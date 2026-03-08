@@ -146,6 +146,15 @@ interface propertyDetail2Props {
   hero?: {
     height?: string;
     overlayOpacity?: number;
+    background?: {
+      type?: "colorOnly" | "imageAndColor" | "imageOnly";
+      image?: string;
+      color?: { useDefaultColor?: boolean; globalColorType?: string } | string;
+      overlay?: {
+        color?: { useDefaultColor?: boolean; globalColorType?: string } | string;
+        opacity?: number;
+      };
+    };
   };
   gallery?: {
     showThumbnails?: boolean;
@@ -497,27 +506,27 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   };
 
   // Get all images (main images + floor planning images)
-  const getAllImages = () => {
-    const allImages = [];
+  const getAllImages = (): string[] => {
+    const allImages: string[] = [];
     if (property?.image) {
       allImages.push(property.image);
     }
-    if (property?.images) {
+    if (property?.images?.length) {
       // Filter out the main image if it exists in images array to avoid duplicates
-      const additionalImages = property.images.filter(
-        (img) => img && img.trim() !== "" && img !== property.image,
+      const additionalImages = (property.images as string[]).filter(
+        (img) => typeof img === "string" && img.trim() !== "" && img !== property?.image,
       );
       allImages.push(...additionalImages);
     }
-    if (property?.floor_planning_image) {
+    if (property?.floor_planning_image?.length) {
       // Filter out the main image if it exists in floor planning images to avoid duplicates
-      const floorImages = property.floor_planning_image.filter(
-        (img) => img && img.trim() !== "" && img !== property.image,
+      const floorImages = (property.floor_planning_image as string[]).filter(
+        (img) => typeof img === "string" && img.trim() !== "" && img !== property?.image,
       );
       allImages.push(...floorImages);
     }
     // Filter out empty images and remove duplicates
-    const filtered = allImages.filter((img) => img && img.trim() !== "");
+    const filtered = allImages.filter((img) => typeof img === "string" && img.trim() !== "");
     // Remove duplicates by converting to Set and back to array
     return Array.from(new Set(filtered));
   };
@@ -732,6 +741,69 @@ export default function propertyDetail2(props: propertyDetail2Props) {
 
   const primaryColorHover = getDarkerColor(primaryColor, 20);
 
+  // Helper to resolve a color field (useDefaultColor + globalColorType or custom hex)
+  const getColorFromField = (
+    colorField: unknown,
+    fallback: string,
+  ): string => {
+    if (!colorField) return fallback;
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    if (
+      typeof colorField === "object" &&
+      colorField !== null &&
+      !Array.isArray(colorField)
+    ) {
+      useDefaultColorValue = (colorField as any).useDefaultColor;
+      globalColorTypeValue = (colorField as any).globalColorType;
+    }
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      return brandingColors[globalColorType] || brandingColors.primary;
+    }
+    if (
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    if (
+      typeof colorField === "object" &&
+      colorField !== null &&
+      !Array.isArray(colorField) &&
+      (colorField as any).value &&
+      typeof (colorField as any).value === "string" &&
+      (colorField as any).value.startsWith("#")
+    ) {
+      return (colorField as any).value.trim();
+    }
+    return fallback;
+  };
+
+  const heroBackgroundType = mergedData.hero?.background?.type ?? "imageAndColor";
+  const defaultHeroImage = "/images/placeholders/projectDetails2/hero.jpg";
+  const heroImageSrc =
+    mergedData.hero?.background?.image?.trim() ||
+    defaultHeroImage;
+
+  const getHeroBackgroundColor = (): string =>
+    getColorFromField(mergedData.hero?.background?.color, brandingColors.primary);
+
+  const getHeroOverlayColor = (): string =>
+    getColorFromField(
+      mergedData.hero?.background?.overlay?.color,
+      brandingColors.primary,
+    );
+
+  const heroOverlayOpacity =
+    typeof mergedData.hero?.background?.overlay?.opacity === "number"
+      ? mergedData.hero.background.overlay.opacity
+      : typeof mergedData.hero?.overlayOpacity === "number"
+        ? mergedData.hero.overlayOpacity
+        : 0.8;
+
   const textColor = mergedData.styling?.textColor || "#967152";
 
   // Show skeleton loading while tenant or property is loading
@@ -792,27 +864,36 @@ export default function propertyDetail2(props: propertyDetail2Props) {
 
   return (
     <main className="w-full" dir="rtl">
-      {/* BEGIN: Top Hero Image Section - Full Width */}
+      {/* BEGIN: Top Hero Section - Full Width (Background: color only / image only / image + overlay) */}
       <section
         className="relative w-full overflow-hidden"
         style={{ height: mergedData.hero?.height || "500px" }}
       >
-        <Image
-          src="/images/placeholders/projectDetails2/hero.jpg"
-          alt={property?.title || "صورة خلفية"}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        {/* Overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: primaryColor,
-            opacity: 0.8,
-          }}
-        />
+        {heroBackgroundType === "colorOnly" && (
+          <div
+            className="absolute inset-0"
+            style={{ backgroundColor: getHeroBackgroundColor() }}
+          />
+        )}
+        {(heroBackgroundType === "imageOnly" || heroBackgroundType === "imageAndColor") && (
+          <Image
+            src={heroImageSrc}
+            alt={property?.title || "صورة خلفية"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        )}
+        {heroBackgroundType === "imageAndColor" && (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: getHeroOverlayColor(),
+              opacity: heroOverlayOpacity,
+            }}
+          />
+        )}
       </section>
 
       {/* Overlay Text Top Right */}
