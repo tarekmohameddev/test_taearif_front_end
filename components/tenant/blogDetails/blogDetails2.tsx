@@ -86,6 +86,15 @@ interface blogDetails2Props {
   hero?: {
     height?: string;
     overlayOpacity?: number;
+    background?: {
+      type?: "colorOnly" | "imageAndColor" | "imageOnly";
+      image?: string;
+      color?: { useDefaultColor?: boolean; globalColorType?: string } | string;
+      overlay?: {
+        color?: { useDefaultColor?: boolean; globalColorType?: string } | string;
+        opacity?: number;
+      };
+    };
   };
   gallery?: {
     showThumbnails?: boolean;
@@ -471,15 +480,93 @@ export default function blogDetails2(props: blogDetails2Props) {
   // صور المدونة - computed value (includes thumbnail + media)
   const blogImages = getAllImages();
 
-  // Get primary color from tenantData or mergedData
-  const primaryColorFromTenant =
-    tenantData?.WebsiteLayout?.branding?.colors?.primary &&
-    tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
-      ? tenantData.WebsiteLayout.branding.colors.primary
-      : "#8b5f46";
+  // Get branding colors from WebsiteLayout (fallback to brown #8b5f46)
+  const brandingColors = {
+    primary:
+      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
+      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.primary
+        : "#8b5f46",
+    secondary:
+      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
+      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.secondary
+        : "#8b5f46",
+    accent:
+      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
+      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
+        ? tenantData.WebsiteLayout.branding.colors.accent
+        : "#8b5f46",
+  };
 
-  const primaryColor =
-    mergedData.styling?.primaryColor || primaryColorFromTenant;
+  // Helper to resolve a color field (useDefaultColor + globalColorType or custom hex)
+  const getColorFromField = (
+    colorField: unknown,
+    fallback: string,
+  ): string => {
+    if (!colorField) return fallback;
+    let useDefaultColorValue: boolean | undefined;
+    let globalColorTypeValue: string | undefined;
+    if (
+      typeof colorField === "object" &&
+      colorField !== null &&
+      !Array.isArray(colorField)
+    ) {
+      useDefaultColorValue = (colorField as any).useDefaultColor;
+      globalColorTypeValue = (colorField as any).globalColorType;
+    }
+    const useDefaultColor = useDefaultColorValue !== undefined ? useDefaultColorValue : true;
+    if (useDefaultColor) {
+      const globalColorType = (globalColorTypeValue || "primary") as keyof typeof brandingColors;
+      return brandingColors[globalColorType] || brandingColors.primary;
+    }
+    if (
+      typeof colorField === "string" &&
+      colorField.trim() !== "" &&
+      colorField.startsWith("#")
+    ) {
+      return colorField.trim();
+    }
+    if (
+      typeof colorField === "object" &&
+      colorField !== null &&
+      !Array.isArray(colorField) &&
+      (colorField as any).value &&
+      typeof (colorField as any).value === "string" &&
+      (colorField as any).value.startsWith("#")
+    ) {
+      return (colorField as any).value.trim();
+    }
+    return fallback;
+  };
+
+  // Get primary color (supports useDefaultColor/globalColorType or custom hex)
+  const primaryColor = getColorFromField(
+    mergedData.styling?.primaryColor,
+    brandingColors.primary,
+  );
+
+  const heroBackgroundType = mergedData.hero?.background?.type ?? "imageAndColor";
+  const defaultHeroImage = "/images/placeholders/blog/hero.jpg";
+  const heroImageSrc =
+    mergedData.hero?.background?.image?.trim() ||
+    (blog?.thumbnail?.url ?? defaultHeroImage);
+
+  const getHeroBackgroundColor = (): string =>
+    getColorFromField(mergedData.hero?.background?.color, brandingColors.primary);
+
+  const getHeroOverlayColor = (): string =>
+    getColorFromField(
+      mergedData.hero?.background?.overlay?.color,
+      brandingColors.primary,
+    );
+
+  const heroOverlayOpacity =
+    typeof mergedData.hero?.background?.overlay?.opacity === "number"
+      ? mergedData.hero.background.overlay.opacity
+      : typeof mergedData.hero?.overlayOpacity === "number"
+        ? mergedData.hero.overlayOpacity
+        : 0.8;
 
   // Helper function to create darker color for hover states
   const getDarkerColor = (hex: string, amount: number = 20): string => {
@@ -516,11 +603,15 @@ export default function blogDetails2(props: blogDetails2Props) {
 
   // Show skeleton loading while tenant or blog is loading
   if (tenantLoading || loadingBlog) {
+    const skeletonHeight =
+      typeof mergedData.hero?.height === "number"
+        ? `${mergedData.hero.height}px`
+        : (mergedData.hero?.height || "500px");
     return (
       <main className="w-full" dir="rtl">
         <section
           className="relative w-full overflow-hidden animate-pulse"
-          style={{ height: mergedData.hero?.height || "500px" }}
+          style={{ height: skeletonHeight }}
         >
           <div className="w-full h-full bg-gray-200" />
         </section>
@@ -570,29 +661,43 @@ export default function blogDetails2(props: blogDetails2Props) {
     );
   }
 
+  const heroHeightStr =
+    typeof mergedData.hero?.height === "number"
+      ? `${mergedData.hero.height}px`
+      : (mergedData.hero?.height || "500px");
+
   return (
     <main className="w-full" dir="rtl">
-      {/* BEGIN: Top Hero Image Section - Full Width */}
+      {/* BEGIN: Top Hero Section - Full Width (Background: color only / image only / image + overlay) */}
       <section
         className="relative w-full overflow-hidden"
-        style={{ height: mergedData.hero?.height || "500px" }}
+        style={{ height: heroHeightStr }}
       >
-        <Image
-          src={blog?.thumbnail?.url || "/images/placeholders/blog/hero.jpg"}
-          alt={blog?.title || "صورة خلفية"}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        {/* Overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundColor: "#361c16",
-            opacity: 0.8,
-          }}
-        />
+        {heroBackgroundType === "colorOnly" && (
+          <div
+            className="absolute inset-0"
+            style={{ backgroundColor: getHeroBackgroundColor() }}
+          />
+        )}
+        {(heroBackgroundType === "imageOnly" || heroBackgroundType === "imageAndColor") && (
+          <Image
+            src={heroImageSrc}
+            alt={blog?.title || "صورة خلفية"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        )}
+        {heroBackgroundType === "imageAndColor" && (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: getHeroOverlayColor(),
+              opacity: heroOverlayOpacity,
+            }}
+          />
+        )}
       </section>
 
       {/* Overlay Text Top Right */}

@@ -103,7 +103,21 @@ export const getDefaultBlogDetails2Data = (): ComponentData => ({
   // Hero section settings
   hero: {
     height: "500px",
-    overlayOpacity: 0.4,
+    background: {
+      type: "imageAndColor",
+      image: "/images/placeholders/blog/hero.jpg",
+      color: {
+        useDefaultColor: true,
+        globalColorType: "primary",
+      },
+      overlay: {
+        color: {
+          useDefaultColor: true,
+          globalColorType: "primary",
+        },
+        opacity: 0.8,
+      },
+    },
   },
 
   // Gallery settings
@@ -199,7 +213,8 @@ export const blogDetailsFunctions = {
 
   /**
    * updateByPath - Update specific field in component data
-    */
+   * Writes to both tempData (for sidebar) and blogDetailsStates (for live preview in the component).
+   */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
     // Get default data based on variant
     const defaultData =
@@ -217,7 +232,7 @@ export const blogDetailsFunctions = {
     // Update the specific path in the merged data
     const newData = updateDataByPath(baseData, path, value);
 
-    // Return updated tempData ONLY
+    // Update both tempData (sidebar) and blogDetailsStates (component preview)
     return {
       tempData: newData,
     } as any;
