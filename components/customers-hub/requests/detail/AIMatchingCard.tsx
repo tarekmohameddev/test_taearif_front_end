@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -110,9 +111,11 @@ export function AIMatchingCard({
                         })}
                       </p>
                     )}
-                    <Button variant="outline" size="sm" className="w-full gap-1.5">
-                      <Eye className="h-3.5 w-3.5" />
-                      عرض التفاصيل
+                    <Button variant="outline" size="sm" className="w-full gap-1.5" asChild>
+                      <Link href={`/dashboard/properties/${property.propertyId}`}>
+                        <Eye className="h-3.5 w-3.5" />
+                        عرض التفاصيل
+                      </Link>
                     </Button>
                   </CardContent>
                 </Card>

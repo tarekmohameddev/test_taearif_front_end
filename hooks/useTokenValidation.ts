@@ -65,12 +65,13 @@ export const useTokenValidation = () => {
         if (hasValidPlanCookie()) {
           const cachedPlan = getPlanCookie();
           if (cachedPlan) {
-            // استخدام البيانات من الكوكي
+            // الحفاظ على domain و company_name من الـ store (getUserInfo لا يرجعهما)
+            const storeUser = useAuthStore.getState().userData;
             const newUser = {
               email: userData?.email || null,
               token: token,
               username: userData?.username || null,
-              domain: userData?.domain || null,
+              domain: storeUser?.domain ?? userData?.domain ?? null,
               first_name: userData?.first_name || null,
               last_name: userData?.last_name || null,
               is_free_plan: cachedPlan.is_free_plan,
@@ -84,7 +85,7 @@ export const useTokenValidation = () => {
                 },
               },
               message: userData?.message || null,
-              company_name: userData?.company_name || null,
+              company_name: storeUser?.company_name ?? userData?.company_name ?? null,
               permissions: userData?.permissions || [],
               account_type: userData?.account_type || null,
               tenant_id: userData?.tenant_id || null,
@@ -139,8 +140,13 @@ export const useTokenValidation = () => {
 
       if (response.status === 200) {
         const userData = response.data;
-        const newUser = userData.data || userData;
+        const data = userData.data || userData;
+        const newUser = data?.user || data;
         setNewUserData(newUser);
+
+        // domain و company_name قد يكونان في جذر data وليس داخل user
+        const domain = data?.domain ?? newUser?.domain ?? null;
+        const company_name = data?.company_name ?? newUser?.company_name ?? null;
 
         // Store user data with permissions in AuthContext
         if (newUser) {
@@ -148,7 +154,7 @@ export const useTokenValidation = () => {
             email: newUser.email,
             token: token,
             username: newUser.username,
-            domain: newUser.domain,
+            domain,
             first_name: newUser.first_name,
             last_name: newUser.last_name,
             is_free_plan: newUser.is_free_plan,
@@ -160,7 +166,7 @@ export const useTokenValidation = () => {
             real_estate_limit_number:
               newUser.membership?.package?.real_estate_limit_number,
             message: newUser.message,
-            company_name: newUser.company_name,
+            company_name: company_name ?? newUser.company_name ?? null,
             permissions: newUser.permissions || [],
             account_type: newUser.account_type,
             tenant_id: newUser.tenant_id,

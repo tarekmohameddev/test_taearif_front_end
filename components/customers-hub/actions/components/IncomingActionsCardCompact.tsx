@@ -68,20 +68,30 @@ const nextActionLabelByType: Record<string, string> = {
   general: "إجراء",
 };
 
-/** First property: 14x14 image + name + نوع • مساحة • للبيع/للايجار (Stitch style) */
-function CompactPropertyBlockStitch({ action }: { action: CustomerAction }) {
+/** Property block: image + name + نوع • مساحة • للبيع/للايجار (Stitch style). Use first or last by useLast. */
+function CompactPropertyBlockStitch({
+  action,
+  useLast = false,
+}: {
+  action: CustomerAction;
+  useLast?: boolean;
+}) {
   const [popupOpen, setPopupOpen] = useState(false);
-  const first = action.properties?.[0] as ActionPropertyRow | undefined;
-  if (!first) return null;
-  const src = first.featuredImage || null;
-  const alt = first.title ?? "";
-  const propType = first.propertyType ? translatePropertyType(first.propertyType) : "—";
-  const area = first.size ?? (first.area != null ? `${first.area} م²` : "—");
-  const listing = first.listingTypeLabel ?? "—";
+  const arr = action.properties ?? [];
+  const prop =
+    arr.length === 0
+      ? undefined
+      : (useLast ? arr[arr.length - 1] : arr[0]) as ActionPropertyRow | undefined;
+  if (!prop) return null;
+  const src = prop.featuredImage || null;
+  const alt = prop.title ?? "";
+  const propType = prop.propertyType ? translatePropertyType(prop.propertyType) : "—";
+  const area = prop.size ?? (prop.area != null ? `${prop.area} م²` : "—");
+  const listing = prop.listingTypeLabel ?? "—";
   const listingAr =
-    listing === "sale" || (first.listingType && String(first.listingType).toLowerCase().includes("sale"))
+    listing === "sale" || (prop.listingType && String(prop.listingType).toLowerCase().includes("sale"))
       ? "للبيع"
-      : listing === "rent" || (first.listingType && String(first.listingType).toLowerCase().includes("rent"))
+      : listing === "rent" || (prop.listingType && String(prop.listingType).toLowerCase().includes("rent"))
         ? "للايجار"
         : listing;
 
@@ -112,7 +122,7 @@ function CompactPropertyBlockStitch({ action }: { action: CustomerAction }) {
           </div>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold truncate max-w-full sm:max-w-[150px] text-slate-900 dark:text-white">{first.title ?? "—"}</p>
+          <p className="text-sm font-bold truncate max-w-full sm:max-w-[150px] text-slate-900 dark:text-white">{prop.title ?? "—"}</p>
           <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
             <span>{propType}</span>
             <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
@@ -350,8 +360,12 @@ export function IncomingActionsCardCompact({
               stitchStyle
             />
           </div>
-          {isPropertyInterestSource(action.source) && action.properties?.length ? (
-            <CompactPropertyBlockStitch action={action} />
+          {(isPropertyInterestSource(action.source) || action.objectType === "property_request") &&
+          action.properties?.length ? (
+            <CompactPropertyBlockStitch
+              action={action}
+              useLast={action.objectType === "property_request"}
+            />
           ) : (
             <div className="flex-1 min-w-0" />
           )}
@@ -468,9 +482,13 @@ export function IncomingActionsCardCompact({
               <StageDropdown availableStages={availableStages} displayStage={displayStage} isUpdatingStage={isUpdatingStage} onStageChange={onStageChange} getStageColor={getStageColor} getStageNameAr={getStageNameAr} compact stitchStyle />
             </div>
           </div>
-          {isPropertyInterestSource(action.source) && action.properties?.length ? (
+          {(isPropertyInterestSource(action.source) || action.objectType === "property_request") &&
+          action.properties?.length ? (
             <div className="w-full min-w-0">
-              <CompactPropertyBlockStitch action={action} />
+              <CompactPropertyBlockStitch
+                action={action}
+                useLast={action.objectType === "property_request"}
+              />
             </div>
           ) : null}
           <div className="w-full min-w-0">

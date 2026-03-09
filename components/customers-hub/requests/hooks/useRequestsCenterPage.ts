@@ -342,20 +342,6 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     filterHooks.budgetMax !== "" ||
     filterHooks.selectedPropertyTypes.length > 0;
 
-  const activeFiltersCount =
-    (appliedSearchQuery ? 1 : 0) +
-    (selectedSources.length > 0 ? 1 : 0) +
-    (selectedObjectTypes.length > 0 ? 1 : 0) +
-    (filterHooks.selectedPriorities.length > 0 ? 1 : 0) +
-    (filterHooks.selectedAppointmentTypes.length > 0 ? 1 : 0) +
-    (filterHooks.selectedAssignees.length > 0 ? 1 : 0) +
-    (filterHooks.dueDateFilter !== "all" ? 1 : 0) +
-    (filterHooks.selectedCities.length > 0 ? 1 : 0) +
-    (filterHooks.selectedStates.length > 0 ? 1 : 0) +
-    (filterHooks.selectedStageIds.length > 0 ? 1 : 0) +
-    (filterHooks.budgetMin !== "" || filterHooks.budgetMax !== "" ? 1 : 0) +
-    (filterHooks.selectedPropertyTypes.length > 0 ? 1 : 0);
-
   const handlers = useRequestsCenterHandlers({
     completeAction,
     dismissAction,
@@ -438,7 +424,6 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     stagesForCards,
     isAllSelected,
     hasActiveFilters,
-    activeFiltersCount,
     newFilters,
     selectedStageIds,
     handleStageDistributionClick,

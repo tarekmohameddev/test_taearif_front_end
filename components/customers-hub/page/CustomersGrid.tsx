@@ -70,6 +70,7 @@ export function CustomersGrid() {
       import: "مستورد",
       referral: "إحالة",
       website: "موقع",
+      property_request: "طلب عقاري",
     };
     return labels[source || "manual"] || source || "غير محدد";
   };

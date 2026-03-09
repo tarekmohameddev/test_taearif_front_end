@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Building, Plus, ChevronDown, ChevronUp, MapPin, DollarSign, Eye, Trash2 } from "lucide-react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
@@ -353,9 +354,12 @@ export function RequestPropertiesCard({
                       variant="ghost"
                       size="sm"
                       className="w-full mt-2 h-8 text-xs"
+                      asChild
                     >
-                      <Eye className="h-3 w-3 ml-1" />
-                      عرض التفاصيل
+                      <Link href={`/dashboard/properties/${prop.id}`}>
+                        <Eye className="h-3 w-3 ml-1" />
+                        عرض التفاصيل
+                      </Link>
                     </Button>
                   </CardContent>
                 </Card>

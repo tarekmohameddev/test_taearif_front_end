@@ -4,10 +4,13 @@ import { useState } from "react";
 import {
   submitPropertyInterest,
   getPropertyInterestErrorMessage,
+  getPropertyInterestFieldErrors,
   SubmitPropertyInterestPayload,
 } from "@/lib/api/propertyRequests";
 
 const PHONE_PATTERN = /^[0-9]{10,15}$/;
+
+export type FieldErrors = Record<string, string>;
 
 export type PropertyInterestFormProps = {
   propertyId: number;
@@ -16,6 +19,11 @@ export type PropertyInterestFormProps = {
   submitButtonText?: string;
   onSuccess?: () => void;
 };
+
+const inputBaseClass =
+  "w-full rounded-md border bg-background px-4 py-3 text-right focus:ring-2 focus:ring-offset-0 focus:outline-none";
+const inputErrorClass = "border-red-500 focus:ring-red-500";
+const inputOkClass = "border-input";
 
 export function PropertyInterestForm({
   propertyId,
@@ -30,30 +38,52 @@ export function PropertyInterestForm({
     notes: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    if (error) setError(null);
+    if (generalError) setGeneralError(null);
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
+  };
+
+  const runClientValidation = (): boolean => {
+    const errors: FieldErrors = {};
+    const trimmedName = form.full_name.trim();
+    const trimmedPhone = form.phone.replace(/\s/g, "");
+
+    if (!trimmedName) {
+      errors.full_name = "الاسم الكامل مطلوب";
+    }
+    if (!trimmedPhone) {
+      errors.phone = "رقم الجوال مطلوب";
+    } else if (!PHONE_PATTERN.test(trimmedPhone)) {
+      errors.phone = "رقم الجوال غير صحيح (أرقام فقط، 10–15 رقم)";
+    }
+
+    setFieldErrors(errors);
+    setGeneralError(null);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setGeneralError(null);
+    setFieldErrors({});
+
+    if (!runClientValidation()) return;
 
     const trimmedName = form.full_name.trim();
     const trimmedPhone = form.phone.replace(/\s/g, "");
-    if (!trimmedName) {
-      setError("الاسم الكامل مطلوب");
-      return;
-    }
-    if (!PHONE_PATTERN.test(trimmedPhone)) {
-      setError("رقم الجوال غير صحيح (أرقام فقط، 10–15 رقم)");
-      return;
-    }
 
     setLoading(true);
     try {
@@ -74,16 +104,24 @@ export function PropertyInterestForm({
         window.alert(successMessage);
       }
       setForm({ full_name: "", phone: "", notes: "" });
+      setFieldErrors({});
       onSuccess?.();
     } catch (err: any) {
-      setError(getPropertyInterestErrorMessage(err));
+      const apiFieldErrors = getPropertyInterestFieldErrors(err);
+      if (Object.keys(apiFieldErrors).length > 0) {
+        setFieldErrors(apiFieldErrors);
+        setGeneralError(null);
+      } else {
+        setGeneralError(getPropertyInterestErrorMessage(err));
+        setFieldErrors({});
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4" dir="rtl">
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4" dir="rtl" noValidate>
       <div>
         <label
           htmlFor="property-interest-inline-full_name"
@@ -99,9 +137,20 @@ export function PropertyInterestForm({
           onChange={handleChange}
           required
           placeholder="أدخل اسمك الكامل"
-          className="w-full rounded-md border border-input bg-background px-4 py-3 text-right focus:ring-2 focus:ring-offset-0 focus:outline-none"
+          className={`${inputBaseClass} ${fieldErrors.full_name ? inputErrorClass : inputOkClass}`}
           maxLength={255}
+          aria-invalid={!!fieldErrors.full_name}
+          aria-describedby={fieldErrors.full_name ? "err-full_name" : undefined}
         />
+        {fieldErrors.full_name && (
+          <p
+            id="err-full_name"
+            className="mt-1 text-sm text-red-600 text-right"
+            role="alert"
+          >
+            {fieldErrors.full_name}
+          </p>
+        )}
       </div>
 
       <div>
@@ -119,11 +168,22 @@ export function PropertyInterestForm({
           onChange={handleChange}
           required
           placeholder="05xxxxxxxx"
-          className="w-full rounded-md border border-input bg-background px-4 py-3 text-right focus:ring-2 focus:ring-offset-0"
+          className={`${inputBaseClass} ${fieldErrors.phone ? inputErrorClass : inputOkClass}`}
           maxLength={20}
           inputMode="numeric"
           pattern="[0-9]{10,15}"
+          aria-invalid={!!fieldErrors.phone}
+          aria-describedby={fieldErrors.phone ? "err-phone" : undefined}
         />
+        {fieldErrors.phone && (
+          <p
+            id="err-phone"
+            className="mt-1 text-sm text-red-600 text-right"
+            role="alert"
+          >
+            {fieldErrors.phone}
+          </p>
+        )}
       </div>
 
       <div>
@@ -140,17 +200,28 @@ export function PropertyInterestForm({
           onChange={handleChange}
           rows={3}
           placeholder="أي تفاصيل إضافية..."
-          className="w-full rounded-md border border-input bg-background px-4 py-3 text-right resize-none focus:ring-2 focus:ring-offset-0"
+          className={`${inputBaseClass} ${fieldErrors.notes ? inputErrorClass : inputOkClass}`}
           maxLength={1000}
+          aria-invalid={!!fieldErrors.notes}
+          aria-describedby={fieldErrors.notes ? "err-notes" : undefined}
         />
+        {fieldErrors.notes && (
+          <p
+            id="err-notes"
+            className="mt-1 text-sm text-red-600 text-right"
+            role="alert"
+          >
+            {fieldErrors.notes}
+          </p>
+        )}
       </div>
 
-      {error && (
+      {generalError && (
         <div
           className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-right text-sm"
           role="alert"
         >
-          {error}
+          {generalError}
         </div>
       )}
 

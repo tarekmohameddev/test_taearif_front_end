@@ -51,6 +51,23 @@ export function getPropertyInterestErrorMessage(err: any): string {
   return "حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.";
 }
 
+/**
+ * Extract field-level validation errors from API error response.
+ * Returns record of field name -> first error message (e.g. full_name, phone, notes).
+ */
+export function getPropertyInterestFieldErrors(err: any): Record<string, string> {
+  const data = err?.response?.data;
+  const out: Record<string, string> = {};
+  if (data?.errors && typeof data.errors === "object") {
+    for (const key of Object.keys(data.errors)) {
+      const val = data.errors[key];
+      const msg = Array.isArray(val) ? val[0] : typeof val === "string" ? val : null;
+      if (msg) out[key] = msg;
+    }
+  }
+  return out;
+}
+
 // --- Property IDs on Property Requests (attach/detach) ---
 
 export interface PropertyRequestWithIds {

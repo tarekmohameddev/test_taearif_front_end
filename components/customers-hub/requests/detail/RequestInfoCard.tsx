@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, UserPlus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { priorityConfig, requestDetailActionTypeLabels } from "../constants";
+import { priorityConfig } from "../constants";
+import { SourceBadge } from "@/components/customers-hub/actions/SourceBadge";
+import { translatePropertyType } from "@/components/customers-hub/actions/utils/propertyUtils";
 import type { CustomerAction } from "@/types/unified-customer";
 
 interface RequestInfoCardProps {
@@ -13,7 +15,6 @@ interface RequestInfoCardProps {
 }
 
 export function RequestInfoCard({ action }: RequestInfoCardProps) {
-  const typeLabel = requestDetailActionTypeLabels[action.type] ?? action.type;
   const borderColor = (priorityConfig[action.priority] ?? priorityConfig.medium).borderColor;
 
   return (
@@ -38,16 +39,6 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
 
         {/* معلومات أساسية عن الطلب */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-              <FileText className="h-4 w-4 text-blue-600" />
-            </div>
-            <div>
-              <div className="text-xs text-gray-500">نوع الطلب</div>
-              <div className="font-medium">{typeLabel}</div>
-            </div>
-          </div>
-
           {action.assignedToName && (
             <div className="flex items-start gap-3">
               <div className="p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg">
@@ -86,9 +77,11 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">نوع العقار (تفصيلي)</span>
               <span className="font-medium">
-                {action.propertyType ??
-                  action.property_type ??
-                  action.metadata?.propertyType}
+                {translatePropertyType(
+                  action.propertyType ??
+                    action.property_type ??
+                    (action.metadata?.propertyType as string | undefined)
+                )}
               </span>
             </div>
           )}
@@ -188,9 +181,9 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
           <h3 className="text-sm font-semibold mb-1">تفاصيل إضافية</h3>
 
           {action.source && (
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm gap-2">
               <span className="text-gray-500">مصدر الطلب</span>
-              <span className="font-medium">{action.source}</span>
+              <SourceBadge source={action.source} className="text-xs" />
             </div>
           )}
         </div>
