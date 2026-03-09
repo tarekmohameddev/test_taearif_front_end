@@ -15,6 +15,7 @@ import { AutomationModule } from "./AutomationModule";
 import { AIResponderModule } from "./AIResponderModule";
 import { WhatsAppCampaignsTab } from "@/components/whatsapp-management/WhatsAppCampaignsTab";
 import { WhatsAppCenterPage } from "@/components/whatsapp-center/page-component";
+import { WhatsAppTemplatesTab } from "@/components/whatsapp-management/WhatsAppTemplatesTab";
 
 export function WhatsAppManagementPage() {
   const [selectedNumberId, setSelectedNumberId] = useState<number | null>(null);
@@ -44,7 +45,7 @@ export function WhatsAppManagementPage() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 h-auto">
+            <TabsList className="grid w-full grid-cols-6 h-auto">
               <TabsTrigger
                 value="conversations"
                 className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2"
@@ -58,6 +59,13 @@ export function WhatsAppManagementPage() {
               >
                 <Megaphone className="h-4 w-4" />
                 <span className="text-xs sm:text-sm">الحملات</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="templates"
+                className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2"
+              >
+                <Zap className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">القوالب</span>
               </TabsTrigger>
               <TabsTrigger
                 value="automation"
@@ -88,6 +96,10 @@ export function WhatsAppManagementPage() {
 
             <TabsContent value="campaigns" className="space-y-4">
               <WhatsAppCampaignsTab />
+            </TabsContent>
+
+            <TabsContent value="templates" className="space-y-4">
+              <WhatsAppTemplatesTab />
             </TabsContent>
 
             <TabsContent value="automation" className="space-y-4">

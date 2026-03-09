@@ -14,6 +14,7 @@ import {
   createAutomationRule,
   deleteAutomationRule,
 } from "@/services/whatsapp-management-api";
+import { toast } from "@/hooks/use-toast";
 
 export function useAutomationRules(selectedNumberId: number | null) {
   const [rules, setRules] = useState<AutomationRule[]>([]);
@@ -37,6 +38,11 @@ export function useAutomationRules(selectedNumberId: number | null) {
       setStats(statsData);
     } catch (error) {
       console.error("Failed to load automation data:", error);
+      toast({
+        title: "فشل في تحميل قواعد الأتمتة",
+        description: "حدث خطأ أثناء جلب القواعد أو الإحصائيات من الخادم.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -56,6 +62,11 @@ export function useAutomationRules(selectedNumberId: number | null) {
       );
     } catch (error) {
       console.error("Failed to update rule:", error);
+      toast({
+        title: "فشل في تحديث القاعدة",
+        description: "تعذر تحديث حالة تفعيل القاعدة، حاول مرة أخرى.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -89,8 +100,17 @@ export function useAutomationRules(selectedNumberId: number | null) {
       }
       await loadData();
       setIsDialogOpen(false);
+      toast({
+        title: editingRule ? "تم تحديث القاعدة" : "تم إنشاء قاعدة جديدة",
+        description: "تم حفظ إعدادات قاعدة الأتمتة بنجاح.",
+      });
     } catch (error) {
       console.error("Failed to save rule:", error);
+      toast({
+        title: "فشل في حفظ القاعدة",
+        description: "تحقق من البيانات أو حاول مرة أخرى لاحقاً.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -101,6 +121,11 @@ export function useAutomationRules(selectedNumberId: number | null) {
       setRules((prev) => prev.filter((rule) => rule.id !== ruleId));
     } catch (error) {
       console.error("Failed to delete rule:", error);
+      toast({
+        title: "فشل في حذف القاعدة",
+        description: "حدث خطأ أثناء محاولة حذف قاعدة الأتمتة.",
+        variant: "destructive",
+      });
     }
   };
 

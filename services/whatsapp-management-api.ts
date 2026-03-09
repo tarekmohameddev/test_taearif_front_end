@@ -8,6 +8,7 @@ import type {
   ConversationFilters,
   AutomationStats,
   AIStats,
+  Attachment,
 } from "@/components/whatsapp-management/types";
 import {
   mockConversations,
@@ -29,6 +30,25 @@ import {
   toggleConversationStarApi,
   updateConversationStatusApi,
 } from "@/lib/services/whatsapp-conversations-api";
+import {
+  listAutomationRules,
+  getAutomationRuleApi,
+  createAutomationRuleApi,
+  updateAutomationRuleApi,
+  deleteAutomationRuleApi,
+  getAutomationStatsApi,
+  toggleAutomationRuleApi,
+  type ApiAutomationRule,
+  type ApiAutomationStats,
+} from "@/lib/services/whatsapp-automation-api";
+import {
+  listWhatsAppTemplates,
+  getWhatsAppTemplateApi,
+  createWhatsAppTemplateApi,
+  updateWhatsAppTemplateApi,
+  deleteWhatsAppTemplateApi,
+  type ApiWhatsAppTemplate,
+} from "@/lib/services/whatsapp-templates-api";
 
 // Simulate API delay
 const delay = (ms: number = 500) =>
@@ -83,7 +103,7 @@ export async function getConversations(
         customerPhone: phoneFallback,
         customerAvatar: undefined,
         whatsappNumberId:
-          c.wa_number_id ?? c.whatsapp_number_id ?? numberId,
+          c.wa_number_id ?? c.whatsapp_number_id ?? numberId ?? 0,
         lastMessage: lastMessageContent,
         lastMessageTime: lastTime,
         unreadCount: c.unread_count ?? 0,
@@ -193,7 +213,7 @@ export async function getConversation(id: string): Promise<Conversation | null> 
       customerName: nameFallback,
       customerPhone: phoneFallback,
       customerAvatar: undefined,
-      whatsappNumberId: c.wa_number_id ?? c.whatsapp_number_id,
+      whatsappNumberId: (c.wa_number_id ?? c.whatsapp_number_id ?? 0) as number,
       lastMessage: lastMessageContent,
       lastMessageTime: lastTime,
       unreadCount: c.unread_count ?? 0,
@@ -403,15 +423,47 @@ export async function updateConversationStatus(
 // ==================== Templates API ====================
 
 export async function getMessageTemplates(): Promise<MessageTemplate[]> {
-  await delay();
-  return mockMessageTemplates;
+  try {
+    const apiTemplates = await listWhatsAppTemplates();
+
+    const mapped: MessageTemplate[] = apiTemplates.map(
+      (t: ApiWhatsAppTemplate) => ({
+        id: String(t.id),
+        name: t.name ?? "",
+        content: t.content ?? "",
+        category: t.category ?? "general",
+        variables: Array.isArray(t.variables)
+          ? t.variables.filter((v): v is string => typeof v === "string")
+          : [],
+      })
+    );
+
+    return mapped;
+  } catch {
+    await delay();
+    return mockMessageTemplates;
+  }
 }
 
 export async function getMessageTemplate(
   id: string
 ): Promise<MessageTemplate | null> {
-  await delay();
-  return mockMessageTemplates.find((t) => t.id === id) || null;
+  try {
+    const t = await getWhatsAppTemplateApi(id);
+    const mapped: MessageTemplate = {
+      id: String(t.id),
+      name: t.name ?? "",
+      content: t.content ?? "",
+      category: t.category ?? "general",
+      variables: Array.isArray(t.variables)
+        ? t.variables.filter((v): v is string => typeof v === "string")
+        : [],
+    };
+    return mapped;
+  } catch {
+    await delay();
+    return mockMessageTemplates.find((t) => t.id === id) || null;
+  }
 }
 
 // ==================== Automation Rules API ====================
@@ -419,70 +471,273 @@ export async function getMessageTemplate(
 export async function getAutomationRules(
   numberId?: number
 ): Promise<AutomationRule[]> {
-  await delay();
-  let rules = [...mockAutomationRules];
+  try {
+    const apiRules = await listAutomationRules({
+      wa_number_id: numberId,
+    });
 
-  if (numberId) {
-    rules = rules.filter(
-      (rule) => !rule.whatsappNumberId || rule.whatsappNumberId === numberId
-    );
+    const mapped: AutomationRule[] = apiRules.map((r: ApiAutomationRule) => {
+      const trigger = (r.trigger as AutomationRule["trigger"]) ?? "new_inquiry";
+      const delayMinutes = r.delay_minutes ?? 0;
+      const templateId =
+        (typeof r.template_id === "number"
+          ? String(r.template_id)
+          : (r.template_id as string | null)) ?? "";
+
+      const whatsappNumberId =
+        (r.wa_number_id ??
+          (r.whatsapp_number_id as number | null | undefined)) ??
+        undefined;
+
+      return {
+        id: String(r.id),
+        name: r.name ?? "",
+        description: (r as { description?: string | null })?.description ?? "",
+        trigger,
+        delayMinutes,
+        templateId,
+        isActive: Boolean(r.is_active ?? true),
+        whatsappNumberId,
+        createdAt: r.created_at ?? new Date().toISOString(),
+        lastTriggered:
+          (r as { last_triggered_at?: string | null })?.last_triggered_at ??
+          undefined,
+        triggeredCount: r.triggered_count ?? 0,
+      };
+    });
+
+    if (numberId) {
+      return mapped.filter(
+        (rule) =>
+          !rule.whatsappNumberId || rule.whatsappNumberId === numberId
+      );
+    }
+
+    return mapped;
+  } catch {
+    await delay();
+    let rules = [...mockAutomationRules];
+
+    if (numberId) {
+      rules = rules.filter(
+        (rule) => !rule.whatsappNumberId || rule.whatsappNumberId === numberId
+      );
+    }
+
+    return rules;
   }
-
-  return rules;
 }
 
 export async function getAutomationRule(
   id: string
 ): Promise<AutomationRule | null> {
-  await delay();
-  return mockAutomationRules.find((r) => r.id === id) || null;
+  try {
+    const r = await getAutomationRuleApi(id);
+    const trigger = (r.trigger as AutomationRule["trigger"]) ?? "new_inquiry";
+    const delayMinutes = r.delay_minutes ?? 0;
+    const templateId =
+      (typeof r.template_id === "number"
+        ? String(r.template_id)
+        : (r.template_id as string | null)) ?? "";
+
+    const whatsappNumberId =
+      (r.wa_number_id ??
+        (r.whatsapp_number_id as number | null | undefined)) ??
+      undefined;
+
+    const mapped: AutomationRule = {
+      id: String(r.id),
+      name: r.name ?? "",
+      description: (r as { description?: string | null })?.description ?? "",
+      trigger,
+      delayMinutes,
+      templateId,
+      isActive: Boolean(r.is_active ?? true),
+      whatsappNumberId,
+      createdAt: r.created_at ?? new Date().toISOString(),
+      lastTriggered:
+        (r as { last_triggered_at?: string | null })?.last_triggered_at ??
+        undefined,
+      triggeredCount: r.triggered_count ?? 0,
+    };
+
+    return mapped;
+  } catch {
+    await delay();
+    return mockAutomationRules.find((r) => r.id === id) || null;
+  }
 }
 
 export async function createAutomationRule(
   rule: Omit<AutomationRule, "id" | "createdAt" | "triggeredCount">
 ): Promise<AutomationRule> {
-  await delay();
+  try {
+    const body: Record<string, unknown> = {
+      name: rule.name,
+      description: rule.description,
+      trigger: rule.trigger,
+      delay_minutes: rule.delayMinutes,
+      template_id: rule.templateId,
+      is_active: rule.isActive,
+    };
 
-  const newRule: AutomationRule = {
-    ...rule,
-    id: `rule-${Date.now()}`,
-    createdAt: new Date().toISOString().split("T")[0],
-    triggeredCount: 0,
-  };
+    if (rule.whatsappNumberId != null) {
+      body.wa_number_id = rule.whatsappNumberId;
+    }
 
-  mockAutomationRules.push(newRule);
-  return newRule;
+    const created = await createAutomationRuleApi(body);
+    const trigger =
+      (created.trigger as AutomationRule["trigger"]) ?? rule.trigger;
+
+    const whatsappNumberId =
+      (created.wa_number_id ??
+        (created.whatsapp_number_id as number | null | undefined)) ??
+      rule.whatsappNumberId;
+
+    const mapped: AutomationRule = {
+      id: String(created.id),
+      name: created.name ?? rule.name,
+      description:
+        (created as { description?: string | null })?.description ??
+        rule.description,
+      trigger,
+      delayMinutes: created.delay_minutes ?? rule.delayMinutes,
+      templateId:
+        (typeof created.template_id === "number"
+          ? String(created.template_id)
+          : (created.template_id as string | null)) ?? rule.templateId,
+      isActive: Boolean(created.is_active ?? rule.isActive),
+      whatsappNumberId,
+      createdAt: created.created_at ?? new Date().toISOString(),
+      lastTriggered:
+        (created as { last_triggered_at?: string | null })?.last_triggered_at ??
+        undefined,
+      triggeredCount: created.triggered_count ?? 0,
+    };
+
+    return mapped;
+  } catch {
+    await delay();
+
+    const newRule: AutomationRule = {
+      ...rule,
+      id: `rule-${Date.now()}`,
+      createdAt: new Date().toISOString().split("T")[0],
+      triggeredCount: 0,
+    };
+
+    mockAutomationRules.push(newRule);
+    return newRule;
+  }
 }
 
 export async function updateAutomationRule(
   id: string,
   updates: Partial<AutomationRule>
 ): Promise<AutomationRule | null> {
-  await delay();
+  try {
+    const body: Record<string, unknown> = {};
 
-  const ruleIndex = mockAutomationRules.findIndex((r) => r.id === id);
-  if (ruleIndex === -1) return null;
+    if (updates.name !== undefined) body.name = updates.name;
+    if (updates.description !== undefined)
+      body.description = updates.description;
+    if (updates.trigger !== undefined) body.trigger = updates.trigger;
+    if (updates.delayMinutes !== undefined)
+      body.delay_minutes = updates.delayMinutes;
+    if (updates.templateId !== undefined)
+      body.template_id = updates.templateId;
+    if (updates.isActive !== undefined) body.is_active = updates.isActive;
+    if (updates.whatsappNumberId !== undefined)
+      body.wa_number_id = updates.whatsappNumberId;
 
-  mockAutomationRules[ruleIndex] = {
-    ...mockAutomationRules[ruleIndex],
-    ...updates,
-  };
+    const updated = await updateAutomationRuleApi(id, body);
 
-  return mockAutomationRules[ruleIndex];
+    const trigger =
+      (updated.trigger as AutomationRule["trigger"]) ??
+      updates.trigger ??
+      "new_inquiry";
+
+    const delayMinutes =
+      updated.delay_minutes ?? updates.delayMinutes ?? 0;
+
+    const templateId =
+      (typeof updated.template_id === "number"
+        ? String(updated.template_id)
+        : (updated.template_id as string | null)) ??
+      updates.templateId ??
+      "";
+
+    const whatsappNumberId =
+      (updated.wa_number_id ??
+        (updated.whatsapp_number_id as number | null | undefined)) ??
+      updates.whatsappNumberId;
+
+    const mapped: AutomationRule = {
+      id: String(updated.id),
+      name: updated.name ?? "",
+      description:
+        (updated as { description?: string | null })?.description ?? "",
+      trigger,
+      delayMinutes,
+      templateId,
+      isActive: Boolean(
+        updated.is_active ??
+          (updates.isActive !== undefined ? updates.isActive : true)
+      ),
+      whatsappNumberId,
+      createdAt: updated.created_at ?? new Date().toISOString(),
+      lastTriggered:
+        (updated as { last_triggered_at?: string | null })?.last_triggered_at ??
+        undefined,
+      triggeredCount: updated.triggered_count ?? 0,
+    };
+
+    return mapped;
+  } catch {
+    await delay();
+
+    const ruleIndex = mockAutomationRules.findIndex((r) => r.id === id);
+    if (ruleIndex === -1) return null;
+
+    mockAutomationRules[ruleIndex] = {
+      ...mockAutomationRules[ruleIndex],
+      ...updates,
+    };
+
+    return mockAutomationRules[ruleIndex];
+  }
 }
 
 export async function deleteAutomationRule(id: string): Promise<boolean> {
-  await delay();
-  const index = mockAutomationRules.findIndex((r) => r.id === id);
-  if (index === -1) return false;
+  try {
+    await deleteAutomationRuleApi(id);
+    return true;
+  } catch {
+    await delay();
+    const index = mockAutomationRules.findIndex((r) => r.id === id);
+    if (index === -1) return false;
 
-  mockAutomationRules.splice(index, 1);
-  return true;
+    mockAutomationRules.splice(index, 1);
+    return true;
+  }
 }
 
 export async function getAutomationStats(): Promise<AutomationStats> {
-  await delay();
-  return mockAutomationStats;
+  try {
+    const apiStats: ApiAutomationStats = await getAutomationStatsApi();
+
+    const mapped: AutomationStats = {
+      totalRules: apiStats.total_rules ?? 0,
+      activeRules: apiStats.active_rules ?? 0,
+      messagesSent24h: apiStats.messages_sent_24h ?? 0,
+      successRate: apiStats.success_rate ?? 0,
+    };
+
+    return mapped;
+  } catch {
+    await delay();
+    return mockAutomationStats;
+  }
 }
 
 // ==================== AI Responder API ====================
