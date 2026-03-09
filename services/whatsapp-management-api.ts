@@ -20,6 +20,15 @@ import {
   mockAIStats,
 } from "@/components/whatsapp-management/mock-data";
 import { getWhatsAppNumbers as getWhatsAppNumbersApi } from "@/lib/services/whatsapp-api";
+import {
+  listConversations,
+  getConversationApi,
+  listMessages,
+  postMessage,
+  markConversationReadApi,
+  toggleConversationStarApi,
+  updateConversationStatusApi,
+} from "@/lib/services/whatsapp-conversations-api";
 
 // Simulate API delay
 const delay = (ms: number = 500) =>
@@ -31,60 +40,223 @@ export async function getConversations(
   numberId?: number,
   filters?: ConversationFilters
 ): Promise<Conversation[]> {
-  await delay();
+  try {
+    const res = await listConversations({
+      per_page: 50,
+      page: 1,
+      status:
+        filters?.status && filters.status !== "all" ? filters.status : undefined,
+      search: filters?.search || undefined,
+      wa_number_id: numberId,
+    });
 
-  let conversations = [...mockConversations];
+    // Map backend conversations to UI Conversation type
+    const mapped: Conversation[] = res.conversations.map((c) => {
+      const lastMessageContent =
+        c.last_message_preview?.content ??
+        c.last_message ??
+        "";
+      const lastTime =
+        c.last_message_preview?.created_at ??
+        c.last_message_at ??
+        c.updated_at ??
+        c.created_at ??
+        new Date().toISOString();
 
-  // Filter by WhatsApp number
-  if (numberId) {
-    conversations = conversations.filter(
-      (conv) => conv.whatsappNumberId === numberId
+      const nameFallback =
+        c.customer_name ??
+        c.external_party_identifier ??
+        c.customer_phone ??
+        "عميل واتساب";
+
+      const phoneFallback =
+        c.customer_phone ?? c.external_party_identifier ?? "";
+
+      return {
+        id: String(c.id),
+        customerId: "", // can be wired when backend exposes it
+        customerName: nameFallback,
+        customerPhone: phoneFallback,
+        customerAvatar: undefined,
+        whatsappNumberId:
+          c.wa_number_id ?? c.whatsapp_number_id ?? (numberId ?? 0),
+        lastMessage: lastMessageContent,
+        lastMessageTime: lastTime,
+        unreadCount: c.unread_count ?? 0,
+        status:
+          (c.status as Conversation["status"]) ?? "active",
+        isStarred: Boolean(c.is_starred),
+        propertyInterests: [],
+        assignedAgent: c.assigned_agent
+          ? {
+              id: String(c.assigned_agent.id ?? ""),
+              name: c.assigned_agent.name ?? "",
+              avatar: c.assigned_agent.avatar_url ?? undefined,
+            }
+          : undefined,
+      };
+    });
+
+    // Apply frontend-only filters (unread/starred) if needed
+    let filtered = [...mapped];
+    if (filters?.starred) {
+      filtered = filtered.filter((conv) => conv.isStarred);
+    }
+    if (filters?.unread) {
+      filtered = filtered.filter((conv) => conv.unreadCount > 0);
+    }
+
+    // Sort by last message time (newest first)
+    filtered.sort(
+      (a, b) =>
+        new Date(b.lastMessageTime).getTime() -
+        new Date(a.lastMessageTime).getTime()
     );
-  }
 
-  // Apply filters
-  if (filters?.status && filters.status !== "all") {
-    conversations = conversations.filter(
-      (conv) => conv.status === filters.status
+    return filtered;
+  } catch {
+    // Fallback to mock data in case backend is unavailable
+    await delay();
+
+    let conversations = [...mockConversations];
+
+    if (numberId) {
+      conversations = conversations.filter(
+        (conv) => conv.whatsappNumberId === numberId
+      );
+    }
+
+    if (filters?.status && filters.status !== "all") {
+      conversations = conversations.filter(
+        (conv) => conv.status === filters.status
+      );
+    }
+
+    if (filters?.starred) {
+      conversations = conversations.filter((conv) => conv.isStarred);
+    }
+
+    if (filters?.unread) {
+      conversations = conversations.filter((conv) => conv.unreadCount > 0);
+    }
+
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      conversations = conversations.filter(
+        (conv) =>
+          conv.customerName.toLowerCase().includes(searchLower) ||
+          conv.customerPhone.includes(searchLower) ||
+          conv.lastMessage.toLowerCase().includes(searchLower)
+      );
+    }
+
+    conversations.sort(
+      (a, b) =>
+        new Date(b.lastMessageTime).getTime() -
+        new Date(a.lastMessageTime).getTime()
     );
+
+    return conversations;
   }
-
-  if (filters?.starred) {
-    conversations = conversations.filter((conv) => conv.isStarred);
-  }
-
-  if (filters?.unread) {
-    conversations = conversations.filter((conv) => conv.unreadCount > 0);
-  }
-
-  if (filters?.search) {
-    const searchLower = filters.search.toLowerCase();
-    conversations = conversations.filter(
-      (conv) =>
-        conv.customerName.toLowerCase().includes(searchLower) ||
-        conv.customerPhone.includes(searchLower) ||
-        conv.lastMessage.toLowerCase().includes(searchLower)
-    );
-  }
-
-  // Sort by last message time (newest first)
-  conversations.sort(
-    (a, b) =>
-      new Date(b.lastMessageTime).getTime() -
-      new Date(a.lastMessageTime).getTime()
-  );
-
-  return conversations;
 }
 
 export async function getConversation(id: string): Promise<Conversation | null> {
-  await delay();
-  return mockConversations.find((conv) => conv.id === id) || null;
+  try {
+    const c = await getConversationApi(id);
+    const lastMessageContent =
+      c.last_message_preview?.content ??
+      c.last_message ??
+      "";
+    const lastTime =
+      c.last_message_preview?.created_at ??
+      c.last_message_at ??
+      c.updated_at ??
+      c.created_at ??
+      new Date().toISOString();
+
+    const nameFallback =
+      c.customer_name ??
+      c.external_party_identifier ??
+      c.customer_phone ??
+      "عميل واتساب";
+
+    const phoneFallback =
+      c.customer_phone ?? c.external_party_identifier ?? "";
+
+    const conv: Conversation = {
+      id: String(c.id),
+      customerId: "",
+      customerName: nameFallback,
+      customerPhone: phoneFallback,
+      customerAvatar: undefined,
+      whatsappNumberId: c.wa_number_id ?? c.whatsapp_number_id ?? 0,
+      lastMessage: lastMessageContent,
+      lastMessageTime: lastTime,
+      unreadCount: c.unread_count ?? 0,
+      status: (c.status as Conversation["status"]) ?? "active",
+      isStarred: Boolean(c.is_starred),
+      propertyInterests: [],
+      assignedAgent: c.assigned_agent
+        ? {
+            id: String(c.assigned_agent.id ?? ""),
+            name: c.assigned_agent.name ?? "",
+            avatar: c.assigned_agent.avatar_url ?? undefined,
+          }
+        : undefined,
+    };
+
+    return conv;
+  } catch {
+    await delay();
+    return mockConversations.find((conv) => conv.id === id) || null;
+  }
 }
 
 export async function getMessages(conversationId: string): Promise<Message[]> {
-  await delay();
-  return mockMessages[conversationId] || [];
+  try {
+    const apiMessages = await listMessages(conversationId);
+    const mapped: Message[] = apiMessages.map((m) => {
+      const direction = m.direction ?? "outbound";
+      const senderType = m.sender_type ?? (direction === "inbound" ? "customer" : "agent");
+
+      const sender: Message["sender"] =
+        senderType === "customer"
+          ? "customer"
+          : senderType === "system"
+            ? "system"
+            : senderType === "ai"
+              ? "ai"
+              : "agent";
+
+      const ts = m.created_at ?? m.sent_at ?? new Date().toISOString();
+
+      return {
+        id: String(m.id),
+        conversationId: String(m.conversation_id ?? conversationId),
+        content: m.content ?? "",
+        sender,
+        senderName: m.sender_name ?? undefined,
+        timestamp: ts,
+        status: (m.status as Message["status"]) ?? "sent",
+        attachments: m.attachments
+          ? m.attachments.map((a, index) => ({
+              id: String(a.id ?? `${m.id}-${index}`),
+              type:
+                (a.type as Attachment["type"]) ??
+                "document",
+              url: a.url ?? "",
+              name: a.name ?? "",
+              size: a.size ?? undefined,
+            }))
+          : undefined,
+      };
+    });
+
+    return mapped;
+  } catch {
+    await delay();
+    return mockMessages[conversationId] || [];
+  }
 }
 
 export async function sendMessage(
@@ -92,66 +264,116 @@ export async function sendMessage(
   content: string,
   attachments?: File[]
 ): Promise<Message> {
-  await delay(300);
+  try {
+    const apiMessage = await postMessage(conversationId, { content });
 
-  const newMessage: Message = {
-    id: `msg-${Date.now()}`,
-    conversationId,
-    content,
-    sender: "agent",
-    senderName: "أحمد محمد",
-    timestamp: new Date().toISOString(),
-    status: "sent",
-    attachments: attachments
-      ? attachments.map((file, index) => ({
-          id: `att-${Date.now()}-${index}`,
-          type: file.type.startsWith("image/")
-            ? "image"
-            : file.type.startsWith("video/")
-              ? "video"
-              : file.type.startsWith("audio/")
-                ? "audio"
-                : "document",
-          url: URL.createObjectURL(file),
-          name: file.name,
-          size: file.size,
-        }))
-      : undefined,
-  };
+    const direction = apiMessage.direction ?? "outbound";
+    const senderType =
+      apiMessage.sender_type ?? (direction === "inbound" ? "customer" : "agent");
 
-  // Update mock data (in a real app, this would be handled by the backend)
-  if (!mockMessages[conversationId]) {
-    mockMessages[conversationId] = [];
+    const sender: Message["sender"] =
+      senderType === "customer"
+        ? "customer"
+        : senderType === "system"
+          ? "system"
+          : senderType === "ai"
+            ? "ai"
+            : "agent";
+
+    const ts =
+      apiMessage.created_at ?? apiMessage.sent_at ?? new Date().toISOString();
+
+    const mapped: Message = {
+      id: String(apiMessage.id),
+      conversationId: String(apiMessage.conversation_id ?? conversationId),
+      content: apiMessage.content ?? "",
+      sender,
+      senderName: apiMessage.sender_name ?? undefined,
+      timestamp: ts,
+      status: (apiMessage.status as Message["status"]) ?? "sent",
+      attachments: apiMessage.attachments
+        ? apiMessage.attachments.map((a, index) => ({
+            id: String(a.id ?? `${apiMessage.id}-${index}`),
+            type:
+              (a.type as Attachment["type"]) ??
+              "document",
+            url: a.url ?? "",
+            name: a.name ?? "",
+            size: a.size ?? undefined,
+          }))
+        : undefined,
+    };
+
+    return mapped;
+  } catch {
+    // Fallback to local mock behavior if backend send fails
+    await delay(300);
+
+    const newMessage: Message = {
+      id: `msg-${Date.now()}`,
+      conversationId,
+      content,
+      sender: "agent",
+      senderName: "أحمد محمد",
+      timestamp: new Date().toISOString(),
+      status: "sent",
+      attachments: attachments
+        ? attachments.map((file, index) => ({
+            id: `att-${Date.now()}-${index}`,
+            type: file.type.startsWith("image/")
+              ? "image"
+              : file.type.startsWith("video/")
+                ? "video"
+                : file.type.startsWith("audio/")
+                  ? "audio"
+                  : "document",
+            url: URL.createObjectURL(file),
+            name: file.name,
+            size: file.size,
+          }))
+        : undefined,
+    };
+
+    if (!mockMessages[conversationId]) {
+      mockMessages[conversationId] = [];
+    }
+    mockMessages[conversationId].push(newMessage);
+
+    const conversation = mockConversations.find((c) => c.id === conversationId);
+    if (conversation) {
+      conversation.lastMessage = content;
+      conversation.lastMessageTime = newMessage.timestamp;
+    }
+
+    return newMessage;
   }
-  mockMessages[conversationId].push(newMessage);
-
-  // Update conversation's last message
-  const conversation = mockConversations.find((c) => c.id === conversationId);
-  if (conversation) {
-    conversation.lastMessage = content;
-    conversation.lastMessageTime = newMessage.timestamp;
-  }
-
-  return newMessage;
 }
 
 export async function markConversationAsRead(
   conversationId: string
 ): Promise<void> {
-  await delay(200);
-  const conversation = mockConversations.find((c) => c.id === conversationId);
-  if (conversation) {
-    conversation.unreadCount = 0;
+  try {
+    await markConversationReadApi(conversationId);
+  } catch {
+    await delay(200);
+    const conversation = mockConversations.find((c) => c.id === conversationId);
+    if (conversation) {
+      conversation.unreadCount = 0;
+    }
   }
 }
 
 export async function toggleConversationStar(
   conversationId: string
 ): Promise<void> {
-  await delay(200);
-  const conversation = mockConversations.find((c) => c.id === conversationId);
-  if (conversation) {
-    conversation.isStarred = !conversation.isStarred;
+  try {
+    await toggleConversationStarApi(conversationId);
+  } catch {
+    await delay(200);
+    const conversation = mockConversations.find((c) => c.id === conversationId);
+    if (conversation) {
+      conversation.isStarred = !conversation.isStarred;
+    }
   }
 }
 
@@ -159,10 +381,14 @@ export async function updateConversationStatus(
   conversationId: string,
   status: "active" | "pending" | "resolved"
 ): Promise<void> {
-  await delay(200);
-  const conversation = mockConversations.find((c) => c.id === conversationId);
-  if (conversation) {
-    conversation.status = status;
+  try {
+    await updateConversationStatusApi(conversationId, status);
+  } catch {
+    await delay(200);
+    const conversation = mockConversations.find((c) => c.id === conversationId);
+    if (conversation) {
+      conversation.status = status;
+    }
   }
 }
 
