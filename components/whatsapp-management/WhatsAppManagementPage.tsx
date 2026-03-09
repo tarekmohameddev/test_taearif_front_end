@@ -13,7 +13,7 @@ import { WhatsAppNumberSelector } from "./WhatsAppNumberSelector";
 import { ConversationsModule } from "./ConversationsModule";
 import { AutomationModule } from "./AutomationModule";
 import { AIResponderModule } from "./AIResponderModule";
-import { CampaignsManagement } from "@/components/marketing/campaigns-management";
+import { WhatsAppCampaignsTab } from "@/components/whatsapp-management/WhatsAppCampaignsTab";
 import { WhatsAppCenterPage } from "@/components/whatsapp-center/page-component";
 
 export function WhatsAppManagementPage() {
@@ -87,7 +87,7 @@ export function WhatsAppManagementPage() {
             </TabsContent>
 
             <TabsContent value="campaigns" className="space-y-4">
-              <CampaignsManagement />
+              <WhatsAppCampaignsTab />
             </TabsContent>
 
             <TabsContent value="automation" className="space-y-4">

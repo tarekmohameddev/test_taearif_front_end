@@ -19,6 +19,7 @@ import {
   mockAutomationStats,
   mockAIStats,
 } from "@/components/whatsapp-management/mock-data";
+import { getWhatsAppNumbers as getWhatsAppNumbersApi } from "@/lib/services/whatsapp-api";
 
 // Simulate API delay
 const delay = (ms: number = 500) =>
@@ -310,15 +311,26 @@ export async function getAIStats(numberId?: number): Promise<AIStats> {
 }
 
 // ==================== WhatsApp Numbers API ====================
+// Uses GET /api/v1/whatsapp/numbers when available; fallback to mock (wa-campaign-send-workflow-AI.md).
 
 export async function getWhatsAppNumbers(): Promise<WhatsAppNumber[]> {
-  await delay();
-  return mockWhatsAppNumbers;
+  try {
+    const list = await getWhatsAppNumbersApi();
+    return list as WhatsAppNumber[];
+  } catch {
+    await delay();
+    return mockWhatsAppNumbers;
+  }
 }
 
 export async function getWhatsAppNumber(
   id: number
 ): Promise<WhatsAppNumber | null> {
-  await delay();
-  return mockWhatsAppNumbers.find((n) => n.id === id) || null;
+  try {
+    const list = await getWhatsAppNumbers();
+    return list.find((n) => n.id === id) ?? null;
+  } catch {
+    await delay();
+    return mockWhatsAppNumbers.find((n) => n.id === id) || null;
+  }
 }
