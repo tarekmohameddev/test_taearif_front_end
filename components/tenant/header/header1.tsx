@@ -490,7 +490,7 @@ const Header1 = (props: HeaderProps = {}) => {
         type: bgType,
         color: bgColorResolved,
         image: bgType === "image" ? sm?.background?.image : undefined,
-        imageOpacity: typeof sm?.background?.imageOpacity === "number" ? sm.background.imageOpacity : 1,
+        imageOpacity: typeof sm?.background?.imageOpacity === "number" ? sm.background.imageOpacity : 100,
       },
       showLogo: sm?.showLogo !== false,
       showCompanyName: sm?.showCompanyName !== false,

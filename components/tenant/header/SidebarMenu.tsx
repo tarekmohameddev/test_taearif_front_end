@@ -98,7 +98,11 @@ const SidebarMenu = ({
   const overlayStyle = overlayBg != null ? { backgroundColor: overlayBg } : undefined;
 
   const isImageBg = sidebarBackground?.type === "image" && sidebarBackground?.image;
-  const imageOpacity = isImageBg ? (sidebarBackground?.imageOpacity ?? 1) : 1;
+  // imageOpacity: 0-100% (stored as number). Convert to CSS 0-1. Backward compat: values ≤1 treated as 0-1.
+  const rawOpacity = sidebarBackground?.imageOpacity ?? 100;
+  const imageOpacity = isImageBg
+    ? (rawOpacity <= 1 ? rawOpacity : rawOpacity / 100)
+    : 1;
   const panelBgColor =
     sidebarBackground?.type === "color" && sidebarBackground?.color
       ? sidebarBackground.color

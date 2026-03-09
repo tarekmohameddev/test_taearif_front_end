@@ -417,9 +417,10 @@ export const headerStructure: ComponentStructure = {
                 },
                 {
                   key: "imageOpacity",
-                  label: "شفافية الصورة (0-1)",
+                  label: "شفافية الصورة (0-100%)",
                   type: "number",
                   condition: { field: "type", value: ["image"] },
+                  placeholder: "100",
                 },
               ],
             },
@@ -740,9 +741,10 @@ export const headerStructure: ComponentStructure = {
                 },
                 {
                   key: "imageOpacity",
-                  label: "شفافية الصورة (0-1)",
+                  label: "شفافية الصورة (0-100%)",
                   type: "number",
                   condition: { field: "type", value: ["image"] },
+                  placeholder: "100",
                 },
               ],
             },

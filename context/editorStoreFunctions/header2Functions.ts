@@ -113,7 +113,7 @@ export const getDefaultHeader2Data = (): ComponentData => {
       background: {
         type: "color",
         color: "#ffffff", // لون مخصص افتراضي (أبيض)
-        imageOpacity: 1,
+        imageOpacity: 100, // 0-100%
       },
       showLogo: true,
       showCompanyName: true,
