@@ -89,14 +89,6 @@ export interface ConversationListParams {
   wa_number_id?: number;
 }
 
-interface LaravelPaginatedData<T> {
-  data?: T[];
-  current_page?: number;
-  per_page?: number;
-  total?: number;
-  last_page?: number;
-}
-
 export interface ApiConversationListResponse {
   conversations: ApiConversation[];
   pagination: {
@@ -106,6 +98,16 @@ export interface ApiConversationListResponse {
     last_page: number;
   };
 }
+
+type ApiConversationListEnvelope = {
+  data?: ApiConversation[];
+  pagination?: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+};
 
 // --- Conversations ---
 
@@ -121,16 +123,17 @@ export async function listConversations(
     q.set("wa_number_id", String(params.wa_number_id));
 
   const res = await axiosInstance.get(`${BASE}/conversations?${q}`);
-  const raw = getData<LaravelPaginatedData<ApiConversation>>(res);
+  const raw = getData<ApiConversationListEnvelope>(res);
   const list = raw?.data ?? [];
+  const pag = raw?.pagination ?? {};
 
   return {
     conversations: Array.isArray(list) ? list : [],
     pagination: {
-      current_page: raw?.current_page ?? 1,
-      per_page: raw?.per_page ?? (params?.per_page ?? 20),
-      total: raw?.total ?? 0,
-      last_page: raw?.last_page ?? 1,
+      current_page: pag.current_page ?? 1,
+      per_page: pag.per_page ?? (params?.per_page ?? 20),
+      total: pag.total ?? 0,
+      last_page: pag.last_page ?? 1,
     },
   };
 }
@@ -159,6 +162,7 @@ export async function listMessages(
 
 export interface SendMessageBody {
   content: string;
+  wa_number_id?: number;
   // Attachments intentionally omitted here; can be extended later.
 }
 
@@ -166,9 +170,16 @@ export async function postMessage(
   conversationId: string,
   body: SendMessageBody
 ): Promise<ApiMessage> {
+  const idempotencyKey =
+    (globalThis as any).crypto?.randomUUID?.() ??
+    `${Date.now()}-${Math.random()}`;
+
   const res = await axiosInstance.post(
     `${BASE}/conversations/${conversationId}/messages`,
-    body
+    body,
+    {
+      headers: { "Idempotency-Key": idempotencyKey },
+    }
   );
   return getData<ApiMessage>(res);
 }

@@ -38,6 +38,7 @@ export function ConversationsModule({
         {selectedConversationId ? (
           <ConversationDetail
             conversationId={selectedConversationId}
+            activeWaNumberId={selectedNumberId}
             onConversationUpdate={handleConversationUpdate}
           />
         ) : (

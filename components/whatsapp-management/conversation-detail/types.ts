@@ -1,5 +1,6 @@
 export interface ConversationDetailProps {
   conversationId: string;
+  activeWaNumberId?: number | null;
   onConversationUpdate?: () => void;
 }
 

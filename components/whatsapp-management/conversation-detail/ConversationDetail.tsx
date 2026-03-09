@@ -12,6 +12,7 @@ import type { ConversationDetailProps } from "./types";
 
 export function ConversationDetail({
   conversationId,
+  activeWaNumberId,
   onConversationUpdate,
 }: ConversationDetailProps) {
   const {
@@ -28,7 +29,7 @@ export function ConversationDetail({
     handleToggleStar,
     handleStatusChange,
     handleTemplateSelect,
-  } = useConversationDetail(conversationId, onConversationUpdate);
+  } = useConversationDetail(conversationId, activeWaNumberId, onConversationUpdate);
 
   if (isLoading) {
     return <ConversationDetailLoadingState />;

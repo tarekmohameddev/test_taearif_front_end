@@ -10,9 +10,11 @@ import {
   markConversationAsRead,
   getMessageTemplates,
 } from "@/services/whatsapp-management-api";
+import { toast } from "@/hooks/use-toast";
 
 export function useConversationDetail(
   conversationId: string,
+  activeWaNumberId?: number | null,
   onConversationUpdate?: () => void
 ) {
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -52,11 +54,28 @@ export function useConversationDetail(
   }, [conversationId]);
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || isSending) return;
+    if (!newMessage.trim() || isSending || !conversation) return;
+
+    const effectiveWaNumberId =
+      conversation.whatsappNumberId ?? activeWaNumberId ?? undefined;
+
+    if (effectiveWaNumberId == null) {
+      toast({
+        title: "لا يمكن إرسال الرسالة",
+        description:
+          "لا توجد محادثة مرتبطة برقم واتساب. يرجى اختيار رقم من الأعلى أو تهيئة الرقم في الباك‑إند.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       setIsSending(true);
-      const message = await sendMessage(conversationId, newMessage);
+      const message = await sendMessage(
+        conversationId,
+        newMessage,
+        effectiveWaNumberId
+      );
       setMessages((prev) => [...prev, message]);
       setNewMessage("");
       onConversationUpdate?.();

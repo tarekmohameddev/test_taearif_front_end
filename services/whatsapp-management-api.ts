@@ -52,25 +52,29 @@ export async function getConversations(
 
     // Map backend conversations to UI Conversation type
     const mapped: Conversation[] = res.conversations.map((c) => {
+      const anyConv = c as any;
+      const innerConv = anyConv.conversation ?? {};
+
       const lastMessageContent =
-        c.last_message_preview?.content ??
-        c.last_message ??
-        "";
+        (typeof anyConv.last_message_preview === "string"
+          ? anyConv.last_message_preview
+          : c.last_message) ?? "";
+
       const lastTime =
-        c.last_message_preview?.created_at ??
-        c.last_message_at ??
+        anyConv.last_message_time ??
+        innerConv.last_message_at ??
         c.updated_at ??
         c.created_at ??
         new Date().toISOString();
 
       const nameFallback =
         c.customer_name ??
-        c.external_party_identifier ??
+        innerConv.external_party_identifier ??
         c.customer_phone ??
         "عميل واتساب";
 
       const phoneFallback =
-        c.customer_phone ?? c.external_party_identifier ?? "";
+        c.customer_phone ?? innerConv.external_party_identifier ?? "";
 
       return {
         id: String(c.id),
@@ -79,7 +83,7 @@ export async function getConversations(
         customerPhone: phoneFallback,
         customerAvatar: undefined,
         whatsappNumberId:
-          c.wa_number_id ?? c.whatsapp_number_id ?? (numberId ?? 0),
+          c.wa_number_id ?? c.whatsapp_number_id ?? numberId,
         lastMessage: lastMessageContent,
         lastMessageTime: lastTime,
         unreadCount: c.unread_count ?? 0,
@@ -189,7 +193,7 @@ export async function getConversation(id: string): Promise<Conversation | null> 
       customerName: nameFallback,
       customerPhone: phoneFallback,
       customerAvatar: undefined,
-      whatsappNumberId: c.wa_number_id ?? c.whatsapp_number_id ?? 0,
+      whatsappNumberId: c.wa_number_id ?? c.whatsapp_number_id,
       lastMessage: lastMessageContent,
       lastMessageTime: lastTime,
       unreadCount: c.unread_count ?? 0,
@@ -262,10 +266,14 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
 export async function sendMessage(
   conversationId: string,
   content: string,
+  waNumberId?: number,
   attachments?: File[]
 ): Promise<Message> {
   try {
-    const apiMessage = await postMessage(conversationId, { content });
+    const apiMessage = await postMessage(conversationId, {
+      content,
+      wa_number_id: waNumberId,
+    });
 
     const direction = apiMessage.direction ?? "outbound";
     const senderType =
