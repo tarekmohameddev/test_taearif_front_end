@@ -99,6 +99,7 @@ export const heroStructure: ComponentStructure = {
               groupFields: [
                 { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
                 { key: "content.title", label: "Title", type: "text" },
+                { key: "content.titleSingleLine", label: "العنوان في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
               ],
             },
             {
@@ -109,6 +110,7 @@ export const heroStructure: ComponentStructure = {
               groupFields: [
                 { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
                 { key: "content.subtitle", label: "Subtitle", type: "text" },
+                { key: "content.subtitleSingleLine", label: "العنوان الفرعي في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
               ],
             },
             { key: "paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
@@ -728,6 +730,7 @@ export const heroStructure: ComponentStructure = {
               groupFields: [
                 { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
                 { key: "content.title", label: "Title", type: "text" },
+                { key: "content.titleSingleLine", label: "العنوان في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
               ],
             },
             {
@@ -738,6 +741,7 @@ export const heroStructure: ComponentStructure = {
               groupFields: [
                 { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
                 { key: "content.subtitle", label: "Subtitle", type: "text" },
+                { key: "content.subtitleSingleLine", label: "العنوان الفرعي في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
               ],
             },
             {
@@ -985,6 +989,7 @@ export const heroStructure: ComponentStructure = {
           groupFields: [
             { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
             { key: "content.title", label: "Title", type: "text" },
+            { key: "content.titleSingleLine", label: "العنوان في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
           ],
         },
         {
@@ -995,6 +1000,7 @@ export const heroStructure: ComponentStructure = {
           groupFields: [
             { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
             { key: "content.subtitle", label: "Subtitle", type: "text" },
+            { key: "content.subtitleSingleLine", label: "العنوان الفرعي في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
           ],
         },
         {
@@ -1166,6 +1172,7 @@ export const heroStructure: ComponentStructure = {
           type: "object",
           fields: [
             { key: "title", label: "Title", type: "text" },
+            { key: "titleSingleLine", label: "العنوان في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
             { key: "alignment", label: "Alignment", type: "text" },
             { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
             {

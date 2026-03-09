@@ -972,6 +972,7 @@ function Hero3(props: HeroProps) {
     color: mergedData.content?.font?.title?.color || "#ffffff",
     lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
     ...(useTitlePx && { fontSize: "var(--hero-title-size-mobile)" }),
+    ...(mergedData.content?.titleSingleLine && { whiteSpace: "nowrap" as const }),
   };
 
   const subtitleStyles = {
@@ -980,6 +981,7 @@ function Hero3(props: HeroProps) {
     color:
       mergedData.content?.font?.subtitle?.color || "rgba(255, 255, 255, 0.85)",
     ...(useSubtitlePx && { fontSize: "var(--hero-subtitle-size-mobile)" }),
+    ...(mergedData.content?.subtitleSingleLine && { whiteSpace: "nowrap" as const }),
   };
 
   const overlayStyles = {
