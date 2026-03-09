@@ -120,7 +120,7 @@ export function CustomersTable() {
     const typeParts = [propertyTypeAr, listingType].filter(Boolean);
     const typeLine = typeParts.length > 0 ? typeParts.join(" · ") : null;
     return (
-      <div className="text-right text-sm space-y-0.5 min-w-[140px]">
+      <div className="text-right text-sm space-y-0.5 min-w-[100px]">
         {location && (
           <div className="flex items-center gap-1 justify-start text-gray-700 dark:text-gray-300">
             <MapPin className="h-3.5 w-3.5 text-gray-400 " />
@@ -206,7 +206,7 @@ export function CustomersTable() {
                   <TableCell>
                     {renderLastPropertyRequest(customer.lastPropertyRequest)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="min-w-[100px]">
                     {customer.lastContactAt ? (
                       <div className="text-sm">
                         <div>
@@ -220,7 +220,7 @@ export function CustomersTable() {
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-400 text-sm">-</span>
+                      <span className="text-gray-400 text-sm">لا يوجد</span>
                     )}
                   </TableCell>
                   <TableCell>
