@@ -15,7 +15,6 @@ export interface RequestsCenterFiltersBarProps {
   clearFilters: () => void;
   showAdvancedFilters: boolean;
   setShowAdvancedFilters: (v: boolean | ((prev: boolean) => boolean)) => void;
-  activeFiltersCount: number;
   viewMode: "compact" | "grid" | "table";
   setViewMode: (v: "compact" | "grid" | "table") => void;
   /** When provided, المصدر / الأولوية / الموظف are shown next to the search button */
@@ -30,7 +29,6 @@ export function RequestsCenterFiltersBar({
   clearFilters,
   showAdvancedFilters,
   setShowAdvancedFilters,
-  activeFiltersCount,
   viewMode,
   setViewMode,
   inlineFilters,
@@ -85,16 +83,11 @@ export function RequestsCenterFiltersBar({
             type="button"
             variant="default"
             size="sm"
-            className="gap-2 relative rounded-xl"
+            className="gap-2 rounded-xl"
             onClick={() => setShowAdvancedFilters(true)}
           >
             <Filter className="h-4 w-4" />
             تصفية متقدمة
-            {activeFiltersCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary-foreground text-primary text-[10px] font-bold flex items-center justify-center">
-                {activeFiltersCount}
-              </span>
-            )}
           </Button>
           <div className="flex items-center rounded-md bg-muted/60 p-1">
             <Button

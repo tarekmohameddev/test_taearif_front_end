@@ -29,7 +29,6 @@ export function RequestsCenterFilters({
   applySearch,
   hasActiveFilters,
   clearFilters,
-  activeFiltersCount,
   viewMode,
   setViewMode,
   selectedSources,
@@ -74,7 +73,6 @@ export function RequestsCenterFilters({
             clearFilters={clearFilters}
             showAdvancedFilters={showAdvancedFilters}
             setShowAdvancedFilters={setShowAdvancedFilters}
-            activeFiltersCount={activeFiltersCount}
             viewMode={viewMode}
             setViewMode={setViewMode}
             inlineFilters={{

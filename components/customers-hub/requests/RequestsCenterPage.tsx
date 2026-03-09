@@ -28,7 +28,6 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     isAllSelected,
     clearFilters,
     hasActiveFilters,
-    activeFiltersCount,
     newFilters,
   } = ctx;
 
@@ -54,7 +53,6 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           clearFilters={clearFilters}
           showAdvancedFilters={ctx.showAdvancedFilters}
           setShowAdvancedFilters={ctx.setShowAdvancedFilters}
-          activeFiltersCount={activeFiltersCount}
           viewMode={ctx.viewMode}
           setViewMode={ctx.setViewMode}
           selectedSources={ctx.selectedSources}

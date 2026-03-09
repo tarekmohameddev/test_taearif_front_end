@@ -40,7 +40,7 @@ export function usePriorityDialog({ action, userData, onRefetch }: UsePriorityDi
     }
     setSavingPriority(true);
     try {
-      await axiosInstance.patch(`/v1/property-requests/${propertyRequestId}/priority`, {
+      await axiosInstance.put(`/v1/property-requests/${propertyRequestId}/priority`, {
         priority: selectedPriority,
       });
       toast.success("تم تحديث أولوية طلب العميل بنجاح");
