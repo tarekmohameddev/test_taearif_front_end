@@ -1,0 +1,20 @@
+2026-03-09
+Update Type: Feature
+التحكم في Sidebar (قائمة الجوال) لـ Header1 و Header2
+
+- إضافة قسم موحد "Sidebar (الجوال)" في الـ Editor لكل من header1 و header2 (componentsStructure/header.ts).
+- الخلفية: نوع (لون أو صورة). اللون يدعم ربط primary/secondary/accent أو لون مخصص (useDefaultColor + ColorObjectRenderer). الصورة مع حقل شفافية (0-1)، تطبيق بـ background-size: cover.
+- إظهار/إخفاء: إظهار الشعار (الصورة فقط)، إظهار اسم الشركة. عند إخفاء الاثنين معاً يتم إزالة منطقة الهيدر بالكامل في الـ Sidebar والاكتفاء بزر الإغلاق ثم القائمة.
+- ألوان النصوص: ثلاثة ألوان (عناوين، روابط، نص عادي/فوتر) مع ربط باللون العام أو لون مخصص.
+- الـ Overlay: لون وشفافية (0-1) للطبقة خلف الـ sidebar.
+- القيم الافتراضية في headerFunctions.ts (header1) و header2Functions.ts (header2). استبدال mobileMenu.backgroundColor في header2 بنظام الخلفية الجديد.
+- SidebarMenu.tsx: توسيع الـ props (sidebarBackground، showLogo، showCompanyName، textColors، overlay) وتطبيق الأنماط؛ طبقة خلفية منفصلة لصورة الخلفية مع opacity.
+- header1.tsx و header2.tsx: قراءة mergedData.sidebarMobile وحل الألوان عبر resolveColor/ brandingColors وتمرير الـ props إلى SidebarMenu. في header1: fallback خلفية الـ sidebar إلى لون الهيدر عند عدم تحديد خلفية.
+
+Files:
+- componentsStructure/header.ts
+- context/editorStoreFunctions/headerFunctions.ts
+- context/editorStoreFunctions/header2Functions.ts
+- components/tenant/header/SidebarMenu.tsx
+- components/tenant/header/header1.tsx
+- components/tenant/header/header2.tsx

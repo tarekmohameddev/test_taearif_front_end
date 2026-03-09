@@ -97,16 +97,38 @@ export const getDefaultHeader2Data = (): ComponentData => {
       },
     },
 
-    // Mobile menu
+    // Mobile menu (sidebar panel controlled via sidebarMobile)
     mobileMenu: {
       ThemeTwo: "mobileMenu",
       enabled: true,
       side: "right", // "right" for RTL, "left" for LTR
       width: 256, // w-64
-      backgroundColor: "#ffffff",
-      showLogo: true,
       showLanguageToggle: true,
       showLogout: true,
+    },
+
+    // Sidebar (الجوال) - background, logo/company name visibility, text colors, overlay
+    sidebarMobile: {
+      ThemeTwo: "sidebarMobile",
+      background: {
+        type: "color",
+        color: {
+          useDefaultColor: true,
+          globalColorType: "primary",
+        },
+        imageOpacity: 1,
+      },
+      showLogo: true,
+      showCompanyName: true,
+      textColors: {
+        heading: { useDefaultColor: true, globalColorType: "primary" },
+        link: { useDefaultColor: true, globalColorType: "primary" },
+        text: { useDefaultColor: true, globalColorType: "secondary" },
+      },
+      overlay: {
+        color: "#000000",
+        opacity: 0.4,
+      },
     },
 
     // Styling

@@ -123,6 +123,27 @@ export const getDefaultHeaderData = (): ComponentData => {
         overlay: true,
       },
     },
+    sidebarMobile: {
+      background: {
+        type: "color",
+        color: {
+          useDefaultColor: true,
+          globalColorType: "primary",
+        },
+        imageOpacity: 1,
+      },
+      showLogo: true,
+      showCompanyName: true,
+      textColors: {
+        heading: { useDefaultColor: true, globalColorType: "primary" },
+        link: { useDefaultColor: true, globalColorType: "primary" },
+        text: { useDefaultColor: true, globalColorType: "secondary" },
+      },
+      overlay: {
+        color: "#000000",
+        opacity: 0.4,
+      },
+    },
     animations: {
       menuItems: {
         enabled: true,
