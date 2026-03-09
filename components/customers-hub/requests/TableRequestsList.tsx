@@ -38,6 +38,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
 import { getStageColor, getStageNameAr } from "@/types/unified-customer";
+import { getPropertyRequestId } from "./request-detail-types";
 
 interface TableRequestsListProps {
   actions: CustomerAction[];
@@ -49,6 +50,7 @@ interface TableRequestsListProps {
   onSnooze: (id: string, until: string) => void;
   onAddNote: (id: string, note: string) => void;
   onQuickView: (id: string) => void;
+  onPriorityClick?: (action: CustomerAction) => void;
   stages?: Array<{
     stage_id: string;
     stage_name_ar: string;
@@ -84,6 +86,7 @@ export function TableRequestsList({
   onSnooze,
   onAddNote,
   onQuickView,
+  onPriorityClick,
   stages,
   completingActionIds,
 }: TableRequestsListProps) {
@@ -587,7 +590,22 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Priority */}
-                      <TableCell>{getPriorityBadge(action.priority)}</TableCell>
+                      <TableCell>
+                        {onPriorityClick && getPropertyRequestId(action) != null ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onPriorityClick(action);
+                            }}
+                            className="focus:outline-none text-right cursor-pointer hover:opacity-90 transition-opacity"
+                          >
+                            {getPriorityBadge(action.priority)}
+                          </button>
+                        ) : (
+                          getPriorityBadge(action.priority)
+                        )}
+                      </TableCell>
 
                       {/* Status */}
                       <TableCell>{getStatusBadge(action.status)}</TableCell>

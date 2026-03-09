@@ -859,6 +859,7 @@ const Hero1 = (props: HeroProps = {}) => {
     fontWeight: mergedData.content?.font?.title?.weight || "extrabold",
     color: mergedData.content?.font?.title?.color || "#ffffff",
     lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
+    ...(mergedData.content?.titleSingleLine && { whiteSpace: "nowrap" as const }),
   };
 
   const subtitleStyles = {
@@ -866,6 +867,7 @@ const Hero1 = (props: HeroProps = {}) => {
     fontWeight: mergedData.content?.font?.subtitle?.weight || "normal",
     color:
       mergedData.content?.font?.subtitle?.color || "rgba(255, 255, 255, 0.85)",
+    ...(mergedData.content?.subtitleSingleLine && { whiteSpace: "nowrap" as const }),
   };
 
   const overlayStyles = {

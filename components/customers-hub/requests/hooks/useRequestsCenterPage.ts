@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import toast from "react-hot-toast";
+import axiosInstance from "@/lib/axiosInstance";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 import useAuthStore from "@/context/AuthContext";
@@ -8,6 +10,7 @@ import { useRequestsCenterHandlers } from "./useRequestsCenterHandlers";
 import type { RequestsCenterPageProps } from "../types";
 import type { CustomerAction, Priority } from "@/types/unified-customer";
 import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
+import { getPropertyRequestId } from "../request-detail-types";
 
 export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   const store = useUnifiedCustomersStore();
@@ -190,12 +193,65 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   const [selectedPriority, setSelectedPriority] = useState<Priority | null>(
     null
   );
+  const [singlePriorityAction, setSinglePriorityAction] =
+    useState<CustomerAction | null>(null);
+  const [singlePrioritySelectedPriority, setSinglePrioritySelectedPriority] =
+    useState<Priority>("medium");
+  const [singlePrioritySaving, setSinglePrioritySaving] = useState(false);
   const [tempBudgetMin, setTempBudgetMin] = useState<string>("");
   const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
   const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const prevFiltersRef = useRef<string>("");
+
+  const handleOpenSinglePriorityDialog = useCallback((action: CustomerAction) => {
+    if (!userData?.token) {
+      toast.error("يجب تسجيل الدخول أولاً");
+      return;
+    }
+    if (getPropertyRequestId(action) == null) {
+      toast.error("يمكن تغيير أولوية طلب العقار فقط لطلبات العقار.");
+      return;
+    }
+    setSinglePriorityAction(action);
+    setSinglePrioritySelectedPriority((action.priority as Priority) || "medium");
+  }, [userData?.token]);
+
+  const handleCloseSinglePriorityDialog = useCallback(() => {
+    setSinglePriorityAction(null);
+  }, []);
+
+  const handleSaveSinglePriority = useCallback(async () => {
+    if (!singlePriorityAction || !userData?.token) return;
+    const propertyRequestId = getPropertyRequestId(singlePriorityAction);
+    if (propertyRequestId == null) {
+      toast.error("لم يتم العثور على معرف طلب العقار");
+      return;
+    }
+    setSinglePrioritySaving(true);
+    try {
+      await axiosInstance.put(`/v1/property-requests/${propertyRequestId}/priority`, {
+        priority: singlePrioritySelectedPriority,
+      });
+      toast.success("تم تحديث أولوية طلب العميل بنجاح");
+      setSinglePriorityAction(null);
+      if (props?.onFetchRequests) {
+        await props.onFetchRequests(newFilters as RequestsListFilters);
+      }
+    } catch (error: unknown) {
+      const msg =
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? String((error as { response: { data: { message: string } } }).response.data.message)
+          : "حدث خطأ أثناء تحديث أولوية طلب العقار";
+      toast.error(msg);
+    } finally {
+      setSinglePrioritySaving(false);
+    }
+  }, [singlePriorityAction, singlePrioritySelectedPriority, userData?.token, props?.onFetchRequests, newFilters]);
 
   useEffect(() => {
     if (!props?.onFetchRequests) return;
@@ -391,5 +447,12 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
       ? (actionId: string, newStageId: string, previousStageId: string) =>
           props.onStageChangeApplied!(actionId, previousStageId, newStageId)
       : undefined,
+    singlePriorityAction,
+    singlePrioritySelectedPriority,
+    setSinglePrioritySelectedPriority,
+    singlePrioritySaving,
+    handleOpenSinglePriorityDialog,
+    handleCloseSinglePriorityDialog,
+    handleSaveSinglePriority,
   };
 }

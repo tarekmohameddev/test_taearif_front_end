@@ -97,16 +97,35 @@ export const getDefaultHeader2Data = (): ComponentData => {
       },
     },
 
-    // Mobile menu
+    // Mobile menu (sidebar panel controlled via sidebarMobile)
     mobileMenu: {
       ThemeTwo: "mobileMenu",
       enabled: true,
       side: "right", // "right" for RTL, "left" for LTR
       width: 256, // w-64
-      backgroundColor: "#ffffff",
-      showLogo: true,
       showLanguageToggle: true,
       showLogout: true,
+    },
+
+    // Sidebar (الجوال) - background, logo/company name visibility, text colors, overlay (ألوان مخصصة افتراضية)
+    sidebarMobile: {
+      ThemeTwo: "sidebarMobile",
+      background: {
+        type: "color",
+        color: "#ffffff", // لون مخصص افتراضي (أبيض)
+        imageOpacity: 100, // 0-100%
+      },
+      showLogo: true,
+      showCompanyName: true,
+      textColors: {
+        heading: "#1c1917", // stone-900
+        link: "#44403c",    // stone-700
+        text: "#57534e",    // stone-600
+      },
+      overlay: {
+        color: "#000000",
+        opacity: 0.4,
+      },
     },
 
     // Styling

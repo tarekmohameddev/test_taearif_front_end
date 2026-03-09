@@ -476,6 +476,42 @@ const Header1 = (props: HeaderProps = {}) => {
     };
   }, [mergedData.colors, resolveColor]);
 
+  // Sidebar (الجوال) props from mergedData.sidebarMobile with fallback for background
+  const sidebarMobileProps = useMemo(() => {
+    const sm = mergedData.sidebarMobile;
+    const headerBgFallback = mergedData.background?.colors?.from || "#ffffff";
+    const bgType = sm?.background?.type ?? "color";
+    const bgColorResolved =
+      bgType === "color"
+        ? resolveColor(sm?.background?.color, headerBgFallback)
+        : undefined;
+    return {
+      sidebarBackground: {
+        type: bgType,
+        color: bgColorResolved,
+        image: bgType === "image" ? sm?.background?.image : undefined,
+        imageOpacity: typeof sm?.background?.imageOpacity === "number" ? sm.background.imageOpacity : 100,
+      },
+      showLogo: sm?.showLogo !== false,
+      showCompanyName: sm?.showCompanyName !== false,
+      textColors:
+        sm?.textColors
+          ? {
+              heading: resolveColor(sm.textColors.heading, "#1c1917"),
+              link: resolveColor(sm.textColors.link, "#44403c"),
+              text: resolveColor(sm.textColors.text, "#57534e"),
+            }
+          : undefined,
+      overlay:
+        sm?.overlay?.color != null || sm?.overlay?.opacity != null
+          ? {
+              color: typeof sm.overlay.color === "string" ? sm.overlay.color : "#000000",
+              opacity: typeof sm.overlay.opacity === "number" ? sm.overlay.opacity : 0.4,
+            }
+          : undefined,
+    };
+  }, [mergedData.sidebarMobile, mergedData.background?.colors?.from, resolveColor]);
+
   // Force re-render when globalHeaderData changes
   useEffect(() => {
     if (globalHeaderData) {
@@ -820,6 +856,11 @@ const Header1 = (props: HeaderProps = {}) => {
           }
         }}
         side={(mergedData.responsive?.mobileMenu?.side as "left" | "right") || "right"}
+        sidebarBackground={sidebarMobileProps.sidebarBackground}
+        showLogo={sidebarMobileProps.showLogo}
+        showCompanyName={sidebarMobileProps.showCompanyName}
+        textColors={sidebarMobileProps.textColors}
+        overlay={sidebarMobileProps.overlay}
       />
     </>
   );

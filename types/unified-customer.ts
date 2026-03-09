@@ -65,6 +65,22 @@ export interface CustomerAction {
   state?: string | null; // State/region (request-level). Inquiries: region_name; property requests: region; null for others
   budgetMin?: number | null; // Min budget (request-level). Single budget or range min
   budgetMax?: number | null; // Max budget (request-level). Single budget or range max; null when not applicable
+  // Extended fields for property requests (from users_property_requests)
+  region?: string | null; // Region/administrative area (e.g. الرياض)
+  property_type?: string | null; // Backend sometimes uses snake_case for property type
+  category_id?: number | null;
+  city_id?: number | null;
+  districts_id?: number | null;
+  area_from?: number | null;
+  area_to?: number | null;
+  purchase_method?: string | null;
+  budget_from?: number | string | null;
+  budget_to?: number | string | null;
+  currency?: string | null;
+  full_name?: string | null;
+  phone?: string | null;
+  contact_on_whatsapp?: boolean | number | null;
+  seriousness?: string | null;
   // Appointments and Reminders (populated for property_request and inquiry)
   appointments?: Appointment[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
   reminders?: Reminder[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
@@ -81,6 +97,10 @@ export interface CustomerAction {
     district?: string;
     city?: string;
   }>;
+  // Property request specific (when objectType === 'property_request'); from API
+  property_request_id?: number;
+  propertyIds?: number[];
+  property_ids?: number[] | string;
 }
 
 // CustomerLifecycleStage is now a string type to support dynamic stages from API

@@ -123,6 +123,24 @@ export const getDefaultHeaderData = (): ComponentData => {
         overlay: true,
       },
     },
+    sidebarMobile: {
+      background: {
+        type: "color",
+        color: "#ffffff", // لون مخصص افتراضي (أبيض)
+        imageOpacity: 100, // 0-100%
+      },
+      showLogo: true,
+      showCompanyName: true,
+      textColors: {
+        heading: "#1c1917", // stone-900
+        link: "#44403c",    // stone-700
+        text: "#57534e",    // stone-600
+      },
+      overlay: {
+        color: "#000000",
+        opacity: 0.4,
+      },
+    },
     animations: {
       menuItems: {
         enabled: true,

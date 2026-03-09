@@ -667,23 +667,40 @@ export default function Header2(props: Header2Props) {
   };
 
   // Get branding colors from WebsiteLayout (fallback to brown #8b5f46)
+  const editorWebsiteLayout = useEditorStore((s) => s.WebsiteLayout);
+  const layoutColors = editorWebsiteLayout?.branding?.colors ?? tenantData?.WebsiteLayout?.branding?.colors;
   const brandingColors = {
     primary:
-      tenantData?.WebsiteLayout?.branding?.colors?.primary &&
-      tenantData.WebsiteLayout.branding.colors.primary.trim() !== ""
-        ? tenantData.WebsiteLayout.branding.colors.primary
-        : "#8b5f46", // Brown fallback
+      layoutColors?.primary && typeof layoutColors.primary === "string" && layoutColors.primary.trim() !== ""
+        ? layoutColors.primary.trim()
+        : "#8b5f46",
     secondary:
-      tenantData?.WebsiteLayout?.branding?.colors?.secondary &&
-      tenantData.WebsiteLayout.branding.colors.secondary.trim() !== ""
-        ? tenantData.WebsiteLayout.branding.colors.secondary
-        : "#8b5f46", // Brown fallback
+      layoutColors?.secondary && typeof layoutColors.secondary === "string" && layoutColors.secondary.trim() !== ""
+        ? layoutColors.secondary.trim()
+        : "#8b5f46",
     accent:
-      tenantData?.WebsiteLayout?.branding?.colors?.accent &&
-      tenantData.WebsiteLayout.branding.colors.accent.trim() !== ""
-        ? tenantData.WebsiteLayout.branding.colors.accent
-        : "#8b5f46", // Brown fallback
+      layoutColors?.accent && typeof layoutColors.accent === "string" && layoutColors.accent.trim() !== ""
+        ? layoutColors.accent.trim()
+        : "#8b5f46",
   };
+
+  const resolveColor = useCallback(
+    (raw: unknown, fallback: string): string => {
+      if (raw == null) return fallback;
+      if (typeof raw === "string" && raw.trim().length > 0 && raw.startsWith("#")) return raw.trim();
+      if (typeof raw === "object" && !Array.isArray(raw)) {
+        const o = raw as Record<string, unknown>;
+        if (o.useDefaultColor && typeof o.globalColorType === "string") {
+          const hex = brandingColors[o.globalColorType as keyof typeof brandingColors];
+          if (typeof hex === "string") return hex;
+        }
+        const v = o.value ?? o.color;
+        if (typeof v === "string" && v.startsWith("#")) return v;
+      }
+      return fallback;
+    },
+    [brandingColors],
+  );
 
   // Helper function to get background color based on useDefaultColor and globalColorType
   const getBackgroundColor = (): string => {
@@ -739,6 +756,42 @@ export default function Header2(props: Header2Props) {
   const bgColor = getBackgroundColor();
   const positionType = mergedData.position?.type || "fixed";
   const zIndex = mergedData.position?.zIndex || 50;
+
+  // Sidebar (الجوال) props from mergedData.sidebarMobile
+  const sidebarMobileProps = useMemo(() => {
+    const sm = mergedData.sidebarMobile;
+    const headerBgFallback = bgColor;
+    const bgType = sm?.background?.type ?? "color";
+    const bgColorResolved =
+      bgType === "color"
+        ? resolveColor(sm?.background?.color, headerBgFallback)
+        : undefined;
+    return {
+      sidebarBackground: {
+        type: bgType,
+        color: bgColorResolved,
+        image: bgType === "image" ? sm?.background?.image : undefined,
+        imageOpacity: typeof sm?.background?.imageOpacity === "number" ? sm.background.imageOpacity : 100,
+      },
+      showLogo: sm?.showLogo !== false,
+      showCompanyName: sm?.showCompanyName !== false,
+      textColors:
+        sm?.textColors
+          ? {
+              heading: resolveColor(sm.textColors.heading, "#1c1917"),
+              link: resolveColor(sm.textColors.link, "#44403c"),
+              text: resolveColor(sm.textColors.text, "#57534e"),
+            }
+          : undefined,
+      overlay:
+        sm?.overlay?.color != null || sm?.overlay?.opacity != null
+          ? {
+              color: typeof sm.overlay.color === "string" ? sm.overlay.color : "#000000",
+              opacity: typeof sm.overlay.opacity === "number" ? sm.overlay.opacity : 0.4,
+            }
+          : undefined,
+    };
+  }, [mergedData.sidebarMobile, bgColor, resolveColor]);
 
   return (
     <nav
@@ -912,6 +965,11 @@ export default function Header2(props: Header2Props) {
             }
           }}
           side={mergedData.mobileMenu?.side === "left" ? "left" : "right"}
+          sidebarBackground={sidebarMobileProps.sidebarBackground}
+          showLogo={sidebarMobileProps.showLogo}
+          showCompanyName={sidebarMobileProps.showCompanyName}
+          textColors={sidebarMobileProps.textColors}
+          overlay={sidebarMobileProps.overlay}
         />
       </div>
     </nav>

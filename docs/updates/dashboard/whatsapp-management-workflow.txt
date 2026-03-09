@@ -1,0 +1,9 @@
+2026-03-09
+Update Type: Feature
+تطبيق نظام حملات الواتساب الموثق في wa-campaign-send-workflow-AI.md على صفحة /dashboard/whatsapp-management بالكامل:
+- إنشاء خدمة API لحملات وأرقام الواتساب (lib/services/whatsapp-api.ts): GET أرقام الواتساب، CRUD حملات، إرسال مع Idempotency-Key، إيقاف مؤقت، استئناف، قوالب؛ معالجة أخطاء الـ API (INSUFFICIENT_CREDITS، CAMPAIGN_NOT_FOUND، WA_NUMBER_NOT_ACTIVE، إلخ).
+- ربط مبدّل أرقام الواتساب بالـ API الحقيقي مع fallback للـ mock عند الفشل (services/whatsapp-management-api.ts).
+- استبدال تبويب الحملات بمكوّن WhatsAppCampaignsTab: قائمة حملات مع فلتر حالة وترقيم، إنشاء حملة (wa_number_id + رسالة أو قالب)، إرسال مع اختيار عملاء من POST /api/v2/customers-hub/list وأرقام يدوية، إيقاف مؤقت واستئناف (متابعة أو إعادة تشغيل بقائمة جديدة)، حذف حملات مسودة/مجدولة.
+- استبدال CampaignsManagement بـ WhatsAppCampaignsTab في WhatsAppManagementPage (تبويب «الحملات»).
+المرجع: docs/backend/communication/whatsapp/wa-campaign-send-workflow-AI.md، communication-GUIDE-Frontend.md.
+الملفات: lib/services/whatsapp-api.ts، services/whatsapp-management-api.ts، components/whatsapp-management/WhatsAppCampaignsTab.tsx، components/whatsapp-management/WhatsAppManagementPage.tsx

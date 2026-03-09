@@ -12,6 +12,7 @@ import { RequestsCenterTabs } from "./RequestsCenterTabs";
 import { RequestsCenterPagination } from "./RequestsCenterPagination";
 import { RequestsCenterBulkDialogs } from "./RequestsCenterBulkDialogs";
 import { RequestsCenterLoading, RequestsCenterError } from "./RequestsCenterEmptyStates";
+import { PropertyRequestPriorityDialog } from "./detail/PropertyRequestPriorityDialog";
 import type { RequestsCenterPageProps } from "./types";
 
 export function RequestsCenterPage(props?: RequestsCenterPageProps) {
@@ -108,6 +109,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           onSnoozeForTable={ctx.handleSnoozeForTable}
           onAddNoteForTable={ctx.handleAddNoteForTable}
           onRestore={ctx.handleRestore}
+          onPriorityClick={ctx.handleOpenSinglePriorityDialog}
           stagesForCards={ctx.stagesForCards}
           completingActionIds={ctx.completingActionIds}
           onStageChangeSuccess={ctx.onStageChangeSuccess}
@@ -167,6 +169,20 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           onBulkAssign={ctx.handleBulkAssign}
           onBulkChangePriority={ctx.handleBulkChangePriority}
         />
+        {ctx.singlePriorityAction && (
+          <PropertyRequestPriorityDialog
+            open={!!ctx.singlePriorityAction}
+            onOpenChange={(open) => {
+              if (!open) ctx.handleCloseSinglePriorityDialog();
+            }}
+            action={ctx.singlePriorityAction}
+            selectedPriority={ctx.singlePrioritySelectedPriority}
+            onSelectedPriorityChange={ctx.setSinglePrioritySelectedPriority}
+            savingPriority={ctx.singlePrioritySaving}
+            onSave={ctx.handleSaveSinglePriority}
+            onClose={ctx.handleCloseSinglePriorityDialog}
+          />
+        )}
       </div>
     </div>
   );
