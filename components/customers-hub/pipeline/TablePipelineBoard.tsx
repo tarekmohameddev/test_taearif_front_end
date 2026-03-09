@@ -39,6 +39,7 @@ import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages
 import type { PipelineStage, PipelineCustomer } from "@/lib/services/customers-hub-pipeline-api";
 import type { MoveCustomerParams } from "@/lib/services/customers-hub-pipeline-api";
 import type { Stage } from "@/lib/services/customers-hub-stages-api";
+import { priorityConfig } from "../requests/constants";
 
 interface TablePipelineBoardProps {
   stages?: PipelineStage[];
@@ -297,32 +298,31 @@ export function TablePipelineBoard(props?: TablePipelineBoardProps) {
   };
 
   const getPriorityBadge = (priority?: string) => {
-    const variants: Record<string, { variant: any; text: string; icon: string }> = {
+    const variants: Record<string, { variant: any; icon: string }> = {
       urgent: {
         variant: "destructive",
-        text: "عاجل",
         icon: "🚨",
       },
       high: {
         variant: "default",
-        text: "عالي",
         icon: "🔥",
       },
       medium: {
         variant: "secondary",
-        text: "متوسط",
         icon: "⚡",
       },
       low: {
         variant: "outline",
-        text: "منخفض",
         icon: "📌",
       },
     };
-    const config = variants[priority || "medium"] || variants.medium;
+    const key = priority || "medium";
+    const variantConfig = variants[key] || variants.medium;
+    const priorityConfigEntry =
+      priorityConfig[key as keyof typeof priorityConfig] ?? priorityConfig.medium;
     return (
-      <Badge variant={config.variant as any} className="text-xs gap-1">
-        {config.icon} {config.text}
+      <Badge variant={variantConfig.variant as any} className="text-xs gap-1">
+        {variantConfig.icon} {priorityConfigEntry.label}
       </Badge>
     );
   };
