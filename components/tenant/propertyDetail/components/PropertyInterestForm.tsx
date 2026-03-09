@@ -45,7 +45,9 @@ export function PropertyInterestForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const nextValue =
+      name === "phone" ? value.replace(/\D/g, "") : value;
+    setForm((prev) => ({ ...prev, [name]: nextValue }));
     if (generalError) setGeneralError(null);
     if (fieldErrors[name]) {
       setFieldErrors((prev) => {
