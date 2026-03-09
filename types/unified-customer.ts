@@ -81,6 +81,10 @@ export interface CustomerAction {
     district?: string;
     city?: string;
   }>;
+  // Property request specific (when objectType === 'property_request'); from API
+  property_request_id?: number;
+  propertyIds?: number[];
+  property_ids?: number[] | string;
 }
 
 // CustomerLifecycleStage is now a string type to support dynamic stages from API

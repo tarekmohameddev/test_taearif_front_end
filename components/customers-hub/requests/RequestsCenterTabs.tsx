@@ -26,6 +26,7 @@ export interface RequestsCenterTabsProps {
   onSnooze: (id: string, until: string) => void;
   onAddNote: (id: string, note: string) => void;
   onQuickView: (id: string) => void;
+  onPriorityClick?: (action: CustomerAction) => void;
   onCompleteForTable: (id: string) => Promise<void>;
   onDismissForTable: (id: string) => Promise<void>;
   onSnoozeForTable: (id: string, until: string) => Promise<void>;
@@ -57,6 +58,7 @@ export function RequestsCenterTabs({
   onSnooze,
   onAddNote,
   onQuickView,
+  onPriorityClick,
   onCompleteForTable,
   onDismissForTable,
   onSnoozeForTable,
@@ -75,6 +77,7 @@ export function RequestsCenterTabs({
     onSnooze: onSnoozeForTable,
     onAddNote: onAddNoteForTable,
     onQuickView,
+    onPriorityClick,
     stages: stagesForCards,
     completingActionIds,
   };

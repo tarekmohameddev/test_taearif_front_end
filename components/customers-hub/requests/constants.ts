@@ -120,3 +120,14 @@ export const REQUEST_TYPES: CustomerActionType[] = [
 ];
 
 export const FOLLOWUP_TYPES: CustomerActionType[] = ["follow_up", "site_visit"];
+
+/** Default time for snooze/schedule/reminder forms (HH:mm). */
+export const DEFAULT_TIME = "10:00";
+
+/**
+ * Feature flags for request detail page sections.
+ * Set to true to show the reminders list and notes card (currently hidden).
+ * See docs/updates/dashboard/customers-hub/requests/RequestDetailPage.txt
+ */
+export const SHOW_REMINDERS_SECTION = false;
+export const SHOW_NOTES_SECTION = false;
