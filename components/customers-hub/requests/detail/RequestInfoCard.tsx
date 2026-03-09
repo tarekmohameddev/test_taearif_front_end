@@ -6,6 +6,7 @@ import { FileText, UserPlus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { priorityConfig } from "../constants";
+import { translatePropertyType } from "@/components/customers-hub/actions/utils/propertyUtils";
 import type { CustomerAction } from "@/types/unified-customer";
 
 interface RequestInfoCardProps {
@@ -75,9 +76,11 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">نوع العقار (تفصيلي)</span>
               <span className="font-medium">
-                {action.propertyType ??
-                  action.property_type ??
-                  action.metadata?.propertyType}
+                {translatePropertyType(
+                  action.propertyType ??
+                    action.property_type ??
+                    (action.metadata?.propertyType as string | undefined)
+                )}
               </span>
             </div>
           )}
