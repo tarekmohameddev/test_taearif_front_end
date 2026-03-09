@@ -6,6 +6,7 @@ import { FileText, UserPlus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { priorityConfig } from "../constants";
+import { SourceBadge } from "@/components/customers-hub/actions/SourceBadge";
 import { translatePropertyType } from "@/components/customers-hub/actions/utils/propertyUtils";
 import type { CustomerAction } from "@/types/unified-customer";
 
@@ -180,9 +181,9 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
           <h3 className="text-sm font-semibold mb-1">تفاصيل إضافية</h3>
 
           {action.source && (
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm gap-2">
               <span className="text-gray-500">مصدر الطلب</span>
-              <span className="font-medium">{action.source}</span>
+              <SourceBadge source={action.source} className="text-xs" />
             </div>
           )}
         </div>
