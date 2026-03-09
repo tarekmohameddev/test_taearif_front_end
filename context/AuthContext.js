@@ -256,20 +256,24 @@ const useAuthStore = create((set, get) => ({
       }
 
       const currentState = get();
+      // الحفاظ على domain و company_name من الـ store حتى لا تُمسح (getUserInfo لا يرجعهما)
+      const mergedUserData = {
+        ...userData,
+        onboarding_completed: userData.onboarding_completed || false,
+        message: currentState.userData?.message || null,
+        domain: currentState.userData?.domain ?? userData.domain ?? null,
+        company_name: currentState.userData?.company_name ?? userData.company_name ?? null,
+      };
       set({
         UserIslogged: true,
-        userData: {
-          ...userData,
-          onboarding_completed: userData.onboarding_completed || false,
-          message: currentState.userData?.message || null, // حفظ الـ message الموجود
-        },
+        userData: mergedUserData,
         IsLoading: true,
         error: null,
       });
 
       // تحديث localStorage للتوافق مع AuthProvider
       try {
-        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("user", JSON.stringify(mergedUserData));
       } catch (error) {
         console.error("Error saving user data to localStorage:", error);
       }
@@ -284,10 +288,14 @@ const useAuthStore = create((set, get) => ({
           if (hasValidPlanCookie()) {
             const cachedPlan = getPlanCookie();
             if (cachedPlan) {
+              // الحفاظ على domain و company_name من الـ store (لا يُرجعهما getUserInfo)
+              const current = get().userData;
               set({
                 authenticated: true,
                 userData: {
                   ...userData,
+                  domain: current?.domain ?? userData.domain ?? null,
+                  company_name: current?.company_name ?? userData.company_name ?? null,
                   days_remaining: cachedPlan.days_remaining,
                   is_free_plan: cachedPlan.is_free_plan,
                   is_expired: cachedPlan.is_expired,
@@ -645,16 +653,20 @@ const useAuthStore = create((set, get) => ({
       }));
 
       const response = await axiosInstance.get("/user");
+      const data = response.data.data || response.data;
       const user =
-        response.data.data?.user ||
-        response.data.data ||
+        data?.user ||
+        data ||
         response.data.user ||
         response.data;
 
+      // domain و company_name قد يكونان في جذر data وليس داخل user
       const userData = {
         ...user,
         token,
         onboarding_completed: user.onboarding_completed || false,
+        domain: data?.domain ?? user?.domain ?? null,
+        company_name: data?.company_name ?? user?.company_name ?? null,
       };
 
       set({

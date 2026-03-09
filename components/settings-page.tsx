@@ -297,6 +297,11 @@ export function SettingsPage() {
       toast.dismiss(loadingToast);
       toast.success("تمت إضافة النطاق بنجاح");
       setErrorMessage("");
+      try {
+        await useAuthStore.getState().fetchUserFromAPI();
+      } catch (e) {
+        console.warn("Could not refresh user after add domain:", e);
+      }
     } catch (error: any) {
       console.error("Error adding domain:", error);
       toast.dismiss(loadingToast);
@@ -328,6 +333,11 @@ export function SettingsPage() {
       setSetupProgress(Math.min(setupProgress + 20, 100));
       toast.dismiss(loadingToast);
       toast.success("تم التحقق من النطاق بنجاح");
+      try {
+        await useAuthStore.getState().fetchUserFromAPI();
+      } catch (e) {
+        console.warn("Could not refresh user after verify domain:", e);
+      }
     } catch (error: any) {
       console.error("Error verifying domain:", error);
       toast.dismiss(loadingToast);
@@ -356,6 +366,12 @@ export function SettingsPage() {
       );
       toast.dismiss(loadingToast);
       toast.success("تم تحديث النطاق الرئيسي بنجاح");
+      // تحديث بيانات المستخدم في الـ store (بما فيها domain) ليعمل زر معاينة الموقع
+      try {
+        await useAuthStore.getState().fetchUserFromAPI();
+      } catch (e) {
+        console.warn("Could not refresh user after set-primary domain:", e);
+      }
     } catch (error: any) {
       console.error("Error setting primary domain:", error);
       toast.dismiss(loadingToast);

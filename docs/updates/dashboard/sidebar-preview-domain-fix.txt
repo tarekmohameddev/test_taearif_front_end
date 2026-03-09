@@ -1,0 +1,31 @@
+# إصلاح: زر "معاينة الموقع" في السايدبار ورسالة "يرجى إعداد domain صحيح"
+
+## المشكلة
+عند الضغط على "معاينة الموقع" في سايدبار الداشبورد كانت تظهر دائماً الرسالة: "يرجى إعداد domain صحيح في إعدادات الحساب".
+
+## الأسباب (من الـ Debug)
+1. GET /api/user/getUserInfo لا يرجّع domain ولا company_name.
+2. fetchUserData في AuthContext كان يستبدل userData بالكامل من استجابة getUserInfo فتُمسح قيم domain و company_name.
+3. مسار Plan Cookie في fetchUserData يخرج دون استدعاء GET /user، فـ domain لا يُجلب أبداً في ذلك المسار.
+4. useTokenValidation عند استخدام الـ cookie كان يضع domain: null لأنه يعتمد على userData من fetchUserInfo.
+5. في مسار تعيين المستخدم من token، كان يتم أخذ user من response.data.data.user فقط، فـ domain إن كان في جذر data يُفقد.
+6. صفحة الإعدادات بعد تعيين النطاق الرئيسي لا تحدّث الـ store.
+
+## التعديلات المنفذة
+
+### context/AuthContext.js
+- في fetchUserData بعد جلب getUserInfo: دمج domain و company_name من currentState في الكائن المُعيّن وحفظه في localStorage حتى لا تُمسح القيم.
+- في مسار Plan Cookie: إضافة domain و company_name من الـ store (get().userData) إلى userData المُعيّن.
+- في مسار تعيين المستخدم من token (بعد GET /user): استخراج domain و company_name من response.data.data إن وُجدا في الجذر وليس داخل user، وإضافتهما إلى userData.
+
+### hooks/useTokenValidation.ts
+- عند استخدام Plan Cookie: أخذ domain و company_name من useAuthStore.getState().userData بدلاً من userData المحلي (الآتي من getUserInfo) للحفاظ على القيم.
+- عند استلام استجابة GET /user: استخراج domain و company_name من جذر data إن وُجدا وتمريرهما إلى setUserData.
+
+### components/settings-page.tsx
+- بعد نجاح تعيين النطاق الرئيسي (handleSetPrimaryDomain): استدعاء fetchUserFromAPI() لتحديث الـ store.
+- بعد إضافة نطاق (handleAddDomain) وبعد التحقق من نطاق (handleVerifyDomain): استدعاء fetchUserFromAPI() لتحديث الـ store.
+
+## ملاحظة
+- الـ Backend (GET /user) يجب أن يرجّع domain و/أو company_name في الاستجابة (في data أو data.user) حتى يظهر النطاق في السايدبار عند أول جلب. بعد ذلك الفرونت يحافظ على القيم ولا يمسحها.
+- لم يُغيّر API getUserInfo لأنه يعتمد على JWT ولا يتضمن domain؛ الاعتماد على الحفاظ على القيم في الـ store ومن GET /user.
