@@ -14,12 +14,14 @@ interface RequestDetailHeaderProps {
   action: CustomerAction;
   isOverdue: boolean;
   onStatusClick?: () => void;
+  onPriorityClick?: () => void;
 }
 
 export function RequestDetailHeader({
   action,
   isOverdue,
   onStatusClick,
+  onPriorityClick,
 }: RequestDetailHeaderProps) {
   const priorityStyle = priorityConfig[action.priority] ?? priorityConfig.medium;
   const statusStyle = statusConfig[action.status] ?? statusConfig.pending;
@@ -60,7 +62,24 @@ export function RequestDetailHeader({
         ) : (
           <Badge className={statusStyle.color}>{statusStyle.label}</Badge>
         )}
-        <Badge className={priorityStyle.color}>{priorityStyle.label}</Badge>
+        {onPriorityClick ? (
+          <button
+            type="button"
+            onClick={onPriorityClick}
+            className="focus:outline-none"
+          >
+            <Badge
+              className={cn(
+                priorityStyle.color,
+                "cursor-pointer hover:opacity-90 transition-opacity"
+              )}
+            >
+              {priorityStyle.label}
+            </Badge>
+          </button>
+        ) : (
+          <Badge className={priorityStyle.color}>{priorityStyle.label}</Badge>
+        )}
         <Badge
           variant="outline"
           className="text-xs font-normal text-gray-700 dark:text-gray-200"

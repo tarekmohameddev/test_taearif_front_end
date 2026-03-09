@@ -34,6 +34,7 @@ import {
   Check,
   Video,
   XCircle,
+  Flag,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -72,7 +73,8 @@ import { RequestPropertiesCard } from "./detail/RequestPropertiesCard";
 import { AIMatchingCard } from "./detail/AIMatchingCard";
 import { RequestActionsCard } from "./detail/RequestActionsCard";
 import { AssignEmployeeDialog } from "./detail/AssignEmployeeDialog";
-import { APPOINTMENT_TYPES } from "./constants";
+import { APPOINTMENT_TYPES, priorityOptions } from "./constants";
+import type { Priority } from "@/types/unified-customer";
 
 interface RequestDetailPageProps {
   requestId: string;
@@ -215,6 +217,9 @@ export function RequestDetailPage({
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
   const [loadingStatuses, setLoadingStatuses] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
+  const [showPriorityDialog, setShowPriorityDialog] = useState(false);
+  const [selectedPriority, setSelectedPriority] = useState<Priority>("medium");
+  const [savingPriority, setSavingPriority] = useState(false);
 
   // Fetch employees when opening assign dialog
   useEffect(() => {
@@ -594,6 +599,15 @@ export function RequestDetailPage({
     }
   };
 
+  const handlePriorityClick = () => {
+    if (action.objectType === "property_request" && (action as { property_request_id?: number }).property_request_id) {
+      setSelectedPriority((action.priority as Priority) || "medium");
+      setShowPriorityDialog(true);
+    } else {
+      toast.error("يمكن تغيير أولوية طلب العقار فقط لطلبات العقار.");
+    }
+  };
+
   const propertyRequestNumericId =
     action.objectType === "property_request"
       ? (action.metadata?.propertyRequestId as number | undefined) ??
@@ -635,6 +649,12 @@ export function RequestDetailPage({
           action={action}
           isOverdue={!!isOverdue}
           onStatusClick={handleStatusClick}
+          onPriorityClick={
+            action.objectType === "property_request" &&
+            (action as { property_request_id?: number }).property_request_id
+              ? handlePriorityClick
+              : undefined
+          }
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1117,6 +1137,133 @@ export function RequestDetailPage({
                       className="min-w-[120px]"
                     >
                       {savingStatus ? (
+                        <>
+                          <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                          جاري الحفظ...
+                        </>
+                      ) : (
+                        "حفظ"
+                      )}
+                    </Button>
+                  </div>
+                </CustomDialogContent>
+              </CustomDialog>
+            )}
+
+            {/* Property Request Priority Dialog */}
+            {action.objectType === "property_request" && (action as any).property_request_id && (
+              <CustomDialog
+                open={showPriorityDialog}
+                onOpenChange={(open) => {
+                  if (open && !userData?.token) {
+                    toast.error("يجب تسجيل الدخول أولاً");
+                    return;
+                  }
+                  setShowPriorityDialog(open);
+                  if (open) {
+                    setSelectedPriority((action.priority as Priority) || "medium");
+                  }
+                }}
+                maxWidth="max-w-md"
+              >
+                <CustomDialogContent className="p-3">
+                  <CustomDialogHeader>
+                    <CustomDialogTitle className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-full">
+                        <Flag className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="text-lg font-semibold">تغيير أولوية طلب العقار</div>
+                        <div className="text-sm text-muted-foreground font-normal">
+                          اختر الأولوية الجديدة لطلب العقار رقم #{(action as any).property_request_id}
+                        </div>
+                      </div>
+                    </CustomDialogTitle>
+                    <CustomDialogClose
+                      onClose={() => {
+                        setShowPriorityDialog(false);
+                      }}
+                    />
+                  </CustomDialogHeader>
+
+                  <div className="space-y-6 p-4">
+                    <div className="p-3 bg-muted/30 rounded-lg space-y-1">
+                      <div className="text-sm font-medium">{action.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        العميل: {action.customerName} — طلب عقار رقم #{(action as any).property_request_id}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">اختر الأولوية:</Label>
+                      <CustomDropdown
+                        fullWidth
+                        contentZIndex={10003}
+                        trigger={
+                          <span className="flex items-center gap-2">
+                            {priorityOptions.find((p) => p.value === selectedPriority)?.label ?? "اختر الأولوية"}
+                          </span>
+                        }
+                        triggerClassName={cn(
+                          "w-full justify-between",
+                          savingPriority && "pointer-events-none opacity-60"
+                        )}
+                      >
+                        {priorityOptions.map((opt) => (
+                          <DropdownItem
+                            key={opt.value}
+                            onClick={() => setSelectedPriority(opt.value)}
+                          >
+                            {opt.label}
+                          </DropdownItem>
+                        ))}
+                      </CustomDropdown>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 px-4 pb-4 border-t">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowPriorityDialog(false)}
+                      disabled={savingPriority}
+                    >
+                      إلغاء
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        if (!userData?.token) {
+                          toast.error("يجب تسجيل الدخول أولاً");
+                          return;
+                        }
+                        const propertyRequestId = (action as any).property_request_id;
+                        if (!propertyRequestId) {
+                          toast.error("لم يتم العثور على معرف طلب العقار");
+                          return;
+                        }
+                        setSavingPriority(true);
+                        try {
+                          await axiosInstance.patch(`/v1/property-requests/${propertyRequestId}/priority`, {
+                            priority: selectedPriority,
+                          });
+                          toast.success("تم تحديث أولوية طلب العميل بنجاح");
+                          setShowPriorityDialog(false);
+                          if (onRefetch) {
+                            await onRefetch();
+                          }
+                        } catch (error: any) {
+                          console.error("Error updating property request priority:", error);
+                          toast.error(
+                            error?.response?.data?.message ||
+                              "حدث خطأ أثناء تحديث أولوية طلب العقار"
+                          );
+                        } finally {
+                          setSavingPriority(false);
+                        }
+                      }}
+                      disabled={savingPriority}
+                      className="min-w-[120px]"
+                    >
+                      {savingPriority ? (
                         <>
                           <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                           جاري الحفظ...
