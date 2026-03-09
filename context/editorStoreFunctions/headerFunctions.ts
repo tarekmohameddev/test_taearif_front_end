@@ -126,18 +126,15 @@ export const getDefaultHeaderData = (): ComponentData => {
     sidebarMobile: {
       background: {
         type: "color",
-        color: {
-          useDefaultColor: true,
-          globalColorType: "primary",
-        },
+        color: "#ffffff", // لون مخصص افتراضي (أبيض)
         imageOpacity: 1,
       },
       showLogo: true,
       showCompanyName: true,
       textColors: {
-        heading: { useDefaultColor: true, globalColorType: "primary" },
-        link: { useDefaultColor: true, globalColorType: "primary" },
-        text: { useDefaultColor: true, globalColorType: "secondary" },
+        heading: "#1c1917", // stone-900
+        link: "#44403c",    // stone-700
+        text: "#57534e",    // stone-600
       },
       overlay: {
         color: "#000000",
