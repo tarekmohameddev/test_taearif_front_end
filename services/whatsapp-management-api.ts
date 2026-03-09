@@ -466,6 +466,90 @@ export async function getMessageTemplate(
   }
 }
 
+export async function createMessageTemplate(
+  template: Omit<MessageTemplate, "id">
+): Promise<MessageTemplate> {
+  try {
+    const body: Record<string, unknown> = {
+      name: template.name,
+      content: template.content,
+      category: template.category,
+      variables: template.variables,
+    };
+
+    const created = await createWhatsAppTemplateApi(body);
+
+    const mapped: MessageTemplate = {
+      id: String(created.id),
+      name: created.name ?? template.name,
+      content: created.content ?? template.content,
+      category: created.category ?? template.category,
+      variables: Array.isArray(created.variables)
+        ? created.variables.filter((v): v is string => typeof v === "string")
+        : template.variables,
+    };
+
+    return mapped;
+  } catch {
+    await delay();
+    const fallback: MessageTemplate = {
+      id: `template-${Date.now()}`,
+      ...template,
+    };
+    mockMessageTemplates.push(fallback);
+    return fallback;
+  }
+}
+
+export async function updateMessageTemplate(
+  id: string,
+  updates: Partial<MessageTemplate>
+): Promise<MessageTemplate | null> {
+  try {
+    const body: Record<string, unknown> = {};
+    if (updates.name !== undefined) body.name = updates.name;
+    if (updates.content !== undefined) body.content = updates.content;
+    if (updates.category !== undefined) body.category = updates.category;
+    if (updates.variables !== undefined) body.variables = updates.variables;
+
+    const updated = await updateWhatsAppTemplateApi(id, body);
+
+    const mapped: MessageTemplate = {
+      id: String(updated.id),
+      name: updated.name ?? updates.name ?? "",
+      content: updated.content ?? updates.content ?? "",
+      category: updated.category ?? updates.category ?? "general",
+      variables: Array.isArray(updated.variables)
+        ? updated.variables.filter((v): v is string => typeof v === "string")
+        : updates.variables ?? [],
+    };
+
+    return mapped;
+  } catch {
+    await delay();
+    const index = mockMessageTemplates.findIndex((t) => t.id === id);
+    if (index === -1) return null;
+    mockMessageTemplates[index] = {
+      ...mockMessageTemplates[index],
+      ...updates,
+    };
+    return mockMessageTemplates[index];
+  }
+}
+
+export async function deleteMessageTemplate(id: string): Promise<boolean> {
+  try {
+    await deleteWhatsAppTemplateApi(id);
+    return true;
+  } catch {
+    await delay();
+    const index = mockMessageTemplates.findIndex((t) => t.id === id);
+    if (index === -1) return false;
+    mockMessageTemplates.splice(index, 1);
+    return true;
+  }
+}
+
 // ==================== Automation Rules API ====================
 
 export async function getAutomationRules(

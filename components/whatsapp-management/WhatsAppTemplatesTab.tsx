@@ -5,6 +5,9 @@ import type { MessageTemplate } from "./types";
 import {
   getMessageTemplates,
   getMessageTemplate,
+  createMessageTemplate,
+  updateMessageTemplate,
+  deleteMessageTemplate,
 } from "@/services/whatsapp-management-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +33,8 @@ export function WhatsAppTemplatesTab() {
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
   const [variables, setVariables] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const loadTemplates = async () => {
     try {
@@ -85,8 +90,104 @@ export function WhatsAppTemplatesTab() {
     }
   };
 
-  // NOTE: create/update/delete wiring إلى الباك-إند لم تُعرّف بعد في whatsapp-management-api.
-  // حالياً هذه الواجهة للعرض فقط حتى تُضاف دوال CRUD كاملة.
+  const parseVariables = (value: string): string[] =>
+    value
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      toast({
+        title: "اسم القالب مطلوب",
+        description: "يرجى إدخال اسم للقالب قبل الحفظ.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!content.trim()) {
+      toast({
+        title: "نص القالب مطلوب",
+        description: "يرجى إدخال نص رسالة واتساب قبل الحفظ.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const vars = parseVariables(variables);
+
+    try {
+      setIsSaving(true);
+      if (editingTemplate) {
+        await updateMessageTemplate(editingTemplate.id, {
+          name: name.trim(),
+          category: category.trim() || "general",
+          content: content,
+          variables: vars,
+        });
+        toast({
+          title: "تم تحديث القالب",
+          description: "تم حفظ تعديلات قالب واتساب بنجاح.",
+        });
+      } else {
+        await createMessageTemplate({
+          name: name.trim(),
+          category: category.trim() || "general",
+          content: content,
+          variables: vars,
+        });
+        toast({
+          title: "تم إنشاء القالب",
+          description: "تم إنشاء قالب واتساب جديد بنجاح.",
+        });
+      }
+      await loadTemplates();
+      setOpenDialog(false);
+      resetForm();
+    } catch (error) {
+      console.error("Failed to save template:", error);
+      toast({
+        title: "فشل في حفظ القالب",
+        description: "حدث خطأ أثناء حفظ القالب. حاول مرة أخرى لاحقاً.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!editingTemplate) return;
+    if (!confirm("هل أنت متأكد من حذف هذا القالب؟")) return;
+    try {
+      setIsDeleting(true);
+      const ok = await deleteMessageTemplate(editingTemplate.id);
+      if (ok) {
+        toast({
+          title: "تم حذف القالب",
+          description: "تم حذف قالب واتساب بنجاح.",
+        });
+        await loadTemplates();
+        setOpenDialog(false);
+        resetForm();
+      } else {
+        toast({
+          title: "فشل في حذف القالب",
+          description: "تعذر العثور على هذا القالب أو حذفه.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to delete template:", error);
+      toast({
+        title: "فشل في حذف القالب",
+        description: "حدث خطأ أثناء حذف القالب. حاول مرة أخرى.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -192,11 +293,6 @@ export function WhatsAppTemplatesTab() {
                 placeholder="customer_name, company_name"
               />
             </div>
-            <p className="text-xs text-muted-foreground">
-              ملاحظة: هذه الواجهة تستخدم بيانات الباك‑إند مباشرة عبر
-              /api/v1/whatsapp/templates. عمليات الحفظ والحذف يمكن ربطها لاحقاً بدوال
-              مخصصة.
-            </p>
           </div>
           <DialogFooter>
             <Button
@@ -206,12 +302,22 @@ export function WhatsAppTemplatesTab() {
             >
               إلغاء
             </Button>
+            {editingTemplate && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting || isSaving}
+              >
+                {isDeleting ? "جاري الحذف..." : "حذف القالب"}
+              </Button>
+            )}
             <Button
               type="button"
-              disabled
-              title="سيتم تفعيل الحفظ لاحقاً بعد تحديد عقد الباك‑إند لعمليات الإنشاء/التحديث."
+              onClick={handleSave}
+              disabled={isSaving}
             >
-              حفظ (قريباً)
+              {isSaving ? "جاري الحفظ..." : "حفظ"}
             </Button>
           </DialogFooter>
         </DialogContent>
