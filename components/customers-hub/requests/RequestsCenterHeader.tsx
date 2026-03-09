@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, ArrowLeft } from "lucide-react";
+import { MessageSquare, ArrowLeft, PlusCircle } from "lucide-react";
 
 export function RequestsCenterHeader() {
   return (
@@ -18,12 +18,20 @@ export function RequestsCenterHeader() {
           إدارة الطلبات الواردة والإجراءات في مكان واحد
         </p>
       </div>
-      <Link href="/ar/dashboard/customers-hub/list">
-        <Button variant="outline" className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          العملاء
-        </Button>
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link href="/dashboard/customers-hub/requests/add">
+          <Button className="gap-2">
+            <PlusCircle className="h-4 w-4" />
+            إنشاء طلب عقاري
+          </Button>
+        </Link>
+        <Link href="/ar/dashboard/customers-hub/list">
+          <Button variant="outline" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            العملاء
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
