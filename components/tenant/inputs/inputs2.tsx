@@ -634,9 +634,15 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
 
   // Handle input changes - memoized
   const handleInputChange = useCallback((fieldId: string, value: any) => {
+    // Phone field: accept digits only (no letters)
+    const nextValue =
+      fieldId === "phone" && value != null
+        ? String(value).replace(/\D/g, "")
+        : value;
+
     setFormData((prev) => ({
       ...prev,
-      [fieldId]: value,
+      [fieldId]: nextValue,
     }));
 
     // Clear error when user starts typing
@@ -731,11 +737,11 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       }
     }
 
-    // Phone number validation
+    // Phone number validation (digits only, 7–15)
     if (field.id === "phone") {
-      const phoneRegex = /^[\+]?[0-9\s\-\(\)]{7,15}$/;
+      const phoneRegex = /^[0-9]{7,15}$/;
       if (!phoneRegex.test(value.toString())) {
-        return `رقم الهاتف غير صحيح`;
+        return `رقم الهاتف غير صحيح (أرقام فقط، 7–15 رقم)`;
       }
     }
 
