@@ -2,13 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
 import type { ApiWaCampaign } from "../types";
 
 export interface DeleteConfirmDialogProps {
@@ -27,23 +27,23 @@ export function DeleteConfirmDialog({
   onConfirm,
 }: DeleteConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent dir="rtl">
-        <DialogHeader>
-          <DialogTitle>حذف الحملة</DialogTitle>
-          <DialogDescription>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-md">
+      <CustomDialogContent>
+        <CustomDialogHeader>
+          <CustomDialogTitle>حذف الحملة</CustomDialogTitle>
+          <CustomDialogDescription>
             هل تريد حذف الحملة «{campaign?.name}»؟ لا يمكن التراجع.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <CustomDialogFooter dir="rtl">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={loading}>
             {loading ? "جاري..." : "حذف"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

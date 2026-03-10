@@ -4,22 +4,19 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CustomersCheckboxesDropdown } from "@/components/customComponents/CustomersCheckboxesDropdown";
 import { resumeWaCampaign, getWhatsAppApiErrorMessage } from "@/lib/services/whatsapp-api";
@@ -92,26 +89,34 @@ export function ResumeCampaignDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>استئناف الحملة: {campaign?.name}</DialogTitle>
-          <DialogDescription>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-lg">
+      <CustomDialogContent className="sm:max-w-lg">
+        <CustomDialogHeader>
+          <CustomDialogTitle>استئناف الحملة: {campaign?.name}</CustomDialogTitle>
+          <CustomDialogDescription>
             متابعة من حيث توقفت، أو إعادة تشغيل بقائمة مستلمين جديدة.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <div className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6" dir="rtl">
           <div>
             <Label>وضع الاستئناف</Label>
-            <Select value={mode} onValueChange={(v) => setMode(v as ResumeMode)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="continue">متابعة</SelectItem>
-                <SelectItem value="restart">إعادة تشغيل (قائمة جديدة)</SelectItem>
-              </SelectContent>
-            </Select>
+            <CustomDropdown
+              trigger={
+                <span>
+                  {mode === "continue"
+                    ? "متابعة"
+                    : "إعادة تشغيل (قائمة جديدة)"}
+                </span>
+              }
+              fullWidth
+            >
+              <DropdownItem onClick={() => setMode("continue")}>
+                متابعة
+              </DropdownItem>
+              <DropdownItem onClick={() => setMode("restart")}>
+                إعادة تشغيل (قائمة جديدة)
+              </DropdownItem>
+            </CustomDropdown>
           </div>
           {mode === "restart" && (
             <>
@@ -144,15 +149,15 @@ export function ResumeCampaignDialog({
             </Alert>
           )}
         </div>
-        <DialogFooter>
+        <CustomDialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
           <Button onClick={handleSubmit} disabled={submitting}>
             {submitting ? "جاري..." : "استئناف"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

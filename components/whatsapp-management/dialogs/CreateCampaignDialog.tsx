@@ -4,23 +4,20 @@ import { useState, useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { createWaCampaign, getWhatsAppApiErrorMessage } from "@/lib/services/whatsapp-api";
 import type { CreateWaCampaignBody } from "../types";
@@ -113,32 +110,43 @@ export function CreateCampaignDialog({
   const templateVarKeys = selectedTemplate?.variables ?? [];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>إنشاء حملة واتساب</DialogTitle>
-          <DialogDescription>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-lg">
+      <CustomDialogContent className="sm:max-w-lg">
+        <CustomDialogHeader>
+          <CustomDialogTitle>إنشاء حملة واتساب</CustomDialogTitle>
+          <CustomDialogDescription>
             اختر الرقم والمحتوى (رسالة أو قالب). يجب تحديد واحد فقط.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <div className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6" dir="rtl">
           <div>
             <Label>رقم الواتساب</Label>
-            <Select
-              value={waNumberId === "" ? "" : String(waNumberId)}
-              onValueChange={(v) => setWaNumberId(v === "" ? "" : Number(v))}
+            <CustomDropdown
+              trigger={
+                <span>
+                  {waNumberId === ""
+                    ? "اختر الرقم"
+                    : `${
+                        numbers.find((n) => n.id === Number(waNumberId))?.name ||
+                        numbers.find((n) => n.id === Number(waNumberId))
+                          ?.phoneNumber
+                      } — ${
+                        numbers.find((n) => n.id === Number(waNumberId))
+                          ?.phoneNumber
+                      }`}
+                </span>
+              }
+              fullWidth
             >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر الرقم" />
-              </SelectTrigger>
-              <SelectContent>
-                {numbers.map((n) => (
-                  <SelectItem key={n.id} value={String(n.id)}>
-                    {n.name || n.phoneNumber} — {n.phoneNumber}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {numbers.map((n) => (
+                <DropdownItem
+                  key={n.id}
+                  onClick={() => setWaNumberId(n.id)}
+                >
+                  {n.name || n.phoneNumber} — {n.phoneNumber}
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
           </div>
           <div>
             <Label>اسم الحملة</Label>
@@ -158,18 +166,21 @@ export function CreateCampaignDialog({
           </div>
           <div>
             <Label>نوع المحتوى</Label>
-            <Select
-              value={contentType}
-              onValueChange={(v) => setContentType(v as "message" | "template")}
+            <CustomDropdown
+              trigger={
+                <span>
+                  {contentType === "message" ? "رسالة نصية" : "قالب"}
+                </span>
+              }
+              fullWidth
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="message">رسالة نصية</SelectItem>
-                <SelectItem value="template">قالب</SelectItem>
-              </SelectContent>
-            </Select>
+              <DropdownItem onClick={() => setContentType("message")}>
+                رسالة نصية
+              </DropdownItem>
+              <DropdownItem onClick={() => setContentType("template")}>
+                قالب
+              </DropdownItem>
+            </CustomDropdown>
           </div>
           {contentType === "message" && (
             <div>
@@ -186,24 +197,29 @@ export function CreateCampaignDialog({
             <>
               <div>
                 <Label>القالب</Label>
-                <Select
-                  value={templateId === "" ? "" : String(templateId)}
-                  onValueChange={(v) => {
-                    setTemplateId(v === "" ? "" : Number(v));
-                    setTemplateVars({});
-                  }}
+                <CustomDropdown
+                  trigger={
+                    <span>
+                      {templateId === ""
+                        ? "اختر قالباً"
+                        : templates.find((t) => t.id === Number(templateId))
+                            ?.name}
+                    </span>
+                  }
+                  fullWidth
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر قالباً" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {templates.map((t) => (
-                      <SelectItem key={t.id} value={String(t.id)}>
-                        {t.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {templates.map((t) => (
+                    <DropdownItem
+                      key={t.id}
+                      onClick={() => {
+                        setTemplateId(t.id);
+                        setTemplateVars({});
+                      }}
+                    >
+                      {t.name}
+                    </DropdownItem>
+                  ))}
+                </CustomDropdown>
               </div>
               {templateVarKeys.length > 0 && (
                 <div className="space-y-2">
@@ -228,15 +244,15 @@ export function CreateCampaignDialog({
             </Alert>
           )}
         </div>
-        <DialogFooter>
+        <CustomDialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
           <Button onClick={handleSubmit} disabled={submitting}>
             {submitting ? "جاري الإنشاء..." : "إنشاء"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

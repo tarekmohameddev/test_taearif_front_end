@@ -5,12 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import {
   Table,
   TableBody,
@@ -52,22 +49,25 @@ export function WaCampaignsTable({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle>قائمة الحملات</CardTitle>
-        <Select
-          value={statusFilter || "all"}
-          onValueChange={(v) => onStatusFilterChange(v === "all" ? "" : v)}
+        <CustomDropdown
+          trigger={
+            <span>
+              {statusFilter
+                ? STATUS_LABELS[statusFilter] ?? statusFilter
+                : "جميع الحالات"}
+            </span>
+          }
+          dropdownWidth="w-[180px]"
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="الحالة" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">جميع الحالات</SelectItem>
-            {Object.entries(STATUS_LABELS).map(([k, v]) => (
-              <SelectItem key={k} value={k}>
-                {v}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <DropdownItem onClick={() => onStatusFilterChange("")}>
+            جميع الحالات
+          </DropdownItem>
+          {Object.entries(STATUS_LABELS).map(([k, v]) => (
+            <DropdownItem key={k} onClick={() => onStatusFilterChange(k)}>
+              {v}
+            </DropdownItem>
+          ))}
+        </CustomDropdown>
       </CardHeader>
       <CardContent>
         {loading ? (

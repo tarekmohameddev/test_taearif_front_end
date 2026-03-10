@@ -142,7 +142,9 @@ export async function getConversationApi(
   id: string
 ): Promise<ApiConversation> {
   const res = await axiosInstance.get(`${BASE}/conversations/${id}`);
-  return getData<ApiConversation>(res);
+  const raw = getData<ApiConversation | { data?: ApiConversation }>(res);
+  const conv = (raw as { data?: ApiConversation } | ApiConversation).data ?? raw;
+  return conv as ApiConversation;
 }
 
 // --- Messages ---

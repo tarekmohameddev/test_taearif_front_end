@@ -207,13 +207,18 @@ export async function getConversation(id: string): Promise<Conversation | null> 
     const phoneFallback =
       c.customer_phone ?? c.external_party_identifier ?? "";
 
+    const waId =
+      (c as any).wa_number_id ??
+      (c as any).whatsapp_number_id ??
+      undefined;
+
     const conv: Conversation = {
       id: String(c.id),
       customerId: "",
       customerName: nameFallback,
       customerPhone: phoneFallback,
       customerAvatar: undefined,
-      whatsappNumberId: (c.wa_number_id ?? c.whatsapp_number_id ?? 0) as number,
+      whatsappNumberId: (waId ?? 0) as number,
       lastMessage: lastMessageContent,
       lastMessageTime: lastTime,
       unreadCount: c.unread_count ?? 0,
