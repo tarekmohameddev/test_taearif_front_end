@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import {
@@ -16,28 +15,41 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Eye,
   Phone,
   User,
-  Building,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
   CheckCircle2,
   X,
-  Clock,
-  Calendar,
   MessageSquare,
   AlertTriangle,
   DollarSign,
   Building2,
   MapPin,
+  MoreVertical,
+  Calendar,
+  Bell,
   UserPlus,
 } from "lucide-react";
-import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SourceBadge } from "../actions/SourceBadge";
+import { translatePropertyType } from "../actions/utils/propertyUtils";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
-import { getStageColor, getStageNameAr } from "@/types/unified-customer";
 import { getPropertyRequestId } from "./request-detail-types";
 
 interface TableRequestsListProps {
@@ -61,20 +73,8 @@ interface TableRequestsListProps {
   completingActionIds: Set<string>;
 }
 
-type SortField = "customer" | "type" | "priority" | "status" | "dueDate" | "createdAt" | "budget" | "propertyType" | "city" | "stage";
+type SortField = "customer" | "priority" | "status" | "createdAt" | "budget" | "propertyType" | "city" | "stage";
 type SortOrder = "asc" | "desc";
-
-/** Translate property type from English to Arabic */
-const translatePropertyType = (propertyType: string | null | undefined): string => {
-  if (!propertyType) return '';
-  const translations: { [key: string]: string } = {
-    Residential: "سكني",
-    Industrial: "صناعي",
-    Agricultural: "زراعي",
-    Commercial: "تجاري",
-  };
-  return translations[propertyType] || propertyType;
-};
 
 export function TableRequestsList({
   actions,
@@ -93,6 +93,9 @@ export function TableRequestsList({
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
+  const [snoozeActionId, setSnoozeActionId] = useState<string | null>(null);
+  const [snoozeDate, setSnoozeDate] = useState("");
+  const [snoozeTime, setSnoozeTime] = useState("10:00");
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -101,15 +104,6 @@ export function TableRequestsList({
       setSortField(field);
       setSortOrder("asc");
     }
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
   };
 
   const getPriorityBadge = (priority?: Priority) => {
@@ -141,37 +135,6 @@ export function TableRequestsList({
         {config.icon} {config.text}
       </Badge>
     );
-  };
-
-  const getSourceBadge = (source?: string) => {
-    const labels: Record<string, string> = {
-      inquiry: "استفسار موقع",
-      manual: "إدخال يدوي",
-      whatsapp: "واتساب",
-      import: "مستورد",
-      referral: "إحالة",
-      website: "موقع",
-    };
-    return (
-      <Badge variant="outline" className="text-xs">
-        {labels[source || "manual"] || source || "غير محدد"}
-      </Badge>
-    );
-  };
-
-  const getTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      new_inquiry: "استفسار جديد",
-      callback_request: "طلب اتصال",
-      property_match: "عقار متطابق",
-      follow_up: "متابعة",
-      document_required: "مستندات مطلوبة",
-      payment_due: "دفعة مستحقة",
-      site_visit: "زيارة موقع",
-      whatsapp_incoming: "رسالة واتساب",
-      ai_recommended: "توصية ذكية",
-    };
-    return labels[type] || type;
   };
 
   const getStatusBadge = (status: string) => {
@@ -307,10 +270,6 @@ export function TableRequestsList({
         aValue = a.customerName || "";
         bValue = b.customerName || "";
         break;
-      case "type":
-        aValue = a.type || "";
-        bValue = b.type || "";
-        break;
       case "priority":
         const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
         aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0;
@@ -319,10 +278,6 @@ export function TableRequestsList({
       case "status":
         aValue = a.status || "";
         bValue = b.status || "";
-        break;
-      case "dueDate":
-        aValue = a.dueDate ? new Date(a.dueDate).getTime() : 0;
-        bValue = b.dueDate ? new Date(b.dueDate).getTime() : 0;
         break;
       case "createdAt":
         aValue = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -352,6 +307,15 @@ export function TableRequestsList({
     if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
+
+  const handleSnoozeConfirm = () => {
+    if (!snoozeActionId || !snoozeDate) return;
+    const until = new Date(`${snoozeDate}T${snoozeTime}`).toISOString();
+    handleSnooze(snoozeActionId, until);
+    setSnoozeActionId(null);
+    setSnoozeDate("");
+    setSnoozeTime("10:00");
+  };
 
   if (actions.length === 0) {
     return (
@@ -386,13 +350,6 @@ export function TableRequestsList({
                       className="rounded border-gray-300"
                     />
                   </TableHead>
-                  <TableHead className="w-12">
-                    <div className="flex items-center justify-center">
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-xs">👤</AvatarFallback>
-                      </Avatar>
-                    </div>
-                  </TableHead>
                   <TableHead>
                     <Button
                       variant="ghost"
@@ -402,17 +359,6 @@ export function TableRequestsList({
                     >
                       العميل
                       <SortIcon field="customer" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 -mr-2"
-                      onClick={() => handleSort("type")}
-                    >
-                      نوع الطلب
-                      <SortIcon field="type" />
                     </Button>
                   </TableHead>
                   <TableHead>
@@ -438,17 +384,6 @@ export function TableRequestsList({
                     </Button>
                   </TableHead>
                   <TableHead>المصدر</TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 -mr-2"
-                      onClick={() => handleSort("dueDate")}
-                    >
-                      تاريخ الاستحقاق
-                      <SortIcon field="dueDate" />
-                    </Button>
-                  </TableHead>
                   <TableHead>
                     <Button
                       variant="ghost"
@@ -537,29 +472,6 @@ export function TableRequestsList({
                         />
                       </TableCell>
 
-                      {/* Avatar */}
-                      <TableCell>
-                        <Avatar
-                          className="h-10 w-10 mx-auto ring-2 ring-offset-2"
-                          style={{
-                            ringColor: customer?.stage
-                              ? stages?.find((s) => s.stage_id === customer.stage)?.color || "#gray"
-                              : "#gray",
-                          }}
-                        >
-                          <AvatarFallback
-                            className="text-white text-sm font-bold"
-                            style={{
-                              backgroundColor: customer?.stage
-                                ? stages?.find((s) => s.stage_id === customer.stage)?.color || "#gray"
-                                : "#gray",
-                            }}
-                          >
-                            {getInitials(action.customerName)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </TableCell>
-
                       {/* Customer Name & Phone */}
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -580,13 +492,6 @@ export function TableRequestsList({
                             </span>
                           )}
                         </div>
-                      </TableCell>
-
-                      {/* Type */}
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          {getTypeLabel(action.type)}
-                        </Badge>
                       </TableCell>
 
                       {/* Priority */}
@@ -611,27 +516,8 @@ export function TableRequestsList({
                       <TableCell>{getStatusBadge(action.status)}</TableCell>
 
                       {/* Source */}
-                      <TableCell>{getSourceBadge(action.source)}</TableCell>
-
-                      {/* Due Date */}
                       <TableCell>
-                        {action.dueDate ? (
-                          <div className="text-sm">
-                            {new Date(action.dueDate).toLocaleDateString("ar-SA", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                            {isOverdue && (
-                              <div className="flex items-center gap-1 text-xs text-red-600 mt-1">
-                                <AlertTriangle className="h-3 w-3" />
-                                متأخر
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">-</span>
-                        )}
+                        <SourceBadge source={action.source} className="text-xs" />
                       </TableCell>
 
                       {/* Created At */}
@@ -668,18 +554,22 @@ export function TableRequestsList({
                         )}
                       </TableCell>
 
-                      {/* Property Type */}
+                      {/* Property Type / Category - translated */}
                       <TableCell>
-                        {(action as any).propertyType ? (
-                          <div className="flex items-center gap-1">
-                            <Building2 className="h-3.5 w-3.5 text-gray-500" />
-                            <Badge variant="outline" className="text-xs">
-                              {translatePropertyType((action as any).propertyType)}
-                            </Badge>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">-</span>
-                        )}
+                        {(() => {
+                          const raw = (action as any).propertyType ?? (action as any).propertyCategory ?? (action as any).property_type;
+                          const translated = raw ? translatePropertyType(raw) : null;
+                          return translated ? (
+                            <div className="flex items-center gap-1">
+                              <Building2 className="h-3.5 w-3.5 text-gray-500 shrink-0" />
+                              <Badge variant="outline" className="text-xs">
+                                {translated}
+                              </Badge>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-sm">-</span>
+                          );
+                        })()}
                       </TableCell>
 
                       {/* City */}
@@ -774,44 +664,64 @@ export function TableRequestsList({
                         })()}
                       </TableCell>
 
-                      {/* Actions */}
+                      {/* Actions: 3-dot dropdown like compact/grid */}
                       <TableCell>
-                        <div className="flex items-center justify-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8"
-                            onClick={() => onQuickView(action.id)}
-                            disabled={isLoading}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 text-green-600 hover:text-green-700"
-                            onClick={() => handleComplete(action.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading && action.status !== "completed" ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <CheckCircle2 className="h-4 w-4" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 text-red-600 hover:text-red-700"
-                            onClick={() => handleDismiss(action.id)}
-                            disabled={isLoading}
-                          >
-                            {isLoading ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <X className="h-4 w-4" />
-                            )}
-                          </Button>
+                        <div className="flex items-center justify-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-slate-500 hover:text-slate-700"
+                                disabled={isLoading}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-[180px]">
+                              <DropdownMenuItem
+                                onClick={(e) => { e.stopPropagation(); handleComplete(action.id); }}
+                                disabled={isCompleting}
+                                className="flex items-center gap-2"
+                              >
+                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                إتمام الطلب
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => { e.stopPropagation(); onQuickView(action.id); }}
+                                className="flex items-center gap-2"
+                              >
+                                <Calendar className="h-4 w-4" />
+                                جدولة إجراء
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSnoozeActionId(action.id);
+                                  setSnoozeDate("");
+                                  setSnoozeTime("10:00");
+                                }}
+                                className="flex items-center gap-2"
+                              >
+                                <Bell className="h-4 w-4" />
+                                تأجيل
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => { e.stopPropagation(); onQuickView(action.id); }}
+                                className="flex items-center gap-2"
+                              >
+                                <UserPlus className="h-4 w-4" />
+                                تعيين موظف
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => { e.stopPropagation(); handleDismiss(action.id); }}
+                                className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                              >
+                                <X className="h-4 w-4" />
+                                رفض الطلب
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -822,6 +732,43 @@ export function TableRequestsList({
           </div>
         </CardContent>
       </Card>
+
+      {/* Snooze dialog for table row */}
+      <Dialog open={!!snoozeActionId} onOpenChange={(open) => { if (!open) { setSnoozeActionId(null); setSnoozeDate(""); setSnoozeTime("10:00"); } }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>تأجيل الطلب</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="snooze-date">التاريخ</Label>
+              <Input
+                id="snooze-date"
+                type="date"
+                value={snoozeDate}
+                onChange={(e) => setSnoozeDate(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="snooze-time">الوقت</Label>
+              <Input
+                id="snooze-time"
+                type="time"
+                value={snoozeTime}
+                onChange={(e) => setSnoozeTime(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2 justify-end pt-2">
+              <Button variant="outline" onClick={() => { setSnoozeActionId(null); setSnoozeDate(""); setSnoozeTime("10:00"); }}>
+                إلغاء
+              </Button>
+              <Button onClick={handleSnoozeConfirm} disabled={!snoozeDate}>
+                تأكيد التأجيل
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
