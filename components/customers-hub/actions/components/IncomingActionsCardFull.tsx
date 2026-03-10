@@ -23,6 +23,7 @@ import {
   PURCHASE_METHOD_RENT_VALUES,
 } from "../constants/incomingCardConstants";
 import { formatNextActionDatetime } from "../utils/dateTimeUtils";
+import { translatePropertyType } from "../utils/propertyUtils";
 import {
   MapPin,
   Home,
@@ -209,7 +210,8 @@ export function IncomingActionsCardFull({
     return addr ?? null;
   }, [action.city, action.state, action.region, action.properties]);
 
-  const categoryLabel = action.propertyCategory ?? action.property_type ?? null;
+  const categoryLabelRaw = action.propertyCategory ?? action.property_type ?? null;
+  const categoryLabel = categoryLabelRaw ? translatePropertyType(categoryLabelRaw) : null;
   const areaLabel = useMemo(() => {
     const from = action.area_from;
     const to = action.area_to;
