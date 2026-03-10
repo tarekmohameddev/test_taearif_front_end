@@ -155,11 +155,18 @@ export async function listMessages(
   const res = await axiosInstance.get(
     `${BASE}/conversations/${conversationId}/messages`
   );
-  const raw = getData<ApiMessage[] | { data?: ApiMessage[] }>(res);
-  const list = Array.isArray(raw)
-    ? raw
-    : (raw as { data?: ApiMessage[] })?.data ?? [];
-  return list ?? [];
+  const raw = getData<
+    | ApiMessage[]
+    | { data?: ApiMessage[] }
+    | { data?: { messages?: ApiMessage[] } }
+  >(res);
+
+  if (Array.isArray(raw)) return raw;
+  const inner = (raw as { data?: unknown })?.data;
+  if (Array.isArray(inner)) return inner;
+  const messages = (inner as { messages?: ApiMessage[] })?.messages;
+  if (Array.isArray(messages)) return messages;
+  return [];
 }
 
 export interface SendMessageBody {
