@@ -1,0 +1,31 @@
+تعديل تصميم بطاقات العرض الشبكي (grid view) في صفحة الطلبات
+================================================================
+
+التاريخ: 2025
+الصفحة: /dashboard/customers-hub/requests
+العرض: grid view (عند اختيار عرض شبكي وليس compact أو table)
+
+الملخص
+------
+تم تعديل شكل بطاقة الطلب في العرض الشبكي ليطابق التصميم المرجعي: صورة علوية من العقار، شارة للبيع/للإيجار، اسم العميل ورقم الهاتف وزر القائمة (more_vert)، أولوية ومصدر، قائمة المرحلة، موقع ونوع العقار ومساحة، وكتلة "الإجراء القادم". قاعدة أساسية: لا يوجد محتوى static في البطاقة؛ كل البيانات المعروضة تأتي من الـ API. عند غياب حقل لا يُعرض نص أو صورة افتراضية ثابتة.
+
+الملفات المعدّلة
+----------------
+- components/customers-hub/actions/components/IncomingActionsCardFull.tsx
+  إعادة هيكلة كاملة: حاوية rounded-xl border slate shadow، قسم صورة (h-48) من action.properties (صورة العقار المضاف على الطلب)، شارة purchase_method عند توفرها، محتوى من API فقط (اسم، هاتف، أولوية، مصدر، مرحلة، موقع، نوع، مساحة، الإجراء القادم). قائمة more_vert: إتمام، جدولة، تأجيل، تعيين، رفض. دعم تأجيل عبر SnoozeFormInline.
+
+- components/customers-hub/requests/RequestsList.tsx
+  توحيد gap للـ grid: gap-6 عند عدم compact، gap-3 للـ compact. إزالة منطق maxCardHeight وResizeObserver وonScheduleFormOpenChange لأن البطاقات الجديدة ذات ارتفاع طبيعي متسق.
+
+- components/customers-hub/actions/constants/incomingCardConstants.ts
+  إضافة NEXT_ACTION_LABEL ("الإجراء القادم")، PURCHASE_METHOD_SALE_VALUES و PURCHASE_METHOD_RENT_VALUES لشارة للبيع/للإيجار من بيانات الـ API فقط.
+
+- components/customers-hub/actions/IncomingActionsCard.tsx
+  تمرير onComplete، onDismiss، onSnooze، isCompleting، showSnoozeForm، setShowSnoozeForm، snoozeForm إلى IncomingActionsCardFull لتفعيل قائمة الإجراءات والتأجيل.
+
+مصدر البيانات
+--------------
+- صورة الخلفية: صورة العقار المضاف على الطلب من action.properties (مثلاً featuredImage). إن لم يُرجع الـ API عقاراً أو صورة يُعرض القسم بخلفية محايدة (لون) فقط.
+- للبيع/للإيجار: من action.purchase_method فقط.
+- الاسم، الهاتف، المصدر، الأولوية، المرحلة، المدينة/المنطقة، نوع العقار، المساحة، المواعيد، التذكيرات، dueDate: كلها من حقول الـ action/الـ API. عند غياب أي حقل يُخفى العنصر المعني.
+- الإجراء القادم: دالة تختار الأقرب من action.appointments و action.reminders و action.dueDate وتعرض العنوان والتاريخ؛ إن لم يوجد أي منها لا يُعرض القسم.

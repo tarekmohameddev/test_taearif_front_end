@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -51,39 +51,6 @@ export function RequestsList({
   onStageChangeSuccess,
 }: RequestsListProps) {
   const gridRef = useRef<HTMLDivElement>(null);
-  const [maxCardHeight, setMaxCardHeight] = useState<number | null>(null);
-  const measureRef = useRef<() => void>(() => {});
-
-  const handleScheduleFormOpenChange = useCallback((open: boolean) => {
-    if (open) return;
-    setMaxCardHeight(null);
-    setTimeout(() => measureRef.current(), 80);
-  }, []);
-
-  useEffect(() => {
-    if (isCompactView || actions.length === 0) {
-      setMaxCardHeight(null);
-      return;
-    }
-    const measure = () => {
-      const grid = gridRef.current;
-      if (!grid?.children?.length) return;
-      let max = 0;
-      for (let i = 0; i < grid.children.length; i++) {
-        const h = (grid.children[i] as HTMLElement).getBoundingClientRect().height;
-        if (h > max) max = h;
-      }
-      if (max > 0) setMaxCardHeight(max);
-    };
-    measureRef.current = measure;
-    const t = setTimeout(measure, 0);
-    const ro = new ResizeObserver(measure);
-    if (gridRef.current) ro.observe(gridRef.current);
-    return () => {
-      clearTimeout(t);
-      ro.disconnect();
-    };
-  }, [actions, isCompactView]);
 
   if (actions.length === 0) {
     return (
@@ -101,19 +68,14 @@ export function RequestsList({
     <div
       ref={gridRef}
       className={cn(
-        "grid gap-3 items-stretch",
-        isCompactView ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        "grid items-stretch",
+        isCompactView ? "grid-cols-1 gap-3" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       )}
     >
       {actions.map((action) => (
         <div
           key={action.id}
           className={isCompactView ? "w-full min-w-0" : "h-full min-h-0"}
-          style={
-            !isCompactView && maxCardHeight != null
-              ? { minHeight: maxCardHeight }
-              : undefined
-          }
         >
           <IncomingActionsCard
             action={action}
@@ -130,7 +92,6 @@ export function RequestsList({
             isCompact={isCompactView}
             isCompleting={completingActionIds.has(action.id)}
             className={isCompactView ? undefined : "h-full"}
-            onScheduleFormOpenChange={handleScheduleFormOpenChange}
             onStageChangeSuccess={onStageChangeSuccess}
           />
         </div>
