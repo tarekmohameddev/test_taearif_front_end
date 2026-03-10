@@ -34,7 +34,7 @@ export function AutomationRulesTable({
       <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-800">
+            <TableRow className="bg-gray-900 hover:bg-gray-800">
               <TableHead className="text-right text-white">القاعدة</TableHead>
               <TableHead className="text-right text-white">المحفز</TableHead>
               <TableHead className="text-right text-white">التأخير</TableHead>
