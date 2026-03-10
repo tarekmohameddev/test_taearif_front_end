@@ -267,10 +267,15 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
 
       const ts = m.created_at ?? m.sent_at ?? new Date().toISOString();
 
+      const msgContent =
+        m.content ??
+        (m as { body?: string }).body ??
+        (m as { text?: string }).text ??
+        "";
       return {
         id: String(m.id),
         conversationId: String(m.conversation_id ?? conversationId),
-        content: m.content ?? "",
+        content: msgContent,
         sender,
         senderName: m.sender_name ?? undefined,
         timestamp: ts,
@@ -328,10 +333,15 @@ export async function sendMessage(
     const ts =
       apiMessage.created_at ?? apiMessage.sent_at ?? new Date().toISOString();
 
+    const apiContent =
+      apiMessage.content ??
+      (apiMessage as { body?: string }).body ??
+      (apiMessage as { text?: string }).text ??
+      content;
     const mapped: Message = {
       id: String(apiMessage.id),
       conversationId: String(apiMessage.conversation_id ?? conversationId),
-      content: apiMessage.content ?? "",
+      content: apiContent,
       sender,
       senderName: apiMessage.sender_name ?? undefined,
       timestamp: ts,
