@@ -1,3 +1,5 @@
+// node scripts/scan-large-files.js
+
 import fs from "fs";
 import path from "path";
 
