@@ -892,17 +892,17 @@ function mapApiAIConfigToUI(api: ApiAIConfig | null, numberId: number): AIRespon
   if (!api) return null;
   const sid = api.wa_number_id ?? api.whatsapp_number_id ?? numberId;
   const s = api.scenarios ?? {};
+  const start = api.business_hours_start ?? api.business_hours?.start ?? "09:00";
+  const end = api.business_hours_end ?? api.business_hours?.end ?? "18:00";
+  const tz = api.timezone ?? api.business_hours?.timezone ?? "";
+  const hasBusinessHours = api.business_hours_only === true || start || end || tz;
   return {
     id: String(api.id ?? ""),
     whatsappNumberId: Number(sid),
     enabled: Boolean(api.enabled),
     businessHoursOnly: Boolean(api.business_hours_only),
-    businessHours: api.business_hours
-      ? {
-          start: api.business_hours.start ?? "09:00",
-          end: api.business_hours.end ?? "18:00",
-          timezone: api.business_hours.timezone ?? "",
-        }
+    businessHours: hasBusinessHours
+      ? { start, end, timezone: tz }
       : undefined,
     scenarios: {
       initialGreeting: Boolean(s.initial_greeting),
@@ -923,7 +923,11 @@ function mapUIConfigToApiBody(config: Partial<AIResponderConfig>): Record<string
   const body: Record<string, unknown> = {};
   if (config.enabled !== undefined) body.enabled = config.enabled;
   if (config.businessHoursOnly !== undefined) body.business_hours_only = config.businessHoursOnly;
-  if (config.businessHours !== undefined) body.business_hours = config.businessHours;
+  if (config.businessHours !== undefined) {
+    body.business_hours_start = config.businessHours.start ?? null;
+    body.business_hours_end = config.businessHours.end ?? null;
+    body.timezone = config.businessHours.timezone ?? null;
+  }
   if (config.scenarios !== undefined) {
     body.scenarios = {
       initial_greeting: config.scenarios.initialGreeting,

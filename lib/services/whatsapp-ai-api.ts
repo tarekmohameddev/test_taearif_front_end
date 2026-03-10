@@ -7,7 +7,7 @@ import axiosInstance from "@/lib/axiosInstance";
 const BASE = "/v1/whatsapp";
 
 function getData<T>(res: {
-  data?: { status?: string | boolean; data?: T; message?: string };
+  data?: { status?: string | boolean; data?: T | { data?: T }; message?: string };
   status: number;
 }): T {
   const body = res.data;
@@ -19,16 +19,23 @@ function getData<T>(res: {
   ) {
     throw new Error(msg);
   }
-  return (body?.data ?? body) as T;
+  const inner = body?.data as T | { data?: T } | undefined;
+  if (inner && typeof inner === "object" && "data" in inner && inner.data != null) {
+    return inner.data as T;
+  }
+  return (inner ?? body) as T;
 }
 
-/** Backend AI config (snake_case). */
+/** Backend AI config (snake_case). Matches backend: flat business_hours_start/end/timezone. */
 export interface ApiAIConfig {
   id?: string | number | null;
   wa_number_id?: number | null;
   whatsapp_number_id?: number | null;
   enabled?: boolean | null;
   business_hours_only?: boolean | null;
+  business_hours_start?: string | null;
+  business_hours_end?: string | null;
+  timezone?: string | null;
   business_hours?: {
     start?: string | null;
     end?: string | null;
@@ -67,17 +74,19 @@ export async function getAIConfigApi(
   return raw ?? null;
 }
 
-/** PUT /api/v1/whatsapp/ai/config/{numberId} — create/update. Body in snake_case. */
+/** PUT /api/v1/whatsapp/ai/config/{numberId} — create/update. Body in snake_case (flat business_hours). */
 export async function putAIConfigApi(
   numberId: number,
   body: {
     enabled?: boolean;
     business_hours_only?: boolean;
-    business_hours?: { start?: string; end?: string; timezone?: string };
+    business_hours_start?: string | null;
+    business_hours_end?: string | null;
+    timezone?: string | null;
     scenarios?: Record<string, boolean>;
     tone?: string;
     language?: string;
-    custom_instructions?: string;
+    custom_instructions?: string | null;
     fallback_to_human?: boolean;
     fallback_delay?: number;
   }
