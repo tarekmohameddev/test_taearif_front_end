@@ -34,13 +34,13 @@ export function AutomationRulesTable({
       <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="text-right">القاعدة</TableHead>
-              <TableHead className="text-right">المحفز</TableHead>
-              <TableHead className="text-right">التأخير</TableHead>
-              <TableHead className="text-right">عدد المرات</TableHead>
-              <TableHead className="text-right">الحالة</TableHead>
-              <TableHead className="text-right">الإجراءات</TableHead>
+            <TableRow className="bg-gray-800">
+              <TableHead className="text-right text-white">القاعدة</TableHead>
+              <TableHead className="text-right text-white">المحفز</TableHead>
+              <TableHead className="text-right text-white">التأخير</TableHead>
+              <TableHead className="text-right text-white">عدد المرات</TableHead>
+              <TableHead className="text-right text-white">الحالة</TableHead>
+              <TableHead className="text-right text-white">الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
