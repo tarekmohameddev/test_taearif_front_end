@@ -107,7 +107,10 @@ export function WhatsAppManagementPage() {
             </TabsContent>
 
             <TabsContent value="ai-responder" className="space-y-4 bg-white mt-0">
-              <AIResponderModule selectedNumberId={selectedNumberId} />
+              <AIResponderModule
+                selectedNumberId={selectedNumberId}
+                onNumberChange={setSelectedNumberId}
+              />
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-4">

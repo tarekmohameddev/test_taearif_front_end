@@ -15,6 +15,7 @@ import type { AIResponderModuleProps } from "./types";
 
 export function AIResponderModule({
   selectedNumberId,
+  onNumberChange,
 }: AIResponderModuleProps) {
   const {
     config,
@@ -39,7 +40,10 @@ export function AIResponderModule({
   if (!selectedNumberId) {
     return (
       <div className="min-h-[320px] bg-white rounded-xl border border-gray-200 flex items-center justify-center">
-        <AIResponderNoNumberState />
+        <AIResponderNoNumberState
+          selectedNumberId={selectedNumberId}
+          onNumberChange={onNumberChange}
+        />
       </div>
     );
   }
