@@ -338,28 +338,26 @@ export function IncomingActionsCardFull({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-4 items-center">
           <span className={cn("px-2.5 py-1 text-xs font-bold rounded-lg flex items-center gap-1", priorityStitchPillClass[action.priority])}>
             <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" aria-hidden />
             {priorityStitchLabels[action.priority]}
           </span>
           <SourceBadge source={action.source} className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-lg" />
+          {availableStages.length > 0 && (
+            <div onClick={(e) => e.stopPropagation()} data-interactive="true" className="shrink-0">
+              <StageDropdown
+                availableStages={availableStages}
+                displayStage={displayStage}
+                isUpdatingStage={isUpdatingStage}
+                onStageChange={onStageChange}
+                getStageColor={getStageColor}
+                getStageNameAr={getStageNameAr}
+                stitchStyle
+              />
+            </div>
+          )}
         </div>
-
-        {availableStages.length > 0 && (
-          <div className="mb-4" onClick={(e) => e.stopPropagation()} data-interactive="true">
-            <StageDropdown
-              availableStages={availableStages}
-              displayStage={displayStage}
-              isUpdatingStage={isUpdatingStage}
-              onStageChange={onStageChange}
-              getStageColor={getStageColor}
-              getStageNameAr={getStageNameAr}
-              stitchStyle
-              className="w-full"
-            />
-          </div>
-        )}
 
         {(locationLine || categoryLabel || areaLabel) && (
           <div className="space-y-2 mb-6 text-sm">
