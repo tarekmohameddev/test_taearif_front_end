@@ -71,10 +71,20 @@ export function WhatsAppTemplatesTab() {
   };
 
   const handleOpenEdit = async (template: MessageTemplate) => {
+    const listId = template.id != null && template.id !== "" ? String(template.id) : "";
+    if (!listId || listId === "undefined") {
+      toast({
+        title: "لا يمكن فتح القالب",
+        description: "معرّف القالب غير متوفر.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
-      const full = await getMessageTemplate(template.id);
+      const full = await getMessageTemplate(listId);
       const t = full ?? template;
-      setEditingTemplate(t);
+      const idForEdit = t.id != null && t.id !== "" && t.id !== "undefined" ? String(t.id) : listId;
+      setEditingTemplate({ ...t, id: idForEdit });
       setName(t.name);
       setCategory(t.category);
       setContent(t.content);
@@ -116,15 +126,38 @@ export function WhatsAppTemplatesTab() {
 
     const vars = parseVariables(variables);
 
+    let templateIdToUpdate: string | null = null;
+    if (editingTemplate) {
+      const rawId = editingTemplate.id;
+      const idStr = rawId != null && rawId !== "" ? String(rawId) : "";
+      if (!idStr || idStr === "undefined" || idStr.trim() === "") {
+        toast({
+          title: "لا يمكن تحديث القالب",
+          description: "معرّف القالب غير متوفر. حدّث الصفحة أو جرّب قالباً آخر.",
+          variant: "destructive",
+        });
+        return;
+      }
+      templateIdToUpdate = idStr;
+    }
+
     try {
       setIsSaving(true);
-      if (editingTemplate) {
-        await updateMessageTemplate(editingTemplate.id, {
+      if (editingTemplate && templateIdToUpdate) {
+        const updated = await updateMessageTemplate(templateIdToUpdate, {
           name: name.trim(),
           category: category.trim() || "general",
           content: content,
           variables: vars,
         });
+        if (updated == null) {
+          toast({
+            title: "فشل في تحديث القالب",
+            description: "معرّف القالب غير صالح أو الخادم لم يستجب. حاول مرة أخرى.",
+            variant: "destructive",
+          });
+          return;
+        }
         toast({
           title: "تم تحديث القالب",
           description: "تم حفظ تعديلات قالب واتساب بنجاح.",
@@ -158,6 +191,15 @@ export function WhatsAppTemplatesTab() {
 
   const handleDelete = async () => {
     if (!editingTemplate) return;
+    const id = editingTemplate.id;
+    if (!id || id === "undefined" || id.trim() === "") {
+      toast({
+        title: "لا يمكن حذف القالب",
+        description: "معرّف القالب غير متوفر. حدّث الصفحة أو جرّب قالباً آخر.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!confirm("هل أنت متأكد من حذف هذا القالب؟")) return;
     try {
       setIsDeleting(true);

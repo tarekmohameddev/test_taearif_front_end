@@ -26,7 +26,7 @@ export function ConversationsModule({
       {/* Conversations List - Left Sidebar */}
       <div className="lg:col-span-1 border rounded-lg overflow-hidden">
         <ConversationsList
-          key={refreshTrigger}
+          refreshTrigger={refreshTrigger}
           selectedConversationId={selectedConversationId}
           onConversationSelect={setSelectedConversationId}
           whatsappNumberId={selectedNumberId}

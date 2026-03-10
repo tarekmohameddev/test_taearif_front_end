@@ -21,7 +21,9 @@ function getData<T>(res: {
 // --- Backend types (approximate; keep flexible for mapping layer) ---
 
 export interface ApiWhatsAppTemplate {
-  id: number | string;
+  id?: number | string;
+  /** Backend may use template_id instead of id in list/single response. */
+  template_id?: number | string;
   name?: string | null;
   content?: string | null;
   category?: string | null;
@@ -44,7 +46,13 @@ export async function getWhatsAppTemplateApi(
   id: string
 ): Promise<ApiWhatsAppTemplate> {
   const res = await axiosInstance.get(`${BASE}/templates/${id}`);
-  return getData<ApiWhatsAppTemplate>(res);
+  const raw = getData<
+    ApiWhatsAppTemplate | { data?: ApiWhatsAppTemplate; template?: ApiWhatsAppTemplate }
+  >(res);
+  const withData = (raw as { data?: ApiWhatsAppTemplate })?.data;
+  const withTemplate = (raw as { template?: ApiWhatsAppTemplate })?.template;
+  const template = withData ?? withTemplate ?? raw;
+  return template as ApiWhatsAppTemplate;
 }
 
 export async function createWhatsAppTemplateApi(
@@ -58,7 +66,11 @@ export async function updateWhatsAppTemplateApi(
   id: string,
   body: Record<string, unknown>
 ): Promise<ApiWhatsAppTemplate> {
-  const res = await axiosInstance.put(`${BASE}/templates/${id}`, body);
+  const safeId = id != null && String(id).trim() !== "" ? String(id) : null;
+  if (safeId == null || safeId === "undefined") {
+    throw new Error("Template id is required for update");
+  }
+  const res = await axiosInstance.put(`${BASE}/templates/${safeId}`, body);
   return getData<ApiWhatsAppTemplate>(res);
 }
 

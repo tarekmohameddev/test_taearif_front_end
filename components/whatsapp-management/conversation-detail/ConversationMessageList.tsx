@@ -30,23 +30,34 @@ export function ConversationMessageList({
   messages,
 }: ConversationMessageListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!scrollAreaRef.current) return;
-    const scrollContainer = scrollAreaRef.current.querySelector(
-      "[data-radix-scroll-area-viewport]"
-    );
-    if (scrollContainer) {
-      scrollContainer.scrollTop = scrollContainer.scrollHeight;
-    }
+    const scrollToBottom = () => {
+      if (scrollAreaRef.current) {
+        const scrollContainer = scrollAreaRef.current.querySelector(
+          "[data-radix-scroll-area-viewport]"
+        );
+        if (scrollContainer) {
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
+      }
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    };
+
+    scrollToBottom();
+    const rafId = requestAnimationFrame(() => {
+      scrollToBottom();
+    });
+    return () => cancelAnimationFrame(rafId);
   }, [messages]);
 
   return (
     <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
       <div className="space-y-4">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
-            key={message.id}
+            key={`msg-${index}-${String(message.id ?? "")}`}
             className={`flex ${
               message.sender === "customer"
                 ? "justify-start"
@@ -102,6 +113,7 @@ export function ConversationMessageList({
             </div>
           </div>
         ))}
+        <div ref={bottomRef} aria-hidden="true" />
       </div>
     </ScrollArea>
   );

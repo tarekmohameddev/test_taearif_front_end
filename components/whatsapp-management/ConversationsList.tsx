@@ -26,12 +26,14 @@ import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 
 interface ConversationsListProps {
+  refreshTrigger?: number;
   selectedConversationId: string | null;
   onConversationSelect: (conversationId: string) => void;
   whatsappNumberId: number | null;
 }
 
 export function ConversationsList({
+  refreshTrigger = 0,
   selectedConversationId,
   onConversationSelect,
   whatsappNumberId,
@@ -45,11 +47,12 @@ export function ConversationsList({
 
   useEffect(() => {
     loadConversations();
-  }, [whatsappNumberId, filters]);
+  }, [whatsappNumberId, filters, refreshTrigger]);
 
   const loadConversations = async () => {
+    const isInitialLoad = conversations.length === 0;
     try {
-      setIsLoading(true);
+      if (isInitialLoad) setIsLoading(true);
       const data = await getConversations(
         whatsappNumberId || undefined,
         filters
@@ -58,7 +61,7 @@ export function ConversationsList({
     } catch (error) {
       console.error("Failed to load conversations:", error);
     } finally {
-      setIsLoading(false);
+      if (isInitialLoad) setIsLoading(false);
     }
   };
 
