@@ -32,9 +32,9 @@ const useStore = create((set, get) => {
     homepage: {
       ...dashboardDevice(set, get),
       ...dashboardSummary(set, get),
-      ...visitorData(set),
+      ...visitorData(set, get),
       ...setupProgress(set, get),
-      ...trafficSources(set),
+      ...trafficSources(set, get),
 
       setSelectedTimeRange: (range) =>
         set((state) => ({
