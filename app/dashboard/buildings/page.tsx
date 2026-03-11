@@ -1,4 +1,4 @@
-import { BuildingsManagementPage } from "@/components/buildings";
+import BuildingsManagementPage from "@/components/buildings/buildings-management-page";
 
 export const metadata = {
   title: "إدارة العمارات",
