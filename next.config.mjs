@@ -45,14 +45,14 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // تحسين cache
+  // تحسين cache للـ dev: الاحتفاظ بعدد أكبر من الصفحات المترجمة في الذاكرة لتقليل إعادة الـ compile
   onDemandEntries: {
-    maxInactiveAge: 60 * 1000,
-    pagesBufferLength: process.env.NODE_ENV === "development" ? 3 : 2,
+    maxInactiveAge: 90 * 1000,
+    pagesBufferLength: process.env.NODE_ENV === "development" ? 6 : 2,
   },
   output: process.platform === "win32" ? undefined : "standalone",
   
-  // تعطيل Turbopack - استخدام webpack فقط
+  // Turbopack: يُستخدم عند تشغيل `npm run dev` (next dev --turbopack). الإنتاج يستخدم webpack.
   turbopack: {},
   
   // ⬅️ Webpack configuration - فقط في PRODUCTION

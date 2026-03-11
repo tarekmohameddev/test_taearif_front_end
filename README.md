@@ -22,7 +22,7 @@ Read: docs/CURSOR_AI_SETUP.md (3-minute setup)
 1. npm install
 2. Configure environment variables
 3. Read: docs/important/INDEX.md
-4. Start development
+4. Start development: npm run dev (uses Next.js with Turbopack for faster dev compile)
 ```
 
 ---

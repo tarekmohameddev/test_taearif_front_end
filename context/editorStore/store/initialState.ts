@@ -1,4 +1,3 @@
-import { COMPONENTS } from "@/lib/ComponentsList";
 import { getDefaultHeaderData } from "../../editorStoreFunctions/headerFunctions";
 import { getDefaultFooterData } from "../../editorStoreFunctions/footerFunctions";
 import type { EditorStore } from "../types/types";
@@ -56,13 +55,8 @@ export const getInitialState = (): Partial<EditorStore> => ({
   // Theme backups collection - Initialize as empty object
   ThemesBackup: {},
 
-  structures: Object.keys(COMPONENTS).reduce(
-    (acc, componentType) => {
-      acc[componentType] = COMPONENTS[componentType];
-      return acc;
-    },
-    {} as Record<string, any>,
-  ),
+  // Structures loaded on demand via getComponentByIdWithStructureAsync (no pre-load of heavy structures)
+  structures: {},
   heroStates: {},
   heroBannerStates: {},
   commitmentSectionStates: {},

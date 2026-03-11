@@ -1,3 +1,7 @@
+/**
+ * Next.js middleware logic: locale, tenant (subdomain/custom domain), rewrites.
+ * Role and invocation: see docs/updates/performance/proxy-role-and-invocation.md
+ */
 import { NextRequest, NextResponse } from "next/server";
 
 const locales = ["ar", "en"];
