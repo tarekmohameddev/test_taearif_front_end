@@ -45,88 +45,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const result = hasSessionSync();
     setHasSession(result);
     setSessionChecked(true);
-
-    // #region agent log
-    fetch(
-      "http://127.0.0.1:7242/ingest/5b679b9a-1ddc-4ba7-b77c-00170dd91735",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "affb0d",
-        },
-        body: JSON.stringify({
-          sessionId: "affb0d",
-          runId: "initial",
-          hypothesisId: "H2",
-          location: "app/AuthGate.tsx:48",
-          message: "AuthGate: initial session check",
-          data: {
-            pathname: pathname || "",
-            hasSession: result,
-          },
-          timestamp: Date.now(),
-        }),
-      },
-    ).catch(() => {});
-    // #endregion
   }, []);
 
   useEffect(() => {
     if (!sessionChecked) return;
     if (isAuthPageNoSessionRequired(pathname || "")) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7242/ingest/5b679b9a-1ddc-4ba7-b77c-00170dd91735",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "affb0d",
-          },
-          body: JSON.stringify({
-            sessionId: "affb0d",
-            runId: "initial",
-            hypothesisId: "H2",
-            location: "app/AuthGate.tsx:66",
-            message:
-              "AuthGate: auth page, no session required (no redirect to login)",
-            data: {
-              pathname: pathname || "",
-              hasSession,
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       return;
     }
     if (!hasSession) {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7242/ingest/5b679b9a-1ddc-4ba7-b77c-00170dd91735",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Debug-Session-Id": "affb0d",
-          },
-          body: JSON.stringify({
-            sessionId: "affb0d",
-            runId: "initial",
-            hypothesisId: "H2",
-            location: "app/AuthGate.tsx:84",
-            message: "AuthGate: redirecting to /login (no session)",
-            data: {
-              pathname: pathname || "",
-              hasSession,
-            },
-            timestamp: Date.now(),
-          }),
-        },
-      ).catch(() => {});
-      // #endregion
       router.push("/login");
     }
   }, [sessionChecked, hasSession, pathname, router]);
@@ -136,54 +62,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   if (!isAuthPageNoSessionRequired(pathname || "") && !hasSession) {
-    // #region agent log
-    fetch(
-      "http://127.0.0.1:7242/ingest/5b679b9a-1ddc-4ba7-b77c-00170dd91735",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "affb0d",
-        },
-        body: JSON.stringify({
-          sessionId: "affb0d",
-          runId: "initial",
-          hypothesisId: "H2",
-          location: "app/AuthGate.tsx:111",
-          message: "AuthGate: rendering null (blocked protected page)",
-          data: {
-            pathname: pathname || "",
-            hasSession,
-          },
-          timestamp: Date.now(),
-        }),
-      },
-    ).catch(() => {});
-    // #endregion
     return null;
   }
-
-  // #region agent log
-  fetch("http://127.0.0.1:7242/ingest/5b679b9a-1ddc-4ba7-b77c-00170dd91735", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "affb0d",
-    },
-    body: JSON.stringify({
-      sessionId: "affb0d",
-      runId: "initial",
-      hypothesisId: "H2",
-      location: "app/AuthGate.tsx:132",
-      message: "AuthGate: rendering ClientLayoutAuth (access granted)",
-      data: {
-        pathname: pathname || "",
-        hasSession,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
 
   return <ClientLayoutAuth>{children}</ClientLayoutAuth>;
 }

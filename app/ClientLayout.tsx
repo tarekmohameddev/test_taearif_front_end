@@ -34,52 +34,8 @@ export default function ClientLayout({
   const pathname = usePathname();
 
   if (!pathname || !isPathRequiringAuth(pathname)) {
-    // #region agent log
-    fetch(
-      "http://127.0.0.1:7242/ingest/5b679b9a-1ddc-4ba7-b77c-00170dd91735",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Debug-Session-Id": "affb0d",
-        },
-        body: JSON.stringify({
-          sessionId: "affb0d",
-          runId: "initial",
-          hypothesisId: "H3",
-          location: "app/ClientLayout.tsx:37",
-          message: "ClientLayout: path does NOT require AuthGate",
-          data: {
-            pathname: pathname || "",
-          },
-          timestamp: Date.now(),
-        }),
-      },
-    ).catch(() => {});
-    // #endregion
     return <>{children}</>;
   }
-
-  // #region agent log
-  fetch("http://127.0.0.1:7242/ingest/5b679b9a-1ddc-4ba7-b77c-00170dd91735", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Debug-Session-Id": "affb0d",
-    },
-    body: JSON.stringify({
-      sessionId: "affb0d",
-      runId: "initial",
-      hypothesisId: "H3",
-      location: "app/ClientLayout.tsx:55",
-      message: "ClientLayout: path requires AuthGate",
-      data: {
-        pathname: pathname || "",
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
 
   return <AuthGate>{children}</AuthGate>;
 }
