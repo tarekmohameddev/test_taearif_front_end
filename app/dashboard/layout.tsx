@@ -2,11 +2,26 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
-import GTMProvider from "@/components/GTMProvider2";
-import PermissionWrapper from "@/components/PermissionWrapper";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useAuthStore from "@/context/AuthContext";
+
+const GTMProvider = dynamic(
+  () => import("@/components/GTMProvider2").then((mod) => ({ default: mod.default })),
+  { ssr: false, loading: () => <div className="min-h-screen" dir="rtl" /> },
+);
+
+const PermissionWrapper = dynamic(
+  () => import("@/components/PermissionWrapper"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      </div>
+    ),
+  },
+);
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
 

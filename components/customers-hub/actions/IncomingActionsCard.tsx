@@ -192,6 +192,13 @@ export function IncomingActionsCard({
       {...commonViewProps}
       onSelect={onSelect}
       onQuickView={onQuickView}
+      onComplete={onComplete}
+      onDismiss={onDismiss}
+      onSnooze={onSnooze}
+      isCompleting={isCompleting}
+      showSnoozeForm={showSnoozeForm}
+      setShowSnoozeForm={setShowSnoozeForm}
+      snoozeForm={snoozeFormProps}
     />
   );
 }

@@ -13,6 +13,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { Loader2 } from "lucide-react";
+
+const PROPERTY_TYPE_LABELS: Record<string, string> = {
+  Agricultural: "زراعي",
+  apartment: "شقة",
+  commercial: "تجاري",
+  Industrial: "صناعي",
+  Residential: "سكني",
+};
 
 interface PropertyRequestFormData {
   property_type: string;
@@ -98,6 +107,17 @@ export const PropertyRequestForm = ({
     return error;
   };
 
+  if (loadingFilters || !filtersData) {
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>جاري تحميل بيانات الطلب العقاري...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Contact Information */}
@@ -174,7 +194,7 @@ export const PropertyRequestForm = ({
                   <SelectContent>
                     {filtersData.property_types.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {type}
+                        {PROPERTY_TYPE_LABELS[type] || type}
                       </SelectItem>
                     ))}
                   </SelectContent>

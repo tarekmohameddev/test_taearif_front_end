@@ -1,4 +1,4 @@
-import { BuildingsManagementPage } from "@/components/buildings";
+import BuildingsPageClient from "./BuildingsPageClient";
 
 export const metadata = {
   title: "إدارة العمارات",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <BuildingsManagementPage />;
+  return <BuildingsPageClient />;
 }

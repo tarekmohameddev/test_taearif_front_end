@@ -6,20 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import type { MessageTemplate, RuleFormData } from "./types";
 import { TRIGGER_OPTIONS } from "./constants";
 
@@ -46,18 +43,18 @@ export function AutomationRuleDialog({
     !!formData.name && !!formData.trigger && !!formData.templateId;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-lg">
+      <CustomDialogContent className="sm:max-w-lg">
+        <CustomDialogHeader>
+          <CustomDialogTitle>
             {editingRule ? "تعديل قاعدة الأتمتة" : "إضافة قاعدة جديدة"}
-          </DialogTitle>
-          <DialogDescription>
+          </CustomDialogTitle>
+          <CustomDialogDescription>
             قم بإعداد قاعدة لإرسال رسائل آلية بناءً على سيناريوهات محددة
-          </DialogDescription>
-        </DialogHeader>
+          </CustomDialogDescription>
+        </CustomDialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6" dir="rtl">
           <div>
             <Label htmlFor="name">اسم القاعدة</Label>
             <Input
@@ -85,23 +82,27 @@ export function AutomationRuleDialog({
 
           <div>
             <Label htmlFor="trigger">المحفز</Label>
-            <Select
-              value={formData.trigger}
-              onValueChange={(value) =>
-                setFormData({ ...formData, trigger: value })
+            <CustomDropdown
+              trigger={
+                <span>
+                  {TRIGGER_OPTIONS.find(
+                    (opt) => opt.value === formData.trigger,
+                  )?.label || "اختر المحفز"}
+                </span>
               }
+              fullWidth
             >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر المحفز" />
-              </SelectTrigger>
-              <SelectContent>
-                {TRIGGER_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {TRIGGER_OPTIONS.map((opt) => (
+                <DropdownItem
+                  key={opt.value}
+                  onClick={() =>
+                    setFormData({ ...formData, trigger: opt.value })
+                  }
+                >
+                  {opt.label}
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
           </div>
 
           <div>
@@ -125,23 +126,27 @@ export function AutomationRuleDialog({
 
           <div>
             <Label htmlFor="template">قالب الرسالة</Label>
-            <Select
-              value={formData.templateId}
-              onValueChange={(value) =>
-                setFormData({ ...formData, templateId: value })
+            <CustomDropdown
+              trigger={
+                <span>
+                  {templates.find(
+                    (template) => template.id === formData.templateId,
+                  )?.name || "اختر قالب الرسالة"}
+                </span>
               }
+              fullWidth
             >
-              <SelectTrigger>
-                <SelectValue placeholder="اختر قالب الرسالة" />
-              </SelectTrigger>
-              <SelectContent>
-                {templates.map((template) => (
-                  <SelectItem key={template.id} value={template.id}>
-                    {template.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {templates.map((template) => (
+                <DropdownItem
+                  key={template.id}
+                  onClick={() =>
+                    setFormData({ ...formData, templateId: template.id })
+                  }
+                >
+                  {template.name}
+                </DropdownItem>
+              ))}
+            </CustomDropdown>
           </div>
 
           <div className="flex items-center space-x-2 space-x-reverse">
@@ -156,15 +161,15 @@ export function AutomationRuleDialog({
           </div>
         </div>
 
-        <DialogFooter className="gap-2">
+        <CustomDialogFooter className="gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
           <Button onClick={onSave} disabled={!isFormValid}>
             {editingRule ? "حفظ التغييرات" : "إضافة القاعدة"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

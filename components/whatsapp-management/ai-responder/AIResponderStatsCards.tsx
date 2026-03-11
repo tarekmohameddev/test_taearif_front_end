@@ -1,7 +1,6 @@
 "use client";
 
 import { Clock, CheckCircle, Users, MessageCircle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import type { AIStats } from "../types";
 
 interface AIResponderStatsCardsProps {
@@ -10,54 +9,35 @@ interface AIResponderStatsCardsProps {
 
 export function AIResponderStatsCards({ stats }: AIResponderStatsCardsProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-4">
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">ردود اليوم</p>
-              <p className="text-2xl font-bold">{stats.totalResponses24h}</p>
-            </div>
-            <MessageCircle className="h-8 w-8 text-blue-600 opacity-20" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">وقت الرد</p>
-              <p className="text-2xl font-bold">{stats.avgResponseTime}ث</p>
-            </div>
-            <Clock className="h-8 w-8 text-green-600 opacity-20" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">رضا العملاء</p>
-              <p className="text-2xl font-bold">{stats.satisfactionRate}%</p>
-            </div>
-            <CheckCircle className="h-8 w-8 text-purple-600 opacity-20" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">تحويل لموظف</p>
-              <p className="text-2xl font-bold">{stats.handoffRate}%</p>
-            </div>
-            <Users className="h-8 w-8 text-orange-600 opacity-20" />
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p className="text-sm text-gray-500">ردود اليوم</p>
+          <p className="text-2xl font-bold text-black mt-0.5">{stats.totalResponses24h}</p>
+        </div>
+        <MessageCircle className="h-9 w-9 text-gray-200" aria-hidden />
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p className="text-sm text-gray-500">وقت الرد</p>
+          <p className="text-2xl font-bold text-black mt-0.5">{stats.avgResponseTime}ث</p>
+        </div>
+        <Clock className="h-9 w-9 text-gray-200" aria-hidden />
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p className="text-sm text-gray-500">رضا العملاء</p>
+          <p className="text-2xl font-bold text-black mt-0.5">{stats.satisfactionRate}%</p>
+        </div>
+        <CheckCircle className="h-9 w-9 text-gray-200" aria-hidden />
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between shadow-sm">
+        <div>
+          <p className="text-sm text-gray-500">تحويل لموظف</p>
+          <p className="text-2xl font-bold text-black mt-0.5">{stats.handoffRate}%</p>
+        </div>
+        <Users className="h-9 w-9 text-gray-400" aria-hidden />
+      </div>
     </div>
   );
 }

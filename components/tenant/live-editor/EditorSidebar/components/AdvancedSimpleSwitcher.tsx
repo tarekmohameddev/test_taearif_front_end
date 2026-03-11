@@ -5,7 +5,7 @@ import { DynamicFieldsRenderer } from "./DynamicFieldsRenderer";
 import { COMPONENTS } from "@/lib/ComponentsList";
 import { useEditorStore } from "@/context/editorStore";
 import { useEditorT } from "@/context/editorI18nStore";
-import { translateComponentStructure } from "@/componentsStructure";
+import { translateComponentStructure } from "@/componentsStructure/translationHelper";
 
 export function AdvancedSimpleSwitcher({
   type,

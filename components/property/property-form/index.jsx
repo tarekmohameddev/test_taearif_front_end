@@ -322,29 +322,31 @@ export default function PropertyForm({ mode, isDraft = false }) {
       {/* Tab Content */}
       {state.activeTab === "form" ? (
         <div className="space-y-6">
-          <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2">
-          <BasicInfoCard
-            formData={state.formData}
-            errors={state.errors}
-            isDraft={isDraft}
-            missingFields={state.missingFields}
-            categories={state.categories}
-            projects={state.projects}
-            buildings={state.buildings}
-            onInputChange={handlers.handleInputChange}
-            onSwitchChange={handlers.handleSwitchChange}
-            onSelectChange={(name, value) =>
-              handlers.handleInputChange({
-                target: { name, value },
-              })
-            }
-            onCitySelect={handlers.handleCitySelect}
-            onDistrictSelect={(districtId) =>
-              state.setFormData((prev) => ({ ...prev, district_id: districtId }))
-            }
-            isFieldMissing={validation.isFieldMissing}
-            cardHasMissingFields={validation.cardHasMissingFields}
-          />
+          <div className="grid gap-4 lg:gap-6 grid-cols-1 xl:grid-cols-2 ">
+          <div className="xl:col-span-2">
+            <BasicInfoCard
+              formData={state.formData}
+              errors={state.errors}
+              isDraft={isDraft}
+              missingFields={state.missingFields}
+              categories={state.categories}
+              projects={state.projects}
+              buildings={state.buildings}
+              onInputChange={handlers.handleInputChange}
+              onSwitchChange={handlers.handleSwitchChange}
+              onSelectChange={(name, value) =>
+                handlers.handleInputChange({
+                  target: { name, value },
+                })
+              }
+              onCitySelect={handlers.handleCitySelect}
+              onDistrictSelect={(districtId) =>
+                state.setFormData((prev) => ({ ...prev, district_id: districtId }))
+              }
+              isFieldMissing={validation.isFieldMissing}
+              cardHasMissingFields={validation.cardHasMissingFields}
+            />
+          </div>
 
           <PropertyDetailsCard
             formData={state.formData}
@@ -367,20 +369,22 @@ export default function PropertyForm({ mode, isDraft = false }) {
             cardHasMissingFields={validation.cardHasMissingFields}
           />
 
-          <ThumbnailCard
-            previews={state.previews}
-            images={state.images}
-            errors={state.errors}
-            isDraft={isDraft}
-            missingFields={state.missingFields}
-            uploading={fileUpload.uploading}
-            isOpen={state.isThumbnailOpen}
-            setIsOpen={state.setIsThumbnailOpen}
-            thumbnailInputRef={state.thumbnailInputRef}
-            onFileChange={fileUpload.handleFileChange}
-            onRemoveImage={fileUpload.removeImage}
-            cardHasMissingFields={validation.cardHasMissingFields}
-          />
+          <div className="xl:col-span-2">
+            <ThumbnailCard
+              previews={state.previews}
+              images={state.images}
+              errors={state.errors}
+              isDraft={isDraft}
+              missingFields={state.missingFields}
+              uploading={fileUpload.uploading}
+              isOpen={state.isThumbnailOpen}
+              setIsOpen={state.setIsThumbnailOpen}
+              thumbnailInputRef={state.thumbnailInputRef}
+              onFileChange={fileUpload.handleFileChange}
+              onRemoveImage={fileUpload.removeImage}
+              cardHasMissingFields={validation.cardHasMissingFields}
+            />
+          </div>
 
           <GalleryCard
             previews={state.previews}

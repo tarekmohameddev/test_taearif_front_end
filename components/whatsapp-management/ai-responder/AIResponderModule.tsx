@@ -15,6 +15,7 @@ import type { AIResponderModuleProps } from "./types";
 
 export function AIResponderModule({
   selectedNumberId,
+  onNumberChange,
 }: AIResponderModuleProps) {
   const {
     config,
@@ -29,34 +30,51 @@ export function AIResponderModule({
   } = useAIResponderConfig(selectedNumberId);
 
   if (isLoading) {
-    return <AIResponderLoadingState />;
+    return (
+      <div className="min-h-[320px] bg-white rounded-xl border border-gray-200 flex items-center justify-center">
+        <AIResponderLoadingState />
+      </div>
+    );
   }
 
   if (!selectedNumberId) {
-    return <AIResponderNoNumberState />;
+    return (
+      <div className="min-h-[320px] bg-white rounded-xl border border-gray-200 flex items-center justify-center">
+        <AIResponderNoNumberState
+          selectedNumberId={selectedNumberId}
+          onNumberChange={onNumberChange}
+        />
+      </div>
+    );
   }
 
   if (!config) {
-    return <AIResponderConfigErrorState />;
+    return (
+      <div className="min-h-[320px] bg-white rounded-xl border border-gray-200 flex items-center justify-center">
+        <AIResponderConfigErrorState />
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      {stats && <AIResponderStatsCards stats={stats} />}
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="p-6 sm:p-8 space-y-8">
+        {stats && <AIResponderStatsCards stats={stats} />}
 
-      <AIResponderHeader
-        numberName={numberName}
-        isSaving={isSaving}
-        onSave={handleSave}
-        saveSuccess={saveSuccess}
-      />
+        <AIResponderHeader
+          numberName={numberName}
+          isSaving={isSaving}
+          onSave={handleSave}
+          saveSuccess={saveSuccess}
+        />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <AIGeneralSettingsCard config={config} updateConfig={updateConfig} />
-        <AIResponseStyleCard config={config} updateConfig={updateConfig} />
+        <div className="grid gap-6 md:grid-cols-2">
+          <AIGeneralSettingsCard config={config} updateConfig={updateConfig} />
+          <AIResponseStyleCard config={config} updateConfig={updateConfig} />
+        </div>
+
+        <AIScenariosCard config={config} updateScenario={updateScenario} />
       </div>
-
-      <AIScenariosCard config={config} updateScenario={updateScenario} />
     </div>
   );
 }

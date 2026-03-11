@@ -1,3 +1,8 @@
+/**
+ * Barrel for component structures. For a single type or helper, prefer direct imports:
+ * - Types: @/componentsStructure/types
+ * - Translation: @/componentsStructure/translationHelper
+ */
 export { heroStructure } from "./hero";
 export { heroBannerStructure } from "./heroBanner";
 export { commitmentSectionStructure } from "./commitmentSection";

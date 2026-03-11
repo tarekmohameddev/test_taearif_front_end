@@ -19,8 +19,13 @@
    const sections = getAllSectionsTranslated(t);
 
 ملاحظة: الدوال القديمة (بدون Translated) تبقى متاحة للتوافق مع الكود الموجود
+
+للحصول على structure لمكون واحد دون تحميل الباقي استخدم:
+  getComponentStructureAsync(id) أو getComponentByIdWithStructureAsync(id)
+المجموعات (homepage, project, property): استورد من @/lib/ComponentsListGroups عند الحاجة لتعيين الأقسام فقط.
 */
 
+import { getComponentStructureAsync } from "@/lib/componentStructureLoaders";
 import { heroStructure } from "@/componentsStructure/hero";
 import { heroBannerStructure } from "@/componentsStructure/heroBanner";
 import { commitmentSectionStructure } from "@/componentsStructure/commitmentSection";
@@ -51,7 +56,6 @@ import { blogDetailsStructure } from "@/componentsStructure/blogDetails";
 import { logosTickerStructure } from "@/componentsStructure/logosTicker";
 import { partnersStructure } from "@/componentsStructure/partners";
 import { contactMapSectionStructure } from "@/componentsStructure/contactMapSection";
-import { whyChooseUsStructure } from "@/componentsStructure/whyChooseUs";
 import { gridStructure } from "@/componentsStructure/grid";
 import { filterButtonsStructure } from "@/componentsStructure/filterButtons";
 import { propertyFilterStructure } from "@/componentsStructure/propertyFilter";
@@ -1074,7 +1078,8 @@ export const COMPONENTS: Record<string, any> = {
     section: "homepage",
     subPath: "whyChooseUs",
     icon: "✨",
-    ...whyChooseUsStructure,
+    hasStructure: true,
+    defaultTheme: "whyChooseUs1",
   },
   testimonials: {
     id: "testimonials",
@@ -1640,6 +1645,21 @@ export const getSectionPath = (section: string): string => {
   const sectionObj = SECTIONS[section];
   return sectionObj ? sectionObj.path : section;
 };
+
+// Re-export for lazy loading by componentType (avoids pulling all structures)
+export { getComponentStructureAsync } from "@/lib/componentStructureLoaders";
+
+/** Load structure on demand and return full component (metadata + structure). Use when you need .variants, .fields, etc. */
+export async function getComponentByIdWithStructureAsync(
+  id: string,
+): Promise<ComponentType | undefined> {
+  const meta = COMPONENTS[id];
+  if (!meta) return undefined;
+  const structure = await getComponentStructureAsync(id);
+  if (!structure || typeof structure !== "object") return meta as ComponentType;
+  const merged = { ...meta, ...(structure as object) };
+  return merged as ComponentType;
+}
 
 // دوال إضافية تدعم الترجمة
 // استخدام: const components = getComponentsByHasStoreTranslated(true, t);

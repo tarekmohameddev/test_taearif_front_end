@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
 import { staticMenuItems } from "./menu-items";
-import { removeLocaleFromPathname } from "@/lib/i18n/config";
+import { getLocaleFromPathname, removeLocaleFromPathname } from "@/lib/i18n/config";
+import { getPreviewSiteUrl } from "@/lib/utils/previewDomain";
 
 // Hook لمراقبة ارتفاع الشاشة
 const useScreenHeight = () => {
@@ -218,16 +219,13 @@ export function DesktopSidebar({
                   onClick={() => {
                     const domain = displayDomain;
 
-                    // التحقق من صحة الـ domain
                     if (!domain || domain.trim() === "") {
                       alert("يرجى إعداد domain صحيح في إعدادات الحساب");
                       return;
                     }
 
-                    // تنظيف الـ domain من المسافات
                     const cleanDomain = domain.trim();
 
-                    // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
                     if (
                       !cleanDomain.includes(".") &&
                       !cleanDomain.startsWith("http")
@@ -238,14 +236,11 @@ export function DesktopSidebar({
                       return;
                     }
 
-                    const url = cleanDomain.startsWith("http")
-                      ? cleanDomain
-                      : `https://${cleanDomain}`;
+                    const localePath = `/${getLocaleFromPathname(pathname)}`;
+                    const url = getPreviewSiteUrl(cleanDomain, localePath);
 
-                    // التحقق من صحة الـ URL قبل فتحه
                     try {
                       new URL(url);
-                      console.log("Opening URL:", url);
                       window.open(url, "_blank");
                     } catch (error) {
                       console.error("Invalid URL:", url, error);

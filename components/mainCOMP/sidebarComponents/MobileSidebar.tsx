@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
 import { staticMenuItems, type MainNavItem } from "./menu-items";
-import { removeLocaleFromPathname } from "@/lib/i18n/config";
+import { getLocaleFromPathname, removeLocaleFromPathname } from "@/lib/i18n/config";
+import { getPreviewSiteUrl } from "@/lib/utils/previewDomain";
 
 interface MobileSidebarProps {
   children: React.ReactNode; // Menu trigger button
@@ -117,7 +118,6 @@ export function MobileSidebar({
               onClick={() => {
                 const userData = useAuthStore.getState().userData;
 
-                // التحقق من وجود userData
                 if (!userData) {
                   console.warn("userData is null or undefined");
                   alert("يرجى تسجيل الدخول أولاً");
@@ -126,7 +126,6 @@ export function MobileSidebar({
 
                 const domain = userData?.domain || "";
 
-                // التحقق من صحة الـ domain
                 if (!domain || domain.trim() === "") {
                   alert(
                     "يرجى إعداد domain صحيح في إعدادات الحساب",
@@ -134,10 +133,8 @@ export function MobileSidebar({
                   return;
                 }
 
-                // تنظيف الـ domain من المسافات
                 const cleanDomain = domain.trim();
 
-                // التحقق من أن الـ domain يحتوي على نقطة أو يكون URL صحيح
                 if (
                   !cleanDomain.includes(".") &&
                   !cleanDomain.startsWith("http")
@@ -148,14 +145,11 @@ export function MobileSidebar({
                   return;
                 }
 
-                const url = cleanDomain.startsWith("http")
-                  ? cleanDomain
-                  : `https://${cleanDomain}`;
+                const localePath = `/${getLocaleFromPathname(pathname)}`;
+                const url = getPreviewSiteUrl(cleanDomain, localePath);
 
-                // التحقق من صحة الـ URL قبل فتحه
                 try {
                   new URL(url);
-                  console.log("Opening URL:", url);
                   window.open(url, "_blank");
                 } catch (error) {
                   console.error("Invalid URL:", url, error);

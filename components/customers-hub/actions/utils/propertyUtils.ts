@@ -3,15 +3,26 @@ import type { PropertyBlock } from "../types/incomingCardTypes";
 import { AI_MATCHING_REQUIRED } from "../constants/incomingCardConstants";
 import type { AIMatchingStatus } from "../types/incomingCardTypes";
 
-/** خريطة ترجمة نوع العقار إلى العربية (المفتاح lowercase للتوافق مع API) */
+/** خريطة ترجمة نوع العقار إلى العربية (المفتاح lowercase للتوافق مع API) - قطاع ونوع وحدة */
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   residential: "سكني",
   industrial: "صناعي",
   agricultural: "زراعي",
   commercial: "تجاري",
   apartment: "شقة",
+  apartments: "شقة",
   land: "أرض",
   villa: "فيلا",
+  villas: "فيلا",
+  building: "مبنى",
+  studio: "استوديو",
+  duplex: "دوبلكس",
+  penthouse: "بنتهاوس",
+  townhouse: "تاون هاوس",
+  warehouse: "مستودع",
+  office: "مكتب",
+  shop: "محل",
+  retail: "تجاري",
 };
 
 export function translatePropertyType(propertyType: string | null | undefined): string {

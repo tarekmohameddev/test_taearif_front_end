@@ -30,26 +30,26 @@ export function AIResponseStyleCard({
   updateConfig,
 }: AIResponseStyleCardProps) {
   return (
-    <Card>
+    <Card className="bg-white border border-gray-200 shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-black">
+          <Sparkles className="h-5 w-5 text-gray-600" />
           أسلوب الردود
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-gray-500">
           تخصيص نبرة ولغة الذكاء الاصطناعي
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <Label htmlFor="tone">نبرة الردود</Label>
+          <Label htmlFor="tone" className="text-gray-700">نبرة الردود</Label>
           <Select
             value={config.tone}
             onValueChange={(value: AIResponderConfig["tone"]) =>
               updateConfig({ tone: value })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="mt-1 border-gray-200 focus:ring-black">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -60,20 +60,20 @@ export function AIResponseStyleCard({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             تحدد كيفية تفاعل الذكاء الاصطناعي مع العملاء
           </p>
         </div>
 
         <div>
-          <Label htmlFor="language">اللغة</Label>
+          <Label htmlFor="language" className="text-gray-700">اللغة</Label>
           <Select
             value={config.language}
             onValueChange={(value: AIResponderConfig["language"]) =>
               updateConfig({ language: value })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="mt-1 border-gray-200 focus:ring-black">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -87,9 +87,10 @@ export function AIResponseStyleCard({
         </div>
 
         <div>
-          <Label htmlFor="customInstructions">تعليمات إضافية</Label>
+          <Label htmlFor="customInstructions" className="text-gray-700">تعليمات إضافية</Label>
           <Textarea
             id="customInstructions"
+            className="mt-1 border-gray-200 focus-visible:ring-black resize-none"
             value={config.customInstructions ?? ""}
             onChange={(e) =>
               updateConfig({ customInstructions: e.target.value })
@@ -97,7 +98,7 @@ export function AIResponseStyleCard({
             placeholder="أضف تعليمات أو سياسات خاصة للذكاء الاصطناعي..."
             rows={4}
           />
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             توجيهات إضافية لضبط سلوك الذكاء الاصطناعي
           </p>
         </div>

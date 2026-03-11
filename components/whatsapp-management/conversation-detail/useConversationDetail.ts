@@ -56,8 +56,14 @@ export function useConversationDetail(
   const handleSendMessage = async () => {
     if (!newMessage.trim() || isSending || !conversation) return;
 
+    const convNumberId =
+      conversation.whatsappNumberId && conversation.whatsappNumberId > 0
+        ? conversation.whatsappNumberId
+        : undefined;
+
     const effectiveWaNumberId =
-      conversation.whatsappNumberId ?? activeWaNumberId ?? undefined;
+      convNumberId ??
+      (activeWaNumberId && activeWaNumberId > 0 ? activeWaNumberId : undefined);
 
     if (effectiveWaNumberId == null) {
       toast({

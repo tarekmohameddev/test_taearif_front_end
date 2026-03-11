@@ -5,12 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  CustomDropdown,
+  DropdownItem,
+} from "@/components/customComponents/customDropdown";
 import {
   Table,
   TableBody,
@@ -52,22 +49,25 @@ export function WaCampaignsTable({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle>قائمة الحملات</CardTitle>
-        <Select
-          value={statusFilter || "all"}
-          onValueChange={(v) => onStatusFilterChange(v === "all" ? "" : v)}
+        <CustomDropdown
+          trigger={
+            <span>
+              {statusFilter
+                ? STATUS_LABELS[statusFilter] ?? statusFilter
+                : "جميع الحالات"}
+            </span>
+          }
+          dropdownWidth="w-[180px]"
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="الحالة" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">جميع الحالات</SelectItem>
-            {Object.entries(STATUS_LABELS).map(([k, v]) => (
-              <SelectItem key={k} value={k}>
-                {v}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <DropdownItem onClick={() => onStatusFilterChange("")}>
+            جميع الحالات
+          </DropdownItem>
+          {Object.entries(STATUS_LABELS).map(([k, v]) => (
+            <DropdownItem key={k} onClick={() => onStatusFilterChange(k)}>
+              {v}
+            </DropdownItem>
+          ))}
+        </CustomDropdown>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -79,12 +79,12 @@ export function WaCampaignsTable({
         ) : (
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>الاسم</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead>الرقم</TableHead>
-                <TableHead>المستلمون / المرسل</TableHead>
-                <TableHead className="text-left">إجراءات</TableHead>
+              <TableRow className="bg-gray-900 hover:bg-gray-800">
+                <TableHead className="text-white">الاسم</TableHead>
+                <TableHead className="text-white">الحالة</TableHead>
+                <TableHead className="text-white">الرقم</TableHead>
+                <TableHead className="text-white">المستلمون / المرسل</TableHead>
+                <TableHead className="text-left text-white">إجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

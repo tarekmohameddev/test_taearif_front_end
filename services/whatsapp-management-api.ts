@@ -49,6 +49,14 @@ import {
   deleteWhatsAppTemplateApi,
   type ApiWhatsAppTemplate,
 } from "@/lib/services/whatsapp-templates-api";
+import {
+  getAIConfigApi,
+  putAIConfigApi,
+  patchAIConfigToggleApi,
+  getAIStatsApi,
+  type ApiAIConfig,
+  type ApiAIStats,
+} from "@/lib/services/whatsapp-ai-api";
 
 // Simulate API delay
 const delay = (ms: number = 500) =>
@@ -207,13 +215,18 @@ export async function getConversation(id: string): Promise<Conversation | null> 
     const phoneFallback =
       c.customer_phone ?? c.external_party_identifier ?? "";
 
+    const waId =
+      (c as any).wa_number_id ??
+      (c as any).whatsapp_number_id ??
+      undefined;
+
     const conv: Conversation = {
       id: String(c.id),
       customerId: "",
       customerName: nameFallback,
       customerPhone: phoneFallback,
       customerAvatar: undefined,
-      whatsappNumberId: (c.wa_number_id ?? c.whatsapp_number_id ?? 0) as number,
+      whatsappNumberId: (waId ?? 0) as number,
       lastMessage: lastMessageContent,
       lastMessageTime: lastTime,
       unreadCount: c.unread_count ?? 0,
@@ -254,10 +267,15 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
 
       const ts = m.created_at ?? m.sent_at ?? new Date().toISOString();
 
+      const msgContent =
+        m.content ??
+        (m as { body?: string }).body ??
+        (m as { text?: string }).text ??
+        "";
       return {
         id: String(m.id),
         conversationId: String(m.conversation_id ?? conversationId),
-        content: m.content ?? "",
+        content: msgContent,
         sender,
         senderName: m.sender_name ?? undefined,
         timestamp: ts,
@@ -276,6 +294,10 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
       };
     });
 
+    mapped.sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
     return mapped;
   } catch {
     await delay();
@@ -311,10 +333,15 @@ export async function sendMessage(
     const ts =
       apiMessage.created_at ?? apiMessage.sent_at ?? new Date().toISOString();
 
+    const apiContent =
+      apiMessage.content ??
+      (apiMessage as { body?: string }).body ??
+      (apiMessage as { text?: string }).text ??
+      content;
     const mapped: Message = {
       id: String(apiMessage.id),
       conversationId: String(apiMessage.conversation_id ?? conversationId),
-      content: apiMessage.content ?? "",
+      content: apiContent,
       sender,
       senderName: apiMessage.sender_name ?? undefined,
       timestamp: ts,
@@ -427,15 +454,22 @@ export async function getMessageTemplates(): Promise<MessageTemplate[]> {
     const apiTemplates = await listWhatsAppTemplates();
 
     const mapped: MessageTemplate[] = apiTemplates.map(
-      (t: ApiWhatsAppTemplate) => ({
-        id: String(t.id),
-        name: t.name ?? "",
-        content: t.content ?? "",
-        category: t.category ?? "general",
-        variables: Array.isArray(t.variables)
-          ? t.variables.filter((v): v is string => typeof v === "string")
-          : [],
-      })
+      (t: ApiWhatsAppTemplate) => {
+        const rawId = t.id ?? (t as { template_id?: number | string }).template_id;
+        const id =
+          rawId != null && rawId !== ""
+            ? String(rawId)
+            : "";
+        return {
+          id,
+          name: t.name ?? "",
+          content: t.content ?? "",
+          category: t.category ?? "general",
+          variables: Array.isArray(t.variables)
+            ? t.variables.filter((v): v is string => typeof v === "string")
+            : [],
+        };
+      }
     );
 
     return mapped;
@@ -450,8 +484,12 @@ export async function getMessageTemplate(
 ): Promise<MessageTemplate | null> {
   try {
     const t = await getWhatsAppTemplateApi(id);
+    const rawId =
+      (t as ApiWhatsAppTemplate).id ??
+      (t as { template_id?: number | string }).template_id ??
+      id;
     const mapped: MessageTemplate = {
-      id: String(t.id),
+      id: rawId != null && rawId !== "" ? String(rawId) : id,
       name: t.name ?? "",
       content: t.content ?? "",
       category: t.category ?? "general",
@@ -478,9 +516,14 @@ export async function createMessageTemplate(
     };
 
     const created = await createWhatsAppTemplateApi(body);
-
+    const createdRawId =
+      (created as ApiWhatsAppTemplate).id ??
+      (created as { template_id?: number | string }).template_id;
     const mapped: MessageTemplate = {
-      id: String(created.id),
+      id:
+        createdRawId != null && createdRawId !== ""
+          ? String(createdRawId)
+          : `template-${Date.now()}`,
       name: created.name ?? template.name,
       content: created.content ?? template.content,
       category: created.category ?? template.category,
@@ -501,10 +544,20 @@ export async function createMessageTemplate(
   }
 }
 
+function isInvalidTemplateId(id: string | number | undefined | null): boolean {
+  if (id == null) return true;
+  const s = String(id);
+  return s === "" || s === "undefined" || s.trim() === "";
+}
+
 export async function updateMessageTemplate(
   id: string,
   updates: Partial<MessageTemplate>
 ): Promise<MessageTemplate | null> {
+  const idStr = id != null ? String(id) : "";
+  if (isInvalidTemplateId(idStr)) {
+    return null;
+  }
   try {
     const body: Record<string, unknown> = {};
     if (updates.name !== undefined) body.name = updates.name;
@@ -512,10 +565,15 @@ export async function updateMessageTemplate(
     if (updates.category !== undefined) body.category = updates.category;
     if (updates.variables !== undefined) body.variables = updates.variables;
 
-    const updated = await updateWhatsAppTemplateApi(id, body);
-
+    const updated = await updateWhatsAppTemplateApi(idStr, body);
+    const updatedRawId =
+      (updated as ApiWhatsAppTemplate).id ??
+      (updated as { template_id?: number | string }).template_id;
     const mapped: MessageTemplate = {
-      id: String(updated.id),
+      id:
+        updatedRawId != null && updatedRawId !== ""
+          ? String(updatedRawId)
+          : idStr,
       name: updated.name ?? updates.name ?? "",
       content: updated.content ?? updates.content ?? "",
       category: updated.category ?? updates.category ?? "general",
@@ -538,6 +596,9 @@ export async function updateMessageTemplate(
 }
 
 export async function deleteMessageTemplate(id: string): Promise<boolean> {
+  if (isInvalidTemplateId(id)) {
+    return false;
+  }
   try {
     await deleteWhatsAppTemplateApi(id);
     return true;
@@ -825,62 +886,155 @@ export async function getAutomationStats(): Promise<AutomationStats> {
 }
 
 // ==================== AI Responder API ====================
+// GET/PUT /api/v1/whatsapp/ai/config/{numberId}, PATCH toggle, GET /api/v1/whatsapp/ai/stats
+
+function mapApiAIConfigToUI(api: ApiAIConfig | null, numberId: number): AIResponderConfig | null {
+  if (!api) return null;
+  const sid = api.wa_number_id ?? api.whatsapp_number_id ?? numberId;
+  const s = api.scenarios ?? {};
+  const start = api.business_hours_start ?? api.business_hours?.start ?? "09:00";
+  const end = api.business_hours_end ?? api.business_hours?.end ?? "18:00";
+  const tz = api.timezone ?? api.business_hours?.timezone ?? "";
+  const hasBusinessHours = api.business_hours_only === true || start || end || tz;
+  return {
+    id: String(api.id ?? ""),
+    whatsappNumberId: Number(sid),
+    enabled: Boolean(api.enabled),
+    businessHoursOnly: Boolean(api.business_hours_only),
+    businessHours: hasBusinessHours
+      ? { start, end, timezone: tz }
+      : undefined,
+    scenarios: {
+      initialGreeting: Boolean(s.initial_greeting),
+      faqResponses: Boolean(s.faq_responses),
+      propertyInquiryResponse: Boolean(s.property_inquiry_response),
+      appointmentBooking: Boolean(s.appointment_booking),
+      generalQuestions: Boolean(s.general_questions),
+    },
+    tone: (api.tone as AIResponderConfig["tone"]) ?? "friendly",
+    language: (api.language as AIResponderConfig["language"]) ?? "ar",
+    customInstructions: api.custom_instructions ?? undefined,
+    fallbackToHuman: Boolean(api.fallback_to_human ?? true),
+    fallbackDelay: Number(api.fallback_delay ?? 5),
+  };
+}
+
+function mapUIConfigToApiBody(config: Partial<AIResponderConfig>): Record<string, unknown> {
+  const body: Record<string, unknown> = {};
+  if (config.enabled !== undefined) body.enabled = config.enabled;
+  if (config.businessHoursOnly !== undefined) body.business_hours_only = config.businessHoursOnly;
+  if (config.businessHours !== undefined) {
+    body.business_hours_start = config.businessHours.start ?? null;
+    body.business_hours_end = config.businessHours.end ?? null;
+    body.timezone = config.businessHours.timezone ?? null;
+  }
+  if (config.scenarios !== undefined) {
+    body.scenarios = {
+      initial_greeting: config.scenarios.initialGreeting,
+      faq_responses: config.scenarios.faqResponses,
+      property_inquiry_response: config.scenarios.propertyInquiryResponse,
+      appointment_booking: config.scenarios.appointmentBooking,
+      general_questions: config.scenarios.generalQuestions,
+    };
+  }
+  if (config.tone !== undefined) body.tone = config.tone;
+  if (config.language !== undefined) body.language = config.language;
+  if (config.customInstructions !== undefined) body.custom_instructions = config.customInstructions;
+  if (config.fallbackToHuman !== undefined) body.fallback_to_human = config.fallbackToHuman;
+  if (config.fallbackDelay !== undefined) body.fallback_delay = config.fallbackDelay;
+  return body;
+}
+
+function mapApiAIStatsToUI(api: ApiAIStats | null): AIStats {
+  if (!api) return mockAIStats;
+  return {
+    totalResponses24h: Number(api.total_responses_24h ?? 0),
+    avgResponseTime: Number(api.avg_response_time ?? 0),
+    satisfactionRate: Number(api.satisfaction_rate ?? 0),
+    handoffRate: Number(api.handoff_rate ?? 0),
+  };
+}
 
 export async function getAIConfig(
   numberId: number
 ): Promise<AIResponderConfig | null> {
-  await delay();
-  return (
-    mockAIResponderConfigs.find((c) => c.whatsappNumberId === numberId) || null
-  );
+  try {
+    const api = await getAIConfigApi(numberId);
+    return mapApiAIConfigToUI(api, numberId);
+  } catch (err: unknown) {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+    if (status === 404) return null;
+    await delay();
+    return (
+      mockAIResponderConfigs.find((c) => c.whatsappNumberId === numberId) ||
+      null
+    );
+  }
 }
 
 export async function updateAIConfig(
   numberId: number,
   config: Partial<AIResponderConfig>
 ): Promise<AIResponderConfig | null> {
-  await delay();
-
-  const configIndex = mockAIResponderConfigs.findIndex(
-    (c) => c.whatsappNumberId === numberId
-  );
-
-  if (configIndex === -1) {
-    // Create new config
-    const newConfig: AIResponderConfig = {
-      id: `ai-config-${Date.now()}`,
-      whatsappNumberId: numberId,
-      enabled: false,
-      businessHoursOnly: false,
-      scenarios: {
-        initialGreeting: false,
-        faqResponses: false,
-        propertyInquiryResponse: false,
-        appointmentBooking: false,
-        generalQuestions: false,
-      },
-      tone: "friendly",
-      language: "ar",
-      fallbackToHuman: true,
-      fallbackDelay: 5,
+  try {
+    const body = mapUIConfigToApiBody(config);
+    const api = await putAIConfigApi(numberId, body as Parameters<typeof putAIConfigApi>[1]);
+    return mapApiAIConfigToUI(api, numberId);
+  } catch {
+    await delay();
+    const configIndex = mockAIResponderConfigs.findIndex(
+      (c) => c.whatsappNumberId === numberId
+    );
+    if (configIndex === -1) {
+      const newConfig: AIResponderConfig = {
+        id: `ai-config-${Date.now()}`,
+        whatsappNumberId: numberId,
+        enabled: false,
+        businessHoursOnly: false,
+        scenarios: {
+          initialGreeting: false,
+          faqResponses: false,
+          propertyInquiryResponse: false,
+          appointmentBooking: false,
+          generalQuestions: false,
+        },
+        tone: "friendly",
+        language: "ar",
+        fallbackToHuman: true,
+        fallbackDelay: 5,
+        ...config,
+      };
+      mockAIResponderConfigs.push(newConfig);
+      return newConfig;
+    }
+    mockAIResponderConfigs[configIndex] = {
+      ...mockAIResponderConfigs[configIndex],
       ...config,
     };
-    mockAIResponderConfigs.push(newConfig);
-    return newConfig;
+    return mockAIResponderConfigs[configIndex];
   }
-
-  mockAIResponderConfigs[configIndex] = {
-    ...mockAIResponderConfigs[configIndex],
-    ...config,
-  };
-
-  return mockAIResponderConfigs[configIndex];
 }
 
-export async function getAIStats(numberId?: number): Promise<AIStats> {
-  await delay();
-  // In a real implementation, this would filter by numberId
-  return mockAIStats;
+/** PATCH /api/v1/whatsapp/ai/config/{numberId}/toggle — toggle AI on/off. */
+export async function toggleAIConfig(
+  numberId: number
+): Promise<AIResponderConfig | null> {
+  try {
+    const api = await patchAIConfigToggleApi(numberId);
+    return mapApiAIConfigToUI(api, numberId);
+  } catch {
+    return null;
+  }
+}
+
+export async function getAIStats(_numberId?: number): Promise<AIStats> {
+  try {
+    const api = await getAIStatsApi();
+    return mapApiAIStatsToUI(api);
+  } catch {
+    await delay();
+    return mockAIStats;
+  }
 }
 
 // ==================== WhatsApp Numbers API ====================

@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Palette, Sparkles, Lock } from "lucide-react";
-import { COMPONENTS } from "@/lib/ComponentsList";
+import { COMPONENTS, getComponentByIdWithStructureAsync } from "@/lib/ComponentsList";
 import { useEditorT } from "@/context/editorI18nStore";
 import { useThemes } from "@/hooks/useThemes";
 import { findThemeForComponent } from "@/lib/themes/themeComponentLookup";
@@ -67,24 +67,29 @@ export function ThemeSelector({
   >({});
 
   useEffect(() => {
-    const newThemeOptions: Record<string, ThemeOption[]> = {};
-    for (const componentType in COMPONENTS) {
-      const component = COMPONENTS[componentType];
-      if (component && component.variants) {
-        newThemeOptions[componentType] = component.variants.map(
-          (variant: any) => ({
-            id: variant.id || variant,
-            name:
-              variant.name ||
-              `${component.displayName} ${(variant.id || variant).replace(componentType, "")}`,
-            image: "/placeholder.svg",
-            description: `${component.description} - ${variant.id || variant} variant`,
-            category: componentType,
-          }),
-        );
+    let cancelled = false;
+    (async () => {
+      const newThemeOptions: Record<string, ThemeOption[]> = {};
+      for (const type in COMPONENTS) {
+        const component = await getComponentByIdWithStructureAsync(type);
+        if (cancelled) return;
+        if (component && component.variants && Array.isArray(component.variants)) {
+          newThemeOptions[type] = component.variants.map(
+            (variant: any) => ({
+              id: variant.id || variant,
+              name:
+                variant.name ||
+                `${component.displayName} ${(variant.id || variant).toString().replace(type, "")}`,
+              image: "/placeholder.svg",
+              description: `${component.description} - ${variant.id || variant} variant`,
+              category: type,
+            }),
+          );
+        }
       }
-    }
-    setThemeOptions(newThemeOptions);
+      if (!cancelled) setThemeOptions(newThemeOptions);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const currentThemes = themeOptions[componentType] || [];

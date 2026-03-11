@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -81,15 +81,15 @@ export function SendCampaignDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>إرسال الحملة: {campaign?.name}</DialogTitle>
-          <DialogDescription>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-lg">
+      <CustomDialogContent className="sm:max-w-lg">
+        <CustomDialogHeader>
+          <CustomDialogTitle>إرسال الحملة: {campaign?.name}</CustomDialogTitle>
+          <CustomDialogDescription>
             اختر العملاء و/أو أدخل أرقاماً يدوية (8–16 رقم). مطلوب واحد على الأقل.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <div className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6" dir="rtl">
           <div>
             <Label>العملاء</Label>
             <CustomersCheckboxesDropdown
@@ -117,15 +117,15 @@ export function SendCampaignDialog({
             </Alert>
           )}
         </div>
-        <DialogFooter>
+        <CustomDialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
           <Button onClick={handleSubmit} disabled={submitting}>
             {submitting ? "جاري الإرسال..." : "إرسال"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

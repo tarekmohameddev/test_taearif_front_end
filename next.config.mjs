@@ -1,3 +1,9 @@
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
 let userConfig = undefined;
 try {
   userConfig = await import("./v0-user-next.config");
@@ -16,18 +22,22 @@ const nextConfig = {
   },
   experimental: {
     scrollRestoration: true,
-    // تحسين package imports - تقليل حجم bundle للمكتبات الكبيرة
+    // تحسين package imports - تقليل حجم bundle وتسريع الـ compile
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
       'recharts',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-alert-dialog',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-popover',
       '@radix-ui/react-select',
       '@radix-ui/react-tabs',
       '@radix-ui/react-tooltip',
       'date-fns',
       'react-hot-toast',
+      'sonner',
       'zustand',
     ],
   },
@@ -35,14 +45,14 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // تحسين cache
+  // تحسين cache للـ dev: الاحتفاظ بعدد أكبر من الصفحات المترجمة في الذاكرة لتقليل إعادة الـ compile
   onDemandEntries: {
-    maxInactiveAge: 60 * 1000,
-    pagesBufferLength: process.env.NODE_ENV === "development" ? 3 : 2,
+    maxInactiveAge: 90 * 1000,
+    pagesBufferLength: process.env.NODE_ENV === "development" ? 6 : 2,
   },
   output: process.platform === "win32" ? undefined : "standalone",
   
-  // تعطيل Turbopack - استخدام webpack فقط
+  // Turbopack: يُستخدم عند تشغيل `npm run dev` (next dev --turbopack). الإنتاج يستخدم webpack.
   turbopack: {},
   
   // ⬅️ Webpack configuration - فقط في PRODUCTION
@@ -181,4 +191,4 @@ function mergeConfig(nextConfig, userConfig) {
   }
 }
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

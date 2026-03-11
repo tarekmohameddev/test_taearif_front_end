@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { ComponentData } from "@/lib/types";
-import { COMPONENTS } from "@/lib/ComponentsList";
+import { COMPONENT_IDS_BY_SECTION } from "@/lib/ComponentsListGroups";
 import type { EditorStore } from "../types/types";
 import { getInitialState } from "./initialState";
 import { createDialogActions } from "./actions/dialogActions";
@@ -19,14 +19,16 @@ import { createDatabaseActions } from "./actions/databaseActions";
 import { isDebugEnabled } from "@/lib/debug/live-editor/core/config";
 import { storeTracker } from "@/lib/debug/live-editor/trackers/storeTracker";
 
+const ALL_COMPONENT_IDS = Object.values(COMPONENT_IDS_BY_SECTION).flat();
+
 export const useEditorStore = create<EditorStore>((set, get) => {
   const initialState = getInitialState();
 
   return {
     ...initialState,
 
-    // Dynamic component getters - generated from ComponentsList
-    componentGetters: Object.keys(COMPONENTS).reduce(
+    // Dynamic component getters - generated from component group ids (avoids pulling full ComponentsList)
+    componentGetters: ALL_COMPONENT_IDS.reduce(
       (acc, componentType) => {
         acc[componentType] = (variantId: string) => {
           const state = get();

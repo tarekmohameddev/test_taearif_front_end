@@ -2,13 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogDescription,
+  CustomDialogFooter,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
 import type { ApiWaCampaign } from "../types";
 
 export interface PauseConfirmDialogProps {
@@ -27,23 +27,23 @@ export function PauseConfirmDialog({
   onConfirm,
 }: PauseConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent dir="rtl">
-        <DialogHeader>
-          <DialogTitle>إيقاف مؤقت</DialogTitle>
-          <DialogDescription>
+    <CustomDialog open={open} onOpenChange={onOpenChange} maxWidth="max-w-md">
+      <CustomDialogContent>
+        <CustomDialogHeader>
+          <CustomDialogTitle>إيقاف مؤقت</CustomDialogTitle>
+          <CustomDialogDescription>
             هل تريد إيقاف الحملة «{campaign?.name}» مؤقتاً؟
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
+          </CustomDialogDescription>
+        </CustomDialogHeader>
+        <CustomDialogFooter dir="rtl">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             إلغاء
           </Button>
           <Button onClick={onConfirm} disabled={loading}>
             {loading ? "جاري..." : "إيقاف مؤقت"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+      </CustomDialogContent>
+    </CustomDialog>
   );
 }

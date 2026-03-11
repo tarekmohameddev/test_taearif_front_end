@@ -48,3 +48,10 @@ export const AI_MATCHING_REQUIRED = {
   budget: "الميزانية",
   location: "المنطقة أو المدينة",
 } as const;
+
+/** Label for "next action" section on grid card (all data from API) */
+export const NEXT_ACTION_LABEL = "الإجراء القادم";
+
+/** Purchase method / listing type from API: sale = للبيع, rent = للإيجار. Used for badge; only show when API returns value. */
+export const PURCHASE_METHOD_SALE_VALUES = ["sale", "بيع", "للبيع", "buy"] as const;
+export const PURCHASE_METHOD_RENT_VALUES = ["rent", "إيجار", "للإيجار"] as const;
