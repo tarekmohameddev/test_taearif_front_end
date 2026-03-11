@@ -68,14 +68,7 @@ function extractTenantFromHostname(hostname: string): string | null {
     "store",
   ];
 
-  // التحقق من Custom Domain (يحتوي على TLD مثل .com, .sa, .ae, .eg, إلخ)
-  const isCustomDomain = /\.([a-z]{2,})$/i.test(hostname);
-
-  if (isCustomDomain) {
-    // إذا كان Custom Domain، إرجاع الـ hostname نفسه
-    return hostname;
-  }
-
+  // التحقق من subdomain أولاً حتى لا يُعتبر kkkkk.localhost custom domain
   // For localhost development: tenant1.localhost -> tenant1
   if (hostname.includes(localDomain)) {
     const parts = hostname.split(".");
@@ -96,6 +89,12 @@ function extractTenantFromHostname(hostname: string): string | null {
         return potentialTenantId;
       }
     }
+  }
+
+  // التحقق من Custom Domain (TLD حقيقي مثل .com, .sa): إرجاع الـ hostname كما هو
+  const isCustomDomain = /\.([a-z]{2,})$/i.test(hostname);
+  if (isCustomDomain) {
+    return hostname;
   }
 
   return null;
