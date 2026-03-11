@@ -8,10 +8,15 @@ import { ComponentState, createDefaultData, updateDataByPath } from "./types";
  * The remaining 1% (visibility controls) are added at the end to allow
  * fine-grained control over which cards and fields are visible.
  */
-export const getDefaultInputs2Data = (): ComponentData => ({
+export const getDefaultInputs2Data = (): ComponentData => {
   // NOTE: keep endpoint derived from NEXT_PUBLIC_Backend_URLWithOutApi
   // so tenant deployments can switch backend without code changes.
-  visible: true,
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_Backend_URLWithOutApi || "https://api.taearif.com"
+  ).replace(/\/+$/, "");
+
+  return {
+    visible: true,
   texts: {
     title: "Advanced Inputs System Title",
     subtitle: "This is a sample subtitle for the section.",
@@ -39,19 +44,17 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     accentColor: "#60a5fa",
     submitButtonGradient: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)",
   },
-  submitButton: {
-    text: "إرسال",
-    show: true,
-    className: "max-w-[50%]",
-    backgroundColor: "#059669",
-    textColor: "#ffffff",
-    hoverColor: "#067a55",
-    borderRadius: "8px",
-    padding: "12px 24px",
-    apiEndpoint: `${(process.env.NEXT_PUBLIC_Backend_URLWithOutApi ||
-      "https://api.taearif.com")
-      .replace(/\/+$/, "")}/api/v1/property-requests/public`,
-  },
+    submitButton: {
+      text: "إرسال",
+      show: true,
+      className: "max-w-[50%]",
+      backgroundColor: "#059669",
+      textColor: "#ffffff",
+      hoverColor: "#067a55",
+      borderRadius: "8px",
+      padding: "12px 24px",
+      apiEndpoint: `${baseUrl}/api/v1/property-requests/public`,
+    },
   cardsLayout: {
     columns: "1",
     gap: "24px",
@@ -115,7 +118,7 @@ export const getDefaultInputs2Data = (): ComponentData => ({
     whatsapp: false,
     notes: false,
   },
-  cards: [
+    cards: [
     {
       title: "معلومات العقار المطلوب",
       description: null,
@@ -490,8 +493,9 @@ export const getDefaultInputs2Data = (): ComponentData => ({
         },
       ],
     },
-  ],
-});
+    ],
+  };
+};
 
 export const inputs2Functions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
