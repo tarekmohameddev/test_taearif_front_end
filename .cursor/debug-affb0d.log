@@ -1000,3 +1000,6 @@
 {"sessionId":"affb0d","runId":"initial","hypothesisId":"H2","location":"app/AuthGate.tsx:132","message":"AuthGate: rendering ClientLayoutAuth (access granted)","data":{"pathname":"/ar/live-editor/contact-us","hasSession":true},"timestamp":1773266008983}
 {"sessionId":"affb0d","runId":"initial","hypothesisId":"H3","location":"app/ClientLayout.tsx:37","message":"ClientLayout: path does NOT require AuthGate","data":{"pathname":"/api/user/getData"},"timestamp":1773266011004}
 {"sessionId":"affb0d","runId":"initial","hypothesisId":"H3","location":"app/ClientLayout.tsx:37","message":"ClientLayout: path does NOT require AuthGate","data":{"pathname":"/api/user/getData"},"timestamp":1773266011658}
+{"sessionId":"affb0d","runId":"initial","hypothesisId":"H3","location":"app/ClientLayout.tsx:37","message":"ClientLayout: path does NOT require AuthGate","data":{"pathname":"/ar/for-rent"},"timestamp":1773269004016}
+{"sessionId":"affb0d","runId":"initial","hypothesisId":"H3","location":"app/ClientLayout.tsx:37","message":"ClientLayout: path does NOT require AuthGate","data":{"pathname":"/ar/for-rent"},"timestamp":1773269005407}
+{"sessionId":"affb0d","runId":"initial","hypothesisId":"H3","location":"app/ClientLayout.tsx:37","message":"ClientLayout: path does NOT require AuthGate","data":{"pathname":"/ar/for-rent"},"timestamp":1773269005409}
