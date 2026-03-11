@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axiosInstance from "@/lib/axiosInstance";
-import useStore from "@/context/Store";
+import useProjectsStore from "@/context/projectsStore";
 import {
   Dialog,
   DialogContent,
@@ -144,7 +144,7 @@ export function ProjectsManagementPage() {
     },
     setProjectsManagement,
     fetchProjects,
-  } = useStore();
+  } = useProjectsStore();
 
   // Debug logging for state
   console.log("=== COMPONENT STATE DEBUGGING ===");

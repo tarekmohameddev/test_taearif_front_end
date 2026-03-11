@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useStore from "@/context/Store";
+import useMarketingStore from "@/context/marketingStore";
 import useAuthStore from "@/context/AuthContext";
 import { StatusChangeDialog } from "../status-change-dialog";
 import { PaymentCollectionDialog } from "../../payment-collection-dialog";
@@ -44,21 +45,18 @@ export function RentalApplicationsService({
   paymentsDueToDate = "",
 }: RentalApplicationsServiceProps) {
   const router = useRouter();
-  const {
-    rentalApplications,
-    setRentalApplications,
-    openRentalDetailsDialog,
-    openPaymentCollectionDialog,
-    openRentalWhatsAppDialog,
-    closeRentalWhatsAppDialog,
-    marketingChannels,
-    fetchMarketingChannels,
-  } = useStore();
+  const rentalApplications = useStore((state) => state.rentalApplications);
+  const setRentalApplications = useStore((state) => state.setRentalApplications);
+  const openRentalDetailsDialog = useStore((state) => state.openRentalDetailsDialog);
+  const openPaymentCollectionDialog = useStore((state) => state.openPaymentCollectionDialog);
+  const openRentalWhatsAppDialog = useStore((state) => state.openRentalWhatsAppDialog);
+  const closeRentalWhatsAppDialog = useStore((state) => state.closeRentalWhatsAppDialog);
+  const { marketingChannels, fetchMarketingChannels } = useMarketingStore();
 
   const { userData } = useAuthStore();
 
   const {
-    rentals,
+    rentals = [],
     pagination,
     loading,
     error,
@@ -73,8 +71,8 @@ export function RentalApplicationsService({
     deletingRental,
     isDeleting,
     isInitialized,
-    lastProcessedOpenAddDialogCounter,
-  } = rentalApplications;
+    lastProcessedOpenAddDialogCounter = -1,
+  } = rentalApplications ?? {};
 
   // Use the new filters hook (like Properties)
   const filterHooks = useRentalFiltersState();

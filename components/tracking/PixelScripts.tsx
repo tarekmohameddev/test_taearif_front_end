@@ -117,19 +117,21 @@ export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) 
       try {
         const data = await fetchTenantPixels(tenantId);
         setPixels(data);
-        
-        // ⭐ من Claude: Initialize dataLayer for GTM
+
+        // Initialize dataLayer and push high-level tenant info only once
         initializeDataLayer();
-        
-        // ⭐ من Claude: Set tenant info in dataLayer
         setTenantInfo(tenantId, {
           tenantType: "real_estate",
-          loadedPixels: data.map(p => p.provider),
+          loadedPixels: data.map((p) => p.provider),
         });
-        
-        console.log("🎯 Pixels loaded for tenant:", tenantId, data);
+
+        if (process.env.NODE_ENV === "development") {
+          console.log("🎯 Pixels loaded for tenant:", tenantId, data);
+        }
       } catch (error) {
-        console.error("Failed to fetch pixels:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Failed to fetch pixels:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -138,14 +140,13 @@ export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) 
     loadPixels();
   }, [tenantId]);
 
-  // ⭐ من Gemini: تتبع عميق لتغييرات المسار (Deep Tracking)
+  // تتبع تغييرات المسار (virtual pageview) بطريقة خفيفة
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.dataLayer = window.dataLayer || [];
       
       const fullPath = pathname + (searchParams?.toString() ? "?" + searchParams.toString() : "");
       
-      // ⭐ من Gemini: دفع حدث مخصص لـ GTM لضمان التقاط الصفحات في الـ SPA (Next.js)
       window.dataLayer.push({
         event: "virtual_pageview", // ⭐ من Gemini
         page_path: fullPath,
@@ -235,43 +236,8 @@ export default function PixelScripts({ tenantId, pageType }: PixelScriptsProps) 
               />
             );
           case "gtm":
-            // ⭐ CRITICAL FIX: GTM needs full ID with GTM- prefix
-            // ⭐ من Gemini + Claude: التأكد القاطع من وجود بادئة GTM-
-            let gtmId = pixel.externalId.trim();
-            
-            // Check if already has GTM- prefix (case-insensitive)
-            if (!gtmId.toUpperCase().startsWith("GTM-")) {
-              // Remove any existing gtm- prefix first (case-insensitive)
-              gtmId = gtmId.replace(/^gtm-/i, "");
-              // Add GTM- prefix in uppercase
-              gtmId = `GTM-${gtmId}`;
-            } else {
-              // Normalize to uppercase GTM-
-              gtmId = gtmId.replace(/^gtm-/i, "GTM-");
-            }
-            
-            // ⭐ FIX: استخدام gtmId بعد إزالة البادئة لتجنب التكرار في id
-            const idWithoutPrefix = gtmId.replace(/^GTM-/i, "");
-            const gtmScriptId = `gtm-${idWithoutPrefix.toLowerCase()}`;
-            const gtmKey = pixel._id || gtmScriptId;
-            
-            // Debug log to verify GTM loading
-            console.log("🔵 GTM Pixel Loading:", {
-              originalExternalId: pixel.externalId,
-              normalizedGtmId: gtmId,
-              scriptId: gtmScriptId,
-              provider: pixel.provider,
-              settings: pixel.settings,
-            });
-            
-            return (
-              <GTMScriptLoader
-                key={gtmKey}
-                gtmId={gtmId}
-                scriptId={gtmScriptId}
-                tenantId={tenantId}
-              />
-            );
+            // تم نقل تحميل GTM الرئيسي إلى GTMProvider؛ نتجنب تحميل حاويات إضافية هنا
+            return null;
           default:
             return null;
         }

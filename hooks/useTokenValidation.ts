@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 
@@ -23,6 +23,7 @@ export const useTokenValidation = () => {
   const isValidatingRef = useRef(false);
 
   const router = useRouter();
+  const pathname = usePathname();
   const logout = useAuthStore((state) => state.logout);
   const setUserData = useAuthStore((state) => state.setUserData);
   const setUserIsLogged = useAuthStore((state) => state.setUserIsLogged);
@@ -31,7 +32,9 @@ export const useTokenValidation = () => {
 
   const fetchUserInfo = async () => {
     try {
-      const userInfoResponse = await fetch("/api/user/getUserInfo");
+      const userInfoResponse = await fetch("/api/user/getUserInfo", {
+        credentials: "include",
+      });
       const userData = await userInfoResponse.json();
       setUserDataState(userData);
       return userData;
@@ -287,7 +290,8 @@ export const useTokenValidation = () => {
 
   const handleInvalidToken = () => {
     clearAllCookies();
-    router.push("/login");
+    const loginPath = pathname?.startsWith("/ar") ? "/ar/login" : "/login";
+    router.push(loginPath);
   };
 
   useEffect(() => {
@@ -318,6 +322,13 @@ export const useTokenValidation = () => {
       const userInfo = await fetchUserInfo();
 
       if (!userInfo || !userInfo.token) {
+        // بعد تسجيل الدخول مباشرة، الـ store قد يكون محدثاً بينما الـ API لم يُحدّث بعد
+        const storeToken = useAuthStore.getState().userData?.token;
+        const storeLogged = useAuthStore.getState().UserIslogged;
+        if (storeToken && storeLogged) {
+          validateToken(storeToken);
+          return;
+        }
         setTokenValidation({
           isValid: false,
           message: "لا يوجد token",

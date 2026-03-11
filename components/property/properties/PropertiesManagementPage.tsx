@@ -84,19 +84,18 @@ export function PropertiesManagementPage({
 
   const { clickedONSubButton, userData, IsLoading: authLoading } = useAuthStore();
   const router = useRouter();
+  const propertiesManagement = useStore((state) => state.propertiesManagement);
+  const setPropertiesManagement = useStore((state) => state.setPropertiesManagement);
   const {
-    propertiesManagement: {
-      viewMode,
-      favorites,
-      properties,
-      loading,
-      error,
-      pagination,
-      propertiesAllData,
-      incompleteCount,
-    },
-    setPropertiesManagement,
-  } = useStore();
+    viewMode,
+    favorites,
+    properties = [],
+    loading,
+    error,
+    pagination,
+    propertiesAllData,
+    incompleteCount = 0,
+  } = propertiesManagement ?? {};
 
   // Use custom hooks
   const filterHooks = usePropertyFilters();

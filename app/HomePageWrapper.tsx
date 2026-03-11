@@ -2,18 +2,9 @@
 
 import PixelScripts from "@/components/tracking/PixelScripts";
 
-import {
-  Suspense,
-  lazy,
-  useEffect,
-  useMemo,
-  Fragment,
-  useCallback,
-  useRef,
-} from "react";
+import { Suspense, lazy, useEffect, useMemo, Fragment, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PAGE_DEFINITIONS } from "@/lib/defaultComponents";
-import { useAuth } from "@/context/AuthContext";
 import useTenantStore from "@/context/tenantStore";
 import {
   getSectionPath,
@@ -263,7 +254,6 @@ export default function HomePageWrapper({
   tenantId,
   domainType = "subdomain",
 }: HomePageWrapperProps) {
-  const { user, loading } = useAuth();
   const router = useRouter();
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);

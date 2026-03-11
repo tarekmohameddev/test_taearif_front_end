@@ -111,7 +111,9 @@ export function createAuthActions(set, get) {
 
     fetchUserData: async () => {
       set({ IsLoading: true, error: null });
-      if (get().IsDone === true) return;
+      if (get().IsDone === true) {
+        return;
+      }
       set({ IsDone: true, error: null });
       try {
         let userData;

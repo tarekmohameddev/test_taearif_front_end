@@ -1,4 +1,7 @@
 // context/Store.js
+// Combined store for backward compatibility. For compile performance, use dedicated
+// slice stores when a component needs only one slice (e.g. useSidebarStore from
+// context/sidebarStore for sidebarData/fetchSideMenus). Modules: context/store/*.js
 import { create } from "zustand";
 import axiosInstance from "@/lib/axiosInstance";
 

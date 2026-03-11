@@ -7,7 +7,6 @@ import {
   trackPageView,
   setTenantContext,
 } from "@/lib/ga4-tracking";
-import useTenantStore from "@/context/tenantStore";
 
 interface GA4ProviderProps {
   tenantId: string | null;
@@ -22,9 +21,6 @@ export default function GA4Provider({
 }: GA4ProviderProps) {
   const pathname = usePathname();
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // الحصول على username من tenantStore (للـ custom domains)
-  const tenantData = useTenantStore((s) => s.tenantData);
 
   // Initialize GA4 only once
   useEffect(() => {
@@ -48,21 +44,10 @@ export default function GA4Provider({
     if (typeof window === "undefined") return;
 
     const currentDomain = window.location.hostname;
+    // Use explicit tenantId when available; otherwise fall back to domain-derived id
     const domainTenantId = getTenantIdFromDomain(currentDomain);
-
-    // Use tenantId if it's a valid string, otherwise use domainTenantId
-    // This prevents empty strings from being used
     let finalTenantId =
       tenantId && tenantId.trim() !== "" ? tenantId : domainTenantId;
-
-    // ✅ للـ custom domains: استخدم username من API بدلاً من domain
-    if (domainType === "custom" && tenantData?.username) {
-      finalTenantId = tenantData.username;
-      console.log(
-        "🌐 GA4: Using username from API for custom domain:",
-        finalTenantId,
-      );
-    }
 
     // Only track if we have a valid tenant ID (not empty, not null, not 'www')
     const isValidTenantId =
@@ -80,16 +65,17 @@ export default function GA4Provider({
         trackPageView(finalTenantId, pathname);
       }, 500);
     } else {
-      console.warn("⚠️ Missing required data for tracking:", {
-        finalTenantId,
-        pathname,
-        isInitialized,
-        isValidTenantId,
-        domainType,
-        tenantDataUsername: tenantData?.username,
-      });
+      if (process.env.NODE_ENV === "development") {
+        console.warn("⚠️ Missing required data for GA4 tracking:", {
+          finalTenantId,
+          pathname,
+          isInitialized,
+          isValidTenantId,
+          domainType,
+        });
+      }
     }
-  }, [tenantId, pathname, isInitialized, domainType, tenantData?.username]);
+  }, [tenantId, pathname, isInitialized, domainType]);
 
   return <>{children}</>;
 }

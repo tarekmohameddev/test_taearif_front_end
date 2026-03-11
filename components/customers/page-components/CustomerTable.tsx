@@ -51,7 +51,7 @@ import {
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import useStore from "@/context/Store";
+import useMarketingStore from "@/context/marketingStore";
 import { WhatsAppSendDialog } from "@/components/marketing/whatsapp-send-dialog";
 import axiosInstance from "@/lib/axiosInstance";
 import {
@@ -89,7 +89,7 @@ export const CustomerTable = ({
   onPageChange,
   loading,
 }: any) => {
-  const { marketingChannels, fetchMarketingChannels } = useStore();
+  const { marketingChannels, fetchMarketingChannels } = useMarketingStore();
   const [showWhatsAppDialog, setShowWhatsAppDialog] = useState(false);
   const [selectedCustomerForWhatsApp, setSelectedCustomerForWhatsApp] =
     useState<any>(null);

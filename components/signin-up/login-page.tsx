@@ -2,8 +2,8 @@
 "use client";
 import Image from "next/image";
 import type React from "react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, AlertCircle, LogOut, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,10 +23,13 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { signIn, getSession } from "next-auth/react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
 import { LoginPageWithReCaptcha } from "./LoginPageWithReCaptcha";
+import { hasSessionSync } from "@/lib/session";
 
 function LoginPageContent() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const hasRedirectedToDashboardRef = useRef(false);
 
   // Token validation
   const { tokenValidation: tokenValidationHook } = useTokenValidation();
@@ -127,51 +130,20 @@ function LoginPageContent() {
     const urlParams = new URLSearchParams(window.location.search);
     const hasToken = urlParams.get("token");
 
-    // التحقق من وجود بيانات في localStorage أيضاً
-    let hasLocalStorageData = false;
-    if (typeof window !== "undefined") {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          if (parsedUser && parsedUser.email) {
-            hasLocalStorageData = true;
-          }
-        }
-      } catch (error) {
-        // تجاهل الأخطاء في قراءة localStorage
-      }
-    }
+    // إعادة التوجيه فقط إذا لم يكن هناك token (تسجيل دخول جديد)،
+    // ولا يوجد dialog مفتوح، وتوجد جلسة محفوظة بحسب نفس منطق AuthGate.
+    const hasSession = hasSessionSync();
 
-    // التحقق من وجود cookie authToken
-    let hasAuthCookie = false;
-    if (typeof window !== "undefined") {
-      try {
-        const cookies = document.cookie.split(";");
-        hasAuthCookie = cookies.some((cookie) =>
-          cookie.trim().startsWith("authToken=")
-        );
-      } catch (error) {
-        // تجاهل الأخطاء في قراءة cookies
-      }
-    }
-
-    // إعادة التوجيه فقط إذا كانت هناك بيانات فعلية من store أو localStorage أو cookie
-    // وإذا لم يكن هناك token في URL (لأن token في URL يعني تسجيل دخول جديد)
-    // وإذا لم يكن هناك dialog مفتوح
-    if (
-      !hasToken &&
-      !showLogoutDialog &&
-      (userData?.email || hasLocalStorageData || hasAuthCookie)
-    ) {
-      // إضافة تأخير بسيط للتأكد من اكتمال أي عمليات جلب بيانات
+    if (!hasToken && !showLogoutDialog && hasSession && !hasRedirectedToDashboardRef.current) {
+      hasRedirectedToDashboardRef.current = true;
+      // Full page navigation so proxy can redirect /dashboard → /ar/dashboard and rewrite to /dashboard (avoids RSC fetch matching [...slug])
       const redirectTimer = setTimeout(() => {
-        router.push("/dashboard");
+        window.location.assign("/dashboard");
       }, 100);
 
       return () => clearTimeout(redirectTimer);
     }
-  }, [userData, router, showLogoutDialog]);
+  }, [router, showLogoutDialog, pathname]);
 
   useEffect(() => {
     if (googleToken) {
@@ -330,7 +302,7 @@ function LoginPageContent() {
     setIsLoading(false);
 
     if (result.success) {
-      router.push("/dashboard");
+      window.location.assign("/dashboard");
     } else {
       setErrors((prev) => ({
         ...prev,
@@ -463,7 +435,7 @@ function LoginPageContent() {
     if (typeof window !== "undefined") {
       window.history.replaceState({}, document.title, "/login");
     }
-    router.push("/dashboard");
+    window.location.assign("/dashboard");
   };
 
   // تسجيل الدخول بالطريقة التقليدية
@@ -535,7 +507,7 @@ function LoginPageContent() {
           general: result.error || "فشل تسجيل الدخول",
         }));
       } else {
-        router.push("/dashboard");
+        window.location.assign("/dashboard");
       }
     } catch (error) {
       const rawMessage =

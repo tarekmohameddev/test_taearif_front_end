@@ -56,7 +56,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import axiosInstance from "@/lib/axiosInstance";
-import useStore from "@/context/Store";
+import { usePropertiesStore } from "@/context/propertiesStore";
 import EmptyState from "@/components/empty-state";
 import { ErrorDisplay } from "@/components/ui/error-display";
 import { ActiveFiltersDisplay } from "@/components/property/active-filters-display";
@@ -818,7 +818,7 @@ export function IncompletePropertiesManagementPage() {
       pagination,
     },
     setIncompletePropertiesManagement,
-  } = useStore();
+  } = usePropertiesStore();
 
   const [reorderPopup, setReorderPopup] = useState<{
     open: boolean;

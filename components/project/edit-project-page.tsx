@@ -78,7 +78,6 @@ const uploadVideos = async (files: File[]) => {
 
   return uploadedFiles;
 };
-import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
@@ -98,10 +97,6 @@ type ProjectImage = {
 
 export default function EditProjectPage(): JSX.Element {
   const { userData } = useAuthStore();
-  const {
-    projectsManagement: { projects, loading, isInitialized },
-    setProjectsManagement,
-  } = useStore();
   const router = useRouter();
   const { id } = useParams();
   const [originalData, setOriginalData] = useState(null);

@@ -47,7 +47,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import useAuthStore from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
-import useStore from "@/context/Store";
+import useSidebarStore from "@/context/sidebarStore";
 import axiosInstance from "@/lib/axiosInstance";
 import { cn } from "@/lib/utils";
 import {
@@ -69,7 +69,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  const { sidebarData, fetchSideMenus } = useStore();
+  const { sidebarData, fetchSideMenus } = useSidebarStore();
   const { mainNavItems, loading, error } = sidebarData;
   const [currentPlan, setCurrentPlan] = useState<PlanData | null>(null);
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);

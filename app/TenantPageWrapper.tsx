@@ -1,18 +1,22 @@
 "use client";
 
-import { Suspense, lazy, Fragment, useMemo, useEffect } from "react";
+import { Suspense, lazy, Fragment, useMemo, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import useTenantStore from "@/context/tenantStore";
-import { useEditorStore } from "@/context/editorStore";
+import useTenantViewStore from "@/context/tenantViewStore";
+import { useTenantStaticPagesStore } from "@/context/tenantStaticPagesStore";
 import { notFound } from "next/navigation";
 import {
   getSectionPath,
   getComponentSubPath,
-} from "@/lib/ComponentsList";
-import StaticHeader1 from "@/components/tenant/header/StaticHeader1";
+} from "@/lib/componentPaths";
+import StaticHeader1Viewer, {
+  StaticHeader1ViewerData,
+} from "@/components/tenant/header/StaticHeader1Viewer";
+import StaticFooter1Viewer, {
+  StaticFooter1ViewerData,
+} from "@/components/tenant/footer/StaticFooter1Viewer";
 import Header1 from "@/components/tenant/header/header1";
 import Header2 from "@/components/tenant/header/header2";
-import StaticFooter1 from "@/components/tenant/footer/StaticFooter1";
 import Footer1 from "@/components/tenant/footer/footer1";
 import Footer2 from "@/components/tenant/footer/footer2";
 import PropertyDetail1 from "@/components/tenant/propertyDetail/propertyDetail1";
@@ -21,16 +25,10 @@ import { I18nProvider } from "@/components/providers/I18nProvider";
 import { LanguageDropdown } from "@/components/tenant/LanguageDropdown";
 import { PAGE_DEFINITIONS } from "@/lib/defaultComponents";
 import { SkeletonLoader } from "@/components/skeleton";
-import {
-  StaticHeaderSkeleton1,
-  HeroSkeleton1,
-  HeroSkeleton2,
-  FilterButtonsSkeleton1,
-  GridSkeleton1,
-  HalfTextHalfImageSkeleton1,
-  ContactCardsSkeleton1,
-} from "@/components/skeleton";
-import { HeaderSkeleton } from "@/components/skeleton/HeaderSkeleton";
+const TenantPageSkeleton = dynamic(
+  () => import("@/app/TenantPageSkeleton").then((m) => m.default),
+  { ssr: true }
+);
 import {
   shouldCenterComponent,
   getCenterWrapperClasses,
@@ -58,123 +56,80 @@ const headerComponentsCache = new Map<string, any>();
 // ⭐ Cache للـ footer components
 const footerComponentsCache = new Map<string, any>();
 
-// Load header component dynamically
+// Load header component dynamically (viewer-optimized + cached)
 const loadHeaderComponent = (componentName: string) => {
   if (!componentName) return null;
 
-  // ⭐ Check cache first
-  if (headerComponentsCache.has(componentName)) {
-    return headerComponentsCache.get(componentName);
-  }
+  const cached = headerComponentsCache.get(componentName);
+  if (cached) return cached;
 
-  // Handle StaticHeader1 specially (no number suffix)
-  if (componentName === "StaticHeader1") {
-    const component = lazy(() =>
-      import(`@/components/tenant/header/StaticHeader1`).catch(() => ({
-        default: StaticHeader1,
-      })),
-    );
-    headerComponentsCache.set(componentName, component);
-    return component;
-  }
-
-  // ⭐ Direct import for known header components (more reliable than dynamic import)
   const headerComponentMap: Record<string, any> = {
     header1: Header1,
     header2: Header2,
   };
 
-  if (headerComponentMap[componentName]) {
-    // Wrap in lazy for Suspense compatibility
-    const component = lazy(() =>
-      Promise.resolve({ default: headerComponentMap[componentName] }),
+  let Component: any = headerComponentMap[componentName];
+
+  if (!Component) {
+    const match = componentName?.match(/^(.*?)(\d+)$/);
+    if (!match) return null;
+
+    const baseName = match[1];
+    const subPath = getComponentSubPath(baseName);
+    if (!subPath) {
+      return null;
+    }
+
+    const fullPath = `${subPath}/${componentName}`;
+
+    Component = dynamic(
+          () => import(`@/components/tenant/${fullPath}`),
+      { ssr: false },
     );
-    headerComponentsCache.set(componentName, component);
-    return component;
   }
 
-  // Fallback to dynamic import for other header variants
-  const match = componentName?.match(/^(.*?)(\d+)$/);
-  if (!match) return null;
-
-  const baseName = match[1];
-  const subPath = getComponentSubPath(baseName);
-  if (!subPath) {
-    return null;
-  }
-
-  const fullPath = `${subPath}/${componentName}`;
-
-  const component = dynamic(
-    () =>
-      import(`@/components/tenant/${fullPath}`).catch(() => {
-        return { default: StaticHeader1 };
-      }),
-    { ssr: false },
-  );
-
-  // ⭐ Cache the component
-  headerComponentsCache.set(componentName, component);
-  return component;
+  headerComponentsCache.set(componentName, Component);
+  return Component;
 };
 
-// Load footer component dynamically (same logic as header)
+// Load footer component dynamically (viewer-optimized + cached)
 const loadFooterComponent = (componentName: string) => {
   if (!componentName) return null;
 
-  // ⭐ Check cache first
-  if (footerComponentsCache.has(componentName)) {
-    return footerComponentsCache.get(componentName);
-  }
+  const cached = footerComponentsCache.get(componentName);
+  if (cached) return cached;
 
-  // Handle StaticFooter1 specially (no number suffix)
-  if (componentName === "StaticFooter1") {
-    const component = lazy(() =>
-      import(`@/components/tenant/footer/StaticFooter1`).catch(() => ({
-        default: StaticFooter1,
-      })),
-    );
-    footerComponentsCache.set(componentName, component);
-    return component;
-  }
-
-  // ⭐ Direct import for known footer components
   const footerComponentMap: Record<string, any> = {
     footer1: Footer1,
     footer2: Footer2,
   };
 
-  if (footerComponentMap[componentName]) {
-    const component = lazy(() =>
-      Promise.resolve({ default: footerComponentMap[componentName] }),
+  let Component: any = footerComponentMap[componentName];
+
+  if (!Component) {
+    const match = componentName?.match(/^(.*?)(\d+)$/);
+    if (!match) return null;
+
+    const baseName = match[1];
+    const subPath = getComponentSubPath(baseName);
+    if (!subPath) {
+      return null;
+    }
+
+    const fullPath = `${subPath}/${componentName}`;
+
+    Component = dynamic(
+      () => import(`@/components/tenant/${fullPath}`),
+      { ssr: false },
     );
-    footerComponentsCache.set(componentName, component);
-    return component;
   }
 
-  // Fallback to dynamic import for other footer variants
-  const match = componentName?.match(/^(.*?)(\d+)$/);
-  if (!match) return null;
-
-  const baseName = match[1];
-  const subPath = getComponentSubPath(baseName);
-  if (!subPath) {
-    return null;
-  }
-
-  const fullPath = `${subPath}/${componentName}`;
-
-  const component = dynamic(
-    () =>
-      import(`@/components/tenant/${fullPath}`).catch(() => {
-        return { default: StaticFooter1 };
-      }),
-    { ssr: false },
-  );
-
-  footerComponentsCache.set(componentName, component);
-  return component;
+  footerComponentsCache.set(componentName, Component);
+  return Component;
 };
+
+// Generic component loader with simple memoized cache keyed by section+name
+const genericComponentsCache = new Map<string, any>();
 
 const loadComponent = (section: string, componentName: string) => {
   if (!componentName) return null;
@@ -207,6 +162,10 @@ const loadComponent = (section: string, componentName: string) => {
 
   // استخدام القائمة المركزية للحصول على مسارات المكونات الفرعية
   // ⭐ IMPORTANT: baseName should be "propertyDetail" (with capital P and D) to match COMPONENTS key
+  const cacheKey = `${section}:${componentName}`;
+  const cached = genericComponentsCache.get(cacheKey);
+  if (cached) return cached;
+
   const subPath = getComponentSubPath(baseName);
   if (!subPath) {
     // استخدام fallback للمكونات غير المعروفة
@@ -252,7 +211,6 @@ const loadComponent = (section: string, componentName: string) => {
   }
   const fullPath = `${subPath}/${fileName}`;
 
-
   const component = lazy(() =>
     import(`@/components/tenant/${fullPath}`).catch((error) => {
       if (process.env.NODE_ENV === "development") {
@@ -274,6 +232,7 @@ const loadComponent = (section: string, componentName: string) => {
     }),
   );
 
+  genericComponentsCache.set(cacheKey, component);
   return component;
 };
 
@@ -292,12 +251,12 @@ export default function TenantPageWrapper({
 }: TenantPageWrapperProps) {
 
 
-  const tenantData = useTenantStore((s) => s.tenantData);
-  const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
-  const setTenantId = useTenantStore((s) => s.setTenantId);
-  const staticPagesData = useEditorStore((s) => s.staticPagesData);
-  const getStaticPageData = useEditorStore((s) => s.getStaticPageData);
+  const tenantData = useTenantViewStore((s: any) => s.tenantData);
+  const loadingTenantData = useTenantViewStore((s: any) => s.loadingTenantData);
+  const fetchTenantData = useTenantViewStore((s: any) => s.fetchTenantData);
+  const setTenantId = useTenantViewStore((s: any) => s.setTenantId);
+  const staticPagesData = useTenantStaticPagesStore((s) => s.staticPagesData);
+  const getStaticPageData = useTenantStaticPagesStore((s) => s.getStaticPageData);
 
 
 
@@ -370,7 +329,7 @@ export default function TenantPageWrapper({
       return true;
     }
 
-    // ⭐ Priority 1: Check static pages in editorStore
+    // ⭐ Priority 1: Check static pages in tenantStaticPagesStore
     const staticPageData = getStaticPageData(slug);
     if (staticPageData) {
       return true;
@@ -429,27 +388,30 @@ export default function TenantPageWrapper({
   // Load footer component dynamically
   const FooterComponent = useMemo(() => {
     const componentMap: Record<string, string> = {
-      StaticFooter1: "StaticFooter1",
       footer1: "footer1",
       footer2: "footer2",
     };
 
-    const componentName = componentMap[globalFooterVariant] || "StaticFooter1";
-    return loadFooterComponent(componentName) || StaticFooter1;
+    const componentName = componentMap[globalFooterVariant];
+    return componentName ? loadFooterComponent(componentName) : null;
   }, [globalFooterVariant]);
 
   // Get components from staticPagesData, componentSettings, or default components
   const componentsList = useMemo(() => {
-
-    // ⭐ Priority 1: Check multi-level pages (like "project", "property") with dynamicSlug
+    // ⭐ Priority 1: Multi-level pages (project/property/blog with dynamicSlug)
     if (isMultiLevelPage(slug) && dynamicSlug) {
-      // Get the slug property name (e.g., "projectSlug", "propertySlug")
       const slugPropertyName = getSlugPropertyName(slug);
 
-      // ⭐ Priority 1.1: Try to get from staticPagesData[slug]
       const staticPageData = getStaticPageData(slug);
-      if (staticPageData && Array.isArray(staticPageData.components)) {
-        return staticPageData.components
+      const componentsSource =
+        staticPageData?.components ||
+        (Array.isArray(tenantData?.StaticPages?.[slug])
+          ? (tenantData!.StaticPages[slug] as any[])[1]
+          : (tenantData?.StaticPages?.[slug] as any)?.components) ||
+        [];
+
+      if (Array.isArray(componentsSource) && componentsSource.length > 0) {
+        return componentsSource
           .map((component: any) => ({
             id: component.id,
             componentName: component.componentName,
@@ -459,47 +421,7 @@ export default function TenantPageWrapper({
           .sort((a: any, b: any) => a.position - b.position);
       }
 
-      // ⭐ Priority 1.2: Try to get from tenantData.StaticPages
-      // Handle both formats: { slug, components, apiEndpoints } or [slug, components, apiEndpoints]
-      if (tenantData?.StaticPages?.[slug]) {
-        const staticPage = tenantData.StaticPages[slug];
-
-        // Format 1: Array format [slug, components, apiEndpoints]
-        if (Array.isArray(staticPage) && staticPage.length >= 2) {
-          const components = staticPage[1];
-          if (Array.isArray(components)) {
-            return components
-              .map((component: any) => ({
-                id: component.id,
-                componentName: component.componentName,
-                data: { ...component.data, [slugPropertyName]: dynamicSlug },
-                position: component.position || 0,
-              }))
-              .sort((a: any, b: any) => a.position - b.position);
-          }
-        }
-
-        // Format 2: Object format { slug, components, apiEndpoints }
-        if (
-          staticPage &&
-          typeof staticPage === "object" &&
-          !Array.isArray(staticPage)
-        ) {
-          if (Array.isArray(staticPage.components)) {
-            return staticPage.components
-              .map((component: any) => ({
-                id: component.id,
-                componentName: component.componentName,
-                data: { ...component.data, [slugPropertyName]: dynamicSlug },
-                position: component.position || 0,
-              }))
-              .sort((a: any, b: any) => a.position - b.position);
-          }
-        }
-      }
-
-      // ⭐ Fallback: Return default component based on slug
-      // For project, use projectDetails1; for property, use propertyDetail2; for blog, use blogDetails2
+      // Fallback default for multi-level pages
       let defaultComponentName = `${slug}1`;
       let defaultComponentType = slug;
 
@@ -525,7 +447,7 @@ export default function TenantPageWrapper({
       ];
     }
 
-    // ⭐ Priority 2: Check static pages without additional segments
+    // ⭐ Priority 2: Static pages data from lightweight store
     const staticPageData = getStaticPageData(slug);
     if (staticPageData && Array.isArray(staticPageData.components)) {
       return staticPageData.components
@@ -538,47 +460,33 @@ export default function TenantPageWrapper({
         .sort((a: any, b: any) => a.position - b.position);
     }
 
-    // ⭐ Priority 3: Check tenantData.StaticPages
-    // Support format: [slug, components, apiEndpoints] or { slug, components, apiEndpoints }
-    if (tenantData?.StaticPages?.[slug]) {
-      const staticPage = tenantData.StaticPages[slug];
+    // ⭐ Priority 3: Static pages from tenantData (both formats)
+    const tenantStaticPage = tenantData?.StaticPages?.[slug];
+    if (tenantStaticPage) {
+      let components: any[] | undefined;
 
-      // Format 1: Array format [slug, components, apiEndpoints]
-      if (Array.isArray(staticPage) && staticPage.length >= 2) {
-        const components = staticPage[1];
-        if (Array.isArray(components)) {
-          return components
-            .map((component: any) => ({
-              id: component.id,
-              componentName: component.componentName,
-              data: component.data,
-              position: component.position || 0,
-            }))
-            .sort((a: any, b: any) => a.position - b.position);
-        }
+      if (Array.isArray(tenantStaticPage) && tenantStaticPage.length >= 2) {
+        components = tenantStaticPage[1];
+      } else if (
+        typeof tenantStaticPage === "object" &&
+        !Array.isArray(tenantStaticPage)
+      ) {
+        components = tenantStaticPage.components;
       }
 
-      // Format 2: Object format { slug, components, apiEndpoints }
-      if (
-        staticPage &&
-        typeof staticPage === "object" &&
-        !Array.isArray(staticPage)
-      ) {
-        if (Array.isArray(staticPage.components)) {
-          return staticPage.components
-            .map((component: any) => ({
-              id: component.id,
-              componentName: component.componentName,
-              data: component.data,
-              position: component.position || 0,
-            }))
-            .sort((a: any, b: any) => a.position - b.position);
-        }
+      if (Array.isArray(components)) {
+        return components
+          .map((component: any) => ({
+            id: component.id,
+            componentName: component.componentName,
+            data: component.data,
+            position: component.position || 0,
+          }))
+          .sort((a: any, b: any) => a.position - b.position);
       }
     }
 
-    // ⭐ Priority 3.5: Check if it's a known static page (has default component)
-    // This ensures static pages are always available even if not in tenantData
+    // ⭐ Priority 4: Static default component for known static pages
     const defaultStaticComponent = getDefaultComponentForStaticPage(slug);
     if (defaultStaticComponent) {
       return [
@@ -591,11 +499,8 @@ export default function TenantPageWrapper({
       ];
     }
 
-    // ⭐ Priority 4: Check componentSettings (regular pages only, skip for static pages)
-    // Static pages should ignore componentSettings and only use StaticPages or default data
-    // If it's a static page (has default component), skip componentSettings check
+    // ⭐ Priority 5: componentSettings for regular pages (non-static)
     if (
-      !defaultStaticComponent &&
       tenantData?.componentSettings &&
       slug &&
       tenantData.componentSettings[slug]
@@ -603,8 +508,7 @@ export default function TenantPageWrapper({
       const pageSettings = tenantData.componentSettings[slug];
       const normalizedSettings = normalizeComponentSettings(pageSettings);
 
-      // تحويل componentSettings إلى قائمة مكونات
-      const components = Object.entries(normalizedSettings)
+      return Object.entries(normalizedSettings)
         .map(([id, component]: [string, any]) => ({
           id,
           componentName: component.componentName,
@@ -612,14 +516,12 @@ export default function TenantPageWrapper({
           position: component.position,
         }))
         .sort((a, b) => (a.position || 0) - (b.position || 0));
-
-      return components;
     }
 
-    // ⭐ Priority 5: استخدام البيانات الافتراضية من PAGE_DEFINITIONS
-    if (slug && (PAGE_DEFINITIONS as any)[slug]) {
-      const defaultPageData = (PAGE_DEFINITIONS as any)[slug];
-      const components = Object.entries(defaultPageData)
+    // ⭐ Priority 6: PAGE_DEFINITIONS fallback
+    const pageDefinition = slug ? (PAGE_DEFINITIONS as any)[slug] : null;
+    if (pageDefinition) {
+      return Object.entries(pageDefinition)
         .map(([id, component]: [string, any]) => ({
           id,
           componentName: component.componentName,
@@ -627,87 +529,17 @@ export default function TenantPageWrapper({
           position: component.position || 0,
         }))
         .sort((a, b) => (a.position || 0) - (b.position || 0));
-
-      return components;
     }
 
     return [];
-  }, [
-    tenantData, // ⭐ CRITICAL: Add tenantData itself to re-compute when data loads
-    slug,
-    dynamicSlug,
-    staticPagesData,
-    getStaticPageData,
-  ]);
+  }, [slug, dynamicSlug, tenantData?.StaticPages, tenantData?.componentSettings, getStaticPageData]);
 
-  // دالة لتحديد الـ skeleton المناسب حسب الـ slug
-  const renderSkeletonContent = () => {
-    switch (slug) {
-      case "for-rent":
-      case "for-sale":
-        return (
-          <main className="flex-1">
-            <FilterButtonsSkeleton1 />
-            <GridSkeleton1 />
-          </main>
-        );
-      case "about-us":
-        return (
-          <main className="flex-1">
-            <HeroSkeleton2 />
-            <HalfTextHalfImageSkeleton1 />
-          </main>
-        );
-      case "contact-us":
-        return (
-          <main className="flex-1">
-            <HeroSkeleton2 />
-            <ContactCardsSkeleton1 />
-          </main>
-        );
-      case "property-requests/create":
-        return (
-          <main className="flex-1">
-            <HeroSkeleton2 />
-            <div className="max-w-4xl mx-auto p-6">
-              <div className="bg-white rounded-lg shadow-lg p-8">
-                <div className="animate-pulse">
-                  <div className="h-8 bg-gray-200 rounded mb-6"></div>
-                  <div className="space-y-4">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main>
-        );
-      default:
-        // الصفحات الأخرى تعرض HeroSkeleton1
-        return (
-          <main className="flex-1">
-            <HeroSkeleton1 />
-          </main>
-        );
-    }
-  };
-
-  // إذا كان التحميل جارياً أو لم تأت البيانات بعد، أظهر skeleton loading فقط
+  // إذا كان التحميل جارياً أو لم تأت البيانات بعد، أظهر skeleton loading (محمّل ديناميكياً)
   if (loadingTenantData || !tenantData) {
     return (
       <I18nProvider>
         <PixelScripts tenantId={tenantId} pageType={slug} />
-        <div className="min-h-screen flex flex-col" dir="rtl">
-          {/* Header Skeleton */}
-          <StaticHeaderSkeleton1 />
-
-          {/* Page-specific Skeleton Content */}
-          {renderSkeletonContent()}
-          
-          {/* Footer Skeleton */}
-          <SkeletonLoader componentName="footer" />
-        </div>
+        <TenantPageSkeleton slug={slug} />
       </I18nProvider>
     );
   }
@@ -779,25 +611,44 @@ export default function TenantPageWrapper({
                   const componentName =
                     componentMap[globalHeaderVariant] || "StaticHeader1";
 
-                  const HeaderComponent = loadHeaderComponent(componentName);
+                  // Viewer-only StaticHeader1 (no editor/tenant store deps)
+                  if (componentName === "StaticHeader1") {
+                    const viewerData: StaticHeader1ViewerData = {
+                      logo: {
+                        text:
+                          tenantData?.branding?.name ||
+                          tenantData?.websiteName ||
+                          globalHeaderData?.logo?.text,
+                        image:
+                          globalHeaderData?.logo?.image ||
+                          tenantData?.branding?.logo,
+                        url: globalHeaderData?.logo?.url || "/",
+                      },
+                      menu: Array.isArray(globalHeaderData?.menu)
+                        ? globalHeaderData.menu.map((item: any) => ({
+                            id: item.id || item.text,
+                            text: item.text,
+                            url: item.url,
+                          }))
+                        : undefined,
+                    };
 
-                  if (!HeaderComponent) {
                     return (
-                      <StaticHeader1 overrideData={globalHeaderData} />
+                      <StaticHeader1Viewer
+                        data={viewerData}
+                        tenantId={tenantId}
+                      />
                     );
                   }
 
-                  // Remove variant from data before passing to component
-                  const headerDataWithoutVariant = globalHeaderData
-                    ? (() => {
-                        const { variant: _variant, ...data } = globalHeaderData;
-                        return data;
-                      })()
-                    : {};
+                  const HeaderComponent = loadHeaderComponent(componentName);
+                  if (!HeaderComponent) {
+                    return null;
+                  }
 
                   return (
                     <HeaderComponent
-                      overrideData={headerDataWithoutVariant}
+                      overrideData={globalHeaderData}
                       variant={globalHeaderVariant}
                       id="global-header"
                     />
@@ -814,7 +665,7 @@ export default function TenantPageWrapper({
             <main className="flex-1">
               {Array.isArray(filteredComponentsList) &&
               filteredComponentsList.length > 0 ? (
-                filteredComponentsList.map((comp: any) => {
+            filteredComponentsList.map((comp: any) => {
                   const Cmp = loadComponent(slug as string, comp.componentName);
                   if (!Cmp) {
                     return <Fragment key={comp.id} />;
@@ -835,7 +686,13 @@ export default function TenantPageWrapper({
                         <SkeletonLoader componentName={comp.componentName} />
                       }
                     >
-                      <Cmp {...(comp.data as any)} useStore variant={comp.componentName} id={comp.id} />
+                      {/* Viewer mode: components receive data only, no editor store binding */}
+                      <Cmp
+                        {...(comp.data as any)}
+                        useStore={false}
+                        variant={comp.componentName}
+                        id={comp.id}
+                      />
                     </Suspense>
                   );
 
@@ -869,22 +726,54 @@ export default function TenantPageWrapper({
                   return <SkeletonLoader componentName="footer" />;
                 }
 
-                const footerDataWithoutVariant = globalFooterData
-                  ? (() => {
-                      const { variant: _variant, ...data } = globalFooterData;
-                      return data;
-                    })()
-                  : {};
+                // Viewer-only StaticFooter1 (no editor/tenant store deps)
+                if (globalFooterVariant === "StaticFooter1") {
+                  const viewerData: StaticFooter1ViewerData = {
+                    companyName:
+                      globalFooterData?.content?.companyInfo?.name ||
+                      tenantData?.branding?.name ||
+                      tenantData?.websiteName,
+                    companyTagline:
+                      globalFooterData?.content?.companyInfo?.tagline,
+                    companyDescription:
+                      globalFooterData?.content?.companyInfo?.description,
+                    companyLogo:
+                      globalFooterData?.content?.companyInfo?.logo ||
+                      tenantData?.branding?.logo,
+                    quickLinks:
+                      globalFooterData?.content?.quickLinks?.links ??
+                      undefined,
+                    address:
+                      globalFooterData?.content?.contactInfo?.address ??
+                      undefined,
+                    phone1:
+                      globalFooterData?.content?.contactInfo?.phone1 ??
+                      undefined,
+                    phone2:
+                      globalFooterData?.content?.contactInfo?.phone2 ??
+                      undefined,
+                    email:
+                      globalFooterData?.content?.contactInfo?.email ??
+                      undefined,
+                    copyright:
+                      globalFooterData?.footerBottom?.copyright ??
+                      undefined,
+                    legalLinks:
+                      globalFooterData?.footerBottom?.legalLinks ?? undefined,
+                    backgroundImage:
+                      globalFooterData?.background?.image ?? undefined,
+                  };
+
+                  return <StaticFooter1Viewer data={viewerData} />;
+                }
 
                 if (!FooterComponent) {
-                  return (
-                    <StaticFooter1 overrideData={footerDataWithoutVariant} />
-                  );
+                  return null;
                 }
 
                 return (
                   <FooterComponent
-                    overrideData={footerDataWithoutVariant}
+                    overrideData={globalFooterData}
                     variant={globalFooterVariant}
                     id="global-footer"
                   />

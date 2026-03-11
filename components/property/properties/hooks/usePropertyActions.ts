@@ -14,10 +14,9 @@ export const usePropertyActions = (
   newFilters: Record<string, any>
 ) => {
   const router = useRouter();
-  const {
-    propertiesManagement: { properties },
-    setPropertiesManagement,
-  } = useStore();
+  const propertiesManagement = useStore((state) => state.propertiesManagement);
+  const setPropertiesManagement = useStore((state) => state.setPropertiesManagement);
+  const properties = propertiesManagement?.properties ?? [];
 
   const handleDeleteProperty = useCallback(
     async (id: string) => {

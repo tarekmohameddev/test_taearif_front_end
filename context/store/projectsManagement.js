@@ -1,10 +1,10 @@
-const axiosInstance = require("@/lib/axiosInstance");
-const useAuthStore = require("@/context/AuthContext");
-const {
+import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
+import {
   retryWithBackoff,
   logError,
   formatErrorMessage,
-} = require("@/utils/errorHandler");
+} from "@/utils/errorHandler";
 
 export default (set, get) => ({
   projectsManagement: {
