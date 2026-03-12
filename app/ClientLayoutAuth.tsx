@@ -34,8 +34,6 @@ export default function ClientLayoutAuth({
   const setMessage = useAuthStore((state) => state.setMessage);
   const hasCheckedOnboardingRef = useRef(false);
   const isFetchingOnboardingRef = useRef(false);
-  const hasFetchedLiveEditorDataRef = useRef(false);
-  const isFetchingLiveEditorDataRef = useRef(false);
 
   const handleShowPopup = () => {
     setShowPopup(true);
@@ -262,56 +260,6 @@ export default function ClientLayoutAuth({
       }
     }
   }, [router, pathname]);
-
-  const removeLocaleFromPath = (pathname: string) => {
-    const localePattern = /^\/[a-z]{2}\//;
-    if (localePattern.test(pathname)) {
-      return pathname.replace(/^\/[a-z]{2}\//, "/");
-    }
-    return pathname;
-  };
-
-  useEffect(() => {
-    if (!isMounted || IsLoading) return;
-
-    const pathWithoutLocale = removeLocaleFromPath(pathname || "");
-
-    if (
-      pathWithoutLocale === "/live-editor" ||
-      pathWithoutLocale.startsWith("/live-editor/")
-    ) {
-      if (
-        isFetchingLiveEditorDataRef.current ||
-        hasFetchedLiveEditorDataRef.current
-      ) {
-        return;
-      }
-
-      const fetchUserFromAPI = async () => {
-        isFetchingLiveEditorDataRef.current = true;
-        try {
-          const response = await axiosInstance.get("/user");
-          if (response.data && response.data.data) {
-            const userApiData = response.data.data;
-            const currentUserData = useAuthStore.getState().userData;
-            useAuthStore.getState().setUserData({
-              ...currentUserData,
-              ...userApiData,
-            });
-            hasFetchedLiveEditorDataRef.current = true;
-          }
-        } catch (error) {
-          console.error("Error fetching user data from /user API:", error);
-        } finally {
-            isFetchingLiveEditorDataRef.current = false;
-        }
-      };
-
-      fetchUserFromAPI();
-    } else {
-      hasFetchedLiveEditorDataRef.current = false;
-    }
-  }, [isMounted, IsLoading, pathname]);
 
   const publicPages = [
     "/login",

@@ -12,6 +12,7 @@
 - **Dashboard layout:** إزالة الـ useEffect الذي كان يستدعي `fetchUserFromAPI()` بعد التحقق من التوكن؛ الاعتماد على البيانات التي يملأها useTokenValidation.
 - **userStore.fetchUserData:** عند انتهاء صلاحية الكاش يستدعي `fetchUserFromAPI()` عبر استيراد ديناميكي لـ AuthContext (لتجنب تبعية دائرية)، فلا يُنفَّذ طلب /user إضافي.
 - **OAuthSuccessPageContent:** إزالة الطلب المباشر لـ GET /user والتعيين اليدوي لـ AuthStore؛ الاعتماد على `fetchUserFromAPI()` ثم استدعاء setAuth ببيانات المستخدم من الـ store.
+- **ClientLayoutAuth (Live Editor):** إزالة الـ useEffect الذي كان يستدعي `axiosInstance.get("/user")` عند المسار `/live-editor`؛ الاعتماد على المصدر الموحد: عند فتح live-editor يُستدعى `fetchUserData()` من الـ useEffect العام (لأي مسار غير /login) فيملأ AuthStore عبر `fetchUserFromAPI()` → `fetchUserOnceAndSync()`، ولا حاجة لطلب /user منفصل.
 
 ## Bootstrap الداشبورد والـ Sidebar الموازي
 
