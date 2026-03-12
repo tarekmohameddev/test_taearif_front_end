@@ -18,7 +18,14 @@ const nextConfig = {
     tsconfigPath: './tsconfig.json',
   },
   images: {
-    unoptimized: false ,
+    unoptimized: false,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "taearifvideos.oss-me-central-1.aliyuncs.com",
+        pathname: "/**",
+      },
+    ],
   },
   experimental: {
     scrollRestoration: true,
