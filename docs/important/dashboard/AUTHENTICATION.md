@@ -363,31 +363,8 @@ export const usePermissions = () => {
     return segments[0] || "";
   };
 
-  // Map slug to permission
-  const getPermissionName = (slug: string): string => {
-    const permissionMap = {
-      customers: "customers.view",
-      properties: "properties.view",
-      analytics: "analytics.view",
-      "rental-management": "rental.management",
-      "purchase-management": "purchase.management",
-      "access-control": "access.control",
-      "activity-logs": "activity.logs.view",
-      affiliate: "affiliate.view",
-      marketing: "marketing.view",
-      "whatsapp-ai": "whatsapp.ai",
-      live_editor: "live_editor.view",
-      projects: "projects.view",
-      blogs: "blogs.view",
-      messages: "messages.view",
-      apps: "apps.view",
-      settings: "settings.view",
-      templates: "templates.view",
-    };
-
-    return permissionMap[slug] || `${slug}.view`;
-  };
-
+  // Slug → permission name: single source in @/lib/permissions/slugToPermission
+  // usePermissions exposes getPermissionName(slug) which delegates there (e.g. "properties" → "properties.view").
   const pageSlug = getPageSlug(pathname);
   const hasPermission = hasAccessToPage(pageSlug);
 
@@ -403,7 +380,7 @@ export const usePermissions = () => {
 
 ### Permission Checking Logic
 
-**In UserStore (`store/userStore.ts`):**
+**In UserStore (`context/userStore.ts`):** Imports `getPermissionNameForSlug` from `@/lib/permissions/slugToPermission`.
 
 ```typescript
 hasAccessToPage: (pageSlug: string | null) => {
@@ -420,10 +397,8 @@ hasAccessToPage: (pageSlug: string | null) => {
     return true;
   }
 
-  // Permission-based access
-  const permissionMap = { /* ... */ };
-  const requiredPermission = permissionMap[pageSlug] || `${pageSlug}.view`;
-
+  // Permission-based access: slug → permission name from @/lib/permissions/slugToPermission
+  const requiredPermission = getPermissionNameForSlug(pageSlug);
   return get().checkPermission(requiredPermission);
 },
 

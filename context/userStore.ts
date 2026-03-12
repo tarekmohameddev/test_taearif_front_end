@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { getPermissionNameForSlug } from "@/lib/permissions/slugToPermission";
 
 interface Permission {
   id: number;
@@ -146,39 +147,7 @@ export const useUserStore = create<UserState & UserActions>()(
           return true;
         }
 
-        // Map page slugs to permission names (must match backend permission names from /api/user)
-        const permissionMap: { [key: string]: string } = {
-          customers: "customers.view",
-          live_editor: "live_editor.view",
-          properties: "properties.view",
-          rentals: "rentals.view",
-          projects: "projects.view",
-          employees: "employees.view",
-          analytics: "analytics.view",
-          settings: "settings.view",
-          "access-control": "access.control",
-          marketing: "marketing.view",
-          templates: "templates.view",
-          websites: "websites.view",
-          "activity-logs": "activity.logs.view",
-          "purchase-management": "purchase.management",
-          "rental-management": "rentals.view",
-          "financial-reporting": "financial.reporting",
-          affiliate: "affiliate.view",
-          "help-center": "help.center",
-          solutions: "solutions.view",
-          apps: "apps.view",
-          blogs: "blogs.view",
-          messages: "messages.view",
-          "whatsapp-ai": "whatsapp.ai",
-          buildings: "buildings.view",
-          "job-applications": "job_applications.view",
-          "property-requests": "property_requests.view",
-          matching: "property_requests.view",
-        };
-
-        const requiredPermission =
-          permissionMap[pageSlug] || `${pageSlug}.view`;
+        const requiredPermission = getPermissionNameForSlug(pageSlug);
         return get().checkPermission(requiredPermission);
       },
 

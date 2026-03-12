@@ -836,6 +836,7 @@ export const useUserStore = create<UserState & UserActions>()(
         );
       },
 
+      // Uses getPermissionNameForSlug from @/lib/permissions/slugToPermission (single source for slug → permission name).
       hasAccessToPage: (pageSlug: string | null) => {
         const { userData } = get();
         if (!userData || !pageSlug) return false;
@@ -850,16 +851,8 @@ export const useUserStore = create<UserState & UserActions>()(
           return true;
         }
 
-        // Permission mapping
-        const permissionMap = {
-          properties: "properties.view",
-          analytics: "analytics.view",
-          "rental-management": "rental.management",
-          // ... all mappings
-        };
-
-        const requiredPermission =
-          permissionMap[pageSlug] || `${pageSlug}.view`;
+        // Slug → permission from shared module
+        const requiredPermission = getPermissionNameForSlug(pageSlug);
         return get().checkPermission(requiredPermission);
       },
 
