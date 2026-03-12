@@ -21,6 +21,10 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import {
+  setTokenGetter,
+  clearTokenGetter,
+} from "@/lib/axiosTokenRegistry";
 
 export const AuthContext = createContext();
 
@@ -36,6 +40,14 @@ export const AuthProvider = ({ children }) => {
       setUser(parsedUser);
     }
     setLoading(false);
+  }, []);
+
+  // Register token getter for axiosInstance so it can attach Authorization without importing AuthContext
+  useEffect(() => {
+    setTokenGetter(
+      () => useAuthStore.getState().userData?.token ?? null,
+    );
+    return () => clearTokenGetter();
   }, []);
 
   const login = async (email, password) => {
