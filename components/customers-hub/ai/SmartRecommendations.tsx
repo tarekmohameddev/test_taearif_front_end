@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 
 export function SmartRecommendations() {
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
 
   // Generate smart recommendations
   const urgentFollowups = customers.filter(

@@ -16,10 +16,10 @@ import type { CustomerActionType, CustomerSource, Priority } from "@/types/unifi
 import type { SavedFilter } from "./SavedFiltersPanel";
 
 export function ActionsPage() {
-  const { 
-    undoStack,
-    undoLastAction,
-  } = useUnifiedCustomersStore();
+  const undoStack = useUnifiedCustomersStore((state) => state.undoStack);
+  const undoLastAction = useUnifiedCustomersStore(
+    (state) => state.undoLastAction,
+  );
   
   // State
   const [searchQuery, setSearchQuery] = useState("");

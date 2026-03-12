@@ -36,7 +36,9 @@ const getTextDirection = (text: string): "rtl" | "ltr" => {
 };
 
 export function ActivitiesTab({ customer }: ActivitiesTabProps) {
-  const { addInteraction } = useUnifiedCustomersStore();
+  const addInteraction = useUnifiedCustomersStore(
+    (state) => state.addInteraction,
+  );
   const userData = useAuthStore((state) => state.userData);
   
   const [showAddForm, setShowAddForm] = useState(false);

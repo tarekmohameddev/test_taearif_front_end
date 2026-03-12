@@ -9,7 +9,7 @@ import { TrendingUp, Users, Target, Eye } from "lucide-react";
 import Link from "next/link";
 
 export function LeadScoringDashboard() {
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
 
   // Segment customers by lead score
   const veryHigh = customers.filter((c) => c.leadScore >= 80);

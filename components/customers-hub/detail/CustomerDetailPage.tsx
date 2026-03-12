@@ -23,7 +23,9 @@ interface CustomerDetailPageProps {
 }
 
 export function CustomerDetailPage({ customerId }: CustomerDetailPageProps) {
-  const { getCustomerById } = useUnifiedCustomersStore();
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
   const customer = getCustomerById(customerId);
 
   if (!customer) {

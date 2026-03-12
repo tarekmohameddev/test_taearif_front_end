@@ -206,7 +206,34 @@ interface UnifiedCustomersStore {
 
 const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      // Batch expensive operations so multiple mutations in the same tick
+      // trigger at most one applyFilters() / calculateStatistics() run.
+      let applyFiltersScheduled = false;
+      let statisticsScheduled = false;
+
+      const scheduleApplyFilters = () => {
+        if (applyFiltersScheduled) return;
+        applyFiltersScheduled = true;
+        Promise.resolve().then(() => {
+          applyFiltersScheduled = false;
+          // Re-read from store to avoid stale closures
+          const { applyFilters } = get();
+          applyFilters();
+        });
+      };
+
+      const scheduleCalculateStatistics = () => {
+        if (statisticsScheduled) return;
+        statisticsScheduled = true;
+        Promise.resolve().then(() => {
+          statisticsScheduled = false;
+          const { calculateStatistics } = get();
+          calculateStatistics();
+        });
+      };
+
+      return {
       // Initial Data State
       customers: [],
       filteredCustomers: [],
@@ -265,9 +292,9 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           lastFetched: Date.now(),
         });
         
-        // Apply filters to update filtered list
-        get().applyFilters();
-        get().calculateStatistics();
+        // Apply filters & statistics in a batched way
+        scheduleApplyFilters();
+        scheduleCalculateStatistics();
       },
       
       addCustomer: (customer) => {
@@ -281,8 +308,8 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           customersCache: updatedCache,
         });
         
-        get().applyFilters();
-        get().calculateStatistics();
+        scheduleApplyFilters();
+        scheduleCalculateStatistics();
       },
       
       // Customer Actions Management
@@ -605,8 +632,8 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           customersCache: updatedCache,
         });
         
-        get().applyFilters();
-        get().calculateStatistics();
+        scheduleApplyFilters();
+        scheduleCalculateStatistics();
       },
       
       removeCustomer: (customerId) => {
@@ -620,8 +647,8 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           customersCache: updatedCache,
         });
         
-        get().applyFilters();
-        get().calculateStatistics();
+        scheduleApplyFilters();
+        scheduleCalculateStatistics();
       },
       
       setSelectedCustomer: (customer) => {
@@ -639,27 +666,27 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           filters: { ...state.filters, ...filters },
           currentPage: 1, // Reset to first page when filters change
         }));
-        get().applyFilters();
+        scheduleApplyFilters();
       },
       
       clearFilters: () => {
         set({ filters: {}, searchTerm: '', currentPage: 1 });
-        get().applyFilters();
+        scheduleApplyFilters();
       },
       
       setSearchTerm: (term) => {
         set({ searchTerm: term, currentPage: 1 });
-        get().applyFilters();
+        scheduleApplyFilters();
       },
       
       setSortBy: (sortBy) => {
         set({ sortBy, currentPage: 1 });
-        get().applyFilters();
+        scheduleApplyFilters();
       },
       
       setSortOrder: (order) => {
         set({ sortOrder: order });
-        get().applyFilters();
+        scheduleApplyFilters();
       },
       
       applyFilters: () => {
@@ -859,7 +886,7 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
       
       setPageSize: (size) => {
         set({ pageSize: size, currentPage: 1 });
-        get().applyFilters();
+        scheduleApplyFilters();
       },
       
       nextPage: () => {
@@ -1438,7 +1465,8 @@ const useUnifiedCustomersStore = create<UnifiedCustomersStore>()(
           },
         });
       },
-    }),
+    };
+    },
     {
       name: 'unified-customers-storage',
       partialize: (state) => ({

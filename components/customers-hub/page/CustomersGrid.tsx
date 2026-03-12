@@ -13,7 +13,11 @@ import {
 import Link from "next/link";
 
 export function CustomersGrid() {
-  const { filteredCustomers, currentPage, pageSize } = useUnifiedCustomersStore();
+  const filteredCustomers = useUnifiedCustomersStore(
+    (state) => state.filteredCustomers,
+  );
+  const currentPage = useUnifiedCustomersStore((state) => state.currentPage);
+  const pageSize = useUnifiedCustomersStore((state) => state.pageSize);
   
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;

@@ -102,18 +102,29 @@ export function RequestDetailPage({
   onRefetch,
 }: RequestDetailPageProps) {
   const router = useRouter();
-  const store = useUnifiedCustomersStore();
   const { userData } = useAuthStore();
-  const {
-    actions: storeActions,
-    getCustomerById,
-    completeAction: storeCompleteAction,
-    dismissAction: storeDismissAction,
-    snoozeAction: storeSnoozeAction,
-    addActionNote: storeAddActionNote,
-    addAppointment: storeAddAppointment,
-    addAppointmentForRequest,
-  } = store;
+  const storeActions = useUnifiedCustomersStore((state) => state.actions);
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
+  const storeCompleteAction = useUnifiedCustomersStore(
+    (state) => state.completeAction,
+  );
+  const storeDismissAction = useUnifiedCustomersStore(
+    (state) => state.dismissAction,
+  );
+  const storeSnoozeAction = useUnifiedCustomersStore(
+    (state) => state.snoozeAction,
+  );
+  const storeAddActionNote = useUnifiedCustomersStore(
+    (state) => state.addActionNote,
+  );
+  const storeAddAppointment = useUnifiedCustomersStore(
+    (state) => state.addAppointment,
+  );
+  const addAppointmentForRequest = useUnifiedCustomersStore(
+    (state) => state.addAppointmentForRequest,
+  );
 
   // Use prop action if provided, otherwise find in store
   const action = propAction ?? storeActions.find((a) => a.id === requestId);

@@ -36,14 +36,16 @@ export function QuickAddFAB({
   onAddProperty,
 }: QuickAddFABProps) {
   const [open, setOpen] = useState(false);
-  const { setAddDialogOpen } = useUnifiedCustomersStore();
+  const setShowAddCustomerDialog = useUnifiedCustomersStore(
+    (state) => state.setShowAddCustomerDialog,
+  );
 
   const handleAddCustomer = () => {
     setOpen(false);
     if (onAddCustomer) {
       onAddCustomer();
     } else {
-      setAddDialogOpen(true);
+      setShowAddCustomerDialog(true);
     }
   };
 

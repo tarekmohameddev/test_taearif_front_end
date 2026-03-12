@@ -24,7 +24,8 @@ import { CheckCircle2, ArrowLeft } from "lucide-react";
 
 export default function AddCustomerPage() {
   const router = useRouter();
-  const { addCustomer, addAction } = useUnifiedCustomersStore();
+  const addCustomer = useUnifiedCustomersStore((state) => state.addCustomer);
+  const addAction = useUnifiedCustomersStore((state) => state.addAction);
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({

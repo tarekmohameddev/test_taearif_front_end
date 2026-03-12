@@ -32,7 +32,8 @@ interface CustomersDashboardProps {
 }
 
 export function CustomersDashboard({ stats: apiStats }: CustomersDashboardProps = {}) {
-  const { statistics: storeStatistics, customers } = useUnifiedCustomersStore();
+  const storeStatistics = useUnifiedCustomersStore((state) => state.statistics);
+  const customers = useUnifiedCustomersStore((state) => state.customers);
   
   // Use API stats if available, otherwise fallback to store statistics
   const statistics: CustomerStatistics | null = apiStats?.byStage ? {

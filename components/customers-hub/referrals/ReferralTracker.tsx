@@ -12,7 +12,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 
 export function ReferralTracker() {
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
 
   // Calculate referral metrics
   const referralCustomers = customers.filter(c => c.source === "referral");

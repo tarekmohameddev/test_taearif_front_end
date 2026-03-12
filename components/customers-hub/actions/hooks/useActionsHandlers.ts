@@ -10,19 +10,37 @@ export function useActionsHandlers(
   completedActions: CustomerAction[],
   getCurrentTabActions: () => CustomerAction[]
 ) {
-  const {
-    completeAction,
-    dismissAction,
-    snoozeAction,
-    completeMultipleActions,
-    dismissMultipleActions,
-    snoozeMultipleActions,
-    assignMultipleActions,
-    updateMultipleActionsPriority,
-    addActionNote,
-    restoreAction,
-    getCustomerById,
-  } = useUnifiedCustomersStore();
+  const completeAction = useUnifiedCustomersStore(
+    (state) => state.completeAction,
+  );
+  const dismissAction = useUnifiedCustomersStore(
+    (state) => state.dismissAction,
+  );
+  const snoozeAction = useUnifiedCustomersStore((state) => state.snoozeAction);
+  const completeMultipleActions = useUnifiedCustomersStore(
+    (state) => state.completeMultipleActions,
+  );
+  const dismissMultipleActions = useUnifiedCustomersStore(
+    (state) => state.dismissMultipleActions,
+  );
+  const snoozeMultipleActions = useUnifiedCustomersStore(
+    (state) => state.snoozeMultipleActions,
+  );
+  const assignMultipleActions = useUnifiedCustomersStore(
+    (state) => state.assignMultipleActions,
+  );
+  const updateMultipleActionsPriority = useUnifiedCustomersStore(
+    (state) => state.updateMultipleActionsPriority,
+  );
+  const addActionNote = useUnifiedCustomersStore(
+    (state) => state.addActionNote,
+  );
+  const restoreAction = useUnifiedCustomersStore(
+    (state) => state.restoreAction,
+  );
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
 
   // Action handlers
   const handleComplete = useCallback((actionId: string) => {

@@ -29,7 +29,9 @@ export function AssignmentDropdown({
   size = "sm",
 }: AssignmentDropdownProps) {
   const { employees } = useCustomersHubAssignment();
-  const { updateCustomer } = useUnifiedCustomersStore();
+  const updateCustomer = useUnifiedCustomersStore(
+    (state) => state.updateCustomer,
+  );
 
   const handleAssign = async (employeeId: string, employeeName: string) => {
     try {

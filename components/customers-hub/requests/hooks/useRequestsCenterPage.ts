@@ -13,23 +13,44 @@ import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-
 import { getPropertyRequestId } from "../request-detail-types";
 
 export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
-  const store = useUnifiedCustomersStore();
-  const {
-    actions: storeActions,
-    customers,
-    completeAction: storeCompleteAction,
-    dismissAction: storeDismissAction,
-    snoozeAction: storeSnoozeAction,
-    completeMultipleActions: storeCompleteMultipleActions,
-    dismissMultipleActions: storeDismissMultipleActions,
-    snoozeMultipleActions: storeSnoozeMultipleActions,
-    assignMultipleActions: storeAssignMultipleActions,
-    updateMultipleActionsPriority,
-    getCustomerById,
-    getCompletedActions,
-    addActionNote,
-    restoreAction,
-  } = store;
+  const storeActions = useUnifiedCustomersStore((state) => state.actions);
+  const customers = useUnifiedCustomersStore((state) => state.customers);
+  const storeCompleteAction = useUnifiedCustomersStore(
+    (state) => state.completeAction,
+  );
+  const storeDismissAction = useUnifiedCustomersStore(
+    (state) => state.dismissAction,
+  );
+  const storeSnoozeAction = useUnifiedCustomersStore(
+    (state) => state.snoozeAction,
+  );
+  const storeCompleteMultipleActions = useUnifiedCustomersStore(
+    (state) => state.completeMultipleActions,
+  );
+  const storeDismissMultipleActions = useUnifiedCustomersStore(
+    (state) => state.dismissMultipleActions,
+  );
+  const storeSnoozeMultipleActions = useUnifiedCustomersStore(
+    (state) => state.snoozeMultipleActions,
+  );
+  const storeAssignMultipleActions = useUnifiedCustomersStore(
+    (state) => state.assignMultipleActions,
+  );
+  const updateMultipleActionsPriority = useUnifiedCustomersStore(
+    (state) => state.updateMultipleActionsPriority,
+  );
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
+  const getCompletedActions = useUnifiedCustomersStore(
+    (state) => state.getCompletedActions,
+  );
+  const addActionNote = useUnifiedCustomersStore(
+    (state) => state.addActionNote,
+  );
+  const restoreAction = useUnifiedCustomersStore(
+    (state) => state.restoreAction,
+  );
 
   const { stages: storeStages, fetchStages } = useCustomersHubStagesStore();
   const { userData, IsLoading: authLoading } = useAuthStore();

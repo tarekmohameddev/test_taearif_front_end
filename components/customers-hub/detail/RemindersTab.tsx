@@ -35,7 +35,12 @@ const reminderTypes: ReminderType[] = [
 ];
 
 export function RemindersTab({ customer }: RemindersTabProps) {
-  const { updateReminder, removeReminder } = useUnifiedCustomersStore();
+  const updateReminder = useUnifiedCustomersStore(
+    (state) => state.updateReminder,
+  );
+  const removeReminder = useUnifiedCustomersStore(
+    (state) => state.removeReminder,
+  );
   const [filter, setFilter] = useState<"all" | "pending" | "overdue" | "completed">("all");
 
   const getReminderType = (type: string): ReminderType => {

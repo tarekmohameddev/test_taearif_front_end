@@ -1523,8 +1523,12 @@ export function CustomerDetailPageSimple({
   onUpdatePreferences,
   onPropertyAdded,
 }: CustomerDetailPageSimpleProps) {
-  const store = useUnifiedCustomersStore();
-  const { getCustomerById, setSelectedCustomer } = store;
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
+  const setSelectedCustomer = useUnifiedCustomersStore(
+    (state) => state.setSelectedCustomer,
+  );
 
   // Use prop customer if provided, otherwise find in store
   const customer = propCustomer ?? getCustomerById(customerId);

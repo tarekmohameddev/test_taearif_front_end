@@ -54,7 +54,10 @@ const SOURCE_OPTIONS = [
 ] as const;
 
 export function FiltersBar({ filterOptions, onSearch, onApplyFilters }: FiltersBarProps) {
-  const { filters, setFilters, clearFilters, applyFilters } = useUnifiedCustomersStore();
+  const filters = useUnifiedCustomersStore((state) => state.filters);
+  const setFilters = useUnifiedCustomersStore((state) => state.setFilters);
+  const clearFilters = useUnifiedCustomersStore((state) => state.clearFilters);
+  const applyFilters = useUnifiedCustomersStore((state) => state.applyFilters);
   const [searchQuery, setSearchQuery] = useState("");
   const { employees } = useCustomersHubAssignment();
   

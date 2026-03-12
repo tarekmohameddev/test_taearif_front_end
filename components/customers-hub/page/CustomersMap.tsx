@@ -120,7 +120,9 @@ const createCustomIcon = (stage: CustomerLifecycleStage, isSelected: boolean): D
 };
 
 export function CustomersMap() {
-  const { filteredCustomers } = useUnifiedCustomersStore();
+  const filteredCustomers = useUnifiedCustomersStore(
+    (state) => state.filteredCustomers,
+  );
   const [isClient, setIsClient] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedStages, setSelectedStages] = useState<CustomerLifecycleStage[]>([]);

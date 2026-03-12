@@ -36,8 +36,11 @@ interface PipelinePageProps {
 }
 
 export function PipelinePage(props?: PipelinePageProps) {
-  const store = useUnifiedCustomersStore();
-  const { customers: storeCustomers, setViewMode, setCustomers: setStoreCustomers } = store;
+  const storeCustomers = useUnifiedCustomersStore((state) => state.customers);
+  const setViewMode = useUnifiedCustomersStore((state) => state.setViewMode);
+  const setStoreCustomers = useUnifiedCustomersStore(
+    (state) => state.setCustomers,
+  );
   
   // Use prop stages if provided, otherwise use store customers
   const stages = props?.stages;

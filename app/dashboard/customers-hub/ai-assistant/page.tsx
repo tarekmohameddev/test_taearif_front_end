@@ -6,7 +6,8 @@ import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import mockCustomers from "@/lib/mock/customers-hub-data";
 
 export default function CustomersHubAIAssistantPage() {
-  const { setCustomers, customers } = useUnifiedCustomersStore();
+  const setCustomers = useUnifiedCustomersStore((state) => state.setCustomers);
+  const customers = useUnifiedCustomersStore((state) => state.customers);
 
   // Load mock data on mount
   useEffect(() => {

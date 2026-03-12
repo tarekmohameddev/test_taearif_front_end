@@ -17,7 +17,9 @@ interface DocumentsTabProps {
 }
 
 export function DocumentsTab({ customer }: DocumentsTabProps) {
-  const { updateCustomer } = useUnifiedCustomersStore();
+  const updateCustomer = useUnifiedCustomersStore(
+    (state) => state.updateCustomer,
+  );
   const [uploading, setUploading] = useState(false);
 
   const getDocumentTypeIcon = (type: string) => {

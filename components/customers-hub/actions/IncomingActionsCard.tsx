@@ -34,8 +34,18 @@ export function IncomingActionsCard({
   onStageChangeSuccess,
 }: IncomingActionsCardProps) {
   const router = useRouter();
-  const { addAppointment, addAppointmentForRequest, updateCustomerStage, getCustomerById } =
-    useUnifiedCustomersStore();
+  const addAppointment = useUnifiedCustomersStore(
+    (state) => state.addAppointment,
+  );
+  const addAppointmentForRequest = useUnifiedCustomersStore(
+    (state) => state.addAppointmentForRequest,
+  );
+  const updateCustomerStage = useUnifiedCustomersStore(
+    (state) => state.updateCustomerStage,
+  );
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
   const { userData } = useAuthStore();
   const { stages: storeStages } = useCustomersHubStagesStore();
 

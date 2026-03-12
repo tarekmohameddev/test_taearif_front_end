@@ -17,7 +17,12 @@ interface AppointmentsTabProps {
 }
 
 export function AppointmentsTab({ customer }: AppointmentsTabProps) {
-  const { updateAppointment, removeAppointment } = useUnifiedCustomersStore();
+  const updateAppointment = useUnifiedCustomersStore(
+    (state) => state.updateAppointment,
+  );
+  const removeAppointment = useUnifiedCustomersStore(
+    (state) => state.removeAppointment,
+  );
   const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null);
 
   const getStatusBadge = (status: Appointment["status"]) => {
