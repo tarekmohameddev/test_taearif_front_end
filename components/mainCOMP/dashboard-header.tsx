@@ -69,7 +69,7 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  const { sidebarData, fetchSideMenus } = useSidebarStore();
+  const { sidebarData } = useSidebarStore();
   const { mainNavItems, loading, error } = sidebarData;
   const [currentPlan, setCurrentPlan] = useState<PlanData | null>(null);
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);
@@ -77,15 +77,6 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   const hasFetchedPlanRef = useRef(false);
   const isFetchingRef = useRef(false);
   const lastTokenRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    // إزالة fetchUserData من هنا لأنه يتم استدعاؤه في layout.tsx
-    // fetchUserData();
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (userData?.token) {
-      fetchSideMenus();
-    }
-  }, [fetchSideMenus, userData?.token]);
 
   // جلب بيانات الخطة مرة واحدة وحفظها في كوكي
   useEffect(() => {
