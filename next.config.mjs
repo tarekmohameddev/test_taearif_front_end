@@ -18,34 +18,7 @@ const nextConfig = {
     tsconfigPath: './tsconfig.json',
   },
   images: {
-    unoptimized: false,
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "taearifvideos.oss-me-central-1.aliyuncs.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "api.taearif.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "bigrises.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "test.kingbellsa.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        pathname: "/**",
-      },
-    ],
+    unoptimized: true, // عشان في مصادر للصور كتير جدا مش هعرف اجيب لينكاتها كلها
   },
   experimental: {
     scrollRestoration: true,
