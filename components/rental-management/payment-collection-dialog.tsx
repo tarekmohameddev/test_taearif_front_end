@@ -114,6 +114,10 @@ export function PaymentCollectionDialog() {
   const [data, setData] = useState<PaymentCollectionData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** PREVENT_DUPLICATE_API: مفتاح آخر جلب لتفادي الطلبات المكررة */
+  const [lastFetchedPaymentRentalId, setLastFetchedPaymentRentalId] = useState<
+    number | null
+  >(null);
   const [paymentAmount, setPaymentAmount] = useState<string>("");
   const [fullPaymentAmount, setFullPaymentAmount] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -176,6 +180,7 @@ export function PaymentCollectionDialog() {
       setPaymentAmount("");
       setFullPaymentItems([]);
       setData(null);
+      setLastFetchedPaymentRentalId(null);
     }
   }, [isPaymentCollectionDialogOpen]);
 
@@ -232,9 +237,16 @@ export function PaymentCollectionDialog() {
   const fetchPaymentCollectionData = async () => {
     if (!selectedPaymentRentalId) return;
 
-    // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
       console.log("No token available, skipping fetchPaymentCollectionData");
+      return;
+    }
+
+    if (loading) return;
+    if (
+      data &&
+      lastFetchedPaymentRentalId === selectedPaymentRentalId
+    ) {
       return;
     }
 
@@ -248,6 +260,7 @@ export function PaymentCollectionDialog() {
 
       if (response.data.status) {
         setData(response.data.data);
+        setLastFetchedPaymentRentalId(selectedPaymentRentalId);
       } else {
         setError("فشل في تحميل بيانات تحصيل المدفوعات");
       }

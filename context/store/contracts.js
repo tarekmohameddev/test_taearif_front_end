@@ -13,6 +13,8 @@ const useContractsStore = create((set, get) => ({
   // حالات التحميل والأخطاء
   loading: false,
   error: null,
+  /** مفتاح آخر جلب (لمنع الطلبات المكررة) — PREVENT_DUPLICATE_API_PROMPT */
+  lastFetchedContractsKey: null,
 
   // الفلاتر
   searchTerm: "",
@@ -58,34 +60,37 @@ const useContractsStore = create((set, get) => ({
       dateFilter,
       currentPage,
       itemsPerPage,
+      loading,
+      lastFetchedContractsKey,
     } = state;
+
+    // بناء المعاملات أولاً لاستخدامها في مفتاح التخزين المؤقت
+    const apiParams = {
+      page: currentPage,
+      per_page: itemsPerPage,
+      ...params,
+    };
+    if (contractStatusFilter && contractStatusFilter !== "active") {
+      apiParams.contract_status = contractStatusFilter;
+    }
+    if (buildingFilter && buildingFilter !== "all") {
+      apiParams.building_id = buildingFilter;
+    }
+    if (rentalMethodFilter && rentalMethodFilter !== "all") {
+      apiParams.rental_method = rentalMethodFilter;
+    }
+    if (paymentStatusFilter && paymentStatusFilter !== "all") {
+      apiParams.payment_status = paymentStatusFilter;
+    }
+    const paramsKey = JSON.stringify(apiParams);
+
+    // PREVENT_DUPLICATE_API: loading guard
+    if (loading) return;
+    // PREVENT_DUPLICATE_API: last-fetched guard
+    if (lastFetchedContractsKey === paramsKey) return;
 
     try {
       set({ loading: true, error: null });
-
-      // بناء المعاملات - تحميل بدون فلاتر عند فتح الصفحة
-      const apiParams = {
-        page: currentPage,
-        per_page: itemsPerPage,
-        ...params,
-      };
-
-      // إضافة الفلاتر فقط إذا كانت مختلفة عن القيم الافتراضية
-      if (contractStatusFilter && contractStatusFilter !== "active") {
-        apiParams.contract_status = contractStatusFilter;
-      }
-
-      if (buildingFilter && buildingFilter !== "all") {
-        apiParams.building_id = buildingFilter;
-      }
-
-      if (rentalMethodFilter && rentalMethodFilter !== "all") {
-        apiParams.rental_method = rentalMethodFilter;
-      }
-
-      if (paymentStatusFilter && paymentStatusFilter !== "all") {
-        apiParams.payment_status = paymentStatusFilter;
-      }
 
       const response = await axiosInstance.get("/v1/rms/contracts", {
         params: apiParams,
@@ -135,12 +140,12 @@ const useContractsStore = create((set, get) => ({
           pagination: pagination,
           totalPages: newTotalPages,
           totalRecords: pagination.total || 0,
-          // إعادة تعيين currentPage إلى 1 إذا كان أكبر من totalPages الجديد
           currentPage:
             currentState.currentPage > newTotalPages
               ? 1
               : currentState.currentPage,
           loading: false,
+          lastFetchedContractsKey: paramsKey,
         });
 
         console.log("Contracts data loaded:", data);
@@ -171,6 +176,7 @@ const useContractsStore = create((set, get) => ({
       buildingFilter: "all",
       dateFilter: "today",
       currentPage: 1,
+      lastFetchedContractsKey: null,
     }),
 
   // Pagination Actions

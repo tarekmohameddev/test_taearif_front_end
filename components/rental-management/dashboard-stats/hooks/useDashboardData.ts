@@ -13,6 +13,25 @@ interface UseDashboardDataParams {
   isInitialized: boolean;
 }
 
+/** بناء مفتاح فريد للفلاتر (لمنع الطلبات المكررة) */
+function buildDashboardParamsKey(params: {
+  collectionsPeriod: string;
+  collectionsFromDate: string;
+  collectionsToDate: string;
+  paymentsDuePeriod: string;
+  paymentsDueFromDate: string;
+  paymentsDueToDate: string;
+}): string {
+  return [
+    params.collectionsPeriod,
+    params.collectionsFromDate,
+    params.collectionsToDate,
+    params.paymentsDuePeriod,
+    params.paymentsDueFromDate,
+    params.paymentsDueToDate,
+  ].join("|");
+}
+
 export function useDashboardData({
   collectionsPeriod = "this_month",
   collectionsFromDate = "",
@@ -22,17 +41,22 @@ export function useDashboardData({
   paymentsDueToDate = "",
   isInitialized,
 }: UseDashboardDataParams) {
-  const { setDashboardData, setLoading, setError } = useRentalDashboardStore();
+  const {
+    setDashboardData,
+    setLoading,
+    setError,
+    setLastFetchedDashboardKey,
+    loading,
+    lastFetchedDashboardKey,
+  } = useRentalDashboardStore();
 
   const fetchDashboardData = async () => {
-    // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {
       console.log("No token available, skipping fetchDashboardData");
       return;
     }
 
-    // التحقق من الحقول المطلوبة عند اختيار "مخصص"
     if (
       collectionsPeriod === "custom" &&
       (!collectionsFromDate || !collectionsToDate)
@@ -48,6 +72,20 @@ export function useDashboardData({
       console.log("Payments due custom period requires both from and to dates");
       return;
     }
+
+    const paramsKey = buildDashboardParamsKey({
+      collectionsPeriod,
+      collectionsFromDate,
+      collectionsToDate,
+      paymentsDuePeriod,
+      paymentsDueFromDate,
+      paymentsDueToDate,
+    });
+
+    // PREVENT_DUPLICATE_API: loading guard
+    if (loading) return;
+    // PREVENT_DUPLICATE_API: cache + last-fetched guard (نفس الفلاتر = لا إعادة طلب)
+    if (lastFetchedDashboardKey === paramsKey) return;
 
     try {
       setLoading(true);
@@ -77,6 +115,7 @@ export function useDashboardData({
 
       if (response.data.status) {
         setDashboardData(response.data.data);
+        setLastFetchedDashboardKey(paramsKey);
       } else {
         setError("فشل في جلب بيانات لوحة المعلومات");
       }

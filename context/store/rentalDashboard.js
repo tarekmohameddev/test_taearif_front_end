@@ -6,6 +6,8 @@ export const useRentalDashboardStore = create((set, get) => ({
   loading: false,
   error: null,
   isInitialized: false,
+  /** مفتاح آخر جلب (لمنع الطلبات المكررة) — PREVENT_DUPLICATE_API_PROMPT */
+  lastFetchedDashboardKey: null,
 
   // بيانات الإحصائيات
   counts: {
@@ -67,6 +69,8 @@ export const useRentalDashboardStore = create((set, get) => ({
 
   setError: (error) => set({ error }),
 
+  setLastFetchedDashboardKey: (key) => set({ lastFetchedDashboardKey: key }),
+
   // Dialog actions
   openOngoingRentalsDialog: () => set({ isOngoingRentalsDialogOpen: true }),
   closeOngoingRentalsDialog: () => set({ isOngoingRentalsDialogOpen: false }),
@@ -97,6 +101,7 @@ export const useRentalDashboardStore = create((set, get) => ({
       loading: false,
       error: null,
       isInitialized: false,
+      lastFetchedDashboardKey: null,
       counts: {
         ongoing_rentals: 0,
         expiring_contracts_next_30d: 0,
