@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useEditorT } from "@/context/editorI18nStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { usePageForm } from "../../hooks/usePageForm";
 import { usePageValidation } from "../../hooks/usePageValidation";
 import { createPageHandler } from "../../utils/createPageHandler";
@@ -34,7 +35,7 @@ export function AddPageDialog({
   const setOpen = onOpenChange || setInternalOpen;
   const [errors, setErrors] = useState<Record<string, string>>({});
   const t = useEditorT();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const router = useRouter();
 
   const {

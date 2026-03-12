@@ -21,7 +21,6 @@ export const usePropertyData = (props: propertyDetail2Props) => {
   const propertyDetailStates = useEditorStore((s) => s.propertyDetailStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Tenant ID hook
@@ -34,14 +33,7 @@ export const usePropertyData = (props: propertyDetail2Props) => {
   const [loadingProperty, setLoadingProperty] = useState(true);
   const [propertyError, setPropertyError] = useState<string | null>(null);
 
-  // Initialize tenant data
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Extract component data from tenantData
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect)
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
       return {};

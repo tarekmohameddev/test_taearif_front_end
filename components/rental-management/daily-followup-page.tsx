@@ -6,10 +6,11 @@ import { DailyFollowupStats } from "@/components/rental-management/daily-followu
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import useDailyFollowupStore from "@/context/store/dailyFollowup";
 
 export function DailyFollowupPage() {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const router = useRouter();
   const { resetFilters } = useDailyFollowupStore();
 

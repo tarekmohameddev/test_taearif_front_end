@@ -51,7 +51,7 @@ import {
 import { useEffect, useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import useStore from "@/context/Store";
+import useMarketingStore from "@/context/marketingStore";
 import { WhatsAppSendDialog } from "@/components/marketing/whatsapp-send-dialog";
 import axiosInstance from "@/lib/axiosInstance";
 import {
@@ -64,6 +64,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, CheckCircle } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 
 export const CustomerTable = ({
@@ -89,7 +90,7 @@ export const CustomerTable = ({
   onPageChange,
   loading,
 }: any) => {
-  const { marketingChannels, fetchMarketingChannels } = useStore();
+  const { marketingChannels, fetchMarketingChannels } = useMarketingStore();
   const [showWhatsAppDialog, setShowWhatsAppDialog] = useState(false);
   const [selectedCustomerForWhatsApp, setSelectedCustomerForWhatsApp] =
     useState<any>(null);
@@ -113,7 +114,7 @@ export const CustomerTable = ({
   );
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // جلب قنوات التسويق عند تحميل المكون
   useEffect(() => {

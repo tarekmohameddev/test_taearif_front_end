@@ -25,6 +25,29 @@ function getData<T>(res: {
   return (body?.data ?? body) as T;
 }
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function conversationsListKey(params?: ConversationListParams): string {
+  if (!params) return "conversations:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof ConversationListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `conversations:${JSON.stringify(sorted)}`;
+}
+
 // --- Backend types (approximate; keep flexible for mapping layer) ---
 
 export interface ApiConversation {
@@ -114,37 +137,42 @@ type ApiConversationListEnvelope = {
 export async function listConversations(
   params?: ConversationListParams
 ): Promise<ApiConversationListResponse> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  if (params?.status) q.set("status", params.status);
-  if (params?.search) q.set("search", params.search);
-  if (params?.wa_number_id != null)
-    q.set("wa_number_id", String(params.wa_number_id));
+  const key = conversationsListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    if (params?.status) q.set("status", params.status);
+    if (params?.search) q.set("search", params.search);
+    if (params?.wa_number_id != null)
+      q.set("wa_number_id", String(params.wa_number_id));
 
-  const res = await axiosInstance.get(`${BASE}/conversations?${q}`);
-  const raw = getData<ApiConversationListEnvelope>(res);
-  const list = raw?.data ?? [];
-  const pag = raw?.pagination ?? {};
+    const res = await axiosInstance.get(`${BASE}/conversations?${q}`);
+    const raw = getData<ApiConversationListEnvelope>(res);
+    const list = raw?.data ?? [];
+    const pag = raw?.pagination ?? {};
 
-  return {
-    conversations: Array.isArray(list) ? list : [],
-    pagination: {
-      current_page: pag.current_page ?? 1,
-      per_page: pag.per_page ?? (params?.per_page ?? 20),
-      total: pag.total ?? 0,
-      last_page: pag.last_page ?? 1,
-    },
-  };
+    return {
+      conversations: Array.isArray(list) ? list : [],
+      pagination: {
+        current_page: pag.current_page ?? 1,
+        per_page: pag.per_page ?? (params?.per_page ?? 20),
+        total: pag.total ?? 0,
+        last_page: pag.last_page ?? 1,
+      },
+    };
+  });
 }
 
 export async function getConversationApi(
   id: string
 ): Promise<ApiConversation> {
-  const res = await axiosInstance.get(`${BASE}/conversations/${id}`);
-  const raw = getData<ApiConversation | { data?: ApiConversation }>(res);
-  const conv = (raw as { data?: ApiConversation } | ApiConversation).data ?? raw;
-  return conv as ApiConversation;
+  return dedupeByKey(`conversation:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/conversations/${id}`);
+    const raw = getData<ApiConversation | { data?: ApiConversation }>(res);
+    const conv = (raw as { data?: ApiConversation } | ApiConversation).data ?? raw;
+    return conv as ApiConversation;
+  });
 }
 
 // --- Messages ---
@@ -152,21 +180,23 @@ export async function getConversationApi(
 export async function listMessages(
   conversationId: string
 ): Promise<ApiMessage[]> {
-  const res = await axiosInstance.get(
-    `${BASE}/conversations/${conversationId}/messages`
-  );
-  const raw = getData<
-    | ApiMessage[]
-    | { data?: ApiMessage[] }
-    | { data?: { messages?: ApiMessage[] } }
-  >(res);
+  return dedupeByKey(`messages:${conversationId}`, async () => {
+    const res = await axiosInstance.get(
+      `${BASE}/conversations/${conversationId}/messages`
+    );
+    const raw = getData<
+      | ApiMessage[]
+      | { data?: ApiMessage[] }
+      | { data?: { messages?: ApiMessage[] } }
+    >(res);
 
-  if (Array.isArray(raw)) return raw;
-  const inner = (raw as { data?: unknown })?.data;
-  if (Array.isArray(inner)) return inner;
-  const messages = (inner as { messages?: ApiMessage[] })?.messages;
-  if (Array.isArray(messages)) return messages;
-  return [];
+    if (Array.isArray(raw)) return raw;
+    const inner = (raw as { data?: unknown })?.data;
+    if (Array.isArray(inner)) return inner;
+    const messages = (inner as { messages?: ApiMessage[] })?.messages;
+    if (Array.isArray(messages)) return messages;
+    return [];
+  });
 }
 
 export interface SendMessageBody {

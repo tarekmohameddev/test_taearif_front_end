@@ -1,8 +1,23 @@
 import { headers } from "next/headers";
+import nextDynamic from "next/dynamic";
 import { getMetaForSlugServer } from "@/lib/metaTags";
 import { getDefaultSeoData } from "@/lib/defaultSeo";
-import TenantPageWrapper from "../TenantPageWrapper";
 import { isMultiLevelPage } from "@/lib/multiLevelPages";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const TenantPageWrapper = nextDynamic(
+  () => import("../TenantPageWrapper").then((m) => m.default),
+  {
+    ssr: true,
+    loading: () => (
+      <div className="min-h-screen flex flex-col">
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="flex-1 min-h-[60vh] w-full" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    ),
+  }
+);
 
 export const dynamic = "force-dynamic";
 
@@ -109,14 +124,6 @@ export default async function TenantPage({
     | null;
   const { slug: slugArray } = await params;
 
-  // 🔍 Debug logging for route matching
-  console.log("🔍 [...slug]/page.tsx - Route Match:", {
-    slugArray,
-    slugArrayLength: slugArray?.length,
-    tenantId,
-    domainType,
-  });
-
   // Handle complex paths: ["property-requests", "create"] -> slug: "property-requests/create"
   // Or single slug: ["about"] -> slug: "about"
   // Or multi-level: ["project", "samy"] -> slug: "project", dynamicSlug: "samy"
@@ -130,18 +137,6 @@ export default async function TenantPage({
     : slugArray?.join("/") || "";
   const dynamicSlug =
     isMultiLevel && slugArray?.length > 1 ? slugArray[1] : undefined;
-
-  console.log("🔍 [...slug]/page.tsx - Processed:", {
-    slug,
-    isMultiLevel,
-    dynamicSlug,
-    tenantId,
-    domainType,
-  });
-
-  if (!tenantId) {
-    console.log("❌ [...slug]/page.tsx - No tenantId found!");
-  }
 
   return (
     <TenantPageWrapper

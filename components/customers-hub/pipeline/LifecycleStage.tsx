@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import type { LifecycleStageInfo, UnifiedCustomer } from "@/types/unified-customer";
 import { CustomerPipelineCard } from "./CustomerPipelineCard";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import useUnifiedCustomersStore from "@/context/store/unified-customers";
 
 interface LifecycleStageProps {
   stage: LifecycleStageInfo;

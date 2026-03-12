@@ -23,6 +23,53 @@ function getData<T>(
   return (body?.data ?? body) as T;
 }
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function numbersListKey(params?: GetWhatsAppNumbersParams): string {
+  if (!params) return "numbers:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof GetWhatsAppNumbersParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `numbers:${JSON.stringify(sorted)}`;
+}
+
+function campaignsListKey(params?: CampaignListParams): string {
+  if (!params) return "campaigns:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof CampaignListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `campaigns:${JSON.stringify(sorted)}`;
+}
+
+function waTemplatesListKey(params?: { per_page?: number; page?: number }): string {
+  if (!params) return "wa-templates:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof { per_page?: number; page?: number })[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `wa-templates:${JSON.stringify(sorted)}`;
+}
+
 /** API error body for WhatsApp endpoints (4xx). */
 export interface WhatsAppApiErrorBody {
   status?: boolean;
@@ -99,15 +146,18 @@ export interface GetWhatsAppNumbersParams {
 export async function getWhatsAppNumbers(
   params?: GetWhatsAppNumbersParams
 ): Promise<WhatsAppNumberDTO[]> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.status) q.set("status", params.status);
-  const res = await axiosInstance.get(`${BASE}/numbers?${q}`);
-  const raw = getData<ApiWhatsAppNumber[] | { data?: ApiWhatsAppNumber[] }>(
-    res
-  );
-  const list = Array.isArray(raw) ? raw : (raw as { data?: ApiWhatsAppNumber[] })?.data ?? [];
-  return (list as ApiWhatsAppNumber[]).map(mapNumberToDTO);
+  const key = numbersListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.status) q.set("status", params.status);
+    const res = await axiosInstance.get(`${BASE}/numbers?${q}`);
+    const raw = getData<ApiWhatsAppNumber[] | { data?: ApiWhatsAppNumber[] }>(
+      res
+    );
+    const list = Array.isArray(raw) ? raw : (raw as { data?: ApiWhatsAppNumber[] })?.data ?? [];
+    return (list as ApiWhatsAppNumber[]).map(mapNumberToDTO);
+  });
 }
 
 // --- Campaigns ---
@@ -170,27 +220,32 @@ export interface WaCampaignListResponse {
 export async function getWaCampaigns(
   params?: CampaignListParams
 ): Promise<WaCampaignListResponse> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  if (params?.status) q.set("status", params.status);
-  const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
-  const raw = getData<LaravelPaginatedData<ApiWaCampaign>>(res);
-  const list = raw?.data ?? [];
-  return {
-    campaigns: Array.isArray(list) ? list : [],
-    pagination: {
-      current_page: raw?.current_page ?? 1,
-      per_page: raw?.per_page ?? 20,
-      total: raw?.total ?? 0,
-      last_page: raw?.last_page ?? 1,
-    },
-  };
+  const key = campaignsListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    if (params?.status) q.set("status", params.status);
+    const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
+    const raw = getData<LaravelPaginatedData<ApiWaCampaign>>(res);
+    const list = raw?.data ?? [];
+    return {
+      campaigns: Array.isArray(list) ? list : [],
+      pagination: {
+        current_page: raw?.current_page ?? 1,
+        per_page: raw?.per_page ?? 20,
+        total: raw?.total ?? 0,
+        last_page: raw?.last_page ?? 1,
+      },
+    };
+  });
 }
 
 export async function getWaCampaign(id: number): Promise<ApiWaCampaign> {
-  const res = await axiosInstance.get(`${BASE}/campaigns/${id}`);
-  return getData<ApiWaCampaign>(res);
+  return dedupeByKey(`campaign:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/campaigns/${id}`);
+    return getData<ApiWaCampaign>(res);
+  });
 }
 
 /** Content contract: exactly one of message or template_id. */
@@ -332,11 +387,14 @@ export async function getWaTemplates(params?: {
   per_page?: number;
   page?: number;
 }): Promise<ApiWaTemplate[]> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  const res = await axiosInstance.get(`${BASE}/templates?${q}`);
-  const raw = getData<ApiWaTemplate[] | { data?: ApiWaTemplate[] }>(res);
-  const list = Array.isArray(raw) ? raw : (raw as { data?: ApiWaTemplate[] })?.data ?? [];
-  return (list as ApiWaTemplate[]) ?? [];
+  const key = waTemplatesListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    const res = await axiosInstance.get(`${BASE}/templates?${q}`);
+    const raw = getData<ApiWaTemplate[] | { data?: ApiWaTemplate[] }>(res);
+    const list = Array.isArray(raw) ? raw : (raw as { data?: ApiWaTemplate[] })?.data ?? [];
+    return (list as ApiWaTemplate[]) ?? [];
+  });
 }

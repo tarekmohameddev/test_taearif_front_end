@@ -41,6 +41,7 @@ import {
   Loader2,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import useContractsStore from "@/context/store/contracts";
 
 interface PaymentData {
@@ -89,7 +90,7 @@ interface PaymentData {
 
 export function ContractsService() {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const {
     contractsData,

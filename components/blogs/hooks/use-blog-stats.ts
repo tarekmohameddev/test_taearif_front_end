@@ -19,9 +19,11 @@ import { useState, useEffect } from "react";
 import { blogApi } from "../services/blog-api";
 import type { BlogStats } from "../types/blog.types";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export function useBlogStats() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [stats, setStats] = useState<BlogStats>({
     total_blogs: 0,
     total_views: 0,

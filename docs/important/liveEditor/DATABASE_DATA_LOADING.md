@@ -91,16 +91,9 @@ export default function Partners1(props: PartnersProps = {}) {
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const partnersStates = useEditorStore((s) => s.partnersStates);
 
-  // Get tenant data FIRST
+  // Get tenant data from store (fetched once by useTenantDataEffect in LiveEditorEffects)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Extract component data from tenantData
   const getTenantComponentData = () => {

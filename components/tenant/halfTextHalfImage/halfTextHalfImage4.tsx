@@ -121,21 +121,10 @@ export default function HalfTextHalfImage4(props: HalfTextHalfImage4Props) {
   );
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
 
-  // ─────────────────────────────────────────────────────────
-  // 3. FETCH TENANT DATA
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // ─────────────────────────────────────────────────────────
-  // 4. RETRIEVE DATA FROM STORE
+  // RETRIEVE DATA FROM STORE
   // ─────────────────────────────────────────────────────────
   const storeData = props.useStore
     ? halfTextHalfImageStates[uniqueId] || {}

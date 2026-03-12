@@ -70,6 +70,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import useDailyFollowupStore from "@/context/store/dailyFollowup";
 import toast from "react-hot-toast";
 
@@ -123,7 +124,7 @@ interface PaymentData {
 
 export function DailyFollowupService() {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const isInitialMount = useRef(true);
 
   const {

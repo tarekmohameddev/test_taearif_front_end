@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -144,12 +144,15 @@ export default function ViewEmployeePage() {
   const [employeeDetails, setEmployeeDetails] = useState<Employee | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const fetchDetailsInFlightRef = useRef(false);
 
-  // Fetch employee details
+  // Fetch employee details (duplicate-API guards per PREVENT_DUPLICATE_API_PROMPT.md)
   useEffect(() => {
     if (!employeeId) return;
 
     const fetchEmployeeDetails = async () => {
+      if (fetchDetailsInFlightRef.current) return;
+      fetchDetailsInFlightRef.current = true;
       setDetailsLoading(true);
       setError(null);
       try {
@@ -162,6 +165,7 @@ export default function ViewEmployeePage() {
         setError(err.response?.data?.message || "حدث خطأ في جلب تفاصيل الموظف");
       } finally {
         setDetailsLoading(false);
+        fetchDetailsInFlightRef.current = false;
       }
     };
 

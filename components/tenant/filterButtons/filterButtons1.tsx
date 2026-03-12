@@ -40,16 +40,9 @@ export default function FilterButtons({
   const { transactionType, activeFilter, setActiveFilter } =
     usePropertiesStore();
 
-  // Get tenant data from store
+  // Get tenant data from store (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get data from store or content prop with fallback logic
   const storeData = useStore

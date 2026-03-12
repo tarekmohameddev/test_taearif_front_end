@@ -18,6 +18,17 @@ function getData<T>(res: {
   return (body?.data ?? body) as T;
 }
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
 // --- Backend types (approximate; keep flexible for mapping layer) ---
 
 export interface ApiWhatsAppTemplate {
@@ -32,27 +43,31 @@ export interface ApiWhatsAppTemplate {
 }
 
 export async function listWhatsAppTemplates(): Promise<ApiWhatsAppTemplate[]> {
-  const res = await axiosInstance.get(`${BASE}/templates`);
-  const raw = getData<ApiWhatsAppTemplate[] | { data?: ApiWhatsAppTemplate[] }>(
-    res
-  );
-  if (Array.isArray(raw)) {
-    return raw;
-  }
-  return (raw as { data?: ApiWhatsAppTemplate[] })?.data ?? [];
+  return dedupeByKey("templates", async () => {
+    const res = await axiosInstance.get(`${BASE}/templates`);
+    const raw = getData<ApiWhatsAppTemplate[] | { data?: ApiWhatsAppTemplate[] }>(
+      res
+    );
+    if (Array.isArray(raw)) {
+      return raw;
+    }
+    return (raw as { data?: ApiWhatsAppTemplate[] })?.data ?? [];
+  });
 }
 
 export async function getWhatsAppTemplateApi(
   id: string
 ): Promise<ApiWhatsAppTemplate> {
-  const res = await axiosInstance.get(`${BASE}/templates/${id}`);
-  const raw = getData<
-    ApiWhatsAppTemplate | { data?: ApiWhatsAppTemplate; template?: ApiWhatsAppTemplate }
-  >(res);
-  const withData = (raw as { data?: ApiWhatsAppTemplate })?.data;
-  const withTemplate = (raw as { template?: ApiWhatsAppTemplate })?.template;
-  const template = withData ?? withTemplate ?? raw;
-  return template as ApiWhatsAppTemplate;
+  return dedupeByKey(`template:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/templates/${id}`);
+    const raw = getData<
+      ApiWhatsAppTemplate | { data?: ApiWhatsAppTemplate; template?: ApiWhatsAppTemplate }
+    >(res);
+    const withData = (raw as { data?: ApiWhatsAppTemplate })?.data;
+    const withTemplate = (raw as { template?: ApiWhatsAppTemplate })?.template;
+    const template = withData ?? withTemplate ?? raw;
+    return template as ApiWhatsAppTemplate;
+  });
 }
 
 export async function createWhatsAppTemplateApi(

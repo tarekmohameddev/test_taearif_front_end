@@ -9,12 +9,13 @@ import axiosInstance from "@/lib/axiosInstance";
 import { CustomerForm } from "@/components/customers/page-components/CustomerForm";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export default function EditCustomerPage() {
   const params = useParams();
   const router = useRouter();
   const customerId = params?.id as string;
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const [customerDetails, setCustomerDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);

@@ -27,7 +27,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { LIFECYCLE_STAGES, getStageNameAr } from "@/types/unified-customer";
 
 export function AdvancedFilters() {
-  const { filters, setFilters, clearFilters, applyFilters } = useUnifiedCustomersStore();
+  const filters = useUnifiedCustomersStore((state) => state.filters);
+  const setFilters = useUnifiedCustomersStore((state) => state.setFilters);
+  const clearFilters = useUnifiedCustomersStore((state) => state.clearFilters);
+  const applyFilters = useUnifiedCustomersStore((state) => state.applyFilters);
   const [isOpen, setIsOpen] = useState(false);
 
   const propertyTypes = [

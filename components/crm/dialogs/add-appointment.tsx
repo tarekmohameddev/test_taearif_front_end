@@ -21,6 +21,7 @@ import {
 import { Calendar, Clock, AlertTriangle, CalendarCheck } from "lucide-react";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface AddAppointmentDialogProps {
@@ -36,7 +37,7 @@ export default function AddAppointmentDialog({
     setShowAddAppointmentDialog,
     customers,
   } = useCrmStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [appointmentData, setAppointmentData] = useState({
     customer_id: "",
     title: "",

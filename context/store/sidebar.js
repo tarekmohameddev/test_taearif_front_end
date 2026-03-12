@@ -71,6 +71,7 @@ export default (set, get) => ({
   },
 
   fetchSideMenus: async (app) => {
+    // Initial fetch is triggered only from app/dashboard/layout.tsx when token is valid; other callers (e.g. apps-page) may call with an argument to force refresh.
     // التحقق من وجود التوكن قبل إجراء الطلب
     const token = useAuthStore.getState().userData?.token;
     if (!token) {

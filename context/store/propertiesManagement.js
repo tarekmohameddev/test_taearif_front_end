@@ -17,6 +17,7 @@ export default (set) => ({
     isInitialized: false,
     pagination: null,
     propertiesAllData: null,
+    incompleteCount: 0,
   },
 
   setPropertiesManagement: (newState) =>

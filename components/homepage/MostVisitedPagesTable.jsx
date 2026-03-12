@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   Card,
   CardHeader,
@@ -23,27 +24,42 @@ export function MostVisitedPagesTable() {
   const [pagesData, setPagesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
+  const fetchingRef = useRef(false);
+  const lastFetchedAtRef = useRef(null);
 
-  // دالة جلب البيانات من API
+  // دالة جلب البيانات من API (see docs/important/prompts/PREVENT_DUPLICATE_API_PROMPT.md)
   const fetchMostVisitedPages = async () => {
-    // Wait until token is fetched
     if (authLoading || !userData?.token) {
       setLoading(false);
-      return; // Exit early if token is not ready
+      return;
     }
 
+    // CHECK 1: Already fetching
+    if (fetchingRef.current) return;
+    // CHECK 2: Fetched within last second
+    if (
+      lastFetchedAtRef.current &&
+      Date.now() - lastFetchedAtRef.current < 1000
+    ) {
+      return;
+    }
+
+    fetchingRef.current = true;
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
       const response = await axiosInstance.get(
         `${process.env.NEXT_PUBLIC_Backend_URL}/dashboard/most-visited-pages`,
       );
       setPagesData(response.data.pages);
+      lastFetchedAtRef.current = Date.now();
     } catch (err) {
       console.error("Error fetching most visited pages:", err);
       setError(err.message || "حدث خطأ أثناء جلب البيانات");
     } finally {
+      fetchingRef.current = false;
       setLoading(false);
     }
   };

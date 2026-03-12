@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 // Types
 interface PropertyLog {
@@ -65,7 +66,8 @@ interface PropertyLogsResponse {
 }
 
 export default function PropertyActivityLogPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const params = useParams();
   const propertyId = params.slug as string;
 

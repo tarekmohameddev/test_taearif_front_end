@@ -18,9 +18,11 @@ import { useState, useEffect, useCallback } from "react";
 import { blogApi } from "../services/blog-api";
 import type { BlogListItem, Pagination } from "../types/blog.types";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export function useBlogsList(initialPage: number = 1, perPage: number = 15) {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [blogs, setBlogs] = useState<BlogListItem[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);

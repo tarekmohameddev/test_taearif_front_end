@@ -21,6 +21,7 @@ import {
 import { Bell, Calendar, Clock, AlertTriangle, Loader2 } from "lucide-react";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface AddReminderDialogProps {
@@ -44,7 +45,8 @@ export default function AddReminderDialog({
     setShowAddReminderDialog,
     customers,
   } = useCrmStore();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [reminderData, setReminderData] = useState({
     customer_id: "",

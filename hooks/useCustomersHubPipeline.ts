@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   getPipelineBoard,
   getPipelineFilterOptions,
@@ -14,7 +15,8 @@ import {
 } from "@/lib/services/customers-hub-pipeline-api";
 
 export function useCustomersHubPipeline() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [analytics, setAnalytics] = useState<PipelineAnalytics | null>(null);
   const [filterOptions, setFilterOptions] = useState<FilterOptionsResponse["data"] | null>(null);

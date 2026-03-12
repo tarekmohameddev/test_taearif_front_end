@@ -18,12 +18,14 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export default function CustomerDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const customerId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [customerDetails, setCustomerDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);

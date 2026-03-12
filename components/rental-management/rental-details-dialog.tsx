@@ -50,6 +50,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 
 interface RentalDetails {
@@ -114,10 +115,14 @@ export function RentalDetailsDialog() {
 
   const { isRentalDetailsDialogOpen, selectedRentalId } = rentalApplications;
 
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const [details, setDetails] = useState<RentalDetails | null>(null);
   const [loading, setLoading] = useState(false);
+  /** PREVENT_DUPLICATE_API: مفتاح آخر جلب لتفادي الطلبات المكررة */
+  const [lastFetchedRentalId, setLastFetchedRentalId] = useState<
+    number | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("tenant");
 
@@ -170,11 +175,11 @@ export function RentalDetailsDialog() {
   // Cleanup effect to fix pointer-events issue
   useEffect(() => {
     if (!isRentalDetailsDialogOpen) {
-      // Reset states
       setActiveTab("tenant");
       setIsAddExpenseDialogOpen(false);
       setIsDeleteExpenseDialogOpen(false);
       setExpenseToDelete(null);
+      setLastFetchedRentalId(null);
 
       // Fix pointer-events issue by removing the style attribute
       setTimeout(() => {
@@ -203,11 +208,13 @@ export function RentalDetailsDialog() {
   const fetchRentalDetails = async () => {
     if (!selectedRentalId) return;
 
-    // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
       console.log("No token available, skipping fetchRentalDetails");
       return;
     }
+
+    if (loading) return;
+    if (details && lastFetchedRentalId === selectedRentalId) return;
 
     setLoading(true);
     setError(null);
@@ -219,6 +226,7 @@ export function RentalDetailsDialog() {
 
       if (response.data.status) {
         setDetails(response.data.data);
+        setLastFetchedRentalId(selectedRentalId);
       } else {
         setError("فشل في تحميل تفاصيل طلب الإيجار");
       }
@@ -232,6 +240,7 @@ export function RentalDetailsDialog() {
 
   const fetchExpensesData = async () => {
     if (!details?.property?.id) return;
+    if (expensesLoading) return;
 
     setExpensesLoading(true);
     setExpensesError(null);
@@ -269,6 +278,7 @@ export function RentalDetailsDialog() {
 
   const fetchActualExpensesData = async () => {
     if (!selectedRentalId) return;
+    if (actualExpensesLoading) return;
 
     try {
       setActualExpensesLoading(true);

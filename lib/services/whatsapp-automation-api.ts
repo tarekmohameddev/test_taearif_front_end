@@ -18,6 +18,29 @@ function getData<T>(res: {
   return (body?.data ?? body) as T;
 }
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function automationListKey(params?: AutomationRuleListParams): string {
+  if (!params) return "automation-rules:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof AutomationRuleListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `automation-rules:${JSON.stringify(sorted)}`;
+}
+
 // --- Backend types (approximate; keep flexible for mapping layer) ---
 
 export interface ApiAutomationRule {
@@ -66,38 +89,43 @@ export interface ApiAutomationStats {
 export async function listAutomationRules(
   params?: AutomationRuleListParams
 ): Promise<ApiAutomationRule[]> {
-  const q = new URLSearchParams();
-  if (params?.is_active != null) {
-    q.set("is_active", params.is_active ? "1" : "0");
-  }
-  if (params?.trigger) {
-    q.set("trigger", params.trigger);
-  }
-  if (params?.wa_number_id != null) {
-    q.set("wa_number_id", String(params.wa_number_id));
-  }
+  const key = automationListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.is_active != null) {
+      q.set("is_active", params.is_active ? "1" : "0");
+    }
+    if (params?.trigger) {
+      q.set("trigger", params.trigger);
+    }
+    if (params?.wa_number_id != null) {
+      q.set("wa_number_id", String(params.wa_number_id));
+    }
 
-  const queryString = q.toString();
-  const url =
-    queryString.length > 0
-      ? `${BASE}/automation/rules?${queryString}`
-      : `${BASE}/automation/rules`;
+    const queryString = q.toString();
+    const url =
+      queryString.length > 0
+        ? `${BASE}/automation/rules?${queryString}`
+        : `${BASE}/automation/rules`;
 
-  const res = await axiosInstance.get(url);
-  const raw = getData<ApiAutomationRule[] | ApiAutomationRuleListEnvelope>(res);
+    const res = await axiosInstance.get(url);
+    const raw = getData<ApiAutomationRule[] | ApiAutomationRuleListEnvelope>(res);
 
-  if (Array.isArray(raw)) {
-    return raw;
-  }
+    if (Array.isArray(raw)) {
+      return raw;
+    }
 
-  return (raw?.data ?? []) as ApiAutomationRule[];
+    return (raw?.data ?? []) as ApiAutomationRule[];
+  });
 }
 
 export async function getAutomationRuleApi(
   id: string
 ): Promise<ApiAutomationRule> {
-  const res = await axiosInstance.get(`${BASE}/automation/rules/${id}`);
-  return getData<ApiAutomationRule>(res);
+  return dedupeByKey(`rule:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/automation/rules/${id}`);
+    return getData<ApiAutomationRule>(res);
+  });
 }
 
 export async function createAutomationRuleApi(
@@ -136,7 +164,9 @@ export async function deleteAutomationRuleApi(id: string): Promise<void> {
 }
 
 export async function getAutomationStatsApi(): Promise<ApiAutomationStats> {
-  const res = await axiosInstance.get(`${BASE}/automation/stats`);
-  return getData<ApiAutomationStats>(res);
+  return dedupeByKey("automation-stats", async () => {
+    const res = await axiosInstance.get(`${BASE}/automation/stats`);
+    return getData<ApiAutomationStats>(res);
+  });
 }
 

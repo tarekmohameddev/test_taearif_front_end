@@ -41,6 +41,7 @@ import { CustomDropdown, DropdownItem } from "@/components/customComponents/cust
 import axiosInstance from "@/lib/axiosInstance";
 import { assignPropertyToCustomer } from "@/lib/services/customer-assigned-properties-api";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { CustomerRequestsCard } from "./CustomerRequestsCard";
@@ -318,7 +319,7 @@ function PropertiesSectionCard({
   customerId: string;
   onPropertyAdded?: () => void;
 }) {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [isOpen, setIsOpen] = useState(true);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
@@ -1523,8 +1524,12 @@ export function CustomerDetailPageSimple({
   onUpdatePreferences,
   onPropertyAdded,
 }: CustomerDetailPageSimpleProps) {
-  const store = useUnifiedCustomersStore();
-  const { getCustomerById, setSelectedCustomer } = store;
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
+  const setSelectedCustomer = useUnifiedCustomersStore(
+    (state) => state.setSelectedCustomer,
+  );
 
   // Use prop customer if provided, otherwise find in store
   const customer = propCustomer ?? getCustomerById(customerId);

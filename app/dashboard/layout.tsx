@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import useAuthStore from "@/context/AuthContext";
 
@@ -24,6 +23,7 @@ const PermissionWrapper = dynamic(
 );
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
+import useSidebarStore from "@/context/sidebarStore";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
@@ -65,16 +65,12 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Token validation
+  // Token validation (useTokenValidation already fetches user once and syncs AuthStore + userStore)
   const { tokenValidation } = useTokenValidation();
-  const router = useRouter();
   const [isValidDomain, setIsValidDomain] = useState<boolean | null>(null);
-  const fetchUserFromAPI = useAuthStore((state) => state.fetchUserFromAPI);
   const hydrateUserFromStorage = useAuthStore(
     (state) => state.hydrateUserFromStorage,
   );
-  const userData = useAuthStore((state) => state.userData);
-  const hasFetchedUserRef = useRef(false);
 
   // تهيئة الـ store من localStorage فوراً لعرض اسم الـ tenant والرابط في الـ sidebar قبل وصول استجابة API
   useEffect(() => {
@@ -90,41 +86,6 @@ export default function DashboardLayout({
       return false;
     },
   );
-
-  // جلب بيانات المستخدم من API عند فتح أي صفحة في الداشبورد
-  useEffect(() => {
-    const fetchUser = async () => {
-      // منع إعادة الجلب إذا تم الجلب من قبل
-      if (hasFetchedUserRef.current) {
-        return;
-      }
-
-      // التحقق من وجود التوكن قبل إجراء الطلب
-      if (!userData?.token) {
-        return;
-      }
-
-      hasFetchedUserRef.current = true;
-
-      try {
-        await fetchUserFromAPI();
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        // إعادة تعيين المرجع في حالة الخطأ للسماح بإعادة المحاولة
-        hasFetchedUserRef.current = false;
-      }
-    };
-
-    // جلب البيانات فقط بعد التحقق من صحة الجلسة
-    if (tokenValidation.isValid && !tokenValidation.loading) {
-      fetchUser();
-    }
-  }, [
-    tokenValidation.isValid,
-    tokenValidation.loading,
-    userData?.token,
-    fetchUserFromAPI,
-  ]);
 
   // حفظ حالة التحقق في sessionStorage عند اكتمال التحقق بنجاح
   // هذا يضمن عدم عرض رسالة التحميل عند التنقل بين الصفحات في نفس الجلسة
@@ -145,6 +106,13 @@ export default function DashboardLayout({
     ) {
       sessionStorage.removeItem(SESSION_VALIDATION_KEY);
       setHasValidatedSession(false);
+    }
+  }, [tokenValidation.isValid, tokenValidation.loading]);
+
+  // Start sidebar menu fetch as soon as token is valid (runs in parallel with PermissionWrapper)
+  useEffect(() => {
+    if (tokenValidation.isValid === true && !tokenValidation.loading) {
+      useSidebarStore.getState().fetchSideMenus();
     }
   }, [tokenValidation.isValid, tokenValidation.loading]);
 

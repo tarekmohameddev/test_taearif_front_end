@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -90,7 +91,7 @@ export function VendorManagementService() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

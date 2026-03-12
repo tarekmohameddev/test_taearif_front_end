@@ -41,6 +41,7 @@ import {
   MapPin,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PurchaseAgreement {
   id: string;
@@ -112,7 +113,7 @@ export function PurchaseAgreementsService() {
   const [selectedAgreement, setSelectedAgreement] =
     useState<PurchaseAgreement | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

@@ -36,6 +36,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PaymentCollectionData {
   rental_info: {
@@ -109,11 +110,15 @@ export function PaymentCollectionDialog() {
   const { isPaymentCollectionDialogOpen, selectedPaymentRentalId } =
     rentalApplications;
 
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const [data, setData] = useState<PaymentCollectionData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** PREVENT_DUPLICATE_API: مفتاح آخر جلب لتفادي الطلبات المكررة */
+  const [lastFetchedPaymentRentalId, setLastFetchedPaymentRentalId] = useState<
+    number | null
+  >(null);
   const [paymentAmount, setPaymentAmount] = useState<string>("");
   const [fullPaymentAmount, setFullPaymentAmount] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -176,6 +181,7 @@ export function PaymentCollectionDialog() {
       setPaymentAmount("");
       setFullPaymentItems([]);
       setData(null);
+      setLastFetchedPaymentRentalId(null);
     }
   }, [isPaymentCollectionDialogOpen]);
 
@@ -232,9 +238,16 @@ export function PaymentCollectionDialog() {
   const fetchPaymentCollectionData = async () => {
     if (!selectedPaymentRentalId) return;
 
-    // التحقق من وجود التوكن قبل إجراء الطلب
     if (!userData?.token) {
       console.log("No token available, skipping fetchPaymentCollectionData");
+      return;
+    }
+
+    if (loading) return;
+    if (
+      data &&
+      lastFetchedPaymentRentalId === selectedPaymentRentalId
+    ) {
       return;
     }
 
@@ -248,6 +261,7 @@ export function PaymentCollectionDialog() {
 
       if (response.data.status) {
         setData(response.data.data);
+        setLastFetchedPaymentRentalId(selectedPaymentRentalId);
       } else {
         setError("فشل في تحميل بيانات تحصيل المدفوعات");
       }

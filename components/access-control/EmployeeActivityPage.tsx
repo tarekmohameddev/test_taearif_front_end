@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 // Types
 interface EmployeeLog {
@@ -95,7 +96,8 @@ interface EmployeeResponse {
 export default function EmployeeActivityPage() {
   const params = useParams();
   const employeeId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   // State
   const [employeeLogs, setEmployeeLogs] = useState<EmployeeLog[]>([]);
@@ -110,10 +112,15 @@ export default function EmployeeActivityPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalLogs, setTotalLogs] = useState(0);
+  const fetchEmployeeInfoInFlightRef = useRef(false);
+  const fetchEmployeeLogsInFlightRef = useRef(false);
 
-  // Fetch employee info
+  // Fetch employee info (duplicate-API guards per PREVENT_DUPLICATE_API_PROMPT.md)
   const fetchEmployeeInfo = async () => {
     if (!employeeId || !userData?.token) return;
+    if (fetchEmployeeInfoInFlightRef.current) return;
+    if (employeeInfo?.id === Number(employeeId)) return;
+    fetchEmployeeInfoInFlightRef.current = true;
     setEmployeeLoading(true);
     try {
       const response = await axiosInstance.get<EmployeeResponse>(
@@ -134,12 +141,15 @@ export default function EmployeeActivityPage() {
       setError("فشل في جلب معلومات الموظف");
     } finally {
       setEmployeeLoading(false);
+      fetchEmployeeInfoInFlightRef.current = false;
     }
   };
 
-  // Fetch employee logs
+  // Fetch employee logs (duplicate-API guards)
   const fetchEmployeeLogs = async () => {
     if (!employeeId || !userData?.token) return;
+    if (fetchEmployeeLogsInFlightRef.current) return;
+    fetchEmployeeLogsInFlightRef.current = true;
     setLoading(true);
     setError(null);
     try {
@@ -180,6 +190,7 @@ export default function EmployeeActivityPage() {
       setError("فشل في جلب سجل نشاطات الموظف");
     } finally {
       setLoading(false);
+      fetchEmployeeLogsInFlightRef.current = false;
     }
   };
 

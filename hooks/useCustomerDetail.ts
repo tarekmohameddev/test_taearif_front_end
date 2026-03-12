@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   getCustomerDetail,
   updateCustomer as apiUpdateCustomer,
@@ -23,7 +24,8 @@ import {
 import type { UnifiedCustomer } from "@/types/unified-customer";
 
 export function useCustomerDetail(customerId: string) {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [customer, setCustomer] = useState<UnifiedCustomer | null>(null);
   const [stats, setStats] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);

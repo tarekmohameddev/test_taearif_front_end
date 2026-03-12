@@ -5,10 +5,15 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Loader2, Save, X, Home, MapPin, DollarSign } from "lucide-react";
+import {
+  getPropertyRequestById,
+  updatePropertyRequest,
+} from "@/lib/api/property-requests-dashboard-api";
 import axiosInstance from "@/lib/axiosInstance";
 import { PropertyRequestForm } from "@/components/property-requests/page-components/PropertyRequestForm";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   Select,
   SelectContent,
@@ -114,7 +119,8 @@ export default function EditPropertyRequestPage() {
   const params = useParams();
   const router = useRouter();
   const propertyRequestId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [propertyRequest, setPropertyRequest] = useState<PropertyRequest | null>(
     null,
@@ -145,9 +151,7 @@ export default function EditPropertyRequestPage() {
     setLoadingDetails(true);
     setError(null);
     try {
-      const response = await axiosInstance.get(`/v1/property-requests/${id}`);
-      // التحقق من وجود البيانات في أي من الأشكال المحتملة
-      const data = response.data?.data || response.data;
+      const data = await getPropertyRequestById(id);
       if (data && (data.id || data.user_id)) {
         setPropertyRequest(data);
         // Set selected property ID if exists
@@ -320,10 +324,7 @@ export default function EditPropertyRequestPage() {
         payload.property_id = null;
       }
 
-      await axiosInstance.put(
-        `/v1/property-requests/${propertyRequestId}`,
-        payload,
-      );
+      await updatePropertyRequest(Number(propertyRequestId), payload);
 
       toast.success("تم تحديث بيانات طلب العقار بنجاح!", {
         duration: 4000,

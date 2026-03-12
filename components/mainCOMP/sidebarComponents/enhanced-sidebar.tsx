@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { removeLocaleFromPathname } from "@/lib/i18n/config";
 
 // Hook لمراقبة ارتفاع الشاشة
@@ -64,7 +65,8 @@ export function EnhancedSidebar({
   );
   const { isShortScreen, isVeryShortScreen } = useScreenHeight();
 
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");

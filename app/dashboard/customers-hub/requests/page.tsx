@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import { RequestsCenterPage } from "@/components/customers-hub/requests/RequestsCenterPage";
 import { useCustomersHubRequests } from "@/hooks/useCustomersHubRequests";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
 
 export default function CustomersHubRequestsPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const {
     actions,
     stats,

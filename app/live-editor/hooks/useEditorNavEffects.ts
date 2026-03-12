@@ -11,7 +11,7 @@ export function useEditorNavEffects(
   setIsDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>,
   setIsPagesDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
-  const { fetchTenantData, tenantData, loadingTenantData } = useTenantStore();
+  const { tenantData } = useTenantStore();
 
   // إغلاق الـ dropdown عند النقر خارجه
   useEffect(() => {
@@ -36,14 +36,7 @@ export function useEditorNavEffects(
     };
   }, [isDropdownOpen, isPagesDropdownOpen, setIsDropdownOpen, setIsPagesDropdownOpen]);
 
-  // تحميل tenantData
-  useEffect(() => {
-    if (tenantId && !tenantData && !loadingTenantData) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
-
-  // تحميل جميع البيانات من componentSettings أو البيانات الافتراضية
+  // تحميل جميع البيانات من componentSettings أو البيانات الافتراضية (tenant data is fetched once via useTenantDataEffect in LiveEditorEffects)
   useEffect(() => {
     if (!tenantData) return;
 

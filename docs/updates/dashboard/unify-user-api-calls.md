@@ -1,0 +1,28 @@
+# توحيد استدعاء GET /user (استدعاء واحد + كاش)
+
+## الملخص
+
+تم توحيد جلب بيانات المستخدم بحيث يتم تنفيذ **طلب واحد** لـ GET /user في كل رحلة تحميل (داشبورد أو بعد تسجيل الدخول)، مع مزامنة النتيجة إلى AuthStore و userStore.
+
+## التغييرات
+
+- **نقطة الدخول الموحدة:** [`lib/auth/fetchUserOnceAndSync.ts`](../../../lib/auth/fetchUserOnceAndSync.ts) — إلغاء تكرار الطلبات المتزامنة (in-flight deduplication).
+- **AuthStore (authActions):** `fetchUserFromAPI` يستدعي `fetchUserOnceAndSync()` ثم يحدّث AuthStore و userStore من نفس الاستجابة. `fetchUserData` يكتفي بجلب التوكن (getUserInfo) ثم يستدعي `fetchUserFromAPI`.
+- **useTokenValidation:** يستدعي `fetchUserFromAPI()` بعد تعيين التوكن في الـ store (بدلاً من الطلب المباشر لـ /user أو تخطيه بخطة الكوكي).
+- **Dashboard layout:** إزالة الـ useEffect الذي كان يستدعي `fetchUserFromAPI()` بعد التحقق من التوكن؛ الاعتماد على البيانات التي يملأها useTokenValidation.
+- **userStore.fetchUserData:** عند انتهاء صلاحية الكاش يستدعي `fetchUserFromAPI()` عبر استيراد ديناميكي لـ AuthContext (لتجنب تبعية دائرية)، فلا يُنفَّذ طلب /user إضافي.
+- **OAuthSuccessPageContent:** إزالة الطلب المباشر لـ GET /user والتعيين اليدوي لـ AuthStore؛ الاعتماد على `fetchUserFromAPI()` ثم استدعاء setAuth ببيانات المستخدم من الـ store.
+- **ClientLayoutAuth (Live Editor):** إزالة الـ useEffect الذي كان يستدعي `axiosInstance.get("/user")` عند المسار `/live-editor`؛ الاعتماد على المصدر الموحد: عند فتح live-editor يُستدعى `fetchUserData()` من الـ useEffect العام (لأي مسار غير /login) فيملأ AuthStore عبر `fetchUserFromAPI()` → `fetchUserOnceAndSync()`، ولا حاجة لطلب /user منفصل.
+
+## Bootstrap الداشبورد والـ Sidebar الموازي
+
+- **Bootstrap الداشبورد:** التحقق من التوكن يملأ AuthStore و userStore مرة واحدة (عبر useTokenValidation → fetchUserFromAPI → fetchUserOnceAndSync + setUserData على كلا الـ store).
+- **جلب القوائم الجانبية بالتوازي:** الـ Layout يستدعي `fetchSideMenus()` فور تحقق التوكن (`tokenValidation.isValid === true && !tokenValidation.loading`) بحيث يبدأ طلب `/settings/side-menus` بالتوازي مع عرض PermissionWrapper، ولا ينتظر mount الـ Header. الـ sidebar store يمنع الطلبات المكررة عبر `isSidebarFetched`.
+- **مصدر واحد لـ Sidebar:** جلب القوائم الجانبية الأولي يُطلَق فقط من layout الداشبورد عند تحقق التوكن. DashboardHeader لا يستدعي `fetchSideMenus`. صفحة التطبيقات (apps-page) تستخدم `useSidebarStore` وتستدعي `fetchSideMenus("apps")` فقط لتحديث القائمة بعد التثبيت/الدفع.
+- **إنهاء حالة تحميل الصلاحيات:** useTokenValidation يستدعي `setIsLoading(false)` بعد نجاح التحقق حتى ينتقل usePermissions من حالة التحميل ولا تبقى شاشة «جاري التحقق من الصلاحيات» معلقة.
+- **شاشة «جاري التحقق من الصلاحيات»:** تم ربط حالة التحميل في `usePermissions` بمرحلة التهيئة الأولى لـ userStore (`isInitialized === false`) فقط، بحيث تظهر شاشة التحقق مرة واحدة في بداية الجلسة، ثم تعتمد جميع تنقلات الداشبورد التالية على بيانات الصلاحيات المخبأة في userStore بدون إعادة إظهار شاشة التحميل.
+
+## المراجع
+
+- الخطة: توحيد استدعاء /user (استدعاء واحد + كاش).
+- [`docs/important/dashboard/AUTHENTICATION.md`](../../important/dashboard/AUTHENTICATION.md) — طبقات الحماية والتحقق من الجلسة.

@@ -243,7 +243,9 @@ export async function getWebsiteLayoutFromBackend(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ websiteName: tenantIdOrWebsiteName }),
-      // cache: 'no-store'
+      // Meta data تتغير ببطء جداً، لذلك نسمح للـ runtime بعمل cache على مستوى السيرفر/edge.
+      // يمكن ضبط مدة الـ revalidate من خلال طبقة أعلى إذا لزم الأمر.
+      cache: "force-cache",
     });
     if (!res.ok) return null;
     const data = await res.json();

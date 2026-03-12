@@ -17,12 +17,14 @@ export function useActionsData(
   dueDateFilter: 'all' | 'overdue' | 'today' | 'week' | 'no_date',
   hasNotesFilter: boolean | null
 ) {
-  const { 
-    customers, 
-    actions, 
-    getCompletedActions,
-    getCustomerById,
-  } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
+  const actions = useUnifiedCustomersStore((state) => state.actions);
+  const getCompletedActions = useUnifiedCustomersStore(
+    (state) => state.getCompletedActions,
+  );
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
 
   // Get all actions (both from store and AI-generated)
   const allActions = useMemo(() => {

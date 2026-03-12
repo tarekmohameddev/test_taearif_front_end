@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   getCustomersList,
   getListFilterOptions,
@@ -11,7 +12,8 @@ import {
 import type { UnifiedCustomer } from "@/types/unified-customer";
 
 export function useCustomersHubList() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [customers, setCustomers] = useState<UnifiedCustomer[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [filterOptions, setFilterOptions] = useState<FilterOptionsResponse["data"] | null>(null);

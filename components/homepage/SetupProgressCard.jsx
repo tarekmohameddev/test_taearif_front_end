@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   Card,
   CardHeader,
@@ -24,7 +25,8 @@ export function SetupProgressCard() {
     },
     loading,
   } = useStore();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   useEffect(() => {
     // Wait until token is fetched

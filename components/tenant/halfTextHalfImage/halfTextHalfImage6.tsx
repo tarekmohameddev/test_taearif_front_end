@@ -91,7 +91,6 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
   );
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
   
   console.log("🏪 STORE DATA:", {
@@ -103,18 +102,6 @@ export default function HalfTextHalfImage6(props: HalfTextHalfImage6Props) {
     halfTextHalfImageStatesKeys: Object.keys(halfTextHalfImageStates || {}),
   });
 
-  // ─────────────────────────────────────────────────────────
-  // 3. FETCH TENANT DATA
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // ─────────────────────────────────────────────────────────
-  // 4. RETRIEVE DATA FROM STORE
-  // ─────────────────────────────────────────────────────────
   const storeData = props.useStore
     ? halfTextHalfImageStates[uniqueId] || {}
     : {};

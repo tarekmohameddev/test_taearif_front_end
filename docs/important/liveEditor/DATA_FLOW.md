@@ -75,12 +75,19 @@ LiveEditorHooks.tsx:
   const slug = useParams().slug || "homepage";
 
 
-STEP 3: Fetch Tenant Data
+STEP 3: Fetch Tenant Data (single layer)
 ────────────────────────────────────────────────
-LiveEditorEffects.tsx:
+Tenant data is fetched from one place only per context:
+- Tenant site home: HomePageWrapper.
+- Tenant site other pages: TenantPageWrapper (tenantViewStore).
+- Live Editor: useTenantDataEffect inside LiveEditorEffects (tenantStore).
+
+Child components no longer call fetchTenantData; they only read tenantData/tenantId from the store. See docs/updates/performance/tenant-fetch-single-layer.md.
+
+Live Editor (useTenantDataEffect in LiveEditorEffects.tsx):
   useEffect(() => {
     if (tenantId) {
-      fetchTenantData(tenantId);  ← API call
+      fetchTenantData(tenantId);  ← API call (only place in Live Editor)
     }
   }, [tenantId, fetchTenantData]);
 

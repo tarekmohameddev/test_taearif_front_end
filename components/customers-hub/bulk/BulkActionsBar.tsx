@@ -53,7 +53,10 @@ interface BulkActionsBarProps {
 }
 
 export function BulkActionsBar({ selectedIds, onClearSelection }: BulkActionsBarProps) {
-  const { customers, updateCustomer } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
+  const updateCustomer = useUnifiedCustomersStore(
+    (state) => state.updateCustomer,
+  );
   const { employees, assignCustomerManually } = useAssignmentRulesStore();
   const [showStageDialog, setShowStageDialog] = useState(false);
   const [showPriorityDialog, setShowPriorityDialog] = useState(false);

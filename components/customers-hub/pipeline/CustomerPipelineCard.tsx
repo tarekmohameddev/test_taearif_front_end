@@ -18,7 +18,12 @@ export function CustomerPipelineCard({
   customer,
   stageColor,
 }: CustomerPipelineCardProps) {
-  const { setSelectedCustomer, setShowCustomerDetailDialog } = useUnifiedCustomersStore();
+  const setSelectedCustomer = useUnifiedCustomersStore(
+    (state) => state.setSelectedCustomer,
+  );
+  const setShowCustomerDetailDialog = useUnifiedCustomersStore(
+    (state) => state.setShowCustomerDetailDialog,
+  );
 
   const handleCardClick = () => {
     setSelectedCustomer(customer);

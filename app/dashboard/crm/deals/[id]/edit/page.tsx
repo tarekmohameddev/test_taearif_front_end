@@ -32,6 +32,7 @@ import {
 import { AddActivityForm } from "@/components/crm/dialogs/add-activity-form";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import {
   Select,
   SelectContent,
@@ -82,7 +83,7 @@ export default function EditDealPage() {
   const params = useParams();
   const router = useRouter();
   const dealId = params?.id as string;
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const { pipelineStages, getStageById, setPipelineStages, resetCache } = useCrmStore();
   const [activeTab, setActiveTab] = useState("crm");
 

@@ -72,6 +72,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 // مكون إضافة إيجار جديد محدث
 interface AddRentalFormProps {
@@ -85,7 +86,7 @@ export function UpdatedAddRentalForm({
   onCancel,
   isSubmitting,
 }: AddRentalFormProps) {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const [formData, setFormData] = useState({
     tenant_full_name: "",

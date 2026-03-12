@@ -47,6 +47,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   Select,
   SelectContent,
@@ -56,7 +57,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import axiosInstance from "@/lib/axiosInstance";
-import useStore from "@/context/Store";
+import { usePropertiesStore } from "@/context/propertiesStore";
 import EmptyState from "@/components/empty-state";
 import { ErrorDisplay } from "@/components/ui/error-display";
 import { ActiveFiltersDisplay } from "@/components/property/active-filters-display";
@@ -306,7 +307,7 @@ function PropertyCard({
   onCompleteDraft,
 }: PropertyCardProps & { setReorderPopup: any; onCompleteDraft?: (id: string) => void }) {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [columnsCount, setColumnsCount] = useState(4);
   
   useEffect(() => {
@@ -804,7 +805,8 @@ export function IncompletePropertiesManagementPage() {
     total: number;
   } | null>(null);
   const [loadingStatistics, setLoadingStatistics] = useState(true);
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const router = useRouter();
   const {
@@ -818,7 +820,7 @@ export function IncompletePropertiesManagementPage() {
       pagination,
     },
     setIncompletePropertiesManagement,
-  } = useStore();
+  } = usePropertiesStore();
 
   const [reorderPopup, setReorderPopup] = useState<{
     open: boolean;

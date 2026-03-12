@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 
-export default (set) => ({
+export default (set, get) => ({
   visitorData: {
     7: {
       data: [],
@@ -29,6 +29,9 @@ export default (set) => ({
     },
   },
   selectedTimeRange: "7",
+  loadingVisitorData: false,
+  lastFetchedVisitorDataKey: null,
+  lastFetchedVisitorDataAt: null,
 
   setVisitorData: (timeRange, data) =>
     set((state) => ({
@@ -56,14 +59,32 @@ export default (set) => ({
       return; // Exit early if token is not ready
     }
 
+    // Prevent duplicate API calls (see docs/important/prompts/PREVENT_DUPLICATE_API_PROMPT.md)
+    const homepage = get?.()?.homepage;
+    if (homepage?.loadingVisitorData) {
+      return; // CHECK 1: Already fetching
+    }
+    if (
+      homepage?.lastFetchedVisitorDataKey === String(timeRange) &&
+      homepage?.lastFetchedVisitorDataAt &&
+      Date.now() - homepage.lastFetchedVisitorDataAt < 1000
+    ) {
+      return; // CHECK 2: Same timeRange fetched within last second
+    }
+
+    set((state) => ({
+      homepage: {
+        ...state.homepage,
+        loadingVisitorData: true,
+      },
+    }));
     set({ loading: true });
     try {
       const response = await axiosInstance.post(
-        // تغيير من get إلى post
         "/dashboard/visitors",
-        { time_range: timeRange }, // هذا سيذهب في body الطلب
+        { time_range: timeRange },
       );
-
+      const now = Date.now();
       set((state) => ({
         homepage: {
           ...state.homepage,
@@ -76,10 +97,18 @@ export default (set) => ({
               fetched: true,
             },
           },
+          loadingVisitorData: false,
+          lastFetchedVisitorDataKey: String(timeRange),
+          lastFetchedVisitorDataAt: now,
         },
       }));
     } catch (error) {
-      // Handle error silently
+      set((state) => ({
+        homepage: {
+          ...state.homepage,
+          loadingVisitorData: false,
+        },
+      }));
     } finally {
       set({ loading: false });
     }

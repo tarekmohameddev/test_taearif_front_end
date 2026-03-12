@@ -60,15 +60,7 @@ export default function Title1(props: TitleProps = {}) {
   const titleStates = useEditorStore((s) => s.titleStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  // 3. Initialize from tenant & store
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = () => {
     if (!tenantData) return {};

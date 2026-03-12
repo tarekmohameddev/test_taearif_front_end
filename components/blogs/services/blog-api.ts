@@ -1,19 +1,20 @@
 /**
  * Blog API Service
- * 
+ *
  * @description جميع API calls المتعلقة بالمقالات
- * 
+ * @see docs/important/prompts/PREVENT_DUPLICATE_API_PROMPT.md — منع الطلبات المكررة (loading/cache/last-fetched)
+ *
  * @dependencies
  * - Uses: lib/axiosInstance.js (للطلبات)
  * - Used by: hooks/use-blogs-list.ts, hooks/use-blog-detail.ts, hooks/use-blog-form.ts
- * 
+ *
  * @endpoints
  * - GET /posts - قائمة المقالات
  * - GET /posts/{id} - تفاصيل مقال
  * - POST /posts - إنشاء مقال
  * - PUT /posts/{slug} - تحديث مقال
  * - DELETE /posts/{slug} - حذف مقال
- * 
+ *
  * @related
  * - types/blog.types.ts (جميع الأنواع المستخدمة)
  * - docs/ExcessFiles/blogs.txt (وثائق API)
@@ -30,6 +31,72 @@ import type {
   Pagination,
 } from "../types/blog.types";
 
+// ─── منع الطلبات المكررة (مأخوذ من PREVENT_DUPLICATE_API_PROMPT / TENANT_STORE_AND_API) ───
+const LAST_FETCH_WINDOW_MS = 300;
+
+const inFlight = new Map<string, Promise<unknown>>();
+const cache = new Map<string, { data: unknown; ts: number }>();
+let lastFetchedKey: string | null = null;
+let lastFetchedTs = 0;
+
+function cacheKey(prefix: string, ...parts: (string | number)[]): string {
+  return [prefix, ...parts].join(":");
+}
+
+/** Guard 1: طلب قيد التنفيذ لنفس المفتاح → إرجاع نفس الـ Promise. Guard 2: بيانات في الكاش لنفس المفتاح → إرجاعها. */
+async function withDedup<T>(
+  key: string,
+  fetchFn: () => Promise<T>
+): Promise<T> {
+  const now = Date.now();
+
+  if (inFlight.has(key)) {
+    return inFlight.get(key) as Promise<T>;
+  }
+
+  const cached = cache.get(key);
+  if (cached != null) {
+    return cached.data as T;
+  }
+
+  const promise = fetchFn()
+    .then((data) => {
+      cache.set(key, { data, ts: now });
+      lastFetchedKey = key;
+      lastFetchedTs = now;
+      inFlight.delete(key);
+      return data;
+    })
+    .catch((err) => {
+      inFlight.delete(key);
+      throw err;
+    });
+
+  inFlight.set(key, promise);
+  return promise as Promise<T>;
+}
+
+/** للعمليات (create/update/delete): منع تنفيذ مكرر لنفس المفتاح فقط (إرجاع نفس الـ Promise). */
+async function withMutationDedup<T>(
+  key: string,
+  fetchFn: () => Promise<T>
+): Promise<T> {
+  if (inFlight.has(key)) {
+    return inFlight.get(key) as Promise<T>;
+  }
+  const promise = fetchFn()
+    .then((data) => {
+      inFlight.delete(key);
+      return data;
+    })
+    .catch((err) => {
+      inFlight.delete(key);
+      throw err;
+    });
+  inFlight.set(key, promise);
+  return promise as Promise<T>;
+}
+
 /**
  * Get list of all posts (published + drafts)
  * @param page - Page number (default: 1)
@@ -40,14 +107,13 @@ export async function getBlogsList(
   page: number = 1,
   perPage: number = 15
 ): Promise<BlogsListResponse> {
-  // GET /posts?per_page=15&page=1
-  const response = await axiosInstance.get("/posts", {
-    params: {
-      page,
-      per_page: perPage,
-    },
+  const key = cacheKey("list", page, perPage);
+  return withDedup(key, async () => {
+    const response = await axiosInstance.get("/posts", {
+      params: { page, per_page: perPage },
+    });
+    return response.data;
   });
-  return response.data;
 }
 
 /**
@@ -62,15 +128,17 @@ export async function getBlogsByCategory(
   page: number = 1,
   perPage: number = 15
 ): Promise<BlogsListResponse> {
-  // GET /posts?category_id={categoryId}&per_page=15&page=1
-  const response = await axiosInstance.get("/posts", {
-    params: {
-      category_id: categoryId,
-      page,
-      per_page: perPage,
-    },
+  const key = cacheKey("category", categoryId, page, perPage);
+  return withDedup(key, async () => {
+    const response = await axiosInstance.get("/posts", {
+      params: {
+        category_id: categoryId,
+        page,
+        per_page: perPage,
+      },
+    });
+    return response.data;
   });
-  return response.data;
 }
 
 /**
@@ -79,9 +147,11 @@ export async function getBlogsByCategory(
  * @returns Promise with post data
  */
 export async function getBlogById(id: number): Promise<BlogDetailResponse> {
-  // GET /posts/{id}
-  const response = await axiosInstance.get(`/posts/${id}`);
-  return response.data;
+  const key = cacheKey("id", id);
+  return withDedup(key, async () => {
+    const response = await axiosInstance.get(`/posts/${id}`);
+    return response.data;
+  });
 }
 
 /**
@@ -90,9 +160,11 @@ export async function getBlogById(id: number): Promise<BlogDetailResponse> {
  * @returns Promise with post data
  */
 export async function getBlogBySlug(slug: string): Promise<BlogDetailResponse> {
-  // GET /posts/{slug}
-  const response = await axiosInstance.get(`/posts/${slug}`);
-  return response.data;
+  const key = cacheKey("slug", slug);
+  return withDedup(key, async () => {
+    const response = await axiosInstance.get(`/posts/${slug}`);
+    return response.data;
+  });
 }
 
 /**
@@ -103,9 +175,10 @@ export async function getBlogBySlug(slug: string): Promise<BlogDetailResponse> {
 export async function createBlog(
   data: BlogFormData
 ): Promise<BlogCreateResponse> {
-  // POST /posts
-  const response = await axiosInstance.post("/posts", data);
-  return response.data;
+  return withMutationDedup("create", async () => {
+    const response = await axiosInstance.post("/posts", data);
+    return response.data;
+  });
 }
 
 /**
@@ -118,9 +191,10 @@ export async function updateBlog(
   slug: string,
   data: Partial<BlogFormData>
 ): Promise<BlogCreateResponse> {
-  // PUT /posts/{slug}
-  const response = await axiosInstance.put(`/posts/${slug}`, data);
-  return response.data;
+  return withMutationDedup(`update:${slug}`, async () => {
+    const response = await axiosInstance.put(`/posts/${slug}`, data);
+    return response.data;
+  });
 }
 
 /**
@@ -129,9 +203,10 @@ export async function updateBlog(
  * @returns Promise with success message
  */
 export async function deleteBlog(slug: string): Promise<{ message: string }> {
-  // DELETE /posts/{slug}
-  const response = await axiosInstance.delete(`/posts/${slug}`);
-  return response.data;
+  return withMutationDedup(`delete:${slug}`, async () => {
+    const response = await axiosInstance.delete(`/posts/${slug}`);
+    return response.data;
+  });
 }
 
 /**
@@ -144,23 +219,22 @@ export async function getBlogStats(): Promise<{
   total_views: number;
   total_categories: number;
 }> {
-  // Calculate from posts list and categories
-  const postsResponse = await getBlogsList(1, 1000); // Get all posts
-  const total_blogs = postsResponse.pagination.total;
-  const total_views = postsResponse.data.reduce(
-    (sum, post) => sum + (post.views || 0),
-    0
-  );
-  
-  // Get categories count
-  const categoriesResponse = await axiosInstance.get("/categories");
-  const total_categories = categoriesResponse.data.data?.length || 0;
-
-  return {
-    total_blogs,
-    total_views,
-    total_categories,
-  };
+  const key = "stats";
+  return withDedup(key, async () => {
+    const postsResponse = await getBlogsList(1, 1000);
+    const total_blogs = postsResponse.pagination.total;
+    const total_views = postsResponse.data.reduce(
+      (sum, post) => sum + (post.views || 0),
+      0
+    );
+    const categoriesResponse = await axiosInstance.get("/categories");
+    const total_categories = categoriesResponse.data.data?.length || 0;
+    return {
+      total_blogs,
+      total_views,
+      total_categories,
+    };
+  });
 }
 
 // Export all functions as default object

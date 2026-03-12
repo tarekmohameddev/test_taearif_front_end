@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useStore from "@/context/Store";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -107,7 +108,7 @@ export function PurchaseDetailPage({ requestId }: PurchaseDetailPageProps) {
 
   // Use store instead of local state
   const { clearError } = useStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const [request, setRequest] = useState<PurchaseRequest | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);

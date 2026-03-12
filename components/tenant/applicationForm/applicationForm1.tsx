@@ -37,9 +37,8 @@ export default function ApplicationFormSection(
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const applicationFormStates = useEditorStore((s) => s.applicationFormStates);
 
-  // الاشتراك في tenant store
+  // الاشتراك في tenant store (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s: any) => s.tenantData);
-  const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData);
   const tenantId = useTenantStore((s: any) => s.tenantId);
 
   // تهيئة المكون في الـ store
@@ -52,13 +51,6 @@ export default function ApplicationFormSection(
       ensureComponentVariant("applicationForm", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant]);
-
-  // جلب بيانات المستأجر
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // دالة لجلب بيانات المكون من tenant data
   const getTenantComponentData = () => {

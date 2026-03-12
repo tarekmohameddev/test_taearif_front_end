@@ -37,8 +37,9 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
-import useStore from "@/context/Store";
+import useSidebarStore from "@/context/sidebarStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import PaymentPopup from "@/components/popup/PopupForPayment";
 import { ShoppingCart } from "lucide-react";
 
@@ -65,13 +66,14 @@ interface App {
 }
 
 export function AppsPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("apps");
   const [apps, setApps] = useState<App[]>([]);
   const [loading, setLoading] = useState(true);
-  const { sidebarData, fetchSideMenus } = useStore();
+  const { sidebarData, fetchSideMenus } = useSidebarStore();
   const { mainNavItems, error } = sidebarData;
   const router = useRouter();
   const hasFetchedRef = useRef(false);

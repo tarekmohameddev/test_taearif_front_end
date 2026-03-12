@@ -7,7 +7,6 @@
  */
 
 import {
-  fetchUserFromBackend,
   fetchUserInfoFromBackend,
   loginToBackend,
   setAuthCookie,
@@ -15,6 +14,8 @@ import {
   fetchGoogleAuthUrlFromBackend,
   fetchUserWithTokenFromBackend,
 } from "@/context/auth/authApi";
+import { fetchUserOnceAndSync } from "@/lib/auth/fetchUserOnceAndSync";
+import { useUserStore } from "@/context/userStore";
 
 export function createAuthActions(set, get) {
   return {
@@ -47,7 +48,7 @@ export function createAuthActions(set, get) {
 
     fetchUserFromAPI: async () => {
       try {
-        const subscriptionDATA = await fetchUserFromBackend();
+        const subscriptionDATA = await fetchUserOnceAndSync();
         const currentState = get();
         const userData = subscriptionDATA.user || subscriptionDATA;
         const updatedUserData = {
@@ -102,6 +103,11 @@ export function createAuthActions(set, get) {
             console.error("Error setting plan cookie:", error);
           }
         }
+        try {
+          useUserStore.getState().setUserData(userData);
+        } catch (err) {
+          console.error("Error syncing userStore from fetchUserFromAPI:", err);
+        }
         return { success: true, data: updatedUserData };
       } catch (error) {
         console.error("Error fetching user data from API:", error);
@@ -111,12 +117,14 @@ export function createAuthActions(set, get) {
 
     fetchUserData: async () => {
       set({ IsLoading: true, error: null });
-      if (get().IsDone === true) return;
+      if (get().IsDone === true) {
+        return;
+      }
       set({ IsDone: true, error: null });
       try {
-        let userData;
+        let userInfo;
         try {
-          userData = await fetchUserInfoFromBackend();
+          userInfo = await fetchUserInfoFromBackend();
         } catch (err) {
           if (typeof window !== "undefined") {
             try {
@@ -129,7 +137,7 @@ export function createAuthActions(set, get) {
           set({ authenticated: false, UserIslogged: false, userData: null });
           throw err;
         }
-        if (!userData || !userData.email) {
+        if (!userInfo || !userInfo.email) {
           if (typeof window !== "undefined") {
             try {
               localStorage.removeItem("user");
@@ -142,87 +150,23 @@ export function createAuthActions(set, get) {
           return;
         }
         const currentState = get();
-        const mergedUserData = {
-          ...userData,
-          onboarding_completed: userData.onboarding_completed || false,
-          message: currentState.userData?.message || null,
-          domain: currentState.userData?.domain ?? userData.domain ?? null,
-          company_name: currentState.userData?.company_name ?? userData.company_name ?? null,
+        const mergedForToken = {
+          ...currentState.userData,
+          ...userInfo,
+          token: userInfo.token ?? currentState.userData?.token ?? null,
         };
-        set({ UserIslogged: true, userData: mergedUserData, IsLoading: true, error: null });
+        set({ UserIslogged: true, userData: mergedForToken, IsLoading: true, error: null });
         try {
-          localStorage.setItem("user", JSON.stringify(mergedUserData));
+          localStorage.setItem("user", JSON.stringify(mergedForToken));
         } catch (error) {
           console.error("Error saving user data to localStorage:", error);
         }
-        if (typeof window !== "undefined") {
-          try {
-            const { getPlanCookie, hasValidPlanCookie } = require("@/lib/planCookie");
-            if (hasValidPlanCookie()) {
-              const cachedPlan = getPlanCookie();
-              if (cachedPlan) {
-                const current = get().userData;
-                set({
-                  authenticated: true,
-                  userData: {
-                    ...userData,
-                    domain: current?.domain ?? userData.domain ?? null,
-                    company_name: current?.company_name ?? userData.company_name ?? null,
-                    days_remaining: cachedPlan.days_remaining,
-                    is_free_plan: cachedPlan.is_free_plan,
-                    is_expired: cachedPlan.is_expired,
-                    package_title: cachedPlan.package_title,
-                    package_features: cachedPlan.package_features,
-                    project_limit_number: cachedPlan.project_limit_number,
-                    real_estate_limit_number: cachedPlan.real_estate_limit_number,
-                    onboarding_completed: cachedPlan.onboarding_completed !== undefined ? cachedPlan.onboarding_completed : userData.onboarding_completed,
-                  },
-                  onboarding_completed: cachedPlan.onboarding_completed !== undefined ? cachedPlan.onboarding_completed : userData.onboarding_completed,
-                });
-                return;
-              }
-            }
-          } catch (error) {
-            console.error("Error reading plan cookie:", error);
-          }
-        }
-        if (get().userData.is_free_plan == null) {
-          const subscriptionDATA = await fetchUserFromBackend();
-          if (typeof window !== "undefined") {
-            try {
-              const { setPlanCookie } = require("@/lib/planCookie");
-              setPlanCookie({
-                package_title: subscriptionDATA.membership.package.title || null,
-                is_free_plan: subscriptionDATA.membership.is_free_plan || false,
-                days_remaining: subscriptionDATA.membership.days_remaining || null,
-                is_expired: subscriptionDATA.membership.is_expired || false,
-                package_features: subscriptionDATA.membership.package.features || [],
-                project_limit_number: subscriptionDATA.membership.package.project_limit_number || null,
-                real_estate_limit_number: subscriptionDATA.membership.package.real_estate_limit_number || null,
-                onboarding_completed: subscriptionDATA.onboarding_completed,
-                fetched_at: Date.now(),
-              });
-            } catch (error) {
-              console.error("Error setting plan cookie:", error);
-            }
-          }
+        const result = await get().fetchUserFromAPI();
+        if (!result.success) {
           set({
-            authenticated: true,
-            userData: {
-              ...userData,
-              days_remaining: subscriptionDATA.membership.days_remaining || null,
-              is_free_plan: subscriptionDATA.membership.is_free_plan || false,
-              is_expired: subscriptionDATA.membership.is_expired || false,
-              package_title: subscriptionDATA.membership.package.title || null,
-              package_features: subscriptionDATA.membership.package.features || [],
-              project_limit_number: subscriptionDATA.membership.package.project_limit_number || null,
-              real_estate_limit_number: subscriptionDATA.membership.package.real_estate_limit_number || null,
-              domain: subscriptionDATA.domain || null,
-              message: subscriptionDATA.message || null,
-              company_name: subscriptionDATA.company_name || null,
-              onboarding_completed: subscriptionDATA.onboarding_completed || false,
-            },
-            onboarding_completed: subscriptionDATA.onboarding_completed || false,
+            error: result.error || "خطأ في جلب بيانات المستخدم",
+            authenticated: false,
+            UserIslogged: false,
           });
         }
         set({ IsDone: false, error: null });

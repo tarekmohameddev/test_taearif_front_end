@@ -16,9 +16,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, User, ArrowRight, Loader2 } from "lucide-react";
-import axiosInstance from "@/lib/axiosInstance";
+import {
+  getCrmStages,
+  updateCustomerStage,
+} from "@/lib/api/property-requests-dashboard-api";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface Stage {
   id: number;
@@ -52,7 +56,7 @@ export const PropertyRequestStageAssignmentDialog = ({
   const [selectedStageId, setSelectedStageId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [fetchingStages, setFetchingStages] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // جلب المراحل من الAPI
   useEffect(() => {
@@ -82,14 +86,8 @@ export const PropertyRequestStageAssignmentDialog = ({
 
     setFetchingStages(true);
     try {
-      const response = await axiosInstance.get("/crm/stages");
-      if (response.data.status === "success") {
-        // ترتيب المراحل حسب order
-        const sortedStages = response.data.data.sort(
-          (a: Stage, b: Stage) => a.order - b.order,
-        );
-        setStages(sortedStages);
-      }
+      const sortedStages = await getCrmStages();
+      setStages(sortedStages as Stage[]);
     } catch (error) {
       console.error("Error fetching stages:", error);
       toast.error("حدث خطأ أثناء تحميل المراحل", {
@@ -112,7 +110,7 @@ export const PropertyRequestStageAssignmentDialog = ({
 
     setLoading(true);
     try {
-      await axiosInstance.put(`/customers/${customer.id}`, {
+      await updateCustomerStage(customer.id, {
         stage_id: selectedStageId,
       });
 

@@ -42,6 +42,53 @@ function getPaginator<T>(res: { data?: { status?: boolean; data?: { data?: T[]; 
   };
 }
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function templatesListKey(params?: TemplateListParams): string {
+  if (!params) return "email-templates:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof TemplateListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `email-templates:${JSON.stringify(sorted)}`;
+}
+
+function campaignsListKey(params?: CampaignListParams): string {
+  if (!params) return "email-campaigns:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof CampaignListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `email-campaigns:${JSON.stringify(sorted)}`;
+}
+
+function logsListKey(params?: LogsListParams): string {
+  if (!params) return "email-logs:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof LogsListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `email-logs:${JSON.stringify(sorted)}`;
+}
+
 /** Extract user-facing error message from Email API error. */
 export function getEmailApiErrorMessage(error: unknown): string {
   const err = error as {
@@ -84,26 +131,31 @@ export async function getTemplates(params?: TemplateListParams): Promise<{
   templates: ApiTemplate[];
   pagination: { current_page: number; per_page: number; total: number; last_page: number };
 }> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  if (params?.is_active != null) q.set("is_active", String(params.is_active));
-  const res = await axiosInstance.get(`${BASE}/templates?${q}`);
-  const paginator = getPaginator<ApiTemplate>(res);
-  return {
-    templates: paginator.data,
-    pagination: {
-      current_page: paginator.current_page,
-      per_page: paginator.per_page,
-      total: paginator.total,
-      last_page: paginator.last_page,
-    },
-  };
+  const key = templatesListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    if (params?.is_active != null) q.set("is_active", String(params.is_active));
+    const res = await axiosInstance.get(`${BASE}/templates?${q}`);
+    const paginator = getPaginator<ApiTemplate>(res);
+    return {
+      templates: paginator.data,
+      pagination: {
+        current_page: paginator.current_page,
+        per_page: paginator.per_page,
+        total: paginator.total,
+        last_page: paginator.last_page,
+      },
+    };
+  });
 }
 
 export async function getTemplate(id: number): Promise<ApiTemplate> {
-  const res = await axiosInstance.get(`${BASE}/templates/${id}`);
-  return getData<ApiTemplate>(res);
+  return dedupeByKey(`email-template:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/templates/${id}`);
+    return getData<ApiTemplate>(res);
+  });
 }
 
 export interface CreateTemplateBody {
@@ -232,26 +284,31 @@ export interface CampaignListResponse {
 }
 
 export async function getCampaigns(params?: CampaignListParams): Promise<CampaignListResponse> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  if (params?.status) q.set("status", params.status);
-  const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
-  const paginator = getPaginator<ApiCampaign>(res);
-  return {
-    campaigns: paginator.data,
-    pagination: {
-      current_page: paginator.current_page,
-      per_page: paginator.per_page,
-      total: paginator.total,
-      last_page: paginator.last_page,
-    },
-  };
+  const key = campaignsListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    if (params?.status) q.set("status", params.status);
+    const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
+    const paginator = getPaginator<ApiCampaign>(res);
+    return {
+      campaigns: paginator.data,
+      pagination: {
+        current_page: paginator.current_page,
+        per_page: paginator.per_page,
+        total: paginator.total,
+        last_page: paginator.last_page,
+      },
+    };
+  });
 }
 
 export async function getCampaign(id: number): Promise<ApiCampaign> {
-  const res = await axiosInstance.get(`${BASE}/campaigns/${id}`);
-  return getData<ApiCampaign>(res);
+  return dedupeByKey(`email-campaign:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/campaigns/${id}`);
+    return getData<ApiCampaign>(res);
+  });
 }
 
 export interface CreateCampaignBody {
@@ -411,25 +468,28 @@ function normalizeLogItem(item: ApiEmailLogItem): ApiEmailLog {
 
 /** GET /api/v1/email/logs?per_page=20&campaign_id=1&status=sent&from_date=Y-m-d&to_date=Y-m-d */
 export async function getLogs(params?: LogsListParams): Promise<LogsListResponse> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  if (params?.campaign_id != null) q.set("campaign_id", String(params.campaign_id));
-  if (params?.status) q.set("status", params.status);
-  if (params?.from_date) q.set("from_date", params.from_date);
-  if (params?.to_date) q.set("to_date", params.to_date);
-  const res = await axiosInstance.get(`${BASE}/logs?${q}`);
-  const paginator = getPaginator<ApiEmailLogItem>(res);
-  const logs = paginator.data.map(normalizeLogItem);
-  return {
-    logs,
-    pagination: {
-      current_page: paginator.current_page,
-      per_page: paginator.per_page,
-      total: paginator.total,
-      last_page: paginator.last_page,
-    },
-  };
+  const key = logsListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    if (params?.campaign_id != null) q.set("campaign_id", String(params.campaign_id));
+    if (params?.status) q.set("status", params.status);
+    if (params?.from_date) q.set("from_date", params.from_date);
+    if (params?.to_date) q.set("to_date", params.to_date);
+    const res = await axiosInstance.get(`${BASE}/logs?${q}`);
+    const paginator = getPaginator<ApiEmailLogItem>(res);
+    const logs = paginator.data.map(normalizeLogItem);
+    return {
+      logs,
+      pagination: {
+        current_page: paginator.current_page,
+        per_page: paginator.per_page,
+        total: paginator.total,
+        last_page: paginator.last_page,
+      },
+    };
+  });
 }
 
 // --- Stats ---
@@ -444,14 +504,16 @@ export interface ApiEmailStats {
 }
 
 export async function getStats(): Promise<ApiEmailStats> {
-  const res = await axiosInstance.get(`${BASE}/stats`);
-  const data = getData<ApiEmailStats>(res);
-  return {
-    total_campaigns: data.total_campaigns ?? 0,
-    total_sent: data.total_sent ?? 0,
-    total_delivered: data.total_delivered ?? 0,
-    total_failed: data.total_failed ?? 0,
-    delivery_rate: data.delivery_rate ?? 0,
-    this_month_sent: data.this_month_sent ?? 0,
-  };
+  return dedupeByKey("email-stats", async () => {
+    const res = await axiosInstance.get(`${BASE}/stats`);
+    const data = getData<ApiEmailStats>(res);
+    return {
+      total_campaigns: data.total_campaigns ?? 0,
+      total_sent: data.total_sent ?? 0,
+      total_delivered: data.total_delivered ?? 0,
+      total_failed: data.total_failed ?? 0,
+      delivery_rate: data.delivery_rate ?? 0,
+      this_month_sent: data.this_month_sent ?? 0,
+    };
+  });
 }

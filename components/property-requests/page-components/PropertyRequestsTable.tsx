@@ -61,7 +61,10 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Skeleton } from "@/components/ui/skeleton";
-import axiosInstance from "@/lib/axiosInstance";
+import {
+  getCustomers,
+  getCrmRequestsByCustomer,
+} from "@/lib/api/property-requests-dashboard-api";
 import toast from "react-hot-toast";
 
 // Import PropertyRequest interface from parent
@@ -197,9 +200,9 @@ export const PropertyRequestsTable = ({
   // Extract customer from property request (find customer by phone number)
   const findCustomerByPhone = async (phone: string): Promise<number | null> => {
     try {
-      const response = await axiosInstance.get("/customers");
-      if (response.data?.status === "success") {
-        const customers = response.data.data?.customers || [];
+      const response = await getCustomers();
+      if (response?.status === "success") {
+        const customers = (response as { data?: { customers?: any[] } }).data?.customers || [];
         const customer = customers.find(
           (c: any) => c.phone_number === phone || c.phone_number?.replace(/\D/g, "") === phone.replace(/\D/g, "")
         );
@@ -215,14 +218,13 @@ export const PropertyRequestsTable = ({
   // Check if customer has existing deal
   const checkExistingDeal = async (customerId: number): Promise<boolean> => {
     try {
-      const response = await axiosInstance.get(
-        `/v1/crm/requests?customer_id=${customerId}`,
-      );
-
-      const data = response.data?.data;
+      const data = await getCrmRequestsByCustomer(customerId);
+      const dataStages = (data as { data?: { stages?: any[] } })?.data ?? data;
 
       // API format used across CRM pages: stages[].requests[]
-      const stages = Array.isArray(data?.stages) ? data.stages : [];
+      const stages = Array.isArray((dataStages as any)?.stages)
+        ? (dataStages as any).stages
+        : [];
       const allRequests = stages.flatMap((stage: any) =>
         Array.isArray(stage?.requests) ? stage.requests : [],
       );

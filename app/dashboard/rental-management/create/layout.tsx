@@ -7,7 +7,9 @@ export default function CreateRentalLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col" dir="rtl">
-      <main className="flex-1 p-4 md:p-6">{children}</main>
+      <main className="flex-1 p-4 md:p-6">
+        <div className="mx-auto max-w-[1000px]">{children}</div>
+      </main>
     </div>
   );
 }

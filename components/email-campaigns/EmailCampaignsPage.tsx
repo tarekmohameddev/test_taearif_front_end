@@ -6,6 +6,7 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { EmailCreditBalance } from "./EmailCreditBalance";
 import { EmailCampaignsStats } from "./EmailCampaignsStats";
 import { EmailCampaignsOverview } from "./EmailCampaignsOverview";
@@ -19,7 +20,8 @@ import useStore from "@/context/Store";
 
 export function EmailCampaignsPage() {
   const router = useRouter();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [activeTab, setActiveTab] = useState("overview");
   const [createTemplateOpen, setCreateTemplateOpen] = useState(false);
 

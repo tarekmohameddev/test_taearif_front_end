@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import useStore from "@/context/Store";
+import useMarketingStore from "@/context/marketingStore";
 import {
   Plus,
   Phone,
@@ -76,7 +76,7 @@ export function WhatsAppNumbersManagement() {
     deleteMarketingChannel,
     updateChannelStatus,
     updateChannelSystemIntegrations,
-  } = useStore();
+  } = useMarketingStore();
   const [numbers, setNumbers] = useState<WhatsAppNumber[]>([]);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);

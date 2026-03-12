@@ -23,12 +23,7 @@ export default function EssenceSection1(props: EssenceSection1Props) {
   const essenceSectionStates = useEditorStore((s) => s.essenceSectionStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) fetchTenantData(tenantId);
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<EssenceSectionProps> => {
     if (!tenantData) return {};

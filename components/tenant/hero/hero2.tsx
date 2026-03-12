@@ -33,17 +33,10 @@ export default function HeroSection2(props: HeroSection2Props = {}) {
     }
   }, [variantId, props.useStore, ensureComponentVariant]);
 
-  // Get tenant data
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s: any) => s.tenantData);
-  const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669

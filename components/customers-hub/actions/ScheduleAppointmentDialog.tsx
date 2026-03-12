@@ -49,7 +49,9 @@ export function ScheduleAppointmentDialog({
   customerName,
   onScheduled,
 }: ScheduleAppointmentDialogProps) {
-  const { addAppointment } = useUnifiedCustomersStore();
+  const addAppointment = useUnifiedCustomersStore(
+    (state) => state.addAppointment,
+  );
   const [type, setType] = useState<Appointment["type"]>("office_meeting");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");

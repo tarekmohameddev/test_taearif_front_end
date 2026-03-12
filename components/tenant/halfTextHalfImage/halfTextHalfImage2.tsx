@@ -251,16 +251,9 @@ const halfTextHalfImage = (props: halfTextHalfImageProps = {}) => {
   const { user, loading } = useAuth();
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
   const error = useTenantStore((s) => s.error);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
   const uniqueId = props.id || variantId;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import {
 import { PermissionsDropdown } from "@/components/access-control/PermissionsDropdown";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { useUserStore } from "@/context/userStore";
 import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
@@ -61,7 +62,7 @@ interface CreateEmployeeRequest {
 
 export default function CreateEmployeePage() {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const userStoreData = useUserStore((state) => state.userData);
   const employeesData = userStoreData?.employees;
   
@@ -82,6 +83,7 @@ export default function CreateEmployeePage() {
     null,
   );
   const [permissionsLoading, setPermissionsLoading] = useState(false);
+  const fetchPermissionsInFlightRef = useRef(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState(false);
@@ -150,14 +152,14 @@ export default function CreateEmployeePage() {
     setIsOverLimit(false);
   }, [employeesData]);
 
-  // Fetch permissions
+  // Fetch permissions (duplicate-API guards per PREVENT_DUPLICATE_API_PROMPT.md)
   useEffect(() => {
-    // التحقق من وجود token قبل إرسال الطلب
-    if (!userData?.token) {
-      return;
-    }
+    if (!userData?.token) return;
 
     const fetchPermissions = async () => {
+      if (fetchPermissionsInFlightRef.current) return;
+      if (permissions !== null) return;
+      fetchPermissionsInFlightRef.current = true;
       setPermissionsLoading(true);
       try {
         const response = await axiosInstance.get("/v1/permissions");
@@ -166,11 +168,12 @@ export default function CreateEmployeePage() {
         console.error("Error fetching permissions:", err);
       } finally {
         setPermissionsLoading(false);
+        fetchPermissionsInFlightRef.current = false;
       }
     };
 
     fetchPermissions();
-  }, [userData?.token]);
+  }, [userData?.token, permissions]);
 
   // Handle permission change
   const handlePermissionChange = (permissionName: string, checked: boolean) => {

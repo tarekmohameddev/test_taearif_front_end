@@ -82,7 +82,9 @@ import { Textarea } from "@/components/ui/textarea";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
+import useProjectsStore from "@/context/projectsStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -129,7 +131,7 @@ export default function AddProjectPage(): JSX.Element {
   const {
     homepage: { setupProgressData, fetchSetupProgressData },
   } = useStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [newProject, setNewProject] = useState({
     id: "",
     name: "",
@@ -163,7 +165,7 @@ export default function AddProjectPage(): JSX.Element {
     projectsManagement: { projects, loading, isInitialized },
     setProjectsManagement,
     fetchProjects,
-  } = useStore();
+  } = useProjectsStore();
 
   const addAmenity = () => {
     if (
@@ -703,7 +705,7 @@ export default function AddProjectPage(): JSX.Element {
         projectData,
       );
 
-      const currentState = useStore.getState();
+      const currentState = useProjectsStore.getState();
       const createdProject = response.data.user_project;
       console.log("Created project:", createdProject);
       const updatedProjects = [

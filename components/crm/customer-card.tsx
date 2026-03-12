@@ -29,7 +29,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Customer, PipelineStage, Reminder } from "@/types/crm";
-import useStore from "@/context/Store";
+import useMarketingStore from "@/context/marketingStore";
 import useCrmStore from "@/context/store/crm";
 import { WhatsAppSendDialog } from "@/components/marketing/whatsapp-send-dialog";
 
@@ -68,7 +68,7 @@ export default function CustomerCard({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [tabletMenuOpen, setTabletMenuOpen] = useState(false);
   const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
-  const { marketingChannels, fetchMarketingChannels } = useStore();
+  const { marketingChannels, fetchMarketingChannels } = useMarketingStore();
   const { reminders } = useCrmStore();
 
   // جلب قنوات التسويق عند تحميل المكون

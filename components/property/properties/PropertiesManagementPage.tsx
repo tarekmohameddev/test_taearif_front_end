@@ -39,6 +39,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useAuthStore from "@/context/AuthContext";
+import {
+  selectUserData,
+  selectIsLoading,
+  selectClickedOnSubButton,
+} from "@/context/auth/selectors";
 import useStore from "@/context/Store";
 import EmptyState from "@/components/empty-state";
 import { ErrorDisplay } from "@/components/ui/error-display";
@@ -82,21 +87,22 @@ export function PropertiesManagementPage({
     type: "normal",
   });
 
-  const { clickedONSubButton, userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
+  const clickedONSubButton = useAuthStore(selectClickedOnSubButton);
   const router = useRouter();
+  const propertiesManagement = useStore((state) => state.propertiesManagement);
+  const setPropertiesManagement = useStore((state) => state.setPropertiesManagement);
   const {
-    propertiesManagement: {
-      viewMode,
-      favorites,
-      properties,
-      loading,
-      error,
-      pagination,
-      propertiesAllData,
-      incompleteCount,
-    },
-    setPropertiesManagement,
-  } = useStore();
+    viewMode,
+    favorites,
+    properties = [],
+    loading,
+    error,
+    pagination,
+    propertiesAllData,
+    incompleteCount = 0,
+  } = propertiesManagement ?? {};
 
   // Use custom hooks
   const filterHooks = usePropertyFilters();

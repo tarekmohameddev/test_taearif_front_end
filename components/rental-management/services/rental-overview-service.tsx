@@ -22,6 +22,7 @@ import {
   Wrench,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface OverviewStats {
   totalProperties: number;
@@ -64,7 +65,7 @@ export function RentalOverviewService({
 }: RentalOverviewServiceProps) {
   const { rentalOverview, setRentalOverview } = useStore();
   const { stats, recentActivity, loading, isInitialized } = rentalOverview;
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

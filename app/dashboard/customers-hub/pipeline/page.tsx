@@ -5,10 +5,12 @@ import { PipelinePage } from "@/components/customers-hub/pipeline/PipelinePage";
 import { useCustomersHubPipeline } from "@/hooks/useCustomersHubPipeline";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import type { PipelineBoardParams } from "@/lib/services/customers-hub-pipeline-api";
 
 export default function CustomersHubPipelinePage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const {
     stages,
     analytics,

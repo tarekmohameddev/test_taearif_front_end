@@ -18,7 +18,7 @@ const nextConfig = {
     tsconfigPath: './tsconfig.json',
   },
   images: {
-    unoptimized: true,
+    unoptimized: true, // عشان في مصادر للصور كتير جدا مش هعرف اجيب لينكاتها كلها
   },
   experimental: {
     scrollRestoration: true,

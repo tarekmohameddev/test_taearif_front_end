@@ -15,6 +15,7 @@ import { uploadSingleFile } from "@/utils/uploadSingle";
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface AdditionalSettings {
   theme_color: string;
@@ -30,7 +31,7 @@ interface AdditionalSettings {
 
 export function GeneralSettingsPage() {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     site_name: "",

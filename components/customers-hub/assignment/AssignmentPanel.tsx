@@ -70,7 +70,7 @@ export function AssignmentPanel() {
     handleSaveRules,
   } = useCustomersHubAssignment();
   
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
   
   const [open, setOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);

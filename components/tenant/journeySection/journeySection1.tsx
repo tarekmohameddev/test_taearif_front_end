@@ -23,12 +23,7 @@ export default function JourneySection1(props: JourneySection1Props) {
   const journeySectionStates = useEditorStore((s) => s.journeySectionStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) fetchTenantData(tenantId);
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<JourneySectionProps> => {
     if (!tenantData) return {};

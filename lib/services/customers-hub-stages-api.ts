@@ -2,6 +2,29 @@ import axiosInstance from "@/lib/axiosInstance";
 
 const BASE_URL = "/v2/customers-hub/stages";
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function stagesParamsKey(params?: GetStagesParams): string {
+  if (!params) return "stages:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof GetStagesParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `stages:${JSON.stringify(sorted)}`;
+}
+
 export interface Stage {
   id: number;                    // Internal DB id
   stage_id: string;              // Unique slug (e.g., "new_lead")
@@ -84,17 +107,20 @@ export interface DeleteStageResponse {
 export async function getStages(
   params?: GetStagesParams
 ): Promise<GetStagesResponse> {
-  const queryParams = new URLSearchParams();
-  if (params?.active_only !== undefined) {
-    queryParams.append("active_only", params.active_only.toString());
-  }
-  if (params?.order_by) {
-    queryParams.append("order_by", params.order_by);
-  }
+  const key = stagesParamsKey(params);
+  return dedupeByKey(key, async () => {
+    const queryParams = new URLSearchParams();
+    if (params?.active_only !== undefined) {
+      queryParams.append("active_only", params.active_only.toString());
+    }
+    if (params?.order_by) {
+      queryParams.append("order_by", params.order_by);
+    }
 
-  const url = `${BASE_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
-  const response = await axiosInstance.get<GetStagesResponse>(url);
-  return response.data;
+    const url = `${BASE_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    const response = await axiosInstance.get<GetStagesResponse>(url);
+    return response.data;
+  });
 }
 
 // Create a new stage

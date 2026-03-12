@@ -13,6 +13,8 @@ const useDailyFollowupStore = create((set, get) => ({
   // حالات التحميل والأخطاء
   loading: false,
   error: null,
+  /** مفتاح آخر جلب (لمنع الطلبات المكررة) — PREVENT_DUPLICATE_API_PROMPT */
+  lastFetchedDailyFollowupKey: null,
 
   // الفلاتر
   searchTerm: "",
@@ -55,53 +57,54 @@ const useDailyFollowupStore = create((set, get) => ({
       toDate,
       currentPage,
       itemsPerPage,
+      loading,
+      lastFetchedDailyFollowupKey,
     } = state;
 
-    // التحقق من الحقول المطلوبة عند اختيار "مخصص"
     if (dateFilter === "custom" && (!fromDate || !toDate)) {
       console.log("Custom date filter requires both from and to dates");
       return;
     }
 
+    // بناء المعاملات للمفتاح والطلب
+    let apiParams = {
+      status: statusFilter,
+      page: currentPage,
+      per_page: itemsPerPage,
+      ...params,
+    };
+    if (dateFilter === "custom") {
+      if (fromDate) apiParams.from_date = fromDate;
+      if (toDate) apiParams.to_date = toDate;
+    } else if (dateFilter === "today") {
+      const today = new Date().toISOString().split("T")[0];
+      apiParams.from_date = today;
+      apiParams.to_date = today;
+    } else if (dateFilter === "week") {
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      apiParams.from_date = weekStart.toISOString().split("T")[0];
+      apiParams.to_date = weekEnd.toISOString().split("T")[0];
+    } else if (dateFilter === "month") {
+      const today = new Date();
+      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      apiParams.from_date = monthStart.toISOString().split("T")[0];
+      apiParams.to_date = monthEnd.toISOString().split("T")[0];
+    }
+    if (buildingFilter && buildingFilter !== "all") {
+      apiParams.building_id = buildingFilter;
+    }
+    const paramsKey = JSON.stringify(apiParams);
+
+    if (loading) return;
+    if (lastFetchedDailyFollowupKey === paramsKey) return;
+
     try {
       set({ loading: true, error: null });
-
-      // بناء المعاملات
-      const apiParams = {
-        status: statusFilter,
-        page: currentPage,
-        per_page: itemsPerPage,
-        ...params,
-      };
-
-      // إضافة تواريخ حسب dateFilter
-      if (dateFilter === "custom") {
-        if (fromDate) apiParams.from_date = fromDate;
-        if (toDate) apiParams.to_date = toDate;
-      } else if (dateFilter === "today") {
-        const today = new Date().toISOString().split("T")[0];
-        apiParams.from_date = today;
-        apiParams.to_date = today;
-      } else if (dateFilter === "week") {
-        const today = new Date();
-        const weekStart = new Date(today);
-        weekStart.setDate(today.getDate() - today.getDay());
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 6);
-        apiParams.from_date = weekStart.toISOString().split("T")[0];
-        apiParams.to_date = weekEnd.toISOString().split("T")[0];
-      } else if (dateFilter === "month") {
-        const today = new Date();
-        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        apiParams.from_date = monthStart.toISOString().split("T")[0];
-        apiParams.to_date = monthEnd.toISOString().split("T")[0];
-      }
-
-      // إضافة building_id فقط إذا لم يكن "all"
-      if (buildingFilter && buildingFilter !== "all") {
-        apiParams.building_id = buildingFilter;
-      }
 
       const response = await axiosInstance.get("/v1/rms/daily-follow-up", {
         params: apiParams,
@@ -149,6 +152,7 @@ const useDailyFollowupStore = create((set, get) => ({
               ? 1
               : currentState.currentPage,
           loading: false,
+          lastFetchedDailyFollowupKey: paramsKey,
         });
 
         return { data, summary, pagination, filters };
@@ -178,6 +182,7 @@ const useDailyFollowupStore = create((set, get) => ({
       fromDate: "",
       toDate: "",
       currentPage: 1,
+      lastFetchedDailyFollowupKey: null,
     }),
 
   // Pagination Actions

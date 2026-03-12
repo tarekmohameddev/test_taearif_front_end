@@ -28,7 +28,14 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2 } from "lucide-react";
 
 export function AddCustomerDialog() {
-  const { showAddCustomerDialog, setShowAddCustomerDialog, addCustomer, addAction } = useUnifiedCustomersStore();
+  const showAddCustomerDialog = useUnifiedCustomersStore(
+    (state) => state.showAddCustomerDialog,
+  );
+  const setShowAddCustomerDialog = useUnifiedCustomersStore(
+    (state) => state.setShowAddCustomerDialog,
+  );
+  const addCustomer = useUnifiedCustomersStore((state) => state.addCustomer);
+  const addAction = useUnifiedCustomersStore((state) => state.addAction);
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({

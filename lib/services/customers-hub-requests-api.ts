@@ -3,6 +3,34 @@ import type { CustomerAction, CustomerActionType, CustomerSource, Priority } fro
 
 const BASE_URL = "/v2/customers-hub/requests";
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+// Same key requested while a request is in progress returns the existing promise.
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) {
+    return existing as Promise<T>;
+  }
+  const promise = fn().finally(() => {
+    inFlight.delete(key);
+  });
+  inFlight.set(key, promise);
+  return promise;
+}
+
+/** Stable key for list params (sorted keys for consistency). */
+function listParamsKey(body: RequestsListFilters): string {
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(body) as (keyof RequestsListFilters)[])
+    .sort()
+    .forEach((k) => {
+      const v = body[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return "list:" + JSON.stringify(sorted);
+}
+
 // Flat structure matching new API format
 export type ObjectType = "inquiry" | "property_request" | "reminder" | "appointment" | "customer_reminder";
 
@@ -394,21 +422,28 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       }
     });
   }
-  
-  const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, requestBody);
-  return response.data;
+
+  const key = listParamsKey(requestBody);
+  return dedupeByKey(key, async () => {
+    const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, requestBody);
+    return response.data;
+  });
 }
 
 // Get Filter Options
 export async function getFilterOptions(): Promise<FilterOptionsResponse> {
-  const response = await axiosInstance.get<FilterOptionsResponse>(`${BASE_URL}/filter-options`);
-  return response.data;
+  return dedupeByKey("filter-options", async () => {
+    const response = await axiosInstance.get<FilterOptionsResponse>(`${BASE_URL}/filter-options`);
+    return response.data;
+  });
 }
 
 // Get Single Action Detail
 export async function getActionDetail(actionId: string): Promise<ActionDetailResponse> {
-  const response = await axiosInstance.get<ActionDetailResponse>(`${BASE_URL}/${actionId}`);
-  return response.data;
+  return dedupeByKey(`detail:${actionId}`, async () => {
+    const response = await axiosInstance.get<ActionDetailResponse>(`${BASE_URL}/${actionId}`);
+    return response.data;
+  });
 }
 
 // Complete Action
@@ -444,8 +479,10 @@ export async function assignAction(actionId: string, employeeId: number): Promis
 
 // Get Action Stats
 export async function getActionStats(actionId: string): Promise<any> {
-  const response = await axiosInstance.get(`${BASE_URL}/${actionId}/stats`);
-  return response.data;
+  return dedupeByKey(`stats:${actionId}`, async () => {
+    const response = await axiosInstance.get(`${BASE_URL}/${actionId}/stats`);
+    return response.data;
+  });
 }
 
 // Add Note to Action
@@ -509,7 +546,7 @@ export async function updateCustomerStage(
 
   // If inquiryId is explicitly provided, use it
   if (inquiryId !== undefined && inquiryId !== null) {
-    const inquiryIdNum = typeof inquiryId === "number" ? inquiryId : parseInt(inquiryId.toString());
+    const inquiryIdNum = Number(inquiryId);
     if (isNaN(inquiryIdNum)) {
       throw new Error(`Invalid inquiry ID: ${inquiryId} - must be a valid number`);
     }

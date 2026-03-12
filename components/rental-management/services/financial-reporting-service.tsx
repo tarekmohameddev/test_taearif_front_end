@@ -27,6 +27,7 @@ import {
   Target,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface FinancialData {
   revenue: {
@@ -74,7 +75,7 @@ export function FinancialReportingService() {
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("12months");
   const [selectedProperty, setSelectedProperty] = useState("all");
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

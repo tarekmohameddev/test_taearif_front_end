@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import axiosInstance from "@/lib/axiosInstance";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface Stage {
   id: number;
@@ -94,7 +95,7 @@ export const CustomerForm = ({
   const [loadingCities, setLoadingCities] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const { filterData, setFilterData } = useCustomersFiltersStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // دالة جلب بيانات الفلاتر من الAPI
   const fetchFilters = useCallback(async () => {

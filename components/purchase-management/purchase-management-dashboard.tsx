@@ -1,9 +1,10 @@
 "use client";
 import { PurchaseFlowService } from "@/components/purchase-management/services/purchase-flow-service";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export function PurchaseManagementDashboard() {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // التحقق من وجود التوكن قبل عرض المحتوى
   if (!userData?.token) {

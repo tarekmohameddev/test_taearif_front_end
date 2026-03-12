@@ -32,12 +32,7 @@ export default function ValuesSection1(props: ValuesSection1Props) {
   const valuesSectionStates = useEditorStore((s) => s.valuesSectionStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) fetchTenantData(tenantId);
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<ValuesSectionProps> => {
     if (!tenantData) return {};

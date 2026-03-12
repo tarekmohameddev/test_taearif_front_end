@@ -1,13 +1,15 @@
 "use client";
 
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export default function CustomersHubLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   if (authLoading || !userData?.token) {
     return (

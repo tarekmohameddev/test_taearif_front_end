@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -134,6 +134,11 @@ export default function RolesPage() {
   const [deleteRoleLoading, setDeleteRoleLoading] = useState(false);
   const [deleteRoleError, setDeleteRoleError] = useState<string | null>(null);
 
+  // Refs for duplicate-API guards (synchronous check)
+  const fetchRolesForTabInFlightRef = useRef(false);
+  const fetchRoleDetailsInFlightRef = useRef(false);
+  const fetchAvailablePermissionsForRoleInFlightRef = useRef(false);
+
   // Filter roles based on search query
   const filteredRoles = rolesTabData.filter(
     (role) =>
@@ -151,8 +156,10 @@ export default function RolesPage() {
       ),
   );
 
-  // Fetch roles for roles tab
+  // Fetch roles for roles tab (duplicate-API guards per PREVENT_DUPLICATE_API_PROMPT.md)
   const fetchRolesForTab = async () => {
+    if (fetchRolesForTabInFlightRef.current) return;
+    fetchRolesForTabInFlightRef.current = true;
     setRolesTabLoading(true);
     setRolesTabError(null);
     try {
@@ -163,11 +170,15 @@ export default function RolesPage() {
       setRolesTabError("حدث خطأ في جلب الأدوار");
     } finally {
       setRolesTabLoading(false);
+      fetchRolesForTabInFlightRef.current = false;
     }
   };
 
-  // Fetch role details
+  // Fetch role details (duplicate-API guards)
   const fetchRoleDetails = async (roleId: number) => {
+    if (fetchRoleDetailsInFlightRef.current) return;
+    if (roleDetails?.id === roleId) return;
+    fetchRoleDetailsInFlightRef.current = true;
     setRoleDetailsLoading(true);
     setRoleDetailsError(null);
     try {
@@ -181,11 +192,15 @@ export default function RolesPage() {
       );
     } finally {
       setRoleDetailsLoading(false);
+      fetchRoleDetailsInFlightRef.current = false;
     }
   };
 
-  // Fetch available permissions for role creation
+  // Fetch available permissions for role creation (duplicate-API guards)
   const fetchAvailablePermissionsForRole = async () => {
+    if (fetchAvailablePermissionsForRoleInFlightRef.current) return;
+    if (availablePermissionsForRole) return;
+    fetchAvailablePermissionsForRoleInFlightRef.current = true;
     setPermissionsForRoleLoading(true);
     try {
       const response = await axiosInstance.get("/v1/permissions");
@@ -198,6 +213,7 @@ export default function RolesPage() {
       console.error("Error fetching available permissions for role:", error);
     } finally {
       setPermissionsForRoleLoading(false);
+      fetchAvailablePermissionsForRoleInFlightRef.current = false;
     }
   };
 

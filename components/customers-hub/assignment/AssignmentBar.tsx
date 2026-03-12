@@ -26,7 +26,7 @@ import { toast } from "sonner";
 
 export function AssignmentBar() {
   const { employees, rules, autoAssignCustomers, assignMultiple, refreshWorkloads, toggleRule } = useAssignmentStore();
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
   
   const [showAutoDialog, setShowAutoDialog] = useState(false);
   const [showManualDialog, setShowManualDialog] = useState(false);

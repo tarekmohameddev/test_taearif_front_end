@@ -169,7 +169,6 @@ export default function Footer2(props: Footer2Props) {
   const [forceUpdate, setForceUpdate] = useState(0);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Subscribe to website layout for custom branding
@@ -178,16 +177,7 @@ export default function Footer2(props: Footer2Props) {
   // Check if this is a global footer
   const isGlobalFooter = uniqueId === "global-footer";
 
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Extract component data from tenantData
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
 

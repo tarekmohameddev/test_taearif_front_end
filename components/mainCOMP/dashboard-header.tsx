@@ -46,8 +46,9 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { useRouter, usePathname } from "next/navigation";
-import useStore from "@/context/Store";
+import useSidebarStore from "@/context/sidebarStore";
 import axiosInstance from "@/lib/axiosInstance";
 import { cn } from "@/lib/utils";
 import {
@@ -66,10 +67,12 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ children }: DashboardHeaderProps) {
-  const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const fetchUserData = useAuthStore((s) => s.fetchUserData);
+  const clickedONSubButton = useAuthStore((s) => s.clickedONSubButton);
   const router = useRouter();
   const pathname = usePathname();
-  const { sidebarData, fetchSideMenus } = useStore();
+  const { sidebarData } = useSidebarStore();
   const { mainNavItems, loading, error } = sidebarData;
   const [currentPlan, setCurrentPlan] = useState<PlanData | null>(null);
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);
@@ -77,15 +80,6 @@ export function DashboardHeader({ children }: DashboardHeaderProps) {
   const hasFetchedPlanRef = useRef(false);
   const isFetchingRef = useRef(false);
   const lastTokenRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    // إزالة fetchUserData من هنا لأنه يتم استدعاؤه في layout.tsx
-    // fetchUserData();
-    // التحقق من وجود التوكن قبل إجراء الطلب
-    if (userData?.token) {
-      fetchSideMenus();
-    }
-  }, [fetchSideMenus, userData?.token]);
 
   // جلب بيانات الخطة مرة واحدة وحفظها في كوكي
   useEffect(() => {

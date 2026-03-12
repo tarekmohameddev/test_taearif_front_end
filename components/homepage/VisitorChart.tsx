@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   AreaChart,
   XAxis,
@@ -24,7 +25,8 @@ function VisitorChart() {
     },
     loading,
   } = useStore();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   useEffect(() => {
     // Wait until token is fetched

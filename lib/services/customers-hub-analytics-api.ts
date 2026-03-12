@@ -2,6 +2,28 @@ import axiosInstance from "@/lib/axiosInstance";
 
 const BASE_URL = "/v2/customers-hub/analytics";
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function analyticsParamsKey(prefix: string, params: object): string {
+  const sorted: Record<string, unknown> = {};
+  Object.keys(params)
+    .sort()
+    .forEach((k) => {
+      const v = (params as Record<string, unknown>)[k];
+      if (v !== undefined) sorted[k] = v;
+    });
+  return `${prefix}:${JSON.stringify(sorted)}`;
+}
+
 export interface TimeRange {
   timeRange: "today" | "yesterday" | "last7days" | "last30days" | "thisMonth" | "lastMonth" | "custom";
   start?: string;
@@ -122,14 +144,20 @@ export interface AnalyticsPerformanceResponse {
 
 // Get Analytics Metrics
 export async function getAnalyticsMetrics(params: AnalyticsMetricsParams): Promise<AnalyticsMetricsResponse> {
-  const response = await axiosInstance.post<AnalyticsMetricsResponse>(`${BASE_URL}`, params);
-  return response.data;
+  const key = analyticsParamsKey("metrics", params);
+  return dedupeByKey(key, async () => {
+    const response = await axiosInstance.post<AnalyticsMetricsResponse>(`${BASE_URL}`, params);
+    return response.data;
+  });
 }
 
 // Get Analytics Trends
 export async function getAnalyticsTrends(params: AnalyticsTrendsParams): Promise<AnalyticsTrendsResponse> {
-  const response = await axiosInstance.post<AnalyticsTrendsResponse>(`${BASE_URL}/trends`, params);
-  return response.data;
+  const key = analyticsParamsKey("trends", params);
+  return dedupeByKey(key, async () => {
+    const response = await axiosInstance.post<AnalyticsTrendsResponse>(`${BASE_URL}/trends`, params);
+    return response.data;
+  });
 }
 
 // Get Analytics by Sources
@@ -140,6 +168,9 @@ export async function getAnalyticsSources(params: AnalyticsSourcesParams): Promi
 
 // Get Performance Analytics
 export async function getAnalyticsPerformance(params: AnalyticsPerformanceParams): Promise<AnalyticsPerformanceResponse> {
-  const response = await axiosInstance.post<AnalyticsPerformanceResponse>(`${BASE_URL}/performance`, params);
-  return response.data;
+  const key = analyticsParamsKey("performance", params);
+  return dedupeByKey(key, async () => {
+    const response = await axiosInstance.post<AnalyticsPerformanceResponse>(`${BASE_URL}/performance`, params);
+    return response.data;
+  });
 }

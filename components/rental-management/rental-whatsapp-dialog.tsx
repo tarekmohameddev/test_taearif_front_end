@@ -33,7 +33,7 @@ import {
   User,
   Building2,
 } from "lucide-react";
-import useStore from "@/context/Store";
+import useMarketingStore from "@/context/marketingStore";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface RentalWhatsAppDialogProps {
@@ -62,7 +62,7 @@ export function RentalWhatsAppDialog({
   onClose,
   rental,
 }: RentalWhatsAppDialogProps) {
-  const { marketingChannels, fetchMarketingChannels } = useStore();
+  const { marketingChannels, fetchMarketingChannels } = useMarketingStore();
   const [selectedChannel, setSelectedChannel] = useState<string>("");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);

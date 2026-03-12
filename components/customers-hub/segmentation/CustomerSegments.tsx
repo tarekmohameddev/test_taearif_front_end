@@ -26,7 +26,7 @@ interface Segment {
 }
 
 export function CustomerSegments() {
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
 
   const segments: Segment[] = [
     {

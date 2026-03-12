@@ -26,6 +26,11 @@ export default (set, get) => ({
     assignedPropertiesPagination: null,
     loadingAssignedProperties: false,
     assignedPropertiesError: null,
+    /** PREVENT_DUPLICATE_API_PROMPT */
+    lastFetchedOwnerRentalsKey: null,
+    lastFetchedOwnerDetailsId: null,
+    lastFetchedProperties: false,
+    lastFetchedAssignedKey: null,
   },
 
   setRentalOwnerDashboard: (newState) =>
@@ -39,7 +44,16 @@ export default (set, get) => ({
   // Fetch owners with filters
   fetchOwnerRentals: async (page = 1, perPage = 15) => {
     const state = get();
-    const { searchTerm, statusFilter } = state.rentalOwnerDashboard;
+    const {
+      searchTerm,
+      statusFilter,
+      loading,
+      lastFetchedOwnerRentalsKey,
+    } = state.rentalOwnerDashboard;
+
+    const paramsKey = `${page}|${perPage}|${searchTerm}|${statusFilter}`;
+    if (loading) return;
+    if (lastFetchedOwnerRentalsKey === paramsKey) return;
 
     set((state) => ({
       rentalOwnerDashboard: {
@@ -80,6 +94,7 @@ export default (set, get) => ({
             },
             loading: false,
             isInitialized: true,
+            lastFetchedOwnerRentalsKey: paramsKey,
           },
         }));
       }
@@ -98,6 +113,13 @@ export default (set, get) => ({
 
   // Fetch single owner details
   fetchOwnerDetails: async (ownerRentalId) => {
+    const state = get();
+    const { loadingOwnerDetails, lastFetchedOwnerDetailsId } =
+      state.rentalOwnerDashboard;
+
+    if (loadingOwnerDetails) return;
+    if (lastFetchedOwnerDetailsId === ownerRentalId) return;
+
     set((state) => ({
       rentalOwnerDashboard: {
         ...state.rentalOwnerDashboard,
@@ -117,6 +139,7 @@ export default (set, get) => ({
             ...state.rentalOwnerDashboard,
             selectedOwnerDetails: response.data.data,
             loadingOwnerDetails: false,
+            lastFetchedOwnerDetailsId: ownerRentalId,
           },
         }));
       }
@@ -135,6 +158,13 @@ export default (set, get) => ({
 
   // Fetch available properties (excluding already assigned ones)
   fetchAvailableProperties: async () => {
+    const state = get();
+    const { loadingProperties, lastFetchedProperties } =
+      state.rentalOwnerDashboard;
+
+    if (loadingProperties) return;
+    if (lastFetchedProperties) return;
+
     set((state) => ({
       rentalOwnerDashboard: {
         ...state.rentalOwnerDashboard,
@@ -162,6 +192,7 @@ export default (set, get) => ({
           ...state.rentalOwnerDashboard,
           availableProperties: Array.isArray(properties) ? properties : [],
           loadingProperties: false,
+          lastFetchedProperties: true,
         },
       }));
     } catch (error) {
@@ -277,6 +308,16 @@ export default (set, get) => ({
 
   // Fetch assigned properties for owner
   fetchAssignedProperties: async (ownerRentalId, page = 1, perPage = 15) => {
+    const state = get();
+    const {
+      loadingAssignedProperties,
+      lastFetchedAssignedKey,
+    } = state.rentalOwnerDashboard;
+
+    const paramsKey = `${ownerRentalId}|${page}|${perPage}`;
+    if (loadingAssignedProperties) return;
+    if (lastFetchedAssignedKey === paramsKey) return;
+
     set((state) => ({
       rentalOwnerDashboard: {
         ...state.rentalOwnerDashboard,
@@ -310,6 +351,7 @@ export default (set, get) => ({
               to: response.data.data.to,
             },
             loadingAssignedProperties: false,
+            lastFetchedAssignedKey: paramsKey,
           },
         }));
       }

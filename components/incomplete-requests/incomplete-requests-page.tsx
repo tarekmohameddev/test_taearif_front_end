@@ -3,6 +3,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { useEffect, useState, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
@@ -51,7 +52,7 @@ export default function IncompleteRequestsPage() {
     by_source?: { web?: number; whatsapp?: number };
     by_purpose?: { rent?: number; sale?: number };
   } | null>(null);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const isInitialLoad = useRef(true);
 
   // Fetch incomplete requests with filters

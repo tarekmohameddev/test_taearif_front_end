@@ -6,12 +6,13 @@ import toast from "react-hot-toast";
 import SaveConfirmationDialog from "@/components/SaveConfirmationDialog";
 import { useEditorStore } from "./editorStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import axiosInstance from "@/lib/axiosInstance";
 import useTenantStore from "./tenantStore";
 
 export function EditorProvider({ children }: { children: ReactNode }) {
   const { showDialog, closeDialog, openSaveDialogFn } = useEditorStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   // tenantId يمكن أن يكون subdomain (tenant1) أو custom domain (hey.com)
   const tenantId = userData?.username;
 

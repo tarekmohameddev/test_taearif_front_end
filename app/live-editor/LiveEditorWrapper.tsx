@@ -43,12 +43,7 @@ function extractTenantFromHostname(hostname: string): string | null {
     "store",
   ];
 
-  const isCustomDomain = /\.([a-z]{2,})$/i.test(hostname);
-
-  if (isCustomDomain) {
-    return hostname;
-  }
-
+  // Check subdomain first so "kkkkk.localhost" -> "kkkkk" (not treated as custom domain)
   if (hostname.includes(localDomain)) {
     const parts = hostname.split(".");
     if (parts.length > 1 && parts[0] !== localDomain) {
@@ -67,6 +62,12 @@ function extractTenantFromHostname(hostname: string): string | null {
         return potentialTenantId;
       }
     }
+  }
+
+  // Custom domain (real TLD like .com, .sa): return hostname as-is
+  const isCustomDomain = /\.([a-z]{2,})$/i.test(hostname);
+  if (isCustomDomain) {
+    return hostname;
   }
 
   return null;

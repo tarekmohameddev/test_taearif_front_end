@@ -37,6 +37,7 @@ import { PipelineStage } from "@/types/crm";
 import axiosInstance from "@/lib/axiosInstance";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -108,7 +109,7 @@ export default function CrmFilters({
       )
     : [];
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const { customers: storeCustomers } = useCrmStore();
   const [isSearching, setIsSearching] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(

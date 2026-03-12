@@ -78,8 +78,8 @@ const uploadVideos = async (files: File[]) => {
 
   return uploadedFiles;
 };
-import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -97,11 +97,7 @@ type ProjectImage = {
 };
 
 export default function EditProjectPage(): JSX.Element {
-  const { userData } = useAuthStore();
-  const {
-    projectsManagement: { projects, loading, isInitialized },
-    setProjectsManagement,
-  } = useStore();
+  const userData = useAuthStore(selectUserData);
   const router = useRouter();
   const { id } = useParams();
   const [originalData, setOriginalData] = useState(null);

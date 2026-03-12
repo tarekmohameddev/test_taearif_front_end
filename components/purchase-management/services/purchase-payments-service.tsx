@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +94,7 @@ export function PurchasePaymentsService() {
     useState<PurchasePayment | null>(null);
   const [isRecordPaymentDialogOpen, setIsRecordPaymentDialogOpen] =
     useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Active contracts for creating payment records
   const activeContracts = [

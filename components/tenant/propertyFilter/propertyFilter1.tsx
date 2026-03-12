@@ -102,17 +102,9 @@ export default function PropertyFilter({
   // Tenant ID hook
   const { tenantId: currentTenantId, isLoading: tenantLoading } = useTenantId();
 
-  // Get tenant data from store
+  // Get tenant data from store (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantIdFromStore = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    const finalTenantId = tenantIdFromStore || currentTenantId;
-    if (finalTenantId) {
-      fetchTenantData(finalTenantId);
-    }
-  }, [tenantIdFromStore, currentTenantId, fetchTenantData]);
 
   // Get data from store or content prop with fallback logic
   const storeData = useStore

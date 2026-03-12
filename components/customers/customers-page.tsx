@@ -13,6 +13,7 @@ import { CustomerTable } from "./page-components/CustomerTable";
 import { CrmLinkCard } from "./page-components/CrmLinkCard";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface Customer {
   id: number;
@@ -149,7 +150,7 @@ export default function CustomersPage() {
 
   // Get filter states from store
   const { searchTerm, filterType, filterCity } = useCustomersFiltersStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Function to fetch customers with current filters and pagination
   const fetchCustomersWithFilters = useCallback(

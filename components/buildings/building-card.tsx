@@ -54,6 +54,7 @@ import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "sonner";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 import { Building } from "./types";
 
@@ -71,7 +72,8 @@ export default function BuildingCard({
   isSelected = false,
 }: BuildingCardProps) {
   const router = useRouter();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [showAllProperties, setShowAllProperties] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 

@@ -44,13 +44,14 @@ import axiosInstance from "@/lib/axiosInstance";
 import { Skeleton } from "@/components/ui/skeleton";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export function AffiliateDashboardPage() {
   const {
     affiliateData: { data: dashboardData, loading },
     fetchAffiliateData,
   } = useStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // UI states
   const [searchTerm, setSearchTerm] = useState("");

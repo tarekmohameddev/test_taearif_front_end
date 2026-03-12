@@ -73,21 +73,9 @@ export default function LogosTicker1(props: LogosTickerProps) {
   const logosTickerStates = useEditorStore((s) => s.logosTickerStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
-  // ─────────────────────────────────────────────────────────
-  // 3. FETCH TENANT DATA
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // ─────────────────────────────────────────────────────────
-  // 4. GET TENANT COMPONENT DATA
-  // ─────────────────────────────────────────────────────────
+  // GET TENANT COMPONENT DATA
   // Get tenant data for this specific component variant - memoized
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {

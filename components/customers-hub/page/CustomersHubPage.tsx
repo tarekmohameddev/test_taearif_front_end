@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/button";
 import { AddCustomerDialog } from "../dialogs/AddCustomerDialog";
 
 export function CustomersHubPage() {
-  const { viewMode, setViewMode } = useUnifiedCustomersStore();
+  const viewMode = useUnifiedCustomersStore((state) => state.viewMode);
+  const setViewMode = useUnifiedCustomersStore((state) => state.setViewMode);
 
   return (
     <div className="flex flex-col gap-6 p-6" dir="rtl">

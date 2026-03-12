@@ -6,10 +6,11 @@ import { ContractsStats } from "@/components/rental-management/contracts-stats";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import useContractsStore from "@/context/store/contracts";
 
 export function ContractsPage() {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const router = useRouter();
   const { resetFilters } = useContractsStore();
 

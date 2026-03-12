@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { fetchFilterOptionsAPI } from "../services/api";
 import {
   translateContractStatus,
@@ -10,7 +11,7 @@ import {
 import type { FilterOptions } from "../types/types";
 
 export const useRentalFilters = () => {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     contract_statuses: [],
     rental_statuses: [],

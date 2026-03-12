@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import type { Customer, PipelineStage, Appointment } from "@/types/crm";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Users,
@@ -360,7 +361,7 @@ export default function CrmPage() {
     updateAppointment,
     updateInquiry,
   } = useCrmStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Ensure pipelineStages is always an array and filter out "unassigned" stage
   const pipelineStages = Array.isArray(rawPipelineStages)

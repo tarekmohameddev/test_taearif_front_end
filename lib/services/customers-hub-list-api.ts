@@ -3,6 +3,28 @@ import type { UnifiedCustomer } from "@/types/unified-customer";
 
 const BASE_URL = "/v2/customers-hub/list";
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function listParamsKey(params: CustomersListParams): string {
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof CustomersListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `list:${JSON.stringify(sorted)}`;
+}
+
 export interface CustomersListFilters {
   stage?: string[];              // Array of stage_id strings (e.g., ["new_lead", "qualified"])
   priority?: number[];
@@ -101,18 +123,25 @@ export interface StatsResponse {
 
 // Get Customers List
 export async function getCustomersList(params: CustomersListParams): Promise<CustomersListResponse> {
-  const response = await axiosInstance.post<CustomersListResponse>(`${BASE_URL}`, params);
-  return response.data;
+  const key = listParamsKey(params);
+  return dedupeByKey(key, async () => {
+    const response = await axiosInstance.post<CustomersListResponse>(`${BASE_URL}`, params);
+    return response.data;
+  });
 }
 
 // Get Filter Options
 export async function getListFilterOptions(): Promise<FilterOptionsResponse> {
-  const response = await axiosInstance.get<FilterOptionsResponse>(`${BASE_URL}/filter-options`);
-  return response.data;
+  return dedupeByKey("filter-options", async () => {
+    const response = await axiosInstance.get<FilterOptionsResponse>(`${BASE_URL}/filter-options`);
+    return response.data;
+  });
 }
 
 // Get List Stats
 export async function getListStats(): Promise<StatsResponse> {
-  const response = await axiosInstance.get<StatsResponse>(`${BASE_URL}/stats`);
-  return response.data;
+  return dedupeByKey("stats", async () => {
+    const response = await axiosInstance.get<StatsResponse>(`${BASE_URL}/stats`);
+    return response.data;
+  });
 }

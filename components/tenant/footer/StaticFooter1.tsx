@@ -256,10 +256,9 @@ export default function StaticFooter({
   variant?: string;
   id?: string;
 } = {}) {
-  // Get tenant data
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Subscribe to website layout for custom branding
@@ -279,13 +278,6 @@ export default function StaticFooter({
   // Get global components data from tenantData
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalFooterData = tenantGlobalComponentsData?.footer;
-
-  // Fetch tenant data when tenantId is available
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Ensure component variant exists in store
   useEffect(() => {

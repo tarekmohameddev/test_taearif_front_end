@@ -345,17 +345,31 @@ export default function PermissionWrapper({ children, fallback }) {
 ```typescript
 export const usePermissions = () => {
   const pathname = usePathname();
-  const { userData, loading, error, hasAccessToPage, fetchUserData } =
-    useUserStore();
 
-  // Initialize user data
+  // 1) ننتظر توكن Auth قبل استدعاء userStore.fetchUserData لتفادي 401 على /user
+  const { userData: authUserData, IsLoading: authLoading } = useAuthStore();
+
+  // 2) نقرأ حالة userStore بما في ذلك isInitialized (تهيئة بيانات الصلاحيات)
+  const {
+    userData,
+    loading,
+    error,
+    fetchUserData,
+    hasAccessToPage,
+    isInitialized,
+  } = useUserStore();
+
+  // Initialize user data on first load — only after Auth token is ready to avoid 401
   useEffect(() => {
-    if (!userData) {
+    if (authLoading || !authUserData?.token) {
+      return;
+    }
+    if (!isInitialized) {
       fetchUserData();
     }
-  }, [userData, fetchUserData]);
+  }, [isInitialized, fetchUserData, authLoading, authUserData?.token]);
 
-  // Extract page slug from pathname
+  // Extract page slug from pathname (remove locale and /dashboard prefix)
   const getPageSlug = (pathname: string): string => {
     let cleanPath = pathname.replace(/^\/[a-z]{2}/, ""); // Remove locale
     cleanPath = cleanPath.replace(/^\/dashboard/, ""); // Remove /dashboard
@@ -363,47 +377,27 @@ export const usePermissions = () => {
     return segments[0] || "";
   };
 
-  // Map slug to permission
-  const getPermissionName = (slug: string): string => {
-    const permissionMap = {
-      customers: "customers.view",
-      properties: "properties.view",
-      analytics: "analytics.view",
-      "rental-management": "rental.management",
-      "purchase-management": "purchase.management",
-      "access-control": "access.control",
-      "activity-logs": "activity.logs.view",
-      affiliate: "affiliate.view",
-      marketing: "marketing.view",
-      "whatsapp-ai": "whatsapp.ai",
-      live_editor: "live_editor.view",
-      projects: "projects.view",
-      blogs: "blogs.view",
-      messages: "messages.view",
-      apps: "apps.view",
-      settings: "settings.view",
-      templates: "templates.view",
-    };
+  const pageSlug = pathname ? getPageSlug(pathname) : "";
+  const hasPermission = pageSlug ? hasAccessToPage(pageSlug) : true;
 
-    return permissionMap[slug] || `${slug}.view`;
-  };
-
-  const pageSlug = getPageSlug(pathname);
-  const hasPermission = hasAccessToPage(pageSlug);
+  // نعتبر أن hook في حالة \"تحميل صلاحيات\" فقط أثناء أول تهيئة لـ userStore.
+  // بعد أن تصبح isInitialized === true، نستمر في استخدام الكاش بدون إعادة عرض
+  // شاشة \"جاري التحقق من الصلاحيات\" عند كل تنقل داخل الداشبورد.
+  const isFirstPermissionsLoad = !isInitialized;
 
   return {
     hasPermission,
-    loading,
+    loading: isFirstPermissionsLoad && (loading || authLoading),
     userData,
     error,
-    getPageSlug: () => pageSlug,
+    getPageSlug: () => (pathname ? getPageSlug(pathname) : ""),
   };
 };
 ```
 
 ### Permission Checking Logic
 
-**In UserStore (`store/userStore.ts`):**
+**In UserStore (`context/userStore.ts`):** Imports `getPermissionNameForSlug` from `@/lib/permissions/slugToPermission`.
 
 ```typescript
 hasAccessToPage: (pageSlug: string | null) => {
@@ -420,10 +414,8 @@ hasAccessToPage: (pageSlug: string | null) => {
     return true;
   }
 
-  // Permission-based access
-  const permissionMap = { /* ... */ };
-  const requiredPermission = permissionMap[pageSlug] || `${pageSlug}.view`;
-
+  // Permission-based access: slug → permission name from @/lib/permissions/slugToPermission
+  const requiredPermission = getPermissionNameForSlug(pageSlug);
   return get().checkPermission(requiredPermission);
 },
 

@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { getPaymentMethodText, truncateTitle, formatAddress } from "../utils/helpers";
 import type { PropertyCardProps } from "../types/properties.types";
 
@@ -51,7 +52,7 @@ export function PropertyCard({
   onCompleteDraft,
 }: PropertyCardProps & { setReorderPopup: any; showIncompleteOnly?: boolean; onCompleteDraft?: (id: string) => void }) {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [columnsCount, setColumnsCount] = useState(4);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   

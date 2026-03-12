@@ -18,8 +18,9 @@ import {
   Home,
   DollarSign,
 } from "lucide-react";
-import axiosInstance from "@/lib/axiosInstance";
+import { getPropertyRequestById } from "@/lib/api/property-requests-dashboard-api";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 interface PropertyRequest {
   id: number;
@@ -55,7 +56,8 @@ export default function PropertyRequestDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const propertyRequestId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [activeTab, setActiveTab] = useState("property-requests");
   const [propertyRequest, setPropertyRequest] = useState<PropertyRequest | null>(
@@ -74,9 +76,7 @@ export default function PropertyRequestDetailsPage() {
     setLoadingDetails(true);
     setError(null);
     try {
-      const response = await axiosInstance.get(`/v1/property-requests/${id}`);
-      // التحقق من وجود البيانات في أي من الأشكال المحتملة
-      const data = response.data?.data || response.data;
+      const data = await getPropertyRequestById(id);
       if (data && (data.id || data.user_id)) {
         setPropertyRequest(data);
       } else {

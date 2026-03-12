@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 export function KSAComplianceKPIs() {
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
 
   const ksaMetrics = useMemo(() => {
     const customersWithKSA = customers.filter(c => c.ksaCompliance);

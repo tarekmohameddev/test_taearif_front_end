@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserIsLogged } from "@/context/auth/selectors";
 import Link from "next/link";
 import { Eye, EyeOff, Check, AlertCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,7 @@ interface Errors {
 }
 
 export function GoogleRegisterPage() {
-  const { UserIslogged } = useAuthStore();
+  const UserIslogged = useAuthStore(selectUserIsLogged);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
   const searchParams = useSearchParams();

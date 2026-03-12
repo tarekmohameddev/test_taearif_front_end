@@ -16,9 +16,13 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Loader2 } from "lucide-react";
-import axiosInstance from "@/lib/axiosInstance";
+import {
+  getEmployees,
+  assignPropertyRequestEmployee,
+} from "@/lib/api/property-requests-dashboard-api";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PropertyRequest {
   id: number;
@@ -57,7 +61,7 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
   );
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // جلب الموظفين عند فتح dialog
   useEffect(() => {
@@ -82,10 +86,8 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
 
     setLoadingEmployees(true);
     try {
-      const response = await axiosInstance.get("/v1/employees");
-      if (response.data && response.data.data) {
-        setEmployees(response.data.data);
-      }
+      const data = await getEmployees();
+      setEmployees((data as Employee[]) || []);
     } catch (error) {
       console.error("Error fetching employees:", error);
       toast.error("حدث خطأ أثناء تحميل الموظفين", {
@@ -136,12 +138,9 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
           ? null
           : selectedEmployeeId;
 
-      await axiosInstance.put(
-        `/v1/property-requests/customer/${customerID}/employee`,
-        {
-          responsible_employee_id: employeeIdToSend,
-        },
-      );
+      await assignPropertyRequestEmployee(customerID, {
+        responsible_employee_id: employeeIdToSend,
+      });
 
       toast.success("تم تعيين الموظف المسؤول بنجاح!", {
         duration: 4000,

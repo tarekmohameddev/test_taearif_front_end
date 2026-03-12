@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { useUserStore } from "@/context/userStore";
 import { usePropertyFormStore } from "@/context/store/dashboard/properties/propertyForm";
 import {
@@ -46,7 +47,8 @@ export default function PropertyForm({ mode, isDraft = false }) {
     propertiesManagement: { properties, loading, isInitialized },
     fetchProperties,
   } = useStore();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const { checkPermission } = useUserStore();
   const router = useRouter();
   const { id } = useParams();

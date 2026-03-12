@@ -31,7 +31,7 @@ import {
   AlertCircle,
   X,
 } from "lucide-react";
-import useStore from "@/context/Store";
+import useMarketingStore from "@/context/marketingStore";
 import axiosInstance from "@/lib/axiosInstance";
 
 interface WhatsAppSendDialogProps {
@@ -57,7 +57,7 @@ export function WhatsAppSendDialog({
   customerName = "",
   customerId,
 }: WhatsAppSendDialogProps) {
-  const { marketingChannels, fetchMarketingChannels } = useStore();
+  const { marketingChannels, fetchMarketingChannels } = useMarketingStore();
   const [selectedChannel, setSelectedChannel] = useState<string>("");
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);

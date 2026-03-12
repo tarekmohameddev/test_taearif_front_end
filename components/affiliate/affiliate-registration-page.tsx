@@ -21,6 +21,7 @@ import useStore from "@/context/Store";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export function AffiliateRegistrationPage() {
   const {
@@ -28,7 +29,7 @@ export function AffiliateRegistrationPage() {
     fetchAffiliateData,
   } = useStore();
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [formData, setFormData] = useState({
     fullName: "",
     bankName: "",

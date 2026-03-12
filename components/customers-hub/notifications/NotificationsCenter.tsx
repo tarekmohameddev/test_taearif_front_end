@@ -42,7 +42,7 @@ interface Notification {
 }
 
 export function NotificationsCenter() {
-  const { customers } = useUnifiedCustomersStore();
+  const customers = useUnifiedCustomersStore((state) => state.customers);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 

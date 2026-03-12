@@ -103,14 +103,7 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Add effect to listen for store updates
   useEffect(() => {

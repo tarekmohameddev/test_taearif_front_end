@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useEditorStore } from "@/context/editorStore";
-import useTenantStore from "@/context/tenantStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { useEditorLocale } from "@/context/editorI18nStore";
 import { AddPageDialog } from "../AddPageDialog";
 import { ThemeChangeDialog } from "@/components/tenant/live-editor/ThemeChangeDialog";
@@ -25,7 +25,7 @@ interface EditorNavBarProps {
 export function EditorNavBar({ showArrowTooltip }: EditorNavBarProps) {
   const pathname = usePathname();
   const requestSave = useEditorStore((state) => state.requestSave);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const { locale } = useEditorLocale();
   const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -37,8 +37,6 @@ export function EditorNavBar({ showArrowTooltip }: EditorNavBarProps) {
   const basePath = `/live-editor`;
   const currentPath = (pathname || "").replace(basePath, "") || "";
 
-  const { fetchTenantData, tenantData, loadingTenantData } = useTenantStore();
-
   // الحصول على WebsiteLayout من editorStore
   const editorStoreWebsiteLayout = useEditorStore(
     (state) => state.WebsiteLayout,
@@ -48,7 +46,7 @@ export function EditorNavBar({ showArrowTooltip }: EditorNavBarProps) {
     (state) => state.WebsiteLayout?.currentTheme,
   );
 
-  // استخدام hooks للـ effects
+  // استخدام hooks للـ effects (tenant data is fetched once via useTenantDataEffect in LiveEditorEffects)
   useEditorNavEffects(
     tenantId,
     isDropdownOpen,
@@ -71,13 +69,6 @@ export function EditorNavBar({ showArrowTooltip }: EditorNavBarProps) {
 
   // تهيئة الصفحات الافتراضية
   useDefaultPagesInitializer();
-
-  // تحميل tenantData
-  useEffect(() => {
-    if (tenantId && !tenantData && !loadingTenantData) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
 
   // دالة لإضافة صفحة جديدة إلى القائمة المحلية
   const addPageToLocalList = (pageSlug: string) => {

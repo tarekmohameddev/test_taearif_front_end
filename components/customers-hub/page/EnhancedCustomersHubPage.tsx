@@ -42,17 +42,20 @@ interface EnhancedCustomersHubPageProps {
 
 export function EnhancedCustomersHubPage(props?: EnhancedCustomersHubPageProps) {
   const router = useRouter();
-  const store = useUnifiedCustomersStore();
-  const {
-    viewMode,
-    setViewMode,
-    setShowAddCustomerDialog,
-    customers: storeCustomers,
-    filters,
-    setFilters,
-    getPendingActionsCount,
-    setCustomers: setStoreCustomers,
-  } = store;
+  const viewMode = useUnifiedCustomersStore((state) => state.viewMode);
+  const setViewMode = useUnifiedCustomersStore((state) => state.setViewMode);
+  const setShowAddCustomerDialog = useUnifiedCustomersStore(
+    (state) => state.setShowAddCustomerDialog,
+  );
+  const storeCustomers = useUnifiedCustomersStore((state) => state.customers);
+  const filters = useUnifiedCustomersStore((state) => state.filters);
+  const setFilters = useUnifiedCustomersStore((state) => state.setFilters);
+  const getPendingActionsCount = useUnifiedCustomersStore(
+    (state) => state.getPendingActionsCount,
+  );
+  const setStoreCustomers = useUnifiedCustomersStore(
+    (state) => state.setCustomers,
+  );
 
   // Use prop customers if provided, otherwise use store customers
   const customers = props?.customers ?? storeCustomers;

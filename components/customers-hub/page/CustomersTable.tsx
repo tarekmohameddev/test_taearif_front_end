@@ -38,19 +38,21 @@ import Link from "next/link";
 import { AssignmentDropdown } from "../assignment";
 
 export function CustomersTable() {
-  const {
-    filteredCustomers,
-    currentPage,
-    pageSize,
-    totalPages,
-    searchTerm,
-    setSearchTerm,
-    setCurrentPage,
-    nextPage,
-    prevPage,
-    filters,
-    setFilters,
-  } = useUnifiedCustomersStore();
+  const filteredCustomers = useUnifiedCustomersStore(
+    (state) => state.filteredCustomers,
+  );
+  const currentPage = useUnifiedCustomersStore((state) => state.currentPage);
+  const pageSize = useUnifiedCustomersStore((state) => state.pageSize);
+  const totalPages = useUnifiedCustomersStore((state) => state.totalPages);
+  const searchTerm = useUnifiedCustomersStore((state) => state.searchTerm);
+  const setSearchTerm = useUnifiedCustomersStore((state) => state.setSearchTerm);
+  const setCurrentPage = useUnifiedCustomersStore(
+    (state) => state.setCurrentPage,
+  );
+  const nextPage = useUnifiedCustomersStore((state) => state.nextPage);
+  const prevPage = useUnifiedCustomersStore((state) => state.prevPage);
+  const filters = useUnifiedCustomersStore((state) => state.filters);
+  const setFilters = useUnifiedCustomersStore((state) => state.setFilters);
 
   // Get paginated customers
   const startIndex = (currentPage - 1) * pageSize;

@@ -38,6 +38,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface RentPayment {
   id: string;
@@ -81,7 +82,7 @@ export function RentCollectionService() {
   const [selectedPayment, setSelectedPayment] = useState<RentPayment | null>(
     null,
   );
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

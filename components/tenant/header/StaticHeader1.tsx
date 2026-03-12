@@ -182,26 +182,17 @@ const StaticHeader1 = ({ overrideData }: { overrideData?: any }) => {
   const globalHeaderData = useEditorStore((state) => state.globalHeaderData);
   const globalHeaderDataFromComponents = globalComponentsData?.header;
 
-  // Get tenant data
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
+  const tenantId = useTenantStore((s) => s.tenantId);
 
   // Get global components data from tenantData
   const tenantGlobalComponentsData = tenantData?.globalComponentsData;
   const tenantGlobalHeaderData = tenantGlobalComponentsData?.header;
-  const tenantId = useTenantStore((s) => s.tenantId);
 
   // Subscribe to website layout for custom branding
   const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
-
-  // ─────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get default data once
   const defaultData = useMemo(() => getDefaultHeaderDataFromFunctions(), []);

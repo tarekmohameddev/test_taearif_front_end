@@ -1,7 +1,7 @@
-import { ProjectsManagementPage } from "@/components/project/projects-management-page";
+import ProjectsPageClient from "./ProjectsPageClient";
 export const metadata = {
   title: "إدارة المشاريع",
 };
 export default function Page() {
-  return <ProjectsManagementPage />;
+  return <ProjectsPageClient />;
 }

@@ -37,6 +37,7 @@ import { useRouter } from "next/navigation";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { AppointmentsCard } from "./detail/AppointmentsCard";
 import { CustomerSummaryCard } from "./detail/CustomerSummaryCard";
 import { CompletedDismissedMessage } from "./detail/CompletedDismissedMessage";
@@ -102,18 +103,29 @@ export function RequestDetailPage({
   onRefetch,
 }: RequestDetailPageProps) {
   const router = useRouter();
-  const store = useUnifiedCustomersStore();
-  const { userData } = useAuthStore();
-  const {
-    actions: storeActions,
-    getCustomerById,
-    completeAction: storeCompleteAction,
-    dismissAction: storeDismissAction,
-    snoozeAction: storeSnoozeAction,
-    addActionNote: storeAddActionNote,
-    addAppointment: storeAddAppointment,
-    addAppointmentForRequest,
-  } = store;
+  const userData = useAuthStore(selectUserData);
+  const storeActions = useUnifiedCustomersStore((state) => state.actions);
+  const getCustomerById = useUnifiedCustomersStore(
+    (state) => state.getCustomerById,
+  );
+  const storeCompleteAction = useUnifiedCustomersStore(
+    (state) => state.completeAction,
+  );
+  const storeDismissAction = useUnifiedCustomersStore(
+    (state) => state.dismissAction,
+  );
+  const storeSnoozeAction = useUnifiedCustomersStore(
+    (state) => state.snoozeAction,
+  );
+  const storeAddActionNote = useUnifiedCustomersStore(
+    (state) => state.addActionNote,
+  );
+  const storeAddAppointment = useUnifiedCustomersStore(
+    (state) => state.addAppointment,
+  );
+  const addAppointmentForRequest = useUnifiedCustomersStore(
+    (state) => state.addAppointmentForRequest,
+  );
 
   // Use prop action if provided, otherwise find in store
   const action = propAction ?? storeActions.find((a) => a.id === requestId);

@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useAuthStore from "@/context/AuthContext";
-import axiosInstance from "@/lib/axiosInstance";
 import { Check, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { trackLogin, trackError } from "@/lib/gtm";
@@ -23,40 +22,34 @@ export default function OAuthSuccessPageContent() {
           return;
         }
 
-        // تحديث الـ token في AuthStore مؤقتاً
         useAuthStore.setState({
           userData: {
             ...useAuthStore.getState().userData,
-            token: token,
+            token,
           },
         });
 
-        // جلب بيانات المستخدم من الخادم باستخدام التوكن
-        const response = await axiosInstance.get("/user");
-
-        if (!response.data || !response.data.data) {
-          throw new Error("لم يتم العثور على بيانات المستخدم");
+        const fetchResult = await useAuthStore.getState().fetchUserFromAPI();
+        if (!fetchResult?.success) {
+          throw new Error((fetchResult as { error?: string })?.error || "لم يتم العثور على بيانات المستخدم");
         }
 
-        const userData = response.data.data;
+        const userFromStore = useAuthStore.getState().userData;
+        const userForCookie = userFromStore
+          ? {
+              email: userFromStore.email,
+              username: userFromStore.username,
+              first_name: userFromStore.first_name,
+              last_name: userFromStore.last_name,
+              onboarding_completed: userFromStore.onboarding_completed || false,
+            }
+          : {};
 
-        // تحضير بيانات المستخدم للحفظ محلياً
-        const user = {
-          email: userData.email,
-          username: userData.username,
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          onboarding_completed: userData.onboarding_completed || false,
-        };
-
-        // حفظ بيانات المستخدم والتوكن محلياً
         const setAuthResponse = await fetch("/api/user/setAuth", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            user: user,
+            user: userForCookie,
             UserToken: token,
           }),
         });
@@ -66,44 +59,17 @@ export default function OAuthSuccessPageContent() {
           throw new Error(errorData.error || "فشل في حفظ بيانات المصادقة");
         }
 
-        // تحديث الـ AuthStore بالبيانات الكاملة
-        useAuthStore.setState({
-          UserIslogged: true,
-          userData: {
-            email: user.email,
-            token: token,
-            username: user.username,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            onboarding_completed: user.onboarding_completed,
-            // إضافة بيانات العضوية إذا كانت موجودة
-            domain: userData.domain || null,
-            is_free_plan: userData.membership?.is_free_plan || null,
-            is_expired: userData.membership?.is_expired || false,
-            days_remaining: userData.membership?.days_remaining || null,
-            package_title: userData.membership?.package?.title || null,
-            package_features: userData.membership?.package?.features || [],
-            project_limit_number:
-              userData.membership?.package?.project_limit_number || null,
-            real_estate_limit_number:
-              userData.membership?.package?.real_estate_limit_number || null,
-          },
-        });
-
-        await useAuthStore.getState().fetchUserData();
-
         setStatus("success");
 
         // Track successful login
         trackLogin("oauth");
 
-        // التحقق من الصفحة المرجعية لتحديد وجهة التوجيه
         const returnPage = localStorage.getItem("oauth_return_page");
         localStorage.removeItem("oauth_return_page");
+        const onboardingCompleted = useAuthStore.getState().userData?.onboarding_completed;
 
-        // التوجيه حسب نوع العملية
         setTimeout(() => {
-          if (returnPage === "register" || !user.onboarding_completed) {
+          if (returnPage === "register" || !onboardingCompleted) {
             router.push("/");
           } else {
             router.push("/");

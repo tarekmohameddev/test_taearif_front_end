@@ -79,6 +79,8 @@ export default (set, get) => ({
     isDeleting: false,
     isInitialized: false,
     lastProcessedOpenAddDialogCounter: -1,
+    /** مفتاح آخر جلب (لمنع الطلبات المكررة) — PREVENT_DUPLICATE_API_PROMPT */
+    lastFetchedRentalsKey: null,
     // Dialog states
     isRentalDetailsDialogOpen: false,
     selectedRentalId: null,

@@ -16,10 +16,12 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export function PixelsPage() {
   const router = useRouter();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [pixels, setPixels] = useState<Pixel[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("apps");

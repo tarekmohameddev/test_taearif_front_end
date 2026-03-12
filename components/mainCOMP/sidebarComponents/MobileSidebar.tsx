@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { staticMenuItems, type MainNavItem } from "./menu-items";
 import { getLocaleFromPathname, removeLocaleFromPathname } from "@/lib/i18n/config";
 import { getPreviewSiteUrl } from "@/lib/utils/previewDomain";
@@ -25,7 +26,7 @@ export function MobileSidebar({
 }: MobileSidebarProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathname = usePathname();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // تحديد العنصر النشط بناءً على المسار الحالي
   const currentPath = pathname || "/";

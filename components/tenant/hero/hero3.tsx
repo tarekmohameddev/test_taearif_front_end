@@ -818,16 +818,9 @@ function Hero3(props: HeroProps) {
   const heroStates = useEditorStore((s) => s.heroStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  // ⚠️ REMOVED: fetchTenantData useEffect - causes infinite re-renders
-  // Tenant data should be loaded at a higher level, not in component
-
-  // Extract component data from tenantData (memoized to prevent re-computation)
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect) (memoized to prevent re-computation)
   const tenantComponentData = useMemo(() => {
     if (!tenantData) return {};
 

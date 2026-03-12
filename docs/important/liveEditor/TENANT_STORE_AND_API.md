@@ -247,12 +247,16 @@ fetchTenantData: async (websiteName) => {
 ### Complete Fetch Flow
 
 ```
-FETCH TENANT DATA FLOW
+FETCH TENANT DATA FLOW (single layer)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TRIGGER:
+Tenant data is fetched from one place per context only:
+- Tenant site: HomePageWrapper (home) or TenantPageWrapper (slug pages).
+- Live Editor: useTenantDataEffect inside LiveEditorEffects. Child components do not call fetchTenantData; they read tenantData/tenantId from the store. See docs/updates/performance/tenant-fetch-single-layer.md.
+
+TRIGGER (Live Editor):
 ────────────────────────────────────────────────
-LiveEditorEffects.tsx:
+LiveEditorEffects.tsx → useTenantDataEffect:
   useEffect(() => {
     if (tenantId) {
       fetchTenantData(tenantId);

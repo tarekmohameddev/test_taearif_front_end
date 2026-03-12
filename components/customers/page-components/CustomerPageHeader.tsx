@@ -4,6 +4,7 @@ import Link from "next/link";
 import axiosInstance from "@/lib/axiosInstance";
 import { useState, useEffect } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import {
@@ -78,7 +79,7 @@ export const CustomerPageHeader = ({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Get filter data from store
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // تعيين كلمة المرور تلقائياً عند فتح النموذج
   useEffect(() => {

@@ -28,16 +28,20 @@ export default function GTMProvider({ children }: GTMProviderProps) {
   // Track page views on route change
   useEffect(() => {
     if (pathname) {
-      const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-      
+      const url =
+        pathname +
+        (searchParams?.toString() ? `?${searchParams.toString()}` : "");
+
       // Track virtual page view for SPA navigation
       trackVirtualPageView(url, document.title);
-      
-      console.log("📍 GTM Page View Tracked:", {
-        url,
-        pathname,
-        search: searchParams?.toString(),
-      });
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("📍 GTM Page View Tracked:", {
+          url,
+          pathname,
+          search: searchParams?.toString(),
+        });
+      }
     }
   }, [pathname, searchParams]);
 
@@ -71,7 +75,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
             buttonLocation: window.location.pathname,
             timestamp: new Date().toISOString(),
           });
-          console.log("🔘 Button Click Tracked:", buttonText);
+          if (process.env.NODE_ENV === "development") {
+            console.log("🔘 Button Click Tracked:", buttonText);
+          }
         }
       }
       
@@ -91,7 +97,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
             linkLocation: window.location.pathname,
             timestamp: new Date().toISOString(),
           });
-          console.log("🔗 Link Click Tracked:", linkText, linkHref);
+          if (process.env.NODE_ENV === "development") {
+            console.log("🔗 Link Click Tracked:", linkText, linkHref);
+          }
         }
       }
 
@@ -109,7 +117,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
               location: window.location.pathname,
               timestamp: new Date().toISOString(),
             });
-            console.log("📞 Phone Click Tracked:", phoneNumber);
+            if (process.env.NODE_ENV === "development") {
+              console.log("📞 Phone Click Tracked:", phoneNumber);
+            }
           }
         }
         
@@ -123,7 +133,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
               location: window.location.pathname,
               timestamp: new Date().toISOString(),
             });
-            console.log("📧 Email Click Tracked:", email);
+            if (process.env.NODE_ENV === "development") {
+              console.log("📧 Email Click Tracked:", email);
+            }
           }
         }
         
@@ -136,7 +148,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
               location: window.location.pathname,
               timestamp: new Date().toISOString(),
             });
-            console.log("💬 WhatsApp Click Tracked");
+            if (process.env.NODE_ENV === "development") {
+              console.log("💬 WhatsApp Click Tracked");
+            }
           }
         }
       }
@@ -177,7 +191,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
                 page: window.location.pathname,
                 timestamp: new Date().toISOString(),
               });
-              console.log("📜 Scroll Depth Tracked:", mark + "%");
+              if (process.env.NODE_ENV === "development") {
+                console.log("📜 Scroll Depth Tracked:", mark + "%");
+              }
             }
           }
         });
@@ -208,7 +224,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
           formLocation: window.location.pathname,
           timestamp: new Date().toISOString(),
         });
-        console.log("📋 Form Submit Tracked:", formName);
+        if (process.env.NODE_ENV === "development") {
+          console.log("📋 Form Submit Tracked:", formName);
+        }
       }
     };
 
@@ -232,7 +250,9 @@ export default function GTMProvider({ children }: GTMProviderProps) {
               formLocation: window.location.pathname,
               timestamp: new Date().toISOString(),
             });
-            console.log("📝 Form Start Tracked:", formName);
+            if (process.env.NODE_ENV === "development") {
+              console.log("📝 Form Start Tracked:", formName);
+            }
           }
         }
       }
