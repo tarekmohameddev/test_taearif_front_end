@@ -3,6 +3,28 @@ import type { UnifiedCustomer } from "@/types/unified-customer";
 
 const BASE_URL = "/v2/customers-hub/pipeline";
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function boardParamsKey(params: PipelineBoardParams): string {
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof PipelineBoardParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `board:${JSON.stringify(sorted)}`;
+}
+
 export interface PipelineFilters {
   status?: number[];              // Restrict to these stage IDs (property_request_statuses.id)
   status_id?: number[];          // Same as status
@@ -144,14 +166,19 @@ export interface BulkMoveResponse {
 
 // Get Pipeline Board
 export async function getPipelineBoard(params: PipelineBoardParams): Promise<PipelineBoardResponse> {
-  const response = await axiosInstance.post<PipelineBoardResponse>(`${BASE_URL}`, params);
-  return response.data;
+  const key = boardParamsKey(params);
+  return dedupeByKey(key, async () => {
+    const response = await axiosInstance.post<PipelineBoardResponse>(`${BASE_URL}`, params);
+    return response.data;
+  });
 }
 
 // Get Pipeline Filter Options
 export async function getPipelineFilterOptions(): Promise<FilterOptionsResponse> {
-  const response = await axiosInstance.get<FilterOptionsResponse>(`${BASE_URL}/filter-options`);
-  return response.data;
+  return dedupeByKey("filter-options", async () => {
+    const response = await axiosInstance.get<FilterOptionsResponse>(`${BASE_URL}/filter-options`);
+    return response.data;
+  });
 }
 
 // Move Customer in Pipeline
