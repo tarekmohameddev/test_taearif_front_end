@@ -23,6 +23,7 @@ const PermissionWrapper = dynamic(
 );
 import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
 import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
+import useSidebarStore from "@/context/sidebarStore";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
 const SESSION_VALIDATION_KEY = "dashboard_session_validated";
@@ -105,6 +106,13 @@ export default function DashboardLayout({
     ) {
       sessionStorage.removeItem(SESSION_VALIDATION_KEY);
       setHasValidatedSession(false);
+    }
+  }, [tokenValidation.isValid, tokenValidation.loading]);
+
+  // Start sidebar menu fetch as soon as token is valid (runs in parallel with PermissionWrapper)
+  useEffect(() => {
+    if (tokenValidation.isValid === true && !tokenValidation.loading) {
+      useSidebarStore.getState().fetchSideMenus();
     }
   }, [tokenValidation.isValid, tokenValidation.loading]);
 

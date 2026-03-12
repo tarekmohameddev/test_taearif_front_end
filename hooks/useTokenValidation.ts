@@ -66,6 +66,7 @@ export const useTokenValidation = () => {
           message: "الـ token صالح - يمكن تسجيل الدخول",
           loading: false,
         });
+        setIsLoading(false);
       } else {
         const errorMessage = (result as { error?: string }).error || "الـ token غير صالح";
         setTokenValidation({

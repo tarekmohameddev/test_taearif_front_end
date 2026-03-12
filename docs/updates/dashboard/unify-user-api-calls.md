@@ -13,6 +13,12 @@
 - **userStore.fetchUserData:** عند انتهاء صلاحية الكاش يستدعي `fetchUserFromAPI()` عبر استيراد ديناميكي لـ AuthContext (لتجنب تبعية دائرية)، فلا يُنفَّذ طلب /user إضافي.
 - **OAuthSuccessPageContent:** إزالة الطلب المباشر لـ GET /user والتعيين اليدوي لـ AuthStore؛ الاعتماد على `fetchUserFromAPI()` ثم استدعاء setAuth ببيانات المستخدم من الـ store.
 
+## Bootstrap الداشبورد والـ Sidebar الموازي
+
+- **Bootstrap الداشبورد:** التحقق من التوكن يملأ AuthStore و userStore مرة واحدة (عبر useTokenValidation → fetchUserFromAPI → fetchUserOnceAndSync + setUserData على كلا الـ store).
+- **جلب القوائم الجانبية بالتوازي:** الـ Layout يستدعي `fetchSideMenus()` فور تحقق التوكن (`tokenValidation.isValid === true && !tokenValidation.loading`) بحيث يبدأ طلب `/settings/side-menus` بالتوازي مع عرض PermissionWrapper، ولا ينتظر mount الـ Header. الـ sidebar store يمنع الطلبات المكررة عبر `isSidebarFetched`.
+- **إنهاء حالة تحميل الصلاحيات:** useTokenValidation يستدعي `setIsLoading(false)` بعد نجاح التحقق حتى ينتقل usePermissions من حالة التحميل ولا تبقى شاشة «جاري التحقق من الصلاحيات» معلقة.
+
 ## المراجع
 
 - الخطة: توحيد استدعاء /user (استدعاء واحد + كاش).
