@@ -73,6 +73,7 @@ import { responsiveImageStructure } from "@/componentsStructure/responsiveImage"
 import { titleStructure } from "@/componentsStructure/title";
 import { videoStructure } from "@/componentsStructure/video";
 import { photosGridStructure } from "@/componentsStructure/photosGrid";
+import { whyChooseUsStructure } from "@/componentsStructure/whyChooseUs";
 
 export interface ComponentType {
   id: string;
@@ -1026,6 +1027,7 @@ export const COMPONENTS: Record<string, any> = {
     icon: "✨",
     hasStructure: true,
     defaultTheme: "whyChooseUs1",
+    ...whyChooseUsStructure,
   },
   testimonials: {
     id: "testimonials",
