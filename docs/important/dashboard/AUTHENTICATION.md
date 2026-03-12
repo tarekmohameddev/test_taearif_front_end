@@ -345,17 +345,31 @@ export default function PermissionWrapper({ children, fallback }) {
 ```typescript
 export const usePermissions = () => {
   const pathname = usePathname();
-  const { userData, loading, error, hasAccessToPage, fetchUserData } =
-    useUserStore();
 
-  // Initialize user data
+  // 1) ننتظر توكن Auth قبل استدعاء userStore.fetchUserData لتفادي 401 على /user
+  const { userData: authUserData, IsLoading: authLoading } = useAuthStore();
+
+  // 2) نقرأ حالة userStore بما في ذلك isInitialized (تهيئة بيانات الصلاحيات)
+  const {
+    userData,
+    loading,
+    error,
+    fetchUserData,
+    hasAccessToPage,
+    isInitialized,
+  } = useUserStore();
+
+  // Initialize user data on first load — only after Auth token is ready to avoid 401
   useEffect(() => {
-    if (!userData) {
+    if (authLoading || !authUserData?.token) {
+      return;
+    }
+    if (!isInitialized) {
       fetchUserData();
     }
-  }, [userData, fetchUserData]);
+  }, [isInitialized, fetchUserData, authLoading, authUserData?.token]);
 
-  // Extract page slug from pathname
+  // Extract page slug from pathname (remove locale and /dashboard prefix)
   const getPageSlug = (pathname: string): string => {
     let cleanPath = pathname.replace(/^\/[a-z]{2}/, ""); // Remove locale
     cleanPath = cleanPath.replace(/^\/dashboard/, ""); // Remove /dashboard
@@ -363,17 +377,20 @@ export const usePermissions = () => {
     return segments[0] || "";
   };
 
-  // Slug → permission name: single source in @/lib/permissions/slugToPermission
-  // usePermissions exposes getPermissionName(slug) which delegates there (e.g. "properties" → "properties.view").
-  const pageSlug = getPageSlug(pathname);
-  const hasPermission = hasAccessToPage(pageSlug);
+  const pageSlug = pathname ? getPageSlug(pathname) : "";
+  const hasPermission = pageSlug ? hasAccessToPage(pageSlug) : true;
+
+  // نعتبر أن hook في حالة \"تحميل صلاحيات\" فقط أثناء أول تهيئة لـ userStore.
+  // بعد أن تصبح isInitialized === true، نستمر في استخدام الكاش بدون إعادة عرض
+  // شاشة \"جاري التحقق من الصلاحيات\" عند كل تنقل داخل الداشبورد.
+  const isFirstPermissionsLoad = !isInitialized;
 
   return {
     hasPermission,
-    loading,
+    loading: isFirstPermissionsLoad && (loading || authLoading),
     userData,
     error,
-    getPageSlug: () => pageSlug,
+    getPageSlug: () => (pathname ? getPageSlug(pathname) : ""),
   };
 };
 ```

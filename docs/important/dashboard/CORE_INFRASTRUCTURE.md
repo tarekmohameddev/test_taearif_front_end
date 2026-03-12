@@ -927,12 +927,28 @@ return <>{children}</>;
 // In usePermissions hook
 export const usePermissions = () => {
   const pathname = usePathname();
-  const { userData, loading, error, hasAccessToPage } = useUserStore();
+  const {
+    userData,
+    loading,
+    error,
+    hasAccessToPage,
+    isInitialized,
+  } = useUserStore();
 
   const pageSlug = getPageSlug(pathname); // "properties"
   const hasPermission = hasAccessToPage(pageSlug);
 
-  return { hasPermission, loading, userData, error };
+  // شاشات التحميل في PermissionWrapper تعتمد فقط على مرحلة التهيئة الأولى
+  // لـ userStore (isInitialized). بعد أول تهيئة، يبقى loading = false حتى لا
+  // تظهر \"جاري التحقق من الصلاحيات\" عند كل تنقل داخل الداشبورد.
+  const isFirstPermissionsLoad = !isInitialized;
+
+  return {
+    hasPermission,
+    loading: isFirstPermissionsLoad && loading,
+    userData,
+    error,
+  };
 };
 ```
 

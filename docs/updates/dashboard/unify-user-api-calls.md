@@ -20,6 +20,7 @@
 - **جلب القوائم الجانبية بالتوازي:** الـ Layout يستدعي `fetchSideMenus()` فور تحقق التوكن (`tokenValidation.isValid === true && !tokenValidation.loading`) بحيث يبدأ طلب `/settings/side-menus` بالتوازي مع عرض PermissionWrapper، ولا ينتظر mount الـ Header. الـ sidebar store يمنع الطلبات المكررة عبر `isSidebarFetched`.
 - **مصدر واحد لـ Sidebar:** جلب القوائم الجانبية الأولي يُطلَق فقط من layout الداشبورد عند تحقق التوكن. DashboardHeader لا يستدعي `fetchSideMenus`. صفحة التطبيقات (apps-page) تستخدم `useSidebarStore` وتستدعي `fetchSideMenus("apps")` فقط لتحديث القائمة بعد التثبيت/الدفع.
 - **إنهاء حالة تحميل الصلاحيات:** useTokenValidation يستدعي `setIsLoading(false)` بعد نجاح التحقق حتى ينتقل usePermissions من حالة التحميل ولا تبقى شاشة «جاري التحقق من الصلاحيات» معلقة.
+- **شاشة «جاري التحقق من الصلاحيات»:** تم ربط حالة التحميل في `usePermissions` بمرحلة التهيئة الأولى لـ userStore (`isInitialized === false`) فقط، بحيث تظهر شاشة التحقق مرة واحدة في بداية الجلسة، ثم تعتمد جميع تنقلات الداشبورد التالية على بيانات الصلاحيات المخبأة في userStore بدون إعادة إظهار شاشة التحميل.
 
 ## المراجع
 

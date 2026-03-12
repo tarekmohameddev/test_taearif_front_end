@@ -54,10 +54,19 @@ export const usePermissions = () => {
   const pageSlug = pathname ? getPageSlug(pathname) : "";
   const hasPermission = pageSlug ? hasAccessToPage(pageSlug) : true;
 
-  // Consider loading while Auth is still loading (so we don't show content before token is ready)
+  // Consider this hook in a "permissions loading" state only during the first
+  // initialization of userStore. After userStore is initialized once, we keep
+  // using cached permissions without re-showing the full-screen loading on
+  // every dashboard navigation.
+  const isFirstPermissionsLoad = !isInitialized;
+
   const permissionCheck: PermissionCheck = {
     hasPermission,
-    loading: loading || authLoading,
+    // Show loading only while permissions are being initialized for the first time.
+    // After isInitialized becomes true, keep loading=false even if AuthStore
+    // performs background fetches, so that \"جاري التحقق من الصلاحيات\" appears
+    // only once per session.
+    loading: isFirstPermissionsLoad && (loading || authLoading),
     userData,
     error,
   };
