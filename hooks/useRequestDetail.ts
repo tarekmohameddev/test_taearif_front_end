@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import {
   getActionDetail,
@@ -17,17 +17,31 @@ export function useRequestDetail(requestId: string) {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const loadingDetailRef = useRef(false);
+  const loadingStatsRef = useRef(false);
+  const lastFetchedDetailAt = useRef<{ id: string; at: number }>({ id: "", at: 0 });
+  const DETAIL_DEBOUNCE_MS = 2000;
 
   // Fetch action detail
   const fetchActionDetail = useCallback(async () => {
     if (authLoading || !userData?.token || !requestId) {
       return;
     }
+    if (loadingDetailRef.current) return;
+    const now = Date.now();
+    if (
+      lastFetchedDetailAt.current.id === requestId &&
+      now - lastFetchedDetailAt.current.at < DETAIL_DEBOUNCE_MS
+    ) {
+      return;
+    }
 
+    loadingDetailRef.current = true;
     try {
       setLoading(true);
       setError(null);
       const response = await getActionDetail(requestId);
+      lastFetchedDetailAt.current = { id: requestId, at: Date.now() };
       
       if (response.status === "success") {
         // Transform action to ensure assignedTo is string format
@@ -52,6 +66,7 @@ export function useRequestDetail(requestId: string) {
         err.response?.data?.message || "An error occurred while loading action details"
       );
     } finally {
+      loadingDetailRef.current = false;
       setLoading(false);
     }
   }, [userData?.token, authLoading, requestId]);
@@ -61,7 +76,9 @@ export function useRequestDetail(requestId: string) {
     if (authLoading || !userData?.token || !requestId) {
       return;
     }
+    if (loadingStatsRef.current) return;
 
+    loadingStatsRef.current = true;
     try {
       const response = await getActionStats(requestId);
       if (response.status === "success") {
@@ -70,6 +87,8 @@ export function useRequestDetail(requestId: string) {
     } catch (err: any) {
       console.error("Error fetching action stats:", err);
       // Don't set error for stats, it's optional
+    } finally {
+      loadingStatsRef.current = false;
     }
   }, [userData?.token, authLoading, requestId]);
 

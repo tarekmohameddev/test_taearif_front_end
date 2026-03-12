@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import {
   getRequestsList,
@@ -34,6 +34,10 @@ export function useCustomersHubRequests() {
     totalItems: 0,
     itemsPerPage: 20,
   });
+  const loadingRequestsRef = useRef(false);
+  const loadingFilterOptionsRef = useRef(false);
+  const lastFetchedFilterOptionsAt = useRef(0);
+  const FILTER_OPTIONS_DEBOUNCE_MS = 2000;
 
   // Fetch requests list. When options.silent is true (e.g. filter change), do not set loading state so the page does not show full-page loading.
   const fetchRequests = useCallback(
@@ -44,9 +48,12 @@ export function useCustomersHubRequests() {
       if (authLoading || !userData?.token) {
         return;
       }
+      if (loadingRequestsRef.current) {
+        return;
+      }
 
       const silent = options?.silent === true;
-
+      loadingRequestsRef.current = true;
       try {
         if (!silent) {
           setLoading(true);
@@ -131,6 +138,7 @@ export function useCustomersHubRequests() {
           err.response?.data?.message || "An error occurred while loading requests"
         );
       } finally {
+        loadingRequestsRef.current = false;
         if (!silent) setLoading(false);
       }
     },
@@ -142,14 +150,25 @@ export function useCustomersHubRequests() {
     if (authLoading || !userData?.token) {
       return;
     }
+    if (loadingFilterOptionsRef.current) {
+      return;
+    }
+    const now = Date.now();
+    if (now - lastFetchedFilterOptionsAt.current < FILTER_OPTIONS_DEBOUNCE_MS) {
+      return;
+    }
 
+    loadingFilterOptionsRef.current = true;
     try {
       const response = await getFilterOptions();
+      lastFetchedFilterOptionsAt.current = Date.now();
       if (response.status === "success") {
         setFilterOptions(response.data);
       }
     } catch (err: any) {
       console.error("Error fetching filter options:", err);
+    } finally {
+      loadingFilterOptionsRef.current = false;
     }
   }, [userData?.token, authLoading]);
 
