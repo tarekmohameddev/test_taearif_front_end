@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { useUserStore } from "@/context/userStore";
 import {
   CustomDialog,
@@ -92,7 +93,8 @@ export default function PropertyDetailsPage() {
   const [detailsTab, setDetailsTab] = useState<"details" | "archive">("details");
 
   // جلب token و authLoading من store للمراقبة
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const { checkPermission } = useUserStore();
   
   // Check if user can access archive/owner details tab

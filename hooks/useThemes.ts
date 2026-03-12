@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { getThemes, setActiveTheme, purchaseTheme } from "@/services/theme/themeService";
 import type { Theme, ThemesResponse, Category } from "@/components/settings/themes/types";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 const THEMES_FETCH_DEBOUNCE_MS = 2000;
 
@@ -36,7 +37,8 @@ export interface UseThemesReturn {
 }
 
 export function useThemes(): UseThemesReturn {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [themes, setThemes] = useState<Theme[]>([]);
   const [activeThemeId, setActiveThemeId] = useState<string>("");
   const [loading, setLoading] = useState(true);

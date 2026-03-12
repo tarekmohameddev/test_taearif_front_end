@@ -29,6 +29,7 @@ import useStore from "@/context/Store";
 import { toast, Toaster } from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export function AffiliateOverviewPage() {
   const {
@@ -37,7 +38,7 @@ export function AffiliateOverviewPage() {
   } = useStore();
   const router = useRouter();
   const isAffiliate = !!data;
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

@@ -15,6 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export function AboutCompanyPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +38,7 @@ export function AboutCompanyPage() {
   const {
     homepage: { setupProgressData, fetchSetupProgressData },
   } = useStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const handleImageUploadClick = () => {
     fileInputRef.current.click();

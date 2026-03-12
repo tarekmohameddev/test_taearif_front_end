@@ -41,6 +41,7 @@ import {
   Receipt,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface RentalPayment {
   id: string;
@@ -89,7 +90,7 @@ export function RentalPaymentsService() {
   );
   const [isRecordPaymentDialogOpen, setIsRecordPaymentDialogOpen] =
     useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Active contracts for creating payment records
   const activeContracts = [

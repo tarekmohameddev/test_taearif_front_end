@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   Card,
   CardHeader,
@@ -23,7 +24,8 @@ export function MostVisitedPagesTable() {
   const [pagesData, setPagesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const fetchingRef = useRef(false);
   const lastFetchedAtRef = useRef(null);
 

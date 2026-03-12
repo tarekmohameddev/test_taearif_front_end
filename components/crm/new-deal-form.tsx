@@ -50,6 +50,7 @@ import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import useCrmStore from "@/context/store/crm";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
@@ -58,7 +59,8 @@ import { PropertyCounter } from "@/components/property/propertyCOMP/property-cou
 export default function NewDealForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const { pipelineStages, newDealData, clearNewDealData, resetCache, setPipelineStages } = useCrmStore();
 
   const [isLoading, setIsLoading] = useState(false);

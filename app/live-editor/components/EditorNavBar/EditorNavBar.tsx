@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useEditorStore } from "@/context/editorStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { useEditorLocale } from "@/context/editorI18nStore";
 import { AddPageDialog } from "../AddPageDialog";
 import { ThemeChangeDialog } from "@/components/tenant/live-editor/ThemeChangeDialog";
@@ -24,7 +25,7 @@ interface EditorNavBarProps {
 export function EditorNavBar({ showArrowTooltip }: EditorNavBarProps) {
   const pathname = usePathname();
   const requestSave = useEditorStore((state) => state.requestSave);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const { locale } = useEditorLocale();
   const [recentlyAddedPages, setRecentlyAddedPages] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

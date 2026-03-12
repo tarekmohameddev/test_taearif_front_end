@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { useRouter, usePathname } from "next/navigation";
 import useSidebarStore from "@/context/sidebarStore";
 import axiosInstance from "@/lib/axiosInstance";
@@ -66,7 +67,9 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ children }: DashboardHeaderProps) {
-  const { userData, fetchUserData, clickedONSubButton } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const fetchUserData = useAuthStore((s) => s.fetchUserData);
+  const clickedONSubButton = useAuthStore((s) => s.clickedONSubButton);
   const router = useRouter();
   const pathname = usePathname();
   const { sidebarData } = useSidebarStore();

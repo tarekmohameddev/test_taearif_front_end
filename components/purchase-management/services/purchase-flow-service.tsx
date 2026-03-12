@@ -43,6 +43,7 @@ import {
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PurchaseRequest {
   id: string;
@@ -171,7 +172,7 @@ interface StageRequirement {
 export { PurchaseFlowService };
 export default function PurchaseFlowService() {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Use store instead of local state
   const {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   getRequestsList,
   getFilterOptions,
@@ -21,7 +22,8 @@ import { toast } from "sonner";
 import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
 
 export function useCustomersHubRequests() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [actions, setActions] = useState<CustomerAction[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [stages, setStages] = useState<StageDistribution[]>([]);

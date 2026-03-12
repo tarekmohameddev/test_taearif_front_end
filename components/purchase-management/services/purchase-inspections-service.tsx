@@ -39,6 +39,7 @@ import {
   Phone,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PropertyInspection {
   id: string;
@@ -99,7 +100,7 @@ export function PurchaseInspectionsService() {
   const [inspections, setInspections] = useState<PropertyInspection[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
   const [selectedInspection, setSelectedInspection] =

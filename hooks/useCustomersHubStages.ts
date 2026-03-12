@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   getStages,
   createStage,
@@ -12,7 +13,8 @@ import {
 } from "@/lib/services/customers-hub-stages-api";
 
 export function useCustomersHubStages(activeOnly: boolean = false, skip: boolean = false) {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [stages, setStages] = useState<Stage[]>([]);
   const [loading, setLoading] = useState(skip ? false : true);
   const [error, setError] = useState<string | null>(null);

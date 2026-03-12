@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 // Types
 interface EmployeeLog {
@@ -95,7 +96,8 @@ interface EmployeeResponse {
 export default function EmployeeActivityPage() {
   const params = useParams();
   const employeeId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   // State
   const [employeeLogs, setEmployeeLogs] = useState<EmployeeLog[]>([]);

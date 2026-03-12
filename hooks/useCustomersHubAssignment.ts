@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { useCustomersHubAssignmentStore } from "@/context/store/customers-hub-assignment";
 
 /**
@@ -11,7 +12,8 @@ import { useCustomersHubAssignmentStore } from "@/context/store/customers-hub-as
  * from the Zustand store, preventing duplicate API calls.
  */
 export function useCustomersHubAssignment() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const store = useCustomersHubAssignmentStore();
   const hasInitializedRef = useRef(false);
 

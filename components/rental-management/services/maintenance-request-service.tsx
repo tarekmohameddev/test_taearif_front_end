@@ -40,6 +40,7 @@ import {
   Upload,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface MaintenanceRequest {
   id: string;
@@ -85,7 +86,7 @@ export function MaintenanceRequestService() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] =
     useState<MaintenanceRequest | null>(null);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

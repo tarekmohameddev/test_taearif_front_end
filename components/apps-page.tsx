@@ -39,6 +39,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
 import useSidebarStore from "@/context/sidebarStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import PaymentPopup from "@/components/popup/PopupForPayment";
 import { ShoppingCart } from "lucide-react";
 
@@ -65,7 +66,8 @@ interface App {
 }
 
 export function AppsPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("apps");

@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 // Types
 interface ActivityLog {
@@ -70,7 +71,8 @@ interface ActivityLogsResponse {
 }
 
 export function ActivityLogsPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   
   // State
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);

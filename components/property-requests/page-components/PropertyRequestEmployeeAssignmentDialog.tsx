@@ -22,6 +22,7 @@ import {
 } from "@/lib/api/property-requests-dashboard-api";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PropertyRequest {
   id: number;
@@ -60,7 +61,7 @@ export const PropertyRequestEmployeeAssignmentDialog = ({
   );
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // جلب الموظفين عند فتح dialog
   useEffect(() => {

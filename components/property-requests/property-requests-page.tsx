@@ -10,6 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
@@ -204,7 +205,7 @@ export default function PropertyRequestsPage() {
     phone: "",
     contact_on_whatsapp: false,
   });
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const isInitialLoad = useRef(true);
 
   // Fetch filters data (مع منع الطلبات المكررة عبر property-requests-dashboard-api)

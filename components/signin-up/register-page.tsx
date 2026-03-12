@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserIsLogged } from "@/context/auth/selectors";
 import Link from "next/link";
 import { Eye, EyeOff, Check, AlertCircle, Info } from "lucide-react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
@@ -40,12 +41,10 @@ interface Errors {
 }
 
 export function RegisterPage() {
-  const {
-    UserIslogged,
-    googleUrlFetched,
-    setGoogleUrlFetched,
-    fetchGoogleAuthUrl,
-  } = useAuthStore();
+  const UserIslogged = useAuthStore(selectUserIsLogged);
+  const googleUrlFetched = useAuthStore((s) => s.googleUrlFetched);
+  const setGoogleUrlFetched = useAuthStore((s) => s.setGoogleUrlFetched);
+  const fetchGoogleAuthUrl = useAuthStore((s) => s.fetchGoogleAuthUrl);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
 

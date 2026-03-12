@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 // Hook لمراقبة ارتفاع الشاشة
 const useScreenHeight = () => {
@@ -61,7 +62,8 @@ export function EnhancedSidebar({
   );
   const { isShortScreen, isVeryShortScreen } = useScreenHeight();
 
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   useEffect(() => {
     const hasVisitedBefore = localStorage.getItem("hasVisitedBefore");

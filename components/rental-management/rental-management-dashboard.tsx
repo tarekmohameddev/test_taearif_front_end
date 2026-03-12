@@ -19,10 +19,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export function RentalManagementDashboard() {
   const [openAddDialogCounter, setOpenAddDialogCounter] = useState(0);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Filters state
   const [collectionsPeriod, setCollectionsPeriod] =

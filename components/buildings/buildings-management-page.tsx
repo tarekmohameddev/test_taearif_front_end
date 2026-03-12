@@ -31,12 +31,14 @@ import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 import { Building, BuildingsResponse } from "./types";
 
 export default function BuildingsManagementPage() {
   const router = useRouter();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

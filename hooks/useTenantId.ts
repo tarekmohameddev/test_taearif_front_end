@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import useTenantStore from "@/context/tenantStore";
 
 export function useTenantId() {
   const [tenantId, setTenantId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const tenantData = useTenantStore((s) => s.tenantData);
 
   useEffect(() => {

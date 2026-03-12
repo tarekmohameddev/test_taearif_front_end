@@ -50,6 +50,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "sonner";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface MaintenanceRequest {
   id: number;
@@ -198,7 +199,7 @@ export function RentalMaintenanceService({
     rentalsInitialized,
     lastProcessedOpenCreateDialogCounter,
   } = rentalMaintenance;
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Open Create Maintenance Request dialog when requested by parent
   useEffect(() => {

@@ -46,6 +46,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface Tenant {
   id: string;
@@ -86,7 +87,7 @@ export function TenantManagementService() {
   const [filterNationality, setFilterNationality] = useState("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

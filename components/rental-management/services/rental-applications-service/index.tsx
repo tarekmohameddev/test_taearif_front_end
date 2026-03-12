@@ -15,6 +15,7 @@ import {
 import useStore from "@/context/Store";
 import useMarketingStore from "@/context/marketingStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { StatusChangeDialog } from "../status-change-dialog";
 import { PaymentCollectionDialog } from "../../payment-collection-dialog";
 import { RentalWhatsAppDialog } from "../../rental-whatsapp-dialog";
@@ -53,7 +54,7 @@ export function RentalApplicationsService({
   const closeRentalWhatsAppDialog = useStore((state) => state.closeRentalWhatsAppDialog);
   const { marketingChannels, fetchMarketingChannels } = useMarketingStore();
 
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const {
     rentals = [],

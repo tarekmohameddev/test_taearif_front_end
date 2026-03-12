@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
 import type { PipelineStage } from "@/types/crm";
@@ -34,7 +35,7 @@ interface AddDealDialogProps {
 
 export default function AddDealDialog({ onDealAdded }: AddDealDialogProps) {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const { showAddDealDialog, setShowAddDealDialog, pipelineStages } =
     useCrmStore();
 

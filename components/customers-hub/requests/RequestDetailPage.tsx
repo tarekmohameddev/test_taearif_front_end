@@ -37,6 +37,7 @@ import { useRouter } from "next/navigation";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { AppointmentsCard } from "./detail/AppointmentsCard";
 import { CustomerSummaryCard } from "./detail/CustomerSummaryCard";
 import { CompletedDismissedMessage } from "./detail/CompletedDismissedMessage";
@@ -102,7 +103,7 @@ export function RequestDetailPage({
   onRefetch,
 }: RequestDetailPageProps) {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const storeActions = useUnifiedCustomersStore((state) => state.actions);
   const getCustomerById = useUnifiedCustomersStore(
     (state) => state.getCustomerById,

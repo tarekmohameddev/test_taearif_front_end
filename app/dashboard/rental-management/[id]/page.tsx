@@ -51,6 +51,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 
 interface RentalDetails {
@@ -130,7 +131,7 @@ export default function RentalDetailsPage() {
   const rentalId = params?.id as string;
 
   const { openPaymentCollectionDialog } = useStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const [details, setDetails] = useState<RentalDetails | null>(null);
   const [loading, setLoading] = useState(false);

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import {
   DialogTrigger,
   Dialog,
@@ -60,7 +61,7 @@ import useStore from "@/context/Store";
 export function ContentManagementPage() {
   const { contentManagement, fetchContentSections, setContentManagement } =
     useStore();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const {
     newSectionDialogOpen,
     statusFilter,

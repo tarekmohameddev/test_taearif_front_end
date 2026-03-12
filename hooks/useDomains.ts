@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 import type {
   Domain,
@@ -59,7 +60,8 @@ export interface UseDomainsReturn {
 }
 
 export function useDomains(): UseDomainsReturn {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [domains, setDomains] = useState<Domain[]>([]);
   const [dnsInstructions, setDnsInstructions] = useState<DnsInstructions | null>(
     null,

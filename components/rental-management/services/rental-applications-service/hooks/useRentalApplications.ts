@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { fetchRentalsAPI } from "../services/api";
 import type { RentalData } from "../types/types";
 
@@ -26,7 +27,7 @@ export const useRentalApplications = ({
   setRentalApplications,
   newFilters,
 }: UseRentalApplicationsProps) => {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [tableMaxWidth, setTableMaxWidth] = useState<number | null>(null);
   const prevFiltersRef = useRef<string>("");
 

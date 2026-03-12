@@ -15,6 +15,7 @@ import {
 } from "@/components/customComponents/CustomDialog";
 import { CustomDropdown, DropdownItem } from "@/components/customComponents/customDropdown";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import axiosInstance from "@/lib/axiosInstance";
 import { assignPropertyToCustomer } from "@/lib/services/customer-assigned-properties-api";
 
@@ -39,7 +40,7 @@ export function AddPropertyToCustomerDialog({
   customerId,
   onSuccess,
 }: AddPropertyToCustomerDialogProps) {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
   const [isLoadingProperties, setIsLoadingProperties] = useState(false);

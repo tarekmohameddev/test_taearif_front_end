@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useUserStore } from "@/context/userStore";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { getPermissionNameForSlug } from "@/lib/permissions/slugToPermission";
 
 interface PermissionCheck {
@@ -15,7 +16,9 @@ export const usePermissions = () => {
   const pathname = usePathname();
 
   // Wait for Auth token before calling userStore.fetchUserData (avoids 401 on /user)
-  const { userData: authUserData, IsLoading: authLoading } = useAuthStore();
+  // Use separate selectors to avoid getSnapshot returning a new object every time (infinite loop)
+  const authUserData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   // Get state and actions from Zustand store
   const {

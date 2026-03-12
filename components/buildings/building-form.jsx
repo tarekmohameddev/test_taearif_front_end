@@ -31,12 +31,14 @@ import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export default function BuildingForm({ mode = "add" }) {
   const router = useRouter();
   const params = useParams();
   const buildingId = params?.id;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   // States
   const [loading, setLoading] = useState(false);

@@ -34,6 +34,7 @@ import {
 import { AddActivityForm } from "@/components/crm/dialogs/add-activity-form";
 import useCrmStore from "@/context/store/crm";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 interface DealDetailsData {
   request: {
@@ -147,7 +148,8 @@ export default function DealDetailsPage() {
   const dealId = (params?.id as string) || "";
   const [activeTab, setActiveTab] = useState("crm");
   const { pipelineStages, getStageById, setPipelineStages } = useCrmStore();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

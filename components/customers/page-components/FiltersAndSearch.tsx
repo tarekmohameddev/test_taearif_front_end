@@ -23,6 +23,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import useCustomersFiltersStore from "@/context/store/customersFilters";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import type { DateRange } from "react-day-picker";
@@ -105,7 +106,7 @@ export const FiltersAndSearch = ({
 }: any) => {
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Get filter states and actions from the Zustand store
   const {

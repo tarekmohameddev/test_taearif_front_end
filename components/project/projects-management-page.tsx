@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import {
   Activity,
   Building2,
@@ -132,7 +133,7 @@ function SkeletonProjectCard() {
 export function ProjectsManagementPage() {
   const [isLimitReached, setIsLimitReached] = useState(false);
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const {
     projectsManagement: {
       viewMode,
@@ -461,7 +462,7 @@ export function ProjectsManagementPage() {
 
 function ProjectCard({ project }: { project: IProject }) {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const handleDelete = async (id: number) => {
     // التحقق من وجود التوكن قبل إجراء الطلب
@@ -684,7 +685,7 @@ function ProjectCard({ project }: { project: IProject }) {
 
 function ProjectListItem({ project }: { project: IProject }) {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   return (
     <Card>

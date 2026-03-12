@@ -28,7 +28,7 @@ export default function ClientLayoutAuth({
   );
 
   const userData = useAuthStore((state) => state.userData);
-  const { setOnboardingCompleted } = useAuthStore();
+  const setOnboardingCompleted = useAuthStore((s) => s.setOnboardingCompleted);
   const [showPopup, setShowPopup] = useState(false);
   const clearMessage = useAuthStore((state) => state.clearMessage);
   const setMessage = useAuthStore((state) => state.setMessage);

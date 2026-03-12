@@ -35,6 +35,16 @@ const nextConfig = {
         hostname: "bigrises.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "test.kingbellsa.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
   },
   experimental: {

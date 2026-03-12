@@ -19,6 +19,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import useAuthStore from "@/context/AuthContext";
+import {
+  selectUserData,
+  selectUserIsLogged,
+} from "@/context/auth/selectors";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { signIn, getSession } from "next-auth/react";
 import { useTokenValidation } from "@/hooks/useTokenValidation";
@@ -38,7 +42,8 @@ function LoginPageContent() {
     password: "",
     rememberMe: false,
   });
-  const { UserIslogged, userData } = useAuthStore();
+  const UserIslogged = useAuthStore(selectUserIsLogged);
+  const userData = useAuthStore(selectUserData);
   const [errors, setErrors] = useState({
     email: "",
     password: "",
@@ -53,8 +58,9 @@ function LoginPageContent() {
   const [redirectUrl, setRedirectUrl] = useState<string>("");
   const [googleToken, setGoogleToken] = useState<string>("");
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { googleUrlFetched, setGoogleUrlFetched, fetchGoogleAuthUrl } =
-    useAuthStore();
+  const googleUrlFetched = useAuthStore((s) => s.googleUrlFetched);
+  const setGoogleUrlFetched = useAuthStore((s) => s.setGoogleUrlFetched);
+  const fetchGoogleAuthUrl = useAuthStore((s) => s.fetchGoogleAuthUrl);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [pendingToken, setPendingToken] = useState<string>("");

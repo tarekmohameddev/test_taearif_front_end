@@ -22,6 +22,7 @@ import {
 } from "@/lib/api/property-requests-dashboard-api";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface Stage {
   id: number;
@@ -55,7 +56,7 @@ export const PropertyRequestStageAssignmentDialog = ({
   const [selectedStageId, setSelectedStageId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [fetchingStages, setFetchingStages] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // جلب المراحل من الAPI
   useEffect(() => {

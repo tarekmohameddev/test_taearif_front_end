@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   getActionDetail,
   getActionStats,
@@ -12,7 +13,8 @@ import type { CustomerAction } from "@/types/unified-customer";
 import toast from "react-hot-toast";
 
 export function useRequestDetail(requestId: string) {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [action, setAction] = useState<CustomerAction | null>(null);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);

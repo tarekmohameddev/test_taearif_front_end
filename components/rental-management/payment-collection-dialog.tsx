@@ -36,6 +36,7 @@ import {
 import axiosInstance from "@/lib/axiosInstance";
 import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PaymentCollectionData {
   rental_info: {
@@ -109,7 +110,7 @@ export function PaymentCollectionDialog() {
   const { isPaymentCollectionDialogOpen, selectedPaymentRentalId } =
     rentalApplications;
 
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   const [data, setData] = useState<PaymentCollectionData | null>(null);
   const [loading, setLoading] = useState(false);

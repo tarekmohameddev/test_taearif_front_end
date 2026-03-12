@@ -5,6 +5,7 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { SMSCreditBalance } from "./SMSCreditBalance";
 import { SmsCampaignsStats } from "./SmsCampaignsStats";
 import { SmsCampaignsOverview } from "./SmsCampaignsOverview";
@@ -18,7 +19,8 @@ import useStore from "@/context/Store";
 import { useSmsCampaignsDialogStore } from "@/context/store/dashboard/smsCampaignsDialog";
 
 export function SMSCampaignsPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [activeTab, setActiveTab] = useState("overview");
   const [createTemplateOpen, setCreateTemplateOpen] = useState(false);
   const openCreateCampaignDialog = useSmsCampaignsDialogStore((s) => s.openCreateCampaignDialog);

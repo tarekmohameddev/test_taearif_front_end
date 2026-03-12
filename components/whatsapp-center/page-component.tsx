@@ -66,6 +66,7 @@ import { Label } from "@/components/ui/label";
 import { WhatsappIcon } from "@/components/icons";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
 interface WhatsAppNumber {
@@ -182,7 +183,7 @@ export function WhatsAppCenterPage() {
   const [paymentPopupOpen, setPaymentPopupOpen] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string>("");
   const [addonId, setAddonId] = useState<number | undefined>(undefined);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Fetch WhatsApp data function (reusable)
   const fetchWhatsAppData = async () => {

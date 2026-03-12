@@ -22,6 +22,7 @@ import {
 } from "@/lib/api/property-requests-dashboard-api";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface PropertyRequest {
   id: number;
@@ -56,7 +57,7 @@ export const PropertyRequestStatusChangeDialog = ({
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingStatuses, setFetchingStatuses] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Fetch statuses from API
   useEffect(() => {

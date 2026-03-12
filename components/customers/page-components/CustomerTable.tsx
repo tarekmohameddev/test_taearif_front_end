@@ -64,6 +64,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, CheckCircle } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 
 export const CustomerTable = ({
@@ -113,7 +114,7 @@ export const CustomerTable = ({
   );
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [savingEmployee, setSavingEmployee] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // جلب قنوات التسويق عند تحميل المكون
   useEffect(() => {

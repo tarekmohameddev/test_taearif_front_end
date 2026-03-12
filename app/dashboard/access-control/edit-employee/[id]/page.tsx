@@ -18,6 +18,7 @@ import {
 import { PermissionsDropdown } from "@/components/access-control/PermissionsDropdown";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 // Types
 interface Permission {
@@ -70,7 +71,7 @@ interface Employee {
 export default function EditEmployeePage() {
   const router = useRouter();
   const params = useParams();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const employeeId = params?.id ? parseInt(params.id as string) : null;
 
   const [editFormData, setEditFormData] = useState<UpdateEmployeeRequest>({

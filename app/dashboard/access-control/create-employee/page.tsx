@@ -19,6 +19,7 @@ import {
 import { PermissionsDropdown } from "@/components/access-control/PermissionsDropdown";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { useUserStore } from "@/context/userStore";
 import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 
@@ -61,7 +62,7 @@ interface CreateEmployeeRequest {
 
 export default function CreateEmployeePage() {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const userStoreData = useUserStore((state) => state.userData);
   const employeesData = userStoreData?.employees;
   

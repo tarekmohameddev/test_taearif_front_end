@@ -8,9 +8,10 @@ import {
 } from "../utils/translations";
 import type { FilterOptions } from "../types/types";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 export const useRentalFiltersState = () => {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   
   // Filter states - local state like Properties
   const [contractSearchTerm, setContractSearchTerm] = useState<string>("");

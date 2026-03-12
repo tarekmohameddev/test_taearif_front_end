@@ -7,9 +7,11 @@ import Link from "next/link";
 import { AnalyticsDashboard } from "@/components/customers-hub/analytics/AnalyticsDashboard";
 import { useCustomersHubAnalytics } from "@/hooks/useCustomersHubAnalytics";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export default function AnalyticsPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const {
     metrics,
     trends,

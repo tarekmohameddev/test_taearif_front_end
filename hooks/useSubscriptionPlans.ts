@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 import type {
   SubscriptionPlan,
@@ -66,7 +67,8 @@ export interface UseSubscriptionPlansReturn {
 }
 
 export function useSubscriptionPlans(): UseSubscriptionPlansReturn {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [subscriptionPlans, setSubscriptionPlans] =
     useState<SubscriptionPlansResponse>({});
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);

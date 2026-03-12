@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { UpdatedAddRentalForm } from "@/components/rental-management/services/updated-rental-form";
 
 export default function CreateRentalPage() {
   const router = useRouter();
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreateRental = async (formData: any) => {

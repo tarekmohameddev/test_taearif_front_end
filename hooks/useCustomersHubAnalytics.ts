@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   getAnalyticsMetrics,
   getAnalyticsTrends,
@@ -17,7 +18,8 @@ import {
 } from "@/lib/services/customers-hub-analytics-api";
 
 export function useCustomersHubAnalytics() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const [metrics, setMetrics] = useState<AnalyticsMetricsResponse["data"]["metrics"] | null>(null);
   const [trends, setTrends] = useState<AnalyticsTrendsResponse["data"]["trends"] | null>(null);
   const [sources, setSources] = useState<AnalyticsSourcesResponse["data"]["sources"] | null>(null);

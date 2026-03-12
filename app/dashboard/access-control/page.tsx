@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { useUserStore } from "@/context/userStore";
 import PaymentPopup from "@/components/popup/PopupForWhatsapp";
 import {
@@ -26,7 +27,8 @@ import {
 } from "./components";
 
 export default function AccessControlPage() {
-  const { userData: authUserData, IsLoading: authLoading } = useAuthStore();
+  const authUserData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const isAuthReady = !authLoading && !!authUserData?.token;
 
   const employees = useAccessControlEmployees({

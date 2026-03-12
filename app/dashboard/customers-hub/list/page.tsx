@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import { EnhancedCustomersHubPage } from "@/components/customers-hub/page/EnhancedCustomersHubPage";
 import { useCustomersHubList } from "@/hooks/useCustomersHubList";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import type { CustomersListParams } from "@/lib/services/customers-hub-list-api";
 
 export default function CustomersListPage() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const {
     customers,
     stats,

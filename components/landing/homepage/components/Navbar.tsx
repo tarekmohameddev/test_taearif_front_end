@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserIsLogged } from "@/context/auth/selectors";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { UserIslogged, logout } = useAuthStore();
+  const UserIslogged = useAuthStore(selectUserIsLogged);
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
     const handleScroll = () => {

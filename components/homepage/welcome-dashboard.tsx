@@ -48,9 +48,11 @@ import MostVisitedPagesTable from "@/components/homepage/MostVisitedPagesTable";
 import RecentActivity from "@/components/homepage/recent-activity";
 import SetupProgressCard from "@/components/homepage/SetupProgressCard";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 export function WelcomeDashboard() {
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
   const {
     homepage: {
       dashboardDevice,

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { getPropertyRequestById } from "@/lib/api/property-requests-dashboard-api";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 interface PropertyRequest {
   id: number;
@@ -55,7 +56,8 @@ export default function PropertyRequestDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const propertyRequestId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [activeTab, setActiveTab] = useState("property-requests");
   const [propertyRequest, setPropertyRequest] = useState<PropertyRequest | null>(

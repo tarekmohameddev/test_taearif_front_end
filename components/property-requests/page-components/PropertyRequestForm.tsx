@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import { getPropertyRequestsFilters } from "@/lib/api/property-requests-dashboard-api";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { Loader2 } from "lucide-react";
 
 const PROPERTY_TYPE_LABELS: Record<string, string> = {
@@ -65,7 +66,7 @@ export const PropertyRequestForm = ({
   onChange,
   errors = {},
 }: PropertyRequestFormProps) => {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const [filtersData, setFiltersData] = useState<FiltersData | null>(null);
   const [loadingFilters, setLoadingFilters] = useState(false);
   const [filteredDistricts, setFilteredDistricts] = useState<

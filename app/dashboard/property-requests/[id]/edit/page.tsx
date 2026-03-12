@@ -13,6 +13,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { PropertyRequestForm } from "@/components/property-requests/page-components/PropertyRequestForm";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import {
   Select,
   SelectContent,
@@ -118,7 +119,8 @@ export default function EditPropertyRequestPage() {
   const params = useParams();
   const router = useRouter();
   const propertyRequestId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [propertyRequest, setPropertyRequest] = useState<PropertyRequest | null>(
     null,

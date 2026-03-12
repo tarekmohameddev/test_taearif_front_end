@@ -4,6 +4,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { useCustomersHubFiltersState } from "./useCustomersHubFiltersState";
 import { useRequestsCenterData } from "./useRequestsCenterData";
 import { useRequestsCenterHandlers } from "./useRequestsCenterHandlers";
@@ -53,7 +54,8 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   );
 
   const { stages: storeStages, fetchStages } = useCustomersHubStagesStore();
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   React.useEffect(() => {
     if (authLoading || !userData?.token) return;

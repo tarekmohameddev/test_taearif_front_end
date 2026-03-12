@@ -41,6 +41,7 @@ import {
   Edit,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface RentalAgreement {
   id: string;
@@ -115,7 +116,7 @@ export function RentalAgreementsService() {
   const [selectedAgreement, setSelectedAgreement] =
     useState<RentalAgreement | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // Available approved rental requests for creating contracts
   const approvedRequests = [

@@ -22,6 +22,7 @@ import {
   Search,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 
 interface OverviewStats {
   totalRequests: number;
@@ -55,7 +56,7 @@ export function PurchaseOverviewService() {
   const [stats, setStats] = useState<OverviewStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   useEffect(() => {
     // التحقق من وجود التوكن قبل إجراء الطلب

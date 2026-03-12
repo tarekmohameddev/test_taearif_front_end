@@ -62,7 +62,7 @@ const OnboardingPage: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [uploadError, setUploadError] = useState<string>("");
   const [whereErrors, setWhereError] = useState<string>("");
-  const { setOnboardingCompleted } = useAuthStore();
+  const setOnboardingCompleted = useAuthStore((s) => s.setOnboardingCompleted);
   const titleRef = useRef<HTMLInputElement>(null);
   const valLicenseRef = useRef<HTMLInputElement>(null);
   const workingHoursRef = useRef<HTMLInputElement>(null);

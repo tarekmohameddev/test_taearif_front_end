@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Globe, Palette, CreditCardIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useAuthStore from "@/context/AuthContext";
+import { selectClickedOnSubButton } from "@/context/auth/selectors";
 import PaymentPopup from "@/components/popup/Popup";
 import { ThemeSection } from "@/components/settings/themes/ThemeSection";
 import { useDomains } from "@/hooks/useDomains";
@@ -16,7 +17,7 @@ import { UpgradeDialog } from "@/components/settings/subscription/UpgradeDialog"
 import { TAB_IDS } from "@/components/settings/constants";
 
 export function SettingsPage() {
-  const { clickedOnSubButton } = useAuthStore();
+  const clickedOnSubButton = useAuthStore(selectClickedOnSubButton);
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams?.get("tab");
   const initialTab = tabFromUrl ?? `${clickedOnSubButton}`;

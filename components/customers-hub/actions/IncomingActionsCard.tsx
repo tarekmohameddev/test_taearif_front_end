@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 import { getAIMatchingStatus } from "./utils/propertyUtils";
@@ -46,7 +47,7 @@ export function IncomingActionsCard({
   const getCustomerById = useUnifiedCustomersStore(
     (state) => state.getCustomerById,
   );
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const { stages: storeStages } = useCustomersHubStagesStore();
 
   const [showScheduleForm, setShowScheduleForm] = useState(false);

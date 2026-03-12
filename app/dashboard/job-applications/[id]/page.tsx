@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 
 // TypeScript interfaces based on API documentation
 interface JobApplication {
@@ -40,7 +41,8 @@ export default function JobApplicationDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const applicationId = params?.id as string;
-  const { userData, IsLoading: authLoading } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
+  const authLoading = useAuthStore(selectIsLoading);
 
   const [activeTab, setActiveTab] = useState("job-applications");
   const [application, setApplication] = useState<JobApplication | null>(null);

@@ -12,6 +12,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import useContractsStore from "@/context/store/contracts";
 
 // مكون بطاقة الإحصائية
@@ -60,7 +61,7 @@ function StatCard({
 
 // المكون الرئيسي
 export function ContractsStats() {
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
   const { summaryData, loading, error, fetchContractsData, formatCurrency } =
     useContractsStore();
 

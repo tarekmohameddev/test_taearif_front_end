@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, User, ArrowRight, Loader2 } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
 
 interface Stage {
@@ -52,7 +53,7 @@ export const StageAssignmentDialog = ({
   const [selectedStageId, setSelectedStageId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [fetchingStages, setFetchingStages] = useState(false);
-  const { userData } = useAuthStore();
+  const userData = useAuthStore(selectUserData);
 
   // جلب المراحل من الAPI
   useEffect(() => {
