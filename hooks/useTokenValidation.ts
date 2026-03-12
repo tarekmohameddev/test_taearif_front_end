@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import axiosInstance from "@/lib/axiosInstance";
 import useAuthStore from "@/context/AuthContext";
 
 interface TokenValidation {
@@ -45,193 +44,61 @@ export const useTokenValidation = () => {
   };
 
   const validateToken = async (token: string) => {
-    // منع إعادة الجلب إذا كان هناك طلب قيد التنفيذ
-    if (isValidatingRef.current) {
-      return;
-    }
-
-    // إذا تم التحقق من قبل، لا تعيد الجلب
-    if (hasValidatedRef.current && tokenValidation.isValid === true) {
-      return;
-    }
+    if (isValidatingRef.current) return;
+    if (hasValidatedRef.current && tokenValidation.isValid === true) return;
 
     setTokenValidation({ isValid: null, message: "", loading: true });
     isValidatingRef.current = true;
 
-    // التحقق من الكوكي أولاً لتجنب طلب API
-    if (typeof window !== "undefined") {
-      try {
-        const {
-          getPlanCookie,
-          hasValidPlanCookie,
-        } = require("@/lib/planCookie");
-        if (hasValidPlanCookie()) {
-          const cachedPlan = getPlanCookie();
-          if (cachedPlan) {
-            // الحفاظ على domain و company_name من الـ store (getUserInfo لا يرجعهما)
-            const storeUser = useAuthStore.getState().userData;
-            const newUser = {
-              email: userData?.email || null,
-              token: token,
-              username: userData?.username || null,
-              domain: storeUser?.domain ?? userData?.domain ?? null,
-              first_name: userData?.first_name || null,
-              last_name: userData?.last_name || null,
-              is_free_plan: cachedPlan.is_free_plan,
-              membership: {
-                days_remaining: cachedPlan.days_remaining,
-                package: {
-                  title: cachedPlan.package_title,
-                  features: cachedPlan.package_features,
-                  project_limit_number: cachedPlan.project_limit_number,
-                  real_estate_limit_number: cachedPlan.real_estate_limit_number,
-                },
-              },
-              message: userData?.message || null,
-              company_name: storeUser?.company_name ?? userData?.company_name ?? null,
-              permissions: userData?.permissions || [],
-              account_type: userData?.account_type || null,
-              tenant_id: userData?.tenant_id || null,
-            };
-
-            setNewUserData(newUser);
-            setUserData({
-              email: newUser.email,
-              token: token,
-              username: newUser.username,
-              domain: newUser.domain,
-              first_name: newUser.first_name,
-              last_name: newUser.last_name,
-              is_free_plan: newUser.is_free_plan,
-              days_remaining: newUser.membership.days_remaining,
-              package_title: newUser.membership.package.title,
-              package_features: newUser.membership.package.features || [],
-              project_limit_number:
-                newUser.membership.package.project_limit_number,
-              real_estate_limit_number:
-                newUser.membership.package.real_estate_limit_number,
-              message: newUser.message,
-              company_name: newUser.company_name,
-              permissions: newUser.permissions || [],
-              account_type: newUser.account_type,
-              tenant_id: newUser.tenant_id,
-            });
-            setUserIsLogged(true);
-            setAuthenticated(true);
-
-            setTokenValidation({
-              isValid: true,
-              message: "الـ token صالح - بيانات من الكوكي",
-              loading: false,
-            });
-            hasValidatedRef.current = true;
-            isValidatingRef.current = false;
-            return; // لا حاجة لجلب البيانات من API
-          }
-        }
-      } catch (error) {
-        console.error("Error reading plan cookie:", error);
-      }
-    }
-
     try {
-      const response = await axiosInstance.get("/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const store = useAuthStore.getState();
+      setUserData({ ...store.userData, token } as any);
+      setUserIsLogged(true);
+      setAuthenticated(true);
 
-      if (response.status === 200) {
-        const userData = response.data;
-        const data = userData.data || userData;
-        const newUser = data?.user || data;
-        setNewUserData(newUser);
+      const result = await store.fetchUserFromAPI();
 
-        // domain و company_name قد يكونان في جذر data وليس داخل user
-        const domain = data?.domain ?? newUser?.domain ?? null;
-        const company_name = data?.company_name ?? newUser?.company_name ?? null;
-
-        // Store user data with permissions in AuthContext
-        if (newUser) {
-          setUserData({
-            email: newUser.email,
-            token: token,
-            username: newUser.username,
-            domain,
-            first_name: newUser.first_name,
-            last_name: newUser.last_name,
-            is_free_plan: newUser.is_free_plan,
-            days_remaining: newUser.membership?.days_remaining,
-            package_title: newUser.membership?.package?.title,
-            package_features: newUser.membership?.package?.features || [],
-            project_limit_number:
-              newUser.membership?.package?.project_limit_number,
-            real_estate_limit_number:
-              newUser.membership?.package?.real_estate_limit_number,
-            message: newUser.message,
-            company_name: company_name ?? newUser.company_name ?? null,
-            permissions: newUser.permissions || [],
-            account_type: newUser.account_type,
-            tenant_id: newUser.tenant_id,
-          });
-          setUserIsLogged(true);
-          setAuthenticated(true);
-        }
-
-        // التحقق من تطابق الحساب
-        const currentUser = userData;
-        const isSame = currentUser && currentUser.email === newUser.email;
-        setIsSameAccount(isSame);
-
+      if (result.success && result.data) {
+        setNewUserData(result.data);
         hasValidatedRef.current = true;
-        if (isSame) {
-          setTokenValidation({
-            isValid: true,
-            message: "نفس الحساب المسجل دخول بالفعل",
-            loading: false,
-          });
-        } else {
-          setTokenValidation({
-            isValid: true,
-            message: "الـ token صالح - يمكن تسجيل الدخول",
-            loading: false,
-          });
-        }
+        setTokenValidation({
+          isValid: true,
+          message: "الـ token صالح - يمكن تسجيل الدخول",
+          loading: false,
+        });
       } else {
-        throw new Error("Invalid response");
+        const errorMessage = (result as { error?: string }).error || "الـ token غير صالح";
+        setTokenValidation({
+          isValid: false,
+          message: errorMessage,
+          loading: false,
+        });
+        hasValidatedRef.current = false;
       }
     } catch (error: any) {
       let errorMessage = "الـ token غير صالح";
-
-      if (error.response?.status === 401) {
+      if (error?.response?.status === 401) {
         errorMessage = "الـ token منتهي الصلاحية أو غير صحيح";
-
-        // حذف authToken cookie عند الحصول على 401
         clearAuthCookie();
-
-        // حذف جميع البيانات من AuthContext مباشرة
         clearAuthContextData();
-
-        // تسجيل الخروج من AuthContext (كإجراء إضافي)
         try {
           await logout({ redirect: false, clearStore: true });
         } catch (logoutError) {
           console.error("❌ Error during AuthContext logout:", logoutError);
         }
-      } else if (error.response?.status === 500) {
+      } else if (error?.response?.status === 500) {
         errorMessage = "خطأ في الخادم";
-      } else if (error.response?.data?.message) {
+      } else if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
-      } else if (error.message) {
+      } else if (error?.message) {
         errorMessage = error.message;
       }
-
       setTokenValidation({
         isValid: false,
         message: errorMessage,
         loading: false,
       });
-      hasValidatedRef.current = false; // إعادة تعيين في حالة الخطأ
+      hasValidatedRef.current = false;
     } finally {
       isValidatingRef.current = false;
     }

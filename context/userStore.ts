@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import axiosInstance from "@/lib/axiosInstance";
 
 interface Permission {
   id: number;
@@ -65,7 +64,6 @@ export const useUserStore = create<UserState & UserActions>()(
       fetchUserData: async () => {
         const { lastFetched, userData } = get();
 
-        // Check if we have cached data that's still valid
         if (
           userData &&
           lastFetched &&
@@ -78,25 +76,22 @@ export const useUserStore = create<UserState & UserActions>()(
         set({ loading: true, error: null });
 
         try {
-          const response = await axiosInstance.get("/user");
-
-          if (response.data.status === "success" && response.data.data) {
-            const userData: UserData = response.data.data;
+          const useAuthStore = (await import("@/context/AuthContext")).default;
+          const result = await useAuthStore.getState().fetchUserFromAPI();
+          if (result?.success) {
+            set({ loading: false, error: null });
+          } else {
             set({
-              userData,
               loading: false,
-              error: null,
-              lastFetched: Date.now(),
+              error: (result as { error?: string })?.error || "خطأ في جلب بيانات المستخدم",
               isInitialized: true,
             });
-          } else {
-            throw new Error("Failed to fetch user data");
           }
         } catch (error: any) {
           console.error("Error fetching user data:", error);
           set({
             loading: false,
-            error: error.message || "خطأ في جلب بيانات المستخدم",
+            error: error?.message || "خطأ في جلب بيانات المستخدم",
             isInitialized: true,
           });
         }
