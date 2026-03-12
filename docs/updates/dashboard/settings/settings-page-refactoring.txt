@@ -60,3 +60,19 @@ Refactored `components/settings-page.tsx` from a single ~1361-line file into a m
 - hooks/useSubscriptionPlans.ts
 
 ThemeSection and ThemeSection-related code under components/settings/themes/ were not changed.
+
+---
+
+## PREVENT_DUPLICATE_API (later update)
+
+Applied the pattern from docs/important/prompts/PREVENT_DUPLICATE_API_PROMPT.md to all settings-related endpoints.
+
+### New API service layer (single source for each endpoint)
+- **lib/services/settings-domains-api.ts**: getDomains, addDomain, verifyDomain, setPrimaryDomain, deleteDomain. Used only by useDomains.
+- **lib/services/settings-payment-api.ts**: getSubscriptionPlans, makePayment. Used only by useSubscriptionPlans.
+- **services/theme/themeService.ts**: already existed; useThemes already used it.
+
+### Guards applied in hooks
+- **useDomains**: (1) Loading guard via loadingDomainsRef so the same GET is not sent twice; (2) Last-fetched guard (2s debounce) for GET /settings/domain; (3) Per-action loading guards for add (isAddingDomain), verify (verifyingDomains[id]), set-primary (isSettingPrimary), delete (isDeletingDomain). All domain API calls go through settings-domains-api.
+- **useSubscriptionPlans**: (1) Loading guard via loadingPlansRef; (2) Last-fetched guard (2s debounce) for GET /settings/payment; (3) isProcessingPayment guard for POST /make-payment. All payment API calls go through settings-payment-api.
+- **useThemes**: (1) Loading guard via loadingThemesRef; (2) Last-fetched guard (2s debounce) for GET /settings/theme; (3) switchingThemeIdRef / purchasingThemeIdRef so the same set-active or purchase request is not sent twice. Continues to use services/theme/themeService.

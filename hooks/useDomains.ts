@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import axiosInstance from "@/lib/axiosInstance";
+import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import type {
@@ -11,6 +10,15 @@ import type {
 } from "@/components/settings/types";
 import { DOMAIN_STATUS } from "@/components/settings/constants";
 import { validateDomainInput } from "@/components/settings/utils/domainValidation";
+import {
+  getDomains,
+  addDomain as addDomainApi,
+  verifyDomain as verifyDomainApi,
+  setPrimaryDomain as setPrimaryDomainApi,
+  deleteDomain as deleteDomainApi,
+} from "@/lib/services/settings-domains-api";
+
+const DOMAINS_FETCH_DEBOUNCE_MS = 2000;
 
 function getErrorMessage(error: unknown, fallback: string): string {
   if (error && typeof error === "object" && "response" in error) {
@@ -68,19 +76,38 @@ export function useDomains(): UseDomainsReturn {
   const [newDomain, setNewDomain] = useState("");
   const [hasFormatError, setHasFormatError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isAddingDomain, setIsAddingDomain] = useState(false);
+  const [isDeletingDomain, setIsDeletingDomain] = useState(false);
+  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
+  const lastFetchedDomainsAt = useRef<number>(0);
+  const loadingDomainsRef = useRef<boolean>(false);
 
   const isAuthReady = !authLoading && !!userData?.token;
 
   const fetchDomains = useCallback(async () => {
     if (!isAuthReady) return;
+
+    // 1) Loading guard: do not start another request if one is in progress
+    if (loadingDomainsRef.current) return;
+
+    // 2) Last-fetched guard: skip if we just fetched this resource (avoid rapid duplicate calls)
+    const now = Date.now();
+    if (now - lastFetchedDomainsAt.current < DOMAINS_FETCH_DEBOUNCE_MS) {
+      setIsLoading(false);
+      return;
+    }
+
+    loadingDomainsRef.current = true;
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await axiosInstance.get("/settings/domain");
-      setDomains(response.data.domains ?? []);
-      setDnsInstructions(response.data.dnsInstructions ?? null);
+      const data = await getDomains();
+      setDomains(data.domains);
+      setDnsInstructions(data.dnsInstructions);
+      lastFetchedDomainsAt.current = Date.now();
     } catch (error) {
       console.error("Error fetching domains:", error);
     } finally {
+      loadingDomainsRef.current = false;
       setIsLoading(false);
     }
   }, [isAuthReady]);
@@ -109,14 +136,14 @@ export function useDomains(): UseDomainsReturn {
       return;
     }
     if (!isAuthReady) return;
+    if (isAddingDomain) return;
 
+    setIsAddingDomain(true);
     const loadingToast = toast.loading("جاري إضافة النطاق...");
     try {
-      const response = await axiosInstance.post("/settings/domain", {
-        custom_name: newDomain.trim(),
-      });
+      const response = await addDomainApi(newDomain.trim());
       const addedDomain: Domain = {
-        ...response.data.data,
+        ...response.data,
         status: "pending",
       };
       setDomains((prev) => [...prev, addedDomain]);
@@ -136,19 +163,21 @@ export function useDomains(): UseDomainsReturn {
       const msg = getErrorMessage(error, "حدث خطأ أثناء إضافة النطاق");
       toast.error(msg);
       setErrorMessage(msg);
+    } finally {
+      setIsAddingDomain(false);
     }
-  }, [newDomain, isAuthReady]);
+  }, [newDomain, isAuthReady, isAddingDomain]);
 
   const handleVerifyDomain = useCallback(
     async (domainId: string) => {
       if (!isAuthReady) return;
+      if (verifyingDomains[domainId]) return;
+
       setVerifyingDomains((prev) => ({ ...prev, [domainId]: true }));
       const loadingToast = toast.loading("جاري التحقق من النطاق...");
       try {
-        const response = await axiosInstance.post("/settings/domain/verify", {
-          id: domainId,
-        });
-        const verifiedDomain: Domain = response.data.data;
+        const response = await verifyDomainApi(domainId);
+        const verifiedDomain = response.data;
         setDomains((prev) =>
           prev.map((d) => (d.id === domainId ? verifiedDomain : d)),
         );
@@ -166,17 +195,18 @@ export function useDomains(): UseDomainsReturn {
         setVerifyingDomains((prev) => ({ ...prev, [domainId]: false }));
       }
     },
-    [isAuthReady],
+    [isAuthReady, verifyingDomains],
   );
 
   const handleSetPrimaryDomain = useCallback(
     async (domainId: string) => {
       if (!isAuthReady) return;
+      if (isSettingPrimary) return;
+
+      setIsSettingPrimary(true);
       const loadingToast = toast.loading("جاري تحديث النطاق الرئيسي...");
       try {
-        await axiosInstance.post("/settings/domain/set-primary", {
-          id: domainId,
-        });
+        await setPrimaryDomainApi(domainId);
         setDomains((prev) =>
           prev.map((d) => ({ ...d, primary: d.id === domainId })),
         );
@@ -190,16 +220,21 @@ export function useDomains(): UseDomainsReturn {
       } catch (error) {
         toast.dismiss(loadingToast);
         toast.error("حدث خطأ أثناء تحديث النطاق الرئيسي");
+      } finally {
+        setIsSettingPrimary(false);
       }
     },
-    [isAuthReady],
+    [isAuthReady, isSettingPrimary],
   );
 
   const handleDeleteDomain = useCallback(async () => {
     if (!deleteDomainId || !isAuthReady) return;
+    if (isDeletingDomain) return;
+
+    setIsDeletingDomain(true);
     const loadingToast = toast.loading("جاري حذف النطاق...");
     try {
-      await axiosInstance.delete(`/settings/domain/${deleteDomainId}`);
+      await deleteDomainApi(deleteDomainId);
       setDomains((prev) => prev.filter((d) => d.id !== deleteDomainId));
       toast.dismiss(loadingToast);
       toast.success("تم حذف النطاق بنجاح");
@@ -209,8 +244,9 @@ export function useDomains(): UseDomainsReturn {
     } finally {
       setIsDeleteDialogOpen(false);
       setDeleteDomainId(null);
+      setIsDeletingDomain(false);
     }
-  }, [deleteDomainId, isAuthReady]);
+  }, [deleteDomainId, isAuthReady, isDeletingDomain]);
 
   const openDeleteDialog = useCallback((id: string) => {
     setDeleteDomainId(id);

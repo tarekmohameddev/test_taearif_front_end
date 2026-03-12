@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getThemes, setActiveTheme, purchaseTheme } from "@/services/theme/themeService";
 import type { Theme, ThemesResponse, Category } from "@/components/settings/themes/types";
 import useAuthStore from "@/context/AuthContext";
+
+const THEMES_FETCH_DEBOUNCE_MS = 2000;
 
 export interface UseThemesReturn {
   themes: Theme[];
@@ -40,30 +42,50 @@ export function useThemes(): UseThemesReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const lastFetchedThemesAt = useRef<number>(0);
+  const loadingThemesRef = useRef<boolean>(false);
+  const switchingThemeIdRef = useRef<string | null>(null);
+  const purchasingThemeIdRef = useRef<string | null>(null);
+
+  const isAuthReady = !authLoading && !!userData?.token;
 
   const fetchThemes = useCallback(async () => {
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
-      return; // Exit early if token is not ready
+    if (!isAuthReady) {
+      setLoading(false);
+      return;
     }
 
+    // 1) Loading guard: do not start another request if one is in progress
+    if (loadingThemesRef.current) return;
+
+    // 2) Last-fetched guard: skip if we just fetched (avoid rapid duplicate calls)
+    const now = Date.now();
+    if (now - lastFetchedThemesAt.current < THEMES_FETCH_DEBOUNCE_MS) {
+      setLoading(false);
+      return;
+    }
+
+    loadingThemesRef.current = true;
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
       const data = await getThemes();
       setThemes(data.themes);
       setActiveThemeId(data.activeTheme);
       setCategories(data.categories);
-    } catch (err: any) {
+      lastFetchedThemesAt.current = Date.now();
+    } catch (err: unknown) {
+      const errObj = err as { response?: { data?: { message?: string } }; message?: string };
       const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
+        errObj?.response?.data?.message ||
+        errObj?.message ||
         "Failed to load themes";
       setError(errorMessage);
     } finally {
+      loadingThemesRef.current = false;
       setLoading(false);
     }
-  }, [authLoading, userData?.token]);
+  }, [isAuthReady]);
 
   useEffect(() => {
     fetchThemes();
@@ -71,13 +93,16 @@ export function useThemes(): UseThemesReturn {
 
   const switchTheme = useCallback(
     async (themeId: string) => {
-      // Wait until token is fetched
-      if (authLoading || !userData?.token) {
+      if (!isAuthReady) {
         return { success: false, error: "Token not ready" };
       }
+      if (switchingThemeIdRef.current !== null) {
+        return { success: false, error: "Request already in progress" };
+      }
 
+      switchingThemeIdRef.current = themeId;
+      setError(null);
       try {
-        setError(null);
         const result = await setActiveTheme(themeId);
 
         if (result.success) {
@@ -94,59 +119,63 @@ export function useThemes(): UseThemesReturn {
         } else {
           throw new Error(result.message || "Failed to switch theme");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errObj = err as { response?: { data?: { message?: string } }; message?: string };
         const message =
-          err.response?.data?.message ||
-          err.message ||
+          errObj?.response?.data?.message ||
+          errObj?.message ||
           "Failed to switch theme";
         setError(message);
         return { success: false, error: message };
+      } finally {
+        switchingThemeIdRef.current = null;
       }
     },
-    [authLoading, userData?.token],
+    [isAuthReady],
   );
 
   const purchaseAndSwitch = useCallback(async (themeId: string) => {
-    // Wait until token is fetched
-    if (authLoading || !userData?.token) {
+    if (!isAuthReady) {
       return { success: false, error: "Token not ready" };
     }
+    if (purchasingThemeIdRef.current !== null) {
+      return { success: false, error: "Request already in progress" };
+    }
 
+    purchasingThemeIdRef.current = themeId;
+    setError(null);
     try {
-      setError(null);
-
-      // Step 1: Purchase theme
       const purchaseResult = await purchaseTheme(themeId);
 
       if (purchaseResult.status === "success" && purchaseResult.payment_url) {
-        // Step 2: Return payment URL - parent component will handle popup
-        return { 
-          success: true, 
+        return {
+          success: true,
           redirecting: true,
-          paymentUrl: purchaseResult.payment_url 
+          paymentUrl: purchaseResult.payment_url,
         };
       } else {
         throw new Error(
           purchaseResult.message || "Failed to initiate purchase",
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errObj = err as { response?: { data?: { message?: string } }; message?: string };
       const message =
-        err.response?.data?.message ||
-        err.message ||
+        errObj?.response?.data?.message ||
+        errObj?.message ||
         "Failed to purchase theme";
       setError(message);
       return { success: false, error: message };
+    } finally {
+      purchasingThemeIdRef.current = null;
     }
-  }, [authLoading, userData?.token]);
+  }, [isAuthReady]);
 
   const handleThemeSwitch = useCallback(
     async (themeId: string) => {
-      // Try to switch directly
       const switchResult = await switchTheme(themeId);
 
       if (switchResult.requiresPurchase) {
-        // If purchase required, initiate purchase
         return await purchaseAndSwitch(themeId);
       }
 

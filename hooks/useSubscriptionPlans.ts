@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import axiosInstance from "@/lib/axiosInstance";
+import { useState, useEffect, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import type {
@@ -10,6 +9,12 @@ import type {
   BillingPeriod,
 } from "@/components/settings/types";
 import { DEFAULT_BILLING_PERIOD } from "@/components/settings/constants";
+import {
+  getSubscriptionPlans,
+  makePayment,
+} from "@/lib/services/settings-payment-api";
+
+const PLANS_FETCH_DEBOUNCE_MS = 2000;
 
 function getErrorMessage(error: unknown, fallback: string): string {
   if (error && typeof error === "object" && "response" in error) {
@@ -75,36 +80,49 @@ export function useSubscriptionPlans(): UseSubscriptionPlansReturn {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
+  const lastFetchedPlansAt = useRef<number>(0);
+  const loadingPlansRef = useRef<boolean>(false);
 
   const isAuthReady = !authLoading && !!userData?.token;
 
-  useEffect(() => {
+  const fetchPlans = useCallback(async () => {
     if (!isAuthReady) {
       setIsLoadingPlans(false);
       return;
     }
+
+    // 1) Loading guard: do not start another request if one is in progress
+    if (loadingPlansRef.current) return;
+
+    // 2) Last-fetched guard: skip if we just fetched (avoid rapid duplicate calls)
+    const now = Date.now();
+    if (now - lastFetchedPlansAt.current < PLANS_FETCH_DEBOUNCE_MS) {
+      setIsLoadingPlans(false);
+      return;
+    }
+
+    loadingPlansRef.current = true;
+    setIsLoadingPlans(true);
+    try {
+      const data = await getSubscriptionPlans();
+      setSubscriptionPlans(data.plans);
+      lastFetchedPlansAt.current = Date.now();
+    } catch (error) {
+      console.error("Error fetching subscription plans:", error);
+      toast.error("فشل في تحميل خطط الاشتراك");
+    } finally {
+      loadingPlansRef.current = false;
+      setIsLoadingPlans(false);
+    }
+  }, [isAuthReady]);
+
+  useEffect(() => {
     let cancelled = false;
-    const fetchPlans = async () => {
-      try {
-        setIsLoadingPlans(true);
-        const response = await axiosInstance.get("/settings/payment");
-        if (!cancelled) {
-          setSubscriptionPlans(response.data.plans ?? {});
-        }
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Error fetching subscription plans:", error);
-          toast.error("فشل في تحميل خطط الاشتراك");
-        }
-      } finally {
-        if (!cancelled) setIsLoadingPlans(false);
-      }
-    };
     fetchPlans();
     return () => {
       cancelled = true;
     };
-  }, [isAuthReady]);
+  }, [fetchPlans]);
 
   const getCurrentPlans = useCallback((): SubscriptionPlan[] => {
     if (billingPeriod === "monthly") {
@@ -128,19 +146,21 @@ export function useSubscriptionPlans(): UseSubscriptionPlansReturn {
 
   const handleConfirmUpgrade = useCallback(async () => {
     if (!selectedPlan || !isAuthReady) return;
+    if (isProcessingPayment) return;
+
     setIsProcessingPayment(true);
     try {
       const periods = selectedMonths[0];
       const periodPrice = parseFloat(String(selectedPlan.price));
       const totalAmount = periodPrice * periods;
-      const response = await axiosInstance.post("/make-payment", {
+      const response = await makePayment({
         package_id: selectedPlan.id,
         price: totalAmount,
         period: periods,
         total_amount: totalAmount,
       });
-      if (response.data.status === "success") {
-        setPaymentUrl(response.data.payment_url ?? "");
+      if (response.status === "success") {
+        setPaymentUrl(response.payment_url ?? "");
         setIsUpgradeDialogOpen(false);
         setIsPopupOpen(true);
       } else {
@@ -151,7 +171,7 @@ export function useSubscriptionPlans(): UseSubscriptionPlansReturn {
     } finally {
       setIsProcessingPayment(false);
     }
-  }, [selectedPlan, selectedMonths, isAuthReady]);
+  }, [selectedPlan, selectedMonths, isAuthReady, isProcessingPayment]);
 
   const closePopup = useCallback(() => {
     setIsPopupOpen(false);
