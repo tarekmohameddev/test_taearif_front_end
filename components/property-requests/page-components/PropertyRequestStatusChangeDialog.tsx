@@ -16,7 +16,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckCircle, User, Tag, Loader2 } from "lucide-react";
-import axiosInstance from "@/lib/axiosInstance";
+import {
+  getPropertyRequestsFilters,
+  updatePropertyRequestStatus,
+} from "@/lib/api/property-requests-dashboard-api";
 import toast from "react-hot-toast";
 import useAuthStore from "@/context/AuthContext";
 
@@ -65,21 +68,9 @@ export const PropertyRequestStatusChangeDialog = ({
 
       setFetchingStatuses(true);
       try {
-        const response = await axiosInstance.get<{
-          status: string;
-          data: {
-            status?: Status[];
-            cities?: any[];
-            districts?: any[];
-            categories?: any[];
-            property_types?: string[];
-            purchase_goals?: string[];
-            seriousness_options?: string[];
-            employees?: any[];
-          };
-        }>("/v1/property-requests/filters");
-        if (response.data.data?.status) {
-          setStatuses(response.data.data.status);
+        const data = await getPropertyRequestsFilters();
+        if (data.status) {
+          setStatuses(data.status);
         }
       } catch (error) {
         console.error("Error fetching statuses:", error);
@@ -118,7 +109,7 @@ export const PropertyRequestStatusChangeDialog = ({
 
     setLoading(true);
     try {
-      await axiosInstance.put(`/v1/property-requests/${propertyRequest.id}/status`, {
+      await updatePropertyRequestStatus(propertyRequest.id, {
         status_id: selectedStatusId,
       });
 

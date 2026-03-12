@@ -18,7 +18,7 @@ import {
   Home,
   DollarSign,
 } from "lucide-react";
-import axiosInstance from "@/lib/axiosInstance";
+import { getPropertyRequestById } from "@/lib/api/property-requests-dashboard-api";
 import useAuthStore from "@/context/AuthContext";
 
 interface PropertyRequest {
@@ -74,9 +74,7 @@ export default function PropertyRequestDetailsPage() {
     setLoadingDetails(true);
     setError(null);
     try {
-      const response = await axiosInstance.get(`/v1/property-requests/${id}`);
-      // التحقق من وجود البيانات في أي من الأشكال المحتملة
-      const data = response.data?.data || response.data;
+      const data = await getPropertyRequestById(id);
       if (data && (data.id || data.user_id)) {
         setPropertyRequest(data);
       } else {

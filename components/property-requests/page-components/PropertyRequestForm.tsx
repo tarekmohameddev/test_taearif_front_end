@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
-import axiosInstance from "@/lib/axiosInstance";
+import { getPropertyRequestsFilters } from "@/lib/api/property-requests-dashboard-api";
 import useAuthStore from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
 
@@ -81,11 +81,8 @@ export const PropertyRequestForm = ({
 
       setLoadingFilters(true);
       try {
-        const response = await axiosInstance.get<{
-          status: string;
-          data: FiltersData;
-        }>("/v1/property-requests/filters");
-        setFiltersData(response.data.data);
+        const data = await getPropertyRequestsFilters();
+        setFiltersData(data);
       } catch (err) {
         console.error("Error fetching filters:", err);
       } finally {

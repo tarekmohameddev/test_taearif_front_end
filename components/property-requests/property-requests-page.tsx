@@ -1,6 +1,12 @@
 "use client";
 
-import axiosInstance from "@/lib/axiosInstance";
+import {
+  getPropertyRequestsFilters,
+  getPropertyRequestsList,
+  createPropertyRequest,
+  updatePropertyRequest,
+  deletePropertyRequest,
+} from "@/lib/api/property-requests-dashboard-api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState, useCallback, useRef } from "react";
 import useAuthStore from "@/context/AuthContext";
@@ -201,7 +207,7 @@ export default function PropertyRequestsPage() {
   const { userData } = useAuthStore();
   const isInitialLoad = useRef(true);
 
-  // Fetch filters data
+  // Fetch filters data (مع منع الطلبات المكررة عبر property-requests-dashboard-api)
   useEffect(() => {
     const fetchFilters = async () => {
       if (!userData?.token) {
@@ -211,10 +217,8 @@ export default function PropertyRequestsPage() {
       }
 
       try {
-        const response = await axiosInstance.get<FiltersResponse>(
-          "/v1/property-requests/filters",
-        );
-        setFiltersData(response.data.data);
+        const data = await getPropertyRequestsFilters();
+        setFiltersData(data);
       } catch (err) {
         console.error("Error fetching filters:", err);
         toast.error("حدث خطأ أثناء تحميل بيانات الفلاتر");
@@ -238,34 +242,30 @@ export default function PropertyRequestsPage() {
     try {
       setLoading(true);
 
-      // Build query parameters
-      const params = new URLSearchParams();
-      if (cityId) params.append("city_id", cityId);
-      if (districtId) params.append("district_id", districtId);
-      if (categoryId) params.append("category_id", categoryId);
-      if (propertyType) params.append("property_type", propertyType);
-      if (purchaseGoal) params.append("purchase_goal", purchaseGoal);
-      if (seriousness) params.append("seriousness", seriousness);
-      if (employeeId) params.append("responsible_employee_id", employeeId);
-      if (employeePhone) params.append("employee_phone", employeePhone);
-      if (statusId) params.append("status_id", statusId);
-      if (searchTerm) params.append("q", searchTerm);
+      const listParams: Record<string, string | number> = {
+        per_page: perPage,
+        page: currentPage,
+      };
+      if (cityId) listParams.city_id = cityId;
+      if (districtId) listParams.district_id = districtId;
+      if (categoryId) listParams.category_id = categoryId;
+      if (propertyType) listParams.property_type = propertyType;
+      if (purchaseGoal) listParams.purchase_goal = purchaseGoal;
+      if (seriousness) listParams.seriousness = seriousness;
+      if (employeeId) listParams.responsible_employee_id = employeeId;
+      if (employeePhone) listParams.employee_phone = employeePhone;
+      if (statusId) listParams.status_id = statusId;
+      if (searchTerm) listParams.q = searchTerm;
       if (dateRange?.from) {
-        params.append("created_from", format(dateRange.from, "yyyy-MM-dd"));
+        listParams.created_from = format(dateRange.from, "yyyy-MM-dd");
       }
       if (dateRange?.to) {
-        params.append("created_to", format(dateRange.to, "yyyy-MM-dd"));
+        listParams.created_to = format(dateRange.to, "yyyy-MM-dd");
       }
-      if (typeId) {
-        params.append("type_id", typeId);
-      }
-      params.append("per_page", perPage.toString());
-      params.append("page", currentPage.toString());
+      if (typeId) listParams.type_id = typeId;
 
-      const response = await axiosInstance.get<PropertyRequestsResponse>(
-        `/v1/property-requests?${params.toString()}`,
-      );
-      const { property_requests, pagination, statistics } = response.data.data;
+      const response = await getPropertyRequestsList(listParams);
+      const { property_requests, pagination, statistics } = response.data;
       setPropertyRequestsData(property_requests);
       setTotalPropertyRequests(pagination.total);
       setStatistics(statistics);
@@ -400,13 +400,10 @@ export default function PropertyRequestsPage() {
         status_id: 2,
       };
 
-      const response = await axiosInstance.post(
-        "/v1/property-requests",
-        requestData,
-      );
+      const response = await createPropertyRequest(requestData);
 
       // Add the new property request to the list
-      setPropertyRequestsData((prev) => [response.data.data, ...prev]);
+      setPropertyRequestsData((prev) => [response.data, ...prev]);
 
       // Show success toast
       toast.success("تم إضافة طلب العقار بنجاح! 🎉", {
@@ -626,10 +623,7 @@ export default function PropertyRequestsPage() {
     }
 
     try {
-      await axiosInstance.put(
-        `/v1/property-requests/${editingPropertyRequestId}`,
-        formData,
-      );
+      await updatePropertyRequest(editingPropertyRequestId, formData);
 
       // تحديث الـ property request داخل القائمة
       setPropertyRequestsData((prev) =>
@@ -714,7 +708,7 @@ export default function PropertyRequestsPage() {
     }
 
     try {
-      await axiosInstance.delete(`/v1/property-requests/${propertyRequestId}`);
+      await deletePropertyRequest(propertyRequestId);
       // احذف طلب العقار من الواجهة
       setPropertyRequestsData((prev) =>
         prev.filter(
