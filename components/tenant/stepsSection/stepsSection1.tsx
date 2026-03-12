@@ -333,9 +333,8 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
   const getComponentData = useEditorStore((s) => s.getComponentData);
   const stepsSectionStates = useEditorStore((s) => s.stepsSectionStates);
 
-  // Get tenant data (needed before useEffect)
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Get tenant data for this specific component variant
@@ -406,12 +405,6 @@ export default function StepsSection1(props: StepsSectionProps = {}) {
       ensureComponentVariant("stepsSection", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore

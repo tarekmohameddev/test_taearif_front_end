@@ -27,14 +27,7 @@ export default function CommitmentSection1(props: CommitmentSection1Props) {
   );
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<CommitmentSectionProps> => {
     if (!tenantData) return {};

@@ -101,20 +101,10 @@ export default function ImageText1(props: ImageTextProps = {}) {
   const imageTextStates = useEditorStore((s) => s.imageTextStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Translation hook
   const t = useClientT();
-
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Extract component data from tenantData using useState
   const [tenantComponentData, setTenantComponentData] = useState<any>({});

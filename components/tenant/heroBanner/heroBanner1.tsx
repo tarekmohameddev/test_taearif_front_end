@@ -25,14 +25,7 @@ export default function HeroBanner1(props: HeroBanner1Props) {
   const heroBannerStates = useEditorStore((s) => s.heroBannerStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<HeroBannerProps> => {
     if (!tenantData) return {};

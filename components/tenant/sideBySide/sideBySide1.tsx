@@ -145,15 +145,8 @@ const sideBySide = (props: sideBySideProps = {}) => {
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
   const uniqueId = props.id || variantId;

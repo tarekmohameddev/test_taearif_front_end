@@ -119,9 +119,8 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
-  // Get tenant data
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
@@ -246,12 +245,6 @@ export default function PropertyGrid(props: PropertyGridProps = {}) {
       ensureComponentVariant("grid", uniqueId, initialData);
     }
   }, [uniqueId, props.useStore, ensureComponentVariant, tenantComponentData]);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Note: URL parameters are automatically applied by useUrlFilters hook
   // The hook uses useEffect internally to watch searchParams changes

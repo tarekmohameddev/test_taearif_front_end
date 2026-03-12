@@ -64,19 +64,9 @@ export default function BlogCard1(props: BlogCard1Props) {
   const blogCardStates = useEditorStore((s) => s.blogCardStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Extract component data from tenantData (BEFORE useEffect)
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
 

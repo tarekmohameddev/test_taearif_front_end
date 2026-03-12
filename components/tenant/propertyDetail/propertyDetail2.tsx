@@ -212,7 +212,6 @@ export default function propertyDetail2(props: propertyDetail2Props) {
   const propertyDetailStates = useEditorStore((s) => s.propertyDetailStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Tenant ID hook
@@ -220,16 +219,7 @@ export default function propertyDetail2(props: propertyDetail2Props) {
     useTenantId();
   const finalTenantId = tenantId || tenantIdFromHook;
 
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Extract component data from tenantData
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect)
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
       return {};

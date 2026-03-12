@@ -23,14 +23,7 @@ export default function Header3(props: Header3Props) {
   const headerStates = useEditorStore((s) => s.headerStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<HeaderProps> => {
     if (!tenantData) return {};

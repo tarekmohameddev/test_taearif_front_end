@@ -43,20 +43,10 @@ export default function JobForm1(props: JobFormProps = {}) {
   const jobFormStates = useEditorStore((s) => s.jobFormStates);
 
   const tenantData = useTenantStore((s: any) => s.tenantData);
-  const fetchTenantData = useTenantStore((s: any) => s.fetchTenantData);
   const tenantIdFromStore = useTenantStore((s: any) => s.tenantId);
   const { tenantId: tenantIdFromHook } = useTenantId();
 
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantIdFromStore || tenantIdFromHook) {
-      fetchTenantData(tenantIdFromStore || tenantIdFromHook);
-    }
-  }, [tenantIdFromStore, tenantIdFromHook, fetchTenantData]);
-
-  // Extract component data from tenantData
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
 

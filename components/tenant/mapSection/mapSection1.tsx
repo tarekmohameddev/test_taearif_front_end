@@ -65,20 +65,9 @@ export default function MapSection1(props: MapSectionProps) {
   const mapSectionStates = useEditorStore((s) => s.mapSectionStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  // Get tenant data FIRST
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Extract component data from tenantData (BEFORE useEffect)
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect)
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {
       return {};

@@ -615,7 +615,6 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
   );
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Tenant ID hook for API calls
@@ -719,15 +718,6 @@ export default function PropertiesShowcase1(props: PropertiesShowcaseProps) {
       setLoading(false);
     }
   };
-
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Track screen size for responsive grid
   useEffect(() => {

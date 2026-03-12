@@ -271,16 +271,9 @@ const Header1 = (props: HeaderProps = {}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uniqueId, props.useStore]);
 
-  // Get tenant data
+  // Get tenant data (fetched once by HomePageWrapper / TenantPageWrapper / LiveEditor useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Subscribe to website layout for custom branding
   const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);

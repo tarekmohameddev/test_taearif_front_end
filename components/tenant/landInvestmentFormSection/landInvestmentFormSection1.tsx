@@ -23,12 +23,7 @@ export default function LandInvestmentFormSection1(props: LandInvestmentFormSect
   const landInvestmentFormSectionStates = useEditorStore((s) => s.landInvestmentFormSectionStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) fetchTenantData(tenantId);
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<LandInvestmentFormSectionProps> => {
     if (!tenantData) return {};

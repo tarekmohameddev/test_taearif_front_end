@@ -23,12 +23,7 @@ export default function FeaturesSection1(props: FeaturesSection1Props) {
   const featuresSectionStates = useEditorStore((s) => s.featuresSectionStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) fetchTenantData(tenantId);
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<FeaturesSectionProps> => {
     if (!tenantData) return {};

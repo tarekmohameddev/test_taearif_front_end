@@ -708,16 +708,9 @@ const Hero1 = (props: HeroProps = {}) => {
     }
   }, [uniqueId, props.useStore, ensureComponentVariant]);
 
-  // Get tenant data
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
   // emerald-600 in Tailwind = #059669

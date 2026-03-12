@@ -45,7 +45,6 @@ export default function GlobalLayout({ children }: GlobalLayoutProps) {
   const slug = useParams<{ slug: string }>()?.slug;
   const tenantData = useTenantStore((s) => s.tenantData);
   const loadingTenantData = useTenantStore((s) => s.loadingTenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
 
   // Get global components from editor store
   const {
@@ -98,12 +97,7 @@ export default function GlobalLayout({ children }: GlobalLayoutProps) {
     }
   }, []); // Remove dependencies to prevent re-initialization
 
-  // تحميل البيانات إذا لم تكن موجودة
-  useEffect(() => {
-    if (tenantId && !tenantData && !loadingTenantData) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, tenantData, loadingTenantData, fetchTenantData]);
+  // Tenant data is fetched once by HomePageWrapper / TenantPageWrapper / useTenantDataEffect
 
   // For pages without tenantId (like homepage), we still want to show global header
   const shouldShowGlobalHeader = !tenantId || tenantData;

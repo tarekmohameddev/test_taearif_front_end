@@ -68,15 +68,7 @@ export default function PhotosGrid1(props: PhotosGridProps) {
   const photosGridStates = useEditorStore((s) => s.photosGridStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  // 3. INITIALIZE IN STORE (on mount)
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = () => {
     if (!tenantData?.componentSettings) {

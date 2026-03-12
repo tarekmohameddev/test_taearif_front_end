@@ -179,23 +179,12 @@ export default function Header2(props: Header2Props) {
   const [forceUpdate, setForceUpdate] = useState(0);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Subscribe to website layout for custom branding
   const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
 
-  // ─────────────────────────────────────────────────────────
-  // 3. INITIALIZE IN STORE (on mount)
-  // ─────────────────────────────────────────────────────────
-  // Get tenant data FIRST
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
-
-  // Extract component data from tenantData (BEFORE useEffect)
+  // Extract component data from tenantData (fetched once by wrapper / useTenantDataEffect)
   const getTenantComponentData = () => {
     if (!tenantData) return {};
 

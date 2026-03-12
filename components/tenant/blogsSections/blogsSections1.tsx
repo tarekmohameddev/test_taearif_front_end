@@ -166,14 +166,7 @@ export default function BlogsSections1(props: BlogsSectionsProps) {
 
   // Get tenant data FIRST
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Extract component data from tenantData (BEFORE useEffect)
   const getTenantComponentData = () => {

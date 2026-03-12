@@ -255,19 +255,12 @@ export default function Footer(props: FooterProps = {}) {
     }
   }, [variantId, props.useStore, ensureComponentVariant]);
 
-  // Get tenant data
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Subscribe to website layout for custom branding
   const customBranding = useEditorStore((s) => s.WebsiteLayout.CustomBranding);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Check if this is a global footer
   const isGlobalFooter = variantId === "global-footer" || props.id === "global-footer";

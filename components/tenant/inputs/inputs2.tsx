@@ -168,9 +168,8 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
     }
   }, [variantId, props.useStore, ensureComponentVariant]);
 
-  // Get tenant data
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
 
   // Get primary color from WebsiteLayout branding (fallback to emerald-600)
@@ -221,12 +220,6 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
   const primaryColorHover = getDarkerColor(primaryColor, 20);
   const primaryColorLight = getLighterColor(primaryColor, 0.1); // 10% opacity for hover backgrounds
   const primaryColorShadow = getShadowColor(primaryColor); // Shadow color from primary
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore

@@ -221,9 +221,8 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
   );
   const getComponentData = useEditorStore((s) => s.getComponentData);
 
-  // Get tenant data (needed before useEffect)
+  // Get tenant data (fetched once by wrapper / useTenantDataEffect)
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
   const router = useRouter();
 
@@ -397,12 +396,6 @@ export default function PropertySlider(props: PropertySliderProps = {}) {
 
     return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   };
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore

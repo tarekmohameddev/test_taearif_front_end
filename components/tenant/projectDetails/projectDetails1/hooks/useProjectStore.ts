@@ -18,15 +18,7 @@ export const useProjectStore = (props: ProjectDetailsProps) => {
   const projectDetailsStates = useEditorStore((s) => s.projectDetailsStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  // Initialize tenant data
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Extract component data from tenantData
   const getTenantComponentData = () => {

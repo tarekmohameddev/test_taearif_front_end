@@ -79,14 +79,7 @@ export default function Partners2(props: Partners2Props = {}) {
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get tenant data for this specific component variant
   const getTenantComponentData = () => {

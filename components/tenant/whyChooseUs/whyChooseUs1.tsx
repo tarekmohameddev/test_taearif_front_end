@@ -384,14 +384,7 @@ export default function WhyChooseUsSection(props: WhyChooseUsProps = {}) {
 
   // Get tenant data
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) {
-      fetchTenantData(tenantId);
-    }
-  }, [tenantId, fetchTenantData]);
 
   // Get data from store or tenantData with fallback logic
   const storeData = props.useStore

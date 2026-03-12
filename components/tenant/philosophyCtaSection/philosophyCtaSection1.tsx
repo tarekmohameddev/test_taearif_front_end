@@ -23,12 +23,7 @@ export default function PhilosophyCtaSection1(props: PhilosophyCtaSection1Props)
   const philosophyCtaSectionStates = useEditorStore((s) => s.philosophyCtaSectionStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) fetchTenantData(tenantId);
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<PhilosophyCtaSectionProps> => {
     if (!tenantData) return {};

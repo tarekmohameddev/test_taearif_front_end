@@ -23,12 +23,7 @@ export default function ProjectsHeader1(props: ProjectsHeader1Props) {
   const projectsHeaderStates = useEditorStore((s) => s.projectsHeaderStates);
 
   const tenantData = useTenantStore((s) => s.tenantData);
-  const fetchTenantData = useTenantStore((s) => s.fetchTenantData);
   const tenantId = useTenantStore((s) => s.tenantId);
-
-  useEffect(() => {
-    if (tenantId) fetchTenantData(tenantId);
-  }, [tenantId, fetchTenantData]);
 
   const getTenantComponentData = (): Partial<ProjectsHeaderProps> => {
     if (!tenantData) return {};
