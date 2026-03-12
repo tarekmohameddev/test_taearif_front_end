@@ -25,6 +25,16 @@ const nextConfig = {
         hostname: "taearifvideos.oss-me-central-1.aliyuncs.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.taearif.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "bigrises.com",
+        pathname: "/**",
+      },
     ],
   },
   experimental: {
