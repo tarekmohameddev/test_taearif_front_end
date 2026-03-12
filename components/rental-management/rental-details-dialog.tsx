@@ -34,10 +34,6 @@ import {
   DollarSign,
   FileText,
   CreditCard,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
   Home,
   MapPin,
   Hash,
@@ -52,59 +48,19 @@ import useStore from "@/context/Store";
 import useAuthStore from "@/context/AuthContext";
 import { selectUserData } from "@/context/auth/selectors";
 import toast from "react-hot-toast";
-
-interface RentalDetails {
-  rental: {
-    id: number;
-    tenant_full_name: string;
-    tenant_phone: string;
-    tenant_email: string;
-    tenant_job_title: string;
-    tenant_social_status: string;
-    tenant_national_id: string;
-    base_rent_amount: number;
-    deposit_amount: number;
-    currency: string;
-    move_in_date: string;
-    paying_plan: string;
-    rental_period_months: number;
-    status: string;
-    notes: string;
-  };
-  property: {
-    id: number;
-    name: string;
-    unit_label: string;
-    property_number: string;
-    project: {
-      id: number;
-      name: string | null;
-    };
-  };
-  contract: {
-    id: number;
-    contract_number: string;
-    start_date: string;
-    end_date: string;
-    status: string;
-  };
-  payment_details: {
-    items: Array<{
-      id: number;
-      sequence_no: number;
-      due_date: string;
-      amount: number;
-      paid_amount: number;
-      status: string;
-      payment_type: string;
-      payment_status: string;
-      reference: string | null;
-      paid_at: string | null;
-      payment_id: number | null;
-      can_reverse: boolean;
-    }>;
-  };
-}
+import type {
+  RentalDetails,
+  RentalPaymentItem,
+} from "@/components/rental-management/rental-details-types";
+import {
+  formatCurrency,
+  formatDate,
+  getPaymentStatusColor,
+  getPaymentStatusText,
+  getStatusColor,
+  getStatusIcon,
+  getStatusText,
+} from "@/components/rental-management/rental-details-helpers";
 
 export function RentalDetailsDialog() {
   const {
@@ -158,9 +114,8 @@ export function RentalDetailsDialog() {
   const [deleteExpenseLoading, setDeleteExpenseLoading] = useState(false);
 
   // State for reversing payment
-  const [reversingPaymentId, setReversingPaymentId] = useState<number | null>(
-    null,
-  );
+  const [reversingPaymentId, setReversingPaymentId] =
+    useState<number | null>(null);
 
   // Fetch rental details when dialog opens
   useEffect(() => {
@@ -423,115 +378,6 @@ export function RentalDetailsDialog() {
     setIsDeleteExpenseDialogOpen(true);
   };
 
-  const formatCurrency = (amount: number, currency: string = "SAR") => {
-    return new Intl.NumberFormat("ar-US", {
-      style: "currency",
-      currency: currency,
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("ar-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "completed":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active":
-        return <CheckCircle className="h-4 w-4 ml-1" />;
-      case "pending":
-        return <Clock className="h-4 w-4 ml-1" />;
-      case "completed":
-        return <CheckCircle className="h-4 w-4 ml-1" />;
-      case "cancelled":
-        return <XCircle className="h-4 w-4 ml-1" />;
-      default:
-        return <AlertCircle className="h-4 w-4 ml-1" />;
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "نشط";
-      case "pending":
-        return "في الانتظار";
-      case "completed":
-        return "مكتمل";
-      case "cancelled":
-        return "ملغي";
-      default:
-        return status;
-    }
-  };
-
-  const getPaymentStatusColor = (payment: any) => {
-    // إذا كان المبلغ المدفوع يساوي أو أكبر من المبلغ المطلوب، اعرضه باللون الأخضر
-    if (payment.paid_amount >= payment.amount) {
-      return "bg-green-100 text-green-800 border-green-200";
-    }
-
-    // إذا كان status هو paid أو paid_in_full، اعرضه باللون الأخضر
-    if (payment.status === "paid" || payment.status === "paid_in_full") {
-      return "bg-green-100 text-green-800 border-green-200";
-    }
-
-    // باقي الحالات حسب payment_status
-    switch (payment.payment_status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "overdue":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "not_due":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getPaymentStatusText = (payment: any) => {
-    // إذا كان المبلغ المدفوع يساوي أو أكبر من المبلغ المطلوب، اعرضه كمدفوع
-    if (payment.paid_amount >= payment.amount) {
-      return "مدفوع";
-    }
-
-    // إذا كان status هو paid أو paid_in_full، اعرضه كمدفوع
-    if (payment.status === "paid" || payment.status === "paid_in_full") {
-      return "مدفوع";
-    }
-
-    // باقي الحالات حسب payment_status
-    switch (payment.payment_status) {
-      case "pending":
-        return "في الانتظار";
-      case "overdue":
-        return "متأخر";
-      case "not_due":
-        return "غير مستحق";
-      default:
-        return payment.payment_status;
-    }
-  };
-
   const handleOpenPaymentCollection = () => {
     if (selectedRentalId) {
       openPaymentCollectionDialog(selectedRentalId);
@@ -543,7 +389,7 @@ export function RentalDetailsDialog() {
 
     // التحقق من وجود الدفعة في البيانات الحالية
     const payment = details?.payment_details?.items?.find(
-      (p) => p.id === paymentId,
+      (p: RentalPaymentItem) => p.id === paymentId,
     );
     if (!payment) {
       toast.error("الدفعة غير موجودة في البيانات الحالية");
