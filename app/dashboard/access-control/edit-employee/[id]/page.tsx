@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,12 +94,15 @@ export default function EditEmployeePage() {
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [editSuccess, setEditSuccess] = useState(false);
+  const fetchEmployeeInFlightRef = useRef(false);
 
-  // Fetch employee data
+  // Fetch employee data (duplicate-API guards per PREVENT_DUPLICATE_API_PROMPT.md)
   useEffect(() => {
     if (!employeeId) return;
 
     const fetchEmployee = async () => {
+      if (fetchEmployeeInFlightRef.current) return;
+      fetchEmployeeInFlightRef.current = true;
       setEmployeeLoading(true);
       try {
         const response = await axiosInstance.get<{ data: Employee }>(
@@ -118,7 +121,6 @@ export default function EditEmployeePage() {
           permissions: employee.permissions.map((perm) => perm.name),
         });
 
-        // Set selected permissions
         const permissionsMap: { [key: string]: boolean } = {};
         employee.permissions.forEach((perm) => {
           permissionsMap[perm.name] = true;
@@ -131,20 +133,20 @@ export default function EditEmployeePage() {
         );
       } finally {
         setEmployeeLoading(false);
+        fetchEmployeeInFlightRef.current = false;
       }
     };
 
     fetchEmployee();
   }, [employeeId]);
 
-  // Fetch permissions
+  // Fetch permissions (duplicate-API guards)
   useEffect(() => {
-    // التحقق من وجود token قبل إرسال الطلب
-    if (!userData?.token) {
-      return;
-    }
+    if (!userData?.token) return;
 
     const fetchPermissions = async () => {
+      if (permissionsLoading) return;
+      if (permissions !== null) return;
       setPermissionsLoading(true);
       try {
         const response =
@@ -158,7 +160,7 @@ export default function EditEmployeePage() {
     };
 
     fetchPermissions();
-  }, [userData?.token]);
+  }, [userData?.token, permissionsLoading, permissions]);
 
   // Handle permission change
   const handlePermissionChange = (permissionName: string, checked: boolean) => {

@@ -1,8 +1,9 @@
 /**
  * Employees list, fetch, delete dialog, and addon payment.
+ * Applies duplicate-API guards per PREVENT_DUPLICATE_API_PROMPT.md.
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/context/userStore";
 import { accessControlApi } from "@/lib/services/access-control-api";
@@ -20,6 +21,7 @@ export function useAccessControlEmployees({
 }: UseAccessControlEmployeesOptions) {
   const router = useRouter();
   const employeesData = useUserStore((s) => s.userData?.employees);
+  const fetchEmployeesInFlightRef = useRef(false);
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,9 @@ export function useAccessControlEmployees({
 
   const fetchEmployees = useCallback(async () => {
     if (!isAuthReady || !hasToken) return;
+    // Loading guard: avoid duplicate request (e.g. Strict Mode or double effect)
+    if (fetchEmployeesInFlightRef.current) return;
+    fetchEmployeesInFlightRef.current = true;
     setLoading(true);
     setError(null);
     try {
@@ -47,6 +52,7 @@ export function useAccessControlEmployees({
       );
     } finally {
       setLoading(false);
+      fetchEmployeesInFlightRef.current = false;
     }
   }, [isAuthReady, hasToken]);
 
