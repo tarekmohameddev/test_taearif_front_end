@@ -16,6 +16,58 @@ function getData<T>(res: { data?: { status?: string | boolean; data?: T; message
   return (body?.data ?? body) as T;
 }
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
+function campaignsListKey(params?: CampaignListParams): string {
+  if (!params) return "sms-campaigns:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof CampaignListParams)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `sms-campaigns:${JSON.stringify(sorted)}`;
+}
+
+function templatesListKey(params?: { per_page?: number; page?: number }): string {
+  if (!params) return "sms-templates:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof { per_page?: number; page?: number })[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `sms-templates:${JSON.stringify(sorted)}`;
+}
+
+function logsListKey(params?: {
+  per_page?: number;
+  page?: number;
+  campaign_id?: number;
+  status?: string;
+}): string {
+  if (!params) return "sms-logs:{}";
+  const sorted: Record<string, unknown> = {};
+  (Object.keys(params) as (keyof typeof params)[])
+    .sort()
+    .forEach((k) => {
+      const v = params[k];
+      if (v !== undefined) sorted[k as string] = v;
+    });
+  return `sms-logs:${JSON.stringify(sorted)}`;
+}
+
 /** Extract user-facing error message from SMS API error (Axios or thrown Error). */
 export function getSmsApiErrorMessage(error: unknown): string {
   const err = error as {
@@ -133,27 +185,32 @@ interface LaravelPaginatedData<T> {
 }
 
 export async function getCampaigns(params?: CampaignListParams): Promise<CampaignListResponse> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  if (params?.status) q.set("status", params.status);
-  const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
-  const raw = getData<LaravelPaginatedData<ApiCampaign>>(res);
-  const list = raw?.data ?? [];
-  return {
-    campaigns: Array.isArray(list) ? list : [],
-    pagination: {
-      current_page: raw?.current_page ?? 1,
-      per_page: raw?.per_page ?? 20,
-      total: raw?.total ?? 0,
-      last_page: raw?.last_page ?? 1,
-    },
-  };
+  const key = campaignsListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    if (params?.status) q.set("status", params.status);
+    const res = await axiosInstance.get(`${BASE}/campaigns?${q}`);
+    const raw = getData<LaravelPaginatedData<ApiCampaign>>(res);
+    const list = raw?.data ?? [];
+    return {
+      campaigns: Array.isArray(list) ? list : [],
+      pagination: {
+        current_page: raw?.current_page ?? 1,
+        per_page: raw?.per_page ?? 20,
+        total: raw?.total ?? 0,
+        last_page: raw?.last_page ?? 1,
+      },
+    };
+  });
 }
 
 export async function getCampaign(id: number): Promise<ApiCampaign> {
-  const res = await axiosInstance.get(`${BASE}/campaigns/${id}`);
-  return getData<ApiCampaign>(res);
+  return dedupeByKey(`sms-campaign:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/campaigns/${id}`);
+    return getData<ApiCampaign>(res);
+  });
 }
 
 export interface CreateCampaignBody {
@@ -263,21 +320,26 @@ export async function getTemplates(params?: { per_page?: number; page?: number }
   templates: ApiTemplate[];
   pagination?: Pagination;
 }> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  const res = await axiosInstance.get(`${BASE}/templates?${q}`);
-  const data = getData<TemplateListResponse>(res);
-  const templates = data.templates ?? (data as unknown as { data?: ApiTemplate[] }).data ?? [];
-  return {
-    templates: Array.isArray(templates) ? templates : [],
-    pagination: data.pagination,
-  };
+  const key = templatesListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    const res = await axiosInstance.get(`${BASE}/templates?${q}`);
+    const data = getData<TemplateListResponse>(res);
+    const templates = data.templates ?? (data as unknown as { data?: ApiTemplate[] }).data ?? [];
+    return {
+      templates: Array.isArray(templates) ? templates : [],
+      pagination: data.pagination,
+    };
+  });
 }
 
 export async function getTemplate(id: number): Promise<ApiTemplate> {
-  const res = await axiosInstance.get(`${BASE}/templates/${id}`);
-  return getData<ApiTemplate>(res);
+  return dedupeByKey(`sms-template:${id}`, async () => {
+    const res = await axiosInstance.get(`${BASE}/templates/${id}`);
+    return getData<ApiTemplate>(res);
+  });
 }
 
 export interface CreateTemplateBody {
@@ -371,24 +433,27 @@ export async function getLogs(params?: {
   campaign_id?: number;
   status?: string;
 }): Promise<LogsListResponse> {
-  const q = new URLSearchParams();
-  if (params?.per_page != null) q.set("per_page", String(params.per_page));
-  if (params?.page != null) q.set("page", String(params.page));
-  if (params?.campaign_id != null) q.set("campaign_id", String(params.campaign_id));
-  if (params?.status) q.set("status", params.status);
-  const res = await axiosInstance.get(`${BASE}/logs?${q}`);
-  const raw = getData<LaravelPaginatedData<RawApiSmsLogItem>>(res);
-  const list = raw?.data ?? [];
-  const logs = Array.isArray(list) ? list.map(normalizeLogItem) : [];
-  return {
-    logs,
-    pagination: {
-      current_page: raw?.current_page ?? 1,
-      per_page: raw?.per_page ?? 20,
-      total: raw?.total ?? 0,
-      last_page: raw?.last_page ?? 1,
-    },
-  };
+  const key = logsListKey(params);
+  return dedupeByKey(key, async () => {
+    const q = new URLSearchParams();
+    if (params?.per_page != null) q.set("per_page", String(params.per_page));
+    if (params?.page != null) q.set("page", String(params.page));
+    if (params?.campaign_id != null) q.set("campaign_id", String(params.campaign_id));
+    if (params?.status) q.set("status", params.status);
+    const res = await axiosInstance.get(`${BASE}/logs?${q}`);
+    const raw = getData<LaravelPaginatedData<RawApiSmsLogItem>>(res);
+    const list = raw?.data ?? [];
+    const logs = Array.isArray(list) ? list.map(normalizeLogItem) : [];
+    return {
+      logs,
+      pagination: {
+        current_page: raw?.current_page ?? 1,
+        per_page: raw?.per_page ?? 20,
+        total: raw?.total ?? 0,
+        last_page: raw?.last_page ?? 1,
+      },
+    };
+  });
 }
 
 // --- Stats ---
@@ -403,14 +468,16 @@ export interface ApiSmsStats {
 }
 
 export async function getStats(): Promise<ApiSmsStats> {
-  const res = await axiosInstance.get(`${BASE}/stats`);
-  const data = getData<ApiSmsStats>(res);
-  return {
-    total_campaigns: data.total_campaigns ?? 0,
-    total_sent: data.total_sent ?? 0,
-    total_delivered: data.total_delivered ?? 0,
-    total_failed: data.total_failed ?? 0,
-    delivery_rate: data.delivery_rate ?? 0,
-    this_month_sent: data.this_month_sent ?? 0,
-  };
+  return dedupeByKey("sms-stats", async () => {
+    const res = await axiosInstance.get(`${BASE}/stats`);
+    const data = getData<ApiSmsStats>(res);
+    return {
+      total_campaigns: data.total_campaigns ?? 0,
+      total_sent: data.total_sent ?? 0,
+      total_delivered: data.total_delivered ?? 0,
+      total_failed: data.total_failed ?? 0,
+      delivery_rate: data.delivery_rate ?? 0,
+      this_month_sent: data.this_month_sent ?? 0,
+    };
+  });
 }
