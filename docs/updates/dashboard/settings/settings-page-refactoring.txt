@@ -1,0 +1,62 @@
+# Settings Page Refactoring (Clean Code & Best Practices)
+
+## Date
+2025-03-12
+
+## Summary
+Refactored `components/settings-page.tsx` from a single ~1361-line file into a modular structure: shared types/constants, custom hooks, and presentational components. Behavior and API contracts are unchanged.
+
+## What Was Done
+
+### 1. Types and constants
+- **components/settings/types.ts**: Domain, DnsInstructions, BillingPeriod, SubscriptionPlan, SubscriptionPlansResponse, DomainStatusFilter.
+- **components/settings/constants.ts**: TAB_IDS, DOMAIN_STATUS, DOMAIN_STATUS_FILTER, DOMAIN_REGEX, DEFAULT_BILLING_PERIOD, NAMESERVERS, DEFAULT_DNS_DESCRIPTION, DEFAULT_DNS_NOTE.
+
+### 2. Custom hooks
+- **hooks/useDomains.ts**: All domain state and API (fetch, add, verify, set primary, delete), filter state, add-dialog state, delete-dialog state. Auth check and error handling (getErrorMessage) inside the hook.
+- **hooks/useSubscriptionPlans.ts**: Plans fetch, billing period, getCurrentPlans, isYearlyPlan, calculateSavings, upgrade dialog state, payment popup state, handleUpgradeClick, handleConfirmUpgrade.
+
+### 3. Domain components
+- **components/settings/domains/DomainsTab.tsx**: Composes domain header, status filter, AddDomainDialog trigger, loading/empty/list (DomainCard grid), NameserversCard. Receives all data/handlers from useDomains.
+- **components/settings/domains/DomainCard.tsx**: Single domain card (name, status, SSL, date, verify/set-primary/delete actions).
+- **components/settings/domains/AddDomainDialog.tsx**: Dialog with domain input, format hint, submit/cancel. Validation is done in useDomains via domainValidation util.
+- **components/settings/domains/DeleteDomainDialog.tsx**: Confirm delete dialog; open/confirm/cancel wired from parent.
+- **components/settings/domains/NameserversCard.tsx**: Accordion with DNS description, nameservers table, and note (uses constants for defaults).
+
+### 4. Subscription components
+- **components/settings/subscription/SubscriptionTab.tsx**: Header, savings message (when yearly), plan grid (PlanCard) or loading/empty state.
+- **components/settings/subscription/PlanCard.tsx**: Single plan card (name, price, features, current/upgrade CTA, optional savings line).
+- **components/settings/subscription/UpgradeDialog.tsx**: Full upgrade flow (plan summary, duration slider, total, confirm/cancel). All state and API live in useSubscriptionPlans.
+
+### 5. Domain validation and error handling
+- **components/settings/utils/domainValidation.ts**: validateDomainInput(value) returns { valid, error? }. Used by useDomains in handleAddDomain.
+- **Error handling**: Both hooks use a shared getErrorMessage(error, fallback) pattern and toast from the hook; no duplicate auth checks in the page.
+
+### 6. Main page
+- **components/settings-page.tsx**: Now ~150 lines. Uses useSearchParams (tab, themeId), useDomains(), useSubscriptionPlans(), local activeTab state. Renders Tabs (Domains, Subscription, Themes), DomainsTab, SubscriptionTab, ThemeSection, DeleteDomainDialog, PaymentPopup, UpgradeDialog. No domain/subscription state or API logic in the page; all delegated to hooks and subcomponents.
+
+## Removed / not carried over
+- Unused imports: ExternalLink, Save, Download, PaintBucket, Zap, HelpCenter, Progress, Tooltip, TooltipProvider, TooltipContent, TooltipTrigger.
+- Unused constant: domainsHelp.
+- Unused state: isVerifyingDomain, allFeatures, setupProgress (no UI displayed).
+- Unused component: SearchIcon (search UI was commented out).
+- Large commented block: renderFeatures.
+
+## File layout (reference)
+
+- components/settings-page.tsx          (entry, thin)
+- components/settings/types.ts
+- components/settings/constants.ts
+- components/settings/utils/domainValidation.ts
+- components/settings/domains/DomainsTab.tsx
+- components/settings/domains/DomainCard.tsx
+- components/settings/domains/AddDomainDialog.tsx
+- components/settings/domains/DeleteDomainDialog.tsx
+- components/settings/domains/NameserversCard.tsx
+- components/settings/subscription/SubscriptionTab.tsx
+- components/settings/subscription/PlanCard.tsx
+- components/settings/subscription/UpgradeDialog.tsx
+- hooks/useDomains.ts
+- hooks/useSubscriptionPlans.ts
+
+ThemeSection and ThemeSection-related code under components/settings/themes/ were not changed.
