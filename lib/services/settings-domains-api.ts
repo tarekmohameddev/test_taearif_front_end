@@ -7,6 +7,17 @@ import type { Domain, DnsInstructions } from "@/components/settings/types";
 
 const BASE = "/settings/domain";
 
+// --- In-flight request deduplication (PREVENT_DUPLICATE_API) ---
+const inFlight = new Map<string, Promise<unknown>>();
+
+function dedupeByKey<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+  const promise = fn().finally(() => inFlight.delete(key));
+  inFlight.set(key, promise);
+  return promise;
+}
+
 export interface GetDomainsResponse {
   domains: Domain[];
   dnsInstructions: DnsInstructions | null;
@@ -22,14 +33,16 @@ export interface VerifyDomainResponse {
 
 /** GET /settings/domain — list domains and DNS instructions */
 export async function getDomains(): Promise<GetDomainsResponse> {
-  const response = await axiosInstance.get<{
-    domains?: Domain[];
-    dnsInstructions?: DnsInstructions | null;
-  }>(BASE);
-  return {
-    domains: response.data.domains ?? [],
-    dnsInstructions: response.data.dnsInstructions ?? null,
-  };
+  return dedupeByKey("domains", async () => {
+    const response = await axiosInstance.get<{
+      domains?: Domain[];
+      dnsInstructions?: DnsInstructions | null;
+    }>(BASE);
+    return {
+      domains: response.data.domains ?? [],
+      dnsInstructions: response.data.dnsInstructions ?? null,
+    };
+  });
 }
 
 /** POST /settings/domain — add a custom domain */
