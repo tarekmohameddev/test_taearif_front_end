@@ -146,21 +146,22 @@ export function useBackendDataState({
           .getState()
           .getComponentData(component.type, component.id);
 
-        // ⭐ NEW: Fallback to pageComponentsByPage data (from Database)
-        // This ensures we use Database data even if storeData is empty
+        // ⭐ Page-specific data: pageComponentsByPage[slug] and component.data (current page list)
         const pageComponentsByPage = useEditorStore.getState().pageComponentsByPage[slug];
         const pageComponentFromStore = pageComponentsByPage?.find(
           (pc: any) => pc.id === component.id
         );
         const databaseData = pageComponentFromStore?.data;
 
-        // دمج البيانات: أولوية للبيانات من editorStore، ثم Database، ثم component.data
+        // ⭐ FIX: Prefer page-specific data over global store so components don't revert to default on navigation.
+        // The store is keyed by component id only; when the same id exists on multiple pages, store gets overwritten.
+        // Priority: databaseData (this page's aggregate) → component.data (this page's list) → storeData (fallback)
         const mergedData =
-          storeData && Object.keys(storeData).length > 0
-            ? storeData
-            : databaseData && Object.keys(databaseData).length > 0
-              ? databaseData
-              : component.data;
+          databaseData && Object.keys(databaseData).length > 0
+            ? databaseData
+            : component.data && Object.keys(component.data || {}).length > 0
+              ? component.data
+              : storeData || {};
 
         return {
           ...component,
