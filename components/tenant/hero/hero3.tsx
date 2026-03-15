@@ -26,6 +26,8 @@ import { useBrandingColors } from "@/hooks/useBrandingColors";
 // ═══════════════════════════════════════════════════════════
 interface HeroProps {
   visible?: boolean;
+  showTitle?: boolean;
+  showSubtitle?: boolean;
   height?: {
     desktop?: string;
     tablet?: string;
@@ -52,6 +54,10 @@ interface HeroProps {
   content?: {
       title?: string;
         subtitle?: string;
+        titleSingleLine?: boolean;
+        titleSingleLineDesktop?: boolean;
+        titleSingleLineMobile?: boolean;
+        subtitleSingleLine?: boolean;
         font?: {
       title?: {
         family?: string;
@@ -59,6 +65,9 @@ interface HeroProps {
         weight?: string;
         color?: string;
         lineHeight?: string;
+        letterSpacing?: string;
+        marginTop?: number;
+        marginBottom?: number;
       };
       subtitle?: {
         family?: string;
@@ -801,8 +810,12 @@ function Hero3(props: HeroProps) {
     color: mergedData.content?.font?.title?.color || "#ffffff",
     lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
     ...(useTitlePx && { fontSize: "var(--hero-title-size-mobile)" }),
-    ...(mergedData.content?.titleSingleLine && { whiteSpace: "nowrap" as const }),
+    ...(mergedData.content?.font?.title?.letterSpacing != null && mergedData.content.font.title.letterSpacing !== "" && { letterSpacing: mergedData.content.font.title.letterSpacing }),
+    ...(mergedData.content?.font?.title?.marginTop != null && { marginTop: toDimension(mergedData.content.font.title.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.title?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.title.marginBottom, "px", "0") }),
   };
+  const titleSingleLineDesktop = mergedData.content?.titleSingleLine || mergedData.content?.titleSingleLineDesktop;
+  const titleSingleLineMobile = mergedData.content?.titleSingleLine || mergedData.content?.titleSingleLineMobile;
 
   const subtitleStyles = {
     fontFamily: mergedData.content?.font?.subtitle?.family || "Tajawal",
@@ -983,7 +996,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "5xl"}`,
                   useTitlePx && "hero3-title",
                 )}
-                style={titleStyles}
+                style={{
+                  ...titleStyles,
+                  ...(titleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.title ||
                   "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
@@ -1029,7 +1045,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "5xl"}`,
                   useTitlePx && "hero3-title",
                 )}
-                style={titleStyles}
+                style={{
+                  ...titleStyles,
+                  ...(titleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.title ||
                   "مع باهية... اجعل حلمك السكني استثمارا يدوم"}

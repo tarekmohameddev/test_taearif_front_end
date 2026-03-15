@@ -209,6 +209,8 @@ export const getDefaultHero3Data = (): ComponentData => ({
     title: "مع باهية... اجعل حلمك السكني استثمارا يد22وم",
     subtitle:
       "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم.",
+    titleSingleLineDesktop: false,
+    titleSingleLineMobile: false,
     font: {
       title: {
         family: "Tajawal",
@@ -216,6 +218,7 @@ export const getDefaultHero3Data = (): ComponentData => ({
         weight: "extrabold",
         color: "#ffffff",
         lineHeight: "1.25",
+        letterSpacing: "",
       },
       subtitle: {
         family: "Tajawal",

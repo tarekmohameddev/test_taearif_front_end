@@ -95,6 +95,13 @@ type number, unit "px", and a numeric default (e.g. 24, 20, 18).
 The path should be consistent, e.g. content.font.title.size or under
 typography.title.fontSize with desktop, tablet, and mobile keys.
 
+In the title group (groupFields): you can group the size fields (desktop,
+tablet, mobile) into a single collapsible group. Add a field with
+displayAsGroup: true and groupFields containing the full paths (e.g.
+content.font.title.size.desktop, .tablet, .mobile) and a group label such
+as "حجم الخط" (Font size), without changing where the fields live in the
+structure.
+
 --------------------------------------------------------------------------------
 4) Font weight
 --------------------------------------------------------------------------------
@@ -102,6 +109,11 @@ typography.title.fontSize with desktop, tablet, and mobile keys.
 Control font weight (normal, bold, etc.) with a single field such as
 fontWeight or weight (type text, e.g. "400", "700").
 Place it in the same typography group as that text (e.g. title or subtitle).
+
+For the editor UI: you can use type "badge-select" instead of type "text"
+with options (e.g. normal, medium, semibold, bold, extrabold) and
+badgeConfig: { mode: "single", requiredAtLeastOne: false, allowUnset: true }
+so that font weight is shown as buttons (BadgeSelectFieldRenderer).
 
 --------------------------------------------------------------------------------
 5) Margin around the text
@@ -113,6 +125,13 @@ separate fields like marginTop, marginBottom (as in whyChooseUs,
 stepsSection, halfTextHalfImage).
 Values can be type text (e.g. "mb-10", "24px") or type number with
 unit: "px".
+
+In the title group: you can group margin fields (e.g. marginTop,
+marginBottom) into a single collapsible group with a label such as
+"الهوامش" (Margins). Use a field with displayAsGroup: true and
+groupFields containing the field paths (e.g. content.font.title.marginTop,
+content.font.title.marginBottom) without changing where the fields live
+in the structure.
 
 --------------------------------------------------------------------------------
 6) Blur and badge
@@ -140,6 +159,15 @@ Typography: Add letterSpacing under that text's typography group when needed
 Alignment: textAlign (select: left, center, right) or alignment when
 relevant.
 
+In the title group (groupFields): you can group font weight (weight),
+line height (lineHeight), and letter spacing (letterSpacing) into one
+collapsible group with a label such as "سمك الخط والتباعد" (Font weight
+and spacing). Use a field with displayAsGroup: true and groupFields
+containing the three fields (with their full paths). Apply the same
+pattern to other fields: any set of related fields (e.g. weight +
+lineHeight + letterSpacing) can be placed in a single group to reduce
+clutter in the sidebar.
+
 --------------------------------------------------------------------------------
 8) Single-line text (سطر واحد فقط — Desktop / Mobile)
 --------------------------------------------------------------------------------
@@ -161,6 +189,14 @@ Path example: e.g. typography.title.singleLine.desktop and
 typography.title.singleLine.mobile, or an object singleLine: { desktop:
 boolean, mobile: boolean } under that text's styling.
 
+In the title group (groupFields): put only the two boolean fields
+(desktop, mobile) inside one collapsible group. Use a field with
+displayAsGroup: true and groupFields containing the two paths (e.g.
+content.titleSingleLineDesktop, content.titleSingleLineMobile) and a
+group label such as "سطر واحد" (Single line). You do not need a
+global single-line switch in the group — the two per-device fields
+inside the group are enough.
+
 --------------------------------------------------------------------------------
 9) Consistency with the component (mandatory)
 --------------------------------------------------------------------------------
@@ -181,7 +217,10 @@ References in the project
 
 Full text structure (color, size, weight, spacing): componentsStructure/title.ts
 Text with grouped font (title/subtitle) and branding colors:
-  componentsStructure/hero.ts (e.g. content.font.title, content.font.subtitle)
+  componentsStructure/hero.ts (e.g. content.font.title, content.font.subtitle).
+  hero.ts also shows: font size in a "حجم الخط" group, badge-select for
+  font weight, weight + lineHeight + letterSpacing in "سمك الخط والتباعد",
+  margins in "الهوامش", and single-line (desktop/mobile) in "سطر واحد".
 Text with badge and colors: componentsStructure/partners.ts,
   componentsStructure/projectDetails.ts
 Blur: componentsStructure/header.ts

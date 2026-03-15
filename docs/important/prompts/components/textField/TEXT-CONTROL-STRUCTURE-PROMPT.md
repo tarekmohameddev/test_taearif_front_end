@@ -51,6 +51,7 @@ So: **place in structure does not change** — `content.title` stays under `cont
 - Use an object with three fields: `desktop`, `tablet`, `mobile`. Each field must be **`type: "number"`** with **`unit: "px"`** (ثابت على px). The user enters a number and the unit is always pixels.
 - Example: `typography.title.fontSize` with `fields: [ { key: "desktop", type: "number", unit: "px", defaultValue: 24 }, { key: "tablet", type: "number", unit: "px", defaultValue: 20 }, { key: "mobile", type: "number", unit: "px", defaultValue: 18 } ]`.
 - Path should be consistent, e.g. `content.font.title.size` or under `typography.title.fontSize` with desktop/tablet/mobile keys.
+- **في مجموعة العنوان (groupFields):** يمكن تجميع حقول الحجم (desktop, tablet, mobile) في مجموعة قابلة للطي واحدة: أضف حقلًا بـ `displayAsGroup: true` و `groupFields` يحتوي على المسارات الكاملة (مثل `content.font.title.size.desktop`, `.tablet`, `.mobile`) مع عنوان للمجموعة مثل "حجم الخط"، دون تغيير مكان الحقول في الـ structure.
 
 ---
 
@@ -58,6 +59,7 @@ So: **place in structure does not change** — `content.title` stays under `cont
 
 - Control font weight (normal, bold, etc.) with a single field such as `fontWeight` or `weight` (`type: "text"`, e.g. `"400"`, `"700"`).
 - Place it in the same typography group as that text (e.g. with title or subtitle).
+- **للعرض في المحرر:** يمكن استخدام `type: "badge-select"` بدل `type: "text"` مع `options` (مثل: normal, medium, semibold, bold, extrabold) و `badgeConfig: { mode: "single", requiredAtLeastOne: false, allowUnset: true }` لعرض سمك الخط كأزرار (BadgeSelectFieldRenderer).
 
 ---
 
@@ -66,6 +68,7 @@ So: **place in structure does not change** — `content.title` stays under `cont
 - Control spacing around the text (top, bottom, left, right as needed).
 - Either one object like `spacing.margin` with `top`, `bottom`, `left`, `right`, or separate fields like `marginTop`, `marginBottom` (as in whyChooseUs, stepsSection, halfTextHalfImage).
 - Values can be `type: "text"` (e.g. `"mb-10"`, `"24px"`) or `type: "number"` with `unit: "px"`.
+- **في مجموعة العنوان:** يمكن تجميع حقول الهامش (مثل marginTop، marginBottom) في مجموعة قابلة للطي واحدة بعنوان مثل "الهوامش" باستخدام حقل بـ `displayAsGroup: true` و `groupFields` تضم مسارات الحقول (مثل `content.font.title.marginTop`, `content.font.title.marginBottom`) دون تغيير أماكن الحقول في الـ structure.
 
 ---
 
@@ -83,6 +86,7 @@ So: **place in structure does not change** — `content.title` stays under `cont
 
 - **Typography:** Add `letterSpacing` under that text's typography group when needed (as in `title.ts`).
 - **Alignment:** `textAlign` (select: left | center | right) or `alignment` when relevant.
+- **في مجموعة العنوان (groupFields):** يمكن تجميع سمك الخط (weight)، ارتفاع السطر (lineHeight)، وتباعد الحروف (letterSpacing) في مجموعة قابلة للطي واحدة بعنوان مثل "سمك الخط والتباعد": حقل بـ `displayAsGroup: true` و `groupFields` تضم الحقول الثلاثة (بمساراتها الكاملة). يُطبَّق نفس النمط على حقول أخرى: أي مجموعة حقول مرتبطة (مثلاً weight + lineHeight + letterSpacing) يمكن وضعها في group واحدة لتقليل التفرّع في الـ sidebar.
 
 ---
 
@@ -93,6 +97,7 @@ So: **place in structure does not change** — `content.title` stays under `cont
   - **One switch:** to enable *"جعل النص في سطر واحد فقط وفي row واحد بشكل اجباري في التليفون"* (force text to a single line / single row on phone/mobile).
 - When a switch is on, the component must apply the appropriate CSS (e.g. `white-space: nowrap`, overflow handling, or single-line layout) so the text stays on one line on the corresponding breakpoint (desktop vs mobile).
 - Path example: e.g. `typography.title.singleLine.desktop` and `typography.title.singleLine.mobile`, or an object `singleLine: { desktop: boolean, mobile: boolean }` under that text’s styling.
+- **في مجموعة العنوان:** ضع الحقلين (desktop، mobile) فقط داخل مجموعة قابلة للطي واحدة: حقل بـ `displayAsGroup: true` و `groupFields` يحتوي على المسارين (مثل `content.titleSingleLineDesktop`, `content.titleSingleLineMobile`) وعنوان المجموعة مثل "سطر واحد". لا حاجة لمفتاح عام واحد (سطر واحد لكل الأجهزة) في الـ group — يكفي المفتاحان حسب الجهاز داخل الـ group.
 
 ---
 
@@ -107,7 +112,7 @@ So: **place in structure does not change** — `content.title` stays under `cont
 ## References in the Project
 
 - **Full text structure (color, size, weight, spacing):** `componentsStructure/title.ts`
-- **Text with grouped font (title/subtitle) and branding colors:** `componentsStructure/hero.ts` (e.g. `content.font.title`, `content.font.subtitle`)
+- **Text with grouped font (title/subtitle) and branding colors:** `componentsStructure/hero.ts` (e.g. `content.font.title`, `content.font.subtitle`) — ويضم أيضاً: تجميع حجم الخط في group "حجم الخط"، استخدام badge-select لسمك الخط، تجميع سمك الخط + ارتفاع السطر + تباعد الحروف في group "سمك الخط والتباعد"، تجميع الهوامش في group "الهوامش"، وتجميع سطر واحد (desktop/mobile) في group "سطر واحد".
 - **Text with badge and colors:** `componentsStructure/partners.ts` (content.badge, showBadge, badgeColor), `componentsStructure/projectDetails.ts` (badgeText, badgeBackgroundColor, badgeTextColor)
 - **Blur:** `componentsStructure/header.ts` (blur for backdrop)
 - **Margin around text:** `componentsStructure/halfTextHalfImage.ts`, `componentsStructure/whyChooseUs.ts`, `componentsStructure/stepsSection.ts`
