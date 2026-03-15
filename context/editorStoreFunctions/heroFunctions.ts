@@ -381,6 +381,17 @@ export const getDefaultHero4Data = (): ComponentData => ({
         color: "#ffffff",
         lineHeight: "1.25",
       },
+      subtitle: {
+        family: "Tajawal",
+        size: {
+          desktop: "lg",
+          tablet: "lg",
+          mobile: "base",
+        },
+        weight: "normal",
+        color: "rgba(255, 255, 255, 0.85)",
+        lineHeight: "1.5",
+      },
     },
   },
   animations: {
