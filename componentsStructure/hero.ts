@@ -799,7 +799,65 @@ export const heroStructure: ComponentStructure = {
               groupFields: [
                 { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
                 { key: "content.subtitle", label: "Subtitle", type: "text" },
-                { key: "content.subtitleSingleLine", label: "العنوان الفرعي في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
+                {
+                  key: "content.subtitleSingleLineGroup",
+                  label: "سطر واحد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.subtitleSingleLineDesktop", label: "سطر واحد (سطح المكتب)", type: "boolean", defaultValue: false },
+                    { key: "content.subtitleSingleLineMobile", label: "سطر واحد (الجوال)", type: "boolean", defaultValue: false },
+                  ],
+                },
+                { key: "content.font.subtitle.color", label: "لون العنوان الفرعي", type: "color", useDefaultColor: true, globalColorType: "secondary" },
+                {
+                  key: "content.font.subtitle.size",
+                  label: "حجم الخط",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.subtitle.size.desktop", label: "سطح المكتب", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.size.tablet", label: "التابلت", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.size.mobile", label: "الجوال", type: "number", unit: "px" },
+                  ],
+                },
+                {
+                  key: "content.font.subtitle.typography",
+                  label: "سمك الخط والتباعد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "content.font.subtitle.weight",
+                      label: "سمك الخط",
+                      type: "badge-select",
+                      options: [
+                        { label: "عادي", value: "normal" },
+                        { label: "متوسط", value: "medium" },
+                        { label: "نصف غامق", value: "semibold" },
+                        { label: "غامق", value: "bold" },
+                        { label: "غامق جداً", value: "extrabold" },
+                      ],
+                      badgeConfig: {
+                        mode: "single",
+                        requiredAtLeastOne: false,
+                        allowUnset: true,
+                      },
+                    },
+                    { key: "content.font.subtitle.lineHeight", label: "ارتفاع السطر", type: "text" },
+                    { key: "content.font.subtitle.letterSpacing", label: "تباعد الحروف", type: "text" },
+                  ],
+                },
+                {
+                  key: "content.font.subtitle.margin",
+                  label: "الهوامش",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.subtitle.marginTop", label: "هامش علوي", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.marginBottom", label: "هامش سفلي", type: "number", unit: "px" },
+                  ],
+                },
               ],
             },
             {
@@ -813,69 +871,6 @@ export const heroStructure: ComponentStructure = {
                 { key: "content.maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
               ],
             },
-            {
-              key: "font",
-              label: "Font Settings",
-              type: "object",
-              fields: [
-                {
-                  key: "title",
-                  label: "Title Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "سطح المكتب", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "tablet", label: "التابلت", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "mobile", label: "الجوال", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary",
-                    },
-                    { key: "lineHeight", label: "Line Height", type: "text" },
-                    { key: "letterSpacing", label: "Letter Spacing", type: "text" },
-                    { key: "marginTop", label: "Margin Top", type: "number", unit: "px" },
-                    { key: "marginBottom", label: "Margin Bottom", type: "number", unit: "px" },
-                  ],
-                },
-                {
-                  key: "subtitle",
-                  label: "Subtitle Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "سطح المكتب", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "tablet", label: "التابلت", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "mobile", label: "الجوال", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary",
-                    },
-                  ],
-                },
-              ],
-            },
-            { key: "titleSingleLineDesktop", label: "Title Single Line (Desktop)", type: "boolean", defaultValue: false },
-            { key: "titleSingleLineMobile", label: "Title Single Line (Mobile)", type: "boolean", defaultValue: false },
           ],
         },
         {

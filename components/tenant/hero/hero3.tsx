@@ -58,6 +58,8 @@ interface HeroProps {
         titleSingleLineDesktop?: boolean;
         titleSingleLineMobile?: boolean;
         subtitleSingleLine?: boolean;
+        subtitleSingleLineDesktop?: boolean;
+        subtitleSingleLineMobile?: boolean;
         font?: {
       title?: {
         family?: string;
@@ -74,6 +76,10 @@ interface HeroProps {
         size?: { desktop?: string | number; tablet?: string | number; mobile?: string | number };
         weight?: string;
         color?: string;
+        lineHeight?: string;
+        letterSpacing?: string;
+        marginTop?: number;
+        marginBottom?: number;
       };
     };
     alignment?: string;
@@ -816,6 +822,8 @@ function Hero3(props: HeroProps) {
   };
   const titleSingleLineDesktop = mergedData.content?.titleSingleLine || mergedData.content?.titleSingleLineDesktop;
   const titleSingleLineMobile = mergedData.content?.titleSingleLine || mergedData.content?.titleSingleLineMobile;
+  const subtitleSingleLineDesktop = mergedData.content?.subtitleSingleLineDesktop ?? mergedData.content?.subtitleSingleLine;
+  const subtitleSingleLineMobile = mergedData.content?.subtitleSingleLineMobile ?? mergedData.content?.subtitleSingleLine;
 
   const subtitleStyles = {
     fontFamily: mergedData.content?.font?.subtitle?.family || "Tajawal",
@@ -823,7 +831,10 @@ function Hero3(props: HeroProps) {
     color:
       mergedData.content?.font?.subtitle?.color || "rgba(255, 255, 255, 0.85)",
     ...(useSubtitlePx && { fontSize: "var(--hero-subtitle-size-mobile)" }),
-    ...(mergedData.content?.subtitleSingleLine && { whiteSpace: "nowrap" as const }),
+    ...(mergedData.content?.font?.subtitle?.lineHeight != null && mergedData.content.font.subtitle.lineHeight !== "" && { lineHeight: mergedData.content.font.subtitle.lineHeight }),
+    ...(mergedData.content?.font?.subtitle?.letterSpacing != null && mergedData.content.font.subtitle.letterSpacing !== "" && { letterSpacing: mergedData.content.font.subtitle.letterSpacing }),
+    ...(mergedData.content?.font?.subtitle?.marginTop != null && { marginTop: toDimension(mergedData.content.font.subtitle.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.subtitle?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.subtitle.marginBottom, "px", "0") }),
   };
 
   const overlayStyles = {
@@ -1013,7 +1024,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "4xl"}`,
                   useSubtitlePx && "hero3-subtitle",
                 )}
-                style={subtitleStyles}
+                style={{
+                  ...subtitleStyles,
+                  ...(subtitleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.subtitle ||
                   "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}
@@ -1062,7 +1076,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "4xl"}`,
                   useSubtitlePx && "hero3-subtitle",
                 )}
-                style={subtitleStyles}
+                style={{
+                  ...subtitleStyles,
+                  ...(subtitleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.subtitle ||
                   "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}
