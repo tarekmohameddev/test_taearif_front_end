@@ -8,85 +8,6 @@ export const heroStructure: ComponentStructure = {
       name: "Hero 1 - Modern Search",
       fields: [
         {
-          key: "height",
-          label: "Height",
-          type: "object",
-          fields: [
-            {
-              key: "desktop",
-              label: "Desktop",
-              type: "number",
-              placeholder: "90",
-              unit: "vh",
-            },
-            {
-              key: "tablet",
-              label: "Tablet",
-              type: "number",
-              placeholder: "80",
-              unit: "vh",
-            },
-            {
-              key: "mobile",
-              label: "Mobile",
-              type: "number",
-              placeholder: "70",
-              unit: "vh",
-            },
-          ],
-        },
-        {
-          key: "background",
-          label: "Background",
-          type: "object",
-          fields: [
-            {
-              key: "type",
-              label: "Background Type",
-              type: "select",
-              options: [
-                { label: "Image", value: "image" },
-                { label: "Color", value: "color" },
-              ],
-            },
-            {
-              key: "imageGroup",
-              label: "Image Settings",
-              type: "text",
-              displayAsGroup: true,
-              condition: { field: "type", value: "image" },
-              groupFields: [
-                { key: "background.image", label: "Image URL", type: "image" },
-                { key: "background.alt", label: "Alt Text", type: "text" },
-                {
-                  key: "background.overlay",
-                  label: "Overlay",
-                  type: "object",
-                  fields: [
-                    { key: "enabled", label: "Enabled", type: "boolean" },
-                    {
-                      key: "opacity",
-                      label: "Opacity",
-                      type: "text",
-                      placeholder: "0.45",
-                    },
-                    { key: "color", label: "Color", type: "color" },
-                  ],
-                },
-              ],
-            },
-            {
-              key: "color",
-              label: "Background Color",
-              type: "color",
-              useDefaultColor: true,
-              globalColorType: "primary",
-              condition: { field: "type", value: "color" },
-              description: "لون الخلفية. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
-            },
-          ],
-        },
-        {
           key: "content",
           label: "Content",
           type: "object",
@@ -233,6 +154,86 @@ export const heroStructure: ComponentStructure = {
             { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
           ],
         },
+        {
+          key: "height",
+          label: "Height",
+          type: "object",
+          fields: [
+            {
+              key: "desktop",
+              label: "Desktop",
+              type: "number",
+              placeholder: "90",
+              unit: "vh",
+            },
+            {
+              key: "tablet",
+              label: "Tablet",
+              type: "number",
+              placeholder: "80",
+              unit: "vh",
+            },
+            {
+              key: "mobile",
+              label: "Mobile",
+              type: "number",
+              placeholder: "70",
+              unit: "vh",
+            },
+          ],
+        },
+        {
+          key: "background",
+          label: "Background",
+          type: "object",
+          fields: [
+            {
+              key: "type",
+              label: "Background Type",
+              type: "select",
+              options: [
+                { label: "Image", value: "image" },
+                { label: "Color", value: "color" },
+              ],
+            },
+            {
+              key: "imageGroup",
+              label: "Image Settings",
+              type: "text",
+              displayAsGroup: true,
+              condition: { field: "type", value: "image" },
+              groupFields: [
+                { key: "background.image", label: "Image URL", type: "image" },
+                { key: "background.alt", label: "Alt Text", type: "text" },
+                {
+                  key: "background.overlay",
+                  label: "Overlay",
+                  type: "object",
+                  fields: [
+                    { key: "enabled", label: "Enabled", type: "boolean" },
+                    {
+                      key: "opacity",
+                      label: "Opacity",
+                      type: "text",
+                      placeholder: "0.45",
+                    },
+                    { key: "color", label: "Color", type: "color" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "color",
+              label: "Background Color",
+              type: "color",
+              useDefaultColor: true,
+              globalColorType: "primary",
+              condition: { field: "type", value: "color" },
+              description: "لون الخلفية. يمكنك استخدام Primary/Secondary/Accent Color من إعدادات التاجر أو لون مخصص.",
+            },
+          ],
+        },
+      
         {
           key: "searchForm",
           label: "Search Form",
@@ -519,50 +520,6 @@ export const heroStructure: ComponentStructure = {
       name: "Hero 2 - Simple Image",
       fields: [
         {
-          key: "height",
-          label: "Height",
-          type: "object",
-          fields: [
-            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
-            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
-            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
-          ],
-        },
-        {
-          key: "minHeight",
-          label: "Minimum Height",
-          type: "object",
-          fields: [
-            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
-            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
-            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
-          ],
-        },
-        {
-          key: "background",
-          label: "Background",
-          type: "object",
-          fields: [
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "alt", label: "Alt Text", type: "text" },
-            {
-              key: "overlay",
-              label: "Overlay",
-              type: "object",
-              fields: [
-                { key: "enabled", label: "Enabled", type: "boolean" },
-                {
-                  key: "opacity",
-                  label: "Opacity",
-                  type: "text",
-                  placeholder: "0.6",
-                },
-                { key: "color", label: "Color", type: "color" },
-              ],
-            },
-          ],
-        },
-        {
           key: "content",
           label: "Content",
           type: "object",
@@ -680,6 +637,51 @@ export const heroStructure: ComponentStructure = {
           ],
         },
         {
+          key: "height",
+          label: "Height",
+          type: "object",
+          fields: [
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
+          ],
+        },
+        {
+          key: "minHeight",
+          label: "Minimum Height",
+          type: "object",
+          fields: [
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
+          ],
+        },
+        {
+          key: "background",
+          label: "Background",
+          type: "object",
+          fields: [
+            { key: "image", label: "Image URL", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+            {
+              key: "overlay",
+              label: "Overlay",
+              type: "object",
+              fields: [
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                {
+                  key: "opacity",
+                  label: "Opacity",
+                  type: "text",
+                  placeholder: "0.6",
+                },
+                { key: "color", label: "Color", type: "color" },
+              ],
+            },
+          ],
+        },
+      
+        {
           key: "styling",
           label: "Styling",
           type: "object",
@@ -733,48 +735,6 @@ export const heroStructure: ComponentStructure = {
       id: "hero3",
       name: "Hero 3 - Video Background with Search",
       fields: [
-        {
-          key: "height",
-          label: "Height",
-          type: "object",
-          fields: [
-            { key: "desktop", label: "Desktop", type: "number", placeholder: "90", unit: "vh" },
-            { key: "tablet", label: "Tablet", type: "number", placeholder: "80", unit: "vh" },
-            { key: "mobile", label: "Mobile", type: "number", placeholder: "70", unit: "vh" },
-          ],
-        },
-        {
-          key: "background",
-          label: "Background",
-          type: "object",
-          fields: [
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "video", label: "Video URL (YouTube)", type: "text" },
-            {
-              key: "videoStart",
-              label: "Video Start (seconds)",
-              type: "number",
-            },
-            { key: "playOnMobile", label: "Play on Mobile", type: "boolean" },
-            { key: "privacyMode", label: "Privacy Mode", type: "boolean" },
-            { key: "alt", label: "Alt Text", type: "text" },
-            {
-              key: "overlay",
-              label: "Overlay",
-              type: "object",
-              fields: [
-                { key: "enabled", label: "Enabled", type: "boolean" },
-                {
-                  key: "opacity",
-                  label: "Opacity",
-                  type: "text",
-                  placeholder: "0.45",
-                },
-                { key: "color", label: "Color", type: "color" },
-              ],
-            },
-          ],
-        },
         {
           key: "content",
           label: "Content",
@@ -931,6 +891,49 @@ export const heroStructure: ComponentStructure = {
             },
           ],
         },
+        {
+          key: "height",
+          label: "Height",
+          type: "object",
+          fields: [
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "90", unit: "vh" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "80", unit: "vh" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "70", unit: "vh" },
+          ],
+        },
+        {
+          key: "background",
+          label: "Background",
+          type: "object",
+          fields: [
+            { key: "image", label: "Image URL", type: "image" },
+            { key: "video", label: "Video URL (YouTube)", type: "text" },
+            {
+              key: "videoStart",
+              label: "Video Start (seconds)",
+              type: "number",
+            },
+            { key: "playOnMobile", label: "Play on Mobile", type: "boolean" },
+            { key: "privacyMode", label: "Privacy Mode", type: "boolean" },
+            { key: "alt", label: "Alt Text", type: "text" },
+            {
+              key: "overlay",
+              label: "Overlay",
+              type: "object",
+              fields: [
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                {
+                  key: "opacity",
+                  label: "Opacity",
+                  type: "text",
+                  placeholder: "0.45",
+                },
+                { key: "color", label: "Color", type: "color" },
+              ],
+            },
+          ],
+        },
+      
         {
           key: "searchForm",
           label: "Search Form",
