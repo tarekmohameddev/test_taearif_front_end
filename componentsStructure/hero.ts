@@ -230,64 +230,6 @@ export const heroStructure: ComponentStructure = {
               ],
             },
             { key: "paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
-            {
-              key: "font",
-              label: "Font Settings",
-              type: "object",
-              fields: [
-                {
-                  key: "title",
-                  label: "Title Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "Desktop", type: "text" },
-                        { key: "tablet", label: "Tablet", type: "text" },
-                        { key: "mobile", label: "Mobile", type: "text" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary", // Title uses secondary color
-                    },
-                    { key: "lineHeight", label: "Line Height", type: "text" },
-                  ],
-                },
-                {
-                  key: "subtitle",
-                  label: "Subtitle Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "Desktop", type: "text" },
-                        { key: "tablet", label: "Tablet", type: "text" },
-                        { key: "mobile", label: "Mobile", type: "text" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary", // Subtitle uses secondary color
-                    },
-                  ],
-                },
-              ],
-            },
             { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
           ],
         },
