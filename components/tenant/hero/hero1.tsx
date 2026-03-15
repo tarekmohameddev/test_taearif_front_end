@@ -840,27 +840,79 @@ const Hero1 = (props: HeroProps = {}) => {
   const heightTablet = toDimension(mergedData.height?.tablet, "vh", heightDesktop);
   const heightMobile = toDimension(mergedData.height?.mobile, "vh", heightDesktop);
 
-  // Generate dynamic styles with responsive height
+  // Title/subtitle font sizes (number px or legacy Tailwind string)
+  const titleSize = mergedData.content?.font?.title?.size;
+  const subtitleSize = mergedData.content?.font?.subtitle?.size;
+  const toPx = (v: string | number | undefined, fallback: number) =>
+    typeof v === "number" ? `${v}px` : typeof v === "string" && /^\d+$/.test(v) ? `${v}px` : undefined;
+  const titleDesktopPx = toPx(titleSize?.desktop, 48);
+  const titleTabletPx = toPx(titleSize?.tablet, 36);
+  const titleMobilePx = toPx(titleSize?.mobile, 24);
+  const subtitleDesktopPx = toPx(subtitleSize?.desktop, 24);
+  const subtitleTabletPx = toPx(subtitleSize?.tablet, 24);
+  const subtitleMobilePx = toPx(subtitleSize?.mobile, 20);
+  const useTitlePx = titleDesktopPx ?? titleTabletPx ?? titleMobilePx;
+  const useSubtitlePx = subtitleDesktopPx ?? subtitleTabletPx ?? subtitleMobilePx;
+
+  // Generate dynamic styles with responsive height and optional font sizes
   const sectionStyles = {
     "--hero-height-desktop": heightDesktop,
     "--hero-height-tablet": heightTablet,
     "--hero-height-mobile": heightMobile,
+    ...(useTitlePx && {
+      "--hero1-title-size-mobile": titleMobilePx ?? useTitlePx,
+      "--hero1-title-size-tablet": titleTabletPx ?? useTitlePx,
+      "--hero1-title-size-desktop": titleDesktopPx ?? useTitlePx,
+    }),
+    ...(useSubtitlePx && {
+      "--hero1-subtitle-size-mobile": subtitleMobilePx ?? useSubtitlePx,
+      "--hero1-subtitle-size-tablet": subtitleTabletPx ?? useSubtitlePx,
+      "--hero1-subtitle-size-desktop": subtitleDesktopPx ?? useSubtitlePx,
+    }),
   } as React.CSSProperties;
 
-  const titleStyles = {
-    fontFamily: mergedData.content?.font?.title?.family || "Tajawal",
-    fontWeight: mergedData.content?.font?.title?.weight || "extrabold",
-    color: mergedData.content?.font?.title?.color || "#ffffff",
-    lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
-    ...(mergedData.content?.titleSingleLine && { whiteSpace: "nowrap" as const }),
+  const editorWebsiteLayoutForColors = useEditorStore((s) => s.WebsiteLayout);
+  const brandingColorsForContent =
+    editorWebsiteLayoutForColors?.branding?.colors ??
+    tenantData?.WebsiteLayout?.branding?.colors;
+  const getContentColor = (which: "title" | "subtitle"): string => {
+    const font = mergedData.content?.font?.[which];
+    const colorField = font?.color;
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      const useDefault = (colorField as { useDefaultColor?: boolean }).useDefaultColor;
+      const globalType = (colorField as { globalColorType?: keyof typeof brandingColorsForContent }).globalColorType;
+      if (useDefault && globalType && brandingColorsForContent) {
+        const hex = brandingColorsForContent[globalType as keyof typeof brandingColorsForContent];
+        if (typeof hex === "string") return hex;
+      }
+    }
+    if (typeof colorField === "string" && colorField.trim().length > 0) return colorField.trim();
+    return which === "title" ? "#ffffff" : "rgba(255, 255, 255, 0.85)";
   };
 
-  const subtitleStyles = {
+  const titleSingleLineDesktop = mergedData.content?.titleSingleLine ?? mergedData.content?.titleSingleLineDesktop;
+  const titleSingleLineMobile = mergedData.content?.titleSingleLine ?? mergedData.content?.titleSingleLineMobile;
+  const subtitleSingleLineDesktop = mergedData.content?.subtitleSingleLineDesktop ?? mergedData.content?.subtitleSingleLine;
+  const subtitleSingleLineMobile = mergedData.content?.subtitleSingleLineMobile ?? mergedData.content?.subtitleSingleLine;
+
+  const titleStyles: React.CSSProperties = {
+    fontFamily: mergedData.content?.font?.title?.family || "Tajawal",
+    fontWeight: mergedData.content?.font?.title?.weight || "extrabold",
+    color: getContentColor("title"),
+    lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
+    ...(mergedData.content?.font?.title?.letterSpacing != null && mergedData.content.font.title.letterSpacing !== "" && { letterSpacing: mergedData.content.font.title.letterSpacing }),
+    ...(mergedData.content?.font?.title?.marginTop != null && { marginTop: toDimension(mergedData.content.font.title.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.title?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.title.marginBottom, "px", "0") }),
+  };
+
+  const subtitleStyles: React.CSSProperties = {
     fontFamily: mergedData.content?.font?.subtitle?.family || "Tajawal",
     fontWeight: mergedData.content?.font?.subtitle?.weight || "normal",
-    color:
-      mergedData.content?.font?.subtitle?.color || "rgba(255, 255, 255, 0.85)",
-    ...(mergedData.content?.subtitleSingleLine && { whiteSpace: "nowrap" as const }),
+    color: getContentColor("subtitle"),
+    ...(mergedData.content?.font?.subtitle?.lineHeight != null && mergedData.content.font.subtitle.lineHeight !== "" && { lineHeight: mergedData.content.font.subtitle.lineHeight }),
+    ...(mergedData.content?.font?.subtitle?.letterSpacing != null && mergedData.content.font.subtitle.letterSpacing !== "" && { letterSpacing: mergedData.content.font.subtitle.letterSpacing }),
+    ...(mergedData.content?.font?.subtitle?.marginTop != null && { marginTop: toDimension(mergedData.content.font.subtitle.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.subtitle?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.subtitle.marginBottom, "px", "0") }),
   };
 
   const overlayStyles = {
@@ -978,10 +1030,14 @@ const Hero1 = (props: HeroProps = {}) => {
             <h1
               className={cn(
                 "mx-auto text-balance",
-                `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
                 `max-w-${mergedData.content?.maxWidth || "5xl"}`,
+                !useTitlePx && `text-${mergedData.content?.font?.title?.size?.tablet || "4xl"} md:text-${mergedData.content?.font?.title?.size?.desktop || "5xl"}`,
+                useTitlePx && "text-[length:var(--hero1-title-size-mobile)] md:text-[length:var(--hero1-title-size-tablet)] lg:text-[length:var(--hero1-title-size-desktop)]",
               )}
-              style={titleStyles}
+              style={{
+                ...titleStyles,
+                ...(titleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+              }}
             >
               {mergedData.content?.title || "اكتشف عقارك المثالي في أفضل المواقع"}
             </h1>
@@ -990,9 +1046,13 @@ const Hero1 = (props: HeroProps = {}) => {
             <p
               className={cn(
                 "mt-4",
-                `text-${mergedData.content?.font?.subtitle?.size?.tablet || "2xl"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "2xl"}`,
+                !useSubtitlePx && `text-${mergedData.content?.font?.subtitle?.size?.tablet || "2xl"} md:text-${mergedData.content?.font?.subtitle?.size?.desktop || "2xl"}`,
+                useSubtitlePx && "text-[length:var(--hero1-subtitle-size-mobile)] md:text-[length:var(--hero1-subtitle-size-tablet)] lg:text-[length:var(--hero1-subtitle-size-desktop)]",
               )}
-              style={subtitleStyles}
+              style={{
+                ...subtitleStyles,
+                ...(subtitleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+              }}
             >
               {mergedData.content?.subtitle ||
                 "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية"}
@@ -1007,10 +1067,14 @@ const Hero1 = (props: HeroProps = {}) => {
               <h1
                 className={cn(
                   "mx-auto text-balance mb-4",
-                  `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
                   `max-w-${mergedData.content?.maxWidth || "5xl"}`,
+                  !useTitlePx && `text-${mergedData.content?.font?.title?.size?.mobile || "2xl"}`,
+                  useTitlePx && "text-[length:var(--hero1-title-size-mobile)]",
                 )}
-                style={titleStyles}
+                style={{
+                  ...titleStyles,
+                  ...(titleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.title ||
                   "اكتشف عقارك المثالي في أفضل المواقع"}
@@ -1020,9 +1084,13 @@ const Hero1 = (props: HeroProps = {}) => {
               <p
                 className={cn(
                   "mb-8",
-                  `text-${mergedData.content?.font?.subtitle?.size?.mobile || "2xl"}`,
+                  !useSubtitlePx && `text-${mergedData.content?.font?.subtitle?.size?.mobile || "2xl"}`,
+                  useSubtitlePx && "text-[length:var(--hero1-subtitle-size-mobile)]",
                 )}
-                style={subtitleStyles}
+                style={{
+                  ...subtitleStyles,
+                  ...(subtitleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.subtitle ||
                   "نقدم لك أفضل الخيارات العقارية مع ضمان الجودة والموثوقية"}
