@@ -22,6 +22,7 @@ export function RequestsCenterFilters({
   clearFilters,
   viewMode,
   setViewMode,
+  sourceOptions = [],
   selectedSources,
   setSelectedSources,
   selectedPriorities,
@@ -71,6 +72,7 @@ export function RequestsCenterFilters({
             viewMode={viewMode}
             setViewMode={setViewMode}
             inlineFilters={{
+              sourceOptions,
               selectedSources,
               setSelectedSources,
               requestDateFrom,

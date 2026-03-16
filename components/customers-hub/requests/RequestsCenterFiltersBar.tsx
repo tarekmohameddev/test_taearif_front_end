@@ -58,6 +58,7 @@ export function RequestsCenterFiltersBar({
           </Button>
           {inlineFilters && (
             <InlineFiltersRow
+              sourceOptions={inlineFilters.sourceOptions}
               selectedSources={inlineFilters.selectedSources}
               setSelectedSources={inlineFilters.setSelectedSources}
               requestDateFrom={inlineFilters.requestDateFrom}

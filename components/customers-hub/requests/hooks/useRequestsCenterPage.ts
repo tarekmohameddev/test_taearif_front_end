@@ -399,6 +399,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   });
 
   const appointmentTypes = props?.filterOptions?.data?.appointmentTypes;
+  const sourceOptions = props?.filterOptions?.sources ?? [];
 
   return {
     ...filterHooks,
@@ -406,6 +407,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     ...handlers,
     props,
     appointmentTypes,
+    sourceOptions,
     apiStages,
     apiLoading,
     apiError,

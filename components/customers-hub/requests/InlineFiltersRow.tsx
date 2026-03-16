@@ -13,17 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Calendar as CalendarIcon, UserPlus, Filter, ChevronDown } from "lucide-react";
 import { SourceBadge } from "../actions/SourceBadge";
-import type { CustomerSource } from "@/types/unified-customer";
 
-const SOURCES: CustomerSource[] = [
-  "whatsapp",
-  "inquiry",
-  "manual",
-  "referral",
-  "import",
-];
+export type SourceOption = { id: string; label: string; labelEn: string };
 
 export interface InlineFiltersRowProps {
+  /** Options from GET /v2/customers-hub/requests/filter-options (data.sources). When provided, المصدر dropdown uses these instead of a hardcoded list. */
+  sourceOptions?: SourceOption[];
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
   requestDateFrom: string | null;
@@ -36,6 +31,7 @@ export interface InlineFiltersRowProps {
 }
 
 export function InlineFiltersRow({
+  sourceOptions = [],
   selectedSources,
   setSelectedSources,
   requestDateFrom,
@@ -68,19 +64,23 @@ export function InlineFiltersRow({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>المصدر</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {SOURCES.map((source) => (
-            <DropdownMenuCheckboxItem
-              key={source}
-              checked={selectedSources.includes(source)}
-              onCheckedChange={(checked) =>
-                setSelectedSources((prev) =>
-                  checked ? [...prev, source] : prev.filter((s) => s !== source)
-                )
-              }
-            >
-              <SourceBadge source={source} className="text-xs" />
-            </DropdownMenuCheckboxItem>
-          ))}
+          {sourceOptions.length === 0 ? (
+            <div className="px-4 py-2 text-sm text-muted-foreground">جاري تحميل المصادر...</div>
+          ) : (
+            sourceOptions.map((opt) => (
+              <DropdownMenuCheckboxItem
+                key={opt.id}
+                checked={selectedSources.includes(opt.id)}
+                onCheckedChange={(checked) =>
+                  setSelectedSources((prev) =>
+                    checked ? [...prev, opt.id] : prev.filter((s) => s !== opt.id)
+                  )
+                }
+              >
+                <SourceBadge source={opt.id} className="text-xs" />
+              </DropdownMenuCheckboxItem>
+            ))
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 

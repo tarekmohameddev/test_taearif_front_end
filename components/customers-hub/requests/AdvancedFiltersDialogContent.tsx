@@ -23,19 +23,14 @@ import {
   priorityLabels,
 } from "./constants";
 import { SourceBadge } from "../actions/SourceBadge";
-import type { AppointmentTypeOption } from "./AdvancedFiltersPanel";
-import type { CustomerSource, Priority } from "@/types/unified-customer";
+import type { AppointmentTypeOption, SourceOption } from "./AdvancedFiltersPanel";
+import type { Priority } from "@/types/unified-customer";
 
-const SOURCES: CustomerSource[] = [
-  "whatsapp",
-  "inquiry",
-  "manual",
-  "referral",
-  "import",
-];
 const PRIORITIES: Priority[] = ["urgent", "high", "medium", "low"];
 
 export interface AdvancedFiltersDialogContentProps {
+  /** Options from GET /v2/customers-hub/requests/filter-options (data.sources). */
+  sourceOptions?: SourceOption[];
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
   selectedPriorities: string[];
@@ -144,6 +139,7 @@ function SectionWrapper({
 }
 
 export function AdvancedFiltersDialogContent({
+  sourceOptions = [],
   selectedSources,
   setSelectedSources,
   selectedPriorities,
@@ -202,27 +198,31 @@ export function AdvancedFiltersDialogContent({
           badgeCount={selectedSources.length}
           searchActive={hasSearch}
         >
-          {SOURCES.map((source) => {
-            const checked = selectedSources.includes(source);
-            return (
-              <button
-                key={source}
-                type="button"
-                onClick={() =>
-                  setSelectedSources((prev) =>
-                    checked ? prev.filter((s) => s !== source) : [...prev, source]
-                  )
-                }
-                className={cn(
-                  "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
-                  checked && "bg-gray-100 dark:bg-gray-800"
-                )}
-              >
-                <span className="w-4 text-center">{checked ? "✓" : ""}</span>
-                <SourceBadge source={source} className="text-xs" />
-              </button>
-            );
-          })}
+          {sourceOptions.length === 0 ? (
+            <div className="px-3 py-2 text-sm text-muted-foreground">جاري تحميل المصادر...</div>
+          ) : (
+            sourceOptions.map((opt) => {
+              const checked = selectedSources.includes(opt.id);
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() =>
+                    setSelectedSources((prev) =>
+                      checked ? prev.filter((s) => s !== opt.id) : [...prev, opt.id]
+                    )
+                  }
+                  className={cn(
+                    "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                    checked && "bg-gray-100 dark:bg-gray-800"
+                  )}
+                >
+                  <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                  <SourceBadge source={opt.id} className="text-xs" />
+                </button>
+              );
+            })
+          )}
         </SectionWrapper>
       )}
 

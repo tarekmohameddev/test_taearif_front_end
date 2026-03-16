@@ -38,7 +38,11 @@ export interface AppointmentTypeOption {
   labelEn?: string;
 }
 
+export type SourceOption = { id: string; label: string; labelEn: string };
+
 export interface AdvancedFiltersPanelProps {
+  /** Options from GET filter-options (data.sources). When provided, المصدر uses these. */
+  sourceOptions?: SourceOption[];
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
   selectedPriorities: string[];
@@ -70,7 +74,7 @@ export interface AdvancedFiltersPanelProps {
   setIsBudgetDialogOpen: (v: boolean) => void;
 }
 
-const SOURCES: CustomerSource[] = [
+const FALLBACK_SOURCES: CustomerSource[] = [
   "whatsapp",
   "inquiry",
   "manual",
@@ -86,6 +90,7 @@ const DEFAULT_APPOINTMENT_OPTIONS: AppointmentTypeOption[] = APPOINTMENT_TYPES.m
 }));
 
 export function AdvancedFiltersPanel({
+  sourceOptions,
   selectedSources,
   setSelectedSources,
   selectedPriorities,
@@ -116,6 +121,9 @@ export function AdvancedFiltersPanel({
   isBudgetDialogOpen,
   setIsBudgetDialogOpen,
 }: AdvancedFiltersPanelProps) {
+  const sourceList = sourceOptions && sourceOptions.length > 0
+    ? sourceOptions.map((o) => ({ id: o.id, label: o.label }))
+    : FALLBACK_SOURCES.map((id) => ({ id, label: id }));
   const btnClass =
     "gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700";
 
@@ -137,17 +145,17 @@ export function AdvancedFiltersPanel({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>المصدر</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {SOURCES.map((source) => (
+          {sourceList.map((item) => (
             <DropdownMenuCheckboxItem
-              key={source}
-              checked={selectedSources.includes(source)}
+              key={item.id}
+              checked={selectedSources.includes(item.id)}
               onCheckedChange={(checked) =>
                 setSelectedSources((prev) =>
-                  checked ? [...prev, source] : prev.filter((s) => s !== source)
+                  checked ? [...prev, item.id] : prev.filter((s) => s !== item.id)
                 )
               }
             >
-              <SourceBadge source={source} className="text-xs" />
+              <SourceBadge source={item.id} className="text-xs" />
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>

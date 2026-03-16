@@ -66,6 +66,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           setShowAdvancedFilters={ctx.setShowAdvancedFilters}
           viewMode={ctx.viewMode}
           setViewMode={ctx.setViewMode}
+          sourceOptions={ctx.sourceOptions}
           selectedSources={ctx.selectedSources}
           setSelectedSources={ctx.setSelectedSources}
           selectedPriorities={ctx.selectedPriorities}
@@ -226,6 +227,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   className="h-8 rounded-xl text-xs"
                 />
                 <AdvancedFiltersDialogContent
+                  sourceOptions={ctx.sourceOptions}
                   selectedSources={ctx.selectedSources}
                   setSelectedSources={ctx.setSelectedSources}
                   selectedPriorities={ctx.selectedPriorities}

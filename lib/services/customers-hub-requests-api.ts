@@ -159,7 +159,7 @@ export interface FilterOptionsResponse {
     types: Array<{ value: string; label: string }>;
     priorities: Array<{ value: string; label: string }>;
     statuses: Array<{ value: string; label: string }>;
-    sources?: Array<{ value: string; label: string }>; // Optional: Origin options
+    sources?: Array<{ id: string; label: string; labelEn: string }>; // Optional: Origin options (from GET filter-options)
     objectTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filtering by kind of record
     appointmentTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filter "نوع الموعد" (from GET filter-options)
     employees: Array<{ id: number; name: string }>;
