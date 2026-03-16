@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -84,6 +85,7 @@ export function TableRequestsList({
   stages,
   completingActionIds,
 }: TableRequestsListProps) {
+  const router = useRouter();
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
@@ -310,6 +312,15 @@ export function TableRequestsList({
     setSnoozeTime("10:00");
   };
 
+  const handleRowClick =
+    (actionId: string) => (e: React.MouseEvent<HTMLTableRowElement>) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('button, a, [role="checkbox"], input, [data-interactive]')) {
+        return;
+      }
+      router.push(`/ar/dashboard/customers-hub/requests/${actionId}`);
+    };
+
   if (actions.length === 0) {
     return (
       <Card>
@@ -438,6 +449,7 @@ export function TableRequestsList({
                   return (
                     <TableRow
                       key={action.id}
+                      onClick={handleRowClick(action.id)}
                       className={cn(
                         "transition-colors cursor-pointer",
                         isOverdue && "bg-red-50 dark:bg-red-950/20"
