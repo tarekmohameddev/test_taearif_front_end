@@ -43,10 +43,84 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SourceBadge } from "../actions/SourceBadge";
 import { CompactPropertyBlockStitch } from "../actions/components/IncomingActionsCardCompact";
+import { StageDropdown } from "../actions/components/StageDropdown";
+import { useStageResolution } from "../actions/hooks/useStageResolution";
+import { useStageChangeHandler } from "../actions/hooks/useStageChangeHandler";
+import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
+import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { translatePropertyType } from "../actions/utils/propertyUtils";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
+import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 import { getPropertyRequestId } from "./request-detail-types";
+import type { ApiStageShape } from "../actions/types/incomingCardTypes";
+
+interface TableStageCellProps {
+  action: CustomerAction;
+  stages: Array<{ stage_id: string; stage_name_ar: string; stage_name_en: string; color: string; order: number }>;
+  getCustomerById: (id: string) => UnifiedCustomer | undefined;
+  onStageChangeSuccess?: (actionId: string, newStageId: string, previousStageId: string) => void;
+}
+
+function TableStageCell({ action, stages, getCustomerById, onStageChangeSuccess }: TableStageCellProps) {
+  const resolvedCustomer = getCustomerById(
+    typeof action.customerId === "string" ? action.customerId : String(action.customerId)
+  );
+  const { stages: storeStages } = useCustomersHubStagesStore();
+  const updateCustomerStage = useUnifiedCustomersStore((s) => s.updateCustomerStage);
+
+  const {
+    availableStages,
+    normalizedStage,
+    displayStage,
+    setOptimisticStage,
+    setActionStageId,
+  } = useStageResolution({
+    action,
+    propStages: stages as ApiStageShape[],
+    storeStages: (storeStages ?? undefined) as ApiStageShape[] | undefined,
+    resolvedCustomer,
+  });
+
+  const { handleStageChange, isUpdatingStage } = useStageChangeHandler({
+    action,
+    resolvedCustomer,
+    availableStages,
+    storeStages: (storeStages ?? undefined) as ApiStageShape[] | undefined,
+    normalizedStage,
+    updateCustomerStage,
+    setOptimisticStage,
+    setActionStageId,
+    onStageChangeSuccess,
+  });
+
+  if (availableStages.length === 0) {
+    const stageId = (action as any).stage?.stage_id ?? (action as any).stage_id;
+    const matched = stages.find((s: any) => s.stage_id === String(stageId));
+    const name = matched?.stage_name_ar ?? "-";
+    const color = matched?.color ?? "#gray";
+    return (
+      <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit" style={{ borderColor: color, color }}>
+        <span className="size-1.5 rounded-full shrink-0" style={{ backgroundColor: color }} aria-hidden />
+        {name}
+      </Badge>
+    );
+  }
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <StageDropdown
+        availableStages={availableStages}
+        displayStage={displayStage}
+        isUpdatingStage={isUpdatingStage}
+        onStageChange={handleStageChange}
+        getStageColor={getStageColor}
+        getStageNameAr={getStageNameAr}
+        stitchStyle
+      />
+    </div>
+  );
+}
 
 interface TableRequestsListProps {
   actions: CustomerAction[];
@@ -67,6 +141,11 @@ interface TableRequestsListProps {
     order: number;
   }>;
   completingActionIds: Set<string>;
+  onStageChangeSuccess?: (
+    actionId: string,
+    newStageId: string,
+    previousStageId: string
+  ) => void;
 }
 
 type SortField = "customer" | "priority" | "status" | "createdAt" | "budget" | "propertyType" | "city" | "stage";
@@ -85,6 +164,7 @@ export function TableRequestsList({
   onPriorityClick,
   stages,
   completingActionIds,
+  onStageChangeSuccess,
 }: TableRequestsListProps) {
   const router = useRouter();
   const [sortField, setSortField] = useState<SortField>("createdAt");
@@ -440,7 +520,9 @@ export function TableRequestsList({
               </TableHeader>
               <TableBody>
                 {sortedActions.map((action) => {
-                  const customer = getCustomerById(action.customerId);
+                  const customer = getCustomerById(
+                    action.customerId != null ? String(action.customerId) : ""
+                  );
                   const isCompleting = completingActionIds.has(action.id);
                   const isSelected = selectedActionIds.has(action.id);
                   const isOverdue = action.dueDate
@@ -635,60 +717,34 @@ export function TableRequestsList({
                         )}
                       </TableCell>
 
-                      {/* Stage */}
-                      <TableCell>
-                        {(() => {
-                          // Get stage from action.stage object or action.stage_id
-                          let stageId: string | number | null = null;
-                          let stageNameAr: string | null = null;
-                          
-                          if ((action as any).stage) {
-                            // If stage is an object, extract id or stage_id
-                            const stageObj = (action as any).stage;
-                            stageId = stageObj.id || stageObj.stage_id || null;
-                            stageNameAr = stageObj.nameAr || null;
-                          } else if ((action as any).stage_id) {
-                            // If stage_id is directly available
-                            stageId = (action as any).stage_id;
-                          }
-                          
-                          // Find stage in stages array
-                          let matchedStage = null;
-                          if (stageId != null && stages) {
-                            // Try to match by numeric id first
-                            if (typeof stageId === 'number') {
-                              matchedStage = stages.find((s: any) => s.id === stageId || s.numericId === stageId);
+                      {/* Stage — clickable dropdown like compact view */}
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        {stages && stages.length > 0 ? (
+                          <TableStageCell
+                            action={action}
+                            stages={stages}
+                            getCustomerById={getCustomerById}
+                            onStageChangeSuccess={onStageChangeSuccess}
+                          />
+                        ) : (
+                          (() => {
+                            let stageId: string | number | null = (action as any).stage?.stage_id ?? (action as any).stage_id ?? null;
+                            const matchedStage = stageId != null && stages?.length
+                              ? stages.find((s: any) => s.stage_id === String(stageId) || s.id === stageId)
+                              : null;
+                            const displayName = matchedStage?.stage_name_ar ?? (action as any).stage?.nameAr ?? "-";
+                            const stageColor = matchedStage?.color ?? "#gray";
+                            if (displayName !== "-") {
+                              return (
+                                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit" style={{ borderColor: stageColor, color: stageColor }}>
+                                  <span className="size-1.5 rounded-full shrink-0" style={{ backgroundColor: stageColor }} aria-hidden />
+                                  {displayName}
+                                </Badge>
+                              );
                             }
-                            // If not found, try to match by string stage_id
-                            if (!matchedStage) {
-                              matchedStage = stages.find((s: any) => s.stage_id === String(stageId));
-                            }
-                          }
-                          
-                          const displayName = stageNameAr || matchedStage?.stage_name_ar || "-";
-                          const stageColor = matchedStage?.color || "#gray";
-                          
-                          if (displayName !== "-") {
-                            return (
-                              <Badge
-                                variant="outline"
-                                className="text-xs flex items-center gap-1 w-fit"
-                                style={{
-                                  borderColor: stageColor,
-                                  color: stageColor,
-                                }}
-                              >
-                                <span
-                                  className="size-1.5 rounded-full shrink-0"
-                                  style={{ backgroundColor: stageColor }}
-                                  aria-hidden
-                                />
-                                {displayName}
-                              </Badge>
-                            );
-                          }
-                          return <span className="text-gray-400 text-sm">-</span>;
-                        })()}
+                            return <span className="text-gray-400 text-sm">-</span>;
+                          })()
+                        )}
                       </TableCell>
 
                       {/* Actions column removed */}
