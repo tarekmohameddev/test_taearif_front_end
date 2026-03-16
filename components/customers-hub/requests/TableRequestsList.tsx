@@ -439,7 +439,7 @@ export function TableRequestsList({
                     <TableRow
                       key={action.id}
                       className={cn(
-                        "transition-colors",
+                        "transition-colors cursor-pointer",
                         isOverdue && "bg-red-50 dark:bg-red-950/20"
                       )}
                     >
