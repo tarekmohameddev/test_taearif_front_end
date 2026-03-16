@@ -51,6 +51,10 @@ export function RequestsCenterFilters({
   setTempBudgetMax,
   isBudgetDialogOpen,
   setIsBudgetDialogOpen,
+  dateFrom,
+  setDateFrom,
+  dateTo,
+  setDateTo,
 }: RequestsCenterFiltersProps) {
   return (
     <Card>
@@ -66,6 +70,10 @@ export function RequestsCenterFilters({
             setShowAdvancedFilters={setShowAdvancedFilters}
             viewMode={viewMode}
             setViewMode={setViewMode}
+            dateFrom={dateFrom}
+            setDateFrom={setDateFrom}
+            dateTo={dateTo}
+            setDateTo={setDateTo}
             inlineFilters={{
               selectedSources,
               setSelectedSources,

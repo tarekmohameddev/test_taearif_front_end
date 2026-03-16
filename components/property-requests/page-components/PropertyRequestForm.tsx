@@ -178,7 +178,7 @@ export const PropertyRequestForm = ({
             <>
               <div className="space-y-2">
                 <Label htmlFor="property_type">
-                  نوع العقار <span className="text-red-500">*</span>
+                  نوع العقار
                 </Label>
                 <Select
                   value={formData.property_type}
@@ -206,7 +206,7 @@ export const PropertyRequestForm = ({
 
               <div className="space-y-2">
                 <Label htmlFor="purchase_method">
-                  طريقة الشراء <span className="text-red-500">*</span>
+                  طريقة الشراء
                 </Label>
                 <Select
                   value={formData.purchase_method}
@@ -236,7 +236,7 @@ export const PropertyRequestForm = ({
 
           <div className="space-y-2">
             <Label htmlFor="budget_from">
-              الميزانية من <span className="text-red-500">*</span>
+              الميزانية من
             </Label>
             <Input
               id="budget_from"
@@ -254,7 +254,7 @@ export const PropertyRequestForm = ({
 
           <div className="space-y-2">
             <Label htmlFor="budget_to">
-              الميزانية إلى <span className="text-red-500">*</span>
+              الميزانية إلى
             </Label>
             <Input
               id="budget_to"

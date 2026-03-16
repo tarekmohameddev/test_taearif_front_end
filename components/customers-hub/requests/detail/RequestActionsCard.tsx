@@ -179,7 +179,7 @@ export function RequestActionsCard({
             {showScheduleForm && (
               <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
                 <div className="space-y-2">
-                  <Label className="text-sm">نوع الإجراء</Label>
+                  <Label className="text-sm">نوع الإجراء (اختياري)</Label>
                   <Select
                     value={aptType}
                     onValueChange={(v) => onAptTypeChange(v as Appointment["type"])}
@@ -198,7 +198,7 @@ export function RequestActionsCard({
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
-                    <Label className="text-sm">التاريخ</Label>
+                    <Label className="text-sm">التاريخ (اختياري)</Label>
                     <Input
                       type="date"
                       value={aptDate}
@@ -207,7 +207,7 @@ export function RequestActionsCard({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">الوقت</Label>
+                    <Label className="text-sm">الوقت (اختياري)</Label>
                     <Input
                       type="time"
                       value={aptTime}
@@ -230,7 +230,6 @@ export function RequestActionsCard({
                   <Button
                     size="sm"
                     onClick={onScheduleSubmit}
-                    disabled={!aptDate || !aptTime}
                     className="flex-1"
                   >
                     جدولة

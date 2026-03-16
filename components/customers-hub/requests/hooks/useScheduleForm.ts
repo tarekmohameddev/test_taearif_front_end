@@ -41,11 +41,17 @@ export function useScheduleForm({
   }, []);
 
   const handleScheduleAppointment = useCallback(async () => {
-    if (!aptDate || !aptTime) {
-      toast.error("الرجاء اختيار التاريخ والوقت");
+    // إذا لم يتم إدخال أي تاريخ أو وقت، نطلب من المستخدم إدخال واحد منهما على الأقل
+    if (!aptDate && !aptTime) {
+      toast.error("الرجاء اختيار التاريخ أو الوقت (أو كلاهما)");
       return;
     }
-    const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
+
+    // إذا كان أحدهما فارغًا نجعل له قيمة افتراضية
+    const effectiveDate = aptDate || new Date().toISOString().slice(0, 10);
+    const effectiveTime = aptTime || DEFAULT_TIME;
+
+    const datetime = new Date(`${effectiveDate}T${effectiveTime}`).toISOString();
     const now = new Date();
     if (new Date(datetime) <= now) {
       toast.error("التاريخ والوقت يجب أن يكون في المستقبل");

@@ -52,8 +52,6 @@ export default function AddPropertyRequestPage() {
     const newErrors: Record<string, string> = {};
     if (!formData.full_name?.trim()) newErrors.full_name = "الاسم الكامل مطلوب";
     if (!formData.phone?.trim()) newErrors.phone = "رقم الهاتف مطلوب";
-    if (!formData.property_type) newErrors.property_type = "نوع العقار مطلوب";
-    if (!formData.purchase_method) newErrors.purchase_method = "طريقة الشراء مطلوبة";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.error("يرجى إكمال الحقول المطلوبة");

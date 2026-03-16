@@ -21,6 +21,8 @@ export const useCustomersHubFiltersState = () => {
   const [budgetMin, setBudgetMin] = useState<string>("");
   const [budgetMax, setBudgetMax] = useState<string>("");
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
 
   // Applied search query (used in filters - applied manually via button)
   const [appliedSearchQuery, setAppliedSearchQuery] = useState<string>("");
@@ -148,6 +150,14 @@ export const useCustomersHubFiltersState = () => {
       filters.budget_max = Number(budgetMax);
     }
 
+    // Created date range filters
+    if (dateFrom) {
+      filters.date_from = dateFrom;
+    }
+    if (dateTo) {
+      filters.date_to = dateTo;
+    }
+
     // Property types filter (changed from propertyType to property_types)
     if (selectedPropertyTypes.length > 0) {
       filters.property_types = selectedPropertyTypes;
@@ -183,6 +193,8 @@ export const useCustomersHubFiltersState = () => {
     budgetMin,
     budgetMax,
     selectedPropertyTypes,
+    dateFrom,
+    dateTo,
   ]);
 
   const handleClearFilters = () => {
@@ -202,6 +214,8 @@ export const useCustomersHubFiltersState = () => {
     setBudgetMin("");
     setBudgetMax("");
     setSelectedPropertyTypes([]);
+    setDateFrom("");
+    setDateTo("");
   };
 
   return {
@@ -238,6 +252,10 @@ export const useCustomersHubFiltersState = () => {
     setBudgetMax,
     selectedPropertyTypes,
     setSelectedPropertyTypes,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
     // Computed filters object
     newFilters,
     // Handlers
