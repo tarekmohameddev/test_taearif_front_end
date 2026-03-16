@@ -304,7 +304,7 @@ export function RequestDetailPage({
 
   const statusDialog = useStatusDialog({ requestId, action, userData, onRefetch });
 
-  const priorityDialog = usePriorityDialog({ action, userData, onRefetch });
+  const priorityDialog = usePriorityDialog({ requestId, action, userData, onRefetch });
 
   if (propLoading && !action) {
     return <RequestDetailLoading />;
@@ -361,6 +361,7 @@ export function RequestDetailPage({
           onStatusClick={handleStatusClick}
           onPriorityClick={isPropertyRequestAction(action) ? handlePriorityClick : undefined}
           propertyRequestStatusOptions={isPropertyRequestAction(action) ? statusDialog.statusOptions : undefined}
+          propertyRequestPriorityOptions={isPropertyRequestAction(action) ? priorityDialog.priorityOptions : undefined}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

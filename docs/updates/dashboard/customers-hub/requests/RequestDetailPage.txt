@@ -1,5 +1,10 @@
 2026-03-17
 Update Type: Feature
+ترجمة أولوية طلب العقار في الـ badge من API: إضافة priority_id إلى CustomerAction؛ usePriorityDialog يجلِب الأولويات من GET /v1/property-requests/filters (data.priorities أو data.data.priorities) ويعيد priorityOptions؛ RequestDetailHeader يقبل propertyRequestPriorityOptions ويعرض name ولون (color hex) عند وجود priority_id؛ RequestDetailPage يمرّر priorityDialog.priorityOptions للهيدر لطلبات العقار.
+types/unified-customer.ts, components/customers-hub/requests/hooks/usePriorityDialog.ts, components/customers-hub/requests/detail/RequestDetailHeader.tsx, components/customers-hub/requests/RequestDetailPage.tsx
+
+2026-03-17
+Update Type: Feature
 ترجمة حالة طلب العقار في الـ badge (هيدر صفحة التفاصيل) من API: إضافة status_id اختياري إلى CustomerAction؛ RequestDetailHeader يقبل propertyRequestStatusOptions (من GET /v1/property-requests/filters) ويعرض name_ar للحالة عند وجود status_id؛ RequestDetailPage يمرّر statusDialog.statusOptions للهيدر لطلبات العقار. إذا لم يُرسل الباك اند status_id في الـ action يبقى الاعتماد على statusConfig في constants.
 types/unified-customer.ts, components/customers-hub/requests/detail/RequestDetailHeader.tsx, components/customers-hub/requests/RequestDetailPage.tsx
 

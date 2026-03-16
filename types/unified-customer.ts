@@ -103,6 +103,8 @@ export interface CustomerAction {
   property_request_id?: number;
   /** Status id from property_request_statuses (e.g. 1–5). Used to show label from GET /v1/property-requests/filters. */
   status_id?: number;
+  /** Priority id from API (e.g. 235–237). Used to show label/color from GET /v1/property-requests/filters priorities. */
+  priority_id?: number;
   propertyIds?: number[];
   property_ids?: number[] | string;
 }
