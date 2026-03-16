@@ -325,13 +325,13 @@ export function TableRequestsList({
   return (
     <div className="space-y-4" dir="rtl">
       {/* Table */}
-      <Card>
+      <Card className="rounded-2xl">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-2xl">
             <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50 dark:bg-gray-800">
-                  <TableHead className="w-12">
+              <TableHeader className="bg-gray-900 text-white">
+                <TableRow>
+                  <TableHead className="w-12 bg-transparent">
                     <input
                       type="checkbox"
                       checked={sortedActions.length > 0 && sortedActions.every((a) => selectedActionIds.has(a.id))}
@@ -343,79 +343,79 @@ export function TableRequestsList({
                       className="rounded border-gray-300"
                     />
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("customer")}
                     >
                       العميل
                       <SortIcon field="customer" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("priority")}
                     >
                       الأولوية
                       <SortIcon field="priority" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">المصدر</TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-white bg-transparent">المصدر</TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("createdAt")}
                     >
                        وقت الإنشاء
                       <SortIcon field="createdAt" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("budget")}
                     >
                       الميزانية
                       <SortIcon field="budget" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("propertyType")}
                     >
                       نوع العقار
                       <SortIcon field="propertyType" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("city")}
                     >
                       الموقع
                       <SortIcon field="city" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-right">الموظف المسؤول</TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="text-right text-white bg-transparent">الموظف المسؤول</TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("stage")}
                     >
                       المرحلة
@@ -439,7 +439,7 @@ export function TableRequestsList({
                     <TableRow
                       key={action.id}
                       className={cn(
-                        "hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors",
+                        "transition-colors",
                         isOverdue && "bg-red-50 dark:bg-red-950/20"
                       )}
                     >
