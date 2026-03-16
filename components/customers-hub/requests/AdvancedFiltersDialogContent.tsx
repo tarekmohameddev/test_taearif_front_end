@@ -48,6 +48,11 @@ export interface AdvancedFiltersDialogContentProps {
   appointmentTypes?: AppointmentTypeOption[];
   dueDateFilter: string;
   setDueDateFilter: (v: string) => void;
+  /** نطاق تاريخ إنشاء الطلب (من / إلى) */
+  requestDateFrom: string | null;
+  setRequestDateFrom: (v: string | null) => void;
+  requestDateTo: string | null;
+  setRequestDateTo: (v: string | null) => void;
   selectedCities: string[];
   setSelectedCities: (v: string[] | ((prev: string[]) => string[])) => void;
   selectedStates: string[];
@@ -151,6 +156,10 @@ export function AdvancedFiltersDialogContent({
   appointmentTypes,
   dueDateFilter,
   setDueDateFilter,
+  requestDateFrom,
+  setRequestDateFrom,
+  requestDateTo,
+  setRequestDateTo,
   selectedCities,
   setSelectedCities,
   selectedStates,
@@ -361,6 +370,61 @@ export function AdvancedFiltersDialogContent({
               <span>{opt.label}</span>
             </button>
           ))}
+        </SectionWrapper>
+      )}
+
+      {/* تاريخ إنشاء الطلب - نطاق (من / إلى) */}
+      {(!hasSearch || matches("تاريخ إنشاء الطلب") || matches("التاريخ")) && (
+        <SectionWrapper
+          id="created-at-range"
+          title={
+            <span className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>تاريخ إنشاء الطلب</span>
+            </span>
+          }
+          badgeCount={requestDateFrom || requestDateTo ? 1 : 0}
+          searchActive={hasSearch}
+        >
+          <div className="grid grid-cols-2 gap-2 py-1">
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">من</label>
+              <div className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3">
+                <input
+                  type="date"
+                  className="flex-1 min-w-0 border-0 bg-transparent p-0 text-xs outline-none [color-scheme:light]"
+                  value={requestDateFrom ?? ""}
+                  onChange={(e) => setRequestDateFrom(e.target.value || null)}
+                />
+                <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">إلى</label>
+              <div className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3">
+                <input
+                  type="date"
+                  className="flex-1 min-w-0 border-0 bg-transparent p-0 text-xs outline-none [color-scheme:light]"
+                  value={requestDateTo ?? ""}
+                  onChange={(e) => setRequestDateTo(e.target.value || null)}
+                />
+                <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              onClick={() => {
+                setRequestDateFrom(null);
+                setRequestDateTo(null);
+              }}
+            >
+              مسح التاريخ
+            </Button>
+          </div>
         </SectionWrapper>
       )}
 

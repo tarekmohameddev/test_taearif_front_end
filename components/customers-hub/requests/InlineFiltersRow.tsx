@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -47,8 +47,6 @@ export function InlineFiltersRow({
   uniqueAssignees,
 }: InlineFiltersRowProps) {
   const [datePanelOpen, setDatePanelOpen] = useState(false);
-  const fromInputRef = useRef<HTMLInputElement>(null);
-  const toInputRef = useRef<HTMLInputElement>(null);
   const btnClass =
     "gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700";
 
@@ -120,12 +118,8 @@ export function InlineFiltersRow({
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <div className="text-xs text-muted-foreground">من</div>
-                  <label
-                    className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 [&:has(input:focus)]:ring-2 [&:has(input:focus)]:ring-ring [&:has(input:focus)]:ring-offset-2"
-                    onClick={() => fromInputRef.current?.showPicker?.()}
-                  >
+                  <label className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 [&:has(input:focus)]:ring-2 [&:has(input:focus)]:ring-ring [&:has(input:focus)]:ring-offset-2">
                     <input
-                      ref={fromInputRef}
                       type="date"
                       className="flex-1 min-w-0 border-0 bg-transparent p-0 text-xs outline-none [color-scheme:light]"
                       value={requestDateFrom ?? ""}
@@ -138,12 +132,8 @@ export function InlineFiltersRow({
                 </div>
                 <div className="space-y-1">
                   <div className="text-xs text-muted-foreground">إلى</div>
-                  <label
-                    className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 [&:has(input:focus)]:ring-2 [&:has(input:focus)]:ring-ring [&:has(input:focus)]:ring-offset-2"
-                    onClick={() => toInputRef.current?.showPicker?.()}
-                  >
+                  <label className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 [&:has(input:focus)]:ring-2 [&:has(input:focus)]:ring-ring [&:has(input:focus)]:ring-offset-2">
                     <input
-                      ref={toInputRef}
                       type="date"
                       className="flex-1 min-w-0 border-0 bg-transparent p-0 text-xs outline-none [color-scheme:light]"
                       value={requestDateTo ?? ""}
