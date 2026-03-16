@@ -1,10 +1,9 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CustomDropdown, DropdownItem, DropdownContext } from "@/components/customComponents/customDropdown";
 import {
   Calendar,
   Timer,
@@ -14,6 +13,7 @@ import {
   Filter,
   AlertTriangle,
   UserPlus,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -65,6 +65,9 @@ export interface AdvancedFiltersDialogContentProps {
   setTempBudgetMax: (v: string) => void;
   isBudgetDialogOpen: boolean;
   setIsBudgetDialogOpen: (v: boolean) => void;
+  /** نص البحث داخل قائمة الفلاتر في الـ sidebar */
+  filterSearch: string;
+  setFilterSearch: (v: string) => void;
 }
 
 const DEFAULT_APPOINTMENT_OPTIONS: AppointmentTypeOption[] = APPOINTMENT_TYPES.map((t) => ({
@@ -83,92 +86,54 @@ const DUE_DATE_OPTIONS: { value: string; label: React.ReactNode }[] = [
 
 const btnClass =
   "gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700";
-
-function BudgetDropdownContent({
-  budgetMin,
-  budgetMax,
-  setBudgetMin,
-  setBudgetMax,
-  tempBudgetMin,
-  tempBudgetMax,
-  setTempBudgetMin,
-  setTempBudgetMax,
-  setIsBudgetDialogOpen,
+function SectionWrapper({
+  id,
+  title,
+  badgeCount,
+  children,
+  defaultOpen = false,
+  searchActive,
 }: {
-  budgetMin: string;
-  budgetMax: string;
-  setBudgetMin: (v: string) => void;
-  setBudgetMax: (v: string) => void;
-  tempBudgetMin: string;
-  tempBudgetMax: string;
-  setTempBudgetMin: (v: string) => void;
-  setTempBudgetMax: (v: string) => void;
-  setIsBudgetDialogOpen: (v: boolean) => void;
+  id: string;
+  title: React.ReactNode;
+  badgeCount?: number;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  searchActive: boolean;
 }) {
-  const ctx = useContext(DropdownContext);
-
-  // Sync temp from budget when dropdown opens (content mounts)
-  useEffect(() => {
-    setTempBudgetMin(budgetMin);
-    setTempBudgetMax(budgetMax);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const [open, setOpen] = useState(defaultOpen || searchActive);
 
   return (
-    <div className="w-64 p-3">
-      <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نطاق الميزانية (ر.س)</div>
-      <div className="grid grid-cols-2 gap-2 py-2">
-        <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">من</label>
-          <Input
-            type="number"
-            placeholder="الحد الأدنى"
-            value={tempBudgetMin}
-            onChange={(e) => setTempBudgetMin(e.target.value)}
-            className="h-8"
-            min={0}
-          />
+    <div
+      data-section-id={id}
+      className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+    >
+      <button
+        type="button"
+        className={cn(
+          "w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-right",
+          "hover:bg-gray-50 dark:hover:bg-gray-800"
+        )}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <div className="flex items-center gap-2">
+          {title}
+          {typeof badgeCount === "number" && badgeCount > 0 && (
+            <Badge variant="secondary" className="mr-1">
+              {badgeCount}
+            </Badge>
+          )}
         </div>
-        <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">إلى</label>
-          <Input
-            type="number"
-            placeholder="الحد الأقصى"
-            value={tempBudgetMax}
-            onChange={(e) => setTempBudgetMax(e.target.value)}
-            className="h-8"
-            min={0}
-          />
-        </div>
-      </div>
-      <div className="flex gap-2 pt-2">
-        <Button
-          size="sm"
-          className="flex-1"
-          onClick={() => {
-            setBudgetMin(tempBudgetMin);
-            setBudgetMax(tempBudgetMax);
-            setIsBudgetDialogOpen(false);
-            ctx?.closeDropdown();
-          }}
-        >
-          تطبيق
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => {
-            setTempBudgetMin("");
-            setTempBudgetMax("");
-            setBudgetMin("");
-            setBudgetMax("");
-            setIsBudgetDialogOpen(false);
-            ctx?.closeDropdown();
-          }}
-        >
-          إعادة تعيين
-        </Button>
-      </div>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 text-gray-500 transition-transform",
+            open ? "rotate-180" : "rotate-0"
+          )}
+        />
+      </button>
+      {open && (
+        <div className="px-3 pb-3 pt-1 space-y-1 max-h-64 overflow-y-auto">{children}</div>
+      )}
     </div>
   );
 }
@@ -203,361 +168,382 @@ export function AdvancedFiltersDialogContent({
   setTempBudgetMax,
   isBudgetDialogOpen,
   setIsBudgetDialogOpen,
+      filterSearch,
+      setFilterSearch,
 }: AdvancedFiltersDialogContentProps) {
   const appointmentOpts = appointmentTypes && appointmentTypes.length > 0 ? appointmentTypes : DEFAULT_APPOINTMENT_OPTIONS;
+  const search = filterSearch.trim().toLowerCase();
+  const hasSearch = search.length > 0;
+
+  const matches = (text: string | undefined | null) =>
+    !!text && text.toString().toLowerCase().includes(search);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+    <div className="space-y-3">
       {/* المصدر - multi-select */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-48"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        trigger={
-          <>
-            <Filter className="h-4 w-4" />
-            <span>المصدر</span>
-            {selectedSources.length > 0 && (
-              <Badge variant="secondary" className="mr-1">
-                {selectedSources.length}
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {SOURCES.map((source) => {
-          const checked = selectedSources.includes(source);
-          return (
-            <div
-              key={source}
-              onClick={() =>
-                setSelectedSources((prev) =>
-                  checked ? prev.filter((s) => s !== source) : [...prev, source]
-                )
-              }
-              className={cn(
-                "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2",
-                checked && "bg-gray-100 dark:bg-gray-800"
-              )}
-            >
-              {checked ? "✓ " : ""}
-              <SourceBadge source={source} className="text-xs" />
-            </div>
-          );
-        })}
-      </CustomDropdown>
+      {(!hasSearch || matches("المصدر")) && (
+        <SectionWrapper
+          id="source"
+          title={
+            <span className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              <span>المصدر</span>
+            </span>
+          }
+          badgeCount={selectedSources.length}
+          searchActive={hasSearch}
+        >
+          {SOURCES.map((source) => {
+            const checked = selectedSources.includes(source);
+            return (
+              <button
+                key={source}
+                type="button"
+                onClick={() =>
+                  setSelectedSources((prev) =>
+                    checked ? prev.filter((s) => s !== source) : [...prev, source]
+                  )
+                }
+                className={cn(
+                  "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                  checked && "bg-gray-100 dark:bg-gray-800"
+                )}
+              >
+                <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                <SourceBadge source={source} className="text-xs" />
+              </button>
+            );
+          })}
+        </SectionWrapper>
+      )}
 
       {/* الأولوية - multi-select */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-40"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        trigger={
-          <>
-            <AlertTriangle className="h-4 w-4" />
-            <span>الأولوية</span>
-            {selectedPriorities.length > 0 && (
-              <Badge variant="secondary" className="mr-1">
-                {selectedPriorities.length}
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {PRIORITIES.map((p) => {
-          const checked = selectedPriorities.includes(p);
-          return (
-            <div
-              key={p}
-              onClick={() =>
-                setSelectedPriorities((prev) =>
-                  checked ? prev.filter((x) => x !== p) : [...prev, p]
-                )
-              }
-              className={cn(
-                "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2",
-                checked && "bg-gray-100 dark:bg-gray-800"
-              )}
-            >
-              {checked ? "✓ " : ""}
-              {priorityLabels[p as Priority]}
-            </div>
-          );
-        })}
-      </CustomDropdown>
-
-      {/* الموظف - multi-select (always visible, disabled when no assignees) */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-48"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        disabled={uniqueAssignees.length === 0}
-        trigger={
-          <>
-            <UserPlus className="h-4 w-4" />
-            <span>الموظف</span>
-            {selectedAssignees.length > 0 && (
-              <Badge variant="secondary" className="mr-1">
-                {selectedAssignees.length}
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {uniqueAssignees.length === 0 ? (
-          <div className="px-4 py-2 text-sm text-muted-foreground">لا يوجد موظفين</div>
-        ) : (
-          uniqueAssignees.map((a) => {
-            const checked = selectedAssignees.includes(a.id);
+      {(!hasSearch || matches("الأولوية")) && (
+        <SectionWrapper
+          id="priority"
+          title={
+            <span className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              <span>الأولوية</span>
+            </span>
+          }
+          badgeCount={selectedPriorities.length}
+          searchActive={hasSearch}
+        >
+          {PRIORITIES.map((p) => {
+            const checked = selectedPriorities.includes(p);
             return (
-              <div
-                key={a.id}
+              <button
+                key={p}
+                type="button"
                 onClick={() =>
-                  setSelectedAssignees((prev) =>
-                    checked ? prev.filter((x) => x !== a.id) : [...prev, a.id]
+                  setSelectedPriorities((prev) =>
+                    checked ? prev.filter((x) => x !== p) : [...prev, p]
                   )
                 }
                 className={cn(
-                  "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2",
+                  "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
                   checked && "bg-gray-100 dark:bg-gray-800"
                 )}
               >
-                {checked ? "✓ " : ""}
-                {a.name}
-              </div>
+                <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                <span>{priorityLabels[p as Priority]}</span>
+              </button>
             );
-          })
-        )}
-      </CustomDropdown>
+          })}
+        </SectionWrapper>
+      )}
+
+      {/* الموظف - multi-select */}
+      {(!hasSearch || matches("الموظف")) && (
+        <SectionWrapper
+          id="assignee"
+          title={
+            <span className="flex items-center gap-2">
+              <UserPlus className="h-4 w-4" />
+              <span>الموظف</span>
+            </span>
+          }
+          badgeCount={selectedAssignees.length}
+          searchActive={hasSearch}
+        >
+          {uniqueAssignees.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">لا يوجد موظفين</div>
+          ) : (
+            uniqueAssignees.map((a) => {
+              const checked = selectedAssignees.includes(a.id);
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() =>
+                    setSelectedAssignees((prev) =>
+                      checked ? prev.filter((x) => x !== a.id) : [...prev, a.id]
+                    )
+                  }
+                  className={cn(
+                    "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                    checked && "bg-gray-100 dark:bg-gray-800"
+                  )}
+                >
+                  <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                  <span>{a.name}</span>
+                </button>
+              );
+            })
+          )}
+        </SectionWrapper>
+      )}
 
       {/* نوع الموعد - multi-select */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-48"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        trigger={
-          <>
-            <Calendar className="h-4 w-4" />
-            <span>نوع الموعد</span>
-            {selectedAppointmentTypes.length > 0 && (
-              <Badge variant="secondary" className="mr-1">
-                {selectedAppointmentTypes.length}
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {appointmentOpts.map((opt) => {
-          const checked = selectedAppointmentTypes.includes(opt.id);
-          return (
-            <div
-              key={opt.id}
-              onClick={() =>
-                setSelectedAppointmentTypes((prev) =>
-                  checked ? prev.filter((t) => t !== opt.id) : [...prev, opt.id]
-                )
-              }
-              className={cn(
-                "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2",
-                checked && "bg-gray-100 dark:bg-gray-800"
-              )}
-            >
-              {checked ? "✓ " : ""}
-              {opt.label}
-            </div>
-          );
-        })}
-      </CustomDropdown>
-
-      {/* الإجراء - single select */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-40"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        trigger={
-          <>
-            <Timer className="h-4 w-4" />
-            <span>الإجراء</span>
-            {dueDateFilter !== "all" && (
-              <Badge variant="secondary" className="mr-1">
-                1
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {DUE_DATE_OPTIONS.map((opt) => (
-          <DropdownItem
-            key={opt.value}
-            onClick={() => setDueDateFilter(opt.value)}
-          >
-            {opt.label}
-          </DropdownItem>
-        ))}
-      </CustomDropdown>
-
-      {/* المدينة - multi-select (always visible, disabled when no cities) */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-48"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        disabled={uniqueCities.length === 0}
-        trigger={
-          <>
-            <MapPin className="h-4 w-4" />
-            <span>المدينة</span>
-            {selectedCities.length > 0 && (
-              <Badge variant="secondary" className="mr-1">
-                {selectedCities.length}
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {uniqueCities.length === 0 ? (
-          <div className="px-4 py-2 text-sm text-muted-foreground">لا توجد مدن</div>
-        ) : (
-          uniqueCities.map((city) => {
-            const checked = selectedCities.includes(city);
+      {(!hasSearch || matches("نوع الموعد")) && (
+        <SectionWrapper
+          id="appointment-type"
+          title={
+            <span className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>نوع الموعد</span>
+            </span>
+          }
+          badgeCount={selectedAppointmentTypes.length}
+          searchActive={hasSearch}
+        >
+          {appointmentOpts.map((opt) => {
+            const checked = selectedAppointmentTypes.includes(opt.id);
             return (
-              <div
-                key={city}
+              <button
+                key={opt.id}
+                type="button"
                 onClick={() =>
-                  setSelectedCities((prev) =>
-                    checked ? prev.filter((c) => c !== city) : [...prev, city]
+                  setSelectedAppointmentTypes((prev) =>
+                    checked ? prev.filter((t) => t !== opt.id) : [...prev, opt.id]
                   )
                 }
                 className={cn(
-                  "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2",
+                  "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
                   checked && "bg-gray-100 dark:bg-gray-800"
                 )}
               >
-                {checked ? "✓ " : ""}
-                {city}
-              </div>
+                <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                <span>{opt.label}</span>
+              </button>
             );
-          })
-        )}
-      </CustomDropdown>
+          })}
+        </SectionWrapper>
+      )}
+
+      {/* الإجراء - single select */}
+      {(!hasSearch || matches("الإجراء")) && (
+        <SectionWrapper
+          id="due-date"
+          title={
+            <span className="flex items-center gap-2">
+              <Timer className="h-4 w-4" />
+              <span>الإجراء</span>
+            </span>
+          }
+          badgeCount={dueDateFilter !== "all" ? 1 : 0}
+          searchActive={hasSearch}
+        >
+          {DUE_DATE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setDueDateFilter(opt.value)}
+              className={cn(
+                "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                dueDateFilter === opt.value && "bg-gray-100 dark:bg-gray-800"
+              )}
+            >
+              <span className="w-4 text-center">
+                {dueDateFilter === opt.value ? "✓" : ""}
+              </span>
+              <span>{opt.label}</span>
+            </button>
+          ))}
+        </SectionWrapper>
+      )}
+
+      {/* المدينة - multi-select */}
+      {(!hasSearch || matches("المدينة")) && (
+        <SectionWrapper
+          id="city"
+          title={
+            <span className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>المدينة</span>
+            </span>
+          }
+          badgeCount={selectedCities.length}
+          searchActive={hasSearch}
+        >
+          {uniqueCities.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مدن</div>
+          ) : (
+            uniqueCities.map((city) => {
+              const checked = selectedCities.includes(city);
+              return (
+                <button
+                  key={city}
+                  type="button"
+                  onClick={() =>
+                    setSelectedCities((prev) =>
+                      checked ? prev.filter((c) => c !== city) : [...prev, city]
+                    )
+                  }
+                  className={cn(
+                    "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                    checked && "bg-gray-100 dark:bg-gray-800"
+                  )}
+                >
+                  <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                  <span>{city}</span>
+                </button>
+              );
+            })
+          )}
+        </SectionWrapper>
+      )}
 
       {/* المنطقة - multi-select */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-48"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        trigger={
-          <>
-            <MapPin className="h-4 w-4" />
-            <span>المنطقة</span>
-            {selectedStates.length > 0 && (
-              <Badge variant="secondary" className="mr-1">
-                {selectedStates.length}
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {SAUDI_REGIONS.map((region) => {
-          const checked = selectedStates.includes(region);
-          return (
-            <div
-              key={region}
-              onClick={() =>
-                setSelectedStates((prev) =>
-                  checked ? prev.filter((r) => r !== region) : [...prev, region]
-                )
-              }
-              className={cn(
-                "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2",
-                checked && "bg-gray-100 dark:bg-gray-800"
-              )}
-            >
-              {checked ? "✓ " : ""}
-              {region}
-            </div>
-          );
-        })}
-      </CustomDropdown>
+      {(!hasSearch || matches("المنطقة")) && (
+        <SectionWrapper
+          id="state"
+          title={
+            <span className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>المنطقة</span>
+            </span>
+          }
+          badgeCount={selectedStates.length}
+          searchActive={hasSearch}
+        >
+          {SAUDI_REGIONS.map((region) => {
+            const checked = selectedStates.includes(region);
+            return (
+              <button
+                key={region}
+                type="button"
+                onClick={() =>
+                  setSelectedStates((prev) =>
+                    checked ? prev.filter((r) => r !== region) : [...prev, region]
+                  )
+                }
+                className={cn(
+                  "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                  checked && "bg-gray-100 dark:bg-gray-800"
+                )}
+              >
+                <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                <span>{region}</span>
+              </button>
+            );
+          })}
+        </SectionWrapper>
+      )}
 
       {/* الميزانية - custom content with form */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-auto"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        trigger={
-          <>
-            <DollarSign className="h-4 w-4" />
-            <span>الميزانية</span>
-            {(budgetMin !== "" || budgetMax !== "") && (
-              <Badge variant="secondary" className="mr-1">
-                1
-              </Badge>
-            )}
-          </>
-        }
-      >
-        <BudgetDropdownContent
-          budgetMin={budgetMin}
-          budgetMax={budgetMax}
-          setBudgetMin={setBudgetMin}
-          setBudgetMax={setBudgetMax}
-          tempBudgetMin={tempBudgetMin}
-          tempBudgetMax={tempBudgetMax}
-          setTempBudgetMin={setTempBudgetMin}
-          setTempBudgetMax={setTempBudgetMax}
-          setIsBudgetDialogOpen={setIsBudgetDialogOpen}
-        />
-      </CustomDropdown>
+      {(!hasSearch || matches("الميزانية")) && (
+        <SectionWrapper
+          id="budget"
+          title={
+            <span className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              <span>الميزانية</span>
+            </span>
+          }
+          badgeCount={budgetMin !== "" || budgetMax !== "" ? 1 : 0}
+          searchActive={hasSearch}
+        >
+          <div className="grid grid-cols-2 gap-2 py-1">
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">من</label>
+              <Input
+                type="number"
+                placeholder="الحد الأدنى"
+                value={tempBudgetMin}
+                onChange={(e) => setTempBudgetMin(e.target.value)}
+                className="h-8"
+                min={0}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">إلى</label>
+              <Input
+                type="number"
+                placeholder="الحد الأقصى"
+                value={tempBudgetMax}
+                onChange={(e) => setTempBudgetMax(e.target.value)}
+                className="h-8"
+                min={0}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button
+              size="sm"
+              className="flex-1"
+              onClick={() => {
+                setBudgetMin(tempBudgetMin);
+                setBudgetMax(tempBudgetMax);
+                setIsBudgetDialogOpen(false);
+              }}
+            >
+              تطبيق
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setTempBudgetMin("");
+                setTempBudgetMax("");
+                setBudgetMin("");
+                setBudgetMax("");
+                setIsBudgetDialogOpen(false);
+              }}
+            >
+              إعادة تعيين
+            </Button>
+          </div>
+        </SectionWrapper>
+      )}
 
       {/* نوع العقار - multi-select */}
-      <CustomDropdown
-        contentZIndex={10003}
-        dropdownWidth="w-40"
-        maxHeight="300px"
-        triggerClassName={btnClass}
-        trigger={
-          <>
-            <Building2 className="h-4 w-4" />
-            <span>نوع العقار</span>
-            {selectedPropertyTypes.length > 0 && (
-              <Badge variant="secondary" className="mr-1">
-                {selectedPropertyTypes.length}
-              </Badge>
-            )}
-          </>
-        }
-      >
-        {PROPERTY_TYPE_OPTIONS.map((opt) => {
-          const checked = selectedPropertyTypes.includes(opt.value);
-          return (
-            <div
-              key={opt.value}
-              onClick={() =>
-                setSelectedPropertyTypes((prev) =>
-                  checked
-                    ? prev.filter((t) => t !== opt.value)
-                    : [...prev, opt.value]
-                )
-              }
-              className={cn(
-                "cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2",
-                checked && "bg-gray-100 dark:bg-gray-800"
-              )}
-            >
-              {checked ? "✓ " : ""}
-              {opt.label}
-            </div>
-          );
-        })}
-      </CustomDropdown>
+      {(!hasSearch || matches("نوع العقار")) && (
+        <SectionWrapper
+          id="property-type"
+          title={
+            <span className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              <span>نوع العقار</span>
+            </span>
+          }
+          badgeCount={selectedPropertyTypes.length}
+          searchActive={hasSearch}
+        >
+          {PROPERTY_TYPE_OPTIONS.map((opt) => {
+            const checked = selectedPropertyTypes.includes(opt.value);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() =>
+                  setSelectedPropertyTypes((prev) =>
+                    checked ? prev.filter((t) => t !== opt.value) : [...prev, opt.value]
+                  )
+                }
+                className={cn(
+                  "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                  checked && "bg-gray-100 dark:bg-gray-800"
+                )}
+              >
+                <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </SectionWrapper>
+      )}
     </div>
   );
 }
