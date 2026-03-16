@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 import {
   APPOINTMENT_TYPES,
   PROPERTY_TYPE_OPTIONS,
-  SAUDI_REGIONS,
   priorityLabels,
 } from "./constants";
 import { SourceBadge } from "../actions/SourceBadge";
@@ -59,6 +58,8 @@ export interface AdvancedFiltersDialogContentProps {
   selectedPropertyTypes: string[];
   setSelectedPropertyTypes: (v: string[] | ((prev: string[]) => string[])) => void;
   uniqueCities: string[];
+  /** مناطق من الباك اند (من filter-options أو من /cities). إن لم تُمرَّر يُعرض قائمة فارغة. */
+  regionOptions?: string[];
   tempBudgetMin: string;
   tempBudgetMax: string;
   setTempBudgetMin: (v: string) => void;
@@ -167,14 +168,15 @@ export function AdvancedFiltersDialogContent({
   selectedPropertyTypes,
   setSelectedPropertyTypes,
   uniqueCities,
+  regionOptions = [],
   tempBudgetMin,
   tempBudgetMax,
   setTempBudgetMin,
   setTempBudgetMax,
   isBudgetDialogOpen,
   setIsBudgetDialogOpen,
-      filterSearch,
-      setFilterSearch,
+  filterSearch,
+  setFilterSearch,
 }: AdvancedFiltersDialogContentProps) {
   const appointmentOpts = appointmentTypes && appointmentTypes.length > 0 ? appointmentTypes : DEFAULT_APPOINTMENT_OPTIONS;
   const search = filterSearch.trim().toLowerCase();
@@ -482,27 +484,31 @@ export function AdvancedFiltersDialogContent({
           badgeCount={selectedStates.length}
           searchActive={hasSearch}
         >
-          {SAUDI_REGIONS.map((region) => {
-            const checked = selectedStates.includes(region);
-            return (
-              <button
-                key={region}
-                type="button"
-                onClick={() =>
-                  setSelectedStates((prev) =>
-                    checked ? prev.filter((r) => r !== region) : [...prev, region]
-                  )
-                }
-                className={cn(
-                  "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
-                  checked && "bg-gray-100 dark:bg-gray-800"
-                )}
-              >
-                <span className="w-4 text-center">{checked ? "✓" : ""}</span>
-                <span>{region}</span>
-              </button>
-            );
-          })}
+          {regionOptions.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مناطق (تُجلب من الباك اند)</div>
+          ) : (
+            regionOptions.map((region) => {
+              const checked = selectedStates.includes(region);
+              return (
+                <button
+                  key={region}
+                  type="button"
+                  onClick={() =>
+                    setSelectedStates((prev) =>
+                      checked ? prev.filter((r) => r !== region) : [...prev, region]
+                    )
+                  }
+                  className={cn(
+                    "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                    checked && "bg-gray-100 dark:bg-gray-800"
+                  )}
+                >
+                  <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                  <span>{region}</span>
+                </button>
+              );
+            })
+          )}
         </SectionWrapper>
       )}
 

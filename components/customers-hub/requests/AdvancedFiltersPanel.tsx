@@ -28,7 +28,6 @@ import {
   priorityLabels,
   APPOINTMENT_TYPES,
   PROPERTY_TYPE_OPTIONS,
-  SAUDI_REGIONS,
 } from "./constants";
 import type { CustomerSource, Priority } from "@/types/unified-customer";
 
@@ -66,6 +65,8 @@ export interface AdvancedFiltersPanelProps {
   setSelectedPropertyTypes: (v: string[] | ((prev: string[]) => string[])) => void;
   uniqueAssignees: { id: string; name: string }[];
   uniqueCities: string[];
+  /** مناطق من الباك اند (من filter-options أو من /cities). إن لم تُمرَّر يُعرض قائمة فارغة. */
+  regionOptions?: string[];
   tempBudgetMin: string;
   tempBudgetMax: string;
   setTempBudgetMin: (v: string) => void;
@@ -114,6 +115,7 @@ export function AdvancedFiltersPanel({
   setSelectedPropertyTypes,
   uniqueAssignees,
   uniqueCities,
+  regionOptions = [],
   tempBudgetMin,
   tempBudgetMax,
   setTempBudgetMin,
@@ -333,19 +335,23 @@ export function AdvancedFiltersPanel({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>المنطقة (الولاية)</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {SAUDI_REGIONS.map((region) => (
-            <DropdownMenuCheckboxItem
-              key={region}
-              checked={selectedStates.includes(region)}
-              onCheckedChange={(checked) =>
-                setSelectedStates((prev) =>
-                  checked ? [...prev, region] : prev.filter((r) => r !== region)
-                )
-              }
-            >
-              {region}
-            </DropdownMenuCheckboxItem>
-          ))}
+          {regionOptions.length === 0 ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مناطق</div>
+          ) : (
+            regionOptions.map((region) => (
+              <DropdownMenuCheckboxItem
+                key={region}
+                checked={selectedStates.includes(region)}
+                onCheckedChange={(checked) =>
+                  setSelectedStates((prev) =>
+                    checked ? [...prev, region] : prev.filter((r) => r !== region)
+                  )
+                }
+              >
+                {region}
+              </DropdownMenuCheckboxItem>
+            ))
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu

@@ -163,6 +163,10 @@ export interface FilterOptionsResponse {
     objectTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filtering by kind of record
     appointmentTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filter "نوع الموعد" (from GET filter-options)
     employees: Array<{ id: number; name: string }>;
+    /** مدن من الباك اند (اختياري؛ إن لم تُوفَّر يُستخدم GET /cities?country_id=1) */
+    cities?: Array<{ id: number; name: string; region_name?: string }>;
+    /** مناطق من الباك اند (اختياري؛ إن لم تُوفَّر تُستنتج من cities.region_name إن وُجد) */
+    regions?: Array<{ id?: number; name: string }>;
   };
   timestamp: string;
 }

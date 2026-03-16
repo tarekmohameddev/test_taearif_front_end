@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import useUnifiedCustomersStore from "@/context/store/unified-customers";
@@ -12,6 +12,12 @@ import type { RequestsCenterPageProps } from "../types";
 import type { CustomerAction, Priority } from "@/types/unified-customer";
 import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
 import { getPropertyRequestId } from "../request-detail-types";
+import {
+  fetchCities,
+  regionsFromCities,
+  cityToRegionMap,
+  type CityOption,
+} from "@/lib/services/locations-api";
 
 export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   const storeActions = useUnifiedCustomersStore((state) => state.actions);
@@ -225,8 +231,53 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   const [tempBudgetMax, setTempBudgetMax] = useState<string>("");
   const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [locationCities, setLocationCities] = useState<CityOption[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(false);
 
   const prevFiltersRef = useRef<string>("");
+
+  // مدن ومناطق من الباك اند: filterOptions هو نفسه كائن data من الاستجابة (بدون .data مرة ثانية)
+  const fo = props?.filterOptions;
+  useEffect(() => {
+    if (authLoading || !userData?.token) return;
+    if (fo?.cities && Array.isArray(fo.cities) && fo.cities.length > 0) {
+      const list: CityOption[] = fo.cities.map((c: { id: number; name: string; region_name?: string }) => ({
+        id: c.id,
+        name: c.name,
+        region_name: c.region_name,
+      }));
+      setLocationCities(list);
+      return;
+    }
+    let cancelled = false;
+    setLocationsLoading(true);
+    fetchCities(1)
+      .then((list) => {
+        if (!cancelled) setLocationCities(list);
+      })
+      .catch((err) => {
+        if (!cancelled) console.error("Error fetching cities for requests:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setLocationsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, userData?.token, fo]);
+
+  const apiCityNames = useMemo(
+    () => locationCities.map((c) => c.name).filter(Boolean),
+    [locationCities]
+  );
+  const apiRegionNames = useMemo(() => {
+    const fromCities = regionsFromCities(locationCities);
+    if (fromCities.length > 0) return fromCities;
+    if (fo?.regions && Array.isArray(fo.regions))
+      return fo.regions.map((r: { name: string }) => r.name).filter(Boolean);
+    return [];
+  }, [locationCities, fo]);
+  const cityToRegion = useMemo(() => cityToRegionMap(locationCities), [locationCities]);
 
   const handleOpenSinglePriorityDialog = useCallback((action: CustomerAction) => {
     if (!userData?.token) {
@@ -313,6 +364,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     selectedPropertyTypes: filterHooks.selectedPropertyTypes,
     getCustomerById,
     getCompletedActions,
+    cityToRegion,
   });
 
   const isAllSelected =
@@ -398,16 +450,22 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     clearFilters,
   });
 
-  const appointmentTypes = props?.filterOptions?.data?.appointmentTypes;
+  const appointmentTypes = props?.filterOptions?.appointmentTypes;
   const sourceOptions = props?.filterOptions?.sources ?? [];
+
+  const cityOptionsForFilter =
+    apiCityNames.length > 0 ? apiCityNames : data.uniqueCities;
 
   return {
     ...filterHooks,
     ...data,
+    uniqueCities: cityOptionsForFilter.length > 0 ? cityOptionsForFilter : data.uniqueCities,
     ...handlers,
     props,
     appointmentTypes,
     sourceOptions,
+    apiCityNames,
+    apiRegionNames,
     apiStages,
     apiLoading,
     apiError,

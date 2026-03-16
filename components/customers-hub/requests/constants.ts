@@ -78,40 +78,13 @@ export const PROPERTY_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "commercial", label: "تجاري" },
 ];
 
-export const SAUDI_REGIONS = [
-  "الرياض",
-  "مكة المكرمة",
-  "المدينة المنورة",
-  "الشرقية",
-  "القصيم",
-  "عسير",
-  "تبوك",
-  "حائل",
-  "الحدود الشمالية",
-  "جازان",
-  "نجران",
-  "الباحة",
-  "الجوف",
-] as const;
-
-export const CITY_TO_REGION: Record<string, string> = {
-  الرياض: "الرياض",
-  جدة: "مكة المكرمة",
-  مكة: "مكة المكرمة",
-  الدمام: "الشرقية",
-  الخبر: "الشرقية",
-  الظهران: "الشرقية",
-  أبها: "عسير",
-  "خميس مشيط": "عسير",
-  المدينة: "المدينة المنورة",
-  بريدة: "القصيم",
-  حائل: "حائل",
-  تبوك: "تبوك",
-  نجران: "نجران",
-  جازان: "جازان",
-  الباحة: "الباحة",
-  الجوف: "الجوف",
-};
+/**
+ * المدن والمناطق (المحافظات) تُجلب من الـ API في الباك اند، مثل صفحة إنشاء العقار:
+ * - المدن: GET /cities?country_id=1
+ * - الأحياء: GET /districts?city_id={id}
+ * - المناطق قد تأتي مع كل مدينة (region_name) أو من filter-options (data.regions).
+ * استخدم خدمة locations-api و/أو filter-options في صفحة الطلبات.
+ */
 
 export const REQUEST_TYPES: CustomerActionType[] = [
   "new_inquiry",
