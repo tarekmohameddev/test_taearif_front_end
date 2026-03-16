@@ -101,32 +101,28 @@ export function TableRequestsList({
   };
 
   const getPriorityBadge = (priority?: Priority) => {
-    const variants: Record<string, { variant: any; text: string; icon: string }> = {
+    const variants: Record<string, { variant: any; text: string }> = {
       urgent: {
         variant: "destructive",
         text: "عاجل",
-        icon: "🚨",
       },
       high: {
         variant: "default",
         text: "عالي",
-        icon: "🔥",
       },
       medium: {
         variant: "secondary",
         text: "متوسط",
-        icon: "⚡",
       },
       low: {
         variant: "outline",
         text: "منخفض",
-        icon: "📌",
       },
     };
     const config = variants[priority || "medium"] || variants.medium;
     return (
-      <Badge variant={config.variant as any} className="text-xs gap-1">
-        {config.icon} {config.text}
+      <Badge variant={config.variant as any} className="text-xs">
+        {config.text}
       </Badge>
     );
   };
