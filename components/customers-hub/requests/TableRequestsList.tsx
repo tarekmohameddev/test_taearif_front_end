@@ -373,7 +373,7 @@ export function TableRequestsList({
                       className="h-8 -mr-2"
                       onClick={() => handleSort("createdAt")}
                     >
-                      تاريخ ووقت الإنشاء
+                       وقت الإنشاء
                       <SortIcon field="createdAt" />
                     </Button>
                   </TableHead>
