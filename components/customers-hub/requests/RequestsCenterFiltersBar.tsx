@@ -60,8 +60,8 @@ export function RequestsCenterFiltersBar({
             <InlineFiltersRow
               selectedSources={inlineFilters.selectedSources}
               setSelectedSources={inlineFilters.setSelectedSources}
-              selectedPriorities={inlineFilters.selectedPriorities}
-              setSelectedPriorities={inlineFilters.setSelectedPriorities}
+              dueDateFilter={inlineFilters.dueDateFilter}
+              setDueDateFilter={inlineFilters.setDueDateFilter}
               selectedAssignees={inlineFilters.selectedAssignees}
               setSelectedAssignees={inlineFilters.setSelectedAssignees}
               uniqueAssignees={inlineFilters.uniqueAssignees}

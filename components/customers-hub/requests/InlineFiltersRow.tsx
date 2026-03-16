@@ -10,10 +10,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import { Filter, ChevronDown, AlertTriangle, UserPlus } from "lucide-react";
+import { Filter, ChevronDown, Calendar, UserPlus } from "lucide-react";
 import { SourceBadge } from "../actions/SourceBadge";
-import { priorityLabels } from "./constants";
-import type { CustomerSource, Priority } from "@/types/unified-customer";
+import type { CustomerSource } from "@/types/unified-customer";
 
 const SOURCES: CustomerSource[] = [
   "whatsapp",
@@ -22,13 +21,12 @@ const SOURCES: CustomerSource[] = [
   "referral",
   "import",
 ];
-const PRIORITIES: Priority[] = ["urgent", "high", "medium", "low"];
 
 export interface InlineFiltersRowProps {
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
-  selectedPriorities: string[];
-  setSelectedPriorities: (v: string[] | ((prev: string[]) => string[])) => void;
+  dueDateFilter: string;
+  setDueDateFilter: (v: string) => void;
   selectedAssignees: string[];
   setSelectedAssignees: (v: string[] | ((prev: string[]) => string[])) => void;
   uniqueAssignees: { id: string; name: string }[];
@@ -37,8 +35,8 @@ export interface InlineFiltersRowProps {
 export function InlineFiltersRow({
   selectedSources,
   setSelectedSources,
-  selectedPriorities,
-  setSelectedPriorities,
+  dueDateFilter,
+  setDueDateFilter,
   selectedAssignees,
   setSelectedAssignees,
   uniqueAssignees,
@@ -82,32 +80,49 @@ export function InlineFiltersRow({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className={btnClass}>
-            <AlertTriangle className="h-4 w-4" />
-            الأولوية
-            {selectedPriorities.length > 0 && (
+            <Calendar className="h-4 w-4" />
+            التاريخ
+            {dueDateFilter !== "all" && (
               <Badge variant="secondary" className="mr-1">
-                {selectedPriorities.length}
+                1
               </Badge>
             )}
             <ChevronDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>الأولوية</DropdownMenuLabel>
+          <DropdownMenuLabel>التاريخ</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {PRIORITIES.map((p) => (
-            <DropdownMenuCheckboxItem
-              key={p}
-              checked={selectedPriorities.includes(p)}
-              onCheckedChange={(checked) =>
-                setSelectedPriorities((prev) =>
-                  checked ? [...prev, p] : prev.filter((x) => x !== p)
-                )
-              }
-            >
-              {priorityLabels[p as Priority]}
-            </DropdownMenuCheckboxItem>
-          ))}
+          <DropdownMenuCheckboxItem
+            checked={dueDateFilter === "all"}
+            onCheckedChange={() => setDueDateFilter("all")}
+          >
+            الكل
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={dueDateFilter === "overdue"}
+            onCheckedChange={() => setDueDateFilter("overdue")}
+          >
+            متأخر
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={dueDateFilter === "today"}
+            onCheckedChange={() => setDueDateFilter("today")}
+          >
+            اليوم
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={dueDateFilter === "week"}
+            onCheckedChange={() => setDueDateFilter("week")}
+          >
+            هذا الأسبوع
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={dueDateFilter === "no_date"}
+            onCheckedChange={() => setDueDateFilter("no_date")}
+          >
+            بدون تاريخ
+          </DropdownMenuCheckboxItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>

@@ -78,8 +78,8 @@ export function RequestsCenterFilters({
             inlineFilters={{
               selectedSources,
               setSelectedSources,
-              selectedPriorities,
-              setSelectedPriorities,
+              dueDateFilter,
+              setDueDateFilter,
               selectedAssignees,
               setSelectedAssignees,
               uniqueAssignees,
