@@ -42,6 +42,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SourceBadge } from "../actions/SourceBadge";
+import { CompactPropertyBlockStitch } from "../actions/components/IncomingActionsCardCompact";
 import { translatePropertyType } from "../actions/utils/propertyUtils";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
@@ -421,6 +422,7 @@ export function TableRequestsList({
                       <SortIcon field="city" />
                     </Button>
                   </TableHead>
+                  <TableHead className="text-right text-white bg-transparent">تفاصيل العقار</TableHead>
                   <TableHead className="text-right text-white bg-transparent">الموظف المسؤول</TableHead>
                   <TableHead className="text-right text-white bg-transparent">
                     <Button
@@ -607,6 +609,18 @@ export function TableRequestsList({
                             </div>
                           );
                         })()}
+                      </TableCell>
+
+                      {/* Property details (same as compact view) */}
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        {action.properties?.length ? (
+                          <CompactPropertyBlockStitch
+                            action={action}
+                            useLast={action.objectType === "property_request"}
+                          />
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
                       </TableCell>
 
                       {/* Assigned Employee */}

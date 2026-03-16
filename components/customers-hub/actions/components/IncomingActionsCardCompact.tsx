@@ -64,7 +64,7 @@ const nextActionLabelByType: Record<string, string> = {
 };
 
 /** Property block: image + name + نوع • مساحة • للبيع/للايجار (Stitch style). Use first or last by useLast. */
-function CompactPropertyBlockStitch({
+export function CompactPropertyBlockStitch({
   action,
   useLast = false,
 }: {
