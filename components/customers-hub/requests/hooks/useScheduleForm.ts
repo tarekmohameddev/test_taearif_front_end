@@ -47,13 +47,20 @@ export function useScheduleForm({
       return;
     }
 
-    // إذا كان أحدهما فارغًا نجعل له قيمة افتراضية
-    const effectiveDate = aptDate || new Date().toISOString().slice(0, 10);
+    // إذا كان أحدهما فارغًا نجعل له قيمة افتراضية (التاريخ المحلي اليوم، وليس UTC)
+    const now = new Date();
+    const todayLocal =
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const effectiveDate = aptDate || todayLocal;
     const effectiveTime = aptTime || DEFAULT_TIME;
 
-    const datetime = new Date(`${effectiveDate}T${effectiveTime}`).toISOString();
-    const now = new Date();
-    if (new Date(datetime) <= now) {
+    // بناء التاريخ المحلي بشكل صريح لتجنب التفسير الخاطئ حسب التوقيت
+    const [y, m, d] = effectiveDate.split("-").map(Number);
+    const [hh, mm] = effectiveTime.split(":").map(Number);
+    const chosenLocal = new Date(y, m - 1, d, hh ?? 0, mm ?? 0, 0, 0);
+    const datetime = chosenLocal.toISOString();
+
+    if (chosenLocal.getTime() <= now.getTime()) {
       toast.error("التاريخ والوقت يجب أن يكون في المستقبل");
       return;
     }
