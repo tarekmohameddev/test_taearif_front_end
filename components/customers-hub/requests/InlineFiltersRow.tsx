@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,7 +12,6 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Calendar as CalendarIcon, UserPlus, Filter, ChevronDown } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerSource } from "@/types/unified-customer";
 
@@ -46,6 +46,9 @@ export function InlineFiltersRow({
   setSelectedAssignees,
   uniqueAssignees,
 }: InlineFiltersRowProps) {
+  const [datePanelOpen, setDatePanelOpen] = useState(false);
+  const fromInputRef = useRef<HTMLInputElement>(null);
+  const toInputRef = useRef<HTMLInputElement>(null);
   const btnClass =
     "gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700";
 
@@ -82,98 +85,102 @@ export function InlineFiltersRow({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className={btnClass}
+
+      {/* فلتر التاريخ بدون Radix */}
+      <div className="relative">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className={btnClass}
+          onClick={() => setDatePanelOpen((v) => !v)}
+        >
+          <CalendarIcon className="h-4 w-4" />
+          {requestDateFrom || requestDateTo ? (
+            <span className="text-xs">
+              {requestDateFrom ?? "؟"} – {requestDateTo ?? "؟"}
+            </span>
+          ) : (
+            "التاريخ"
+          )}
+          {(requestDateFrom || requestDateTo) && (
+            <Badge variant="secondary" className="mr-1">
+              1
+            </Badge>
+          )}
+        </Button>
+
+        {datePanelOpen && (
+          <div
+            className="absolute z-50 mt-2 w-80 rounded-xl border bg-popover p-3 text-sm shadow-md"
+            dir="rtl"
           >
-            <CalendarIcon className="h-4 w-4" />
-            {requestDateFrom || requestDateTo ? (
-              <span className="text-xs">
-                {requestDateFrom ?? "؟"} – {requestDateTo ?? "؟"}
-              </span>
-            ) : (
-              "التاريخ"
-            )}
-            {(requestDateFrom || requestDateTo) && (
-              <Badge variant="secondary" className="mr-1">
-                1
-              </Badge>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent align="end" className="w-80 p-3" dir="rtl">
-          <div className="space-y-3">
-            <div className="text-sm font-medium">تاريخ إنشاء الطلب</div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">من</div>
-                <div className="relative">
-                  <input
-                    type="date"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    value={requestDateFrom ?? ""}
-                    onChange={(e) =>
-                      setRequestDateFrom(e.target.value || null)
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-between pointer-events-none"
+            <div className="space-y-3">
+              <div className="text-sm font-medium">تاريخ إنشاء الطلب</div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <div className="text-xs text-muted-foreground">من</div>
+                  <label
+                    className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 [&:has(input:focus)]:ring-2 [&:has(input:focus)]:ring-ring [&:has(input:focus)]:ring-offset-2"
+                    onClick={() => fromInputRef.current?.showPicker?.()}
                   >
-                    <span className="text-xs truncate">
-                      {requestDateFrom || "اختر التاريخ"}
-                    </span>
-                    <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  </Button>
+                    <input
+                      ref={fromInputRef}
+                      type="date"
+                      className="flex-1 min-w-0 border-0 bg-transparent p-0 text-xs outline-none [color-scheme:light]"
+                      value={requestDateFrom ?? ""}
+                      onChange={(e) =>
+                        setRequestDateFrom(e.target.value || null)
+                      }
+                    />
+                    <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0 pointer-events-none" />
+                  </label>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-xs text-muted-foreground">إلى</div>
+                  <label
+                    className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 [&:has(input:focus)]:ring-2 [&:has(input:focus)]:ring-ring [&:has(input:focus)]:ring-offset-2"
+                    onClick={() => toInputRef.current?.showPicker?.()}
+                  >
+                    <input
+                      ref={toInputRef}
+                      type="date"
+                      className="flex-1 min-w-0 border-0 bg-transparent p-0 text-xs outline-none [color-scheme:light]"
+                      value={requestDateTo ?? ""}
+                      onChange={(e) =>
+                        setRequestDateTo(e.target.value || null)
+                      }
+                    />
+                    <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0 pointer-events-none" />
+                  </label>
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">إلى</div>
-                <div className="relative">
-                  <input
-                    type="date"
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    value={requestDateTo ?? ""}
-                    onChange={(e) =>
-                      setRequestDateTo(e.target.value || null)
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-between pointer-events-none"
-                  >
-                    <span className="text-xs truncate">
-                      {requestDateTo || "اختر التاريخ"}
-                    </span>
-                    <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  </Button>
-                </div>
+              <div className="flex justify-between gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => {
+                    setRequestDateFrom(null);
+                    setRequestDateTo(null);
+                  }}
+                >
+                  مسح
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setDatePanelOpen(false)}
+                >
+                  إغلاق
+                </Button>
               </div>
-            </div>
-            <div className="flex justify-between gap-2 pt-1">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={() => {
-                  setRequestDateFrom(null);
-                  setRequestDateTo(null);
-                }}
-              >
-                مسح
-              </Button>
             </div>
           </div>
-        </PopoverContent>
-      </Popover>
+        )}
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
