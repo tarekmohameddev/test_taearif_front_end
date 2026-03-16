@@ -1,12 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import {
   Table,
   TableBody,
@@ -54,6 +63,9 @@ import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-
 import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 import { getPropertyRequestId } from "./request-detail-types";
 import type { ApiStageShape } from "../actions/types/incomingCardTypes";
+import type { StatusOption } from "./hooks/useStatusDialog";
+import { statusConfig } from "./constants";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TableStageCellProps {
   action: CustomerAction;
@@ -122,6 +134,85 @@ function TableStageCell({ action, stages, getCustomerById, onStageChangeSuccess 
   );
 }
 
+/** Status dropdown for property requests: options from GET /v1/property-requests/filters, update via PUT /v1/property-requests/:id/status */
+interface TableStatusCellProps {
+  action: CustomerAction;
+  statusOptions: StatusOption[];
+  onStatusChangeSuccess?: (actionId: string, newStatusId: number) => void;
+}
+
+function TableStatusCell({ action, statusOptions, onStatusChangeSuccess }: TableStatusCellProps) {
+  const [saving, setSaving] = useState(false);
+  const propertyRequestId = getPropertyRequestId(action);
+  const statusId = (action as { status_id?: number }).status_id;
+  const apiStatus = statusId != null ? statusOptions.find((s) => s.id === statusId) : undefined;
+  const label = apiStatus?.name_ar ?? statusConfig[action.status]?.label ?? "معلق";
+  const colorClass = apiStatus ? "bg-blue-500 text-white" : (statusConfig[action.status]?.color ?? "bg-gray-500 text-white");
+
+  const handleSelect = async (newStatusId: number) => {
+    if (propertyRequestId == null || newStatusId === statusId || saving) return;
+    setSaving(true);
+    try {
+      await axiosInstance.put(`/v1/property-requests/${propertyRequestId}/status`, {
+        status_id: newStatusId,
+      });
+      (action as { status_id?: number }).status_id = newStatusId;
+      onStatusChangeSuccess?.(action.id, newStatusId);
+      toast.success("تم تحديث حالة طلب العقار بنجاح");
+    } catch (error: unknown) {
+      const message =
+        error && typeof error === "object" && "response" in error && (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? String((error as { response: { data: { message: string } } }).response.data.message)
+          : "حدث خطأ أثناء تحديث الحالة";
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "inline-flex items-center gap-1 rounded-md text-[10px] px-1.5 py-0.5 leading-tight cursor-pointer hover:opacity-90 transition-opacity border-0",
+            colorClass
+          )}
+          onClick={(e) => e.stopPropagation()}
+          data-interactive="true"
+        >
+          {saving ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <>
+              {label}
+              <ChevronDown className="h-3 w-3 shrink-0" />
+            </>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[160px]">
+        {statusOptions.map((status) => (
+          <DropdownMenuItem
+            key={status.id}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelect(status.id);
+            }}
+            disabled={saving || statusId === status.id}
+          >
+            {status.name_ar}
+            {statusId === status.id && (
+              <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 interface TableRequestsListProps {
   actions: CustomerAction[];
   getCustomerById: (id: string) => UnifiedCustomer | undefined;
@@ -146,6 +237,7 @@ interface TableRequestsListProps {
     newStageId: string,
     previousStageId: string
   ) => void;
+  onStatusChangeSuccess?: (actionId: string, newStatusId: number) => void;
 }
 
 type SortField = "customer" | "priority" | "status" | "createdAt" | "budget" | "propertyType" | "city" | "stage";
@@ -165,14 +257,35 @@ export function TableRequestsList({
   stages,
   completingActionIds,
   onStageChangeSuccess,
+  onStatusChangeSuccess,
 }: TableRequestsListProps) {
   const router = useRouter();
+  const userData = useAuthStore(selectUserData);
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
   const [snoozeActionId, setSnoozeActionId] = useState<string | null>(null);
   const [snoozeDate, setSnoozeDate] = useState("");
   const [snoozeTime, setSnoozeTime] = useState("10:00");
+  const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
+  const [loadingStatusOptions, setLoadingStatusOptions] = useState(true);
+
+  useEffect(() => {
+    if (!userData?.token) {
+      setLoadingStatusOptions(false);
+      return;
+    }
+    setLoadingStatusOptions(true);
+    axiosInstance
+      .get<{ data?: { status?: StatusOption[] }; status?: StatusOption[] }>("/v1/property-requests/filters")
+      .then((res) => {
+        const raw = res?.data;
+        const list = Array.isArray(raw?.data?.status) ? raw.data.status : Array.isArray(raw?.status) ? raw.status : [];
+        setStatusOptions(list);
+      })
+      .catch(() => setStatusOptions([]))
+      .finally(() => setLoadingStatusOptions(false));
+  }, [userData?.token]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -570,8 +683,22 @@ export function TableRequestsList({
                               </span>
                             )}
                           </div>
-                          <div>
-                            {getStatusBadge(action.status)}
+                          <div onClick={(e) => e.stopPropagation()}>
+                            {getPropertyRequestId(action) != null ? (
+                              loadingStatusOptions ? (
+                                <Skeleton className="h-5 w-16 rounded-md" />
+                              ) : statusOptions.length > 0 ? (
+                                <TableStatusCell
+                                  action={action}
+                                  statusOptions={statusOptions}
+                                  onStatusChangeSuccess={onStatusChangeSuccess}
+                                />
+                              ) : (
+                                getStatusBadge(action.status)
+                              )
+                            ) : (
+                              getStatusBadge(action.status)
+                            )}
                           </div>
                         </div>
                       </TableCell>
