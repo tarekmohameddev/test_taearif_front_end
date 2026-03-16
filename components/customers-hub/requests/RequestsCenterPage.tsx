@@ -77,6 +77,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           setSelectedAssignees={ctx.setSelectedAssignees}
           dueDateFilter={ctx.dueDateFilter}
           setDueDateFilter={ctx.setDueDateFilter}
+          requestDateFrom={ctx.requestDateFrom}
+          setRequestDateFrom={ctx.setRequestDateFrom}
+          requestDateTo={ctx.requestDateTo}
+          setRequestDateTo={ctx.setRequestDateTo}
           selectedCities={ctx.selectedCities}
           setSelectedCities={ctx.setSelectedCities}
           selectedStates={ctx.selectedStates}

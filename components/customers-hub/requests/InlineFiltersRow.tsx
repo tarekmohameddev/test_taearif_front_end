@@ -10,9 +10,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import { Calendar as CalendarIcon, UserPlus } from "lucide-react";
+import { Calendar as CalendarIcon, UserPlus, Filter, ChevronDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerSource } from "@/types/unified-customer";
 
@@ -105,39 +104,57 @@ export function InlineFiltersRow({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="end" className="w-auto p-3" dir="rtl">
+        <PopoverContent align="end" className="w-80 p-3" dir="rtl">
           <div className="space-y-3">
             <div className="text-sm font-medium">تاريخ إنشاء الطلب</div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <div className="text-xs text-muted-foreground">من</div>
-                <Calendar
-                  mode="single"
-                  selected={requestDateFrom ? new Date(requestDateFrom) : undefined}
-                  onSelect={(date) => {
-                    if (!date) {
-                      setRequestDateFrom(null);
-                      return;
+                <div className="relative">
+                  <input
+                    type="date"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    value={requestDateFrom ?? ""}
+                    onChange={(e) =>
+                      setRequestDateFrom(e.target.value || null)
                     }
-                    const iso = date.toISOString().slice(0, 10);
-                    setRequestDateFrom(iso);
-                  }}
-                />
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-between pointer-events-none"
+                  >
+                    <span className="text-xs truncate">
+                      {requestDateFrom || "اختر التاريخ"}
+                    </span>
+                    <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <div className="text-xs text-muted-foreground">إلى</div>
-                <Calendar
-                  mode="single"
-                  selected={requestDateTo ? new Date(requestDateTo) : undefined}
-                  onSelect={(date) => {
-                    if (!date) {
-                      setRequestDateTo(null);
-                      return;
+                <div className="relative">
+                  <input
+                    type="date"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    value={requestDateTo ?? ""}
+                    onChange={(e) =>
+                      setRequestDateTo(e.target.value || null)
                     }
-                    const iso = date.toISOString().slice(0, 10);
-                    setRequestDateTo(iso);
-                  }}
-                />
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-between pointer-events-none"
+                  >
+                    <span className="text-xs truncate">
+                      {requestDateTo || "اختر التاريخ"}
+                    </span>
+                    <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  </Button>
+                </div>
               </div>
             </div>
             <div className="flex justify-between gap-2 pt-1">
