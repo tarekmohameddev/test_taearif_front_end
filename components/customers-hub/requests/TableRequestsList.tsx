@@ -33,12 +33,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -440,7 +434,7 @@ export function TableRequestsList({
                       <SortIcon field="stage" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-center">الإجراءات</TableHead>
+                  {/* Removed actions column */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -681,66 +675,7 @@ export function TableRequestsList({
                         })()}
                       </TableCell>
 
-                      {/* Actions: 3-dot dropdown like compact/grid */}
-                      <TableCell>
-                        <div className="flex items-center justify-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-slate-500 hover:text-slate-700"
-                                disabled={isLoading}
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="min-w-[180px]">
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); handleComplete(action.id); }}
-                                disabled={isCompleting}
-                                className="flex items-center gap-2"
-                              >
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                إتمام الطلب
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); onQuickView(action.id); }}
-                                className="flex items-center gap-2"
-                              >
-                                <Calendar className="h-4 w-4" />
-                                جدولة إجراء
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSnoozeActionId(action.id);
-                                  setSnoozeDate("");
-                                  setSnoozeTime("10:00");
-                                }}
-                                className="flex items-center gap-2"
-                              >
-                                <Bell className="h-4 w-4" />
-                                تأجيل
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); onQuickView(action.id); }}
-                                className="flex items-center gap-2"
-                              >
-                                <UserPlus className="h-4 w-4" />
-                                تعيين موظف
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); handleDismiss(action.id); }}
-                                className="flex items-center gap-2 text-red-600 focus:text-red-600"
-                              >
-                                <X className="h-4 w-4" />
-                                رفض الطلب
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
+                      {/* Actions column removed */}
                     </TableRow>
                   );
                 })}

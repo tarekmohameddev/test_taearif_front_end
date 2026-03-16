@@ -4,12 +4,6 @@ import React, { useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { SourceBadge } from "../SourceBadge";
 import { StageDropdown } from "./StageDropdown";
 import { AssignEmployeeDialog } from "./AssignEmployeeDialog";
@@ -28,12 +22,7 @@ import {
   MapPin,
   Home,
   Maximize2,
-  MoreVertical,
-  CheckCircle,
   Calendar,
-  Bell,
-  UserPlus,
-  X,
   CalendarDays,
   Phone,
   FileText,
@@ -307,37 +296,7 @@ export function IncomingActionsCardFull({
               </a>
             )}
           </div>
-          <div onClick={(e) => e.stopPropagation()} data-interactive="true">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400">
-                  <MoreVertical className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[180px]">
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onComplete?.(action.id); }} disabled={isCompleting} className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  إتمام الطلب
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowScheduleForm(true); }} className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  جدولة إجراء
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowSnoozeForm?.(true); }} className="flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
-                  تأجيل
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowAssignEmployeeDialog(true); }} className="flex items-center gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  تعيين موظف
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDismiss?.(action.id); }} className="flex items-center gap-2 text-red-600 focus:text-red-600">
-                  <X className="h-4 w-4" />
-                  رفض الطلب
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          {/* Actions dropdown removed */}
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4 items-center">

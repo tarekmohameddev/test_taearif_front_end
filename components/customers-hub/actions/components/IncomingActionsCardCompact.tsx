@@ -5,12 +5,6 @@ import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   CustomDialog,
   CustomDialogContent,
   CustomDialogHeader,
@@ -24,7 +18,7 @@ import { SnoozeFormInline } from "./SnoozeFormInline";
 import { priorityStitchLabels, priorityStitchPillClass } from "../constants/incomingCardConstants";
 import { formatNextActionDatetime } from "../utils/dateTimeUtils";
 import { translatePropertyType } from "../utils/propertyUtils";
-import { MessageSquare, Globe, LayoutDashboard, MoreVertical, CheckCircle, Calendar, Bell, UserPlus, X, Home, CalendarDays, Phone, FileText, FileEdit } from "lucide-react";
+import { MessageSquare, Globe, LayoutDashboard, Calendar, Home, CalendarDays, Phone, FileText, FileEdit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer } from "@/types/unified-customer";
 import type { StageOption, AIMatchingStatus, EmployeeOption } from "../types/incomingCardTypes";
@@ -371,42 +365,6 @@ export function IncomingActionsCardCompact({
             <div className="flex-1 min-w-0" />
           )}
           <CompactNextActionStitch appointments={action.appointments} reminders={action.reminders} />
-          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
-                  data-interactive="true"
-                >
-                  <MoreVertical className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[180px]">
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onComplete?.(action.id); }} disabled={isCompleting} className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  إتمام الطلب
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowScheduleForm(true); }} className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  جدولة إجراء
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowSnoozeForm(true); }} className="flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
-                  تأجيل
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowAssignEmployeeDialog(true); }} className="flex items-center gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  تعيين موظف
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDismiss?.(action.id); }} className="flex items-center gap-2 text-red-600 focus:text-red-600">
-                  <X className="h-4 w-4" />
-                  رفض الطلب
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </div>
 
         {/* Mobile layout: stacked card (visible only on mobile) */}
@@ -438,37 +396,6 @@ export function IncomingActionsCardCompact({
               <p className="text-sm text-slate-500 dark:text-slate-400 tabular-nums dir-ltr" dir="ltr">
                 {(action.customerPhone ?? resolvedCustomer?.phone) ?? "—"}
               </p>
-            </div>
-            <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary" data-interactive="true">
-                    <MoreVertical className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[180px]">
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onComplete?.(action.id); }} disabled={isCompleting} className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    إتمام الطلب
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowScheduleForm(true); }} className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    جدولة إجراء
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowSnoozeForm(true); }} className="flex items-center gap-2">
-                    <Bell className="h-4 w-4" />
-                    تأجيل
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowAssignEmployeeDialog(true); }} className="flex items-center gap-2">
-                    <UserPlus className="h-4 w-4" />
-                    تعيين موظف
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDismiss?.(action.id); }} className="flex items-center gap-2 text-red-600 focus:text-red-600">
-                    <X className="h-4 w-4" />
-                    رفض الطلب
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           </div>
           <div className="flex flex-row flex-wrap items-center gap-2">
