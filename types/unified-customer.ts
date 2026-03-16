@@ -66,8 +66,6 @@ export interface CustomerAction {
   budgetMin?: number | null; // Min budget (request-level). Single budget or range min
   budgetMax?: number | null; // Max budget (request-level). Single budget or range max; null when not applicable
   // Extended fields for property requests (from users_property_requests)
-  /** اسم الحي بالعربي من الـ API (حقل districtAR) */
-  districtAR?: string | null;
   region?: string | null; // Region/administrative area (e.g. الرياض)
   property_type?: string | null; // Backend sometimes uses snake_case for property type
   category_id?: number | null;

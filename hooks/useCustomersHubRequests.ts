@@ -64,33 +64,51 @@ export function useCustomersHubRequests() {
         const response = await getRequestsList(params);
         
         if (response.status === "success") {
-          // Transform actions to ensure assignedTo and source are string format
-          const transformedActions = response.data.actions.map((action: any) => ({
+          // Transform actions to ensure assignedTo/source are strings and preserve backend flags like isUpdated
+          const transformedActions = response.data.actions.map((action: any): CustomerAction => ({
             ...action,
-            assignedTo: action.assignedTo?.id?.toString() || action.assignedTo?.toString() || action.assignedTo,
+            assignedTo:
+              action.assignedTo?.id?.toString() ||
+              action.assignedTo?.toString() ||
+              action.assignedTo,
             assignedToName: action.assignedTo?.name || action.assignedToName,
-            customerId: action.customerId !== null && action.customerId !== undefined
-              ? (typeof action.customerId === 'number' ? action.customerId : parseInt(action.customerId) || action.customerId)
-              : null,
+            customerId:
+              action.customerId !== null && action.customerId !== undefined
+                ? typeof action.customerId === "number"
+                  ? action.customerId
+                  : parseInt(action.customerId) || action.customerId
+                : null,
             // Handle source: if it's an object, extract the id or name, otherwise use as-is
-            source: typeof action.source === 'object' && action.source !== null
-              ? (action.source.id || action.source.name || action.source)
-              : (action.source || ''),
+            source:
+              typeof action.source === "object" && action.source !== null
+                ? action.source.id || action.source.name || action.source
+                : action.source || "",
             // Pass new fields from API response
             objectType: action.objectType || undefined,
             propertyCategory: action.propertyCategory || null,
             propertyType: action.propertyType || null,
             city: action.city || null,
             state: action.state || null,
-            budgetMin: action.budgetMin !== undefined && action.budgetMin !== null ? Number(action.budgetMin) : null,
-            budgetMax: action.budgetMax !== undefined && action.budgetMax !== null ? Number(action.budgetMax) : null,
+            budgetMin:
+              action.budgetMin !== undefined && action.budgetMin !== null
+                ? Number(action.budgetMin)
+                : null,
+            budgetMax:
+              action.budgetMax !== undefined && action.budgetMax !== null
+                ? Number(action.budgetMax)
+                : null,
             // Pass sourceId, sourceTable, stage_id, and stage from API response
-            sourceId: action.sourceId !== undefined && action.sourceId !== null 
-              ? (typeof action.sourceId === 'string' ? parseInt(action.sourceId) || action.sourceId : action.sourceId)
-              : undefined,
+            sourceId:
+              action.sourceId !== undefined && action.sourceId !== null
+                ? typeof action.sourceId === "string"
+                  ? parseInt(action.sourceId) || action.sourceId
+                  : action.sourceId
+                : undefined,
             sourceTable: action.sourceTable || undefined,
             stage_id: action.stage_id || undefined,
             stage: action.stage || undefined,
+            // Preserve backend-computed unread flag
+            isUpdated: action.isUpdated === true,
           }));
           
           setActions(transformedActions);

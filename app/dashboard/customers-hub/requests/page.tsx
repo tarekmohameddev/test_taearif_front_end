@@ -6,6 +6,7 @@ import { useCustomersHubRequests } from "@/hooks/useCustomersHubRequests";
 import useAuthStore from "@/context/AuthContext";
 import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-api";
+import { markRequestsListViewed } from "@/lib/services/customers-hub-requests-api";
 
 export default function CustomersHubRequestsPage() {
   const userData = useAuthStore(selectUserData);
@@ -47,6 +48,9 @@ export default function CustomersHubRequestsPage() {
 
     const loadInitialData = async () => {
       try {
+        // Mark list as viewed for this user at this moment (per-viewer timestamp)
+        await markRequestsListViewed();
+
         // Fetch filter options first
         await fetchFilterOptions();
 

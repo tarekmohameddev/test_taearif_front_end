@@ -298,6 +298,11 @@ export function IncomingActionsCardCompact({
           "w-full bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-800",
           "hover:shadow-md hover:border-primary/30 transition-all group cursor-pointer",
           isOverdue && "border-red-500/50",
+          action.objectType === "property_request" &&
+            action.isUpdated === true &&
+            action.status !== "completed" &&
+            action.status !== "dismissed" &&
+            "bg-sky-50 dark:bg-sky-900/30",
           isSelected && "ring-2 ring-primary bg-primary/5",
           className
         )}
