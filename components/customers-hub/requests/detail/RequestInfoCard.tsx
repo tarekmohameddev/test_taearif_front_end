@@ -95,10 +95,12 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
             </div>
           )}
 
-          {action.districts_id && (
+          {(action.districtAR || action.districts_id) && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">الحي (معرف)</span>
-              <span className="font-medium">{action.districts_id}</span>
+              <span className="text-gray-500">الحي</span>
+              <span className="font-medium">
+                {action.districtAR ?? action.districts_id}
+              </span>
             </div>
           )}
 
