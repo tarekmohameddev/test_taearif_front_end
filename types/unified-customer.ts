@@ -86,6 +86,8 @@ export interface CustomerAction {
   reminders?: Reminder[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
   // Notes (populated for property_request and inquiry)
   notes?: Note[]; // Array of notes for this action
+  /** Flag from /v2/customers-hub/requests/list: true when this action existed on last mark-viewed and was updated after that time. */
+  isUpdated?: boolean;
   // Properties linked to this action (e.g. from property_request; list view uses first item for thumbnail)
   properties?: Array<{
     id: number;

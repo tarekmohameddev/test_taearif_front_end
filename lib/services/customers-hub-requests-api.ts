@@ -116,6 +116,7 @@ export interface RequestsListResponse {
   code?: number; // Optional - may not be present in all responses
   message?: string; // Optional - may not be present in all responses
   data: {
+    // Each action may include backend-computed flags such as `isUpdated` (see mark-viewed docs).
     actions: CustomerAction[];
     stats?: {
       inbox: number;
@@ -141,6 +142,13 @@ export interface RequestsListResponse {
     };
   };
   timestamp?: string; // Optional - may not be present in all responses
+}
+
+export interface MarkViewedResponse {
+  status: "success";
+  data: {
+    viewedAt: string;
+  };
 }
 
 export interface FilterOptionsResponse {
@@ -428,6 +436,13 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
     const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, requestBody);
     return response.data;
   });
+}
+
+// Mark requests list as viewed by current user.
+// Endpoint: POST /api/v2/customers-hub/requests/mark-viewed
+export async function markRequestsListViewed(): Promise<MarkViewedResponse> {
+  const response = await axiosInstance.post<MarkViewedResponse>(`${BASE_URL}/mark-viewed`, {});
+  return response.data;
 }
 
 // Get Filter Options
