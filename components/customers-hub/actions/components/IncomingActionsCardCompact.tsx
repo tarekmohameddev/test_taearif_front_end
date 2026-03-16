@@ -32,11 +32,12 @@ import type { ActionPropertyRow } from "./ActionPropertiesTable";
 
 /** Source config for Stitch-style grey pill (icon + labelEn) */
 const sourceStitchConfig: Record<string, { labelEn: string; Icon: typeof MessageSquare }> = {
-  whatsapp: { labelEn: "WhatsApp", Icon: MessageSquare },
-  manual: { labelEn: "Dashboard", Icon: LayoutDashboard },
-  inquiry: { labelEn: "Website", Icon: Globe },
-  import: { labelEn: "Import", Icon: LayoutDashboard },
-  referral: { labelEn: "Referral", Icon: Globe },
+  employee_dashboard: { labelEn: "من لوحة التحكم", Icon: LayoutDashboard },
+  whatsapp: { labelEn: "من الواتساب", Icon: MessageSquare },
+  manual: { labelEn: "من لوحة التحكم", Icon: LayoutDashboard },
+  inquiry: { labelEn: "استفسار عام", Icon: Globe },
+  import: { labelEn: "استيراد", Icon: LayoutDashboard },
+  referral: { labelEn: "استفسار عام", Icon: Globe },
   property_interest: { labelEn: "من صفحة العقار", Icon: Home },
   public_form: { labelEn: "من صفحة اطلب عقارك", Icon: FileEdit },
   website: { labelEn: "من موقع العميل", Icon: Globe },
