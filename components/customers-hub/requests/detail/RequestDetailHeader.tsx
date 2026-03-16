@@ -10,11 +10,16 @@ import { SourceBadge } from "../../actions/SourceBadge";
 import { priorityConfig, statusConfig, requestDetailActionTypeLabels } from "../constants";
 import type { CustomerAction } from "@/types/unified-customer";
 
+/** Status option from GET /v1/property-requests/filters (used for badge label when status_id is set). */
+export type StatusOptionForBadge = { id: number; name_ar: string; name_en?: string };
+
 interface RequestDetailHeaderProps {
   action: CustomerAction;
   isOverdue: boolean;
   onStatusClick?: () => void;
   onPriorityClick?: () => void;
+  /** When set (e.g. from useStatusDialog), badge label uses name_ar from the option matching action.status_id. */
+  propertyRequestStatusOptions?: StatusOptionForBadge[];
 }
 
 export function RequestDetailHeader({
@@ -22,9 +27,16 @@ export function RequestDetailHeader({
   isOverdue,
   onStatusClick,
   onPriorityClick,
+  propertyRequestStatusOptions,
 }: RequestDetailHeaderProps) {
   const priorityStyle = priorityConfig[action.priority] ?? priorityConfig.medium;
-  const statusStyle = statusConfig[action.status] ?? statusConfig.pending;
+  const statusId = action.status_id;
+  const apiStatus = propertyRequestStatusOptions?.length && statusId != null
+    ? propertyRequestStatusOptions.find((s) => s.id === statusId)
+    : undefined;
+  const statusStyle = apiStatus
+    ? { label: apiStatus.name_ar, color: "bg-blue-500 text-white" }
+    : (statusConfig[action.status] ?? statusConfig.pending);
   const typeLabel = requestDetailActionTypeLabels[action.type] ?? action.type;
 
   return (

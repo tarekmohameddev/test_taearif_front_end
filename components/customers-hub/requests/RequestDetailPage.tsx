@@ -360,6 +360,7 @@ export function RequestDetailPage({
           isOverdue={!!isOverdue}
           onStatusClick={handleStatusClick}
           onPriorityClick={isPropertyRequestAction(action) ? handlePriorityClick : undefined}
+          propertyRequestStatusOptions={isPropertyRequestAction(action) ? statusDialog.statusOptions : undefined}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

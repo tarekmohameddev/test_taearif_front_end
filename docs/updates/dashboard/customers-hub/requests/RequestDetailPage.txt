@@ -1,3 +1,8 @@
+2026-03-17
+Update Type: Feature
+ترجمة حالة طلب العقار في الـ badge (هيدر صفحة التفاصيل) من API: إضافة status_id اختياري إلى CustomerAction؛ RequestDetailHeader يقبل propertyRequestStatusOptions (من GET /v1/property-requests/filters) ويعرض name_ar للحالة عند وجود status_id؛ RequestDetailPage يمرّر statusDialog.statusOptions للهيدر لطلبات العقار. إذا لم يُرسل الباك اند status_id في الـ action يبقى الاعتماد على statusConfig في constants.
+types/unified-customer.ts, components/customers-hub/requests/detail/RequestDetailHeader.tsx, components/customers-hub/requests/RequestDetailPage.tsx
+
 2026-03-09
 Update Type: Refactor (Clean Code)
 Refactoring RequestDetailPage.tsx وفق Clean Code و Best Practices: (1) أنواع: RequestDetailStats بدل any، إضافة property_request_id و propertyIds/property_ids إلى CustomerAction، request-detail-types.ts مع isPropertyRequestAction و getPropertyRequestId. (2) دوال اشتقاق نقية في request-detail-data.ts: getPropertyInfo، getCustomerPreferences، getAiMatching، getMatchedProperties، getPropertyRequestNumericId، showRequestPropertiesCard، getRequestPropertyIds. (3) ثوابت: DEFAULT_TIME و SHOW_REMINDERS_SECTION و SHOW_NOTES_SECTION في constants.ts. (4) Custom hooks في requests/hooks/: useRequestDetailHandlers، useSnoozeForm، useNoteForm، useScheduleForm، useReminderForm، useAssignEmployeeDialog، useStatusDialog، usePriorityDialog. (5) مكونات حوارات: PropertyRequestStatusDialog و PropertyRequestPriorityDialog في detail/. (6) أقسام التذكيرات والملاحظات المعطلة تُعرض الآن عبر SHOW_REMINDERS_SECTION و SHOW_NOTES_SECTION؛ للاستعادة غيّر القيمة إلى true في constants.ts.
