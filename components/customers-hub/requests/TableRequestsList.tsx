@@ -192,7 +192,7 @@ function TableStatusCell({ action, statusOptions, onStatusChangeSuccess }: Table
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[160px]">
+      <DropdownMenuContent align="end" className="min-w-[220px]">
         {statusOptions.map((status) => (
           <DropdownMenuItem
             key={status.id}
