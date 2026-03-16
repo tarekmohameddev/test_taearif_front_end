@@ -66,6 +66,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           setShowAdvancedFilters={ctx.setShowAdvancedFilters}
           viewMode={ctx.viewMode}
           setViewMode={ctx.setViewMode}
+          dateFrom={ctx.dateFrom}
+          setDateFrom={ctx.setDateFrom}
+          dateTo={ctx.dateTo}
+          setDateTo={ctx.setDateTo}
           selectedSources={ctx.selectedSources}
           setSelectedSources={ctx.setSelectedSources}
           selectedPriorities={ctx.selectedPriorities}

@@ -38,6 +38,8 @@ export interface AppointmentTypeOption {
   labelEn?: string;
 }
 
+type DueDateFilter = "all" | "overdue" | "today" | "week" | "no_date";
+
 export interface AdvancedFiltersPanelProps {
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
@@ -48,8 +50,8 @@ export interface AdvancedFiltersPanelProps {
   appointmentTypes?: AppointmentTypeOption[];
   selectedAssignees: string[];
   setSelectedAssignees: (v: string[] | ((prev: string[]) => string[])) => void;
-  dueDateFilter: string;
-  setDueDateFilter: (v: string) => void;
+  dueDateFilter: DueDateFilter;
+  setDueDateFilter: (v: DueDateFilter) => void;
   selectedCities: string[];
   setSelectedCities: (v: string[] | ((prev: string[]) => string[])) => void;
   selectedStates: string[];
