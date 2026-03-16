@@ -141,7 +141,10 @@ export function TableRequestsList({
     };
     const config = variants[status] || variants.pending;
     return (
-      <Badge variant={config.variant as any} className="text-xs">
+      <Badge
+        variant={config.variant as any}
+        className="text-[10px] px-1.5 py-0.5 leading-tight"
+      >
         {config.text}
       </Badge>
     );
@@ -366,17 +369,6 @@ export function TableRequestsList({
                       <SortIcon field="priority" />
                     </Button>
                   </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 -mr-2"
-                      onClick={() => handleSort("status")}
-                    >
-                      الحالة
-                      <SortIcon field="status" />
-                    </Button>
-                  </TableHead>
                   <TableHead>المصدر</TableHead>
                   <TableHead>
                     <Button
@@ -465,25 +457,30 @@ export function TableRequestsList({
                         />
                       </TableCell>
 
-                      {/* Customer Name & Phone */}
+                      {/* Customer Name, Phone & Status */}
                       <TableCell>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                          <span className="font-semibold text-gray-900 dark:text-white">
-                            {action.customerName}
-                          </span>
-                          {(action.customerPhone || customer?.phone) && (
-                            <span className="flex items-center gap-1 text-xs text-gray-500">
-                              <Phone className="h-3 w-3 shrink-0" />
-                              <a
-                                href={`tel:${action.customerPhone || customer?.phone}`}
-                                className="hover:text-blue-600 dir-ltr"
-                                dir="ltr"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {action.customerPhone || customer?.phone}
-                              </a>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                              {action.customerName}
                             </span>
-                          )}
+                            {(action.customerPhone || customer?.phone) && (
+                              <span className="flex items-center gap-1 text-xs text-gray-500">
+                                <Phone className="h-3 w-3 shrink-0" />
+                                <a
+                                  href={`tel:${action.customerPhone || customer?.phone}`}
+                                  className="hover:text-blue-600 dir-ltr"
+                                  dir="ltr"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {action.customerPhone || customer?.phone}
+                                </a>
+                              </span>
+                            )}
+                          </div>
+                          <div>
+                            {getStatusBadge(action.status)}
+                          </div>
                         </div>
                       </TableCell>
 
@@ -504,9 +501,6 @@ export function TableRequestsList({
                           getPriorityBadge(action.priority)
                         )}
                       </TableCell>
-
-                      {/* Status */}
-                      <TableCell>{getStatusBadge(action.status)}</TableCell>
 
                       {/* Source */}
                       <TableCell>
