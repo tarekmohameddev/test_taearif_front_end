@@ -59,7 +59,7 @@ export default function CustomersHubRequestsPage() {
           tab: "all",
           limit: 50,
           offset: 0,
-          sort_by: "createdAt",
+          sort_by: "updatedAt",
           sort_dir: "desc",
         };
 

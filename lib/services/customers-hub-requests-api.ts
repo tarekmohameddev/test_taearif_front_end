@@ -63,7 +63,7 @@ export interface RequestsListFilters {
   date_from?: string; // New field (ISO date string)
   date_to?: string; // New field (ISO date string)
   search?: string;
-  sort_by?: "createdAt" | "dueDate" | "priority" | "customerName"; // Changed from sorting.field
+  sort_by?: "updatedAt" | "createdAt" | "dueDate" | "priority" | "customerName"; // Changed from sorting.field
   sort_dir?: "asc" | "desc"; // Changed from sorting.order
   limit?: number; // Changed from pagination.limit
   offset?: number; // Changed from pagination.offset (calculated from page)
@@ -404,7 +404,7 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       requestBody.offset = 0;
     }
     if (requestBody.sort_by === undefined) {
-      requestBody.sort_by = "createdAt";
+      requestBody.sort_by = "updatedAt";
     }
     if (requestBody.sort_dir === undefined) {
       requestBody.sort_dir = "desc";

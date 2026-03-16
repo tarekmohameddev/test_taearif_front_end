@@ -166,7 +166,7 @@ export const useCustomersHubFiltersState = () => {
     // Default pagination and sorting
     filters.limit = 50;
     filters.offset = 0;
-    filters.sort_by = "createdAt";
+    filters.sort_by = "updatedAt";
     filters.sort_dir = "desc";
 
     console.log("🔍 Building newFilters (Customers Hub - Flat Format):", {
