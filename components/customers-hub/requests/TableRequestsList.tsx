@@ -391,7 +391,7 @@ export function TableRequestsList({
                       className="h-8 -mr-2"
                       onClick={() => handleSort("createdAt")}
                     >
-                      تاريخ الإنشاء
+                      تاريخ ووقت الإنشاء
                       <SortIcon field="createdAt" />
                     </Button>
                   </TableHead>
@@ -424,11 +424,10 @@ export function TableRequestsList({
                       className="h-8 -mr-2"
                       onClick={() => handleSort("city")}
                     >
-                      المدينة
+                      الموقع
                       <SortIcon field="city" />
                     </Button>
                   </TableHead>
-                  <TableHead>الجدية</TableHead>
                   <TableHead>الموظف المسؤول</TableHead>
                   <TableHead>
                     <Button
@@ -520,14 +519,22 @@ export function TableRequestsList({
                         <SourceBadge source={action.source} className="text-xs" />
                       </TableCell>
 
-                      {/* Created At */}
+                      {/* Created At (Date & Time) */}
                       <TableCell>
                         {action.createdAt ? (
-                          <div className="text-sm">
-                            {new Date(action.createdAt).toLocaleDateString("ar-SA", {
-                              month: "short",
-                              day: "numeric",
-                            })}
+                          <div className="text-sm leading-tight">
+                            <div>
+                              {new Date(action.createdAt).toLocaleDateString("ar-SA", {
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {new Date(action.createdAt).toLocaleTimeString("ar-SA", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </div>
                           </div>
                         ) : (
                           <span className="text-gray-400 text-sm">-</span>
@@ -572,28 +579,38 @@ export function TableRequestsList({
                         })()}
                       </TableCell>
 
-                      {/* City */}
+                      {/* City & District */}
                       <TableCell>
-                        {(action as any).city ? (
-                          <div className="flex items-center gap-1 text-sm">
-                            <MapPin className="h-3.5 w-3.5 text-gray-500" />
-                            <span>{(action as any).city}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">-</span>
-                        )}
-                      </TableCell>
+                        {(() => {
+                          const rawCity =
+                            (action as any).city ??
+                            (action as any).region ??
+                            (action as any).state ??
+                            (action as any).properties?.[0]?.city;
+                          const district =
+                            (action as any).district ??
+                            (action as any).properties?.[0]?.district;
 
-                      {/* Seriousness */}
-                      <TableCell>
-                        {(action as any).metadata?.seriousness ? (
-                          <div className="flex items-center gap-1 text-sm">
-                            <AlertTriangle className="h-3.5 w-3.5 text-gray-500" />
-                            <span>{(action as any).metadata.seriousness}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">-</span>
-                        )}
+                          if (!rawCity && !district) {
+                            return <span className="text-gray-400 text-sm">-</span>;
+                          }
+
+                          return (
+                            <div className="flex items-start gap-1 text-sm">
+                              <MapPin className="h-3.5 w-3.5 text-gray-500 mt-0.5" />
+                              <div className="flex flex-col">
+                                {rawCity && (
+                                  <span className="font-medium text-gray-900 dark:text-white">
+                                    {rawCity}
+                                  </span>
+                                )}
+                                {district && (
+                                  <span className="text-xs text-gray-500">{district}</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </TableCell>
 
                       {/* Assigned Employee */}
