@@ -343,7 +343,7 @@ export function TableRequestsList({
                       className="rounded border-gray-300"
                     />
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -354,7 +354,7 @@ export function TableRequestsList({
                       <SortIcon field="customer" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -365,8 +365,8 @@ export function TableRequestsList({
                       <SortIcon field="priority" />
                     </Button>
                   </TableHead>
-                  <TableHead>المصدر</TableHead>
-                  <TableHead>
+                  <TableHead className="text-right">المصدر</TableHead>
+                  <TableHead className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -377,7 +377,7 @@ export function TableRequestsList({
                       <SortIcon field="createdAt" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -388,7 +388,7 @@ export function TableRequestsList({
                       <SortIcon field="budget" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -399,7 +399,7 @@ export function TableRequestsList({
                       <SortIcon field="propertyType" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -410,8 +410,8 @@ export function TableRequestsList({
                       <SortIcon field="city" />
                     </Button>
                   </TableHead>
-                  <TableHead>الموظف المسؤول</TableHead>
-                  <TableHead>
+                  <TableHead className="text-right">الموظف المسؤول</TableHead>
+                  <TableHead className="text-right">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -444,7 +444,7 @@ export function TableRequestsList({
                       )}
                     >
                       {/* Checkbox */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         <input
                           type="checkbox"
                           checked={isSelected}
@@ -454,7 +454,7 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Customer Name, Phone & Status */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         <div className="flex flex-col gap-1">
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                             <span className="font-semibold text-gray-900 dark:text-white">
@@ -481,7 +481,7 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Priority */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         {onPriorityClick && getPropertyRequestId(action) != null ? (
                           <button
                             type="button"
@@ -499,12 +499,12 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Source */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         <SourceBadge source={action.source} className="text-xs" />
                       </TableCell>
 
                       {/* Created At (Date & Time) */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         {action.createdAt ? (
                           <div className="text-sm leading-tight">
                             <div>
@@ -526,7 +526,7 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Budget */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         {(action as any).budgetMin != null || (action as any).budgetMax != null ? (
                           <div className="flex items-center gap-1 text-sm">
                             <DollarSign className="h-3.5 w-3.5 text-gray-500" />
@@ -546,7 +546,7 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Property Type / Category - translated */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         {(() => {
                           const raw = (action as any).propertyType ?? (action as any).propertyCategory ?? (action as any).property_type;
                           const translated = raw ? translatePropertyType(raw) : null;
