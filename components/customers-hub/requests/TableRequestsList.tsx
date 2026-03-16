@@ -64,7 +64,7 @@ import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 import { getPropertyRequestId } from "./request-detail-types";
 import type { ApiStageShape } from "../actions/types/incomingCardTypes";
 import type { StatusOption } from "./hooks/useStatusDialog";
-import { statusConfig } from "./constants";
+import { statusConfig, priorityOptions } from "./constants";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface TableStageCellProps {
@@ -176,7 +176,7 @@ function TableStatusCell({ action, statusOptions, onStatusChangeSuccess }: Table
         <button
           type="button"
           className={cn(
-            "inline-flex items-center gap-1 rounded-md text-[10px] px-1.5 py-0.5 leading-tight cursor-pointer hover:opacity-90 transition-opacity border-0",
+            "inline-flex items-center gap-1 rounded-full text-[10px] px-1.5 py-0.5 leading-tight cursor-pointer hover:opacity-90 transition-opacity border-0",
             colorClass
           )}
           onClick={(e) => e.stopPropagation()}
@@ -213,6 +213,85 @@ function TableStatusCell({ action, statusOptions, onStatusChangeSuccess }: Table
   );
 }
 
+/** Priority dropdown for property requests: same options as detail page (constants), update via PUT /v1/property-requests/:id/priority. Badge appearance unchanged. */
+interface TablePriorityCellProps {
+  action: CustomerAction;
+  onPriorityChangeSuccess?: (actionId: string, newPriority: Priority) => void;
+}
+
+function TablePriorityCell({ action, onPriorityChangeSuccess }: TablePriorityCellProps) {
+  const [saving, setSaving] = useState(false);
+  const propertyRequestId = getPropertyRequestId(action);
+  const priority = action.priority ?? "medium";
+
+  const variants: Record<string, { variant: "destructive" | "default" | "secondary" | "outline"; text: string }> = {
+    urgent: { variant: "destructive", text: "عاجل" },
+    high: { variant: "default", text: "عالي" },
+    medium: { variant: "secondary", text: "متوسط" },
+    low: { variant: "outline", text: "منخفض" },
+  };
+  const config = variants[priority] || variants.medium;
+
+  const handleSelect = async (newPriority: Priority) => {
+    if (propertyRequestId == null || newPriority === priority || saving) return;
+    setSaving(true);
+    try {
+      await axiosInstance.put(`/v1/property-requests/${propertyRequestId}/priority`, {
+        priority: newPriority,
+      });
+      (action as { priority?: Priority }).priority = newPriority;
+      onPriorityChangeSuccess?.(action.id, newPriority);
+      toast.success("تم تحديث أولوية طلب العقار بنجاح");
+    } catch (error: unknown) {
+      const message =
+        error && typeof error === "object" && "response" in error && (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? String((error as { response: { data: { message: string } } }).response.data.message)
+          : "حدث خطأ أثناء تحديث الأولوية";
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="focus:outline-none text-right cursor-pointer hover:opacity-90 transition-opacity w-fit border-0 bg-transparent p-0"
+          onClick={(e) => e.stopPropagation()}
+          data-interactive="true"
+        >
+          {saving ? (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          ) : (
+            <Badge variant={config.variant} className="text-xs">
+              {config.text}
+            </Badge>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[220px]">
+        {priorityOptions.map((opt) => (
+          <DropdownMenuItem
+            key={opt.value}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelect(opt.value);
+            }}
+            disabled={saving || priority === opt.value}
+          >
+            {opt.label}
+            {priority === opt.value && (
+              <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 interface TableRequestsListProps {
   actions: CustomerAction[];
   getCustomerById: (id: string) => UnifiedCustomer | undefined;
@@ -238,6 +317,7 @@ interface TableRequestsListProps {
     previousStageId: string
   ) => void;
   onStatusChangeSuccess?: (actionId: string, newStatusId: number) => void;
+  onPriorityChangeSuccess?: (actionId: string, newPriority: Priority) => void;
 }
 
 type SortField = "customer" | "priority" | "status" | "createdAt" | "budget" | "propertyType" | "city" | "stage";
@@ -258,6 +338,7 @@ export function TableRequestsList({
   completingActionIds,
   onStageChangeSuccess,
   onStatusChangeSuccess,
+  onPriorityChangeSuccess,
 }: TableRequestsListProps) {
   const router = useRouter();
   const userData = useAuthStore(selectUserData);
@@ -703,19 +784,13 @@ export function TableRequestsList({
                         </div>
                       </TableCell>
 
-                      {/* Priority */}
-                      <TableCell className="text-right">
-                        {onPriorityClick && getPropertyRequestId(action) != null ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onPriorityClick(action);
-                            }}
-                            className="focus:outline-none text-right cursor-pointer hover:opacity-90 transition-opacity"
-                          >
-                            {getPriorityBadge(action.priority)}
-                          </button>
+                      {/* Priority — dropdown for property requests (same logic as detail page), same badge look */}
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        {getPropertyRequestId(action) != null ? (
+                          <TablePriorityCell
+                            action={action}
+                            onPriorityChangeSuccess={onPriorityChangeSuccess}
+                          />
                         ) : (
                           getPriorityBadge(action.priority)
                         )}
