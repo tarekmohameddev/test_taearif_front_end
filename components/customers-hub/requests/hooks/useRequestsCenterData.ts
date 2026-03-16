@@ -165,11 +165,20 @@ export function useRequestsCenterData({
         )
           return false;
         if (selectedStates.length > 0) {
-          const customerRegion = customer.city
-            ? cityToRegion[customer.city]
-            : undefined;
-          if (!customerRegion || !selectedStates.includes(customerRegion))
-            return false;
+          const compositeKeys = selectedStates.filter((k) => /^\d+-\d+$/.test(k));
+          if (compositeKeys.length > 0) {
+            const actionKey =
+              a.city_id != null && a.districts_id != null
+                ? `${a.city_id}-${a.districts_id}`
+                : null;
+            if (!actionKey || !compositeKeys.includes(actionKey)) return false;
+          } else {
+            const customerRegion = customer.city
+              ? cityToRegion[customer.city]
+              : undefined;
+            if (!customerRegion || !selectedStates.includes(customerRegion))
+              return false;
+          }
         }
         if (filterMin !== undefined || filterMax !== undefined) {
           const cMin = customer.preferences?.budgetMin;

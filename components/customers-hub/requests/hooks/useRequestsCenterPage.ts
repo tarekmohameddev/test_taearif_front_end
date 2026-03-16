@@ -14,10 +14,18 @@ import type { RequestsListFilters } from "@/lib/services/customers-hub-requests-
 import { getPropertyRequestId } from "../request-detail-types";
 import {
   fetchCities,
+  fetchDistricts,
   regionsFromCities,
   cityToRegionMap,
   type CityOption,
 } from "@/lib/services/locations-api";
+
+export type DistrictOption = { id: number; name: string };
+export type DistrictsByCityItem = {
+  cityId: number;
+  cityName: string;
+  districts: DistrictOption[];
+};
 
 export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   const storeActions = useUnifiedCustomersStore((state) => state.actions);
@@ -233,8 +241,64 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [locationCities, setLocationCities] = useState<CityOption[]>([]);
   const [locationsLoading, setLocationsLoading] = useState(false);
+  const [districtsByCity, setDistrictsByCity] = useState<DistrictsByCityItem[]>([]);
+  const [districtsLoading, setDistrictsLoading] = useState(false);
+  const districtsCacheRef = useRef<Record<number, DistrictOption[]>>({});
 
   const prevFiltersRef = useRef<string>("");
+
+  const selectedCityIds = useMemo(() => {
+    if (!filterHooks.selectedCities.length) return [];
+    return locationCities
+      .filter((c) => filterHooks.selectedCities.includes(c.name))
+      .map((c) => ({ id: c.id, name: c.name }));
+  }, [locationCities, filterHooks.selectedCities]);
+
+  useEffect(() => {
+    if (selectedCityIds.length === 0) {
+      setDistrictsByCity([]);
+      return;
+    }
+    let cancelled = false;
+    setDistrictsLoading(true);
+    Promise.all(
+      selectedCityIds.map(async ({ id, name }) => {
+        if (districtsCacheRef.current[id]) return { cityId: id, cityName: name, districts: districtsCacheRef.current[id] };
+        const districts = await fetchDistricts(id);
+        if (!cancelled) districtsCacheRef.current[id] = districts;
+        return { cityId: id, cityName: name, districts };
+      })
+    )
+      .then((list) => {
+        if (!cancelled) setDistrictsByCity(list);
+      })
+      .catch((err) => {
+        if (!cancelled) console.error("Error fetching districts for requests:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setDistrictsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCityIds]);
+
+  const selectedCityIdsKey = useMemo(
+    () => selectedCityIds.map((c) => c.id).sort((a, b) => a - b).join(","),
+    [selectedCityIds]
+  );
+  useEffect(() => {
+    const currentIds = new Set(selectedCityIds.map((c) => c.id));
+    setSelectedStates((prev) => {
+      const next = prev.filter((key) => {
+        const match = /^(\d+)-/.exec(key);
+        if (!match) return true;
+        const cityId = parseInt(match[1], 10);
+        return currentIds.has(cityId);
+      });
+      return next.length === prev.length ? prev : next;
+    });
+  }, [selectedCityIdsKey, selectedCityIds, setSelectedStates]);
 
   // مدن ومناطق من الباك اند: filterOptions هو نفسه كائن data من الاستجابة (بدون .data مرة ثانية)
   const fo = props?.filterOptions;
@@ -466,6 +530,8 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     sourceOptions,
     apiCityNames,
     apiRegionNames,
+    districtsByCity,
+    districtsLoading,
     apiStages,
     apiLoading,
     apiError,

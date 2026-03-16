@@ -255,6 +255,8 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
                   selectedPropertyTypes={ctx.selectedPropertyTypes}
                   setSelectedPropertyTypes={ctx.setSelectedPropertyTypes}
                   uniqueCities={ctx.uniqueCities}
+                  districtsByCity={ctx.districtsByCity ?? []}
+                  districtsLoading={ctx.districtsLoading ?? false}
                   regionOptions={ctx.apiRegionNames ?? []}
                   tempBudgetMin={ctx.tempBudgetMin}
                   tempBudgetMax={ctx.tempBudgetMax}

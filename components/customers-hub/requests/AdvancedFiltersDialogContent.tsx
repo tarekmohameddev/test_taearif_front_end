@@ -24,6 +24,7 @@ import {
 import { SourceBadge } from "../actions/SourceBadge";
 import type { AppointmentTypeOption, SourceOption } from "./AdvancedFiltersPanel";
 import type { Priority } from "@/types/unified-customer";
+import type { DistrictsByCityItem } from "./hooks/useRequestsCenterPage";
 
 const PRIORITIES: Priority[] = ["urgent", "high", "medium", "low"];
 
@@ -58,7 +59,11 @@ export interface AdvancedFiltersDialogContentProps {
   selectedPropertyTypes: string[];
   setSelectedPropertyTypes: (v: string[] | ((prev: string[]) => string[])) => void;
   uniqueCities: string[];
-  /** مناطق من الباك اند (من filter-options أو من /cities). إن لم تُمرَّر يُعرض قائمة فارغة. */
+  /** أحياء مجمعة حسب المدينة (عند اختيار مدينة تُجلب أحياؤها). إن وُجدت تُعرض مع dividers. */
+  districtsByCity?: DistrictsByCityItem[];
+  /** جاري جلب الأحياء */
+  districtsLoading?: boolean;
+  /** مناطق من الباك اند (fallback قديم). */
   regionOptions?: string[];
   tempBudgetMin: string;
   tempBudgetMax: string;
@@ -168,6 +173,8 @@ export function AdvancedFiltersDialogContent({
   selectedPropertyTypes,
   setSelectedPropertyTypes,
   uniqueCities,
+  districtsByCity = [],
+  districtsLoading = false,
   regionOptions = [],
   tempBudgetMin,
   tempBudgetMax,
@@ -471,43 +478,57 @@ export function AdvancedFiltersDialogContent({
         </SectionWrapper>
       )}
 
-      {/* المنطقة - multi-select */}
-      {(!hasSearch || matches("المنطقة")) && (
+      {/* المنطقة (الأحياء) - multi-select حسب المدن المختارة */}
+      {(!hasSearch || matches("المنطقة") || matches("الحي") || matches("أحياء")) && (
         <SectionWrapper
           id="state"
           title={
             <span className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
-              <span>المنطقة</span>
+              <span>الحي / المنطقة</span>
             </span>
           }
           badgeCount={selectedStates.length}
           searchActive={hasSearch}
         >
-          {regionOptions.length === 0 ? (
-            <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مناطق (تُجلب من الباك اند)</div>
+          {districtsByCity.length === 0 && !districtsLoading ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">
+              {selectedCities.length === 0
+                ? "اختر مدينة أولاً لعرض الأحياء"
+                : "لا توجد أحياء (تُجلب من الباك اند)"}
+            </div>
+          ) : districtsLoading ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">جاري التحميل...</div>
           ) : (
-            regionOptions.map((region, i) => {
-              const checked = selectedStates.includes(region);
-              return (
-                <button
-                  key={`region-${i}-${region}`}
-                  type="button"
-                  onClick={() =>
-                    setSelectedStates((prev) =>
-                      checked ? prev.filter((r) => r !== region) : [...prev, region]
-                    )
-                  }
-                  className={cn(
-                    "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
-                    checked && "bg-gray-100 dark:bg-gray-800"
-                  )}
-                >
-                  <span className="w-4 text-center">{checked ? "✓" : ""}</span>
-                  <span>{region}</span>
-                </button>
-              );
-            })
+            districtsByCity.map(({ cityId, cityName, districts }) => (
+              <div key={`city-${cityId}`} className="space-y-1">
+                <div className="flex items-center gap-2 px-2 py-1.5 border-b border-gray-200 dark:border-gray-700">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{cityName}</span>
+                </div>
+                {districts.map((d) => {
+                  const compositeKey = `${cityId}-${d.id}`;
+                  const checked = selectedStates.includes(compositeKey);
+                  return (
+                    <button
+                      key={`district-${cityId}-${d.id}`}
+                      type="button"
+                      onClick={() =>
+                        setSelectedStates((prev) =>
+                          checked ? prev.filter((k) => k !== compositeKey) : [...prev, compositeKey]
+                        )
+                      }
+                      className={cn(
+                        "w-full text-right cursor-pointer px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 flex items-center gap-2 rounded-lg",
+                        checked && "bg-gray-100 dark:bg-gray-800"
+                      )}
+                    >
+                      <span className="w-4 text-center">{checked ? "✓" : ""}</span>
+                      <span>{d.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))
           )}
         </SectionWrapper>
       )}

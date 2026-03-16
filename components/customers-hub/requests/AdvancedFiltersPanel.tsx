@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ import {
   PROPERTY_TYPE_OPTIONS,
 } from "./constants";
 import type { CustomerSource, Priority } from "@/types/unified-customer";
+import type { DistrictsByCityItem } from "./hooks/useRequestsCenterPage";
 
 export interface AppointmentTypeOption {
   id: string;
@@ -65,7 +67,10 @@ export interface AdvancedFiltersPanelProps {
   setSelectedPropertyTypes: (v: string[] | ((prev: string[]) => string[])) => void;
   uniqueAssignees: { id: string; name: string }[];
   uniqueCities: string[];
-  /** مناطق من الباك اند (من filter-options أو من /cities). إن لم تُمرَّر يُعرض قائمة فارغة. */
+  /** أحياء مجمعة حسب المدينة. إن وُجدت تُعرض مع dividers. */
+  districtsByCity?: DistrictsByCityItem[];
+  districtsLoading?: boolean;
+  /** مناطق من الباك اند (fallback). */
   regionOptions?: string[];
   tempBudgetMin: string;
   tempBudgetMax: string;
@@ -115,6 +120,8 @@ export function AdvancedFiltersPanel({
   setSelectedPropertyTypes,
   uniqueAssignees,
   uniqueCities,
+  districtsByCity = [],
+  districtsLoading = false,
   regionOptions = [],
   tempBudgetMin,
   tempBudgetMax,
@@ -323,7 +330,7 @@ export function AdvancedFiltersPanel({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className={btnClass}>
             <MapPin className="h-4 w-4" />
-            المنطقة
+            الحي / المنطقة
             {selectedStates.length > 0 && (
               <Badge variant="secondary" className="mr-1">
                 {selectedStates.length}
@@ -332,24 +339,39 @@ export function AdvancedFiltersPanel({
             <ChevronDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>المنطقة (الولاية)</DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="max-h-[320px] overflow-y-auto">
+          <DropdownMenuLabel>الحي (حسب المدينة)</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {regionOptions.length === 0 ? (
-            <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مناطق</div>
+          {districtsByCity.length === 0 && !districtsLoading ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">
+              {selectedCities.length === 0 ? "اختر مدينة أولاً" : "لا توجد أحياء"}
+            </div>
+          ) : districtsLoading ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">جاري التحميل...</div>
           ) : (
-            regionOptions.map((region, i) => (
-              <DropdownMenuCheckboxItem
-                key={`region-${i}-${region}`}
-                checked={selectedStates.includes(region)}
-                onCheckedChange={(checked) =>
-                  setSelectedStates((prev) =>
-                    checked ? [...prev, region] : prev.filter((r) => r !== region)
-                  )
-                }
-              >
-                {region}
-              </DropdownMenuCheckboxItem>
+            districtsByCity.map(({ cityId, cityName, districts }) => (
+              <React.Fragment key={`city-${cityId}`}>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {cityName}
+                </DropdownMenuLabel>
+                {districts.map((d) => {
+                  const compositeKey = `${cityId}-${d.id}`;
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={`district-${cityId}-${d.id}`}
+                      checked={selectedStates.includes(compositeKey)}
+                      onCheckedChange={(checked) =>
+                        setSelectedStates((prev) =>
+                          checked ? [...prev, compositeKey] : prev.filter((k) => k !== compositeKey)
+                        )
+                      }
+                    >
+                      {d.name}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+              </React.Fragment>
             ))
           )}
         </DropdownMenuContent>
