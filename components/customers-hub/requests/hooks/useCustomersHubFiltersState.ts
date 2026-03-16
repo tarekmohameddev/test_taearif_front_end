@@ -21,8 +21,8 @@ export const useCustomersHubFiltersState = () => {
   const [budgetMin, setBudgetMin] = useState<string>("");
   const [budgetMax, setBudgetMax] = useState<string>("");
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
-  const [dateFrom, setDateFrom] = useState<string>("");
-  const [dateTo, setDateTo] = useState<string>("");
+  const [requestDateFrom, setRequestDateFrom] = useState<string | null>(null);
+  const [requestDateTo, setRequestDateTo] = useState<string | null>(null);
 
   // Applied search query (used in filters - applied manually via button)
   const [appliedSearchQuery, setAppliedSearchQuery] = useState<string>("");
@@ -150,17 +150,17 @@ export const useCustomersHubFiltersState = () => {
       filters.budget_max = Number(budgetMax);
     }
 
-    // Created date range filters
-    if (dateFrom) {
-      filters.date_from = dateFrom;
-    }
-    if (dateTo) {
-      filters.date_to = dateTo;
-    }
-
     // Property types filter (changed from propertyType to property_types)
     if (selectedPropertyTypes.length > 0) {
       filters.property_types = selectedPropertyTypes;
+    }
+
+    // Request created_at date range filter (date_from / date_to)
+    if (requestDateFrom) {
+      filters.date_from = requestDateFrom;
+    }
+    if (requestDateTo) {
+      filters.date_to = requestDateTo;
     }
 
     // Default pagination and sorting
@@ -193,8 +193,8 @@ export const useCustomersHubFiltersState = () => {
     budgetMin,
     budgetMax,
     selectedPropertyTypes,
-    dateFrom,
-    dateTo,
+    requestDateFrom,
+    requestDateTo,
   ]);
 
   const handleClearFilters = () => {
@@ -214,8 +214,8 @@ export const useCustomersHubFiltersState = () => {
     setBudgetMin("");
     setBudgetMax("");
     setSelectedPropertyTypes([]);
-    setDateFrom("");
-    setDateTo("");
+    setRequestDateFrom(null);
+    setRequestDateTo(null);
   };
 
   return {
@@ -252,10 +252,10 @@ export const useCustomersHubFiltersState = () => {
     setBudgetMax,
     selectedPropertyTypes,
     setSelectedPropertyTypes,
-    dateFrom,
-    setDateFrom,
-    dateTo,
-    setDateTo,
+    requestDateFrom,
+    setRequestDateFrom,
+    requestDateTo,
+    setRequestDateTo,
     // Computed filters object
     newFilters,
     // Handlers

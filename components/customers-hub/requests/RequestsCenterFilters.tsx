@@ -51,10 +51,6 @@ export function RequestsCenterFilters({
   setTempBudgetMax,
   isBudgetDialogOpen,
   setIsBudgetDialogOpen,
-  dateFrom,
-  setDateFrom,
-  dateTo,
-  setDateTo,
 }: RequestsCenterFiltersProps) {
   return (
     <Card>
@@ -70,15 +66,13 @@ export function RequestsCenterFilters({
             setShowAdvancedFilters={setShowAdvancedFilters}
             viewMode={viewMode}
             setViewMode={setViewMode}
-            dateFrom={dateFrom}
-            setDateFrom={setDateFrom}
-            dateTo={dateTo}
-            setDateTo={setDateTo}
             inlineFilters={{
               selectedSources,
               setSelectedSources,
-              dueDateFilter,
-              setDueDateFilter,
+              requestDateFrom: (filterHooks as any)?.requestDateFrom ?? undefined,
+              setRequestDateFrom: (filterHooks as any)?.setRequestDateFrom ?? (() => {}),
+              requestDateTo: (filterHooks as any)?.requestDateTo ?? undefined,
+              setRequestDateTo: (filterHooks as any)?.setRequestDateTo ?? (() => {}),
               selectedAssignees,
               setSelectedAssignees,
               uniqueAssignees,

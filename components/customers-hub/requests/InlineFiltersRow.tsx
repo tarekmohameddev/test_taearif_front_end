@@ -10,7 +10,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import { Filter, ChevronDown, Calendar, UserPlus } from "lucide-react";
+import { Calendar as CalendarIcon, UserPlus } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { SourceBadge } from "../actions/SourceBadge";
 import type { CustomerSource } from "@/types/unified-customer";
 
@@ -25,8 +27,10 @@ const SOURCES: CustomerSource[] = [
 export interface InlineFiltersRowProps {
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
-  dueDateFilter: string;
-  setDueDateFilter: (v: string) => void;
+  requestDateFrom: string | null;
+  setRequestDateFrom: (v: string | null) => void;
+  requestDateTo: string | null;
+  setRequestDateTo: (v: string | null) => void;
   selectedAssignees: string[];
   setSelectedAssignees: (v: string[] | ((prev: string[]) => string[])) => void;
   uniqueAssignees: { id: string; name: string }[];
@@ -35,8 +39,10 @@ export interface InlineFiltersRowProps {
 export function InlineFiltersRow({
   selectedSources,
   setSelectedSources,
-  dueDateFilter,
-  setDueDateFilter,
+  requestDateFrom,
+  setRequestDateFrom,
+  requestDateTo,
+  setRequestDateTo,
   selectedAssignees,
   setSelectedAssignees,
   uniqueAssignees,
@@ -77,54 +83,80 @@ export function InlineFiltersRow({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className={btnClass}>
-            <Calendar className="h-4 w-4" />
-            التاريخ
-            {dueDateFilter !== "all" && (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={btnClass}
+          >
+            <CalendarIcon className="h-4 w-4" />
+            {requestDateFrom || requestDateTo ? (
+              <span className="text-xs">
+                {requestDateFrom ?? "؟"} – {requestDateTo ?? "؟"}
+              </span>
+            ) : (
+              "التاريخ"
+            )}
+            {(requestDateFrom || requestDateTo) && (
               <Badge variant="secondary" className="mr-1">
                 1
               </Badge>
             )}
-            <ChevronDown className="h-4 w-4" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>التاريخ</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem
-            checked={dueDateFilter === "all"}
-            onCheckedChange={() => setDueDateFilter("all")}
-          >
-            الكل
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            checked={dueDateFilter === "overdue"}
-            onCheckedChange={() => setDueDateFilter("overdue")}
-          >
-            متأخر
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            checked={dueDateFilter === "today"}
-            onCheckedChange={() => setDueDateFilter("today")}
-          >
-            اليوم
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            checked={dueDateFilter === "week"}
-            onCheckedChange={() => setDueDateFilter("week")}
-          >
-            هذا الأسبوع
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            checked={dueDateFilter === "no_date"}
-            onCheckedChange={() => setDueDateFilter("no_date")}
-          >
-            بدون تاريخ
-          </DropdownMenuCheckboxItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-auto p-3" dir="rtl">
+          <div className="space-y-3">
+            <div className="text-sm font-medium">تاريخ إنشاء الطلب</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <div className="text-xs text-muted-foreground">من</div>
+                <Calendar
+                  mode="single"
+                  selected={requestDateFrom ? new Date(requestDateFrom) : undefined}
+                  onSelect={(date) => {
+                    if (!date) {
+                      setRequestDateFrom(null);
+                      return;
+                    }
+                    const iso = date.toISOString().slice(0, 10);
+                    setRequestDateFrom(iso);
+                  }}
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs text-muted-foreground">إلى</div>
+                <Calendar
+                  mode="single"
+                  selected={requestDateTo ? new Date(requestDateTo) : undefined}
+                  onSelect={(date) => {
+                    if (!date) {
+                      setRequestDateTo(null);
+                      return;
+                    }
+                    const iso = date.toISOString().slice(0, 10);
+                    setRequestDateTo(iso);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between gap-2 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => {
+                  setRequestDateFrom(null);
+                  setRequestDateTo(null);
+                }}
+              >
+                مسح
+              </Button>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

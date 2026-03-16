@@ -35,8 +35,6 @@ const SOURCES: CustomerSource[] = [
 ];
 const PRIORITIES: Priority[] = ["urgent", "high", "medium", "low"];
 
-type DueDateFilter = "all" | "overdue" | "today" | "week" | "no_date";
-
 export interface AdvancedFiltersDialogContentProps {
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
@@ -48,8 +46,8 @@ export interface AdvancedFiltersDialogContentProps {
   selectedAppointmentTypes: string[];
   setSelectedAppointmentTypes: (v: string[] | ((prev: string[]) => string[])) => void;
   appointmentTypes?: AppointmentTypeOption[];
-  dueDateFilter: DueDateFilter;
-  setDueDateFilter: (v: DueDateFilter) => void;
+  dueDateFilter: string;
+  setDueDateFilter: (v: string) => void;
   selectedCities: string[];
   setSelectedCities: (v: string[] | ((prev: string[]) => string[])) => void;
   selectedStates: string[];

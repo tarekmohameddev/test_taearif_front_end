@@ -186,8 +186,6 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     setBudgetMin,
     setBudgetMax,
     setSelectedPropertyTypes,
-    setDateFrom,
-    setDateTo,
     applySearch,
     newFilters,
   } = filterHooks;
@@ -365,9 +363,7 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     filterHooks.selectedStageIds.length > 0 ||
     filterHooks.budgetMin !== "" ||
     filterHooks.budgetMax !== "" ||
-    filterHooks.selectedPropertyTypes.length > 0 ||
-    filterHooks.dateFrom !== "" ||
-    filterHooks.dateTo !== "";
+    filterHooks.selectedPropertyTypes.length > 0;
 
   const handlers = useRequestsCenterHandlers({
     completeAction,
