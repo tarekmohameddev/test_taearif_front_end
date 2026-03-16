@@ -303,9 +303,9 @@ export function AdvancedFiltersPanel({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>المدينة</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {uniqueCities.map((city) => (
+            {uniqueCities.map((city, i) => (
               <DropdownMenuCheckboxItem
-                key={city}
+                key={`city-${i}-${city}`}
                 checked={selectedCities.includes(city)}
                 onCheckedChange={(checked) =>
                   setSelectedCities((prev) =>
@@ -338,9 +338,9 @@ export function AdvancedFiltersPanel({
           {regionOptions.length === 0 ? (
             <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مناطق</div>
           ) : (
-            regionOptions.map((region) => (
+            regionOptions.map((region, i) => (
               <DropdownMenuCheckboxItem
-                key={region}
+                key={`region-${i}-${region}`}
                 checked={selectedStates.includes(region)}
                 onCheckedChange={(checked) =>
                   setSelectedStates((prev) =>

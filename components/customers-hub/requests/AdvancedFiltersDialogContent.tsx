@@ -446,11 +446,11 @@ export function AdvancedFiltersDialogContent({
           {uniqueCities.length === 0 ? (
             <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مدن</div>
           ) : (
-            uniqueCities.map((city) => {
+            uniqueCities.map((city, i) => {
               const checked = selectedCities.includes(city);
               return (
                 <button
-                  key={city}
+                  key={`city-${i}-${city}`}
                   type="button"
                   onClick={() =>
                     setSelectedCities((prev) =>
@@ -487,11 +487,11 @@ export function AdvancedFiltersDialogContent({
           {regionOptions.length === 0 ? (
             <div className="px-2 py-1.5 text-xs text-muted-foreground">لا توجد مناطق (تُجلب من الباك اند)</div>
           ) : (
-            regionOptions.map((region) => {
+            regionOptions.map((region, i) => {
               const checked = selectedStates.includes(region);
               return (
                 <button
-                  key={region}
+                  key={`region-${i}-${region}`}
                   type="button"
                   onClick={() =>
                     setSelectedStates((prev) =>
