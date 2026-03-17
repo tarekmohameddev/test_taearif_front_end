@@ -73,6 +73,15 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
               </span>
             </div>
           )}
+
+          {action.wants_similar_offers != null && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">يريد عروض مشابهة</span>
+              <span className="font-medium">
+                {Number(action.wants_similar_offers) === 1 ? "نعم" : "لا"}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* تفاصيل العقار المطلوب من نموذج اطلب عقارك */}

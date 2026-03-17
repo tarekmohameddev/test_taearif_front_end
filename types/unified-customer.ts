@@ -77,10 +77,16 @@ export interface CustomerAction {
   budget_from?: number | string | null;
   budget_to?: number | string | null;
   currency?: string | null;
+  /** Arabic district name for property request (e.g. "حي برزان") */
+  districtAR?: string | null;
   full_name?: string | null;
   phone?: string | null;
   contact_on_whatsapp?: boolean | number | null;
   seriousness?: string | null;
+  /** Whether customer wants to receive similar offers (0/1 from backend). */
+  wants_similar_offers?: number | boolean | null;
+  /** Purchase goal/usage, e.g. "سكن خاص" */
+  purchase_goal?: string | null;
   // Appointments and Reminders (populated for property_request and inquiry)
   appointments?: Appointment[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
   reminders?: Reminder[]; // For objectType === 'property_request' or 'inquiry', otherwise empty array
