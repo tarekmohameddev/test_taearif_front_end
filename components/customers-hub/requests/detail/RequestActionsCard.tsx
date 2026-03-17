@@ -34,9 +34,7 @@ export interface RequestActionsCardProps {
   /** Snooze form */
   showSnoozeForm: boolean;
   snoozeDate: string;
-  snoozeTime: string;
   onSnoozeDateChange: (v: string) => void;
-  onSnoozeTimeChange: (v: string) => void;
   onSnoozeSubmit: () => void;
   onSnoozeCancel: () => void;
   /** Schedule form */
@@ -65,9 +63,7 @@ export function RequestActionsCard({
   onScheduleFormToggle,
   showSnoozeForm,
   snoozeDate,
-  snoozeTime,
   onSnoozeDateChange,
-  onSnoozeTimeChange,
   onSnoozeSubmit,
   onSnoozeCancel,
   showScheduleForm,
@@ -145,21 +141,13 @@ export function RequestActionsCard({
 
             {showSnoozeForm && (
               <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3 border">
-                <Label className="text-sm font-medium">تأجيل حتى:</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    type="date"
-                    value={snoozeDate}
-                    onChange={(e) => onSnoozeDateChange(e.target.value)}
-                    className="text-sm"
-                  />
-                  <Input
-                    type="time"
-                    value={snoozeTime}
-                    onChange={(e) => onSnoozeTimeChange(e.target.value)}
-                    className="text-sm"
-                  />
-                </div>
+                <Label className="text-sm font-medium">تأجيل حتى التاريخ:</Label>
+                <Input
+                  type="date"
+                  value={snoozeDate}
+                  onChange={(e) => onSnoozeDateChange(e.target.value)}
+                  className="text-sm"
+                />
                 <div className="flex gap-2">
                   <Button
                     size="sm"
