@@ -480,11 +480,11 @@ export async function dismissAction(actionId: string, reason?: string): Promise<
 // Snooze Action
 export async function snoozeAction(
   actionId: string,
-  snoozeUntil: string,
+  snoozedUntil: string,
   reason?: string
 ): Promise<SnoozeActionResponse> {
   const response = await axiosInstance.post<SnoozeActionResponse>(`${BASE_URL}/${actionId}/snooze`, {
-    snoozeUntil,
+    snoozedUntil,
     reason,
   });
   return response.data;
