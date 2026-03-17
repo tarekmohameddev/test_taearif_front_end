@@ -23,14 +23,10 @@ import {
   CustomDropdown,
   DropdownItem,
 } from "@/components/customComponents/customDropdown";
-
-const PROPERTY_TYPE_LABELS: Record<string, string> = {
-  Agricultural: "زراعي",
-  apartment: "شقة",
-  commercial: "تجاري",
-  Industrial: "صناعي",
-  Residential: "سكني",
-};
+import {
+  PROPERTY_TYPES,
+  PROPERTY_TYPE_LABELS_AR,
+} from "@/lib/properties/propertyType";
 
 interface PropertyRequestFormData {
   property_type: string;
@@ -182,33 +178,31 @@ export const PropertyRequestForm = ({
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filtersData && (
-              <div className="space-y-2">
-                <Label htmlFor="property_type">نوع العقار</Label>
-                <Select
-                  value={formData.property_type}
-                  onValueChange={(value) => onChange("property_type", value)}
+            <div className="space-y-2">
+              <Label htmlFor="property_type">نوع العقار</Label>
+              <Select
+                value={formData.property_type}
+                onValueChange={(value) => onChange("property_type", value)}
+              >
+                <SelectTrigger
+                  className={getError("property_type") ? "border-red-500" : ""}
                 >
-                  <SelectTrigger
-                    className={getError("property_type") ? "border-red-500" : ""}
-                  >
-                    <SelectValue placeholder="اختر نوع العقار" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filtersData.property_types.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {PROPERTY_TYPE_LABELS[type] || type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {getError("property_type") && (
-                  <p className="text-sm text-red-500">
-                    {getError("property_type")}
-                  </p>
-                )}
-              </div>
-            )}
+                  <SelectValue placeholder="اختر نوع العقار" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROPERTY_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {PROPERTY_TYPE_LABELS_AR[type.value]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {getError("property_type") && (
+                <p className="text-sm text-red-500">
+                  {getError("property_type")}
+                </p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
