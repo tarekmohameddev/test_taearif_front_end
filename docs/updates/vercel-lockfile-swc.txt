@@ -1,0 +1,23 @@
+# Vercel: إصلاح تحذير "lockfile missing swc dependencies"
+
+## المشكلة
+أثناء الـ build على Vercel يظهر:
+  Found lockfile missing swc dependencies, run next locally to automatically patch
+
+## السبب
+Next.js يضيف تبعيات اختيارية لـ @next/swc (للمنصات المختلفة) في الـ lockfile عند تشغيل next محلياً. إذا لم يكن package-lock.json موجوداً في المستودع، فإن Vercel ينشئ lockfile جديداً عند كل build ولا يحتوي على هذه التبعيات فيُظهر التحذير ويحاول Next تعديل الـ lockfile أثناء الـ build.
+
+## ما تم عمله
+1. في .gitignore: إزالة تجاهل package-lock.json (واستثناؤه من *.lock) حتى يُرفع الملف مع المشروع.
+2. بعد أول مرة: تشغيل محلياً ثم رفع الـ lockfile:
+   - npm install
+   - npm run build
+   - git add package-lock.json && git commit -m "chore: add lockfile with SWC deps for Vercel" && git push
+
+بعد ذلك سيكون الـ lockfile على Vercel محدّثاً وتختفي الرسالة.
+
+## بديل (بدون تتبع lockfile)
+إذا أردت الإبقاء على تجاهل package-lock.json:
+- في Vercel: Project → Settings → Environment Variables
+- أضف: NEXT_IGNORE_INCORRECT_LOCKFILE = true
+هذا يتخطى التحقق من الـ lockfile (التحذير قد يبقى لكن الـ build يكمل).

@@ -2,11 +2,12 @@
 
 # dependencies
 /node_modules
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 bun.lockb
 *.lock
+# استثناء: تتبع package-lock.json لتفادي تحذير Vercel "lockfile missing swc dependencies"
+!package-lock.json
 
 # next.js
 /.next

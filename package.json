@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev2": "next dev --turbopack",
-    "build": "next build --webpack",
+    "build": "next build",
     "analyze": "node -e \"process.env.ANALYZE='true'; require('child_process').execSync('npx next build --webpack', {stdio:'inherit', env: process.env})\"",
     "start": "next start",
     "lint": "next lint",

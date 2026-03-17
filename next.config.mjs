@@ -1,4 +1,8 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -51,11 +55,14 @@ const nextConfig = {
     pagesBufferLength: process.env.NODE_ENV === "development" ? 6 : 2,
   },
   output: process.platform === "win32" ? undefined : "standalone",
-  
-  // Turbopack: يُستخدم عند تشغيل `npm run dev` (next dev --turbopack). الإنتاج يستخدم webpack.
-  turbopack: {},
-  
-  // ⬅️ Webpack configuration - فقط في PRODUCTION
+
+  // Turbopack: الـ bundler الافتراضي في Next.js 16 للـ dev والـ build.
+  // استخدم `npm run build` (بدون --webpack) ليعمل الـ build دائماً بـ Turbopack.
+  turbopack: {
+    root: path.join(__dirname),
+  },
+
+  // ⬅️ Webpack: يُستخدم فقط عند تشغيل next build --webpack (للتوافق الاختياري).
   webpack: (config, { isServer, dev, webpack }) => {
     // منع حل fs/promises و path في bundle العميل (lib/debug يستخدمها فقط في السيرفر)
     if (!isServer) {
