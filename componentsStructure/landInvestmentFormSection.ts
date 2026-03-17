@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const landInvestmentFormSectionStructure: ComponentStructure = {
   componentType: "landInvestmentFormSection",
@@ -14,11 +15,15 @@ export const landInvestmentFormSectionStructure: ComponentStructure = {
         { key: "description", label: "Description", type: "textarea" },
         { key: "bottomImageSrc", label: "Bottom Image URL", type: "text" },
         { key: "bottomImageAlt", label: "Bottom Image Alt", type: "text" },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "descriptionTextProps", label: "Description Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "heading", label: "Heading", type: "text" },
         { key: "description", label: "Description", type: "textarea" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

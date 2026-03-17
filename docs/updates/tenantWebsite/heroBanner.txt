@@ -1,0 +1,24 @@
+2025-03-17 12:00:00
+Update Type: Enhancement
+Full control over HeroBanner texts in the editor: added titleTextProps, subtitleTextProps, and descriptionTextProps to default data and component structure so PM can edit content and all text styles (typography, color, spacing, effects) for title, subtitle, and description from the EditorSidebar.
+context/editorStoreFunctions/heroBannerFunctions.ts, componentsStructure/heroBanner.ts
+
+2025-03-17 12:15:00
+Update Type: Enhancement
+HeroBanner getData now merges stored data with defaults so when the sidebar opens, default styles (title/subtitle/description text props) are visible in the fields even for new or partially saved instances.
+context/editorStoreFunctions/heroBannerFunctions.ts
+
+2025-03-17 13:00:00
+Update Type: Bug Fix
+HeroBanner default data and video/fallbackImage: sidebar always uses getComponentData for heroBanner so defaults are visible; seed store when empty so first save persists defaults; ensureVariant merges existing stored with defaults; updateByPath applies updates on merged full source so videoSrc and fallbackImage edits do not drop other fields.
+components/tenant/live-editor/EditorSidebar/hooks/useEditorSidebarData.ts, context/editorStoreFunctions/heroBannerFunctions.ts
+
+2025-03-17 14:00:00
+Update Type: Bug Fix
+HeroBanner video and fallback image: when video URL is empty or cleared, do not show default video; show fallback image as full background when no video URL. Video only renders when videoSrc is non-empty; otherwise fallback image is shown as background.
+stories/HeroBanner/HeroBanner.tsx
+
+2025-03-17 15:00:00
+Update Type: Bug Fix
+HeroBanner sidebar edits not updating canvas: canvas mergedData was only recomputed when pageComponents/slug/etc changed, not when editor store (heroBannerStates) changed. CachedComponent is React.memo so it never re-rendered with new store data. Subscribed LiveEditorUI to heroBannerStates and passed it to useBackendDataState so that when user edits video/fallbackImage in sidebar, backendDataState recomputes and canvas shows the new values.
+components/tenant/live-editor/LiveEditorUI/index.tsx, components/tenant/live-editor/LiveEditorUI/hooks/useBackendDataState.ts

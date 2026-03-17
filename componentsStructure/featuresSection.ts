@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const featuresSectionStructure: ComponentStructure = {
   componentType: "featuresSection",
@@ -29,10 +30,16 @@ export const featuresSectionStructure: ComponentStructure = {
             { key: "text", label: "Text", type: "text" },
           ],
         },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "featureTitleTextProps", label: "Feature Title Style", type: "object", fields: sharedTextStyleFields },
+        { key: "featureDescriptionTextProps", label: "Feature Description Style", type: "object", fields: sharedTextStyleFields },
+        { key: "certificationTextProps", label: "Certification Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "heading", label: "Heading", type: "text" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const quoteSectionStructure: ComponentStructure = {
   componentType: "quoteSection",
@@ -14,12 +15,17 @@ export const quoteSectionStructure: ComponentStructure = {
         { key: "imageAlt", label: "Image Alt", type: "text" },
         { key: "name", label: "Name", type: "text" },
         { key: "role", label: "Role", type: "text" },
+        { key: "quoteTextProps", label: "Quote Style", type: "object", fields: sharedTextStyleFields },
+        { key: "nameTextProps", label: "Name Style", type: "object", fields: sharedTextStyleFields },
+        { key: "roleTextProps", label: "Role Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "quote", label: "Quote", type: "textarea" },
         { key: "name", label: "Name", type: "text" },
         { key: "role", label: "Role", type: "text" },
+        { key: "quoteTextProps.fontSize", label: "Quote Font Size", type: "text" },
+        { key: "quoteTextProps.color", label: "Quote Color", type: "color" },
       ],
     },
   ],

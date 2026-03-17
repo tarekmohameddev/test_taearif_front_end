@@ -54,7 +54,23 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
   const hasChangesMade = useEditorStore((s) => s.hasChangesMade);
   const themeChangeTimestamp = useEditorStore((s) => s.themeChangeTimestamp);
   const staticPagesData = useEditorStore((s) => s.staticPagesData);
-  
+  // Subscribe to component states so canvas recomputes when user edits in sidebar (theme3 HeroBanner-style)
+  const heroBannerStates = useEditorStore((s) => s.heroBannerStates);
+  const commitmentSectionStates = useEditorStore((s) => s.commitmentSectionStates);
+  const creativityTriadSectionStates = useEditorStore((s) => s.creativityTriadSectionStates);
+  const essenceSectionStates = useEditorStore((s) => s.essenceSectionStates);
+  const featuresSectionStates = useEditorStore((s) => s.featuresSectionStates);
+  const journeySectionStates = useEditorStore((s) => s.journeySectionStates);
+  const landInvestmentFormSectionStates = useEditorStore((s) => s.landInvestmentFormSectionStates);
+  const philosophyCtaSectionStates = useEditorStore((s) => s.philosophyCtaSectionStates);
+  const quoteSectionStates = useEditorStore((s) => s.quoteSectionStates);
+  const projectsHeaderStates = useEditorStore((s) => s.projectsHeaderStates);
+  const projectsShowcaseStates = useEditorStore((s) => s.projectsShowcaseStates);
+  const contactFormStates = useEditorStore((s) => s.contactFormStates);
+  const valuesSectionStates = useEditorStore((s) => s.valuesSectionStates);
+  const headerStates = useEditorStore((s) => s.headerStates);
+  const footerStates = useEditorStore((s) => s.footerStates);
+
   // Tenant store subscriptions for loading state
   const tenantLoading = useTenantStore((s) => s.loadingTenantData);
   const tenantData = useTenantStore((s) => s.tenantData);
@@ -79,6 +95,21 @@ export function LiveEditorUI({ state, computed, handlers }: LiveEditorUIProps) {
     themeChangeTimestamp,
     selectedComponentId,
     staticPagesData,
+    heroBannerStates,
+    commitmentSectionStates,
+    creativityTriadSectionStates,
+    essenceSectionStates,
+    featuresSectionStates,
+    journeySectionStates,
+    landInvestmentFormSectionStates,
+    philosophyCtaSectionStates,
+    quoteSectionStates,
+    projectsHeaderStates,
+    projectsShowcaseStates,
+    contactFormStates,
+    valuesSectionStates,
+    headerStates,
+    footerStates,
   });
 
   const { selectedDevice, handleDeviceChange, screenWidth } =

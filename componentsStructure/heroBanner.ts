@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const heroBannerStructure: ComponentStructure = {
   componentType: "heroBanner",
@@ -20,6 +21,24 @@ export const heroBannerStructure: ComponentStructure = {
         { key: "title", label: "Title", type: "text" },
         { key: "subtitle", label: "Subtitle", type: "text" },
         { key: "description", label: "Description", type: "text" },
+        {
+          key: "titleTextProps",
+          label: "Title Style",
+          type: "object",
+          fields: sharedTextStyleFields,
+        },
+        {
+          key: "subtitleTextProps",
+          label: "Subtitle Style",
+          type: "object",
+          fields: sharedTextStyleFields,
+        },
+        {
+          key: "descriptionTextProps",
+          label: "Description Style",
+          type: "object",
+          fields: sharedTextStyleFields,
+        },
         {
           key: "primaryCta",
           label: "Primary CTA",
@@ -55,6 +74,12 @@ export const heroBannerStructure: ComponentStructure = {
         { key: "title", label: "Title", type: "text" },
         { key: "subtitle", label: "Subtitle", type: "text" },
         { key: "description", label: "Description", type: "text" },
+        { key: "titleTextProps.fontSize", label: "Title Font Size", type: "text" },
+        { key: "titleTextProps.color", label: "Title Color", type: "color" },
+        { key: "subtitleTextProps.fontSize", label: "Subtitle Font Size", type: "text" },
+        { key: "subtitleTextProps.color", label: "Subtitle Color", type: "color" },
+        { key: "descriptionTextProps.fontSize", label: "Description Font Size", type: "text" },
+        { key: "descriptionTextProps.color", label: "Description Color", type: "color" },
         { key: "primaryCta.label", label: "Primary CTA Text", type: "text" },
         { key: "primaryCta.href", label: "Primary CTA URL", type: "text" },
         { key: "secondaryCta.label", label: "Secondary CTA Text", type: "text" },

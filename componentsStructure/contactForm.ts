@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const contactFormStructure: ComponentStructure = {
   componentType: "contactForm",
@@ -60,12 +61,16 @@ export const contactFormStructure: ComponentStructure = {
         { key: "imageSrc", label: "Image URL", type: "text" },
         { key: "imageAlt", label: "Image Alt", type: "text" },
         { key: "shapeSrc", label: "Shape Image URL", type: "text" },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "descriptionTextProps", label: "Description Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "heading", label: "Heading", type: "text" },
         { key: "description", label: "Description", type: "textarea" },
         { key: "submitText", label: "Submit Text", type: "text" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

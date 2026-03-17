@@ -12,18 +12,37 @@ export const getDefaultFeaturesSectionData = (): ComponentData => ({
   heading: DEFAULT_HEADING,
   features: DEFAULT_FEATURES,
   certifications: DEFAULT_CERTIFICATIONS,
+  headingTextProps: {},
+  featureTitleTextProps: {},
+  featureDescriptionTextProps: {},
+  certificationTextProps: {},
 });
+
+/** Merge stored data with defaults so store always has full shape including *TextProps. */
+function mergeWithDefaults(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultFeaturesSectionData();
+  return {
+    ...defaultData,
+    ...stored,
+    headingTextProps: { ...(defaultData.headingTextProps || {}), ...(stored.headingTextProps || {}) },
+    featureTitleTextProps: { ...(defaultData.featureTitleTextProps || {}), ...(stored.featureTitleTextProps || {}) },
+    featureDescriptionTextProps: { ...(defaultData.featureDescriptionTextProps || {}), ...(stored.featureDescriptionTextProps || {}) },
+    certificationTextProps: { ...(defaultData.certificationTextProps || {}), ...(stored.certificationTextProps || {}) },
+  } as ComponentData;
+}
 
 export const featuresSectionFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.featuresSectionStates?.[variantId] &&
-      Object.keys(state.featuresSectionStates[variantId]).length > 0
-    ) {
-      return {} as any;
-    }
     const defaultData = getDefaultFeaturesSectionData();
-    const data: ComponentData = initial || state.tempData || defaultData;
+    const stored = state.featuresSectionStates?.[variantId];
+    const hasStored = stored && Object.keys(stored).length > 0;
+
+    let data: ComponentData;
+    if (hasStored) {
+      data = mergeWithDefaults(stored);
+    } else {
+      data = initial || state.tempData || defaultData;
+    }
     return {
       featuresSectionStates: {
         ...(state.featuresSectionStates || {}),
@@ -32,7 +51,7 @@ export const featuresSectionFunctions = {
     } as any;
   },
   getData: (state: any, variantId: string) =>
-    state.featuresSectionStates?.[variantId] || getDefaultFeaturesSectionData(),
+    mergeWithDefaults(state.featuresSectionStates?.[variantId] || {}),
   setData: (state: any, variantId: string, data: ComponentData) => ({
     featuresSectionStates: {
       ...(state.featuresSectionStates || {}),
@@ -40,9 +59,9 @@ export const featuresSectionFunctions = {
     },
   }),
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.featuresSectionStates?.[variantId] || getDefaultFeaturesSectionData();
-    const newData = updateDataByPath(source, path, value);
+    const stored = state.featuresSectionStates?.[variantId] || {};
+    const fullSource = mergeWithDefaults(stored);
+    const newData = updateDataByPath(fullSource, path, value);
     return {
       featuresSectionStates: {
         ...(state.featuresSectionStates || {}),

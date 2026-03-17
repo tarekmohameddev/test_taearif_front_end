@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const creativityTriadSectionStructure: ComponentStructure = {
   componentType: "creativityTriadSection",
@@ -22,11 +23,17 @@ export const creativityTriadSectionStructure: ComponentStructure = {
             { key: "imageAlt", label: "Image Alt", type: "text" },
           ],
         },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "introTextProps", label: "Intro Style", type: "object", fields: sharedTextStyleFields },
+        { key: "cardTitleTextProps", label: "Card Title Style", type: "object", fields: sharedTextStyleFields },
+        { key: "cardDescriptionTextProps", label: "Card Description Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "heading", label: "Heading", type: "text" },
         { key: "intro", label: "Intro", type: "textarea" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 // Validation schema for header data
 const validateHeaderData = (data: any): boolean => {
@@ -1015,6 +1016,9 @@ export const headerStructure: ComponentStructure = {
             { key: "href", label: "Button URL", type: "text" },
           ],
         },
+        { key: "navLinkTextProps", label: "Nav Link Style", type: "object", fields: sharedTextStyleFields },
+        { key: "languageToggleTextProps", label: "Language Toggle Style", type: "object", fields: sharedTextStyleFields },
+        { key: "ctaTextProps", label: "CTA Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
@@ -1036,6 +1040,8 @@ export const headerStructure: ComponentStructure = {
         { key: "languageToggle.label", label: "Language Toggle", type: "text" },
         { key: "cta.label", label: "CTA Text", type: "text" },
         { key: "cta.href", label: "CTA URL", type: "text" },
+        { key: "navLinkTextProps.fontSize", label: "Nav Font Size", type: "text" },
+        { key: "navLinkTextProps.color", label: "Nav Color", type: "color" },
       ],
     },
   ],

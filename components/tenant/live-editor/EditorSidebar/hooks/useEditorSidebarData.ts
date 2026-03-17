@@ -4,6 +4,44 @@ import { ComponentInstance } from "@/lib/types";
 import { createDefaultData } from "../utils";
 import { getDefaultHeaderData } from "@/context/editorStoreFunctions/headerFunctions";
 
+/** Theme3 component types that use getComponentData + seed when raw store is empty (HeroBanner-style). */
+const THEME3_COMPONENT_TYPES = new Set([
+  "heroBanner",
+  "commitmentSection",
+  "creativityTriadSection",
+  "essenceSection",
+  "featuresSection",
+  "journeySection",
+  "landInvestmentFormSection",
+  "philosophyCtaSection",
+  "quoteSection",
+  "projectsHeader",
+  "projectsShowcase",
+  "valuesSection",
+  "contactForm",
+  "header",
+  "footer",
+]);
+
+/** Map component type to store state key for raw-empty check and seed. */
+const THEME3_TYPE_TO_STATE_KEY: Record<string, string> = {
+  heroBanner: "heroBannerStates",
+  commitmentSection: "commitmentSectionStates",
+  creativityTriadSection: "creativityTriadSectionStates",
+  essenceSection: "essenceSectionStates",
+  featuresSection: "featuresSectionStates",
+  journeySection: "journeySectionStates",
+  landInvestmentFormSection: "landInvestmentFormSectionStates",
+  philosophyCtaSection: "philosophyCtaSectionStates",
+  quoteSection: "quoteSectionStates",
+  projectsHeader: "projectsHeaderStates",
+  projectsShowcase: "projectsShowcaseStates",
+  valuesSection: "valuesSectionStates",
+  contactForm: "contactFormStates",
+  header: "headerStates",
+  footer: "footerStates",
+};
+
 interface UseEditorSidebarDataProps {
   view: "main" | "add-section" | "edit-component" | "branding-settings";
   selectedComponent: ComponentInstance | null;
@@ -83,6 +121,26 @@ export const useEditorSidebarData = ({
                   : {};
 
           setTempData(dataToUse);
+        } else if (THEME3_COMPONENT_TYPES.has(selectedComponent.type)) {
+          // Theme3 (incl. heroBanner): use getComponentData so sidebar sees merged defaults + stored
+          const dataToUse = store.getComponentData(
+            selectedComponent.type,
+            uniqueVariantId,
+          );
+          setTempData(dataToUse && Object.keys(dataToUse).length > 0 ? dataToUse : selectedComponent.data || {});
+
+          // Seed store with full defaults when raw store is empty so first save persists them
+          const stateKey = THEME3_TYPE_TO_STATE_KEY[selectedComponent.type];
+          const rawStored = stateKey ? (store as any)[stateKey]?.[uniqueVariantId] : undefined;
+          if (!rawStored || Object.keys(rawStored).length === 0) {
+            const seedData =
+              dataToUse && Object.keys(dataToUse).length > 0
+                ? dataToUse
+                : store.getComponentData(selectedComponent.type, uniqueVariantId);
+            if (seedData && Object.keys(seedData).length > 0) {
+              store.setComponentData(selectedComponent.type, uniqueVariantId, seedData);
+            }
+          }
         } else {
           // For other components, use existing component data if available, otherwise get from store
           const existingData =

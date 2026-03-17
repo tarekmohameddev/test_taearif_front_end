@@ -16,18 +16,39 @@ export const getDefaultJourneySectionData = (): ComponentData => ({
   steps: DEFAULT_STEPS,
   flagImageSrc: DEFAULT_FLAG_IMAGE_SRC,
   flagImageAlt: DEFAULT_FLAG_IMAGE_ALT,
+  headingTextProps: {},
+  journeyLabelTextProps: {},
+  stepTitleTextProps: {},
+  stepDurationTextProps: {},
+  stepDescriptionTextProps: {},
 });
+
+/** Merge stored data with defaults so store always has full shape including *TextProps. */
+function mergeWithDefaults(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultJourneySectionData();
+  return {
+    ...defaultData,
+    ...stored,
+    headingTextProps: { ...(defaultData.headingTextProps || {}), ...(stored.headingTextProps || {}) },
+    journeyLabelTextProps: { ...(defaultData.journeyLabelTextProps || {}), ...(stored.journeyLabelTextProps || {}) },
+    stepTitleTextProps: { ...(defaultData.stepTitleTextProps || {}), ...(stored.stepTitleTextProps || {}) },
+    stepDurationTextProps: { ...(defaultData.stepDurationTextProps || {}), ...(stored.stepDurationTextProps || {}) },
+    stepDescriptionTextProps: { ...(defaultData.stepDescriptionTextProps || {}), ...(stored.stepDescriptionTextProps || {}) },
+  } as ComponentData;
+}
 
 export const journeySectionFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.journeySectionStates?.[variantId] &&
-      Object.keys(state.journeySectionStates[variantId]).length > 0
-    ) {
-      return {} as any;
-    }
     const defaultData = getDefaultJourneySectionData();
-    const data: ComponentData = initial || state.tempData || defaultData;
+    const stored = state.journeySectionStates?.[variantId];
+    const hasStored = stored && Object.keys(stored).length > 0;
+
+    let data: ComponentData;
+    if (hasStored) {
+      data = mergeWithDefaults(stored);
+    } else {
+      data = initial || state.tempData || defaultData;
+    }
     return {
       journeySectionStates: {
         ...(state.journeySectionStates || {}),
@@ -36,7 +57,7 @@ export const journeySectionFunctions = {
     } as any;
   },
   getData: (state: any, variantId: string) =>
-    state.journeySectionStates?.[variantId] || getDefaultJourneySectionData(),
+    mergeWithDefaults(state.journeySectionStates?.[variantId] || {}),
   setData: (state: any, variantId: string, data: ComponentData) => ({
     journeySectionStates: {
       ...(state.journeySectionStates || {}),
@@ -44,9 +65,9 @@ export const journeySectionFunctions = {
     },
   }),
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.journeySectionStates?.[variantId] || getDefaultJourneySectionData();
-    const newData = updateDataByPath(source, path, value);
+    const stored = state.journeySectionStates?.[variantId] || {};
+    const fullSource = mergeWithDefaults(stored);
+    const newData = updateDataByPath(fullSource, path, value);
     return {
       journeySectionStates: {
         ...(state.journeySectionStates || {}),

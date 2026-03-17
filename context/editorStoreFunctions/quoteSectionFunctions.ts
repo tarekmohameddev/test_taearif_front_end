@@ -16,18 +16,35 @@ export const getDefaultQuoteSectionData = (): ComponentData => ({
   imageAlt: DEFAULT_IMAGE_ALT,
   name: DEFAULT_NAME,
   role: DEFAULT_ROLE,
+  quoteTextProps: {},
+  nameTextProps: {},
+  roleTextProps: {},
 });
+
+/** Merge stored data with defaults so store always has full shape including *TextProps. */
+function mergeWithDefaults(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultQuoteSectionData();
+  return {
+    ...defaultData,
+    ...stored,
+    quoteTextProps: { ...(defaultData.quoteTextProps || {}), ...(stored.quoteTextProps || {}) },
+    nameTextProps: { ...(defaultData.nameTextProps || {}), ...(stored.nameTextProps || {}) },
+    roleTextProps: { ...(defaultData.roleTextProps || {}), ...(stored.roleTextProps || {}) },
+  } as ComponentData;
+}
 
 export const quoteSectionFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.quoteSectionStates?.[variantId] &&
-      Object.keys(state.quoteSectionStates[variantId]).length > 0
-    ) {
-      return {} as any;
-    }
     const defaultData = getDefaultQuoteSectionData();
-    const data: ComponentData = initial || state.tempData || defaultData;
+    const stored = state.quoteSectionStates?.[variantId];
+    const hasStored = stored && Object.keys(stored).length > 0;
+
+    let data: ComponentData;
+    if (hasStored) {
+      data = mergeWithDefaults(stored);
+    } else {
+      data = initial || state.tempData || defaultData;
+    }
     return {
       quoteSectionStates: {
         ...(state.quoteSectionStates || {}),
@@ -36,7 +53,7 @@ export const quoteSectionFunctions = {
     } as any;
   },
   getData: (state: any, variantId: string) =>
-    state.quoteSectionStates?.[variantId] || getDefaultQuoteSectionData(),
+    mergeWithDefaults(state.quoteSectionStates?.[variantId] || {}),
   setData: (state: any, variantId: string, data: ComponentData) => ({
     quoteSectionStates: {
       ...(state.quoteSectionStates || {}),
@@ -44,9 +61,9 @@ export const quoteSectionFunctions = {
     },
   }),
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.quoteSectionStates?.[variantId] || getDefaultQuoteSectionData();
-    const newData = updateDataByPath(source, path, value);
+    const stored = state.quoteSectionStates?.[variantId] || {};
+    const fullSource = mergeWithDefaults(stored);
+    const newData = updateDataByPath(fullSource, path, value);
     return {
       quoteSectionStates: {
         ...(state.quoteSectionStates || {}),
