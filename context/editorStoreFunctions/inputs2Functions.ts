@@ -1,5 +1,9 @@
 import { ComponentData } from "@/lib/types";
 import { ComponentState, createDefaultData, updateDataByPath } from "./types";
+import {
+  PROPERTY_TYPES,
+  PROPERTY_TYPE_LABELS_AR,
+} from "@/lib/properties/propertyType";
 
 /**
  * Default inputs2 data structure
@@ -215,24 +219,10 @@ export const getDefaultInputs2Data = (): ComponentData => {
           description: null,
           required: false,
           type: "radio",
-          options: [
-            {
-              value: "زراعي",
-              label: "زراعي",
-            },
-            {
-              value: "صناعي",
-              label: "صناعي",
-            },
-            {
-              value: "تجاري",
-              label: "تجاري",
-            },
-            {
-              value: "سكني",
-              label: "سكني",
-            },
-          ],
+          options: PROPERTY_TYPES.map((type) => ({
+            value: type.value,
+            label: PROPERTY_TYPE_LABELS_AR[type.value],
+          })),
           validation: null,
           icon: null,
           id: "category",

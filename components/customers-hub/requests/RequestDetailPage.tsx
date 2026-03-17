@@ -56,6 +56,12 @@ import { AssignEmployeeDialog } from "./detail/AssignEmployeeDialog";
 import { PropertyRequestStatusDialog } from "./detail/PropertyRequestStatusDialog";
 import { PropertyRequestPriorityDialog } from "./detail/PropertyRequestPriorityDialog";
 import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -76,13 +82,13 @@ import {
   type CustomerLike,
 } from "./request-detail-data";
 import { useRequestDetailHandlers } from "./hooks/useRequestDetailHandlers";
-import { useSnoozeForm } from "./hooks/useSnoozeForm";
 import { useNoteForm } from "./hooks/useNoteForm";
 import { useScheduleForm } from "./hooks/useScheduleForm";
 import { useReminderForm } from "./hooks/useReminderForm";
 import { useAssignEmployeeDialog } from "./hooks/useAssignEmployeeDialog";
 import { useStatusDialog } from "./hooks/useStatusDialog";
 import { usePriorityDialog } from "./hooks/usePriorityDialog";
+import { createReminderForRequest } from "@/lib/services/customers-hub-requests-api";
 
 interface RequestDetailPageProps {
   requestId: string;
@@ -208,6 +214,9 @@ export function RequestDetailPage({
   const [dismissReason, setDismissReason] = useState("");
   const [dismissError, setDismissError] = useState<string | null>(null);
   const [dismissSubmitting, setDismissSubmitting] = useState(false);
+  const [showLockedStatusDialog, setShowLockedStatusDialog] = useState(false);
+  const [showSnoozeForm, setShowSnoozeForm] = useState(false);
+  const [snoozeDate, setSnoozeDate] = useState("");
 
   const { handleComplete } = useRequestDetailHandlers({
     action,
@@ -267,18 +276,50 @@ export function RequestDetailPage({
     }
   };
 
-  const snoozeActionFn = onSnoozeAction
-    ? async (snoozeUntil: string, _reason?: string) => {
-        try {
-          await onSnoozeAction(snoozeUntil, _reason);
-          if (onRefetch) await onRefetch();
-        } catch (err) {
-          console.error("Error snoozing action:", err);
-        }
-      }
-    : (snoozeUntil: string) => storeSnoozeAction(requestId, snoozeUntil);
+  const handleSnoozeQuickReminder = async () => {
+    if (!snoozeDate) {
+      toast.error("الرجاء اختيار تاريخ التأجيل");
+      return;
+    }
 
-  const snoozeForm = useSnoozeForm({ snoozeAction: snoozeActionFn, onRefetch });
+    const isRequest =
+      action?.objectType === "property_request" || action?.objectType === "inquiry";
+    if (!isRequest || !action?.id) {
+      toast.error("لا يمكن إضافة التذكير: نوع الطلب غير مدعوم");
+      return;
+    }
+
+    const datetime = new Date(`${snoozeDate}T${DEFAULT_TIME}`).toISOString();
+
+    const toastId = toast.loading("جاري إنشاء تذكير التأجيل...");
+    try {
+      await createReminderForRequest(action.id, {
+        title: "تأجيل المتابعة",
+        datetime,
+        priority: "medium",
+        type: "follow_up",
+      });
+      toast.success("تم إنشاء تذكير التأجيل بنجاح", { id: toastId });
+      setShowSnoozeForm(false);
+      setSnoozeDate("");
+      if (onRefetch) await onRefetch();
+    } catch (err: unknown) {
+      const message =
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        (err.response as { data?: { message?: string } }).data?.message
+          ? (err.response as { data: { message: string } }).data.message
+          : err instanceof Error
+            ? err.message
+            : "حدث خطأ أثناء إنشاء تذكير التأجيل";
+      console.error("Error creating snooze reminder:", err);
+      toast.error(message, { id: toastId });
+    }
+  };
 
   const noteForm = useNoteForm({
     actionId: action?.id ?? "",
@@ -324,6 +365,7 @@ export function RequestDetailPage({
   }
 
   const isOverdue = action.dueDate && new Date(action.dueDate) < new Date();
+  const isFinalStatus = action.status === "completed" || action.status === "dismissed";
 
   const propertyInfo = getPropertyInfo(action);
   const customerPreferences = getCustomerPreferences(customer as CustomerLike);
@@ -334,11 +376,17 @@ export function RequestDetailPage({
   const requestPropertyIds = getRequestPropertyIds(action, showRequestPropertiesCard);
 
   const handleStatusClick = () => {
-    if (isPropertyRequestAction(action)) {
-      statusDialog.setShowStatusDialog(true);
-    } else {
+    if (!isPropertyRequestAction(action)) {
       toast.error("يمكن تغيير حالة طلب العقار فقط لطلبات العقار.");
+      return;
     }
+
+    if (isFinalStatus) {
+      setShowLockedStatusDialog(true);
+      return;
+    }
+
+    statusDialog.setShowStatusDialog(true);
   };
 
   const handlePriorityClick = () => {
@@ -646,15 +694,16 @@ export function RequestDetailPage({
                 onComplete={handleComplete}
                 onDismiss={handleOpenDismissDialog}
                 onAssignClick={() => assignDialog.setShowAssignEmployeeDialog(true)}
-                onSnoozeFormToggle={() => snoozeForm.setShowSnoozeForm((v) => !v)}
+                onSnoozeFormToggle={() => setShowSnoozeForm((v) => !v)}
                 onScheduleFormToggle={() => scheduleForm.setShowScheduleForm((v) => !v)}
-                showSnoozeForm={snoozeForm.showSnoozeForm}
-                snoozeDate={snoozeForm.snoozeDate}
-                snoozeTime={snoozeForm.snoozeTime}
-                onSnoozeDateChange={snoozeForm.setSnoozeDate}
-                onSnoozeTimeChange={snoozeForm.setSnoozeTime}
-                onSnoozeSubmit={snoozeForm.handleSnooze}
-                onSnoozeCancel={snoozeForm.resetSnooze}
+                showSnoozeForm={showSnoozeForm}
+                snoozeDate={snoozeDate}
+                onSnoozeDateChange={setSnoozeDate}
+                onSnoozeSubmit={handleSnoozeQuickReminder}
+                onSnoozeCancel={() => {
+                  setShowSnoozeForm(false);
+                  setSnoozeDate("");
+                }}
                 showScheduleForm={scheduleForm.showScheduleForm}
                 aptType={scheduleForm.aptType}
                 aptDate={scheduleForm.aptDate}
@@ -715,6 +764,46 @@ export function RequestDetailPage({
                 onClose={priorityDialog.onClose}
               />
             )}
+
+            <CustomDialog
+              open={showLockedStatusDialog}
+              onOpenChange={setShowLockedStatusDialog}
+              maxWidth="max-w-md"
+            >
+              <CustomDialogContent className="p-4">
+                <CustomDialogHeader>
+                  <CustomDialogTitle className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300">
+                      {action.status === "dismissed" ? (
+                        <XCircle className="h-5 w-5" />
+                      ) : (
+                        <CheckCircle className="h-5 w-5" />
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-lg font-semibold">
+                        {action.status === "dismissed"
+                          ? "تم رفض الطلب، ولا يمكن تغيير حالته"
+                          : "تم إتمام الطلب، ولا يمكن تغيير حالته"}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        هذا الطلب في حالة نهائية، لذلك لا يمكنك تعديل حالته مرة أخرى للحفاظ على تاريخ المعاملة وسجل القرارات.
+                      </p>
+                    </div>
+                  </CustomDialogTitle>
+                </CustomDialogHeader>
+
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => setShowLockedStatusDialog(false)}
+                    className="min-w-[120px]"
+                  >
+                    فهمت
+                  </Button>
+                </div>
+              </CustomDialogContent>
+            </CustomDialog>
 
             {/* Completed/Dismissed Message */}
             {(action.status === "completed" || action.status === "dismissed") && (

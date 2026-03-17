@@ -7,6 +7,7 @@ import useAuthStore from "@/context/AuthContext";
 import { selectUserData, selectIsLoading } from "@/context/auth/selectors";
 import { useCustomersHubFiltersState } from "./useCustomersHubFiltersState";
 import { useRequestsCenterData } from "./useRequestsCenterData";
+import { useCustomersHubRequests } from "@/hooks/useCustomersHubRequests";
 import { useRequestsCenterHandlers } from "./useRequestsCenterHandlers";
 import type { RequestsCenterPageProps } from "../types";
 import type { CustomerAction, Priority } from "@/types/unified-customer";
@@ -75,6 +76,8 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
     if (authLoading || !userData?.token) return;
     fetchStages(true);
   }, [authLoading, userData?.token, fetchStages]);
+
+  const { fetchRequests, refreshRequests, refreshing } = useCustomersHubRequests();
 
   const actions = props?.actions ?? storeActions;
   const apiStats = props?.stats;
@@ -399,14 +402,18 @@ export function useRequestsCenterPage(props?: RequestsCenterPageProps) {
       const fetchWithFilters = async () => {
         try {
           const requestParams = newFilters as RequestsListFilters;
-          await props.onFetchRequests!(requestParams, { silent: true });
+          if (props?.onFetchRequests) {
+            await props.onFetchRequests!(requestParams, { silent: true });
+          } else {
+            await fetchRequests(requestParams, { silent: true });
+          }
         } catch (err) {
           console.error("Error fetching requests with filters:", err);
         }
       };
       fetchWithFilters();
     }
-  }, [props?.onFetchRequests, newFilters]);
+  }, [props?.onFetchRequests, newFilters, fetchRequests]);
 
   const useAPIFiltering = !!props?.onFetchRequests;
 

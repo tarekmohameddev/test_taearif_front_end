@@ -1,4 +1,8 @@
 import { isMultiLevelPage } from "@/lib/multiLevelPages";
+import {
+  PROPERTY_TYPES,
+  PROPERTY_TYPE_LABELS_AR,
+} from "@/lib/properties/propertyType";
 
 /**
  * Returns the default component configuration for a static page
@@ -238,12 +242,10 @@ export function getDefaultComponentForStaticPage(slug: string) {
                 description: null,
                 required: false,
                 type: "radio",
-                options: [
-                  { value: "زراعي", label: "زراعي" },
-                  { value: "صناعي", label: "صناعي" },
-                  { value: "تجاري", label: "تجاري" },
-                  { value: "سكني", label: "سكني" },
-                ],
+                options: PROPERTY_TYPES.map((type) => ({
+                  value: type.value,
+                  label: PROPERTY_TYPE_LABELS_AR[type.value],
+                })),
                 validation: null,
                 icon: null,
                 id: "category",

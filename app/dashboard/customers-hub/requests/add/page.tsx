@@ -8,12 +8,9 @@ import useAuthStore from "@/context/AuthContext";
 import { selectUserData } from "@/context/auth/selectors";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  PropertyRequestForm,
-  type PropertyModeType,
-} from "@/components/property-requests/page-components/PropertyRequestForm";
+import { PropertyRequestForm } from "@/components/property-requests/page-components/PropertyRequestForm";
 import toast from "react-hot-toast";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, FileText } from "lucide-react";
 
 const initialFormData = {
   property_type: "",
@@ -30,6 +27,7 @@ const initialFormData = {
   full_name: "",
   phone: "",
   contact_on_whatsapp: false,
+  notes: "",
 };
 
 export default function AddPropertyRequestPage() {
@@ -38,7 +36,6 @@ export default function AddPropertyRequestPage() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [propertyMode, setPropertyMode] = useState<PropertyModeType | null>(null);
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<number[]>([]);
 
   const handleChange = (field: keyof typeof formData, value: unknown) => {
@@ -88,16 +85,14 @@ export default function AddPropertyRequestPage() {
         purchase_goal: formData.purchase_goal,
         wants_similar_offers: formData.wants_similar_offers,
         contact_on_whatsapp: formData.contact_on_whatsapp,
+        notes: formData.notes || null,
         is_read: false,
         is_active: true,
         status_id: 2,
       };
 
-      if (propertyMode === "existing" && selectedPropertyIds.length > 0) {
-        requestData.property_ids = selectedPropertyIds;
-      } else {
-        requestData.property_ids = [];
-      }
+      requestData.property_ids =
+        selectedPropertyIds.length > 0 ? selectedPropertyIds : [];
 
       const response = await axiosInstance.post("/v1/property-requests", requestData);
       const newId = response.data?.data?.id;
@@ -142,9 +137,12 @@ export default function AddPropertyRequestPage() {
           </div>
         </div>
 
-        <Card>
+        <Card className="bg-gray-100">
           <CardHeader>
-            <CardTitle>بيانات الطلب</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              <span>بيانات الطلب</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -152,8 +150,6 @@ export default function AddPropertyRequestPage() {
                 formData={formData}
                 onChange={handleChange}
                 errors={errors}
-                propertyMode={propertyMode}
-                onPropertyModeChange={setPropertyMode}
                 selectedPropertyIds={selectedPropertyIds}
                 onSelectedPropertyIdsChange={setSelectedPropertyIds}
               />

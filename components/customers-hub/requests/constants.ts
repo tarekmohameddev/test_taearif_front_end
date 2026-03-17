@@ -102,5 +102,5 @@ export const DEFAULT_TIME = "10:00";
  * Set to true to show the reminders list and notes card (currently hidden).
  * See docs/updates/dashboard/customers-hub/requests/RequestDetailPage.txt
  */
-export const SHOW_REMINDERS_SECTION = false;
+export const SHOW_REMINDERS_SECTION = true;
 export const SHOW_NOTES_SECTION = false;

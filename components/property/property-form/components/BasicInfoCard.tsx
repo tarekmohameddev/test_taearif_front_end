@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import CitySelector from "@/components/CitySelector";
 import DistrictSelector from "@/components/DistrictSelector";
+import { PROPERTY_TYPES } from "@/lib/properties/propertyType";
 
 interface BasicInfoCardProps {
   formData: any;
@@ -464,8 +465,11 @@ export default function BasicInfoCard({
                 <SelectValue placeholder="اختر النوع" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="residential">سكني</SelectItem>
-                <SelectItem value="commercial">تجاري</SelectItem>
+                {PROPERTY_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.labelAr}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {errors.PropertyType && (

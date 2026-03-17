@@ -2946,20 +2946,12 @@
                     "type": "radio",
                     "options": [
                       {
-                        "value": "زراعي",
-                        "label": "زراعي"
-                      },
-                      {
-                        "value": "صناعي",
-                        "label": "صناعي"
-                      },
-                      {
-                        "value": "تجاري",
-                        "label": "تجاري"
-                      },
-                      {
-                        "value": "سكني",
+                        "value": "residential",
                         "label": "سكني"
+                      },
+                      {
+                        "value": "commercial",
+                        "label": "تجاري"
                       }
                     ],
                     "validation": null,
@@ -3426,20 +3418,12 @@
                     "type": "radio",
                     "options": [
                       {
-                        "value": "زراعي",
-                        "label": "زراعي"
-                      },
-                      {
-                        "value": "صناعي",
-                        "label": "صناعي"
-                      },
-                      {
-                        "value": "تجاري",
-                        "label": "تجاري"
-                      },
-                      {
-                        "value": "سكني",
+                        "value": "residential",
                         "label": "سكني"
+                      },
+                      {
+                        "value": "commercial",
+                        "label": "تجاري"
                       }
                     ],
                     "validation": null,
