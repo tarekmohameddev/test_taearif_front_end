@@ -9,6 +9,7 @@ import useTenantStore from "@/context/tenantStore";
 import { getDefaultHero4Data } from "@/context/editorStoreFunctions/heroFunctions";
 import PropertyFilter2 from "@/components/tenant/propertyFilter/propertyFilter2";
 import { usePropertiesStore } from "@/context/propertiesStore";
+import { cn, toDimension } from "@/lib/utils";
 
 interface Hero4Props {
   title?: string;
@@ -318,6 +319,57 @@ export default function Hero4(props: Hero4Props = {}) {
   const accentColorFilter = hexToFilter(accentColor);
   const accentColorFilterHover = hexToFilter(accentColorHover);
 
+  // Resolve content text color (useDefaultColor + globalColorType or custom hex)
+  const getContentColor = (which: "title" | "subtitle"): string => {
+    const font = mergedData.content?.font?.[which];
+    const colorField = font?.color;
+    if (colorField && typeof colorField === "object" && !Array.isArray(colorField)) {
+      const useDefault = (colorField as { useDefaultColor?: boolean }).useDefaultColor;
+      const globalType = (colorField as { globalColorType?: keyof typeof brandingColors }).globalColorType;
+      if (useDefault && globalType) return brandingColors[globalType] ?? brandingColors.primary;
+    }
+    if (typeof colorField === "string" && colorField.trim().length > 0) return colorField.trim();
+    return which === "title" ? "#ffffff" : "rgba(255, 255, 255, 0.85)";
+  };
+
+  // Title/subtitle font sizes (number px or legacy string)
+  const titleSize = mergedData.content?.font?.title?.size;
+  const subtitleSize = mergedData.content?.font?.subtitle?.size;
+  const toPx = (v: string | number | undefined, fallback: number) =>
+    typeof v === "number" ? `${v}px` : typeof v === "string" && /^\d+$/.test(v) ? `${v}px` : undefined;
+  const titleDesktopPx = toPx(titleSize?.desktop, 36);
+  const titleTabletPx = toPx(titleSize?.tablet, 30);
+  const titleMobilePx = toPx(titleSize?.mobile, 24);
+  const subtitleDesktopPx = toPx(subtitleSize?.desktop, 18);
+  const subtitleTabletPx = toPx(subtitleSize?.tablet, 18);
+  const subtitleMobilePx = toPx(subtitleSize?.mobile, 16);
+  const useTitlePx = titleDesktopPx ?? titleTabletPx ?? titleMobilePx;
+  const useSubtitlePx = subtitleDesktopPx ?? subtitleTabletPx ?? subtitleMobilePx;
+
+  const titleStyles: React.CSSProperties = {
+    fontFamily: mergedData.content?.font?.title?.family || "Tajawal",
+    fontWeight: mergedData.content?.font?.title?.weight || "bold",
+    color: getContentColor("title"),
+    ...(mergedData.content?.font?.title?.lineHeight != null && mergedData.content.font.title.lineHeight !== "" && { lineHeight: mergedData.content.font.title.lineHeight }),
+    ...(mergedData.content?.font?.title?.letterSpacing != null && mergedData.content.font.title.letterSpacing !== "" && { letterSpacing: mergedData.content.font.title.letterSpacing }),
+    ...(mergedData.content?.font?.title?.marginTop != null && { marginTop: toDimension(mergedData.content.font.title.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.title?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.title.marginBottom, "px", "0") }),
+  };
+  const subtitleStyles: React.CSSProperties = {
+    fontFamily: mergedData.content?.font?.subtitle?.family || "Tajawal",
+    fontWeight: mergedData.content?.font?.subtitle?.weight || "normal",
+    color: getContentColor("subtitle"),
+    ...(mergedData.content?.font?.subtitle?.lineHeight != null && mergedData.content.font.subtitle.lineHeight !== "" && { lineHeight: mergedData.content.font.subtitle.lineHeight }),
+    ...(mergedData.content?.font?.subtitle?.letterSpacing != null && mergedData.content.font.subtitle.letterSpacing !== "" && { letterSpacing: mergedData.content.font.subtitle.letterSpacing }),
+    ...(mergedData.content?.font?.subtitle?.marginTop != null && { marginTop: toDimension(mergedData.content.font.subtitle.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.subtitle?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.subtitle.marginBottom, "px", "0") }),
+  };
+
+  const titleSingleLineDesktop = mergedData.content?.titleSingleLine ?? mergedData.content?.titleSingleLineDesktop;
+  const titleSingleLineMobile = mergedData.content?.titleSingleLine ?? mergedData.content?.titleSingleLineMobile;
+  const subtitleSingleLineDesktop = mergedData.content?.subtitleSingleLineDesktop ?? mergedData.content?.subtitleSingleLine;
+  const subtitleSingleLineMobile = mergedData.content?.subtitleSingleLineMobile ?? mergedData.content?.subtitleSingleLine;
+
   // ─────────────────────────────────────────────────────────
   // 6.5. PAGE DETECTION AND SEARCH FORM
   // ─────────────────────────────────────────────────────────
@@ -403,7 +455,21 @@ export default function Hero4(props: Hero4Props = {}) {
       }`}
     >
       {/* Hero Section - Image with max height 200px */}
-      <section className="relative w-full h-[300px] overflow-visible">
+      <section
+        className="relative w-full h-[300px] overflow-visible"
+        style={{
+          ...(useTitlePx && {
+            "--hero4-title-size-mobile": titleMobilePx ?? useTitlePx,
+            "--hero4-title-size-tablet": titleTabletPx ?? useTitlePx,
+            "--hero4-title-size-desktop": titleDesktopPx ?? useTitlePx,
+          }),
+          ...(useSubtitlePx && {
+            "--hero4-subtitle-size-mobile": subtitleMobilePx ?? useSubtitlePx,
+            "--hero4-subtitle-size-tablet": subtitleTabletPx ?? useSubtitlePx,
+            "--hero4-subtitle-size-desktop": subtitleDesktopPx ?? useSubtitlePx,
+          }),
+        } as React.CSSProperties}
+      >
         {/* Background Image */}
         <Image
           src={
@@ -421,28 +487,79 @@ export default function Hero4(props: Hero4Props = {}) {
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/30 z-[1]" />
 
-        {/* Title and Subtitle - Show only when toggles are enabled */}
+        {/* Title and Subtitle - Desktop/Tablet */}
         {(mergedData.showTitle !== false || mergedData.showSubtitle !== false) && (
-          <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-2 px-4 text-center">
-            {mergedData.showTitle !== false && (
-              <h2
-                className="text-2xl md:text-3xl lg:text-4xl font-bold text-white"
-                style={mergedData.content?.titleSingleLine ? { whiteSpace: "nowrap" } : undefined}
-              >
-                {mergedData.title ||
-                  mergedData.content?.title ||
-                  "عن تعاريف العقارية"}
-              </h2>
-            )}
-            {mergedData.showSubtitle !== false && (mergedData.content?.subtitle || mergedData.subtitle) && (
-              <p
-                className="text-base md:text-lg lg:text-xl text-white/90 max-w-2xl"
-                style={mergedData.content?.subtitleSingleLine ? { whiteSpace: "nowrap" } : undefined}
-              >
-                {mergedData.content?.subtitle || mergedData.subtitle}
-              </p>
-            )}
-          </div>
+          <>
+            <div className="absolute inset-0 z-[2] hidden md:flex flex-col items-center justify-center gap-2 px-4 text-center">
+              {mergedData.showTitle !== false && (
+                <h2
+                  className={cn(
+                    "font-bold max-w-2xl",
+                    !useTitlePx && "text-2xl md:text-3xl lg:text-4xl",
+                    useTitlePx && "text-[length:var(--hero4-title-size-mobile)] md:text-[length:var(--hero4-title-size-tablet)] lg:text-[length:var(--hero4-title-size-desktop)]"
+                  )}
+                  style={{
+                    ...titleStyles,
+                    ...(titleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+                  }}
+                >
+                  {mergedData.title ||
+                    mergedData.content?.title ||
+                    "عن تعاريف العقارية"}
+                </h2>
+              )}
+              {mergedData.showSubtitle !== false && (mergedData.content?.subtitle || mergedData.subtitle) && (
+                <p
+                  className={cn(
+                    "max-w-2xl",
+                    !useSubtitlePx && "text-base md:text-lg lg:text-xl",
+                    useSubtitlePx && "text-[length:var(--hero4-subtitle-size-mobile)] md:text-[length:var(--hero4-subtitle-size-tablet)] lg:text-[length:var(--hero4-subtitle-size-desktop)]"
+                  )}
+                  style={{
+                    ...subtitleStyles,
+                    ...(subtitleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+                  }}
+                >
+                  {mergedData.content?.subtitle || mergedData.subtitle}
+                </p>
+              )}
+            </div>
+            {/* Title and Subtitle - Mobile */}
+            <div className="absolute inset-0 z-[2] flex md:hidden flex-col items-center justify-center gap-2 px-4 text-center">
+              {mergedData.showTitle !== false && (
+                <h2
+                  className={cn(
+                    "font-bold max-w-2xl",
+                    !useTitlePx && "text-2xl",
+                    useTitlePx && "text-[length:var(--hero4-title-size-mobile)]"
+                  )}
+                  style={{
+                    ...titleStyles,
+                    ...(titleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                  }}
+                >
+                  {mergedData.title ||
+                    mergedData.content?.title ||
+                    "عن تعاريف العقارية"}
+                </h2>
+              )}
+              {mergedData.showSubtitle !== false && (mergedData.content?.subtitle || mergedData.subtitle) && (
+                <p
+                  className={cn(
+                    "max-w-2xl",
+                    !useSubtitlePx && "text-base",
+                    useSubtitlePx && "text-[length:var(--hero4-subtitle-size-mobile)]"
+                  )}
+                  style={{
+                    ...subtitleStyles,
+                    ...(subtitleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                  }}
+                >
+                  {mergedData.content?.subtitle || mergedData.subtitle}
+                </p>
+              )}
+            </div>
+          </>
         )}
       </section>
 

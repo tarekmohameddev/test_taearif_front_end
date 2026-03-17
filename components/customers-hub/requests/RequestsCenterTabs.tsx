@@ -80,6 +80,7 @@ export function RequestsCenterTabs({
     onPriorityClick,
     stages: stagesForCards,
     completingActionIds,
+    onStageChangeSuccess,
   };
   const listProps = {
     getCustomerById: getCustomerForCard,

@@ -5,7 +5,7 @@ import {
   getActionsDueToday,
   sortActionsByPriority,
 } from "@/lib/utils/action-helpers";
-import { CITY_TO_REGION, REQUEST_TYPES, FOLLOWUP_TYPES } from "../constants";
+import { REQUEST_TYPES, FOLLOWUP_TYPES } from "../constants";
 
 export interface UseRequestsCenterDataParams {
   actions: CustomerAction[];
@@ -25,6 +25,8 @@ export interface UseRequestsCenterDataParams {
   selectedPropertyTypes: string[];
   getCustomerById: (id: string) => UnifiedCustomer | undefined;
   getCompletedActions: () => CustomerAction[];
+  /** خريطة اسم المدينة -> اسم المنطقة (من API). إن لم تُمرَّر يُستخدم كائن فارغ. */
+  cityToRegion?: Record<string, string>;
 }
 
 export function useRequestsCenterData({
@@ -45,6 +47,7 @@ export function useRequestsCenterData({
   selectedPropertyTypes,
   getCustomerById,
   getCompletedActions,
+  cityToRegion = {},
 }: UseRequestsCenterDataParams) {
   const allPendingActions = useMemo(
     () => {
@@ -162,11 +165,20 @@ export function useRequestsCenterData({
         )
           return false;
         if (selectedStates.length > 0) {
-          const customerRegion = customer.city
-            ? CITY_TO_REGION[customer.city]
-            : undefined;
-          if (!customerRegion || !selectedStates.includes(customerRegion))
-            return false;
+          const compositeKeys = selectedStates.filter((k) => /^\d+-\d+$/.test(k));
+          if (compositeKeys.length > 0) {
+            const actionKey =
+              a.city_id != null && a.districts_id != null
+                ? `${a.city_id}-${a.districts_id}`
+                : null;
+            if (!actionKey || !compositeKeys.includes(actionKey)) return false;
+          } else {
+            const customerRegion = customer.city
+              ? cityToRegion[customer.city]
+              : undefined;
+            if (!customerRegion || !selectedStates.includes(customerRegion))
+              return false;
+          }
         }
         if (filterMin !== undefined || filterMax !== undefined) {
           const cMin = customer.preferences?.budgetMin;
@@ -207,6 +219,7 @@ export function useRequestsCenterData({
     budgetMax,
     selectedPropertyTypes,
     getCustomerById,
+    cityToRegion,
   ]);
 
   const inboxRequests = useMemo(

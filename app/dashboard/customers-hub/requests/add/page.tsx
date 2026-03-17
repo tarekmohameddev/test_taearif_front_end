@@ -8,7 +8,10 @@ import useAuthStore from "@/context/AuthContext";
 import { selectUserData } from "@/context/auth/selectors";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PropertyRequestForm } from "@/components/property-requests/page-components/PropertyRequestForm";
+import {
+  PropertyRequestForm,
+  type PropertyModeType,
+} from "@/components/property-requests/page-components/PropertyRequestForm";
 import toast from "react-hot-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
@@ -35,6 +38,8 @@ export default function AddPropertyRequestPage() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [propertyMode, setPropertyMode] = useState<PropertyModeType | null>(null);
+  const [selectedPropertyIds, setSelectedPropertyIds] = useState<number[]>([]);
 
   const handleChange = (field: keyof typeof formData, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -52,8 +57,6 @@ export default function AddPropertyRequestPage() {
     const newErrors: Record<string, string> = {};
     if (!formData.full_name?.trim()) newErrors.full_name = "الاسم الكامل مطلوب";
     if (!formData.phone?.trim()) newErrors.phone = "رقم الهاتف مطلوب";
-    if (!formData.property_type) newErrors.property_type = "نوع العقار مطلوب";
-    if (!formData.purchase_method) newErrors.purchase_method = "طريقة الشراء مطلوبة";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       toast.error("يرجى إكمال الحقول المطلوبة");
@@ -64,10 +67,11 @@ export default function AddPropertyRequestPage() {
     setErrors({});
 
     try {
-      const requestData = {
+      const requestData: Record<string, unknown> = {
         full_name: formData.full_name,
         phone: formData.phone,
         region: "",
+        source: "employee_dashboard",
         property_type: formData.property_type,
         category_id: formData.category ? parseInt(formData.category, 10) : null,
         city_id: null,
@@ -88,6 +92,12 @@ export default function AddPropertyRequestPage() {
         is_active: true,
         status_id: 2,
       };
+
+      if (propertyMode === "existing" && selectedPropertyIds.length > 0) {
+        requestData.property_ids = selectedPropertyIds;
+      } else {
+        requestData.property_ids = [];
+      }
 
       const response = await axiosInstance.post("/v1/property-requests", requestData);
       const newId = response.data?.data?.id;
@@ -142,6 +152,10 @@ export default function AddPropertyRequestPage() {
                 formData={formData}
                 onChange={handleChange}
                 errors={errors}
+                propertyMode={propertyMode}
+                onPropertyModeChange={setPropertyMode}
+                selectedPropertyIds={selectedPropertyIds}
+                onSelectedPropertyIdsChange={setSelectedPropertyIds}
               />
               <div className="flex flex-wrap items-center gap-3 border-t pt-6">
                 <Button type="submit" disabled={isSubmitting}>

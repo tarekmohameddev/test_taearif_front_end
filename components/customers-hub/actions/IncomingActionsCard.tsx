@@ -128,6 +128,11 @@ export function IncomingActionsCard({
 
   const aiMatching = getAIMatchingStatus(resolvedCustomer);
   const isOverdue = !!action.dueDate && new Date(action.dueDate) < new Date();
+  const isUnreadPropertyRequest =
+    action.objectType === "property_request" &&
+    action.isUpdated === true &&
+    action.status !== "completed" &&
+    action.status !== "dismissed";
 
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;

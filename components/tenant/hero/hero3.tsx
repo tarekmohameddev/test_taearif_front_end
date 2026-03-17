@@ -26,6 +26,8 @@ import { useBrandingColors } from "@/hooks/useBrandingColors";
 // ═══════════════════════════════════════════════════════════
 interface HeroProps {
   visible?: boolean;
+  showTitle?: boolean;
+  showSubtitle?: boolean;
   height?: {
     desktop?: string;
     tablet?: string;
@@ -52,6 +54,12 @@ interface HeroProps {
   content?: {
       title?: string;
         subtitle?: string;
+        titleSingleLine?: boolean;
+        titleSingleLineDesktop?: boolean;
+        titleSingleLineMobile?: boolean;
+        subtitleSingleLine?: boolean;
+        subtitleSingleLineDesktop?: boolean;
+        subtitleSingleLineMobile?: boolean;
         font?: {
       title?: {
         family?: string;
@@ -59,12 +67,19 @@ interface HeroProps {
         weight?: string;
         color?: string;
         lineHeight?: string;
+        letterSpacing?: string;
+        marginTop?: number;
+        marginBottom?: number;
       };
       subtitle?: {
         family?: string;
         size?: { desktop?: string | number; tablet?: string | number; mobile?: string | number };
         weight?: string;
         color?: string;
+        lineHeight?: string;
+        letterSpacing?: string;
+        marginTop?: number;
+        marginBottom?: number;
       };
     };
     alignment?: string;
@@ -473,14 +488,11 @@ const SearchForm = React.memo(function SearchForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={cn(
-        "w-full rounded-2xl bg-white p-4 sm:px-6 shadow-lg max-w-6xl overflow-hidden transition-all duration-300 ease-in-out",
-        isAdvancedSearchOpen ? "max-h-[200px]" : "max-h-[200px]"
-      )}
+      className="w-full rounded-2xl bg-white p-4 sm:px-6 shadow-lg max-w-6xl transition-all duration-300 ease-in-out"
       aria-label="نموذج البحث عن العقارات"
     >
-      {/* Desktop Layout: all in one row */}
-      <div className="hidden lg:flex items-end gap-4">
+      {/* Unified layout: same fields on desktop and mobile; responsive flex (row on lg) / grid (stacked below lg) */}
+      <div className="grid gap-4 lg:flex lg:items-end lg:gap-4">
         {!isAdvancedSearchOpen && (
           <>
             {/* Property Type */}
@@ -490,7 +502,7 @@ const SearchForm = React.memo(function SearchForm({
                 <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
               </div>
               <Select value={type} onValueChange={setType}>
-                <SelectTrigger 
+                <SelectTrigger
                   className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
                   style={{ color: "black", "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
                 >
@@ -520,7 +532,7 @@ const SearchForm = React.memo(function SearchForm({
                   if (city) setCityName(city.name);
                 }}
               >
-                <SelectTrigger 
+                <SelectTrigger
                   className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
                   style={{ color: "black", "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
                 >
@@ -559,7 +571,7 @@ const SearchForm = React.memo(function SearchForm({
                 <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
               </div>
               <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger 
+                <SelectTrigger
                   className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
                   style={{ color: "black", "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
                 >
@@ -597,202 +609,41 @@ const SearchForm = React.memo(function SearchForm({
           </div>
         )}
 
-        {/* Apply Button */}
-        <div className="flex flex-col gap-2">
-          <div className="flex   flex-col w-full">
+        {/* Apply + Advanced buttons — same on all devices */}
+        <div className="flex flex-col gap-2 w-full lg:w-auto">
           <div className="flex flex-col items-center w-full">
-  {/* الزر العلوي: تطبيق البحث */}
-  <button
-    type="submit"
-    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColorHover;
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColor;
-    }}
-    className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
-  >
-    تطبيق البحث
-  </button>
-
-  {/* الزر السفلي: بحث متقدم */}
-  {advancedButtonEnabled && (
-    <button
-      type="button"
-      onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
-      aria-expanded={isAdvancedSearchOpen}
-      style={{ backgroundColor: buttonColor, color: "#ffffff" }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = buttonColorHover;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = buttonColor;
-      }}
-      className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
-    >
-      {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
-    </button>
-  )}
-</div>
-</div>
-        </div>
-      </div>
-
-      {/* Tablet/Mobile Layout */}
-      <div className="grid gap-4 lg:hidden">
-        {!isAdvancedSearchOpen && (
-          <>
-            {/* Property Type */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Home className="size-5" style={{ color: iconColor }} />
-                <h6 className="text-sm font-medium text-gray-700">نوع العقار</h6>
-              </div>
-              <Select value={type} onValueChange={setType}>
-                <SelectTrigger 
-                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-                  style={{ color: "black" }}
-                >
-                  <SelectValue placeholder={type || "الكل"} />
-                </SelectTrigger>
-                <SelectContent align="end">
-                  {typeOptions.map((option: string) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* City */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="size-5" style={{ color: iconColor }} />
-                <h6 className="text-sm font-medium text-gray-700">موقع العقار</h6>
-              </div>
-              <Select
-                value={cityId}
-                onValueChange={(value) => {
-                  setCityId(value);
-                  const city = cityOptions.find((c) => c.id.toString() === value);
-                  if (city) setCityName(city.name);
+            <button
+              type="submit"
+              style={{ backgroundColor: buttonColor, color: "#ffffff" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = buttonColorHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = buttonColor;
+              }}
+              className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
+            >
+              تطبيق البحث
+            </button>
+            {advancedButtonEnabled && (
+              <button
+                type="button"
+                onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
+                aria-expanded={isAdvancedSearchOpen}
+                style={{ backgroundColor: buttonColor, color: "#ffffff" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = buttonColorHover;
                 }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = buttonColor;
+                }}
+                className="h-8 px-4 rounded-b-2xl rounded-t-none text-[12px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
               >
-                <SelectTrigger 
-                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-                  style={{ color: "black" }}
-                >
-                  <SelectValue
-                    placeholder={
-                      cityLoading
-                        ? "جاري التحميل..."
-                        : cityName || "اختر المدينة"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent align="end">
-                  {cityLoading ? (
-                    <SelectItem value="loading" disabled>
-                      جاري التحميل...
-                    </SelectItem>
-                  ) : cityOptions.length === 0 ? (
-                    <SelectItem value="no-cities" disabled>
-                      لا توجد مدن
-                    </SelectItem>
-                  ) : (
-                    cityOptions.map((city) => (
-                      <SelectItem key={city.id} value={city.id.toString()}>
-                        {city.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Property Status */}
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Tag className="size-5" style={{ color: iconColor }} />
-                <h6 className="text-sm font-medium text-gray-700">حالة العقار</h6>
-              </div>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger 
-                  className="h-12 border border-gray-200 rounded-2xl text-black justify-end text-right [&>svg]:hidden"
-                  style={{ color: "black" }}
-                >
-                  <SelectValue placeholder={status || "بيع / ايجار"} />
-                </SelectTrigger>
-                <SelectContent align="end">
-                  {statusOptions.map((option: string) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </>
-        )}
-
-        {isAdvancedSearchOpen && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Search className="size-5" style={{ color: iconColor }} />
-              <h6 className="text-sm font-medium text-gray-700">البحث</h6>
-            </div>
-            <div className="relative">
-              <Input
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="ابحث عن اسم أو صفة العقار"
-                className="h-12 border border-gray-200 rounded-2xl text-black text-right pr-10"
-                style={{ "--tw-ring-color": iconColor } as React.CSSProperties & { "--tw-ring-color": string }}
-              />
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
-            </div>
+                {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
+              </button>
+            )}
           </div>
-        )}
-
-        {/* Apply Button */}
-        <div className="flex flex-col items-center w-full">
-  {/* الزر العلوي: تطبيق البحث */}
-  <button
-    type="submit"
-    style={{ backgroundColor: buttonColor, color: "#ffffff" }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColorHover;
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = buttonColor;
-    }}
-    className="h-12 w-full px-8 rounded-2xl font-medium text-white transition-colors whitespace-nowrap"
-  >
-    تطبيق البحث
-  </button>
-
-  {/* الزر السفلي: بحث متقدم */}
-  {advancedButtonEnabled && (
-    <button
-      type="button"
-      onClick={() => setIsAdvancedSearchOpen(!isAdvancedSearchOpen)}
-      aria-expanded={isAdvancedSearchOpen}
-      style={{ backgroundColor: buttonColor, color: "#ffffff" }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = buttonColorHover;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = buttonColor;
-      }}
-      className="h-6 px-2 rounded-b-2xl rounded-t-none text-[10px] font-medium text-white transition-colors whitespace-nowrap opacity-90 hover:opacity-100"
-    >
-      {isAdvancedSearchOpen ? "إخفاء البحث المتقدم" : "بحث متقدم"}
-    </button>
-  )}
-</div>
+        </div>
       </div>
     </form>
   );
@@ -965,8 +816,14 @@ function Hero3(props: HeroProps) {
     color: mergedData.content?.font?.title?.color || "#ffffff",
     lineHeight: mergedData.content?.font?.title?.lineHeight || "1.25",
     ...(useTitlePx && { fontSize: "var(--hero-title-size-mobile)" }),
-    ...(mergedData.content?.titleSingleLine && { whiteSpace: "nowrap" as const }),
+    ...(mergedData.content?.font?.title?.letterSpacing != null && mergedData.content.font.title.letterSpacing !== "" && { letterSpacing: mergedData.content.font.title.letterSpacing }),
+    ...(mergedData.content?.font?.title?.marginTop != null && { marginTop: toDimension(mergedData.content.font.title.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.title?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.title.marginBottom, "px", "0") }),
   };
+  const titleSingleLineDesktop = mergedData.content?.titleSingleLine || mergedData.content?.titleSingleLineDesktop;
+  const titleSingleLineMobile = mergedData.content?.titleSingleLine || mergedData.content?.titleSingleLineMobile;
+  const subtitleSingleLineDesktop = mergedData.content?.subtitleSingleLineDesktop ?? mergedData.content?.subtitleSingleLine;
+  const subtitleSingleLineMobile = mergedData.content?.subtitleSingleLineMobile ?? mergedData.content?.subtitleSingleLine;
 
   const subtitleStyles = {
     fontFamily: mergedData.content?.font?.subtitle?.family || "Tajawal",
@@ -974,7 +831,10 @@ function Hero3(props: HeroProps) {
     color:
       mergedData.content?.font?.subtitle?.color || "rgba(255, 255, 255, 0.85)",
     ...(useSubtitlePx && { fontSize: "var(--hero-subtitle-size-mobile)" }),
-    ...(mergedData.content?.subtitleSingleLine && { whiteSpace: "nowrap" as const }),
+    ...(mergedData.content?.font?.subtitle?.lineHeight != null && mergedData.content.font.subtitle.lineHeight !== "" && { lineHeight: mergedData.content.font.subtitle.lineHeight }),
+    ...(mergedData.content?.font?.subtitle?.letterSpacing != null && mergedData.content.font.subtitle.letterSpacing !== "" && { letterSpacing: mergedData.content.font.subtitle.letterSpacing }),
+    ...(mergedData.content?.font?.subtitle?.marginTop != null && { marginTop: toDimension(mergedData.content.font.subtitle.marginTop, "px", "0") }),
+    ...(mergedData.content?.font?.subtitle?.marginBottom != null && { marginBottom: toDimension(mergedData.content.font.subtitle.marginBottom, "px", "0") }),
   };
 
   const overlayStyles = {
@@ -1040,16 +900,25 @@ function Hero3(props: HeroProps) {
       <style dangerouslySetInnerHTML={{
         __html: `
           #${styleId} {
-            height: var(--hero-height-mobile);
+            min-height: var(--hero-height-mobile);
+          }
+          #${styleId} .hero3-content {
+            min-height: var(--hero-height-mobile);
           }
           @media (min-width: 768px) {
             #${styleId} {
-              height: var(--hero-height-tablet);
+              min-height: var(--hero-height-tablet);
+            }
+            #${styleId} .hero3-content {
+              min-height: var(--hero-height-tablet);
             }
           }
           @media (min-width: 1024px) {
             #${styleId} {
-              height: var(--hero-height-desktop);
+              min-height: var(--hero-height-desktop);
+            }
+            #${styleId} .hero3-content {
+              min-height: var(--hero-height-desktop);
             }
           }
           ${useTitlePx ? `
@@ -1074,7 +943,7 @@ function Hero3(props: HeroProps) {
       }} />
       <section
         id={styleId}
-        className="relative w-full overflow-hidden max-h-[95dvh]"
+        className="relative w-full overflow-hidden"
         style={sectionStyles}
         data-debug="hero-component"
       >
@@ -1125,8 +994,8 @@ function Hero3(props: HeroProps) {
         </>
       )}
 
-      {/* Content - Centered in middle */}
-      <div className="absolute inset-0 z-[2] flex items-center justify-center">
+      {/* Content - Centered; section grows downward when form is tall */}
+      <div className="hero3-content relative z-[2] flex flex-col items-center justify-center w-full">
         <div className="w-full max-w-[1600px] px-4 sm:px-6 lg:px-8">
           {/* Desktop/Tablet Layout */}
           <div className="hidden md:flex flex-col items-center text-center text-white">
@@ -1138,7 +1007,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "5xl"}`,
                   useTitlePx && "hero3-title",
                 )}
-                style={titleStyles}
+                style={{
+                  ...titleStyles,
+                  ...(titleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.title ||
                   "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
@@ -1152,7 +1024,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "4xl"}`,
                   useSubtitlePx && "hero3-subtitle",
                 )}
-                style={subtitleStyles}
+                style={{
+                  ...subtitleStyles,
+                  ...(subtitleSingleLineDesktop && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.subtitle ||
                   "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}
@@ -1184,7 +1059,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "5xl"}`,
                   useTitlePx && "hero3-title",
                 )}
-                style={titleStyles}
+                style={{
+                  ...titleStyles,
+                  ...(titleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.title ||
                   "مع باهية... اجعل حلمك السكني استثمارا يدوم"}
@@ -1198,7 +1076,10 @@ function Hero3(props: HeroProps) {
                   `max-w-${mergedData.content?.maxWidth || "4xl"}`,
                   useSubtitlePx && "hero3-subtitle",
                 )}
-                style={subtitleStyles}
+                style={{
+                  ...subtitleStyles,
+                  ...(subtitleSingleLineMobile && { whiteSpace: "nowrap" as const }),
+                }}
               >
                 {mergedData.content?.subtitle ||
                   "في باهية، نرتقي بتجربة العقار عبر رؤية احترافية، وخدمة مصمّمة خصيصًا لتليق بتطلعاتك، لنمنحك حلولًا عقارية متكاملة تُلبي طموحاتك وتحقق استثمارًا يدوم."}

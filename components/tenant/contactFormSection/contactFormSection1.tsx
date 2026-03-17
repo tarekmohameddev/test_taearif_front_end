@@ -421,8 +421,10 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
     return null;
   }
 
-  // Use merged data with proper fallbacks
-  const title = mergedData.content?.title || defaultData.content.title;
+  // Use merged data with proper fallbacks (title may be string or { text } from editor)
+  const titleRaw = mergedData.content?.title ?? defaultData.content.title;
+  const title =
+    typeof titleRaw === "string" ? titleRaw : (titleRaw?.text ?? "");
   // Check if social links are enabled (default: true)
   const socialLinksEnabled = mergedData.content?.socialLinksEnabled !== false;
   // Ensure socialLinks is always an array
@@ -550,7 +552,7 @@ const ContactFormSection1: React.FC<ContactFormSectionProps> = ({
             <h4
               className={`${styling?.title?.size || "text-[15px] md:text-[24px]"} ${styling?.title?.color || "text-custom-maincolor"} ${styling?.title?.weight || "font-normal"} xs:text-[20px] mb-[24px] text-center`}
             >
-              راسلنا الآن
+                 {title}
             </h4>
           )}
           <form className="flex flex-col gap-[12px] md:gap-[24px]">

@@ -1,3 +1,8 @@
+2026-03-17
+Update Type: Enhancement
+المدن والمناطق في صفحة الطلبات من الباك اند: إزالة الثوابت الثابتة SAUDI_REGIONS و CITY_TO_REGION من constants.ts؛ إضافة lib/services/locations-api.ts (نفس API صفحة إنشاء العقار: GET /cities?country_id=1 و GET /districts?city_id=...)؛ جلب المدن عند تحميل الصفحة من filter-options.data.cities إن وُجدت وإلا من fetchCities()؛ استنتاج المناطق من cities.region_name أو من filter-options.data.regions؛ تمرير cityToRegion لـ useRequestsCenterData و regionOptions لـ AdvancedFiltersDialogContent و AdvancedFiltersPanel.
+components/customers-hub/requests/constants.ts, lib/services/locations-api.ts, lib/services/customers-hub-requests-api.ts (FilterOptionsResponse.data.cities/regions), components/customers-hub/requests/hooks/useRequestsCenterData.ts, components/customers-hub/requests/hooks/useRequestsCenterPage.ts, components/customers-hub/requests/AdvancedFiltersPanel.tsx, components/customers-hub/requests/AdvancedFiltersDialogContent.tsx, components/customers-hub/requests/RequestsCenterPage.tsx
+
 2025-01-17 17:00:00
 Update Type: Feature
 إضافة dropdown selector لتغيير عرض الطلبات مع إضافة Table view جديد مشابه لمسار المبيعات

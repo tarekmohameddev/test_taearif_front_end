@@ -55,6 +55,13 @@ import { RequestActionsCard } from "./detail/RequestActionsCard";
 import { AssignEmployeeDialog } from "./detail/AssignEmployeeDialog";
 import { PropertyRequestStatusDialog } from "./detail/PropertyRequestStatusDialog";
 import { PropertyRequestPriorityDialog } from "./detail/PropertyRequestPriorityDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { priorityOptions, DEFAULT_TIME, SHOW_REMINDERS_SECTION, SHOW_NOTES_SECTION } from "./constants";
 import type { RequestDetailStats } from "./request-detail-types";
 import { isPropertyRequestAction, getPropertyRequestId } from "./request-detail-types";
@@ -170,12 +177,13 @@ export function RequestDetailPage({
       };
 
   const dismissAction = onDismissAction
-    ? async () => {
+    ? async (reason?: string) => {
         try {
-          await onDismissAction();
+          await onDismissAction(reason);
           if (onRefetch) await onRefetch();
         } catch (err) {
           console.error("Error dismissing action:", err);
+          throw err;
         }
       }
     : () => {
@@ -196,8 +204,12 @@ export function RequestDetailPage({
       };
 
   const [actionsCardOpen, setActionsCardOpen] = useState(false);
+  const [dismissDialogOpen, setDismissDialogOpen] = useState(false);
+  const [dismissReason, setDismissReason] = useState("");
+  const [dismissError, setDismissError] = useState<string | null>(null);
+  const [dismissSubmitting, setDismissSubmitting] = useState(false);
 
-  const { handleComplete, handleDismiss } = useRequestDetailHandlers({
+  const { handleComplete } = useRequestDetailHandlers({
     action,
     completeAction: onCompleteAction
       ? async () => {
@@ -209,17 +221,51 @@ export function RequestDetailPage({
           }
         }
       : () => storeCompleteAction(requestId),
-    dismissAction: onDismissAction
-      ? async () => {
-          try {
-            await onDismissAction();
-            if (onRefetch) await onRefetch();
-          } catch (err) {
-            console.error("Error dismissing action:", err);
-          }
-        }
-      : () => storeDismissAction(requestId),
+    dismissAction: () => {
+      // Dismiss is handled via a dedicated dialog that collects a reason,
+      // so we don't trigger it directly from the generic handlers hook.
+      return;
+    },
   });
+
+  const handleOpenDismissDialog = () => {
+    setDismissError(null);
+    setDismissDialogOpen(true);
+  };
+
+  const handleCloseDismissDialog = () => {
+    if (dismissSubmitting) return;
+    setDismissDialogOpen(false);
+    setDismissReason("");
+    setDismissError(null);
+  };
+
+  const handleConfirmDismiss = async () => {
+    const trimmedReason = dismissReason.trim();
+    if (trimmedReason.length < 3) {
+      setDismissError("يجب أن يكون سبب الرفض 3 أحرف على الأقل.");
+      return;
+    }
+
+    setDismissSubmitting(true);
+    setDismissError(null);
+    try {
+      await dismissAction(trimmedReason);
+      setDismissDialogOpen(false);
+      setDismissReason("");
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.errors;
+      const fieldError =
+        apiErrors?.reason?.[0] ||
+        err?.response?.data?.message ||
+        err?.message;
+      if (fieldError) {
+        setDismissError(fieldError);
+      }
+    } finally {
+      setDismissSubmitting(false);
+    }
+  };
 
   const snoozeActionFn = onSnoozeAction
     ? async (snoozeUntil: string, _reason?: string) => {
@@ -258,7 +304,7 @@ export function RequestDetailPage({
 
   const statusDialog = useStatusDialog({ requestId, action, userData, onRefetch });
 
-  const priorityDialog = usePriorityDialog({ action, userData, onRefetch });
+  const priorityDialog = usePriorityDialog({ requestId, action, userData, onRefetch });
 
   if (propLoading && !action) {
     return <RequestDetailLoading />;
@@ -314,6 +360,8 @@ export function RequestDetailPage({
           isOverdue={!!isOverdue}
           onStatusClick={handleStatusClick}
           onPriorityClick={isPropertyRequestAction(action) ? handlePriorityClick : undefined}
+          propertyRequestStatusOptions={isPropertyRequestAction(action) ? statusDialog.statusOptions : undefined}
+          propertyRequestPriorityOptions={isPropertyRequestAction(action) ? priorityDialog.priorityOptions : undefined}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -596,7 +644,7 @@ export function RequestDetailPage({
                 open={actionsCardOpen}
                 onOpenChange={setActionsCardOpen}
                 onComplete={handleComplete}
-                onDismiss={handleDismiss}
+                onDismiss={handleOpenDismissDialog}
                 onAssignClick={() => assignDialog.setShowAssignEmployeeDialog(true)}
                 onSnoozeFormToggle={() => snoozeForm.setShowSnoozeForm((v) => !v)}
                 onScheduleFormToggle={() => scheduleForm.setShowScheduleForm((v) => !v)}
@@ -675,6 +723,59 @@ export function RequestDetailPage({
                 completedAt={action.completedAt}
               />
             )}
+
+            <Dialog
+              open={dismissDialogOpen}
+              onOpenChange={(open) => {
+                if (!open) {
+                  handleCloseDismissDialog();
+                } else {
+                  setDismissDialogOpen(true);
+                }
+              }}
+            >
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>رفض الطلب</DialogTitle>
+                  <DialogDescription>
+                    يرجى كتابة سبب واضح لرفض هذا الطلب. سيتم حفظ السبب في سجل الطلب.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 pt-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    سبب الرفض<span className="text-red-600 mr-1">*</span>
+                  </label>
+                  <Textarea
+                    value={dismissReason}
+                    onChange={(e) => {
+                      setDismissReason(e.target.value);
+                      if (dismissError) setDismissError(null);
+                    }}
+                    rows={4}
+                    placeholder="اكتب سبب رفض الطلب (3 أحرف على الأقل)..."
+                  />
+                  {dismissError && (
+                    <p className="text-xs text-red-600">{dismissError}</p>
+                  )}
+                  <div className="flex justify-end gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={handleCloseDismissDialog}
+                      disabled={dismissSubmitting}
+                    >
+                      إلغاء
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleConfirmDismiss}
+                      disabled={dismissSubmitting || dismissReason.trim().length < 3}
+                    >
+                      {dismissSubmitting ? "جاري الرفض..." : "تأكيد الرفض"}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

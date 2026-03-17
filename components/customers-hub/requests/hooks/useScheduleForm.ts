@@ -41,13 +41,26 @@ export function useScheduleForm({
   }, []);
 
   const handleScheduleAppointment = useCallback(async () => {
-    if (!aptDate || !aptTime) {
-      toast.error("الرجاء اختيار التاريخ والوقت");
+    // إذا لم يتم إدخال أي تاريخ أو وقت، نطلب من المستخدم إدخال واحد منهما على الأقل
+    if (!aptDate && !aptTime) {
+      toast.error("الرجاء اختيار التاريخ أو الوقت (أو كلاهما)");
       return;
     }
-    const datetime = new Date(`${aptDate}T${aptTime}`).toISOString();
+
+    // إذا كان أحدهما فارغًا نجعل له قيمة افتراضية (التاريخ المحلي اليوم، وليس UTC)
     const now = new Date();
-    if (new Date(datetime) <= now) {
+    const todayLocal =
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const effectiveDate = aptDate || todayLocal;
+    const effectiveTime = aptTime || DEFAULT_TIME;
+
+    // بناء التاريخ المحلي بشكل صريح لتجنب التفسير الخاطئ حسب التوقيت
+    const [y, m, d] = effectiveDate.split("-").map(Number);
+    const [hh, mm] = effectiveTime.split(":").map(Number);
+    const chosenLocal = new Date(y, m - 1, d, hh ?? 0, mm ?? 0, 0, 0);
+    const datetime = chosenLocal.toISOString();
+
+    if (chosenLocal.getTime() <= now.getTime()) {
       toast.error("التاريخ والوقت يجب أن يكون في المستقبل");
       return;
     }

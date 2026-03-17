@@ -1,11 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import axiosInstance from "@/lib/axiosInstance";
+import useAuthStore from "@/context/AuthContext";
+import { selectUserData } from "@/context/auth/selectors";
 import {
   Table,
   TableBody,
@@ -33,12 +43,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -47,10 +51,246 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SourceBadge } from "../actions/SourceBadge";
+import { CompactPropertyBlockStitch } from "../actions/components/IncomingActionsCardCompact";
+import { StageDropdown } from "../actions/components/StageDropdown";
+import { useStageResolution } from "../actions/hooks/useStageResolution";
+import { useStageChangeHandler } from "../actions/hooks/useStageChangeHandler";
+import { useCustomersHubStagesStore } from "@/context/store/customers-hub-stages";
+import useUnifiedCustomersStore from "@/context/store/unified-customers";
 import { translatePropertyType } from "../actions/utils/propertyUtils";
 import { cn } from "@/lib/utils";
 import type { CustomerAction, UnifiedCustomer, Priority } from "@/types/unified-customer";
+import { getStageNameAr, getStageColor } from "@/types/unified-customer";
 import { getPropertyRequestId } from "./request-detail-types";
+import type { ApiStageShape } from "../actions/types/incomingCardTypes";
+import type { StatusOption } from "./hooks/useStatusDialog";
+import { statusConfig, priorityOptions } from "./constants";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface TableStageCellProps {
+  action: CustomerAction;
+  stages: Array<{ stage_id: string; stage_name_ar: string; stage_name_en: string; color: string; order: number }>;
+  getCustomerById: (id: string) => UnifiedCustomer | undefined;
+  onStageChangeSuccess?: (actionId: string, newStageId: string, previousStageId: string) => void;
+}
+
+function TableStageCell({ action, stages, getCustomerById, onStageChangeSuccess }: TableStageCellProps) {
+  const resolvedCustomer = getCustomerById(
+    typeof action.customerId === "string" ? action.customerId : String(action.customerId)
+  );
+  const { stages: storeStages } = useCustomersHubStagesStore();
+  const updateCustomerStage = useUnifiedCustomersStore((s) => s.updateCustomerStage);
+
+  const {
+    availableStages,
+    normalizedStage,
+    displayStage,
+    setOptimisticStage,
+    setActionStageId,
+  } = useStageResolution({
+    action,
+    propStages: stages as ApiStageShape[],
+    storeStages: (storeStages ?? undefined) as ApiStageShape[] | undefined,
+    resolvedCustomer,
+  });
+
+  const { handleStageChange, isUpdatingStage } = useStageChangeHandler({
+    action,
+    resolvedCustomer,
+    availableStages,
+    storeStages: (storeStages ?? undefined) as ApiStageShape[] | undefined,
+    normalizedStage,
+    updateCustomerStage,
+    setOptimisticStage,
+    setActionStageId,
+    onStageChangeSuccess,
+  });
+
+  if (availableStages.length === 0) {
+    const stageId = (action as any).stage?.stage_id ?? (action as any).stage_id;
+    const matched = stages.find((s: any) => s.stage_id === String(stageId));
+    const name = matched?.stage_name_ar ?? "-";
+    const color = matched?.color ?? "#gray";
+    return (
+      <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit" style={{ borderColor: color, color }}>
+        <span className="size-1.5 rounded-full shrink-0" style={{ backgroundColor: color }} aria-hidden />
+        {name}
+      </Badge>
+    );
+  }
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <StageDropdown
+        availableStages={availableStages}
+        displayStage={displayStage}
+        isUpdatingStage={isUpdatingStage}
+        onStageChange={handleStageChange}
+        getStageColor={getStageColor}
+        getStageNameAr={getStageNameAr}
+        stitchStyle
+      />
+    </div>
+  );
+}
+
+/** Status dropdown for property requests: options from GET /v1/property-requests/filters, update via PUT /v1/property-requests/:id/status */
+interface TableStatusCellProps {
+  action: CustomerAction;
+  statusOptions: StatusOption[];
+  onStatusChangeSuccess?: (actionId: string, newStatusId: number) => void;
+}
+
+function TableStatusCell({ action, statusOptions, onStatusChangeSuccess }: TableStatusCellProps) {
+  const [saving, setSaving] = useState(false);
+  const propertyRequestId = getPropertyRequestId(action);
+  const statusId = (action as { status_id?: number }).status_id;
+  const apiStatus = statusId != null ? statusOptions.find((s) => s.id === statusId) : undefined;
+  const label = apiStatus?.name_ar ?? statusConfig[action.status]?.label ?? "معلق";
+  const colorClass = apiStatus ? "bg-blue-500 text-white" : (statusConfig[action.status]?.color ?? "bg-gray-500 text-white");
+
+  const handleSelect = async (newStatusId: number) => {
+    if (propertyRequestId == null || newStatusId === statusId || saving) return;
+    setSaving(true);
+    try {
+      await axiosInstance.put(`/v1/property-requests/${propertyRequestId}/status`, {
+        status_id: newStatusId,
+      });
+      (action as { status_id?: number }).status_id = newStatusId;
+      onStatusChangeSuccess?.(action.id, newStatusId);
+      toast.success("تم تحديث حالة طلب العقار بنجاح");
+    } catch (error: unknown) {
+      const message =
+        error && typeof error === "object" && "response" in error && (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? String((error as { response: { data: { message: string } } }).response.data.message)
+          : "حدث خطأ أثناء تحديث الحالة";
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full text-[10px] px-1.5 py-0.5 leading-tight cursor-pointer hover:opacity-90 transition-opacity border-0",
+            colorClass
+          )}
+          onClick={(e) => e.stopPropagation()}
+          data-interactive="true"
+        >
+          {saving ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <>
+              {label}
+              <ChevronDown className="h-3 w-3 shrink-0" />
+            </>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[220px]">
+        {statusOptions.map((status) => (
+          <DropdownMenuItem
+            key={status.id}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelect(status.id);
+            }}
+            disabled={saving || statusId === status.id}
+          >
+            {status.name_ar}
+            {statusId === status.id && (
+              <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/** Priority dropdown for property requests: same options as detail page (constants), update via PUT /v1/property-requests/:id/priority. Badge appearance unchanged. */
+interface TablePriorityCellProps {
+  action: CustomerAction;
+  onPriorityChangeSuccess?: (actionId: string, newPriority: Priority) => void;
+}
+
+function TablePriorityCell({ action, onPriorityChangeSuccess }: TablePriorityCellProps) {
+  const [saving, setSaving] = useState(false);
+  const propertyRequestId = getPropertyRequestId(action);
+  const priority = action.priority ?? "medium";
+
+  const variants: Record<string, { variant: "destructive" | "default" | "secondary" | "outline"; text: string }> = {
+    urgent: { variant: "destructive", text: "عاجل" },
+    high: { variant: "default", text: "عالي" },
+    medium: { variant: "secondary", text: "متوسط" },
+    low: { variant: "outline", text: "منخفض" },
+  };
+  const config = variants[priority] || variants.medium;
+
+  const handleSelect = async (newPriority: Priority) => {
+    if (propertyRequestId == null || newPriority === priority || saving) return;
+    setSaving(true);
+    try {
+      await axiosInstance.put(`/v1/property-requests/${propertyRequestId}/priority`, {
+        priority: newPriority,
+      });
+      (action as { priority?: Priority }).priority = newPriority;
+      onPriorityChangeSuccess?.(action.id, newPriority);
+      toast.success("تم تحديث أولوية طلب العقار بنجاح");
+    } catch (error: unknown) {
+      const message =
+        error && typeof error === "object" && "response" in error && (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          ? String((error as { response: { data: { message: string } } }).response.data.message)
+          : "حدث خطأ أثناء تحديث الأولوية";
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="focus:outline-none text-right cursor-pointer hover:opacity-90 transition-opacity w-fit border-0 bg-transparent p-0"
+          onClick={(e) => e.stopPropagation()}
+          data-interactive="true"
+        >
+          {saving ? (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          ) : (
+            <Badge variant={config.variant} className="text-xs">
+              {config.text}
+            </Badge>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[220px]">
+        {priorityOptions.map((opt) => (
+          <DropdownMenuItem
+            key={opt.value}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelect(opt.value);
+            }}
+            disabled={saving || priority === opt.value}
+          >
+            {opt.label}
+            {priority === opt.value && (
+              <span className="mr-auto text-xs text-gray-500">(الحالية)</span>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 interface TableRequestsListProps {
   actions: CustomerAction[];
@@ -71,6 +311,13 @@ interface TableRequestsListProps {
     order: number;
   }>;
   completingActionIds: Set<string>;
+  onStageChangeSuccess?: (
+    actionId: string,
+    newStageId: string,
+    previousStageId: string
+  ) => void;
+  onStatusChangeSuccess?: (actionId: string, newStatusId: number) => void;
+  onPriorityChangeSuccess?: (actionId: string, newPriority: Priority) => void;
 }
 
 type SortField = "customer" | "priority" | "status" | "createdAt" | "budget" | "propertyType" | "city" | "stage";
@@ -89,13 +336,37 @@ export function TableRequestsList({
   onPriorityClick,
   stages,
   completingActionIds,
+  onStageChangeSuccess,
+  onStatusChangeSuccess,
+  onPriorityChangeSuccess,
 }: TableRequestsListProps) {
+  const router = useRouter();
+  const userData = useAuthStore(selectUserData);
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set());
   const [snoozeActionId, setSnoozeActionId] = useState<string | null>(null);
   const [snoozeDate, setSnoozeDate] = useState("");
   const [snoozeTime, setSnoozeTime] = useState("10:00");
+  const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
+  const [loadingStatusOptions, setLoadingStatusOptions] = useState(true);
+
+  useEffect(() => {
+    if (!userData?.token) {
+      setLoadingStatusOptions(false);
+      return;
+    }
+    setLoadingStatusOptions(true);
+    axiosInstance
+      .get<{ data?: { status?: StatusOption[] }; status?: StatusOption[] }>("/v1/property-requests/filters")
+      .then((res) => {
+        const raw = res?.data;
+        const list = Array.isArray(raw?.data?.status) ? raw.data.status : Array.isArray(raw?.status) ? raw.status : [];
+        setStatusOptions(list);
+      })
+      .catch(() => setStatusOptions([]))
+      .finally(() => setLoadingStatusOptions(false));
+  }, [userData?.token]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -107,32 +378,28 @@ export function TableRequestsList({
   };
 
   const getPriorityBadge = (priority?: Priority) => {
-    const variants: Record<string, { variant: any; text: string; icon: string }> = {
+    const variants: Record<string, { variant: any; text: string }> = {
       urgent: {
         variant: "destructive",
         text: "عاجل",
-        icon: "🚨",
       },
       high: {
         variant: "default",
         text: "عالي",
-        icon: "🔥",
       },
       medium: {
         variant: "secondary",
         text: "متوسط",
-        icon: "⚡",
       },
       low: {
         variant: "outline",
         text: "منخفض",
-        icon: "📌",
       },
     };
     const config = variants[priority || "medium"] || variants.medium;
     return (
-      <Badge variant={config.variant as any} className="text-xs gap-1">
-        {config.icon} {config.text}
+      <Badge variant={config.variant as any} className="text-xs">
+        {config.text}
       </Badge>
     );
   };
@@ -147,7 +414,10 @@ export function TableRequestsList({
     };
     const config = variants[status] || variants.pending;
     return (
-      <Badge variant={config.variant as any} className="text-xs">
+      <Badge
+        variant={config.variant as any}
+        className="text-[10px] px-1.5 py-0.5 leading-tight"
+      >
         {config.text}
       </Badge>
     );
@@ -317,6 +587,15 @@ export function TableRequestsList({
     setSnoozeTime("10:00");
   };
 
+  const handleRowClick =
+    (actionId: string) => (e: React.MouseEvent<HTMLTableRowElement>) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('button, a, [role="checkbox"], input, [data-interactive]')) {
+        return;
+      }
+      router.push(`/ar/dashboard/customers-hub/requests/${actionId}`);
+    };
+
   if (actions.length === 0) {
     return (
       <Card>
@@ -332,13 +611,13 @@ export function TableRequestsList({
   return (
     <div className="space-y-4" dir="rtl">
       {/* Table */}
-      <Card>
+      <Card className="rounded-2xl">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-2xl">
             <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50 dark:bg-gray-800">
-                  <TableHead className="w-12">
+              <TableHeader className="bg-gray-900 text-white">
+                <TableRow>
+                  <TableHead className="w-12 bg-transparent">
                     <input
                       type="checkbox"
                       checked={sortedActions.length > 0 && sortedActions.every((a) => selectedActionIds.has(a.id))}
@@ -350,103 +629,94 @@ export function TableRequestsList({
                       className="rounded border-gray-300"
                     />
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("customer")}
                     >
                       العميل
                       <SortIcon field="customer" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("priority")}
                     >
                       الأولوية
                       <SortIcon field="priority" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right text-white bg-transparent">المصدر</TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
-                      onClick={() => handleSort("status")}
-                    >
-                      الحالة
-                      <SortIcon field="status" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>المصدر</TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("createdAt")}
                     >
-                      تاريخ الإنشاء
+                       وقت الإنشاء
                       <SortIcon field="createdAt" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("budget")}
                     >
                       الميزانية
                       <SortIcon field="budget" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("propertyType")}
                     >
                       نوع العقار
                       <SortIcon field="propertyType" />
                     </Button>
                   </TableHead>
-                  <TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("city")}
                     >
-                      المدينة
+                      الموقع
                       <SortIcon field="city" />
                     </Button>
                   </TableHead>
-                  <TableHead>الجدية</TableHead>
-                  <TableHead>الموظف المسؤول</TableHead>
-                  <TableHead>
+                  <TableHead className="text-right text-white bg-transparent">تفاصيل العقار</TableHead>
+                  <TableHead className="text-right text-white bg-transparent">الموظف المسؤول</TableHead>
+                  <TableHead className="text-right text-white bg-transparent">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 -mr-2"
+                      className="h-8 -mr-2 text-white hover:text-white hover:bg-transparent"
                       onClick={() => handleSort("stage")}
                     >
                       المرحلة
                       <SortIcon field="stage" />
                     </Button>
                   </TableHead>
-                  <TableHead className="text-center">الإجراءات</TableHead>
+                  {/* Removed actions column */}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedActions.map((action) => {
-                  const customer = getCustomerById(action.customerId);
+                  const customer = getCustomerById(
+                    action.customerId != null ? String(action.customerId) : ""
+                  );
                   const isCompleting = completingActionIds.has(action.id);
                   const isSelected = selectedActionIds.has(action.id);
                   const isOverdue = action.dueDate
@@ -457,13 +727,14 @@ export function TableRequestsList({
                   return (
                     <TableRow
                       key={action.id}
+                      onClick={handleRowClick(action.id)}
                       className={cn(
-                        "hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors",
+                        "transition-colors cursor-pointer",
                         isOverdue && "bg-red-50 dark:bg-red-950/20"
                       )}
                     >
                       {/* Checkbox */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         <input
                           type="checkbox"
                           checked={isSelected}
@@ -472,62 +743,80 @@ export function TableRequestsList({
                         />
                       </TableCell>
 
-                      {/* Customer Name & Phone */}
-                      <TableCell>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                          <span className="font-semibold text-gray-900 dark:text-white">
-                            {action.customerName}
-                          </span>
-                          {(action.customerPhone || customer?.phone) && (
-                            <span className="flex items-center gap-1 text-xs text-gray-500">
-                              <Phone className="h-3 w-3 shrink-0" />
-                              <a
-                                href={`tel:${action.customerPhone || customer?.phone}`}
-                                className="hover:text-blue-600 dir-ltr"
-                                dir="ltr"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {action.customerPhone || customer?.phone}
-                              </a>
+                      {/* Customer Name, Phone & Status */}
+                      <TableCell className="text-right">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                              {action.customerName}
                             </span>
-                          )}
+                            {(action.customerPhone || customer?.phone) && (
+                              <span className="flex items-center gap-1 text-xs text-gray-500">
+                                <Phone className="h-3 w-3 shrink-0" />
+                                <a
+                                  href={`tel:${action.customerPhone || customer?.phone}`}
+                                  className="hover:text-blue-600 dir-ltr"
+                                  dir="ltr"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {action.customerPhone || customer?.phone}
+                                </a>
+                              </span>
+                            )}
+                          </div>
+                          <div onClick={(e) => e.stopPropagation()}>
+                            {getPropertyRequestId(action) != null ? (
+                              loadingStatusOptions ? (
+                                <Skeleton className="h-5 w-16 rounded-md" />
+                              ) : statusOptions.length > 0 ? (
+                                <TableStatusCell
+                                  action={action}
+                                  statusOptions={statusOptions}
+                                  onStatusChangeSuccess={onStatusChangeSuccess}
+                                />
+                              ) : (
+                                getStatusBadge(action.status)
+                              )
+                            ) : (
+                              getStatusBadge(action.status)
+                            )}
+                          </div>
                         </div>
                       </TableCell>
 
-                      {/* Priority */}
-                      <TableCell>
-                        {onPriorityClick && getPropertyRequestId(action) != null ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onPriorityClick(action);
-                            }}
-                            className="focus:outline-none text-right cursor-pointer hover:opacity-90 transition-opacity"
-                          >
-                            {getPriorityBadge(action.priority)}
-                          </button>
+                      {/* Priority — dropdown for property requests (same logic as detail page), same badge look */}
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        {getPropertyRequestId(action) != null ? (
+                          <TablePriorityCell
+                            action={action}
+                            onPriorityChangeSuccess={onPriorityChangeSuccess}
+                          />
                         ) : (
                           getPriorityBadge(action.priority)
                         )}
                       </TableCell>
 
-                      {/* Status */}
-                      <TableCell>{getStatusBadge(action.status)}</TableCell>
-
                       {/* Source */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         <SourceBadge source={action.source} className="text-xs" />
                       </TableCell>
 
-                      {/* Created At */}
-                      <TableCell>
+                      {/* Created At (Date & Time) */}
+                      <TableCell className="text-right">
                         {action.createdAt ? (
-                          <div className="text-sm">
-                            {new Date(action.createdAt).toLocaleDateString("ar-SA", {
-                              month: "short",
-                              day: "numeric",
-                            })}
+                          <div className="text-sm leading-tight">
+                            <div>
+                              {new Date(action.createdAt).toLocaleDateString("ar-SA", {
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {new Date(action.createdAt).toLocaleTimeString("ar-SA", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </div>
                           </div>
                         ) : (
                           <span className="text-gray-400 text-sm">-</span>
@@ -535,7 +824,7 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Budget */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         {(action as any).budgetMin != null || (action as any).budgetMax != null ? (
                           <div className="flex items-center gap-1 text-sm">
                             <DollarSign className="h-3.5 w-3.5 text-gray-500" />
@@ -555,7 +844,7 @@ export function TableRequestsList({
                       </TableCell>
 
                       {/* Property Type / Category - translated */}
-                      <TableCell>
+                      <TableCell className="text-right">
                         {(() => {
                           const raw = (action as any).propertyType ?? (action as any).propertyCategory ?? (action as any).property_type;
                           const translated = raw ? translatePropertyType(raw) : null;
@@ -572,25 +861,47 @@ export function TableRequestsList({
                         })()}
                       </TableCell>
 
-                      {/* City */}
+                      {/* City & District */}
                       <TableCell>
-                        {(action as any).city ? (
-                          <div className="flex items-center gap-1 text-sm">
-                            <MapPin className="h-3.5 w-3.5 text-gray-500" />
-                            <span>{(action as any).city}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-sm">-</span>
-                        )}
+                        {(() => {
+                          const rawCity =
+                            (action as any).city ??
+                            (action as any).region ??
+                            (action as any).state ??
+                            (action as any).properties?.[0]?.city;
+                          const district =
+                            (action as any).district ??
+                            (action as any).properties?.[0]?.district;
+
+                          if (!rawCity && !district) {
+                            return <span className="text-gray-400 text-sm">-</span>;
+                          }
+
+                          return (
+                            <div className="flex items-start gap-1 text-sm">
+                              <MapPin className="h-3.5 w-3.5 text-gray-500 mt-0.5" />
+                              <div className="flex flex-col">
+                                {rawCity && (
+                                  <span className="font-medium text-gray-900 dark:text-white">
+                                    {rawCity}
+                                  </span>
+                                )}
+                                {district && (
+                                  <span className="text-xs text-gray-500">{district}</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </TableCell>
 
-                      {/* Seriousness */}
-                      <TableCell>
-                        {(action as any).metadata?.seriousness ? (
-                          <div className="flex items-center gap-1 text-sm">
-                            <AlertTriangle className="h-3.5 w-3.5 text-gray-500" />
-                            <span>{(action as any).metadata.seriousness}</span>
-                          </div>
+                      {/* Property details (same as compact view) */}
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        {action.properties?.length ? (
+                          <CompactPropertyBlockStitch
+                            action={action}
+                            useLast={action.objectType === "property_request"}
+                          />
                         ) : (
                           <span className="text-gray-400 text-sm">-</span>
                         )}
@@ -608,122 +919,37 @@ export function TableRequestsList({
                         )}
                       </TableCell>
 
-                      {/* Stage */}
-                      <TableCell>
-                        {(() => {
-                          // Get stage from action.stage object or action.stage_id
-                          let stageId: string | number | null = null;
-                          let stageNameAr: string | null = null;
-                          
-                          if ((action as any).stage) {
-                            // If stage is an object, extract id or stage_id
-                            const stageObj = (action as any).stage;
-                            stageId = stageObj.id || stageObj.stage_id || null;
-                            stageNameAr = stageObj.nameAr || null;
-                          } else if ((action as any).stage_id) {
-                            // If stage_id is directly available
-                            stageId = (action as any).stage_id;
-                          }
-                          
-                          // Find stage in stages array
-                          let matchedStage = null;
-                          if (stageId != null && stages) {
-                            // Try to match by numeric id first
-                            if (typeof stageId === 'number') {
-                              matchedStage = stages.find((s: any) => s.id === stageId || s.numericId === stageId);
+                      {/* Stage — clickable dropdown like compact view */}
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        {stages && stages.length > 0 ? (
+                          <TableStageCell
+                            action={action}
+                            stages={stages}
+                            getCustomerById={getCustomerById}
+                            onStageChangeSuccess={onStageChangeSuccess}
+                          />
+                        ) : (
+                          (() => {
+                            let stageId: string | number | null = (action as any).stage?.stage_id ?? (action as any).stage_id ?? null;
+                            const matchedStage = stageId != null && stages?.length
+                              ? stages.find((s: any) => s.stage_id === String(stageId) || s.id === stageId)
+                              : null;
+                            const displayName = matchedStage?.stage_name_ar ?? (action as any).stage?.nameAr ?? "-";
+                            const stageColor = matchedStage?.color ?? "#gray";
+                            if (displayName !== "-") {
+                              return (
+                                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit" style={{ borderColor: stageColor, color: stageColor }}>
+                                  <span className="size-1.5 rounded-full shrink-0" style={{ backgroundColor: stageColor }} aria-hidden />
+                                  {displayName}
+                                </Badge>
+                              );
                             }
-                            // If not found, try to match by string stage_id
-                            if (!matchedStage) {
-                              matchedStage = stages.find((s: any) => s.stage_id === String(stageId));
-                            }
-                          }
-                          
-                          const displayName = stageNameAr || matchedStage?.stage_name_ar || "-";
-                          const stageColor = matchedStage?.color || "#gray";
-                          
-                          if (displayName !== "-") {
-                            return (
-                              <Badge
-                                variant="outline"
-                                className="text-xs flex items-center gap-1 w-fit"
-                                style={{
-                                  borderColor: stageColor,
-                                  color: stageColor,
-                                }}
-                              >
-                                <span
-                                  className="size-1.5 rounded-full shrink-0"
-                                  style={{ backgroundColor: stageColor }}
-                                  aria-hidden
-                                />
-                                {displayName}
-                              </Badge>
-                            );
-                          }
-                          return <span className="text-gray-400 text-sm">-</span>;
-                        })()}
+                            return <span className="text-gray-400 text-sm">-</span>;
+                          })()
+                        )}
                       </TableCell>
 
-                      {/* Actions: 3-dot dropdown like compact/grid */}
-                      <TableCell>
-                        <div className="flex items-center justify-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-slate-500 hover:text-slate-700"
-                                disabled={isLoading}
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="min-w-[180px]">
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); handleComplete(action.id); }}
-                                disabled={isCompleting}
-                                className="flex items-center gap-2"
-                              >
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                إتمام الطلب
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); onQuickView(action.id); }}
-                                className="flex items-center gap-2"
-                              >
-                                <Calendar className="h-4 w-4" />
-                                جدولة إجراء
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSnoozeActionId(action.id);
-                                  setSnoozeDate("");
-                                  setSnoozeTime("10:00");
-                                }}
-                                className="flex items-center gap-2"
-                              >
-                                <Bell className="h-4 w-4" />
-                                تأجيل
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); onQuickView(action.id); }}
-                                className="flex items-center gap-2"
-                              >
-                                <UserPlus className="h-4 w-4" />
-                                تعيين موظف
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); handleDismiss(action.id); }}
-                                className="flex items-center gap-2 text-red-600 focus:text-red-600"
-                              >
-                                <X className="h-4 w-4" />
-                                رفض الطلب
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </TableCell>
+                      {/* Actions column removed */}
                     </TableRow>
                   );
                 })}

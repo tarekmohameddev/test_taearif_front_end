@@ -58,10 +58,13 @@ export function RequestsCenterFiltersBar({
           </Button>
           {inlineFilters && (
             <InlineFiltersRow
+              sourceOptions={inlineFilters.sourceOptions}
               selectedSources={inlineFilters.selectedSources}
               setSelectedSources={inlineFilters.setSelectedSources}
-              selectedPriorities={inlineFilters.selectedPriorities}
-              setSelectedPriorities={inlineFilters.setSelectedPriorities}
+              requestDateFrom={inlineFilters.requestDateFrom}
+              setRequestDateFrom={inlineFilters.setRequestDateFrom}
+              requestDateTo={inlineFilters.requestDateTo}
+              setRequestDateTo={inlineFilters.setRequestDateTo}
               selectedAssignees={inlineFilters.selectedAssignees}
               setSelectedAssignees={inlineFilters.setSelectedAssignees}
               uniqueAssignees={inlineFilters.uniqueAssignees}

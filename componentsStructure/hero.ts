@@ -8,6 +8,153 @@ export const heroStructure: ComponentStructure = {
       name: "Hero 1 - Modern Search",
       fields: [
         {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            {
+              key: "titleGroup",
+              label: "Title",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
+                { key: "content.title", label: "Title", type: "text" },
+                {
+                  key: "content.titleSingleLineGroup",
+                  label: "سطر واحد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.titleSingleLineDesktop", label: "سطر واحد (سطح المكتب)", type: "boolean", defaultValue: false },
+                    { key: "content.titleSingleLineMobile", label: "سطر واحد (الجوال)", type: "boolean", defaultValue: false },
+                  ],
+                },
+                { key: "content.font.title.color", label: "لون العنوان", type: "color", useDefaultColor: true, globalColorType: "secondary" },
+                {
+                  key: "content.font.title.size",
+                  label: "حجم الخط",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.title.size.desktop", label: "سطح المكتب", type: "number", unit: "px" },
+                    { key: "content.font.title.size.tablet", label: "التابلت", type: "number", unit: "px" },
+                    { key: "content.font.title.size.mobile", label: "الجوال", type: "number", unit: "px" },
+                  ],
+                },
+                {
+                  key: "content.font.title.typography",
+                  label: "سمك الخط والتباعد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "content.font.title.weight",
+                      label: "سمك الخط",
+                      type: "badge-select",
+                      options: [
+                        { label: "عادي", value: "normal" },
+                        { label: "متوسط", value: "medium" },
+                        { label: "نصف غامق", value: "semibold" },
+                        { label: "غامق", value: "bold" },
+                        { label: "غامق جداً", value: "extrabold" },
+                      ],
+                      badgeConfig: {
+                        mode: "single",
+                        requiredAtLeastOne: false,
+                        allowUnset: true,
+                      },
+                    },
+                    { key: "content.font.title.lineHeight", label: "ارتفاع السطر", type: "text" },
+                    { key: "content.font.title.letterSpacing", label: "تباعد الحروف", type: "text" },
+                  ],
+                },
+                {
+                  key: "content.font.title.margin",
+                  label: "الهوامش",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.title.marginTop", label: "هامش علوي", type: "number", unit: "px" },
+                    { key: "content.font.title.marginBottom", label: "هامش سفلي", type: "number", unit: "px" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "subtitleGroup",
+              label: "Subtitle",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
+                { key: "content.subtitle", label: "Subtitle", type: "text" },
+                {
+                  key: "content.subtitleSingleLineGroup",
+                  label: "سطر واحد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.subtitleSingleLineDesktop", label: "سطر واحد (سطح المكتب)", type: "boolean", defaultValue: false },
+                    { key: "content.subtitleSingleLineMobile", label: "سطر واحد (الجوال)", type: "boolean", defaultValue: false },
+                  ],
+                },
+                { key: "content.font.subtitle.color", label: "لون العنوان الفرعي", type: "color", useDefaultColor: true, globalColorType: "secondary" },
+                {
+                  key: "content.font.subtitle.size",
+                  label: "حجم الخط",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.subtitle.size.desktop", label: "سطح المكتب", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.size.tablet", label: "التابلت", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.size.mobile", label: "الجوال", type: "number", unit: "px" },
+                  ],
+                },
+                {
+                  key: "content.font.subtitle.typography",
+                  label: "سمك الخط والتباعد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "content.font.subtitle.weight",
+                      label: "سمك الخط",
+                      type: "badge-select",
+                      options: [
+                        { label: "عادي", value: "normal" },
+                        { label: "متوسط", value: "medium" },
+                        { label: "نصف غامق", value: "semibold" },
+                        { label: "غامق", value: "bold" },
+                        { label: "غامق جداً", value: "extrabold" },
+                      ],
+                      badgeConfig: {
+                        mode: "single",
+                        requiredAtLeastOne: false,
+                        allowUnset: true,
+                      },
+                    },
+                    { key: "content.font.subtitle.lineHeight", label: "ارتفاع السطر", type: "text" },
+                    { key: "content.font.subtitle.letterSpacing", label: "تباعد الحروف", type: "text" },
+                  ],
+                },
+                {
+                  key: "content.font.subtitle.margin",
+                  label: "الهوامش",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.subtitle.marginTop", label: "هامش علوي", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.marginBottom", label: "هامش سفلي", type: "number", unit: "px" },
+                  ],
+                },
+              ],
+            },
+            { key: "paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
+            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
+          ],
+        },
+        {
           key: "height",
           label: "Height",
           type: "object",
@@ -86,95 +233,7 @@ export const heroStructure: ComponentStructure = {
             },
           ],
         },
-        {
-          key: "content",
-          label: "Content",
-          type: "object",
-          fields: [
-            {
-              key: "titleGroup",
-              label: "Title",
-              type: "text",
-              displayAsGroup: true,
-              groupFields: [
-                { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
-                { key: "content.title", label: "Title", type: "text" },
-                { key: "content.titleSingleLine", label: "العنوان في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
-              ],
-            },
-            {
-              key: "subtitleGroup",
-              label: "Subtitle",
-              type: "text",
-              displayAsGroup: true,
-              groupFields: [
-                { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
-                { key: "content.subtitle", label: "Subtitle", type: "text" },
-                { key: "content.subtitleSingleLine", label: "العنوان الفرعي في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
-              ],
-            },
-            { key: "paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
-            {
-              key: "font",
-              label: "Font Settings",
-              type: "object",
-              fields: [
-                {
-                  key: "title",
-                  label: "Title Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "Desktop", type: "text" },
-                        { key: "tablet", label: "Tablet", type: "text" },
-                        { key: "mobile", label: "Mobile", type: "text" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary", // Title uses secondary color
-                    },
-                    { key: "lineHeight", label: "Line Height", type: "text" },
-                  ],
-                },
-                {
-                  key: "subtitle",
-                  label: "Subtitle Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "Desktop", type: "text" },
-                        { key: "tablet", label: "Tablet", type: "text" },
-                        { key: "mobile", label: "Mobile", type: "text" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary", // Subtitle uses secondary color
-                    },
-                  ],
-                },
-              ],
-            },
-            { key: "maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
-          ],
-        },
+      
         {
           key: "searchForm",
           label: "Search Form",
@@ -461,50 +520,6 @@ export const heroStructure: ComponentStructure = {
       name: "Hero 2 - Simple Image",
       fields: [
         {
-          key: "height",
-          label: "Height",
-          type: "object",
-          fields: [
-            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
-            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
-            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
-          ],
-        },
-        {
-          key: "minHeight",
-          label: "Minimum Height",
-          type: "object",
-          fields: [
-            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
-            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
-            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
-          ],
-        },
-        {
-          key: "background",
-          label: "Background",
-          type: "object",
-          fields: [
-            { key: "image", label: "Image URL", type: "image" },
-            { key: "alt", label: "Alt Text", type: "text" },
-            {
-              key: "overlay",
-              label: "Overlay",
-              type: "object",
-              fields: [
-                { key: "enabled", label: "Enabled", type: "boolean" },
-                {
-                  key: "opacity",
-                  label: "Opacity",
-                  type: "text",
-                  placeholder: "0.6",
-                },
-                { key: "color", label: "Color", type: "color" },
-              ],
-            },
-          ],
-        },
-        {
           key: "content",
           label: "Content",
           type: "object",
@@ -622,6 +637,51 @@ export const heroStructure: ComponentStructure = {
           ],
         },
         {
+          key: "height",
+          label: "Height",
+          type: "object",
+          fields: [
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
+          ],
+        },
+        {
+          key: "minHeight",
+          label: "Minimum Height",
+          type: "object",
+          fields: [
+            { key: "desktop", label: "Desktop", type: "number", placeholder: "229", unit: "px" },
+            { key: "tablet", label: "Tablet", type: "number", placeholder: "229", unit: "px" },
+            { key: "mobile", label: "Mobile", type: "number", placeholder: "229", unit: "px" },
+          ],
+        },
+        {
+          key: "background",
+          label: "Background",
+          type: "object",
+          fields: [
+            { key: "image", label: "Image URL", type: "image" },
+            { key: "alt", label: "Alt Text", type: "text" },
+            {
+              key: "overlay",
+              label: "Overlay",
+              type: "object",
+              fields: [
+                { key: "enabled", label: "Enabled", type: "boolean" },
+                {
+                  key: "opacity",
+                  label: "Opacity",
+                  type: "text",
+                  placeholder: "0.6",
+                },
+                { key: "color", label: "Color", type: "color" },
+              ],
+            },
+          ],
+        },
+      
+        {
           key: "styling",
           label: "Styling",
           type: "object",
@@ -676,6 +736,162 @@ export const heroStructure: ComponentStructure = {
       name: "Hero 3 - Video Background with Search",
       fields: [
         {
+          key: "content",
+          label: "Content",
+          type: "object",
+          fields: [
+            {
+              key: "titleGroup",
+              label: "Title",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
+                { key: "content.title", label: "Title", type: "text" },
+                {
+                  key: "content.titleSingleLineGroup",
+                  label: "سطر واحد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.titleSingleLineDesktop", label: "سطر واحد (سطح المكتب)", type: "boolean", defaultValue: false },
+                    { key: "content.titleSingleLineMobile", label: "سطر واحد (الجوال)", type: "boolean", defaultValue: false },
+                  ],
+                },
+                { key: "content.font.title.color", label: "لون العنوان", type: "color", useDefaultColor: true, globalColorType: "secondary" },
+                {
+                  key: "content.font.title.size",
+                  label: "حجم الخط",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.title.size.desktop", label: "سطح المكتب", type: "number", unit: "px" },
+                    { key: "content.font.title.size.tablet", label: "التابلت", type: "number", unit: "px" },
+                    { key: "content.font.title.size.mobile", label: "الجوال", type: "number", unit: "px" },
+                  ],
+                },
+                {
+                  key: "content.font.title.typography",
+                  label: "سمك الخط والتباعد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "content.font.title.weight",
+                      label: "سمك الخط",
+                      type: "badge-select",
+                      options: [
+                        { label: "عادي", value: "normal" },
+                        { label: "متوسط", value: "medium" },
+                        { label: "نصف غامق", value: "semibold" },
+                        { label: "غامق", value: "bold" },
+                        { label: "غامق جداً", value: "extrabold" },
+                      ],
+                      badgeConfig: {
+                        mode: "single",
+                        requiredAtLeastOne: false,
+                        allowUnset: true,
+                      },
+                    },
+                    { key: "content.font.title.lineHeight", label: "ارتفاع السطر", type: "text" },
+                    { key: "content.font.title.letterSpacing", label: "تباعد الحروف", type: "text" },
+                  ],
+                },
+                {
+                  key: "content.font.title.margin",
+                  label: "الهوامش",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.title.marginTop", label: "هامش علوي", type: "number", unit: "px" },
+                    { key: "content.font.title.marginBottom", label: "هامش سفلي", type: "number", unit: "px" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "subtitleGroup",
+              label: "Subtitle",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
+                { key: "content.subtitle", label: "Subtitle", type: "text" },
+                {
+                  key: "content.subtitleSingleLineGroup",
+                  label: "سطر واحد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.subtitleSingleLineDesktop", label: "سطر واحد (سطح المكتب)", type: "boolean", defaultValue: false },
+                    { key: "content.subtitleSingleLineMobile", label: "سطر واحد (الجوال)", type: "boolean", defaultValue: false },
+                  ],
+                },
+                { key: "content.font.subtitle.color", label: "لون العنوان الفرعي", type: "color", useDefaultColor: true, globalColorType: "secondary" },
+                {
+                  key: "content.font.subtitle.size",
+                  label: "حجم الخط",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.subtitle.size.desktop", label: "سطح المكتب", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.size.tablet", label: "التابلت", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.size.mobile", label: "الجوال", type: "number", unit: "px" },
+                  ],
+                },
+                {
+                  key: "content.font.subtitle.typography",
+                  label: "سمك الخط والتباعد",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    {
+                      key: "content.font.subtitle.weight",
+                      label: "سمك الخط",
+                      type: "badge-select",
+                      options: [
+                        { label: "عادي", value: "normal" },
+                        { label: "متوسط", value: "medium" },
+                        { label: "نصف غامق", value: "semibold" },
+                        { label: "غامق", value: "bold" },
+                        { label: "غامق جداً", value: "extrabold" },
+                      ],
+                      badgeConfig: {
+                        mode: "single",
+                        requiredAtLeastOne: false,
+                        allowUnset: true,
+                      },
+                    },
+                    { key: "content.font.subtitle.lineHeight", label: "ارتفاع السطر", type: "text" },
+                    { key: "content.font.subtitle.letterSpacing", label: "تباعد الحروف", type: "text" },
+                  ],
+                },
+                {
+                  key: "content.font.subtitle.margin",
+                  label: "الهوامش",
+                  type: "text",
+                  displayAsGroup: true,
+                  groupFields: [
+                    { key: "content.font.subtitle.marginTop", label: "هامش علوي", type: "number", unit: "px" },
+                    { key: "content.font.subtitle.marginBottom", label: "هامش سفلي", type: "number", unit: "px" },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "layoutGroup",
+              label: "Layout Settings",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
+                { key: "content.alignment", label: "Alignment", type: "text" },
+                { key: "content.maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
+              ],
+            },
+          ],
+        },
+        {
           key: "height",
           label: "Height",
           type: "object",
@@ -717,104 +933,7 @@ export const heroStructure: ComponentStructure = {
             },
           ],
         },
-        {
-          key: "content",
-          label: "Content",
-          type: "object",
-          fields: [
-            {
-              key: "titleGroup",
-              label: "Title",
-              type: "text",
-              displayAsGroup: true,
-              groupFields: [
-                { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
-                { key: "content.title", label: "Title", type: "text" },
-                { key: "content.titleSingleLine", label: "العنوان في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
-              ],
-            },
-            {
-              key: "subtitleGroup",
-              label: "Subtitle",
-              type: "text",
-              displayAsGroup: true,
-              groupFields: [
-                { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
-                { key: "content.subtitle", label: "Subtitle", type: "text" },
-                { key: "content.subtitleSingleLine", label: "العنوان الفرعي في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
-              ],
-            },
-            {
-              key: "layoutGroup",
-              label: "Layout Settings",
-              type: "text",
-              displayAsGroup: true,
-              groupFields: [
-                { key: "content.paddingTop", label: "Padding Top", type: "number", placeholder: "200", unit: "px" },
-                { key: "content.alignment", label: "Alignment", type: "text" },
-                { key: "content.maxWidth", label: "Max Width", type: "number", placeholder: "1280", unit: "px" },
-              ],
-            },
-            {
-              key: "font",
-              label: "Font Settings",
-              type: "object",
-              fields: [
-                {
-                  key: "title",
-                  label: "Title Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "سطح المكتب", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "tablet", label: "التابلت", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "mobile", label: "الجوال", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary",
-                    },
-                    { key: "lineHeight", label: "Line Height", type: "text" },
-                  ],
-                },
-                {
-                  key: "subtitle",
-                  label: "Subtitle Font",
-                  type: "object",
-                  fields: [
-                    {
-                      key: "size",
-                      label: "Size",
-                      type: "object",
-                      fields: [
-                        { key: "desktop", label: "سطح المكتب", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "tablet", label: "التابلت", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                        { key: "mobile", label: "الجوال", type: "number", min: 1, max: 200, step: 1, unit: "px" },
-                      ],
-                    },
-                    { key: "weight", label: "Weight", type: "text" },
-                    {
-                      key: "color",
-                      label: "Color",
-                      type: "color",
-                      useDefaultColor: true,
-                      globalColorType: "secondary",
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
+      
         {
           key: "searchForm",
           label: "Search Form",
@@ -989,7 +1108,65 @@ export const heroStructure: ComponentStructure = {
           groupFields: [
             { key: "showTitle", label: "إظهار العنوان", type: "boolean", defaultValue: true },
             { key: "content.title", label: "Title", type: "text" },
-            { key: "content.titleSingleLine", label: "العنوان في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
+            {
+              key: "content.titleSingleLineGroup",
+              label: "سطر واحد",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.titleSingleLineDesktop", label: "سطر واحد (سطح المكتب)", type: "boolean", defaultValue: false },
+                { key: "content.titleSingleLineMobile", label: "سطر واحد (الجوال)", type: "boolean", defaultValue: false },
+              ],
+            },
+            { key: "content.font.title.color", label: "لون العنوان", type: "color", useDefaultColor: true, globalColorType: "secondary" },
+            {
+              key: "content.font.title.size",
+              label: "حجم الخط",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.font.title.size.desktop", label: "سطح المكتب", type: "number", unit: "px" },
+                { key: "content.font.title.size.tablet", label: "التابلت", type: "number", unit: "px" },
+                { key: "content.font.title.size.mobile", label: "الجوال", type: "number", unit: "px" },
+              ],
+            },
+            {
+              key: "content.font.title.typography",
+              label: "سمك الخط والتباعد",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                {
+                  key: "content.font.title.weight",
+                  label: "سمك الخط",
+                  type: "badge-select",
+                  options: [
+                    { label: "عادي", value: "normal" },
+                    { label: "متوسط", value: "medium" },
+                    { label: "نصف غامق", value: "semibold" },
+                    { label: "غامق", value: "bold" },
+                    { label: "غامق جداً", value: "extrabold" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: false,
+                    allowUnset: true,
+                  },
+                },
+                { key: "content.font.title.lineHeight", label: "ارتفاع السطر", type: "text" },
+                { key: "content.font.title.letterSpacing", label: "تباعد الحروف", type: "text" },
+              ],
+            },
+            {
+              key: "content.font.title.margin",
+              label: "الهوامش",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.font.title.marginTop", label: "هامش علوي", type: "number", unit: "px" },
+                { key: "content.font.title.marginBottom", label: "هامش سفلي", type: "number", unit: "px" },
+              ],
+            },
           ],
         },
         {
@@ -1000,7 +1177,65 @@ export const heroStructure: ComponentStructure = {
           groupFields: [
             { key: "showSubtitle", label: "إظهار العنوان الفرعي", type: "boolean", defaultValue: true },
             { key: "content.subtitle", label: "Subtitle", type: "text" },
-            { key: "content.subtitleSingleLine", label: "العنوان الفرعي في سطر واحد (إجباري)", type: "boolean", defaultValue: false },
+            {
+              key: "content.subtitleSingleLineGroup",
+              label: "سطر واحد",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.subtitleSingleLineDesktop", label: "سطر واحد (سطح المكتب)", type: "boolean", defaultValue: false },
+                { key: "content.subtitleSingleLineMobile", label: "سطر واحد (الجوال)", type: "boolean", defaultValue: false },
+              ],
+            },
+            { key: "content.font.subtitle.color", label: "لون العنوان الفرعي", type: "color", useDefaultColor: true, globalColorType: "secondary" },
+            {
+              key: "content.font.subtitle.size",
+              label: "حجم الخط",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.font.subtitle.size.desktop", label: "سطح المكتب", type: "number", unit: "px" },
+                { key: "content.font.subtitle.size.tablet", label: "التابلت", type: "number", unit: "px" },
+                { key: "content.font.subtitle.size.mobile", label: "الجوال", type: "number", unit: "px" },
+              ],
+            },
+            {
+              key: "content.font.subtitle.typography",
+              label: "سمك الخط والتباعد",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                {
+                  key: "content.font.subtitle.weight",
+                  label: "سمك الخط",
+                  type: "badge-select",
+                  options: [
+                    { label: "عادي", value: "normal" },
+                    { label: "متوسط", value: "medium" },
+                    { label: "نصف غامق", value: "semibold" },
+                    { label: "غامق", value: "bold" },
+                    { label: "غامق جداً", value: "extrabold" },
+                  ],
+                  badgeConfig: {
+                    mode: "single",
+                    requiredAtLeastOne: false,
+                    allowUnset: true,
+                  },
+                },
+                { key: "content.font.subtitle.lineHeight", label: "ارتفاع السطر", type: "text" },
+                { key: "content.font.subtitle.letterSpacing", label: "تباعد الحروف", type: "text" },
+              ],
+            },
+            {
+              key: "content.font.subtitle.margin",
+              label: "الهوامش",
+              type: "text",
+              displayAsGroup: true,
+              groupFields: [
+                { key: "content.font.subtitle.marginTop", label: "هامش علوي", type: "number", unit: "px" },
+                { key: "content.font.subtitle.marginBottom", label: "هامش سفلي", type: "number", unit: "px" },
+              ],
+            },
           ],
         },
         {

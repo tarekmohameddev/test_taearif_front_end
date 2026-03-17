@@ -1,0 +1,4 @@
+2026-03-16
+Update Type: Feature
+إضافة بادجات نوع العقار في صفحة إضافة الطلب (/dashboard/customers-hub/requests/add): (1) "عقار موجود بالفعل" — عند الاختيار يظهر dropdown لاختيار عقار أو أكثر من قائمة العقارات (GET /properties)، مع عرض المختارين كـ badges قابلة للإزالة. (2) "مواصفات عقار جديد (لن ينشئ عقار جديد بل هى بيانات تسجل فقط)" — عند الاختيار تظهر حقول: نوع العقار، طريقة الشراء، الميزانية من/إلى، المساحة من/إلى (م²). الاختيار حصري (واحد فقط) وبدون افتراضي. عند الإرسال: إذا تم اختيار "عقار موجود" وتم اختيار عقارات يُضاف property_ids إلى الـ body ويُرسل source: "employee_dashboard"؛ وإلا يُرسل property_ids: [] مع بقية حقول المواصفات. الـ API: POST /v1/property-requests يدعم property_ids (array) اختياري.
+app/dashboard/customers-hub/requests/add/page.tsx, components/property-requests/page-components/PropertyRequestForm.tsx

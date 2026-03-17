@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -28,9 +29,9 @@ import {
   priorityLabels,
   APPOINTMENT_TYPES,
   PROPERTY_TYPE_OPTIONS,
-  SAUDI_REGIONS,
 } from "./constants";
 import type { CustomerSource, Priority } from "@/types/unified-customer";
+import type { DistrictsByCityItem } from "./hooks/useRequestsCenterPage";
 
 export interface AppointmentTypeOption {
   id: string;
@@ -38,7 +39,11 @@ export interface AppointmentTypeOption {
   labelEn?: string;
 }
 
+export type SourceOption = { id: string; label: string; labelEn: string };
+
 export interface AdvancedFiltersPanelProps {
+  /** Options from GET filter-options (data.sources). When provided, المصدر uses these. */
+  sourceOptions?: SourceOption[];
   selectedSources: string[];
   setSelectedSources: (v: string[] | ((prev: string[]) => string[])) => void;
   selectedPriorities: string[];
@@ -62,6 +67,11 @@ export interface AdvancedFiltersPanelProps {
   setSelectedPropertyTypes: (v: string[] | ((prev: string[]) => string[])) => void;
   uniqueAssignees: { id: string; name: string }[];
   uniqueCities: string[];
+  /** أحياء مجمعة حسب المدينة. إن وُجدت تُعرض مع dividers. */
+  districtsByCity?: DistrictsByCityItem[];
+  districtsLoading?: boolean;
+  /** مناطق من الباك اند (fallback). */
+  regionOptions?: string[];
   tempBudgetMin: string;
   tempBudgetMax: string;
   setTempBudgetMin: (v: string) => void;
@@ -70,7 +80,7 @@ export interface AdvancedFiltersPanelProps {
   setIsBudgetDialogOpen: (v: boolean) => void;
 }
 
-const SOURCES: CustomerSource[] = [
+const FALLBACK_SOURCES: CustomerSource[] = [
   "whatsapp",
   "inquiry",
   "manual",
@@ -86,6 +96,7 @@ const DEFAULT_APPOINTMENT_OPTIONS: AppointmentTypeOption[] = APPOINTMENT_TYPES.m
 }));
 
 export function AdvancedFiltersPanel({
+  sourceOptions,
   selectedSources,
   setSelectedSources,
   selectedPriorities,
@@ -109,6 +120,9 @@ export function AdvancedFiltersPanel({
   setSelectedPropertyTypes,
   uniqueAssignees,
   uniqueCities,
+  districtsByCity = [],
+  districtsLoading = false,
+  regionOptions = [],
   tempBudgetMin,
   tempBudgetMax,
   setTempBudgetMin,
@@ -116,6 +130,9 @@ export function AdvancedFiltersPanel({
   isBudgetDialogOpen,
   setIsBudgetDialogOpen,
 }: AdvancedFiltersPanelProps) {
+  const sourceList = sourceOptions && sourceOptions.length > 0
+    ? sourceOptions.map((o) => ({ id: o.id, label: o.label }))
+    : FALLBACK_SOURCES.map((id) => ({ id, label: id }));
   const btnClass =
     "gap-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700";
 
@@ -137,17 +154,17 @@ export function AdvancedFiltersPanel({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>المصدر</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {SOURCES.map((source) => (
+          {sourceList.map((item) => (
             <DropdownMenuCheckboxItem
-              key={source}
-              checked={selectedSources.includes(source)}
+              key={item.id}
+              checked={selectedSources.includes(item.id)}
               onCheckedChange={(checked) =>
                 setSelectedSources((prev) =>
-                  checked ? [...prev, source] : prev.filter((s) => s !== source)
+                  checked ? [...prev, item.id] : prev.filter((s) => s !== item.id)
                 )
               }
             >
-              <SourceBadge source={source} className="text-xs" />
+              <SourceBadge source={item.id} className="text-xs" />
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
@@ -293,9 +310,9 @@ export function AdvancedFiltersPanel({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>المدينة</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {uniqueCities.map((city) => (
+            {uniqueCities.map((city, i) => (
               <DropdownMenuCheckboxItem
-                key={city}
+                key={`city-${i}-${city}`}
                 checked={selectedCities.includes(city)}
                 onCheckedChange={(checked) =>
                   setSelectedCities((prev) =>
@@ -313,7 +330,7 @@ export function AdvancedFiltersPanel({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className={btnClass}>
             <MapPin className="h-4 w-4" />
-            المنطقة
+            الحي / المنطقة
             {selectedStates.length > 0 && (
               <Badge variant="secondary" className="mr-1">
                 {selectedStates.length}
@@ -322,22 +339,41 @@ export function AdvancedFiltersPanel({
             <ChevronDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>المنطقة (الولاية)</DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="max-h-[320px] overflow-y-auto">
+          <DropdownMenuLabel>الحي (حسب المدينة)</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {SAUDI_REGIONS.map((region) => (
-            <DropdownMenuCheckboxItem
-              key={region}
-              checked={selectedStates.includes(region)}
-              onCheckedChange={(checked) =>
-                setSelectedStates((prev) =>
-                  checked ? [...prev, region] : prev.filter((r) => r !== region)
-                )
-              }
-            >
-              {region}
-            </DropdownMenuCheckboxItem>
-          ))}
+          {districtsByCity.length === 0 && !districtsLoading ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">
+              {selectedCities.length === 0 ? "اختر مدينة أولاً" : "لا توجد أحياء"}
+            </div>
+          ) : districtsLoading ? (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">جاري التحميل...</div>
+          ) : (
+            districtsByCity.map(({ cityId, cityName, districts }) => (
+              <React.Fragment key={`city-${cityId}`}>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {cityName}
+                </DropdownMenuLabel>
+                {districts.map((d) => {
+                  const compositeKey = `${cityId}-${d.id}`;
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={`district-${cityId}-${d.id}`}
+                      checked={selectedStates.includes(compositeKey)}
+                      onCheckedChange={(checked) =>
+                        setSelectedStates((prev) =>
+                          checked ? [...prev, compositeKey] : prev.filter((k) => k !== compositeKey)
+                        )
+                      }
+                    >
+                      {d.name}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+              </React.Fragment>
+            ))
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu

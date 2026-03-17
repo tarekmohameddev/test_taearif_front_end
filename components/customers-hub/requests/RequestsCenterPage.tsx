@@ -13,6 +13,15 @@ import { RequestsCenterPagination } from "./RequestsCenterPagination";
 import { RequestsCenterBulkDialogs } from "./RequestsCenterBulkDialogs";
 import { RequestsCenterLoading, RequestsCenterError } from "./RequestsCenterEmptyStates";
 import { PropertyRequestPriorityDialog } from "./detail/PropertyRequestPriorityDialog";
+import { AdvancedFiltersDialogContent } from "./AdvancedFiltersDialogContent";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import type { RequestsCenterPageProps } from "./types";
 
 export function RequestsCenterPage(props?: RequestsCenterPageProps) {
@@ -31,11 +40,13 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
     newFilters,
   } = ctx;
 
+  const [filterSearch, setFilterSearch] = React.useState("");
+
   if (apiLoading && actions.length === 0) return <RequestsCenterLoading />;
   if (apiError && actions.length === 0) return <RequestsCenterError error={apiError} />;
 
   return (
-    <div className="min-h-screen" dir="rtl">
+    <div className="min-h-screen bg-background" dir="rtl">
       <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
         <RequestsCenterHeader />
         <RequestsCenterStats stats={stats} />
@@ -55,6 +66,7 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           setShowAdvancedFilters={ctx.setShowAdvancedFilters}
           viewMode={ctx.viewMode}
           setViewMode={ctx.setViewMode}
+          sourceOptions={ctx.sourceOptions}
           selectedSources={ctx.selectedSources}
           setSelectedSources={ctx.setSelectedSources}
           selectedPriorities={ctx.selectedPriorities}
@@ -66,6 +78,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           setSelectedAssignees={ctx.setSelectedAssignees}
           dueDateFilter={ctx.dueDateFilter}
           setDueDateFilter={ctx.setDueDateFilter}
+          requestDateFrom={ctx.requestDateFrom}
+          setRequestDateFrom={ctx.setRequestDateFrom}
+          requestDateTo={ctx.requestDateTo}
+          setRequestDateTo={ctx.setRequestDateTo}
           selectedCities={ctx.selectedCities}
           setSelectedCities={ctx.setSelectedCities}
           selectedStates={ctx.selectedStates}
@@ -182,6 +198,80 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
           />
         )}
       </div>
+
+      {/* Sidebar الفلاتر المتقدمة كـ Sheet من اليسار (مثل التعيينات) */}
+      <Sheet open={ctx.showAdvancedFilters} onOpenChange={ctx.setShowAdvancedFilters}>
+        <SheetContent side="left" className="w-[420px] sm:max-w-[420px] p-0" dir="rtl">
+          <div className="flex flex-col h-full">
+            <SheetHeader className="p-4 border-b">
+              <SheetTitle className="flex items-center justify-between">
+                <span>التصفية المتقدمة</span>
+                {hasActiveFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-red-600 hover:text-red-700"
+                    onClick={clearFilters}
+                  >
+                    مسح الكل
+                  </Button>
+                )}
+              </SheetTitle>
+            </SheetHeader>
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full overflow-y-auto p-4 space-y-3">
+                <Input
+                  value={filterSearch}
+                  onChange={(e) => setFilterSearch(e.target.value)}
+                  placeholder="ابحث عن فلتر..."
+                  className="h-8 rounded-xl text-xs"
+                />
+                <AdvancedFiltersDialogContent
+                  sourceOptions={ctx.sourceOptions}
+                  selectedSources={ctx.selectedSources}
+                  setSelectedSources={ctx.setSelectedSources}
+                  selectedPriorities={ctx.selectedPriorities}
+                  setSelectedPriorities={ctx.setSelectedPriorities}
+                  selectedAssignees={ctx.selectedAssignees}
+                  setSelectedAssignees={ctx.setSelectedAssignees}
+                  uniqueAssignees={ctx.uniqueAssignees}
+                  selectedAppointmentTypes={ctx.selectedAppointmentTypes}
+                  setSelectedAppointmentTypes={ctx.setSelectedAppointmentTypes}
+                  appointmentTypes={ctx.appointmentTypes}
+                  dueDateFilter={ctx.dueDateFilter}
+                  setDueDateFilter={ctx.setDueDateFilter}
+                  requestDateFrom={ctx.requestDateFrom}
+                  setRequestDateFrom={ctx.setRequestDateFrom}
+                  requestDateTo={ctx.requestDateTo}
+                  setRequestDateTo={ctx.setRequestDateTo}
+                  selectedCities={ctx.selectedCities}
+                  setSelectedCities={ctx.setSelectedCities}
+                  selectedStates={ctx.selectedStates}
+                  setSelectedStates={ctx.setSelectedStates}
+                  budgetMin={ctx.budgetMin}
+                  budgetMax={ctx.budgetMax}
+                  setBudgetMin={ctx.setBudgetMin}
+                  setBudgetMax={ctx.setBudgetMax}
+                  selectedPropertyTypes={ctx.selectedPropertyTypes}
+                  setSelectedPropertyTypes={ctx.setSelectedPropertyTypes}
+                  uniqueCities={ctx.uniqueCities}
+                  districtsByCity={ctx.districtsByCity ?? []}
+                  districtsLoading={ctx.districtsLoading ?? false}
+                  regionOptions={ctx.apiRegionNames ?? []}
+                  tempBudgetMin={ctx.tempBudgetMin}
+                  tempBudgetMax={ctx.tempBudgetMax}
+                  setTempBudgetMin={ctx.setTempBudgetMin}
+                  setTempBudgetMax={ctx.setTempBudgetMax}
+                  isBudgetDialogOpen={ctx.isBudgetDialogOpen}
+                  setIsBudgetDialogOpen={ctx.setIsBudgetDialogOpen}
+                  filterSearch={filterSearch}
+                  setFilterSearch={setFilterSearch}
+                />
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

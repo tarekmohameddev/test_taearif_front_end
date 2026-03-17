@@ -10,11 +10,21 @@ import { SourceBadge } from "../../actions/SourceBadge";
 import { priorityConfig, statusConfig, requestDetailActionTypeLabels } from "../constants";
 import type { CustomerAction } from "@/types/unified-customer";
 
+/** Status option from GET /v1/property-requests/filters (used for badge label when status_id is set). */
+export type StatusOptionForBadge = { id: number; name_ar: string; name_en?: string };
+
+/** Priority option from GET /v1/property-requests/filters (used for badge label/color when priority_id is set). */
+export type PriorityOptionForBadge = { id: number; name: string; value?: number; icon?: string; color?: string };
+
 interface RequestDetailHeaderProps {
   action: CustomerAction;
   isOverdue: boolean;
   onStatusClick?: () => void;
   onPriorityClick?: () => void;
+  /** When set (e.g. from useStatusDialog), badge label uses name_ar from the option matching action.status_id. */
+  propertyRequestStatusOptions?: StatusOptionForBadge[];
+  /** When set (e.g. from usePriorityDialog), badge label and color use the option matching action.priority_id. */
+  propertyRequestPriorityOptions?: PriorityOptionForBadge[];
 }
 
 export function RequestDetailHeader({
@@ -22,9 +32,33 @@ export function RequestDetailHeader({
   isOverdue,
   onStatusClick,
   onPriorityClick,
+  propertyRequestStatusOptions,
+  propertyRequestPriorityOptions,
 }: RequestDetailHeaderProps) {
-  const priorityStyle = priorityConfig[action.priority] ?? priorityConfig.medium;
-  const statusStyle = statusConfig[action.status] ?? statusConfig.pending;
+  const priorityId = action.priority_id;
+  const apiPriority = propertyRequestPriorityOptions?.length && priorityId != null
+    ? propertyRequestPriorityOptions.find((p) => p.id === priorityId)
+    : undefined;
+  const priorityStyle: {
+    label: string;
+    color: string;
+    style?: React.CSSProperties;
+  } = apiPriority
+    ? {
+        label: apiPriority.name,
+        color: apiPriority.color ? "" : "bg-blue-500 text-white",
+        style: apiPriority.color
+          ? { backgroundColor: apiPriority.color, color: "#fff" }
+          : undefined,
+      }
+    : { ...(priorityConfig[action.priority] ?? priorityConfig.medium), style: undefined };
+  const statusId = action.status_id;
+  const apiStatus = propertyRequestStatusOptions?.length && statusId != null
+    ? propertyRequestStatusOptions.find((s) => s.id === statusId)
+    : undefined;
+  const statusStyle = apiStatus
+    ? { label: apiStatus.name_ar, color: "bg-blue-500 text-white" }
+    : (statusConfig[action.status] ?? statusConfig.pending);
   const typeLabel = requestDetailActionTypeLabels[action.type] ?? action.type;
 
   return (
@@ -73,12 +107,15 @@ export function RequestDetailHeader({
                 priorityStyle.color,
                 "cursor-pointer hover:opacity-90 transition-opacity"
               )}
+              style={priorityStyle.style}
             >
               {priorityStyle.label}
             </Badge>
           </button>
         ) : (
-          <Badge className={priorityStyle.color}>{priorityStyle.label}</Badge>
+          <Badge className={priorityStyle.color} style={priorityStyle.style}>
+            {priorityStyle.label}
+          </Badge>
         )}
         <Badge
           variant="outline"

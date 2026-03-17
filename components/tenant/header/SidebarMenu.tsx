@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +16,20 @@ import {
   MapPin
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+/** Darkens a hex color by a factor (0–1). Returns fallback if not parseable. */
+function darkenHex(hex: string, factor = 0.82, fallback = "#e7e5e4"): string {
+  const h = hex.replace("#", "").trim();
+  if (h.length !== 6 && h.length !== 3) return fallback;
+  const r = h.length === 6 ? parseInt(h.slice(0, 2), 16) : parseInt(h[0] + h[0], 16);
+  const g = h.length === 6 ? parseInt(h.slice(2, 4), 16) : parseInt(h[1] + h[1], 16);
+  const b = h.length === 6 ? parseInt(h.slice(4, 6), 16) : parseInt(h[2] + h[2], 16);
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return fallback;
+  const dr = Math.round(Math.max(0, r * factor));
+  const dg = Math.round(Math.max(0, g * factor));
+  const db = Math.round(Math.max(0, b * factor));
+  return `#${dr.toString(16).padStart(2, "0")}${dg.toString(16).padStart(2, "0")}${db.toString(16).padStart(2, "0")}`;
+}
 
 interface SidebarMenuProps {
   isOpen: boolean;
@@ -113,6 +127,11 @@ const SidebarMenu = ({
       : isImageBg
         ? { backgroundColor: "transparent" }
         : { backgroundColor: "#ffffff" };
+  const panelBaseColor = panelBgColor ?? "#ffffff";
+  const openDropdownBg = useMemo(
+    () => darkenHex(panelBaseColor),
+    [panelBaseColor]
+  );
   const headingColor = textColors?.heading;
   const linkColor = textColors?.link;
   const textColor = textColors?.text;
@@ -169,6 +188,8 @@ const SidebarMenu = ({
     const itemId = rawItemId ? rawItemId.toString().trim() : uniqueKey || `item-${Date.now()}-${Math.random()}`;
     const finalItemId = itemId || uniqueKey || `item-${Date.now()}-${Math.random()}`;
     const isOpenSub = openSubmenus[finalItemId];
+    const [isHovered, setIsHovered] = useState(false);
+    const showDarkerBg = isOpenSub || isHovered;
 
     return (
       <div className="w-full">
@@ -176,14 +197,14 @@ const SidebarMenu = ({
           <div className="flex flex-col">
             <button
               onClick={() => toggleSubmenu(finalItemId)}
-              className={cn(
-                "flex items-center justify-between w-full py-3 px-4 transition-all duration-300 rounded-xl group",
-                isOpenSub ? "bg-stone-50" : "hover:bg-stone-50"
-              )}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              className="flex items-center justify-between w-full py-3 px-4 transition-all duration-300 rounded-xl group"
+              style={{ backgroundColor: showDarkerBg ? openDropdownBg : undefined }}
             >
               <div className="flex items-center gap-3">
                 <span
-                  className={cn("p-2 rounded-lg transition-colors", isOpenSub && "bg-stone-100")}
+                  className={cn("p-2 rounded-lg transition-colors", isOpenSub && "bg-black/10")}
                   style={{ color: isOpenSub ? linkColor ?? "#1c1917" : linkColor ?? "#78716c" }}
                 >
                   {getIcon(item)}
@@ -208,7 +229,8 @@ const SidebarMenu = ({
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="overflow-hidden border-r-2 border-stone-100 mr-8 mt-1 space-y-1"
+                  className="overflow-hidden border-r-2 mr-8 mt-1 space-y-1"
+                  style={{ borderRightColor: openDropdownBg }}
                 >
                   {item.submenu.flatMap((sub: any, idx: number) => {
                     // Normalize submenu structure (sometimes nested in 'items')

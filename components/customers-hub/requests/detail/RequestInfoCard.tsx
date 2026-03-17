@@ -25,17 +25,7 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
           معلومات الطلب
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold mb-2">{action.title}</h3>
-          {action.description && (
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              {action.description}
-            </p>
-          )}
-        </div>
-
-        <Separator />
+      <CardContent className="">
 
         {/* معلومات أساسية عن الطلب */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -105,10 +95,12 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
             </div>
           )}
 
-          {action.districts_id && (
+          {(action.districtAR || action.districts_id) && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">الحي (معرف)</span>
-              <span className="font-medium">{action.districts_id}</span>
+              <span className="text-gray-500">الحي</span>
+              <span className="font-medium">
+                {action.districtAR ?? action.districts_id}
+              </span>
             </div>
           )}
 
@@ -144,49 +136,7 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
           ) : null}
         </div>
 
-        {/* بيانات التواصل كما كتبها العميل في النموذج */}
-        <div className="pt-4 border-t space-y-3">
-          <h3 className="text-sm font-semibold mb-1">بيانات التواصل من الطلب</h3>
-
-          {(action.full_name || action.customerName) && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">اسم العميل</span>
-              <span className="font-medium">
-                {action.full_name ?? action.customerName}
-              </span>
-            </div>
-          )}
-
-          {(action.phone || action.customerPhone) && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">رقم الجوال</span>
-              <span className="font-medium">
-                {action.phone ?? action.customerPhone}
-              </span>
-            </div>
-          )}
-
-          {action.contact_on_whatsapp != null && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">التواصل عبر واتساب</span>
-              <span className="font-medium">
-                {Number(action.contact_on_whatsapp) === 1 ? "نعم" : "لا"}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* معلومات إضافية بسيطة عن الطلب من الـ action */}
-        <div className="pt-4 border-t space-y-3">
-          <h3 className="text-sm font-semibold mb-1">تفاصيل إضافية</h3>
-
-          {action.source && (
-            <div className="flex items-center justify-between text-sm gap-2">
-              <span className="text-gray-500">مصدر الطلب</span>
-              <SourceBadge source={action.source} className="text-xs" />
-            </div>
-          )}
-        </div>
+        {/* تمت إزالة قسم بيانات التواصل الإضافية ومصدر الطلب بناءً على طلب المنتج */}
       </CardContent>
     </Card>
   );

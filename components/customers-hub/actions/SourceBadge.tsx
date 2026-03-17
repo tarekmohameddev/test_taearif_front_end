@@ -2,7 +2,16 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Globe, UserPlus, Upload, Users, Home, FileEdit } from "lucide-react";
+import {
+  MessageSquare,
+  Globe,
+  UserPlus,
+  Upload,
+  Users,
+  Home,
+  FileEdit,
+  LayoutDashboard,
+} from "lucide-react";
 import type { CustomerSource } from "@/types/unified-customer";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +21,13 @@ interface SourceBadgeProps {
 }
 
 const sourceConfig = {
+  employee_dashboard: {
+    label: "من لوحة التحكم",
+    labelEn: "Employee dashboard",
+    icon: LayoutDashboard,
+    color:
+      "bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-950 dark:text-sky-300",
+  },
   whatsapp: {
     label: "واتساب",
     labelEn: "WhatsApp",
@@ -19,8 +35,8 @@ const sourceConfig = {
     color: "bg-green-100 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300",
   },
   inquiry: {
-    label: "موقع إلكتروني",
-    labelEn: "Website",
+    label: "استفسار عام",
+    labelEn: "General inquiry",
     icon: Globe,
     color: "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300",
   },
@@ -55,8 +71,8 @@ const sourceConfig = {
     color: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
   },
   website: {
-    label: "من موقع العميل",
-    labelEn: "Customer website",
+    label: "من الموقع",
+    labelEn: "Website",
     icon: Globe,
     color: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
   },

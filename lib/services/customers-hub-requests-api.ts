@@ -63,7 +63,7 @@ export interface RequestsListFilters {
   date_from?: string; // New field (ISO date string)
   date_to?: string; // New field (ISO date string)
   search?: string;
-  sort_by?: "createdAt" | "dueDate" | "priority" | "customerName"; // Changed from sorting.field
+  sort_by?: "updatedAt" | "createdAt" | "dueDate" | "priority" | "customerName"; // Changed from sorting.field
   sort_dir?: "asc" | "desc"; // Changed from sorting.order
   limit?: number; // Changed from pagination.limit
   offset?: number; // Changed from pagination.offset (calculated from page)
@@ -116,6 +116,7 @@ export interface RequestsListResponse {
   code?: number; // Optional - may not be present in all responses
   message?: string; // Optional - may not be present in all responses
   data: {
+    // Each action may include backend-computed flags such as `isUpdated` (see mark-viewed docs).
     actions: CustomerAction[];
     stats?: {
       inbox: number;
@@ -143,6 +144,13 @@ export interface RequestsListResponse {
   timestamp?: string; // Optional - may not be present in all responses
 }
 
+export interface MarkViewedResponse {
+  status: "success";
+  data: {
+    viewedAt: string;
+  };
+}
+
 export interface FilterOptionsResponse {
   status: "success";
   code: number;
@@ -151,10 +159,14 @@ export interface FilterOptionsResponse {
     types: Array<{ value: string; label: string }>;
     priorities: Array<{ value: string; label: string }>;
     statuses: Array<{ value: string; label: string }>;
-    sources?: Array<{ value: string; label: string }>; // Optional: Origin options
+    sources?: Array<{ id: string; label: string; labelEn: string }>; // Optional: Origin options (from GET filter-options)
     objectTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filtering by kind of record
     appointmentTypes?: Array<{ id: string; label: string; labelEn: string }>; // Options for filter "نوع الموعد" (from GET filter-options)
     employees: Array<{ id: number; name: string }>;
+    /** مدن من الباك اند (اختياري؛ إن لم تُوفَّر يُستخدم GET /cities?country_id=1) */
+    cities?: Array<{ id: number; name: string; region_name?: string }>;
+    /** مناطق من الباك اند (اختياري؛ إن لم تُوفَّر تُستنتج من cities.region_name إن وُجد) */
+    regions?: Array<{ id?: number; name: string }>;
   };
   timestamp: string;
 }
@@ -396,7 +408,7 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
       requestBody.offset = 0;
     }
     if (requestBody.sort_by === undefined) {
-      requestBody.sort_by = "createdAt";
+      requestBody.sort_by = "updatedAt";
     }
     if (requestBody.sort_dir === undefined) {
       requestBody.sort_dir = "desc";
@@ -428,6 +440,13 @@ export async function getRequestsList(params: RequestsListFilters | RequestsList
     const response = await axiosInstance.post<RequestsListResponse>(`${BASE_URL}/list`, requestBody);
     return response.data;
   });
+}
+
+// Mark requests list as viewed by current user.
+// Endpoint: POST /api/v2/customers-hub/requests/mark-viewed
+export async function markRequestsListViewed(): Promise<MarkViewedResponse> {
+  const response = await axiosInstance.post<MarkViewedResponse>(`${BASE_URL}/mark-viewed`, {});
+  return response.data;
 }
 
 // Get Filter Options

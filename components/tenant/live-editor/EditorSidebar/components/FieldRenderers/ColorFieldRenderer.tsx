@@ -2,6 +2,21 @@
 import React, { useState } from "react";
 import { useEditorT } from "@/context/editorI18nStore";
 
+// تخزين اللون دائماً مع # في البيانات؛ العرض في الواجهة بدون #
+function toStored(raw: string): string {
+  const s = (raw || "").trim();
+  if (!s || s.toLowerCase() === "transparent") return "transparent";
+  const hex = s.startsWith("#") ? s.slice(1) : s;
+  if (!/^[0-9A-Fa-f]{3,8}$/.test(hex)) return s;
+  return "#" + hex;
+}
+
+function toDisplay(stored: string): string {
+  if (!stored) return "";
+  if (stored.toLowerCase() === "transparent") return "transparent";
+  return stored.startsWith("#") ? stored.slice(1) : stored;
+}
+
 // مكون عرض حقل اللون
 export const ColorFieldRenderer: React.FC<{
   label: string;
@@ -16,23 +31,27 @@ export const ColorFieldRenderer: React.FC<{
     typeof value === "string"
       ? value
       : typeof value === "object" && value !== null
-        ? value.value || value.color || ""
+        ? (value as { value?: string; color?: string }).value ||
+          (value as { value?: string; color?: string }).color ||
+          ""
         : String(value || "");
-  const hasHex = typeof stringValue === "string" && stringValue.startsWith("#");
-  const colorValue = hasHex ? stringValue : "#000000";
+  const normalizedProp = toStored(stringValue);
+  const hasHex =
+    typeof normalizedProp === "string" && normalizedProp.startsWith("#");
 
-  // Local state to track the current color value for immediate UI updates
-  const [localValue, setLocalValue] = useState(stringValue);
+  // Local state: always stored form (#hex or "transparent")
+  const [localValue, setLocalValue] = useState(normalizedProp);
 
   // Update local value when prop value changes
   React.useEffect(() => {
-    setLocalValue(stringValue);
-  }, [stringValue]);
+    setLocalValue(normalizedProp);
+  }, [normalizedProp]);
 
-  // Handle color updates
+  // Handle color updates — نُخزّن دائماً بالشكل المعياري (مع #)
   const handleColorChange = (newValue: string) => {
-    setLocalValue(newValue);
-    updateValue(path, newValue);
+    const stored = toStored(newValue);
+    setLocalValue(stored);
+    updateValue(path, stored);
   };
 
   return (
@@ -71,13 +90,13 @@ export const ColorFieldRenderer: React.FC<{
           />
         </div>
 
-        {/* حقل النص للكود السادس عشر */}
+        {/* حقل النص للكود السادس عشر — يُعرض بدون # ويُخزَّن مع # في البيانات */}
         <input
           type="text"
-          value={localValue || ""}
+          value={toDisplay(localValue)}
           onChange={(e) => handleColorChange(e.target.value)}
           className="w-28 text-center px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-700 font-mono text-sm"
-          placeholder="#FFFFFF"
+          placeholder="FFFFFF"
         />
 
         {/* زر Transparent */}

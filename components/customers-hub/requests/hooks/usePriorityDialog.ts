@@ -1,21 +1,53 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import type { Priority } from "@/types/unified-customer";
 import { getPropertyRequestId } from "../request-detail-types";
 
+export interface PriorityOption {
+  id: number;
+  name: string;
+  value?: number;
+  icon?: string;
+  color?: string;
+}
+
 export interface UsePriorityDialogParams {
+  requestId: string;
   action: { objectType?: string; property_request_id?: number; priority?: Priority } | null | undefined;
   userData: { token?: string } | null;
   onRefetch?: () => Promise<void>;
 }
 
-export function usePriorityDialog({ action, userData, onRefetch }: UsePriorityDialogParams) {
+export function usePriorityDialog({ requestId, action, userData, onRefetch }: UsePriorityDialogParams) {
   const [showPriorityDialog, setShowPriorityDialog] = useState(false);
+  const [priorityOptions, setPriorityOptions] = useState<PriorityOption[]>([]);
+  const [loadingPriorities, setLoadingPriorities] = useState(false);
   const [selectedPriority, setSelectedPriority] = useState<Priority>("medium");
   const [savingPriority, setSavingPriority] = useState(false);
+
+  useEffect(() => {
+    if (!userData?.token || !requestId) return;
+    setLoadingPriorities(true);
+    axiosInstance
+      .get<{ data?: { priorities?: PriorityOption[] }; priorities?: PriorityOption[] }>("/v1/property-requests/filters")
+      .then((response) => {
+        const raw = response?.data;
+        const list = Array.isArray(raw?.data?.priorities)
+          ? raw.data.priorities
+          : Array.isArray(raw?.priorities)
+            ? raw.priorities
+            : [];
+        setPriorityOptions(list);
+      })
+      .catch((error) => {
+        console.error("Error fetching property request priorities:", error);
+        toast.error("حدث خطأ أثناء تحميل أولويات طلب العقار");
+      })
+      .finally(() => setLoadingPriorities(false));
+  }, [userData?.token, requestId]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -64,6 +96,8 @@ export function usePriorityDialog({ action, userData, onRefetch }: UsePriorityDi
     showPriorityDialog,
     setShowPriorityDialog,
     handleOpenChange,
+    priorityOptions,
+    loadingPriorities,
     selectedPriority,
     setSelectedPriority,
     savingPriority,

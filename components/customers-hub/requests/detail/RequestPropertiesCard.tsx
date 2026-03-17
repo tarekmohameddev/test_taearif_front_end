@@ -25,6 +25,12 @@ interface PropertyOption {
   address?: string;
   price?: number;
   transaction_type?: string;
+  // قد تحتوي الـ API على حقل للصورة باسم مختلف
+  imageUrl?: string;
+  image?: string;
+  thumbnailUrl?: string;
+  main_image_url?: string;
+  featured_image?: string;
 }
 
 interface RequestPropertiesCardProps {
@@ -135,12 +141,25 @@ export function RequestPropertiesCard({
     }
   }, [needFetchForList, isOpen]);
 
-  const linkedProperties = linkedIds.map((id) => ({
-    id,
-    title: propertyMap[id]?.title ?? `عقار #${id}`,
-    address: propertyMap[id]?.address,
-    price: propertyMap[id]?.price,
-  }));
+  const linkedProperties = linkedIds.map((id) => {
+    const prop = propertyMap[id] as PropertyOption | undefined;
+    const anyProp = prop as any;
+    const imageUrl =
+      anyProp?.imageUrl ??
+      anyProp?.featured_image ??
+      anyProp?.main_image_url ??
+      anyProp?.thumbnailUrl ??
+      anyProp?.thumbnail ??
+      anyProp?.image;
+
+    return {
+      id,
+      title: prop?.title ?? `عقار #${id}`,
+      address: prop?.address,
+      price: prop?.price,
+      imageUrl: typeof imageUrl === "string" ? imageUrl : undefined,
+    };
+  });
 
   const availableToAdd = availableProperties.filter(
     (p) => !linkedIds.includes(p.id)
@@ -315,52 +334,64 @@ export function RequestPropertiesCard({
                   className="overflow-hidden hover:shadow-md transition-shadow w-full"
                 >
                   <CardContent className="p-3">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-sm truncate">
-                          {prop.title}
-                        </h4>
-                        {prop.address && (
-                          <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                            <MapPin className="h-3 w-3" />
-                            {prop.address}
-                          </p>
+                    <div className="flex flex-row items-stretch gap-3">
+                    {prop.imageUrl && (
+                        <div className="w-32 h-24 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                          <img
+                            src={prop.imageUrl}
+                            alt={prop.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0 flex flex-col justify-between text-right">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm truncate">
+                              {prop.title}
+                            </h4>
+                            {prop.address && (
+                              <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                                <MapPin className="h-3 w-3" />
+                                {prop.address}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleDetach(prop.id)}
+                            disabled={detachingId === prop.id}
+                            title="إزالة من الطلب"
+                          >
+                            {detachingId === prop.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        {prop.price != null && (
+                          <div className="flex items-center gap-1 text-sm font-bold text-green-600">
+                            <DollarSign className="h-3.5 w-3.5" />
+                            {(prop.price / 1000).toFixed(0)}k ريال
+                          </div>
                         )}
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full mt-2 h-8 text-xs"
+                          asChild
+                        >
+                          <Link href={`/dashboard/properties/${prop.id}`}>
+                            <Eye className="h-3 w-3 ml-1" />
+                            عرض التفاصيل
+                          </Link>
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleDetach(prop.id)}
-                        disabled={detachingId === prop.id}
-                        title="إزالة من الطلب"
-                      >
-                        {detachingId === prop.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
                     </div>
-
-                    {prop.price != null && (
-                      <div className="flex items-center gap-1 text-sm font-bold text-green-600">
-                        <DollarSign className="h-3.5 w-3.5" />
-                        {(prop.price / 1000).toFixed(0)}k ريال
-                      </div>
-                    )}
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full mt-2 h-8 text-xs"
-                      asChild
-                    >
-                      <Link href={`/dashboard/properties/${prop.id}`}>
-                        <Eye className="h-3 w-3 ml-1" />
-                        عرض التفاصيل
-                      </Link>
-                    </Button>
                   </CardContent>
                 </Card>
               ))}
