@@ -8,10 +8,7 @@ import useAuthStore from "@/context/AuthContext";
 import { selectUserData } from "@/context/auth/selectors";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  PropertyRequestForm,
-  type PropertyModeType,
-} from "@/components/property-requests/page-components/PropertyRequestForm";
+import { PropertyRequestForm } from "@/components/property-requests/page-components/PropertyRequestForm";
 import toast from "react-hot-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
@@ -39,7 +36,6 @@ export default function AddPropertyRequestPage() {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [propertyMode, setPropertyMode] = useState<PropertyModeType | null>(null);
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<number[]>([]);
 
   const handleChange = (field: keyof typeof formData, value: unknown) => {
@@ -95,11 +91,8 @@ export default function AddPropertyRequestPage() {
         status_id: 2,
       };
 
-      if (propertyMode === "existing" && selectedPropertyIds.length > 0) {
-        requestData.property_ids = selectedPropertyIds;
-      } else {
-        requestData.property_ids = [];
-      }
+      requestData.property_ids =
+        selectedPropertyIds.length > 0 ? selectedPropertyIds : [];
 
       const response = await axiosInstance.post("/v1/property-requests", requestData);
       const newId = response.data?.data?.id;
@@ -154,8 +147,6 @@ export default function AddPropertyRequestPage() {
                 formData={formData}
                 onChange={handleChange}
                 errors={errors}
-                propertyMode={propertyMode}
-                onPropertyModeChange={setPropertyMode}
                 selectedPropertyIds={selectedPropertyIds}
                 onSelectedPropertyIdsChange={setSelectedPropertyIds}
               />
