@@ -939,6 +939,9 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       jsonData["tenant_username"] = tenantUsername;
     }
 
+    // Add static source key
+    jsonData["source"] = "public_form";
+
     return jsonData;
   };
 
