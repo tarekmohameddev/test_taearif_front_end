@@ -42,6 +42,39 @@ export function RequestInfoCard({ action }: RequestInfoCardProps) {
           )}
         </div>
 
+        {/* بيانات الطلب العامة (غير شخصية) */}
+        <div className=" space-y-3">
+
+          {action.description && (
+            <div className="flex flex-col text-sm">
+              <span className="text-gray-500">وصف الطلب</span>
+              <span className="font-medium whitespace-pre-wrap break-words">
+                {action.description}
+              </span>
+            </div>
+          )}
+
+          {(action.seriousness || action.metadata?.seriousness) && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">درجة الجدية</span>
+              <span className="font-medium">
+                {action.seriousness ?? (action.metadata?.seriousness as string)}
+              </span>
+            </div>
+          )}
+
+          {(action.purchase_goal || action.metadata?.purpose) && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">هدف الشراء</span>
+              <span className="font-medium">
+                {action.purchase_goal ??
+                  (action.metadata?.purpose as string | null) ??
+                  ""}
+              </span>
+            </div>
+          )}
+        </div>
+
         {/* تفاصيل العقار المطلوب من نموذج اطلب عقارك */}
         <div className="pt-4 border-t space-y-3">
           <h3 className="text-sm font-semibold mb-1">تفاصيل العقار المطلوب</h3>
