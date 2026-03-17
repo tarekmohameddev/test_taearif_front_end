@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PropertyRequestForm } from "@/components/property-requests/page-components/PropertyRequestForm";
 import toast from "react-hot-toast";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, FileText } from "lucide-react";
 
 const initialFormData = {
   property_type: "",
@@ -139,7 +139,10 @@ export default function AddPropertyRequestPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>بيانات الطلب</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              <span>بيانات الطلب</span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
