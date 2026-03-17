@@ -15,7 +15,17 @@ import { useEffect, useState } from "react";
 import { getPropertyRequestsFilters } from "@/lib/api/property-requests-dashboard-api";
 import useAuthStore from "@/context/AuthContext";
 import { selectUserData } from "@/context/auth/selectors";
-import { Loader2, X, MapPin, DollarSign, ChevronDown } from "lucide-react";
+import {
+  Loader2,
+  X,
+  MapPin,
+  DollarSign,
+  ChevronDown,
+  Home,
+  Info,
+  Phone,
+  Building2,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axiosInstance from "@/lib/axiosInstance";
 import toast from "react-hot-toast";
@@ -186,8 +196,9 @@ export const PropertyRequestForm = ({
             setOpenSections((prev) => ({ ...prev, propertyInfo: !prev.propertyInfo }))
           }
         >
-          <CardTitle className="text-base md:text-lg">
-            معلومات العقار المطلوب
+          <CardTitle className="text-base md:text-lg flex items-center gap-2">
+            <Home className="h-4 w-4" />
+            <span>معلومات العقار المطلوب</span>
           </CardTitle>
           <ChevronDown
             className={`h-4 w-4 transition-transform ${
@@ -236,8 +247,9 @@ export const PropertyRequestForm = ({
             setOpenSections((prev) => ({ ...prev, budget: !prev.budget }))
           }
         >
-          <CardTitle className="text-base md:text-lg">
-            معلومات الميزانية والدفع
+          <CardTitle className="text-base md:text-lg flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            <span>معلومات الميزانية والدفع</span>
           </CardTitle>
           <ChevronDown
             className={`h-4 w-4 transition-transform ${
@@ -352,8 +364,9 @@ export const PropertyRequestForm = ({
               setOpenSections((prev) => ({ ...prev, extra: !prev.extra }))
             }
           >
-            <CardTitle className="text-base md:text-lg">
-              تفاصيل إضافية
+            <CardTitle className="text-base md:text-lg flex items-center gap-2">
+              <Info className="h-4 w-4" />
+              <span>تفاصيل إضافية</span>
             </CardTitle>
             <ChevronDown
               className={`h-4 w-4 transition-transform ${
@@ -442,8 +455,9 @@ export const PropertyRequestForm = ({
             setOpenSections((prev) => ({ ...prev, contact: !prev.contact }))
           }
         >
-          <CardTitle className="text-base md:text-lg">
-            بيانات التواصل
+          <CardTitle className="text-base md:text-lg flex items-center gap-2">
+            <Phone className="h-4 w-4" />
+            <span>بيانات التواصل</span>
           </CardTitle>
           <ChevronDown
             className={`h-4 w-4 transition-transform ${
@@ -513,8 +527,9 @@ export const PropertyRequestForm = ({
               setOpenSections((prev) => ({ ...prev, addProperty: !prev.addProperty }))
             }
           >
-            <CardTitle className="text-base md:text-lg">
-              إضافة عقار على الطلب العقاري
+            <CardTitle className="text-base md:text-lg flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              <span>إضافة عقار على الطلب العقاري</span>
             </CardTitle>
             <ChevronDown
               className={`h-4 w-4 transition-transform ${
