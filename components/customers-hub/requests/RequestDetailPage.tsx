@@ -56,6 +56,12 @@ import { AssignEmployeeDialog } from "./detail/AssignEmployeeDialog";
 import { PropertyRequestStatusDialog } from "./detail/PropertyRequestStatusDialog";
 import { PropertyRequestPriorityDialog } from "./detail/PropertyRequestPriorityDialog";
 import {
+  CustomDialog,
+  CustomDialogContent,
+  CustomDialogHeader,
+  CustomDialogTitle,
+} from "@/components/customComponents/CustomDialog";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -208,6 +214,7 @@ export function RequestDetailPage({
   const [dismissReason, setDismissReason] = useState("");
   const [dismissError, setDismissError] = useState<string | null>(null);
   const [dismissSubmitting, setDismissSubmitting] = useState(false);
+  const [showLockedStatusDialog, setShowLockedStatusDialog] = useState(false);
 
   const { handleComplete } = useRequestDetailHandlers({
     action,
@@ -324,6 +331,7 @@ export function RequestDetailPage({
   }
 
   const isOverdue = action.dueDate && new Date(action.dueDate) < new Date();
+  const isFinalStatus = action.status === "completed" || action.status === "dismissed";
 
   const propertyInfo = getPropertyInfo(action);
   const customerPreferences = getCustomerPreferences(customer as CustomerLike);
@@ -334,11 +342,17 @@ export function RequestDetailPage({
   const requestPropertyIds = getRequestPropertyIds(action, showRequestPropertiesCard);
 
   const handleStatusClick = () => {
-    if (isPropertyRequestAction(action)) {
-      statusDialog.setShowStatusDialog(true);
-    } else {
+    if (!isPropertyRequestAction(action)) {
       toast.error("يمكن تغيير حالة طلب العقار فقط لطلبات العقار.");
+      return;
     }
+
+    if (isFinalStatus) {
+      setShowLockedStatusDialog(true);
+      return;
+    }
+
+    statusDialog.setShowStatusDialog(true);
   };
 
   const handlePriorityClick = () => {
@@ -715,6 +729,46 @@ export function RequestDetailPage({
                 onClose={priorityDialog.onClose}
               />
             )}
+
+            <CustomDialog
+              open={showLockedStatusDialog}
+              onOpenChange={setShowLockedStatusDialog}
+              maxWidth="max-w-md"
+            >
+              <CustomDialogContent className="p-4">
+                <CustomDialogHeader>
+                  <CustomDialogTitle className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300">
+                      {action.status === "dismissed" ? (
+                        <XCircle className="h-5 w-5" />
+                      ) : (
+                        <CheckCircle className="h-5 w-5" />
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-lg font-semibold">
+                        {action.status === "dismissed"
+                          ? "تم رفض الطلب، ولا يمكن تغيير حالته"
+                          : "تم إتمام الطلب، ولا يمكن تغيير حالته"}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        هذا الطلب في حالة نهائية، لذلك لا يمكنك تعديل حالته مرة أخرى للحفاظ على تاريخ المعاملة وسجل القرارات.
+                      </p>
+                    </div>
+                  </CustomDialogTitle>
+                </CustomDialogHeader>
+
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => setShowLockedStatusDialog(false)}
+                    className="min-w-[120px]"
+                  >
+                    فهمت
+                  </Button>
+                </div>
+              </CustomDialogContent>
+            </CustomDialog>
 
             {/* Completed/Dismissed Message */}
             {(action.status === "completed" || action.status === "dismissed") && (

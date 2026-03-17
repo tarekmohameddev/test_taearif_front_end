@@ -42,10 +42,6 @@ export function useScheduleForm({
 
   const handleScheduleAppointment = useCallback(async () => {
     // إذا لم يتم إدخال أي تاريخ أو وقت، نطلب من المستخدم إدخال واحد منهما على الأقل
-    if (!aptDate && !aptTime) {
-      toast.error("الرجاء اختيار التاريخ أو الوقت (أو كلاهما)");
-      return;
-    }
 
     // إذا كان أحدهما فارغًا نجعل له قيمة افتراضية (التاريخ المحلي اليوم، وليس UTC)
     const now = new Date();
@@ -60,11 +56,7 @@ export function useScheduleForm({
     const chosenLocal = new Date(y, m - 1, d, hh ?? 0, mm ?? 0, 0, 0);
     const datetime = chosenLocal.toISOString();
 
-    if (chosenLocal.getTime() <= now.getTime()) {
-      toast.error("التاريخ والوقت يجب أن يكون في المستقبل");
-      return;
-    }
-
+    
     const toastId = toast.loading("جاري جدولة الإجراء...");
     try {
       const isRequest = action?.objectType === "property_request" || action?.objectType === "inquiry";

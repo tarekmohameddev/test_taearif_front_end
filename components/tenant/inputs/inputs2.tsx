@@ -927,10 +927,16 @@ const Inputs2: React.FC<InputsProps> = (props = {}) => {
       }
     });
 
-    // Add tenant_username with the tenant ID from the store
-    const tenantId = useTenantStore.getState().tenantId;
-    if (tenantId) {
-      jsonData["tenant_username"] = tenantId;
+    // Add tenant_username using data coming from getTenant (tenantData),
+    // with sensible fallbacks to the resolved tenant ID and store state.
+    const tenantUsernameFromData = tenantData?.username;
+    const tenantUsername =
+      tenantUsernameFromData ??
+      currentTenantId ??
+      useTenantStore.getState().tenantId;
+
+    if (tenantUsername) {
+      jsonData["tenant_username"] = tenantUsername;
     }
 
     return jsonData;
