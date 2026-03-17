@@ -30,6 +30,7 @@ const initialFormData = {
   full_name: "",
   phone: "",
   contact_on_whatsapp: false,
+  notes: "",
 };
 
 export default function AddPropertyRequestPage() {
@@ -88,6 +89,7 @@ export default function AddPropertyRequestPage() {
         purchase_goal: formData.purchase_goal,
         wants_similar_offers: formData.wants_similar_offers,
         contact_on_whatsapp: formData.contact_on_whatsapp,
+        notes: formData.notes || null,
         is_read: false,
         is_active: true,
         status_id: 2,
