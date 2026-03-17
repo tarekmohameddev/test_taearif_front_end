@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const essenceSectionStructure: ComponentStructure = {
   componentType: "essenceSection",
@@ -13,6 +14,9 @@ export const essenceSectionStructure: ComponentStructure = {
         { key: "lead", label: "Lead", type: "text" },
         { key: "body1", label: "Body 1", type: "textarea" },
         { key: "body2", label: "Body 2", type: "textarea" },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "leadTextProps", label: "Lead Style", type: "object", fields: sharedTextStyleFields },
+        { key: "bodyTextProps", label: "Body Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
@@ -20,6 +24,8 @@ export const essenceSectionStructure: ComponentStructure = {
         { key: "lead", label: "Lead", type: "text" },
         { key: "body1", label: "Body 1", type: "textarea" },
         { key: "body2", label: "Body 2", type: "textarea" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

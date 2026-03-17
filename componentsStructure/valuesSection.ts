@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const valuesSectionStructure: ComponentStructure = {
   componentType: "valuesSection",
@@ -40,11 +41,17 @@ export const valuesSectionStructure: ComponentStructure = {
             },
           ],
         },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "descriptionTextProps", label: "Description Style", type: "object", fields: sharedTextStyleFields },
+        { key: "cardTitleTextProps", label: "Card Title Style", type: "object", fields: sharedTextStyleFields },
+        { key: "cardDescriptionTextProps", label: "Card Description Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "heading", label: "Heading", type: "text" },
         { key: "description", label: "Description", type: "textarea" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

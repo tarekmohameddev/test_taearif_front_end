@@ -22,18 +22,33 @@ export const getDefaultContactFormData = (): ComponentData => ({
   imageSrc: DEFAULT_IMAGE_SRC,
   imageAlt: DEFAULT_IMAGE_ALT,
   shapeSrc: DEFAULT_SHAPE_SRC,
+  headingTextProps: {},
+  descriptionTextProps: {},
 });
+
+/** Merge stored data with defaults so store always has full shape including *TextProps. */
+function mergeWithDefaults(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultContactFormData();
+  return {
+    ...defaultData,
+    ...stored,
+    headingTextProps: { ...(defaultData.headingTextProps || {}), ...(stored.headingTextProps || {}) },
+    descriptionTextProps: { ...(defaultData.descriptionTextProps || {}), ...(stored.descriptionTextProps || {}) },
+  } as ComponentData;
+}
 
 export const contactFormFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.contactFormStates?.[variantId] &&
-      Object.keys(state.contactFormStates[variantId]).length > 0
-    ) {
-      return {} as any;
-    }
     const defaultData = getDefaultContactFormData();
-    const data: ComponentData = initial || state.tempData || defaultData;
+    const stored = state.contactFormStates?.[variantId];
+    const hasStored = stored && Object.keys(stored).length > 0;
+
+    let data: ComponentData;
+    if (hasStored) {
+      data = mergeWithDefaults(stored);
+    } else {
+      data = initial || state.tempData || defaultData;
+    }
     return {
       contactFormStates: {
         ...(state.contactFormStates || {}),
@@ -42,7 +57,7 @@ export const contactFormFunctions = {
     } as any;
   },
   getData: (state: any, variantId: string) =>
-    state.contactFormStates?.[variantId] || getDefaultContactFormData(),
+    mergeWithDefaults(state.contactFormStates?.[variantId] || {}),
   setData: (state: any, variantId: string, data: ComponentData) => ({
     contactFormStates: {
       ...(state.contactFormStates || {}),
@@ -50,9 +65,9 @@ export const contactFormFunctions = {
     },
   }),
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.contactFormStates?.[variantId] || getDefaultContactFormData();
-    const newData = updateDataByPath(source, path, value);
+    const stored = state.contactFormStates?.[variantId] || {};
+    const fullSource = mergeWithDefaults(stored);
+    const newData = updateDataByPath(fullSource, path, value);
     return {
       contactFormStates: {
         ...(state.contactFormStates || {}),

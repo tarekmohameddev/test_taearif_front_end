@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const footerStructure: ComponentStructure = {
   componentType: "footer",
@@ -1222,6 +1223,12 @@ export const footerStructure: ComponentStructure = {
         },
         { key: "socialHeading", label: "Social Heading", type: "text" },
         { key: "copyright", label: "Copyright", type: "text" },
+        { key: "addressLabelTextProps", label: "Address Label Style", type: "object", fields: sharedTextStyleFields },
+        { key: "addressValueTextProps", label: "Address Value Style", type: "object", fields: sharedTextStyleFields },
+        { key: "emailTextProps", label: "Email Style", type: "object", fields: sharedTextStyleFields },
+        { key: "linksHeadingTextProps", label: "Links Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "socialHeadingTextProps", label: "Social Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "copyrightTextProps", label: "Copyright Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
@@ -1229,6 +1236,8 @@ export const footerStructure: ComponentStructure = {
         { key: "address.value", label: "Address", type: "text" },
         { key: "email", label: "Email", type: "text" },
         { key: "copyright", label: "Copyright", type: "text" },
+        { key: "copyrightTextProps.fontSize", label: "Copyright Font Size", type: "text" },
+        { key: "copyrightTextProps.color", label: "Copyright Color", type: "color" },
       ],
     },
   ],

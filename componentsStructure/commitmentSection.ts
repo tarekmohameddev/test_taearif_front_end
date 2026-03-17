@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const commitmentSectionStructure: ComponentStructure = {
   componentType: "commitmentSection",
@@ -24,6 +25,10 @@ export const commitmentSectionStructure: ComponentStructure = {
         { key: "name", label: "Name", type: "text" },
         { key: "heading", label: "Heading", type: "text" },
         { key: "quote", label: "Quote", type: "textarea" },
+        { key: "roleLabelTextProps", label: "Role Label Style", type: "object", fields: sharedTextStyleFields },
+        { key: "nameTextProps", label: "Name Style", type: "object", fields: sharedTextStyleFields },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "quoteTextProps", label: "Quote Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
@@ -31,6 +36,8 @@ export const commitmentSectionStructure: ComponentStructure = {
         { key: "name", label: "Name", type: "text" },
         { key: "heading", label: "Heading", type: "text" },
         { key: "quote", label: "Quote", type: "textarea" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

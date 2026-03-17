@@ -179,26 +179,28 @@ export const getDefaultHeader3Data = (): ComponentData => ({
     label: DEFAULT_CTA.label,
     href: DEFAULT_CTA.href,
   },
+  navLinkTextProps: {},
+  languageToggleTextProps: {},
+  ctaTextProps: {},
 });
+
+/** Merge stored with defaults for header3 so store has full shape including *TextProps. */
+function mergeWithDefaultsHeader3(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultHeader3Data();
+  return {
+    ...defaultData,
+    ...stored,
+    navLinkTextProps: { ...(defaultData.navLinkTextProps || {}), ...(stored.navLinkTextProps || {}) },
+    languageToggleTextProps: { ...(defaultData.languageToggleTextProps || {}), ...(stored.languageToggleTextProps || {}) },
+    ctaTextProps: { ...(defaultData.ctaTextProps || {}), ...(stored.ctaTextProps || {}) },
+  } as ComponentData;
+}
 
 export const headerFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // Priority 1: Check if variant already exists
-    const currentData = state.headerStates[variantId];
-    if (currentData && Object.keys(currentData).length > 0) {
-      // If initial data provided, update to ensure backend data is synced
-      if (initial && Object.keys(initial).length > 0) {
-        return {
-          headerStates: { ...state.headerStates, [variantId]: initial },
-        } as any;
-      }
-      return {} as any; // Already exists, skip initialization
-    }
-
-    // Determine default data based on variant
     const defaultData =
       variantId === "header2"
         ? getDefaultHeader2Data()
@@ -206,19 +208,40 @@ export const headerFunctions = {
           ? getDefaultHeader3Data()
           : getDefaultHeaderData();
 
-    // Use provided initial data, else tempData, else defaults
-    const data: ComponentData = initial || state.tempData || defaultData;
+    if (variantId === "header3") {
+      const stored = state.headerStates?.[variantId];
+      const hasStored = stored && Object.keys(stored).length > 0;
+      const data: ComponentData = hasStored
+        ? mergeWithDefaultsHeader3(stored)
+        : (initial || state.tempData || defaultData);
+      return {
+        headerStates: { ...(state.headerStates || {}), [variantId]: data },
+      } as any;
+    }
 
+    // Non-header3: existing behavior
+    const currentData = state.headerStates?.[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          headerStates: { ...state.headerStates, [variantId]: initial },
+        } as any;
+      }
+      return {} as any;
+    }
+    const data: ComponentData = initial || state.tempData || defaultData;
     return {
       headerStates: { ...state.headerStates, [variantId]: data },
     } as any;
   },
 
   /**
-   * getData - Retrieve component data from store
+   * getData - Retrieve component data from store (header3: merged with defaults)
    */
   getData: (state: any, variantId: string) =>
-    state.headerStates[variantId] || {},
+    variantId === "header3"
+      ? mergeWithDefaultsHeader3(state.headerStates?.[variantId] || {})
+      : (state.headerStates?.[variantId] || {}),
 
   /**
    * setData - Set/replace component data completely
@@ -228,23 +251,25 @@ export const headerFunctions = {
   }),
 
   /**
-   * updateByPath - Update specific field in component data
+   * updateByPath - Update specific field in component data (header3: full merge then update headerStates)
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    // Get current data from headerStates (saved data) or defaults
-    const savedData = state.headerStates[variantId] || {};
-
-    // Merge saved data with existing tempData to preserve all changes
+    if (variantId === "header3") {
+      const stored = state.headerStates?.[variantId] || {};
+      const fullSource = mergeWithDefaultsHeader3(stored);
+      const newData = updateDataByPath(fullSource, path, value);
+      return {
+        headerStates: {
+          ...(state.headerStates || {}),
+          [variantId]: newData,
+        },
+      } as any;
+    }
+    const savedData = state.headerStates?.[variantId] || {};
     const currentTempData = state.tempData || {};
     const baseData = { ...savedData, ...currentTempData };
-
-    // Update the specific path in the merged data
     const newData = updateDataByPath(baseData, path, value);
-
-    // Return updated tempData ONLY
-    return {
-      tempData: newData,
-    } as any;
+    return { tempData: newData } as any;
   },
 };
 

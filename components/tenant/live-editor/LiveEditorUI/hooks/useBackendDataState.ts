@@ -15,6 +15,22 @@ interface UseBackendDataStateProps {
   themeChangeTimestamp: number;
   selectedComponentId: string | null;
   staticPagesData: Record<string, any>;
+  /** When these change (e.g. sidebar edit), recompute mergedData so canvas shows latest store data */
+  heroBannerStates?: Record<string, any>;
+  commitmentSectionStates?: Record<string, any>;
+  creativityTriadSectionStates?: Record<string, any>;
+  essenceSectionStates?: Record<string, any>;
+  featuresSectionStates?: Record<string, any>;
+  journeySectionStates?: Record<string, any>;
+  landInvestmentFormSectionStates?: Record<string, any>;
+  philosophyCtaSectionStates?: Record<string, any>;
+  quoteSectionStates?: Record<string, any>;
+  projectsHeaderStates?: Record<string, any>;
+  projectsShowcaseStates?: Record<string, any>;
+  contactFormStates?: Record<string, any>;
+  valuesSectionStates?: Record<string, any>;
+  headerStates?: Record<string, any>;
+  footerStates?: Record<string, any>;
 }
 
 export function useBackendDataState({
@@ -26,6 +42,21 @@ export function useBackendDataState({
   themeChangeTimestamp,
   selectedComponentId,
   staticPagesData,
+  heroBannerStates,
+  commitmentSectionStates,
+  creativityTriadSectionStates,
+  essenceSectionStates,
+  featuresSectionStates,
+  journeySectionStates,
+  landInvestmentFormSectionStates,
+  philosophyCtaSectionStates,
+  quoteSectionStates,
+  projectsHeaderStates,
+  projectsShowcaseStates,
+  contactFormStates,
+  valuesSectionStates,
+  headerStates,
+  footerStates,
 }: UseBackendDataStateProps) {
   const [backendDataState, setBackendDataState] = useState<{
     componentsWithMergedData: Array<{
@@ -48,17 +79,45 @@ export function useBackendDataState({
   const prevThemeChangeTimestampRef = useRef<number>(themeChangeTimestamp);
   const prevStaticPagesDataRef = useRef<string>("");
   const prevGlobalFooterVariantRef = useRef<string>(globalFooterVariant);
+  const prevHeroBannerStatesRef = useRef<string>("");
+  const prevCommitmentSectionStatesRef = useRef<string>("");
+  const prevCreativityTriadSectionStatesRef = useRef<string>("");
+  const prevEssenceSectionStatesRef = useRef<string>("");
+  const prevFeaturesSectionStatesRef = useRef<string>("");
+  const prevJourneySectionStatesRef = useRef<string>("");
+  const prevLandInvestmentFormSectionStatesRef = useRef<string>("");
+  const prevPhilosophyCtaSectionStatesRef = useRef<string>("");
+  const prevQuoteSectionStatesRef = useRef<string>("");
+  const prevProjectsHeaderStatesRef = useRef<string>("");
+  const prevProjectsShowcaseStatesRef = useRef<string>("");
+  const prevContactFormStatesRef = useRef<string>("");
+  const prevValuesSectionStatesRef = useRef<string>("");
+  const prevHeaderStatesRef = useRef<string>("");
+  const prevFooterStatesRef = useRef<string>("");
 
   // تحديث البيانات المدمجة عند تغيير أي مصدر بيانات
   useEffect(() => {
     // ⭐ CRITICAL: Check if data actually changed using JSON.stringify
-    // This prevents infinite loops from reference changes
     const currentPageComponentsStr = JSON.stringify(pageComponents);
     const currentGlobalHeaderDataStr = JSON.stringify(globalHeaderData);
     const currentGlobalFooterDataStr = JSON.stringify(globalFooterData);
     const currentStaticPagesDataStr = JSON.stringify(staticPagesData);
+    const currentHeroBannerStatesStr = JSON.stringify(heroBannerStates ?? {});
+    const currentCommitmentSectionStatesStr = JSON.stringify(commitmentSectionStates ?? {});
+    const currentCreativityTriadSectionStatesStr = JSON.stringify(creativityTriadSectionStates ?? {});
+    const currentEssenceSectionStatesStr = JSON.stringify(essenceSectionStates ?? {});
+    const currentFeaturesSectionStatesStr = JSON.stringify(featuresSectionStates ?? {});
+    const currentJourneySectionStatesStr = JSON.stringify(journeySectionStates ?? {});
+    const currentLandInvestmentFormSectionStatesStr = JSON.stringify(landInvestmentFormSectionStates ?? {});
+    const currentPhilosophyCtaSectionStatesStr = JSON.stringify(philosophyCtaSectionStates ?? {});
+    const currentQuoteSectionStatesStr = JSON.stringify(quoteSectionStates ?? {});
+    const currentProjectsHeaderStatesStr = JSON.stringify(projectsHeaderStates ?? {});
+    const currentProjectsShowcaseStatesStr = JSON.stringify(projectsShowcaseStates ?? {});
+    const currentContactFormStatesStr = JSON.stringify(contactFormStates ?? {});
+    const currentValuesSectionStatesStr = JSON.stringify(valuesSectionStates ?? {});
+    const currentHeaderStatesStr = JSON.stringify(headerStates ?? {});
+    const currentFooterStatesStr = JSON.stringify(footerStates ?? {});
 
-    // Check if anything actually changed
     const pageComponentsChanged =
       prevPageComponentsRef.current !== currentPageComponentsStr;
     const globalHeaderChanged =
@@ -70,12 +129,26 @@ export function useBackendDataState({
       prevThemeChangeTimestampRef.current !== themeChangeTimestamp;
     const staticPagesChanged =
       prevStaticPagesDataRef.current !== currentStaticPagesDataStr;
-
-    // Check if globalFooterVariant changed
     const globalFooterVariantChanged =
       prevGlobalFooterVariantRef.current !== globalFooterVariant;
+    const heroBannerStatesChanged =
+      prevHeroBannerStatesRef.current !== currentHeroBannerStatesStr;
+    const theme3StatesChanged =
+      prevCommitmentSectionStatesRef.current !== currentCommitmentSectionStatesStr ||
+      prevCreativityTriadSectionStatesRef.current !== currentCreativityTriadSectionStatesStr ||
+      prevEssenceSectionStatesRef.current !== currentEssenceSectionStatesStr ||
+      prevFeaturesSectionStatesRef.current !== currentFeaturesSectionStatesStr ||
+      prevJourneySectionStatesRef.current !== currentJourneySectionStatesStr ||
+      prevLandInvestmentFormSectionStatesRef.current !== currentLandInvestmentFormSectionStatesStr ||
+      prevPhilosophyCtaSectionStatesRef.current !== currentPhilosophyCtaSectionStatesStr ||
+      prevQuoteSectionStatesRef.current !== currentQuoteSectionStatesStr ||
+      prevProjectsHeaderStatesRef.current !== currentProjectsHeaderStatesStr ||
+      prevProjectsShowcaseStatesRef.current !== currentProjectsShowcaseStatesStr ||
+      prevContactFormStatesRef.current !== currentContactFormStatesStr ||
+      prevValuesSectionStatesRef.current !== currentValuesSectionStatesStr ||
+      prevHeaderStatesRef.current !== currentHeaderStatesStr ||
+      prevFooterStatesRef.current !== currentFooterStatesStr;
 
-    // If nothing changed, skip update
     if (
       !pageComponentsChanged &&
       !globalHeaderChanged &&
@@ -83,12 +156,13 @@ export function useBackendDataState({
       !slugChanged &&
       !themeChanged &&
       !staticPagesChanged &&
-      !globalFooterVariantChanged
+      !globalFooterVariantChanged &&
+      !heroBannerStatesChanged &&
+      !theme3StatesChanged
     ) {
-      return; // No actual changes, skip update
+      return;
     }
 
-    // Update refs
     prevPageComponentsRef.current = currentPageComponentsStr;
     prevGlobalHeaderDataRef.current = currentGlobalHeaderDataStr;
     prevGlobalFooterDataRef.current = currentGlobalFooterDataStr;
@@ -96,6 +170,21 @@ export function useBackendDataState({
     prevThemeChangeTimestampRef.current = themeChangeTimestamp;
     prevStaticPagesDataRef.current = currentStaticPagesDataStr;
     prevGlobalFooterVariantRef.current = globalFooterVariant;
+    prevHeroBannerStatesRef.current = currentHeroBannerStatesStr;
+    prevCommitmentSectionStatesRef.current = currentCommitmentSectionStatesStr;
+    prevCreativityTriadSectionStatesRef.current = currentCreativityTriadSectionStatesStr;
+    prevEssenceSectionStatesRef.current = currentEssenceSectionStatesStr;
+    prevFeaturesSectionStatesRef.current = currentFeaturesSectionStatesStr;
+    prevJourneySectionStatesRef.current = currentJourneySectionStatesStr;
+    prevLandInvestmentFormSectionStatesRef.current = currentLandInvestmentFormSectionStatesStr;
+    prevPhilosophyCtaSectionStatesRef.current = currentPhilosophyCtaSectionStatesStr;
+    prevQuoteSectionStatesRef.current = currentQuoteSectionStatesStr;
+    prevProjectsHeaderStatesRef.current = currentProjectsHeaderStatesStr;
+    prevProjectsShowcaseStatesRef.current = currentProjectsShowcaseStatesStr;
+    prevContactFormStatesRef.current = currentContactFormStatesStr;
+    prevValuesSectionStatesRef.current = currentValuesSectionStatesStr;
+    prevHeaderStatesRef.current = currentHeaderStatesStr;
+    prevFooterStatesRef.current = currentFooterStatesStr;
     // Check if this is a static page
     const editorStore = useEditorStore.getState();
     const staticPageData = editorStore.getStaticPageData(slug);
@@ -207,7 +296,21 @@ export function useBackendDataState({
     themeChangeTimestamp,
     selectedComponentId,
     staticPagesData,
-    // Note: backendDataState.globalFooterData?.variant is checked inside effect
+    heroBannerStates,
+    commitmentSectionStates,
+    creativityTriadSectionStates,
+    essenceSectionStates,
+    featuresSectionStates,
+    journeySectionStates,
+    landInvestmentFormSectionStates,
+    philosophyCtaSectionStates,
+    quoteSectionStates,
+    projectsHeaderStates,
+    projectsShowcaseStates,
+    contactFormStates,
+    valuesSectionStates,
+    headerStates,
+    footerStates,
   ]);
 
   return { backendDataState, setBackendDataState };

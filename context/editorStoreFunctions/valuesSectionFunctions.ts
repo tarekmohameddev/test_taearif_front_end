@@ -15,18 +15,37 @@ export const getDefaultValuesSectionData = (): ComponentData => ({
   heading: DEFAULT_HEADING,
   description: DEFAULT_DESCRIPTION,
   cards: DEFAULT_CARDS,
+  headingTextProps: {},
+  descriptionTextProps: {},
+  cardTitleTextProps: {},
+  cardDescriptionTextProps: {},
 });
+
+/** Merge stored data with defaults so store always has full shape including *TextProps. */
+function mergeWithDefaults(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultValuesSectionData();
+  return {
+    ...defaultData,
+    ...stored,
+    headingTextProps: { ...(defaultData.headingTextProps || {}), ...(stored.headingTextProps || {}) },
+    descriptionTextProps: { ...(defaultData.descriptionTextProps || {}), ...(stored.descriptionTextProps || {}) },
+    cardTitleTextProps: { ...(defaultData.cardTitleTextProps || {}), ...(stored.cardTitleTextProps || {}) },
+    cardDescriptionTextProps: { ...(defaultData.cardDescriptionTextProps || {}), ...(stored.cardDescriptionTextProps || {}) },
+  } as ComponentData;
+}
 
 export const valuesSectionFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.valuesSectionStates?.[variantId] &&
-      Object.keys(state.valuesSectionStates[variantId]).length > 0
-    ) {
-      return {} as any;
-    }
     const defaultData = getDefaultValuesSectionData();
-    const data: ComponentData = initial || state.tempData || defaultData;
+    const stored = state.valuesSectionStates?.[variantId];
+    const hasStored = stored && Object.keys(stored).length > 0;
+
+    let data: ComponentData;
+    if (hasStored) {
+      data = mergeWithDefaults(stored);
+    } else {
+      data = initial || state.tempData || defaultData;
+    }
     return {
       valuesSectionStates: {
         ...(state.valuesSectionStates || {}),
@@ -35,7 +54,7 @@ export const valuesSectionFunctions = {
     } as any;
   },
   getData: (state: any, variantId: string) =>
-    state.valuesSectionStates?.[variantId] || getDefaultValuesSectionData(),
+    mergeWithDefaults(state.valuesSectionStates?.[variantId] || {}),
   setData: (state: any, variantId: string, data: ComponentData) => ({
     valuesSectionStates: {
       ...(state.valuesSectionStates || {}),
@@ -43,9 +62,9 @@ export const valuesSectionFunctions = {
     },
   }),
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.valuesSectionStates?.[variantId] || getDefaultValuesSectionData();
-    const newData = updateDataByPath(source, path, value);
+    const stored = state.valuesSectionStates?.[variantId] || {};
+    const fullSource = mergeWithDefaults(stored);
+    const newData = updateDataByPath(fullSource, path, value);
     return {
       valuesSectionStates: {
         ...(state.valuesSectionStates || {}),

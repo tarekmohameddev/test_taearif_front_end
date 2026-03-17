@@ -15,18 +15,33 @@ export const getDefaultLandInvestmentFormSectionData = (): ComponentData => ({
   description: DEFAULT_DESCRIPTION,
   bottomImageSrc: DEFAULT_BOTTOM_IMAGE_SRC,
   bottomImageAlt: DEFAULT_BOTTOM_IMAGE_ALT,
+  headingTextProps: {},
+  descriptionTextProps: {},
 });
+
+/** Merge stored data with defaults so store always has full shape including *TextProps. */
+function mergeWithDefaults(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultLandInvestmentFormSectionData();
+  return {
+    ...defaultData,
+    ...stored,
+    headingTextProps: { ...(defaultData.headingTextProps || {}), ...(stored.headingTextProps || {}) },
+    descriptionTextProps: { ...(defaultData.descriptionTextProps || {}), ...(stored.descriptionTextProps || {}) },
+  } as ComponentData;
+}
 
 export const landInvestmentFormSectionFunctions = {
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    if (
-      state.landInvestmentFormSectionStates?.[variantId] &&
-      Object.keys(state.landInvestmentFormSectionStates[variantId]).length > 0
-    ) {
-      return {} as any;
-    }
     const defaultData = getDefaultLandInvestmentFormSectionData();
-    const data: ComponentData = initial || state.tempData || defaultData;
+    const stored = state.landInvestmentFormSectionStates?.[variantId];
+    const hasStored = stored && Object.keys(stored).length > 0;
+
+    let data: ComponentData;
+    if (hasStored) {
+      data = mergeWithDefaults(stored);
+    } else {
+      data = initial || state.tempData || defaultData;
+    }
     return {
       landInvestmentFormSectionStates: {
         ...(state.landInvestmentFormSectionStates || {}),
@@ -35,8 +50,7 @@ export const landInvestmentFormSectionFunctions = {
     } as any;
   },
   getData: (state: any, variantId: string) =>
-    state.landInvestmentFormSectionStates?.[variantId] ||
-    getDefaultLandInvestmentFormSectionData(),
+    mergeWithDefaults(state.landInvestmentFormSectionStates?.[variantId] || {}),
   setData: (state: any, variantId: string, data: ComponentData) => ({
     landInvestmentFormSectionStates: {
       ...(state.landInvestmentFormSectionStates || {}),
@@ -44,10 +58,9 @@ export const landInvestmentFormSectionFunctions = {
     },
   }),
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    const source =
-      state.landInvestmentFormSectionStates?.[variantId] ||
-      getDefaultLandInvestmentFormSectionData();
-    const newData = updateDataByPath(source, path, value);
+    const stored = state.landInvestmentFormSectionStates?.[variantId] || {};
+    const fullSource = mergeWithDefaults(stored);
+    const newData = updateDataByPath(fullSource, path, value);
     return {
       landInvestmentFormSectionStates: {
         ...(state.landInvestmentFormSectionStates || {}),

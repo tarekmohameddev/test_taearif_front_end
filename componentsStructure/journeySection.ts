@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const journeySectionStructure: ComponentStructure = {
   componentType: "journeySection",
@@ -26,10 +27,17 @@ export const journeySectionStructure: ComponentStructure = {
             { key: "ctaHref", label: "CTA URL", type: "text" },
           ],
         },
+        { key: "headingTextProps", label: "Heading Style", type: "object", fields: sharedTextStyleFields },
+        { key: "journeyLabelTextProps", label: "Journey Label Style", type: "object", fields: sharedTextStyleFields },
+        { key: "stepTitleTextProps", label: "Step Title Style", type: "object", fields: sharedTextStyleFields },
+        { key: "stepDurationTextProps", label: "Step Duration Style", type: "object", fields: sharedTextStyleFields },
+        { key: "stepDescriptionTextProps", label: "Step Description Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
         { key: "heading", label: "Heading", type: "text" },
+        { key: "headingTextProps.fontSize", label: "Heading Font Size", type: "text" },
+        { key: "headingTextProps.color", label: "Heading Color", type: "color" },
       ],
     },
   ],

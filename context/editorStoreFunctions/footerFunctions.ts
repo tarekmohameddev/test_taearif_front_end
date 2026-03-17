@@ -278,26 +278,34 @@ export const getDefaultFooter3Data = (): ComponentData => ({
   ],
   socialHeading: "تابعنا",
   copyright: DEFAULT_COPYRIGHT,
+  addressLabelTextProps: {},
+  addressValueTextProps: {},
+  emailTextProps: {},
+  linksHeadingTextProps: {},
+  socialHeadingTextProps: {},
+  copyrightTextProps: {},
 });
+
+/** Merge stored with defaults for footer3 so store has full shape including *TextProps. */
+function mergeWithDefaultsFooter3(stored: Record<string, any>): ComponentData {
+  const defaultData = getDefaultFooter3Data();
+  return {
+    ...defaultData,
+    ...stored,
+    addressLabelTextProps: { ...(defaultData.addressLabelTextProps || {}), ...(stored.addressLabelTextProps || {}) },
+    addressValueTextProps: { ...(defaultData.addressValueTextProps || {}), ...(stored.addressValueTextProps || {}) },
+    emailTextProps: { ...(defaultData.emailTextProps || {}), ...(stored.emailTextProps || {}) },
+    linksHeadingTextProps: { ...(defaultData.linksHeadingTextProps || {}), ...(stored.linksHeadingTextProps || {}) },
+    socialHeadingTextProps: { ...(defaultData.socialHeadingTextProps || {}), ...(stored.socialHeadingTextProps || {}) },
+    copyrightTextProps: { ...(defaultData.copyrightTextProps || {}), ...(stored.copyrightTextProps || {}) },
+  } as ComponentData;
+}
 
 export const footerFunctions = {
   /**
    * ensureVariant - Initialize component in store if not exists
    */
   ensureVariant: (state: any, variantId: string, initial?: ComponentData) => {
-    // Priority 1: Check if variant already exists
-    const currentData = state.footerStates[variantId];
-    if (currentData && Object.keys(currentData).length > 0) {
-      // If initial data provided, update to ensure backend data is synced
-      if (initial && Object.keys(initial).length > 0) {
-        return {
-          footerStates: { ...state.footerStates, [variantId]: initial },
-        } as any;
-      }
-      return {} as any; // Already exists, skip initialization
-    }
-
-    // Determine default data based on variant
     const defaultData =
       variantId === "footer2"
         ? getDefaultFooter2Data()
@@ -305,19 +313,39 @@ export const footerFunctions = {
           ? getDefaultFooter3Data()
           : getDefaultFooterData();
 
-    // Use provided initial data, else tempData, else defaults
-    const data: ComponentData = initial || state.tempData || defaultData;
+    if (variantId === "footer3") {
+      const stored = state.footerStates?.[variantId];
+      const hasStored = stored && Object.keys(stored).length > 0;
+      const data: ComponentData = hasStored
+        ? mergeWithDefaultsFooter3(stored)
+        : (initial || state.tempData || defaultData);
+      return {
+        footerStates: { ...(state.footerStates || {}), [variantId]: data },
+      } as any;
+    }
 
+    const currentData = state.footerStates?.[variantId];
+    if (currentData && Object.keys(currentData).length > 0) {
+      if (initial && Object.keys(initial).length > 0) {
+        return {
+          footerStates: { ...state.footerStates, [variantId]: initial },
+        } as any;
+      }
+      return {} as any;
+    }
+    const data: ComponentData = initial || state.tempData || defaultData;
     return {
       footerStates: { ...state.footerStates, [variantId]: data },
     } as any;
   },
 
   /**
-   * getData - Retrieve component data from store
+   * getData - Retrieve component data from store (footer3: merged with defaults)
    */
   getData: (state: any, variantId: string) =>
-    state.footerStates[variantId] || {},
+    variantId === "footer3"
+      ? mergeWithDefaultsFooter3(state.footerStates?.[variantId] || {})
+      : (state.footerStates?.[variantId] || {}),
 
   /**
    * setData - Set/replace component data completely
@@ -327,23 +355,25 @@ export const footerFunctions = {
   }),
 
   /**
-   * updateByPath - Update specific field in component data
+   * updateByPath - Update specific field (footer3: full merge then update footerStates)
    */
   updateByPath: (state: any, variantId: string, path: string, value: any) => {
-    // Get current data from footerStates (saved data) or defaults
-    const savedData = state.footerStates[variantId] || {};
-
-    // Merge saved data with existing tempData to preserve all changes
+    if (variantId === "footer3") {
+      const stored = state.footerStates?.[variantId] || {};
+      const fullSource = mergeWithDefaultsFooter3(stored);
+      const newData = updateDataByPath(fullSource, path, value);
+      return {
+        footerStates: {
+          ...(state.footerStates || {}),
+          [variantId]: newData,
+        },
+      } as any;
+    }
+    const savedData = state.footerStates?.[variantId] || {};
     const currentTempData = state.tempData || {};
     const baseData = { ...savedData, ...currentTempData };
-
-    // Update the specific path in the merged data
     const newData = updateDataByPath(baseData, path, value);
-
-    // Return updated tempData ONLY
-    return {
-      tempData: newData,
-    } as any;
+    return { tempData: newData } as any;
   },
 };
 

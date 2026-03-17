@@ -25,26 +25,37 @@ export const HeroBanner = ({
   const _description = description ?? DEFAULTS.description;
   const _primary = primaryCta ?? DEFAULTS.primaryCta;
   const _secondary = secondaryCta ?? DEFAULTS.secondaryCta;
-  const _video = videoSrc ?? DEFAULTS.videoSrc;
+  const hasVideo =
+    videoSrc != null && String(videoSrc).trim() !== "";
+  const _video = hasVideo ? videoSrc : undefined;
 
   return (
     <div
       dir={dir}
       className="relative flex h-screen flex-col justify-end pb-20"
     >
-      {/* ── Background Video ──────────────────────── */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="absolute top-0 left-0 -z-10 h-full w-full object-cover"
-        poster={fallbackImage}
-      >
-        <source src={_video} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      {/* ── Background: video when URL set, otherwise fallback image ───── */}
+      {_video ? (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute top-0 left-0 -z-10 h-full w-full object-cover"
+          poster={fallbackImage}
+        >
+          <source src={_video} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      ) : fallbackImage ? (
+        <div
+          className="absolute top-0 left-0 -z-10 h-full w-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${fallbackImage})` }}
+          role="img"
+          aria-label="Hero background"
+        />
+      ) : null}
 
       {/* ── Gradient Overlays ─────────────────────── */}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.78)_100%)]" />

@@ -1,4 +1,5 @@
 import { ComponentStructure } from "./types";
+import { sharedTextStyleFields } from "./sharedTextStyleFields";
 
 export const projectsShowcaseStructure: ComponentStructure = {
   componentType: "projectsShowcase",
@@ -59,6 +60,13 @@ export const projectsShowcaseStructure: ComponentStructure = {
             { key: "textColor", label: "Text Color", type: "color" },
           ],
         },
+        { key: "filterButtonTextProps", label: "Filter Button Style", type: "object", fields: sharedTextStyleFields },
+        { key: "statusBadgeTextProps", label: "Status Badge Style", type: "object", fields: sharedTextStyleFields },
+        { key: "projectTitleTextProps", label: "Project Title Style", type: "object", fields: sharedTextStyleFields },
+        { key: "projectLocationTextProps", label: "Project Location Style", type: "object", fields: sharedTextStyleFields },
+        { key: "projectDescriptionTextProps", label: "Project Description Style", type: "object", fields: sharedTextStyleFields },
+        { key: "unitTypeTextProps", label: "Unit Type Style", type: "object", fields: sharedTextStyleFields },
+        { key: "ctaTextProps", label: "CTA Style", type: "object", fields: sharedTextStyleFields },
       ],
       simpleFields: [
         { key: "visible", label: "Visible", type: "boolean" },
