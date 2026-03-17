@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -47,6 +48,7 @@ interface PropertyRequestFormData {
   full_name: string;
   phone: string;
   contact_on_whatsapp: boolean;
+  notes: string;
 }
 
 interface FiltersData {
@@ -106,10 +108,6 @@ export const PropertyRequestForm = ({
   const [availableProperties, setAvailableProperties] = useState<PropertyOption[]>([]);
   const [loadingProperties, setLoadingProperties] = useState(false);
 
-  const showModeBadges =
-    propertyMode !== undefined &&
-    onPropertyModeChange !== undefined;
-
   // Fetch filters data
   useEffect(() => {
     const fetchFilters = async () => {
@@ -158,11 +156,11 @@ export const PropertyRequestForm = ({
     return typeof url === "string" ? url : undefined;
   };
 
+  // إذا كان هناك handler لاختيار العقارات، قم بجلب قائمة العقارات مرة واحدة
   useEffect(() => {
-    if (propertyMode === "existing") {
-      fetchAvailableProperties();
-    }
-  }, [propertyMode]);
+    if (!onSelectedPropertyIdsChange) return;
+    fetchAvailableProperties();
+  }, [onSelectedPropertyIdsChange]);
 
   const getError = (field: string): string | undefined => {
     const error = errors[field];
@@ -187,7 +185,7 @@ export const PropertyRequestForm = ({
     <div className="space-y-6">
       {/* Contact Information */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">معلومات الاتصال</h3>
+        <h3 className="text-lg font-semibold">بيانات التواصل</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="full_name">
@@ -239,34 +237,9 @@ export const PropertyRequestForm = ({
 
       {/* Property Information */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">معلومات العقار</h3>
+        <h3 className="text-lg font-semibold">معلومات الميزانية والدفع</h3>
 
-        {showModeBadges && (
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant={propertyMode === "existing" ? "default" : "outline"}
-              className="cursor-pointer text-sm py-1.5 px-3"
-              onClick={() => onPropertyModeChange!("existing")}
-            >
-              عقار موجود بالفعل
-            </Badge>
-            <Badge
-              variant={propertyMode === "new_specs" ? "default" : "outline"}
-              className="cursor-pointer text-sm py-1.5 px-3"
-              onClick={() => onPropertyModeChange!("new_specs")}
-            >
-              مواصفات عقار جديد (لن ينشئ عقار جديد بل هى بيانات تسجل فقط)
-            </Badge>
-          </div>
-        )}
-
-        {showModeBadges && propertyMode === null && (
-          <p className="text-sm text-muted-foreground">
-            اختر أحد الخيارين أعلاه.
-          </p>
-        )}
-
-        {showModeBadges && propertyMode === "new_specs" && filtersData && (
+        {filtersData && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="property_type">نوع العقار</Label>
@@ -304,12 +277,11 @@ export const PropertyRequestForm = ({
                     getError("purchase_method") ? "border-red-500" : ""
                   }
                 >
-                  <SelectValue placeholder="اختر طريقة الشراء" />
+                  <SelectValue placeholder="طريقة الشراء*" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="نقدي">نقدي</SelectItem>
-                  <SelectItem value="تمويل">تمويل</SelectItem>
-                  <SelectItem value="نقدي وتمويل">نقدي وتمويل</SelectItem>
+                  <SelectItem value="كاش">كاش</SelectItem>
+                  <SelectItem value="تمويل بنكي">تمويل بنكي</SelectItem>
                 </SelectContent>
               </Select>
               {getError("purchase_method") && (
@@ -379,7 +351,7 @@ export const PropertyRequestForm = ({
           </div>
         )}
 
-        {showModeBadges && propertyMode === "existing" && (
+        {onSelectedPropertyIdsChange && (
           <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
             <Label className="text-sm font-medium">اختر العقار</Label>
             {loadingProperties ? (
@@ -516,10 +488,9 @@ export const PropertyRequestForm = ({
           </div>
         )}
 
-        {!showModeBadges && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filtersData && (
-              <>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filtersData && (
+            <>
                 <div className="space-y-2">
                   <Label htmlFor="property_type">نوع العقار</Label>
                   <Select
@@ -556,12 +527,11 @@ export const PropertyRequestForm = ({
                         getError("purchase_method") ? "border-red-500" : ""
                       }
                     >
-                      <SelectValue placeholder="اختر طريقة الشراء" />
+                      <SelectValue placeholder="طريقة الشراء*" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="نقدي">نقدي</SelectItem>
-                      <SelectItem value="تمويل">تمويل</SelectItem>
-                      <SelectItem value="نقدي وتمويل">نقدي وتمويل</SelectItem>
+                      <SelectItem value="كاش">كاش</SelectItem>
+                      <SelectItem value="تمويل بنكي">تمويل بنكي</SelectItem>
                     </SelectContent>
                   </Select>
                   {getError("purchase_method") && (
@@ -569,69 +539,68 @@ export const PropertyRequestForm = ({
                       {getError("purchase_method")}
                     </p>
                   )}
-                </div>
-              </>
+            </div>
+            </>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="budget_from">الميزانية من</Label>
+            <Input
+              id="budget_from"
+              type="number"
+              value={formData.budget_from || ""}
+              onChange={(e) =>
+                onChange("budget_from", parseFloat(e.target.value) || 0)
+              }
+              className={getError("budget_from") ? "border-red-500" : ""}
+            />
+            {getError("budget_from") && (
+              <p className="text-sm text-red-500">{getError("budget_from")}</p>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="budget_from">الميزانية من</Label>
-              <Input
-                id="budget_from"
-                type="number"
-                value={formData.budget_from || ""}
-                onChange={(e) =>
-                  onChange("budget_from", parseFloat(e.target.value) || 0)
-                }
-                className={getError("budget_from") ? "border-red-500" : ""}
-              />
-              {getError("budget_from") && (
-                <p className="text-sm text-red-500">{getError("budget_from")}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="budget_to">الميزانية إلى</Label>
-              <Input
-                id="budget_to"
-                type="number"
-                value={formData.budget_to || ""}
-                onChange={(e) =>
-                  onChange("budget_to", parseFloat(e.target.value) || 0)
-                }
-                className={getError("budget_to") ? "border-red-500" : ""}
-              />
-              {getError("budget_to") && (
-                <p className="text-sm text-red-500">{getError("budget_to")}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="area_from">المساحة من (م²)</Label>
-              <Input
-                id="area_from"
-                type="number"
-                value={formData.area_from || ""}
-                onChange={(e) =>
-                  onChange(
-                    "area_from",
-                    e.target.value ? parseFloat(e.target.value) : null,
-                  )
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="area_to">المساحة إلى (م²)</Label>
-              <Input
-                id="area_to"
-                type="number"
-                value={formData.area_to || ""}
-                onChange={(e) =>
-                  onChange(
-                    "area_to",
-                    e.target.value ? parseFloat(e.target.value) : null,
-                  )
-                }
-              />
-            </div>
           </div>
-        )}
+          <div className="space-y-2">
+            <Label htmlFor="budget_to">الميزانية إلى</Label>
+            <Input
+              id="budget_to"
+              type="number"
+              value={formData.budget_to || ""}
+              onChange={(e) =>
+                onChange("budget_to", parseFloat(e.target.value) || 0)
+              }
+              className={getError("budget_to") ? "border-red-500" : ""}
+            />
+            {getError("budget_to") && (
+              <p className="text-sm text-red-500">{getError("budget_to")}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="area_from">المساحة من (م²)</Label>
+            <Input
+              id="area_from"
+              type="number"
+              value={formData.area_from || ""}
+              onChange={(e) =>
+                onChange(
+                  "area_from",
+                  e.target.value ? parseFloat(e.target.value) : null,
+                )
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="area_to">المساحة إلى (م²)</Label>
+            <Input
+              id="area_to"
+              type="number"
+              value={formData.area_to || ""}
+              onChange={(e) =>
+                onChange(
+                  "area_to",
+                  e.target.value ? parseFloat(e.target.value) : null,
+                )
+              }
+            />
+          </div>
+        </div>
       </div>
 
       {/* Additional Details */}
@@ -691,6 +660,17 @@ export const PropertyRequestForm = ({
               >
                 يريد عروض مشابهة
               </Label>
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="notes">ملاحظات</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => onChange("notes", e.target.value)}
+                placeholder="اكتب أي تفاصيل إضافية عن الطلب أو العميل"
+                rows={4}
+              />
             </div>
           </div>
         </div>
