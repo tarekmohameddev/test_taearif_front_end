@@ -29,6 +29,7 @@ export function useCustomersHubRequests() {
   const [stages, setStages] = useState<StageDistribution[]>([]);
   const [filterOptions, setFilterOptions] = useState<FilterOptionsResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -160,9 +161,18 @@ export function useCustomersHubRequests() {
       } finally {
         loadingRequestsRef.current = false;
         if (!silent) setLoading(false);
+        setRefreshing(false);
       }
     },
     [userData?.token, authLoading]
+  );
+
+  const refreshRequests = useCallback(
+    async (params: RequestsListFilters | RequestsListParams) => {
+      setRefreshing(true);
+      await fetchRequests(params, { silent: true });
+    },
+    [fetchRequests]
   );
 
   // Fetch filter options
@@ -629,9 +639,11 @@ export function useCustomersHubRequests() {
     stages,
     filterOptions,
     loading,
+    refreshing,
     error,
     pagination,
     fetchRequests,
+    refreshRequests,
     fetchFilterOptions,
     completeAction,
     dismissAction,

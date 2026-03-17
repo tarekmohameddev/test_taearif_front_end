@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import toast from "react-hot-toast";
 import { BulkActionsToolbar } from "../actions/BulkActionsToolbar";
 import { QuickViewPanel } from "../actions/QuickViewPanel";
 import { useRequestsCenterPage } from "./hooks/useRequestsCenterPage";
@@ -41,6 +42,24 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   } = ctx;
 
   const [filterSearch, setFilterSearch] = React.useState("");
+  const [headerRefreshing, setHeaderRefreshing] = React.useState(false);
+
+  const handleHeaderRefresh = React.useCallback(async () => {
+    try {
+      setHeaderRefreshing(true);
+      if (props?.onFetchRequests) {
+        await props.onFetchRequests(newFilters);
+      } else if (ctx.props?.onFetchRequests) {
+        await ctx.props.onFetchRequests(newFilters);
+      }
+      toast.success("تم تحديث البيانات بنجاح");
+    } catch (error) {
+      console.error("Error refreshing requests:", error);
+      toast.error("حدث خطأ أثناء تحديث البيانات");
+    } finally {
+      setHeaderRefreshing(false);
+    }
+  }, [props?.onFetchRequests, ctx.props, newFilters]);
 
   if (apiLoading && actions.length === 0) return <RequestsCenterLoading />;
   if (apiError && actions.length === 0) return <RequestsCenterError error={apiError} />;
@@ -48,7 +67,10 @@ export function RequestsCenterPage(props?: RequestsCenterPageProps) {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <div className="space-y-6 p-6 max-w-[1600px] mx-auto">
-        <RequestsCenterHeader />
+        <RequestsCenterHeader
+          onRefresh={handleHeaderRefresh}
+          isRefreshing={headerRefreshing}
+        />
         <RequestsCenterStats stats={stats} />
         <StageDistributionCard
           apiStages={apiStages}

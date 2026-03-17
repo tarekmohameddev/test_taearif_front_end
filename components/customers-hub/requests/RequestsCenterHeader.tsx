@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, ArrowLeft, PlusCircle } from "lucide-react";
+import { MessageSquare, ArrowLeft, PlusCircle, RefreshCcw } from "lucide-react";
 
-export function RequestsCenterHeader() {
+type RequestsCenterHeaderProps = {
+  onRefresh?: () => void | Promise<void>;
+  isRefreshing?: boolean;
+};
+
+export function RequestsCenterHeader({
+  onRefresh,
+  isRefreshing,
+}: RequestsCenterHeaderProps) {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
@@ -19,6 +27,18 @@ export function RequestsCenterHeader() {
         </p>
       </div>
       <div className="flex items-center gap-2">
+        {onRefresh && (
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-2"
+            onClick={() => onRefresh()}
+            disabled={isRefreshing}
+          >
+            <RefreshCcw className="h-4 w-4" />
+            {isRefreshing ? "جاري التحديث..." : "تحديث البيانات"}
+          </Button>
+        )}
         <Link href="/dashboard/customers-hub/requests/add">
           <Button className="gap-2">
             <PlusCircle className="h-4 w-4" />
