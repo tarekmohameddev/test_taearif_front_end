@@ -137,7 +137,7 @@ export default function AddPropertyRequestPage() {
           </div>
         </div>
 
-        <Card>
+        <Card className="bg-gray-100">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
