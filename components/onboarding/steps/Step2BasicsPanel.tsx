@@ -9,7 +9,7 @@ export default function Step2BasicsPanel() {
         <div className="text-[20px] font-bold">
           رقم الجوال <span className="text-red-500">*</span>
         </div>{" "}
-        {/* i want to translate this to arabic */}
+        
         <div className="text-[16px] text-white/80">
           الرقم اللي يتواصل معك فيه عملاؤك — تأكد أنه صحيح
         </div>
@@ -21,7 +21,7 @@ export default function Step2BasicsPanel() {
 
       <div className="flex flex-col gap-1">
         <div className="text-[20px] font-bold">البريد الإلكتروني</div>{" "}
-        {/* i want to translate this to arabic */}
+        
         <div className="text-[16px] text-white/80">
           بريدك المهني إن وجد — اختياري
         </div>
@@ -33,7 +33,7 @@ export default function Step2BasicsPanel() {
 
       <div className="flex flex-col gap-1">
         <div className="text-[20px] font-bold">العنوان</div>{" "}
-        {/* i want to translate this to arabic */}
+        
         <div className="text-[16px] text-white/80">
           حي ومدينة مكتبك — يساعد عملاءك يلقونك بسهولة
         </div>
