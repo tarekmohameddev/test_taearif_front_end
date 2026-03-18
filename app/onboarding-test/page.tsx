@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import OnboardingPage from "@/components/onboarding/onboarding-page";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import TenantPageWrapper from "../TenantPageWrapper";
 
 export const metadata: Metadata = {
@@ -18,5 +18,5 @@ export default async function OnboardingRoute() {
   }
 
   // إذا لم يكن هناك subdomain، افتح صفحة الـ onboarding العادية
-  return <OnboardingPage />;
+  return <OnboardingFlow disableCompletionRedirect />;
 }

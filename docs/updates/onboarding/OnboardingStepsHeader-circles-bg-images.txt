@@ -1,0 +1,5 @@
+2026-03-18 23:06:06
+Update Type: Enhancement
+Updated onboarding steps circles to use background images for active/inactive states (Group 409/420).
+components/onboarding/OnboardingStepsHeader.tsx
+
