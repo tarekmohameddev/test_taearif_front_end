@@ -21,8 +21,8 @@ export default function OnboardingStep1() {
   };
 
   return (
-    <div className="w-[70%] text-white mx-auto">
-      <div className="flex flex-col md:flex-row items-stretch gap-8">
+    <div className="w-[90%] text-white mx-auto">
+      <div className="flex flex-col md:flex-row  gap-8">
         {/* Right side (desktop): content */}
         <Step1BasicsPanel
           siteName={siteName}
@@ -31,8 +31,7 @@ export default function OnboardingStep1() {
           setLogoPreviewUrl={setLogoPreviewUrl}
         />
 
-        {/* Divider (desktop only) */}
-        <div className=" self-stretch min-h-[240px] w-[3px] bg-white" />
+        <div className="hidden md:block  min-h-[50%] max-h-[50%] w-[1px] bg-white/50 shrink-0 px-[0.6px]" />
 
         {/* Left side (desktop): title only */}
         <Step1ColorsPanel
@@ -46,3 +45,5 @@ export default function OnboardingStep1() {
     </div>
   );
 }
+
+
