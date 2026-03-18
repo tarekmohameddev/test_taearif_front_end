@@ -7,8 +7,16 @@ export default function OnboardingStep1() {
   const [siteName, setSiteName] = useState("");
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
   const [manualColorsVisible, setManualColorsVisible] = useState(false);
+  const [manualHexes, setManualHexes] = useState<string[]>([
+    "#5BC4C0",
+    "#4CAF82",
+    "#1A3C34",
+  ]);
 
-  const fileAccept = useMemo(() => "image/png,image/jpeg,image/jpg,image/webp,image/svg+xml", []);
+  const fileAccept = useMemo(
+    () => "image/png,image/jpeg,image/jpg,image/webp,image/svg+xml",
+    [],
+  );
 
   const openPicker = () => {
     fileInputRef.current?.click();
@@ -22,8 +30,14 @@ export default function OnboardingStep1() {
     setLogoPreviewUrl(url);
   };
 
+  const normalizeHexForPreview = (hex: string, fallback: string) => {
+    const raw = hex.trim().toUpperCase();
+    const withHash = raw.startsWith("#") ? raw : `#${raw}`;
+    return /^#[0-9A-F]{6}$/.test(withHash) ? withHash : fallback;
+  };
+
   return (
-    <div className="w-full text-white">
+    <div className="w-[70%] text-white mx-auto">
       <div className="flex flex-col md:flex-row items-stretch gap-8">
         {/* Right side (desktop): content */}
         <div className="w-full md:w-1/2 md:flex-none">
@@ -43,11 +57,14 @@ export default function OnboardingStep1() {
 
             <div className="flex flex-row items-baseline gap-3">
               <div className="text-[20px] font-bold">شعار الموقع</div>
-              <div className="text-[16px] text-white/70 font-normal">(اختياري)</div>
+              <div className="text-[16px] text-white/70 font-normal">
+                (اختياري)
+              </div>
             </div>
 
             <div className="text-[16px] text-white/80">
-              الشعار هو الصورة أو الرمز اللي يمثل موقعك — يمكنك تخطيه الآن وتضيفه لاحقاً
+              الشعار هو الصورة أو الرمز اللي يمثل موقعك — يمكنك تخطيه الآن
+              وتضيفه لاحقاً
             </div>
 
             <div
@@ -156,13 +173,13 @@ export default function OnboardingStep1() {
             ].map((card) => (
               <div
                 key={card.label}
-                className="w-[92px] rounded-[16px] border border-white/60 bg-white/95 px-3 py-3"
+                className="w-fit rounded-xl border border-white/60 bg-white/95 px-1 py-1"
               >
                 <div className="flex items-center justify-center gap-1 dir-ltr">
                   {card.colors.map((c) => (
                     <span
                       key={c}
-                      className="h-5 w-5 rounded-[5px] bg-opacity-100"
+                      className="h-6 w-4 rounded-[5px] bg-opacity-100"
                       style={{ backgroundColor: c }}
                       aria-hidden="true"
                     />
@@ -178,38 +195,54 @@ export default function OnboardingStep1() {
               </div>
             ))}
           </div>
-          
-          
-          
-          
+
+
+
+          <div className="mt-5 h-px w-full bg-white" />  
+          {/* التخصيص اليدوي */}
           {manualColorsVisible && (
             <>
-              {/* التخصيص اليدوي */}
               <div className="mt-5 dir-ltr flex items-center gap-3">
-                {[
-                  { hex: "#5BC4C0", color: "#5BC4C0" },
-                  { hex: "#4CAF82", color: "#4CAF82" },
-                  { hex: "#1A3C34", color: "#1A3C34" },
-                ].map((item) => (
-                  <div
-                    key={item.hex}
-                    className="flex h-[38px] w-[150px] items-center justify-between gap-4 rounded-full border border-white/30 bg-white/10 px-4"
-                  >
-                    <span className="text-[14px] font-semibold text-[#0B5B3A]">
-                      {item.hex}
-                    </span>
-                    <span
-                      className="h-7 w-7 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                      aria-hidden="true"
-                    />
-                  </div>
-                ))}
+                {manualHexes.map((hex, idx) => {
+                  const fallback =
+                    ["#5BC4C0", "#4CAF82", "#1A3C34"][idx] ?? "#000000";
+                  const previewColor = normalizeHexForPreview(hex, fallback);
+
+                  return (
+                    <div
+                      key={`${idx}-${hex}`}
+                      className="flex h-[38px] w-[150px] flex-row-reverse items-center justify-center gap-4"
+                    >
+                    
+                      {/* Hex input on the left */}
+                      <input
+                        type="text"
+                        value={hex}
+                        onChange={(e) => {
+                          const next = e.target.value;
+                          setManualHexes((prev) =>
+                            prev.map((v, i) => (i === idx ? next : v)),
+                          );
+                        }}
+                        dir="ltr"
+                        inputMode="text"
+                        placeholder={fallback}
+                        className="w-[70px] rounded-full border border-white bg-white  py-2 text-center text-[11px] font-semibold text-[#0B5B3A] outline-none placeholder:text-[#0B5B3A]/50"
+
+                      />
+                      {/* Color square on the right */}
+                      <span
+                        className="inline-block h-8 w-8 flex-shrink-0 rounded-lg"
+                        style={{ backgroundColor: previewColor }}
+                        aria-hidden="true"
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </>
           )}
-          
-          
+
           {/* معاينة الالوان */}
           <div
             className="mt-5 dir-ltr flex items-center justify-between gap-6 rounded-[20px] border border-white/70 bg-white/90 px-8 py-5"
@@ -217,14 +250,25 @@ export default function OnboardingStep1() {
           >
             {/* Small palette dots (left side) */}
             <div className="flex items-center gap-3">
-              <span className="h-8 w-8 rounded-full bg-[#72D0C0]" aria-hidden="true" />
-              <span className="h-8 w-8 rounded-full bg-[#55C78A]" aria-hidden="true" />
-              <span className="h-8 w-8 rounded-full bg-[#1E4F3F]" aria-hidden="true" />
+              <span
+                className="h-8 w-8 rounded-full bg-[#72D0C0]"
+                aria-hidden="true"
+              />
+              <span
+                className="h-8 w-8 rounded-full bg-[#55C78A]"
+                aria-hidden="true"
+              />
+              <span
+                className="h-8 w-8 rounded-full bg-[#1E4F3F]"
+                aria-hidden="true"
+              />
             </div>
 
             {/* Text (center/right side, keep Arabic RTL) */}
             <div className="flex-1" dir="rtl">
-              <div className="text-[18px] font-bold text-[#0B5B3A]">اسم الموقع</div>
+              <div className="text-[18px] font-bold text-[#0B5B3A]">
+                اسم الموقع
+              </div>
               <div className="text-[16px] font-normal text-[#0B5B3A]/70">
                 معالجة الألوان
               </div>
@@ -235,10 +279,9 @@ export default function OnboardingStep1() {
               className="h-16 w-16 rounded-full bg-[#1E4F3F]"
               aria-hidden="true"
             />
-        </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
