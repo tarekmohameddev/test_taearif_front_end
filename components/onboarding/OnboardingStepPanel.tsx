@@ -16,7 +16,7 @@ export function OnboardingStepPanel({
   children,
 }: OnboardingStepPanelProps) {
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 gap-10 ">
       <div className="flex-1">
         {stepIndex === 0 && <OnboardingStep1 />}
         {stepIndex === 1 && <OnboardingStep2 />}

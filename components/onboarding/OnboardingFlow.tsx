@@ -91,7 +91,7 @@ export function OnboardingFlow({
         </button>
       </div>
 
-      <div className="relative z-10 w-full max-w-5xl">
+      <div className="relative z-10 w-full max-w-[75%]">
         <div className="text-center mb-6">
           <h1 className="text-[48px] font-bold text-white">
           موقعك الاحترافي جاهز خلال دقائق
