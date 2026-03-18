@@ -41,14 +41,14 @@ export function OnboardingFlow() {
   };
 
   return (
-    <main className="flex flex-1 items-center justify-center p-4">
+    <main className="min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E]">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-foreground">
-            إعداد موقعك الجديد
+          موقعك الاحترافي جاهز خلال دقائق
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            أكمل الخطوات التالية لتهيئة موقعك. (المحتوى فارغ حالياً)
+          سنوجّهك لإعداد موقعك خطوة بخطوة بطريقة سهلة وسريعة
           </p>
         </div>
 

@@ -292,8 +292,8 @@ const OnboardingPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background" dir="rtl">
       {/* Simple Menu */}
-      <div className="w-full flex justify-center md:justify-end mb-8 md:mb-6">
-        <div className="md:absolute md:top-1 md:right-10">
+      <div className="w-full relative flex justify-center md:justify-start mb-8 md:mb-6">
+        <div className="absolute top-0 right-5">
           <Image
             src="/logo.png"
             alt="Website Builder Logo"

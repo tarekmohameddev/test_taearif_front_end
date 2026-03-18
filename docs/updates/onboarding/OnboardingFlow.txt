@@ -1,0 +1,5 @@
+2026-03-18 22:47:00
+Update Type: Update
+Set onboarding page background color to #4F9E8E.
+components/onboarding/OnboardingFlow.tsx
+
