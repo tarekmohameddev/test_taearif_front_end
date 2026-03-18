@@ -1,0 +1,5 @@
+2026-03-18 23:01:10
+Update Type: Update
+Copied onboarding background SVG into public as /onboardingBackground.svg.
+public/onboardingBackground.svg
+

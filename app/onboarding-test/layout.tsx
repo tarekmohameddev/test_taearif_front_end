@@ -11,14 +11,14 @@ export default function OnboardingLayout({
       className="min-h-screen bg-background text-foreground flex flex-col"
       dir="rtl"
     >
-      <div className="w-full flex justify-end px-4 pt-6">
+      <div className="absolute top-10 right-10 z-20">
         <Image
           src="/logo.svg"
           alt="Logo"
-          width={160}
-          height={56}
+          width={120}
+          height={40}
           priority
-          className="h-14 w-auto object-contain dark:invert"
+          className="h-10 w-auto object-contain invert "
         />
       </div>
 

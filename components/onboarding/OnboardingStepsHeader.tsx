@@ -14,7 +14,7 @@ export function OnboardingStepsHeader({
   currentStepIndex,
 }: OnboardingStepsHeaderProps) {
   return (
-    <header className="flex items-start justify-between gap-3">
+    <header className="flex items-start justify-between gap-3 text-white">
       {steps.map((step, index) => {
         const isActive = index === currentStepIndex;
         return (
@@ -23,14 +23,14 @@ export function OnboardingStepsHeader({
               className={cn(
                 "mx-auto flex h-9 w-9 items-center justify-center rounded-full border text-sm",
                 isActive
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-transparent text-muted-foreground",
+                  ? "border-white bg-transparent text-white"
+                  : "border-white/60 bg-transparent text-white",
               )}
               aria-current={isActive ? "step" : undefined}
             >
               {index + 1}
             </div>
-            <div className={cn("mt-2 text-xs", isActive ? "text-foreground" : "text-muted-foreground")}>
+            <div className={cn("mt-2 text-xs", isActive ? "text-white" : "text-white")}>
               {step.title}
             </div>
           </div>

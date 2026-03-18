@@ -1,3 +1,4 @@
+// لا تستخدم هذا الملف لانه الصفحة القديمة , الجديد هو OnboardingFlow.tsx
 "use client";
 import useAuthStore from "@/context/AuthContext";
 import React, { useState, useRef, useEffect } from "react";

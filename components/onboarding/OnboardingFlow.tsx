@@ -41,13 +41,21 @@ export function OnboardingFlow() {
   };
 
   return (
-    <main className="min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E]">
-      <div className="w-full max-w-2xl">
+    <main className="relative min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E] overflow-hidden">
+      <div className="pointer-events-none absolute  z-0 max-w-[70%]  bottom-0" aria-hidden="true">
+        <img
+          src="/onboardingBackground.svg"
+          alt=""
+          className="h-full w-full object-contain"
+        />
+      </div>
+
+      <div className="relative z-10 w-full max-w-5xl">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-[48px] font-bold text-white">
           موقعك الاحترافي جاهز خلال دقائق
           </h1>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-[24px] text-white mt-2">
           سنوجّهك لإعداد موقعك خطوة بخطوة بطريقة سهلة وسريعة
           </p>
         </div>
