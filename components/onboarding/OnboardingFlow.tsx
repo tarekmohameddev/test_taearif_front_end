@@ -106,18 +106,18 @@ export function OnboardingFlow({
           currentStepIndex={currentStepIndex}
         />
 
-        <section className="mt-5 rounded-lg border border-border bg-card p-6">
-          <OnboardingStepPanel stepIndex={currentStepIndex} />
+        <section className="mt-5 flex flex-col rounded-lg border border-border bg-card p-6">
+          <OnboardingStepPanel stepIndex={currentStepIndex}>
+            <OnboardingNavigation
+              stepIndex={currentStepIndex}
+              stepsLength={ONBOARDING_STEPS_COUNT}
+              onBack={handleBack}
+              onNext={handleNext}
+              onFinish={finishOnboarding}
+              onSkip={handleSkip}
+            />
+          </OnboardingStepPanel>
         </section>
-
-        <OnboardingNavigation
-          stepIndex={currentStepIndex}
-          stepsLength={ONBOARDING_STEPS_COUNT}
-          onBack={handleBack}
-          onNext={handleNext}
-          onFinish={finishOnboarding}
-          onSkip={handleSkip}
-        />
       </div>
     </main>
   );
