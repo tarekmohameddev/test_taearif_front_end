@@ -9,18 +9,20 @@ import OnboardingStep4 from "./steps/Step4";
 interface OnboardingStepPanelProps {
   stepIndex: number;
   children?: ReactNode;
+  step3ActiveTab?: "sites" | "new";
 }
 
 export function OnboardingStepPanel({
   stepIndex,
   children,
+  step3ActiveTab = "sites",
 }: OnboardingStepPanelProps) {
   return (
     <div className="flex flex-col flex-1 gap-10 ">
       <div className="flex-1">
         {stepIndex === 0 && <OnboardingStep1 />}
         {stepIndex === 1 && <OnboardingStep2 />}
-        {stepIndex === 2 && <OnboardingStep3 />}
+        {stepIndex === 2 && <OnboardingStep3 activeTab={step3ActiveTab} />}
         {stepIndex === 3 && <OnboardingStep4 />}
       </div>
       {children}

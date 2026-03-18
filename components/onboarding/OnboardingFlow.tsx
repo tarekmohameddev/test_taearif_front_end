@@ -20,6 +20,7 @@ export function OnboardingFlow({
 
   const [stepIndex, setStepIndex] = useState(0);
   const currentStepIndex = clampStepIndex(stepIndex, ONBOARDING_STEPS_COUNT);
+  const [step3ActiveTab, setStep3ActiveTab] = useState<"sites" | "new">("sites");
 
   const handleContactUs = () => {
     const phoneNumber = "966592960339";
@@ -106,8 +107,46 @@ export function OnboardingFlow({
           currentStepIndex={currentStepIndex}
         />
 
+        {currentStepIndex === 2 && (
+          <div className="bg-white rounded-full p-1 max-w-[500px] justify-start mt-8">
+            <div className="flex gap-2 rounded-full">
+              <button
+                type="button"
+                onClick={() => setStep3ActiveTab("sites")}
+                className={[
+                  "flex-1 rounded-full px-4 py-1 text-[15px] font-semibold transition-colors",
+                  step3ActiveTab === "sites"
+                    ? "bg-[#4F9E8E] text-white"
+                    : "bg-white text-[#4F9E8E] ",
+                ].join(" ")}
+              >
+                إضافة عقار من مواقع أخري
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setStep3ActiveTab("new")}
+                className={[
+                  "flex-1 rounded-full px-4 py-1 text-[15px] font-semibold transition-colors",
+                  step3ActiveTab === "new"
+                    ? "bg-[#4F9E8E] text-white"
+                    : "bg-white text-[#4F9E8E] ",
+                ].join(" ")}
+              >
+                إنشاء عقار جديد
+              </button>
+            </div>
+          </div>
+        )}
+
+
+
+
         <section className="mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 p-6 w-full ">
-          <OnboardingStepPanel stepIndex={currentStepIndex}>
+          <OnboardingStepPanel
+            stepIndex={currentStepIndex}
+            step3ActiveTab={step3ActiveTab}
+          >
             <OnboardingNavigation
               stepIndex={currentStepIndex}
               stepsLength={ONBOARDING_STEPS_COUNT}
@@ -116,6 +155,7 @@ export function OnboardingFlow({
               onFinish={finishOnboarding}
               onSkip={handleSkip}
             />
+            
           </OnboardingStepPanel>
         </section>
       </div>
