@@ -187,7 +187,7 @@ export default function OnboardingStep1() {
                 </div>
 
                 <div
-                  className="mt-1 text-center text-[11px] font-normal text-[#0B5B3A]/80"
+                  className="mt-1 text-center text-[11px] font-normal text-[#0B5B3A]/80 whitespace-nowrap"
                   dir="rtl"
                 >
                   {card.label}
@@ -202,7 +202,7 @@ export default function OnboardingStep1() {
           {/* التخصيص اليدوي */}
           {manualColorsVisible && (
             <>
-              <div className="mt-5 dir-ltr flex items-center gap-3">
+              <div className="mt-5 dir-ltr flex items-center gap-1">
                 {manualHexes.map((hex, idx) => {
                   const fallback =
                     ["#5BC4C0", "#4CAF82", "#1A3C34"][idx] ?? "#000000";
@@ -210,7 +210,8 @@ export default function OnboardingStep1() {
 
                   return (
                     <div
-                      key={`${idx}-${hex}`}
+                      // Key must be stable so React doesn't remount the input while typing.
+                      key={idx}
                       className="flex h-[38px] w-[150px] flex-row-reverse items-center justify-center gap-4"
                     >
                     
@@ -243,40 +244,46 @@ export default function OnboardingStep1() {
             </>
           )}
 
+
+
+
+
+
+
           {/* معاينة الالوان */}
           <div
-            className="mt-5 dir-ltr flex items-center justify-between gap-6 rounded-[20px] border border-white/70 bg-white/90 px-8 py-5"
+            className="mt-5 w-full dir-ltr flex items-center justify-between gap-4 rounded-[20px] border border-white/70 bg-white/90 px-8 py-5"
             dir="ltr"
           >
             {/* Small palette dots (left side) */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
               <span
-                className="h-8 w-8 rounded-full bg-[#72D0C0]"
+                className="h-6 w-6 rounded-full bg-[#72D0C0]"
                 aria-hidden="true"
               />
               <span
-                className="h-8 w-8 rounded-full bg-[#55C78A]"
+                className="h-6 w-6 rounded-full bg-[#55C78A]"
                 aria-hidden="true"
               />
               <span
-                className="h-8 w-8 rounded-full bg-[#1E4F3F]"
+                className="h-6 w-6 rounded-full bg-[#1E4F3F]"
                 aria-hidden="true"
               />
             </div>
 
             {/* Text (center/right side, keep Arabic RTL) */}
             <div className="flex-1" dir="rtl">
-              <div className="text-[18px] font-bold text-[#0B5B3A]">
+              <div className="text-[15px] font-bold text-[#0B5B3A]">
                 اسم الموقع
               </div>
-              <div className="text-[16px] font-normal text-[#0B5B3A]/70">
+              <div className="text-[14px] font-normal text-[#0B5B3A]/70">
                 معالجة الألوان
               </div>
             </div>
 
             {/* Big dot (right side) */}
             <div
-              className="h-16 w-16 rounded-full bg-[#1E4F3F]"
+              className="h-12 w-12 rounded-full bg-[#1E4F3F]"
               aria-hidden="true"
             />
           </div>
