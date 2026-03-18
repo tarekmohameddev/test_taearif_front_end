@@ -106,7 +106,7 @@ export function OnboardingFlow({
           currentStepIndex={currentStepIndex}
         />
 
-        <section className="mt-5 flex flex-col rounded-lg border border-border bg-card p-6">
+        <section className="mt-5 flex flex-col rounded-lg border border-white bg-white/20 p-6 w-full ">
           <OnboardingStepPanel stepIndex={currentStepIndex}>
             <OnboardingNavigation
               stepIndex={currentStepIndex}

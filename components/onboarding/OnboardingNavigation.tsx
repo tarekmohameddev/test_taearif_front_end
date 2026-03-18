@@ -29,8 +29,8 @@ export function OnboardingNavigation({
           type="button"
           onClick={onBack}
           className={[
-            "rounded-full border px-8 py-2 text-sm transition-colors",
-            "border-border bg-transparent text-foreground hover:border-muted-foreground hover:bg-foreground/5",
+            "rounded-full border border-white bg-white px-8 py-2 text-sm transition-colors",
+            "text-[#4F9E8E] hover:border-white hover:bg-white/90",
           ].join(" ")}
         >
           رجوع
@@ -50,7 +50,7 @@ export function OnboardingNavigation({
       <button
         type="button"
         onClick={onSkip}
-        className="rounded-full border border-border bg-transparent px-8 py-2 text-sm text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground hover:bg-foreground/5"
+        className="rounded-full border border-white bg-white px-8 py-2 text-sm text-[#4F9E8E] transition-colors hover:border-white hover:bg-white/90"
       >
         تخطي 
       </button>
