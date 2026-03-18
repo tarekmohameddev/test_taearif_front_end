@@ -1,0 +1,5 @@
+2026-03-18 22:32:50
+Update Type: Enhancement
+Added a backup onboarding route file to preserve current behavior while iterating on UI/UX.
+app/onboarding/page.backup.tsx
+
