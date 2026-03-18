@@ -182,7 +182,32 @@ export default function OnboardingStep1() {
           
           
           
-                    <div
+          {/* التخصيص اليدوي */}
+          <div className="mt-5 dir-ltr flex items-center gap-3">
+            {[
+              { hex: "#5BC4C0", color: "#5BC4C0" },
+              { hex: "#4CAF82", color: "#4CAF82" },
+              { hex: "#1A3C34", color: "#1A3C34" },
+            ].map((item) => (
+              <div
+                key={item.hex}
+                className="flex h-[38px] w-[150px] items-center justify-between gap-4 rounded-full border border-white/30 bg-white/10 px-4"
+              >
+                <span className="text-[14px] font-semibold text-[#0B5B3A]">
+                  {item.hex}
+                </span>
+                <span
+                  className="h-7 w-7 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                  aria-hidden="true"
+                />
+              </div>
+            ))}
+          </div>
+          
+          
+          {/* معاينة الالوان */}
+          <div
             className="mt-5 dir-ltr flex items-center justify-between gap-6 rounded-[20px] border border-white/70 bg-white/90 px-8 py-5"
             dir="ltr"
           >
@@ -206,7 +231,7 @@ export default function OnboardingStep1() {
               className="h-16 w-16 rounded-full bg-[#1E4F3F]"
               aria-hidden="true"
             />
-          </div>
+        </div>
         </div>
       </div>
     </div>
