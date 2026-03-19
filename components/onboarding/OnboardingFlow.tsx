@@ -12,6 +12,10 @@ import OnboardingStep5 from "./steps/Step5";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
+import { usePropertyFormStore } from "@/context/store/dashboard/properties/propertyForm";
+import { validateForm as validatePropertyForm } from "@/components/property/property-form/utils/validation";
+import { formatPropertyData } from "@/components/property/property-form/utils/formatters";
+import { createProperty } from "@/components/property/property-form/services/propertyApi";
 
 export function OnboardingFlow({
   disableCompletionRedirect = false,
@@ -40,6 +44,16 @@ export function OnboardingFlow({
   ]);
   const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
   const [savingStep1, setSavingStep1] = useState(false);
+  const [savingStep3, setSavingStep3] = useState(false);
+
+  // Step 3 (new property) state from property form store
+  const step3FormData = usePropertyFormStore((s) => s.formData);
+  const step3Images = usePropertyFormStore((s) => s.images);
+  const step3Previews = usePropertyFormStore((s) => s.previews);
+  const step3Video = usePropertyFormStore((s) => s.video);
+  const step3VideoPreview = usePropertyFormStore((s) => s.videoPreview);
+  const step3Faqs = usePropertyFormStore((s) => s.faqs);
+  const setStep3Errors = usePropertyFormStore((s) => s.setErrors);
 
   const normalizeHexForPreview = (hex: string, fallback: string) => {
     const raw = hex.trim().toUpperCase();
@@ -85,6 +99,49 @@ export function OnboardingFlow({
     }
   };
 
+  const saveStep3NewPropertyToBackend = async () => {
+    setSavingStep3(true);
+    try {
+      const newErrors = validatePropertyForm(
+        step3FormData,
+        step3Images,
+        step3Previews,
+        "add",
+      );
+      setStep3Errors(newErrors as any);
+
+      if (Object.keys(newErrors).length > 0) {
+        toast.error("يرجى التحقق من الحقول المطلوبة وإصلاح الأخطاء.");
+        return false;
+      }
+
+      const propertyData = await formatPropertyData(
+        step3FormData as any,
+        step3Images as any,
+        step3Previews as any,
+        step3Video,
+        step3VideoPreview,
+        step3Faqs as any,
+        "add",
+      );
+
+      // Publish by default in onboarding flow.
+      propertyData.status = 1;
+
+      await createProperty(propertyData);
+      return true;
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "حدث خطأ أثناء حفظ العقار";
+      toast.error(message);
+      return false;
+    } finally {
+      setSavingStep3(false);
+    }
+  };
+
   const handleContactUs = () => {
     const phoneNumber = "966592960339";
     const message = "مرحباً، أريد المساعدة في التسجيل";
@@ -117,6 +174,16 @@ export function OnboardingFlow({
     if (currentStepIndex === 0) {
       void (async () => {
         const ok = await saveStep1ToBackend();
+        if (!ok) return;
+        setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
+      })();
+      return;
+    }
+
+    // Step 3 (new property tab): upload media then create property.
+    if (currentStepIndex === 2 && step3ActiveTab === "new") {
+      void (async () => {
+        const ok = await saveStep3NewPropertyToBackend();
         if (!ok) return;
         setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
       })();
@@ -216,7 +283,12 @@ export function OnboardingFlow({
           </div>
         )}
 
-        <section className="mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full ">
+        <section
+          className={[
+            "mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full",
+            currentStepIndex === 2 ? "px-6" : "",
+          ].join(" ")}
+        >
           {isCompletionStep ? (
             <OnboardingStep5
               onExploreDashboard={finishOnboarding}
@@ -248,8 +320,14 @@ export function OnboardingFlow({
                 onNext={handleNext}
                 onFinish={finishOnboarding}
                 onSkip={handleSkip}
-                nextDisabled={currentStepIndex === 0 && savingStep1}
-                nextLoading={currentStepIndex === 0 && savingStep1}
+                nextDisabled={
+                  (currentStepIndex === 0 && savingStep1) ||
+                  (currentStepIndex === 2 && step3ActiveTab === "new" && savingStep3)
+                }
+                nextLoading={
+                  (currentStepIndex === 0 && savingStep1) ||
+                  (currentStepIndex === 2 && step3ActiveTab === "new" && savingStep3)
+                }
               />
             </OnboardingStepPanel>
           )}

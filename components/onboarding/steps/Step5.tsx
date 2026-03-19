@@ -36,15 +36,8 @@ export default function OnboardingStep5({
       </div>
 
       <div className="w-full max-w-[860px] grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+        
         <div className="flex flex-col items-start gap-4">
-          {steps.map((s) => (
-            <div key={s.title} className="text-[24px] leading-tight">
-              تم
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col items-end gap-4">
           <div className="text-[22px] font-semibold">
             الخطوات المكتملة ({completedCount} من {steps.length})
           </div>
@@ -57,6 +50,14 @@ export default function OnboardingStep5({
             ))}
           </ul>
         </div>
+        <div className="flex flex-col items-end gap-4">
+          {steps.map((s) => (
+            <div key={s.title} className="text-[24px] leading-tight">
+              تم
+            </div>
+          ))}
+        </div>
+
       </div>
 
       <button

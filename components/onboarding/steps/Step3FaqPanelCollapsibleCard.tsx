@@ -1,69 +1,29 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useFAQs } from "@/components/property/property-form/hooks/useFAQs";
 
 export default function Step3FaqPanelCollapsibleCard() {
   const [faqOpen, setFaqOpen] = useState(false);
-  const [selectedSuggestedQuestions, setSelectedSuggestedQuestions] = useState<string[]>([]);
-  const [displayedSuggestedQuestions, setDisplayedSuggestedQuestions] = useState<string[]>([]);
-
-  const suggestedQuestions = [
-    "متى يمكنني معاينة هذا العقار؟",
-    "هل العقار مفروش؟",
-    "ما هي سياسة الحيوانات الأليفة؟",
-    "هل تتوفر مواقف للسيارات؟",
-    "هل يوجد بواب أو حارس أمن؟",
-  ];
-
-  function shuffleByLengthRandom(items: string[]) {
-    const shuffle = (arr: string[]) => {
-      const copy = [...arr];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    };
-
-    const cat = (s: string) => {
-      const len = s.replace(/\s+/g, "").length;
-      if (len <= 16) return "short";
-      if (len <= 26) return "mid";
-      return "long";
-    };
-
-    const groups: Record<"short" | "mid" | "long", string[]> = {
-      short: [],
-      mid: [],
-      long: [],
-    };
-
-    for (const item of items) {
-      groups[cat(item)].push(item);
-    }
-
-    const long = shuffle(groups.long);
-    const mid = shuffle(groups.mid);
-    const short = shuffle(groups.short);
-
-    const result: string[] = [];
-    const maxLen = Math.max(long.length, mid.length, short.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (long[i]) result.push(long[i]);
-      if (mid[i]) result.push(mid[i]);
-      if (short[i]) result.push(short[i]);
-    }
-
-    return result;
-  }
+  const {
+    faqs,
+    newQuestion,
+    newAnswer,
+    suggestedFaqsList,
+    setNewQuestion,
+    setNewAnswer,
+    handleAddFaq,
+    handleRemoveFaq,
+    handleToggleFaqDisplay,
+    handleSelectSuggestedFaq,
+    loadSuggestedFaqs,
+  } = useFAQs();
 
   useEffect(() => {
-    if (!faqOpen) {
-      setSelectedSuggestedQuestions([]);
-      return;
+    if (faqOpen) {
+      void loadSuggestedFaqs();
     }
-    setDisplayedSuggestedQuestions(shuffleByLengthRandom(suggestedQuestions));
-  }, [faqOpen]);
+  }, [faqOpen, loadSuggestedFaqs]);
 
   return (
     <>
@@ -106,78 +66,138 @@ export default function Step3FaqPanelCollapsibleCard() {
         </button>
 
         {faqOpen && (
-          <div className="mt-3 p-5 space-y-5 max-h-[30vh] overflow-y-auto step3-scroll-thin">
+          <div className="mt-3 p-5 max-h-[30vh] overflow-y-auto step3-scroll-thin">
             <div className="text-right text-[12px] text-black/60">
               أضف أسئلة وأجوبة شائعة حول هذه الوحدة لمساعدة المشترين المحتملين
             </div>
 
-            <div className="space-y-4 p-4 border rounded-3xl bg-transparent">
-              <h3 className="text-lg font-medium text-right text-black">إضافة سؤال جديد</h3>
+            <div className="mt-4 space-y-4 p-4 border rounded-3xl bg-transparent">
+              <h3 className="text-lg font-medium text-right text-black">
+                إضافة سؤال جديد
+              </h3>
 
               <div className="space-y-2">
-                <label htmlFor="newQuestion" className="block text-right text-[14px] font-medium text-black ">
+                <label
+                  htmlFor="onboardingFaqQuestion"
+                  className="block text-right text-[14px] font-medium text-black"
+                >
                   السؤال
                 </label>
                 <input
-                  id="newQuestion"
+                  id="onboardingFaqQuestion"
                   type="text"
+                  value={newQuestion}
+                  onChange={(e) => setNewQuestion(e.target.value)}
                   placeholder="مثال: هل مسموح بالحيوانات الأليفة؟"
                   className="w-full rounded-full border border-gray-200 bg-white/70 px-3 py-2 text-right placeholder:text-black/40 text-[14px] focus:outline-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="newAnswer" className="block text-right text-[14px] font-medium text-black">
-                  الاجابة
+                <label
+                  htmlFor="onboardingFaqAnswer"
+                  className="block text-right text-[14px] font-medium text-black"
+                >
+                  الإجابة
                 </label>
-                  <input
-                  id="newAnswer"
+                <input
+                  id="onboardingFaqAnswer"
                   type="text"
-                  placeholder="مثال: هل مسموح بالحيوانات الأليفة؟"
+                  value={newAnswer}
+                  onChange={(e) => setNewAnswer(e.target.value)}
+                  placeholder="مثال: نعم، مسموح بالحيوانات الأليفة الصغيرة."
                   className="w-full rounded-full border border-gray-200 bg-white/70 px-3 py-2 text-right placeholder:text-black/40 text-[14px] focus:outline-none"
                 />
               </div>
 
               <button
                 type="button"
-                className=" block w-full rounded-full bg-[#4f9e8e] px-4 py-1 text-center text-white transition-colors hover:bg-[#3a8075] lg:w-auto"
+                onClick={handleAddFaq}
+                className="block w-full rounded-full bg-[#4f9e8e] px-4 py-1 text-center text-white transition-colors hover:bg-[#3a8075] lg:w-auto"
               >
                 إضافة سؤال
               </button>
-              
-              <div className="text-right text-[14px] font-bold text-black">
-                اسئلة مقترحة:
-              </div>
-              
-              
-              
-              
-              <div className="grid grid-cols-3 gap-2">
-                {(displayedSuggestedQuestions.length > 0 ? displayedSuggestedQuestions : suggestedQuestions).map((q, index) => (
-                  <button
-                    key={`${index}-${q}`}
-                    type="button"
-                    onClick={() =>
-                      setSelectedSuggestedQuestions((prev) =>
-                        prev.includes(q) ? prev.filter((item) => item !== q) : [...prev, q]
-                      )
-                    }
-                    style={
-                      selectedSuggestedQuestions.includes(q)
-                        ? { backgroundColor: "#3a8075", borderColor: "#3a8075" }
-                        : undefined
-                    }
-                    className={
-                      selectedSuggestedQuestions.includes(q)
-                        ? "w-full rounded-full border px-1 py-1 text-center text-white transition-colors hover:opacity-90 whitespace-normal break-words text-[12px]"
-                        : "w-full rounded-full bg-white border px-1 py-1 text-center text-black transition-colors hover:bg-gray-300 whitespace-normal break-words text-[12px]"
-                    }
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
+
+              {suggestedFaqsList?.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <div className="text-right text-[14px] font-bold text-black">
+                    أسئلة مقترحة:
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {suggestedFaqsList.map((sq: any, index: number) => (
+                      <button
+                        key={sq?.id ?? `${index}-${sq?.question ?? "q"}`}
+                        type="button"
+                        onClick={() => handleSelectSuggestedFaq(sq)}
+                        className="w-full rounded-full bg-white border border-gray-200 px-2 py-1 text-center text-black transition-colors hover:bg-gray-100 whitespace-normal break-words text-[12px]"
+                      >
+                        {sq?.question ?? ""}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+
+            {faqs?.length > 0 ? (
+              <div className="mt-4 space-y-2">
+                <div className="text-right text-[14px] font-bold text-black">
+                  الأسئلة المضافة ({faqs.length})
+                </div>
+                <div className="space-y-2">
+                  {faqs.map((faq: any) => (
+                    <div
+                      key={faq.id}
+                      className="rounded-3xl border border-gray-200 bg-white/70 p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1 text-right">
+                          <div className="text-[14px] font-semibold text-black break-words">
+                            {faq.question}
+                          </div>
+                          <div className="mt-1 text-[13px] text-black/70 break-words">
+                            {faq.answer}
+                          </div>
+                        </div>
+
+                        <div className="flex shrink-0 items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleFaqDisplay(faq.id)}
+                            className={[
+                              "rounded-full border px-3 py-1 text-[12px] transition-colors",
+                              faq.displayOnPage
+                                ? "bg-[#4f9e8e] text-white border-[#4f9e8e]"
+                                : "bg-white text-black border-gray-300",
+                            ].join(" ")}
+                            title={
+                              faq.displayOnPage
+                                ? "إخفاء من صفحة الوحدة"
+                                : "عرض في صفحة الوحدة"
+                            }
+                          >
+                            {faq.displayOnPage ? "معروض" : "مخفي"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFaq(faq.id)}
+                            className="rounded-full border border-red-200 bg-white px-3 py-1 text-[12px] text-red-600 transition-colors hover:bg-red-50"
+                            title="حذف السؤال"
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 text-center text-[12px] text-black/50">
+                لم تتم إضافة أي أسئلة شائعة بعد.
+              </div>
+            )}
           </div>
         )}
       </div>

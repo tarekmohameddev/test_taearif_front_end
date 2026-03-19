@@ -1,10 +1,45 @@
 "use client";
 
 import React, { useState } from "react";
-import { ImageIcon, Video } from "lucide-react";
+import { usePropertyFormState } from "@/components/property/property-form/hooks/usePropertyFormState";
+import { useFileUpload } from "@/components/property/property-form/hooks/useFileUpload";
+import { ThumbnailCard, GalleryCard, VideoCard, FloorPlansCard } from "@/components/property/property-form/components";
 
 export default function Step3MediaPanelCollapsibleCard() {
   const [mediaOpen, setMediaOpen] = useState(false);
+  const [thumbnailOpen, setThumbnailOpen] = useState(true);
+  const [galleryOpen, setGalleryOpen] = useState(true);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [floorPlansOpen, setFloorPlansOpen] = useState(false);
+
+  const {
+    images,
+    setImages,
+    previews,
+    setPreviews,
+    video,
+    setVideo,
+    videoPreview,
+    setVideoPreview,
+    errors,
+    setErrors,
+    thumbnailInputRef,
+    galleryInputRef,
+    videoInputRef,
+    floorPlansInputRef,
+    uploading,
+  } = usePropertyFormState("add");
+
+  const { handleFileChange, removeImage, removeVideo } = useFileUpload(
+    images as any,
+    setImages as any,
+    previews as any,
+    setPreviews as any,
+    setVideo as any,
+    setVideoPreview as any,
+    errors as any,
+    setErrors as any,
+  );
 
   return (
     <>
@@ -48,105 +83,55 @@ export default function Step3MediaPanelCollapsibleCard() {
 
         {mediaOpen && (
           <div className="mt-3 p-5 space-y-5 max-h-[30vh] overflow-y-auto step3-scroll-thin">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Card 1 */}
-              <div>
-                <div className="text-[18px] font-bold text-black text-right">
-                  صورة الوحدة الرئيسية <span className="text-red-500">*</span>
-                </div>
-                <div className="text-[12px] text-black/60 mt-1 text-right">
-                  قم بتحميل صورة واحدة لعرض تفاصيل الوحدة
-                </div>
+            <ThumbnailCard
+              previews={{ thumbnail: previews.thumbnail }}
+              images={{ thumbnail: images.thumbnail }}
+              errors={errors}
+              isDraft={false}
+              missingFields={[]}
+              uploading={uploading}
+              isOpen={thumbnailOpen}
+              setIsOpen={setThumbnailOpen}
+              thumbnailInputRef={thumbnailInputRef}
+              onFileChange={handleFileChange as any}
+              onRemoveImage={removeImage as any}
+              cardHasMissingFields={() => false}
+            />
 
-                <div className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-4 py-3">
-                  <div className="h-9 w-9 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <ImageIcon className="h-5 w-5 text-black" />
-                  </div>
+            <GalleryCard
+              previews={{ gallery: previews.gallery || [] }}
+              images={{ gallery: images.gallery || [] }}
+              errors={errors}
+              uploading={uploading}
+              isOpen={galleryOpen}
+              setIsOpen={setGalleryOpen}
+              galleryInputRef={galleryInputRef}
+              onFileChange={handleFileChange as any}
+              onRemoveImage={removeImage as any}
+            />
 
-                  <div className="mt-2 text-[13px]  text-black/50">
-                    رفع صورة
-                  </div>
+            <VideoCard
+              video={video}
+              videoPreview={videoPreview}
+              errors={errors}
+              uploading={uploading}
+              isOpen={videoOpen}
+              setIsOpen={setVideoOpen}
+              videoInputRef={videoInputRef}
+              onFileChange={handleFileChange as any}
+              onRemoveVideo={removeVideo}
+            />
 
-                  <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
-                    يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو
-                    10 ميجابايتز.
-                  </div>
-                </div>
-              </div>  
-
-              {/* Card 2 */}
-              <div>
-                <div className="text-[18px] font-bold text-black text-right">
-                  معرض صور الوحدة
-                </div>
-                <div className="text-[12px] text-black/60 mt-1 text-right">
-                  قم بتحميل صور متعددة لعرض تفاصيل الوحدة
-                </div>
-
-                <div className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 ">
-                  <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <ImageIcon className="h-4 w-4 text-black" />
-                  </div>
-
-                  <div className="mt-1 text-[11px]  text-black/50">
-                  إضافة
-                  </div>
-                </div>
-                <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
-                  يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10
-                  ميجابايتز.
-                </div>
-              </div>
-
-              {/* Card 3 (video) */}
-              <div>
-                <div className="text-[18px] font-bold text-black text-right">
-                  فيديو الوحدة
-                </div>
-                <div className="text-[12px] text-black/60 mt-1 text-right">
-                قم بتحميل فيديو واحد لعرض تفاصيل الوحدة
-                </div>
-
-                <div className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-4 py-3">
-                  <div className="h-11 w-11 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <Video className="h-6 w-6 text-black" />
-                  </div>
-
-                  <div className="mt-3 text-[13px]  text-black/50">
-                    رفع فيديو
-                  </div>
-
-                  <div className="mt-3 text-[10px] text-black/40 text-right leading-relaxed">
-                    يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى لحجم
-                    الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
-                  </div>
-                </div>
-              </div>
-
-                            {/* Card 4 */}
-              <div>
-                <div className="text-[18px] font-bold text-black text-right">
-                  مخططات الوحدة
-                </div>
-                <div className="text-[12px] text-black/60 mt-1 text-right">
-                قم بتحميل مخططات الطوابق والتصاميم الهندسية للوحدة
-                </div>
-
-                <div className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 ">
-                  <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <ImageIcon className="h-4 w-4 text-black" />
-                  </div>
-
-                  <div className="mt-1 text-[11px]  text-black/50">
-                  إضافة
-                  </div>
-                </div>
-                <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
-                  يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10
-                  ميجابايتز.
-                </div>
-              </div>
-            </div>
+            <FloorPlansCard
+              previews={{ floorPlans: previews.floorPlans || [] }}
+              images={{ floorPlans: images.floorPlans || [] }}
+              uploading={uploading}
+              isOpen={floorPlansOpen}
+              setIsOpen={setFloorPlansOpen}
+              floorPlansInputRef={floorPlansInputRef}
+              onFileChange={handleFileChange as any}
+              onRemoveImage={removeImage as any}
+            />
           </div>
         )}
       </div>

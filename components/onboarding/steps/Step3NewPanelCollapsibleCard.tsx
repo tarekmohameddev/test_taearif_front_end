@@ -1,10 +1,70 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePropertyFormState } from "@/components/property/property-form/hooks/usePropertyFormState";
+import { usePropertyHandlers } from "@/components/property/property-form/hooks/usePropertyHandlers";
+import { validateUrl as validateUrlUtil } from "@/components/property/property-form/utils/validation";
+import BasicInfoCard from "@/components/property/property-form/components/BasicInfoCard";
+import { usePropertyData } from "@/components/property/property-form/hooks/usePropertyData";
+import useAuthStore from "@/context/AuthContext";
 
 export default function Step3NewPanelCollapsibleCard() {
   const [commonTimesOpen, setCommonTimesOpen] = useState(false);
-  const [workTimes, setWorkTimes] = useState("");
+
+  const {
+    formData,
+    setFormData,
+    errors,
+    setErrors,
+    missingFields,
+    setMissingFields,
+    missingFieldsAr,
+    setMissingFieldsAr,
+    setValidationErrors,
+    setLoadingProperty,
+    categories,
+    projects,
+    buildings,
+    setCategories,
+    setProjects,
+    setFacades,
+    setBuildings,
+    setPreviews,
+    setFaqs,
+  } = usePropertyFormState("add");
+
+  const authLoading = useAuthStore((s) => s.IsLoading);
+  const userToken = useAuthStore((s) => s.userData?.token);
+
+  // Ensure dropdown data (categories/projects/buildings/facades) loads exactly like property add form.
+  usePropertyData(
+    "add",
+    undefined,
+    false,
+    authLoading,
+    userToken,
+    setCategories,
+    setProjects,
+    setFacades,
+    setBuildings,
+    setFormData,
+    setPreviews,
+    setFaqs,
+    setMissingFields,
+    setMissingFieldsAr,
+    setValidationErrors,
+    setLoadingProperty,
+  );
+
+  const validateUrl = (value: string, name: string) => {
+    if (!value.trim()) return;
+    if (!validateUrlUtil(value)) {
+      setErrors((prev: any) => ({ ...prev, [name]: "رابط غير صالح" }));
+    }
+  };
+
+  const { handleInputChange, handleSwitchChange, handleSelectChange, handleCitySelect } =
+    usePropertyHandlers(formData as any, setFormData as any, errors as any, setErrors as any, validateUrl);
 
   return (
     <>
@@ -49,198 +109,27 @@ export default function Step3NewPanelCollapsibleCard() {
 
         {commonTimesOpen && (
           <div className="mt-3 p-5 space-y-5 max-h-[30vh] overflow-y-auto step3-scroll-thin">
-            <div className="">
-              <div className="text-[14px] text-black font-semibold text-right">
-                اسم الوحدة <span className="text-red-500">*</span>
-              </div>
-
-              <input
-                value={workTimes}
-                onChange={(e) => setWorkTimes(e.target.value)}
-                placeholder="اكتب وصف مختصر هنا"
-                className="mt-3  w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-              />
-            </div>
-
-            <div className="">
-              <div className="text-[14px] text-black font-semibold text-right">
-                وصف الوحدة <span className="text-red-500">*</span>
-              </div>
-
-              <textarea
-                value={workTimes}
-                onChange={(e) => setWorkTimes(e.target.value)}
-                placeholder="اكتب وصف مختصر هنا"
-                rows={4}
-                className="mt-3 w-full rounded-3xl bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60 resize-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* row 1 */}
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  العنوان
-                </div>
-                <input
-                  placeholder="مثال: شقة"
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  العمارة
-                </div>
-                <input
-                  placeholder="مثال: عمارة 3"
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                />
-              </div>
-
-              {/* row 2 */}
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  المبلغ
-                </div>
-                <input
-                  type="number"
-                  placeholder="مثال: 250000"
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  طريقة الدفع
-                </div>
-                <select
-                  defaultValue=""
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                >
-                  <option value="" disabled>
-                    اختر طريقة الدفع
-                  </option>
-                  <option value="cash">كاش</option>
-                  <option value="installments">تقسيط</option>
-                </select>
-              </div>
-
-              {/* row 3 */}
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  سعر المتر
-                </div>
-                <input
-                  type="number"
-                  placeholder="مثال: 8000"
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  نوع القائمة
-                </div>
-                <select
-                  defaultValue=""
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                >
-                  <option value="" disabled>
-                    اختر نوع القائمة
-                  </option>
-                  <option value="sale">للبيع</option>
-                  <option value="rent">للايجار</option>
-                </select>
-              </div>
-
-              {/* row 4 */}
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  فئة الوحدة
-                </div>
-                <input
-                  placeholder="مثال: فئة A"
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  المشروع
-                </div>
-                <input
-                  placeholder="مثال: مشروع الرفاعي"
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                />
-              </div>
-
-              {/* row 5 */}
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  اختر المدينة
-                </div>
-                <select
-                  defaultValue=""
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                >
-                  <option value="" disabled>
-                    اختر المدينة
-                  </option>
-                  <option value="riyadh">الرياض</option>
-                  <option value="jeddah">جدة</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  اختر الحي
-                </div>
-                <select
-                  defaultValue=""
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                >
-                  <option value="" disabled>
-                    اختر الحي
-                  </option>
-                  <option value="north">الشمالية</option>
-                  <option value="east">الشرقية</option>
-                </select>
-              </div>
-
-              {/* row 6 */}
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  نوع الوحدة
-                </div>
-                <select
-                  defaultValue=""
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                >
-                  <option value="" disabled>
-                    اختر نوع الوحدة
-                  </option>
-                  <option value="apartment">شقة</option>
-                  <option value="villa">فيلا</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-[14px] text-black font-semibold text-right">
-                  ترخيص اعلاني
-                </div>
-                <select
-                  defaultValue=""
-                  className="w-full rounded-full bg-white border border-gray-300 py-2 px-4 text-[16px] text-black outline-none focus:ring-2 focus:ring-[#4F9E8E]/60"
-                >
-                  <option value="" disabled>
-                    اختر الترخيص
-                  </option>
-                  <option value="available">متوفر</option>
-                  <option value="not_available">غير متوفر</option>
-                </select>
-              </div>
-            </div>
+            <BasicInfoCard
+              formData={formData as any}
+              errors={errors as any}
+              isDraft={false}
+              missingFields={missingFields as any}
+              categories={categories as any}
+              projects={projects as any}
+              buildings={buildings as any}
+              onInputChange={handleInputChange as any}
+              onSwitchChange={handleSwitchChange}
+              onSelectChange={handleSelectChange}
+              onCitySelect={handleCitySelect}
+              onDistrictSelect={(districtId) =>
+                setFormData((prev: any) => ({ ...prev, district_id: districtId }))
+              }
+              isFieldMissing={(field) => (missingFields as any)?.includes?.(field) ?? false}
+              cardHasMissingFields={(fields) =>
+                Array.isArray(missingFields) &&
+                fields.some((f) => (missingFields as any).includes(f))
+              }
+            />
           </div>
         )}
       </div>
