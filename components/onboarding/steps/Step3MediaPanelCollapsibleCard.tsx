@@ -6,8 +6,8 @@ import { ImageIcon, Video } from "lucide-react";
 export default function Step3MediaPanelCollapsibleCard() {
   const [mediaOpen, setMediaOpen] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [galleryPreview, setGalleryPreview] = useState<string | null>(null);
-  const [floorPlanPreview, setFloorPlanPreview] = useState<string | null>(null);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [floorPlanPreviews, setFloorPlanPreviews] = useState<string[]>([]);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -17,13 +17,21 @@ export default function Step3MediaPanelCollapsibleCard() {
     ref.current?.click();
   };
 
+  const appendImagePreviews = (files: FileList | null, maxItems = 10) => {
+    if (!files || files.length === 0) return [] as string[];
+    const imageFiles = Array.from(files).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+    return imageFiles.slice(0, maxItems).map((file) => URL.createObjectURL(file));
+  };
+
   useEffect(() => {
     return () => {
       if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-      if (galleryPreview) URL.revokeObjectURL(galleryPreview);
-      if (floorPlanPreview) URL.revokeObjectURL(floorPlanPreview);
+      galleryPreviews.forEach((url) => URL.revokeObjectURL(url));
+      floorPlanPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [thumbnailPreview, galleryPreview, floorPlanPreview]);
+  }, [thumbnailPreview, galleryPreviews, floorPlanPreviews]);
 
   return (
     <>
@@ -130,26 +138,30 @@ export default function Step3MediaPanelCollapsibleCard() {
                   قم بتحميل صور متعددة لعرض تفاصيل الوحدة
                 </div>
 
-                <div
-                  className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 cursor-pointer"
-                  onClick={() => openFilePicker(galleryInputRef)}
-                >
-                  {galleryPreview ? (
-                    <img
-                      src={galleryPreview}
-                      alt="معاينة معرض الصور"
-                      className="w-full h-14 object-cover rounded-xl"
-                    />
-                  ) : (
-                    <>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {galleryPreviews.map((preview, index) => (
+                    <div
+                      key={`gallery-${index}`}
+                      className="rounded-2xl border border-black/15 bg-transparent w-16 h-16 overflow-hidden"
+                    >
+                      <img
+                        src={preview}
+                        alt={`معاينة معرض الصور ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+
+                  {galleryPreviews.length < 10 && (
+                    <div
+                      className="rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 h-16 cursor-pointer"
+                      onClick={() => openFilePicker(galleryInputRef)}
+                    >
                       <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
                         <ImageIcon className="h-4 w-4 text-black" />
                       </div>
-
-                      <div className="mt-1 text-[11px]  text-black/50">
-                      إضافة
-                      </div>
-                    </>
+                      <div className="mt-1 text-[11px] text-black/50">إضافة</div>
+                    </div>
                   )}
                 </div>
                 <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
@@ -163,10 +175,12 @@ export default function Step3MediaPanelCollapsibleCard() {
                   multiple
                   className="hidden"
                   onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      if (galleryPreview) URL.revokeObjectURL(galleryPreview);
-                      setGalleryPreview(URL.createObjectURL(file));
+                    const newPreviews = appendImagePreviews(e.target.files, 10);
+                    if (newPreviews.length > 0) {
+                      setGalleryPreviews((prev) => [
+                        ...prev,
+                        ...newPreviews.slice(0, Math.max(0, 10 - prev.length)),
+                      ]);
                     }
                     e.currentTarget.value = "";
                   }}
@@ -219,26 +233,30 @@ export default function Step3MediaPanelCollapsibleCard() {
                 قم بتحميل مخططات الطوابق والتصاميم الهندسية للوحدة
                 </div>
 
-                <div
-                  className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 cursor-pointer"
-                  onClick={() => openFilePicker(floorPlansInputRef)}
-                >
-                  {floorPlanPreview ? (
-                    <img
-                      src={floorPlanPreview}
-                      alt="معاينة مخططات الوحدة"
-                      className="w-full h-14 object-cover rounded-xl"
-                    />
-                  ) : (
-                    <>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {floorPlanPreviews.map((preview, index) => (
+                    <div
+                      key={`floor-plan-${index}`}
+                      className="rounded-2xl border border-black/15 bg-transparent w-16 h-16 overflow-hidden"
+                    >
+                      <img
+                        src={preview}
+                        alt={`معاينة مخطط الوحدة ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+
+                  {floorPlanPreviews.length < 10 && (
+                    <div
+                      className="rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 h-16 cursor-pointer"
+                      onClick={() => openFilePicker(floorPlansInputRef)}
+                    >
                       <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
                         <ImageIcon className="h-4 w-4 text-black" />
                       </div>
-
-                      <div className="mt-1 text-[11px]  text-black/50">
-                      إضافة
-                      </div>
-                    </>
+                      <div className="mt-1 text-[11px] text-black/50">إضافة</div>
+                    </div>
                   )}
                 </div>
                 <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
@@ -252,10 +270,12 @@ export default function Step3MediaPanelCollapsibleCard() {
                   multiple
                   className="hidden"
                   onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file && file.type.startsWith("image/")) {
-                      if (floorPlanPreview) URL.revokeObjectURL(floorPlanPreview);
-                      setFloorPlanPreview(URL.createObjectURL(file));
+                    const newPreviews = appendImagePreviews(e.target.files, 10);
+                    if (newPreviews.length > 0) {
+                      setFloorPlanPreviews((prev) => [
+                        ...prev,
+                        ...newPreviews.slice(0, Math.max(0, 10 - prev.length)),
+                      ]);
                     }
                     e.currentTarget.value = "";
                   }}

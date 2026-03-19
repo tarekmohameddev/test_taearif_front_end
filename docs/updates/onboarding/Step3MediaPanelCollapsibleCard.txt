@@ -7,3 +7,8 @@ components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
 Update Type: Update
 Replace media placeholder content with preview after image selection
 components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
+
+2026-03-19 22:41:36
+Update Type: Update
+Add repeatable image tiles with add-card up to 10 for gallery and floor plans
+components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
