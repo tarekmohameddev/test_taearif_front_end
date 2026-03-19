@@ -9,6 +9,7 @@ import { OnboardingNavigation } from "./OnboardingNavigation";
 import { OnboardingStepPanel } from "./OnboardingStepPanel";
 import { OnboardingStepsHeader } from "./OnboardingStepsHeader";
 import OnboardingStep5 from "./steps/Step5";
+import { OnboardingHelpOfferDialog } from "./OnboardingHelpOfferDialog";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
@@ -45,6 +46,7 @@ export function OnboardingFlow({
   const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
   const [savingStep1, setSavingStep1] = useState(false);
   const [savingStep3, setSavingStep3] = useState(false);
+  const [helpOfferDialogOpen, setHelpOfferDialogOpen] = useState(false);
 
   // Step 3 (new property) state from property form store
   const step3FormData = usePropertyFormStore((s) => s.formData);
@@ -202,6 +204,7 @@ export function OnboardingFlow({
           className="h-full w-full object-contain"
         />
       </div>
+      
 
       <div className="absolute top-10 left-10 z-20 flex items-center gap-2">
         <span className="text-[14px] leading-none font-medium text-white whitespace-nowrap">
@@ -333,6 +336,11 @@ export function OnboardingFlow({
           )}
         </section>
       </div>
+      <OnboardingHelpOfferDialog
+        open={helpOfferDialogOpen}
+        onOpenChange={setHelpOfferDialogOpen}
+        onContactWhatsApp={handleContactUs}
+      />
     </main>
   );
 }

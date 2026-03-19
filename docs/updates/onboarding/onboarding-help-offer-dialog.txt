@@ -1,0 +1,11 @@
+2026-03-19
+Update Type: Feature
+Clicking the bottom-left onboarding circle opens a help-offer dialog (50 SAR + WhatsApp CTA) using Radix Dialog.
+components/onboarding/OnboardingHelpOfferDialog.tsx
+components/onboarding/OnboardingFlow.tsx
+
+2026-03-19
+Update Type: Update
+Replaced modal popup with an anchored panel to the right of the circle button (no overlay); click-outside and Escape close.
+components/onboarding/OnboardingHelpOfferDialog.tsx
+components/onboarding/OnboardingFlow.tsx

@@ -8,7 +8,7 @@ export default function OnboardingLayout({
 }) {
   return (
     <div
-      className="min-h-screen bg-background text-foreground flex flex-col"
+      className="relative min-h-screen bg-background text-foreground flex flex-col"
       dir="rtl"
     >
       <div className="absolute top-10 right-10 z-20">
