@@ -41,6 +41,7 @@ interface PropertyDetailsCardProps {
   setSelectedFacilities: React.Dispatch<React.SetStateAction<string[]>>;
   isFieldMissing: (field: string) => boolean;
   cardHasMissingFields: (fields: string[]) => boolean;
+  variant?: "card" | "plain";
 }
 
 export default function PropertyDetailsCard({
@@ -62,37 +63,47 @@ export default function PropertyDetailsCard({
   setSelectedFacilities,
   isFieldMissing,
   cardHasMissingFields,
+  variant = "card",
 }: PropertyDetailsCardProps) {
   return (
-    <Card className="xl:col-span-2">
-      <CardHeader
-        className="cursor-pointer hover:bg-muted/50 transition-colors"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-xl">تفاصيل الوحدة</CardTitle>
-              {isDraft &&
-                cardHasMissingFields(["type", "area", "size"]) && (
-                  <Badge
-                    variant="outline"
-                    className="bg-orange-100 text-orange-800 border-orange-300"
-                  >
-                    حقول مطلوبة
-                  </Badge>
-                )}
+    <Card
+      className={[
+        "xl:col-span-2",
+        variant === "plain"
+          ? "border-0 bg-transparent shadow-none rounded-none"
+          : "",
+      ].join(" ")}
+    >
+      {variant !== "plain" && (
+        <CardHeader
+          className="cursor-pointer hover:bg-muted/50 transition-colors"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-xl">تفاصيل الوحدة</CardTitle>
+                {isDraft &&
+                  cardHasMissingFields(["type", "area", "size"]) && (
+                    <Badge
+                      variant="outline"
+                      className="bg-orange-100 text-orange-800 border-orange-300"
+                    >
+                      حقول مطلوبة
+                    </Badge>
+                  )}
+              </div>
+              <CardDescription>أدخل مواصفات وميزات الوحدة</CardDescription>
             </div>
-            <CardDescription>أدخل مواصفات وميزات الوحدة</CardDescription>
+            <motion.div
+              animate={{ rotate: isOpen ? 180 : 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
+              <ChevronDown className="h-4 w-4" />
+            </motion.div>
           </div>
-          <motion.div
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-          >
-            <ChevronDown className="h-4 w-4" />
-          </motion.div>
-        </div>
-      </CardHeader>
+        </CardHeader>
+      )}
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
@@ -102,7 +113,11 @@ export default function PropertyDetailsCard({
             transition={{ duration: 0.5, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
           >
-            <CardContent className="space-y-4">
+            <CardContent
+              className={
+                variant === "plain" ? "space-y-4 p-0 pt-0" : "space-y-4"
+              }
+            >
               <div className="space-y-2">
                 <Label htmlFor="featureInput">الميزات</Label>
                 <div className="flex flex-col sm:flex-row gap-2">
@@ -583,7 +598,7 @@ export default function PropertyDetailsCard({
                       <Badge
                         key={facility.key}
                         variant={isSelected ? "default" : "outline"}
-                        className="cursor-pointer text-sm py-2 px-4 hover:bg-primary/80 transition-colors"
+                        className="cursor-pointer text-sm  py-2 px-4 hover:bg-primary/80 transition-colors"
                         onClick={() => {
                           if (!isSelected) {
                             // تفعيل المرفق بقيمة 0

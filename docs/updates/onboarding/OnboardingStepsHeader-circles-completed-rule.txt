@@ -1,0 +1,5 @@
+2026-03-18 23:06:37
+Update Type: Enhancement
+Applied Group 409 background to current and completed steps (index <= currentStepIndex); future steps use Group 420.
+components/onboarding/OnboardingStepsHeader.tsx
+

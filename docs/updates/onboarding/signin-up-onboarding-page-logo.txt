@@ -1,0 +1,5 @@
+2026-03-18 22:48:25
+Update Type: Update
+Moved onboarding logo to absolute top-0 right-5 position.
+components/signin-up/onboarding-page.tsx
+

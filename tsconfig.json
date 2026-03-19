@@ -36,6 +36,12 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "SamyMultiTenancy-backup/**",
+    ".next/**",
+    "trash",
+    "trash/**",
+    "docs",
+    "docs/**"
   ]
 }

@@ -1,0 +1,5 @@
+2026-03-18 23:00:03
+Update Type: Update
+Ensured onboarding logo stays visible above background by adding higher z-index.
+app/onboarding-test/layout.tsx
+

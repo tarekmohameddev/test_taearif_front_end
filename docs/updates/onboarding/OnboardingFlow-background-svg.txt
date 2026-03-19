@@ -1,0 +1,5 @@
+2026-03-18 23:00:03
+Update Type: Enhancement
+Added onboarding background SVG overlay (above bg color, below content) across all steps.
+components/onboarding/OnboardingFlow.tsx
+

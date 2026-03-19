@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "إعداد موقعك الجديد وتخصيصه",
 };
 
-export default async function OnboardingRoute() {
+export default async function OnboardingRouteBackup() {
   const headersList = await headers();
   const tenantId = headersList.get("x-tenant-id");
 
