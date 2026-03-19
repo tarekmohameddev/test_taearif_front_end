@@ -18,5 +18,7 @@ export default async function OnboardingRoute() {
   }
 
   // إذا لم يكن هناك subdomain، افتح صفحة الـ onboarding العادية
-  return <OnboardingFlow disableCompletionRedirect />;
+  return (
+    <OnboardingFlow disableCompletionRedirect hideSkipOnSecondStep />
+  );
 }

@@ -6,6 +6,8 @@ import Image from "next/image";
 export type Step2BasicsPanelProps = {
   phone: string;
   setPhone: React.Dispatch<React.SetStateAction<string>>;
+  /** Set when submit fails validation for empty phone — shows error border on the field. */
+  phoneHasError?: boolean;
   email: string;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
   address: string;
@@ -15,6 +17,7 @@ export type Step2BasicsPanelProps = {
 export default function Step2BasicsPanel({
   phone,
   setPhone,
+  phoneHasError = false,
   email,
   setEmail,
   address,
@@ -46,7 +49,13 @@ export default function Step2BasicsPanel({
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="05xxxxxxxx"
-            className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-black placeholder:black outline-none focus:ring-2 focus:ring-white/60"
+            aria-invalid={phoneHasError}
+            className={[
+              "mt-2 w-full rounded-full bg-white px-4 py-3 text-[16px] text-black placeholder:black outline-none",
+              phoneHasError
+                ? "border-2 border-red-500 focus:ring-2 focus:ring-red-400/70"
+                : "border border-white/30 focus:ring-2 focus:ring-white/60",
+            ].join(" ")}
           />
         </div>
       </div>

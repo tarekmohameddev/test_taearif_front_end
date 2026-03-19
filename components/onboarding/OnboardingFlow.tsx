@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/context/AuthContext";
 import { ONBOARDING_STEPS, ONBOARDING_STEPS_COUNT } from "@/lib/onboarding/steps";
@@ -39,8 +39,11 @@ const ONBOARDING_HELP_SOCIAL_LINKS = {
 
 export function OnboardingFlow({
   disableCompletionRedirect = false,
+  hideSkipOnSecondStep = false,
 }: {
   disableCompletionRedirect?: boolean;
+  /** e.g. onboarding-test: require completing step 2 (contact) without skip. */
+  hideSkipOnSecondStep?: boolean;
 }) {
   const router = useRouter();
   const setOnboardingCompleted = useAuthStore((s) => s.setOnboardingCompleted);
@@ -70,6 +73,14 @@ export function OnboardingFlow({
 
   // Step 2 (بيانات التواصل) — merged into POST /onboarding
   const [step2Phone, setStep2Phone] = useState("");
+  const [step2PhoneHasError, setStep2PhoneHasError] = useState(false);
+  const setStep2PhoneClearingError = useCallback(
+    (value: React.SetStateAction<string>) => {
+      setStep2PhoneHasError(false);
+      setStep2Phone(value);
+    },
+    [],
+  );
   const [step2Email, setStep2Email] = useState("");
   const [step2Address, setStep2Address] = useState("");
   const [step2WorkingHours, setStep2WorkingHours] = useState("");
@@ -159,6 +170,7 @@ export function OnboardingFlow({
     }
 
     if (!step2Phone.trim()) {
+      setStep2PhoneHasError(true);
       toast.error("يرجى إدخال رقم الجوال");
       return false;
     }
@@ -198,6 +210,7 @@ export function OnboardingFlow({
       await axiosInstance.post("/onboarding", body);
 
       clearOnboardingStep1Cache();
+      setStep2PhoneHasError(false);
       toast.success("تم حفظ بيانات الموقع");
       return true;
     } catch (err: any) {
@@ -466,7 +479,8 @@ export function OnboardingFlow({
               }}
               step2Props={{
                 phone: step2Phone,
-                setPhone: setStep2Phone,
+                setPhone: setStep2PhoneClearingError,
+                phoneHasError: step2PhoneHasError,
                 email: step2Email,
                 setEmail: setStep2Email,
                 address: step2Address,
@@ -487,6 +501,7 @@ export function OnboardingFlow({
                 onNext={handleNext}
                 onFinish={finishOnboarding}
                 onSkip={handleSkip}
+                hideSkipOnSecondStep={hideSkipOnSecondStep}
                 nextDisabled={
                   ((currentStepIndex === 0 || currentStepIndex === 1) && savingStep1) ||
                   (currentStepIndex === 2 && step3ActiveTab === "new" && savingStep3)

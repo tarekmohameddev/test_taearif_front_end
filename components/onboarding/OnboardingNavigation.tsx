@@ -9,6 +9,8 @@ interface OnboardingNavigationProps {
   onNext: () => void;
   onFinish: () => void;
   onSkip: () => void;
+  /** When true, hides the skip control on the second step (stepIndex === 1). */
+  hideSkipOnSecondStep?: boolean;
   nextDisabled?: boolean;
   nextLoading?: boolean;
 }
@@ -20,11 +22,14 @@ export function OnboardingNavigation({
   onNext,
   onFinish,
   onSkip,
+  hideSkipOnSecondStep = false,
   nextDisabled = false,
   nextLoading = false,
 }: OnboardingNavigationProps) {
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === stepsLength - 1;
+  const showSkip =
+    !isFirst && !(hideSkipOnSecondStep && stepIndex === 1);
 
   return (
     <footer className="mt-auto flex w-full items-center justify-center gap-4">
@@ -55,7 +60,7 @@ export function OnboardingNavigation({
             : "حفظ ومتابعة"}
       </button>
 
-      {!isFirst && (
+      {showSkip && (
         <button
           type="button"
           onClick={onSkip}
