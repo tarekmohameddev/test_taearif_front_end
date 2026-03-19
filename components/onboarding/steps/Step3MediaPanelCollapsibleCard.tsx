@@ -60,7 +60,7 @@ export default function Step3MediaPanelCollapsibleCard() {
 
                 <div className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-4 py-3">
                   <div className="h-9 w-9 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <ImageIcon  className="h-5 w-5 text-black" />
+                    <ImageIcon className="h-5 w-5 text-black" />
                   </div>
 
                   <div className="mt-2 text-[13px]  text-black/50">
@@ -68,23 +68,35 @@ export default function Step3MediaPanelCollapsibleCard() {
                   </div>
 
                   <div className="mt-2 text-[10px] text-black/50 text-right leading-relaxed">
-                  يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10 ميجابايتز.
+                    يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو
+                    10 ميجابايتز.
                   </div>
                 </div>
-              </div>
+              </div>  
 
-              {/* Card 2 (placeholder) */}
-              <div className="rounded-2xl border border-black/15 bg-white/95 p-6 opacity-60">
+              {/* Card 2 */}
+              <div>
                 <div className="text-[18px] font-bold text-black text-right">
-                  صور الوحدة
+                  معرض صور الوحدة
                 </div>
                 <div className="text-[14px] text-black/70 mt-2 text-right">
-                  (سيتم إضافة واجهة رفع الصور هنا)
+                  قم بتحميل صور متعددة لعرض تفاصيل الوحدة
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 ">
+                  <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
+                    <ImageIcon className="h-4 w-4 text-black" />
+                  </div>
+
+                  <div className="mt-1 text-[11px]  text-black/50">
+                  إضافة
+                  </div>
+                </div>
+                <div className="mt-2 text-[10px] text-black/50 text-right leading-relaxed">
+                  يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10
+                  ميجابايتز.
                 </div>
               </div>
-
-
-
 
               {/* Card 3 (video) */}
               <div>
@@ -117,4 +129,3 @@ export default function Step3MediaPanelCollapsibleCard() {
     </>
   );
 }
-
