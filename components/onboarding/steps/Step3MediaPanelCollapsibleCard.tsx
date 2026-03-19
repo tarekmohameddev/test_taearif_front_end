@@ -67,7 +67,7 @@ export default function Step3MediaPanelCollapsibleCard() {
                     رفع صورة
                   </div>
 
-                  <div className="mt-2 text-[10px] text-black/50 text-right leading-relaxed">
+                  <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
                     يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو
                     10 ميجابايتز.
                   </div>
@@ -92,7 +92,7 @@ export default function Step3MediaPanelCollapsibleCard() {
                   إضافة
                   </div>
                 </div>
-                <div className="mt-2 text-[10px] text-black/50 text-right leading-relaxed">
+                <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
                   يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10
                   ميجابايتز.
                 </div>
@@ -116,7 +116,7 @@ export default function Step3MediaPanelCollapsibleCard() {
                     رفع فيديو
                   </div>
 
-                  <div className="mt-3 text-[10px] text-black/50 text-right leading-relaxed">
+                  <div className="mt-3 text-[10px] text-black/40 text-right leading-relaxed">
                     يمكنك رفع فيديو بصيغة MP4 أو MOV أو AVI. الحد الأقصى لحجم
                     الملف هو 50 ميجابايت والحد الأقصى للطول هو 5 دقائق.
                   </div>
@@ -141,7 +141,7 @@ export default function Step3MediaPanelCollapsibleCard() {
                   إضافة
                   </div>
                 </div>
-                <div className="mt-2 text-[10px] text-black/50 text-right leading-relaxed">
+                <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
                   يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10
                   ميجابايتز.
                 </div>
