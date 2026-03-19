@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ImageIcon, Video } from "lucide-react";
 
 export default function Step3MediaPanelCollapsibleCard() {
   const [mediaOpen, setMediaOpen] = useState(false);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [galleryPreview, setGalleryPreview] = useState<string | null>(null);
+  const [floorPlanPreview, setFloorPlanPreview] = useState<string | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -13,6 +16,14 @@ export default function Step3MediaPanelCollapsibleCard() {
   const openFilePicker = (ref: React.RefObject<HTMLInputElement | null>) => {
     ref.current?.click();
   };
+
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+      if (galleryPreview) URL.revokeObjectURL(galleryPreview);
+      if (floorPlanPreview) URL.revokeObjectURL(floorPlanPreview);
+    };
+  }, [thumbnailPreview, galleryPreview, floorPlanPreview]);
 
   return (
     <>
@@ -70,18 +81,28 @@ export default function Step3MediaPanelCollapsibleCard() {
                   className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-4 py-3 cursor-pointer"
                   onClick={() => openFilePicker(thumbnailInputRef)}
                 >
-                  <div className="h-9 w-9 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <ImageIcon className="h-5 w-5 text-black" />
-                  </div>
+                  {thumbnailPreview ? (
+                    <img
+                      src={thumbnailPreview}
+                      alt="معاينة صورة الوحدة الرئيسية"
+                      className="w-full h-36 object-cover rounded-xl"
+                    />
+                  ) : (
+                    <>
+                      <div className="h-9 w-9 rounded-full bg-[#d8f1ea] flex items-center justify-center">
+                        <ImageIcon className="h-5 w-5 text-black" />
+                      </div>
 
-                  <div className="mt-2 text-[13px]  text-black/50">
-                    رفع صورة
-                  </div>
+                      <div className="mt-2 text-[13px]  text-black/50">
+                        رفع صورة
+                      </div>
 
-                  <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
-                    يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو
-                    10 ميجابايتز.
-                  </div>
+                      <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
+                        يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو
+                        10 ميجابايتز.
+                      </div>
+                    </>
+                  )}
                 </div>
                 <input
                   ref={thumbnailInputRef}
@@ -89,6 +110,11 @@ export default function Step3MediaPanelCollapsibleCard() {
                   accept="image/*"
                   className="hidden"
                   onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+                      setThumbnailPreview(URL.createObjectURL(file));
+                    }
                     // Keep picker reusable even when selecting same file repeatedly.
                     e.currentTarget.value = "";
                   }}
@@ -108,13 +134,23 @@ export default function Step3MediaPanelCollapsibleCard() {
                   className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 cursor-pointer"
                   onClick={() => openFilePicker(galleryInputRef)}
                 >
-                  <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <ImageIcon className="h-4 w-4 text-black" />
-                  </div>
+                  {galleryPreview ? (
+                    <img
+                      src={galleryPreview}
+                      alt="معاينة معرض الصور"
+                      className="w-full h-14 object-cover rounded-xl"
+                    />
+                  ) : (
+                    <>
+                      <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
+                        <ImageIcon className="h-4 w-4 text-black" />
+                      </div>
 
-                  <div className="mt-1 text-[11px]  text-black/50">
-                  إضافة
-                  </div>
+                      <div className="mt-1 text-[11px]  text-black/50">
+                      إضافة
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
                   يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10
@@ -127,6 +163,11 @@ export default function Step3MediaPanelCollapsibleCard() {
                   multiple
                   className="hidden"
                   onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (galleryPreview) URL.revokeObjectURL(galleryPreview);
+                      setGalleryPreview(URL.createObjectURL(file));
+                    }
                     e.currentTarget.value = "";
                   }}
                 />
@@ -182,13 +223,23 @@ export default function Step3MediaPanelCollapsibleCard() {
                   className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 cursor-pointer"
                   onClick={() => openFilePicker(floorPlansInputRef)}
                 >
-                  <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
-                    <ImageIcon className="h-4 w-4 text-black" />
-                  </div>
+                  {floorPlanPreview ? (
+                    <img
+                      src={floorPlanPreview}
+                      alt="معاينة مخططات الوحدة"
+                      className="w-full h-14 object-cover rounded-xl"
+                    />
+                  ) : (
+                    <>
+                      <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
+                        <ImageIcon className="h-4 w-4 text-black" />
+                      </div>
 
-                  <div className="mt-1 text-[11px]  text-black/50">
-                  إضافة
-                  </div>
+                      <div className="mt-1 text-[11px]  text-black/50">
+                      إضافة
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="mt-2 text-[10px] text-black/40 text-right leading-relaxed">
                   يمكنك رفع صورة بصيغة JPG أو PNG. الحد الأقصى لحجم الملف هو 10
@@ -201,6 +252,11 @@ export default function Step3MediaPanelCollapsibleCard() {
                   multiple
                   className="hidden"
                   onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file && file.type.startsWith("image/")) {
+                      if (floorPlanPreview) URL.revokeObjectURL(floorPlanPreview);
+                      setFloorPlanPreview(URL.createObjectURL(file));
+                    }
                     e.currentTarget.value = "";
                   }}
                 />
