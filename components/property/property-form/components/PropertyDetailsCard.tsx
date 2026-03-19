@@ -192,7 +192,9 @@ export default function PropertyDetailsCard({
               </div>
 
               <div className="mt-4">
-                <Label className="text-foreground">الميزات المضافة</Label>
+                <Label className={isOnboarding ? "text-[#4F9E8E]" : "text-foreground"}>
+                  الميزات المضافة
+                </Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.features.map((feature: string, index: number) => (
                     <div
