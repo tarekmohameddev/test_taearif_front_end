@@ -48,17 +48,22 @@ export function OnboardingNavigation({
         disabled={nextDisabled || nextLoading}
         className="rounded-full bg-foreground px-20 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {nextLoading ? "جاري الحفظ..." : "حفظ ومتابعة"}
+        {nextLoading
+          ? "جاري الحفظ..."
+          : isFirst
+            ? "متابعة"
+            : "حفظ ومتابعة"}
       </button>
 
-
-      <button
-        type="button"
-        onClick={onSkip}
-        className="rounded-full border border-white bg-white px-8 py-2 text-sm text-[#4F9E8E] transition-colors hover:border-white hover:bg-white/90"
-      >
-        تخطي 
-      </button>
+      {!isFirst && (
+        <button
+          type="button"
+          onClick={onSkip}
+          className="rounded-full border border-white bg-white px-8 py-2 text-sm text-[#4F9E8E] transition-colors hover:border-white hover:bg-white/90"
+        >
+          تخطي
+        </button>
+      )}
 
     </footer>
   );
