@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Step3PropertyEditorPanel from "./Step3PropertyEditorPanel";
 
 export default function Step3NewPanel() {
   const [commonTimesOpen, setCommonTimesOpen] = useState(false);
@@ -243,6 +244,9 @@ export default function Step3NewPanel() {
           </div>
         )}
       </div>
+
+      {/* Property editor (features/properties/facilities/location) */}
+      <Step3PropertyEditorPanel />
     </div>
   );
 }
