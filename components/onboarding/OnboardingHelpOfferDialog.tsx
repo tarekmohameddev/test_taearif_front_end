@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Headphones, X } from "lucide-react";
+import { Headphones } from "lucide-react";
 
 type OnboardingHelpOfferDialogProps = {
   open: boolean;

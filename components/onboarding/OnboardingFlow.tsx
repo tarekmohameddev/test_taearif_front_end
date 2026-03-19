@@ -10,6 +10,7 @@ import { OnboardingStepPanel } from "./OnboardingStepPanel";
 import { OnboardingStepsHeader } from "./OnboardingStepsHeader";
 import OnboardingStep5 from "./steps/Step5";
 import { OnboardingHelpOfferDialog } from "./OnboardingHelpOfferDialog";
+import { OnboardingSocialLinksRow } from "./OnboardingSocialLinksRow";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
@@ -26,6 +27,15 @@ import {
   readOnboardingStep1Cache,
   writeOnboardingStep1Cache,
 } from "@/lib/onboarding/step1SessionCache";
+
+const ONBOARDING_HELP_SOCIAL_LINKS = {
+  instagram:
+    process.env.NEXT_PUBLIC_ONBOARDING_INSTAGRAM_URL?.trim() || undefined,
+  facebook:
+    process.env.NEXT_PUBLIC_ONBOARDING_FACEBOOK_URL?.trim() || undefined,
+  linkedin:
+    process.env.NEXT_PUBLIC_ONBOARDING_LINKEDIN_URL?.trim() || undefined,
+};
 
 export function OnboardingFlow({
   disableCompletionRedirect = false,
@@ -495,6 +505,13 @@ export function OnboardingFlow({
         onOpenChange={setHelpOfferDialogOpen}
         onContactWhatsApp={handleContactUs}
       />
+
+      <div
+        className="absolute bottom-5  z-20 left-6"
+        dir="ltr"
+      >
+        <OnboardingSocialLinksRow links={ONBOARDING_HELP_SOCIAL_LINKS} />
+      </div>
     </main>
   );
 }
