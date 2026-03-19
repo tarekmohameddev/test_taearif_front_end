@@ -1,15 +1,37 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import axiosInstance from "@/lib/axiosInstance";
 
 export default function OnboardingStep4() {
-  const phoneNumber = "966592960339";
-  const message =
-    "مرحباً، لدي شكوى وأود التواصل مع فريق تدريبنا عبر واتساب";
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message,
-  )}`;
+  const handleWhatsAppSetup = async () => {
+    try {
+      setIsConnecting(true);
+      setError(null);
+
+      const response = await axiosInstance.get("/whatsapp/meta/redirect", {
+        params: {
+          mode: "existing",
+        },
+      });
+
+      if (response.data.success && response.data.redirect_url) {
+        window.open(response.data.redirect_url, "_blank");
+      } else {
+        setError("فشل في الحصول على رابط التوجيه");
+      }
+    } catch (err: any) {
+      console.error("Error getting redirect URL:", err);
+      setError(
+        err.response?.data?.message || "حدث خطأ أثناء محاولة الربط",
+      );
+    } finally {
+      setIsConnecting(false);
+    }
+  };
 
   return (
     <div className="w-[90%] text-white mx-auto flex flex-col items-center justify-center gap-6 py-6">
@@ -38,14 +60,19 @@ export default function OnboardingStep4() {
         يضيف زر واتساب في موقعك عشان عملاؤك يرسلون لك مباشرة بضغطة زر واحدة — سهل جداً!
         </p>
 
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-7 rounded-full bg-[#4F9E8E] text-white px-12 py-3 text-[16px] font-semibold transition-colors hover:bg-[#3a8075]"
+        <button
+          type="button"
+          onClick={handleWhatsAppSetup}
+          disabled={isConnecting}
+          className="mt-7 rounded-full bg-[#4F9E8E] text-white px-12 py-3 text-[16px] font-semibold transition-colors hover:bg-[#3a8075] disabled:pointer-events-none disabled:opacity-60"
         >
-          إعداد واتساب الآن
-        </a>
+          {isConnecting ? "جاري التحميل…" : "إعداد واتساب الآن"}
+        </button>
+        {error ? (
+          <p className="mt-3 max-w-[560px] text-center text-sm text-red-600">
+            {error}
+          </p>
+        ) : null}
       </div>
     </div>
   );
