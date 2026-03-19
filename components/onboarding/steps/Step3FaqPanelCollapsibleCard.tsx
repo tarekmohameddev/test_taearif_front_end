@@ -100,7 +100,7 @@ export default function Step3FaqPanelCollapsibleCard() {
           type="button"
           onClick={() => setFaqOpen((v) => !v)}
           aria-expanded={faqOpen}
-          className="w-full rounded-full px-5 py-2 text-right text-[14px] text-black transition-colors"
+          className="w-full rounded-full px-5  text-right text-[14px] text-black transition-colors"
         >
           الأسئلة الشائعة الخاصة بالوحدة
         </button>

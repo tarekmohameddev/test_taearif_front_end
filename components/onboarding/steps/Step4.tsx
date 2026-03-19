@@ -14,7 +14,7 @@ export default function OnboardingStep4() {
   return (
     <div className="w-[90%] text-white mx-auto flex flex-col items-center justify-center gap-6 py-6">
       {/* Top badge */}
-      <div className="bg-[#F59E0B] text-white rounded-full px-6 py-2 text-[14px] font-medium">
+      <div className="bg-[#ffd285]/70 text-[#895129] rounded-full px-6 py-2 text-[14px] font-medium">
       خطوة اختيارية - نقدر تتجاوزها وتعود لاحقا
       </div>
 
