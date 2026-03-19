@@ -15,6 +15,8 @@ export type OnboardingPostBody = {
   favicon?: string;
   address?: string;
   email?: string;
+  /** رقم الجوال */
+  phone?: string;
   workingHours?: string;
   valLicense?: string;
   allow_update?: boolean;
@@ -27,6 +29,7 @@ export function buildOnboardingPostBody(input: {
   faviconUrl?: string | null;
   address?: string;
   email?: string;
+  phone?: string;
   workingHours?: string;
   valLicense?: string;
   /** When true, includes `allow_update: true` in the payload. */
@@ -43,6 +46,8 @@ export function buildOnboardingPostBody(input: {
   if (addr) body.address = addr;
   const em = input.email?.trim();
   if (em) body.email = em;
+  const ph = input.phone?.trim();
+  if (ph) body.phone = ph;
   const wh = input.workingHours?.trim();
   if (wh) body.workingHours = wh;
   const vl = input.valLicense?.trim();

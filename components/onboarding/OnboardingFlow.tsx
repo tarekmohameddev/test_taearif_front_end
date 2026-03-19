@@ -202,6 +202,7 @@ export function OnboardingFlow({
         faviconUrl,
         address: step2Address,
         email: step2Email,
+        phone: step2Phone,
         workingHours: step2WorkingHours,
         valLicense: step2ValLicense,
         allowUpdate: true,
