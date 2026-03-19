@@ -17,6 +17,7 @@ import { usePropertyFormStore } from "@/context/store/dashboard/properties/prope
 import { validateForm as validatePropertyForm } from "@/components/property/property-form/utils/validation";
 import { formatPropertyData } from "@/components/property/property-form/utils/formatters";
 import { createProperty } from "@/components/property/property-form/services/propertyApi";
+import { buildOnboardingPostBody } from "@/lib/onboarding/onboardingPayload";
 import {
   clearOnboardingStep1Cache,
   dataUrlToFile,
@@ -36,7 +37,8 @@ export function OnboardingFlow({
 
   const [stepIndex, setStepIndex] = useState(0);
   const currentStepIndex = clampStepIndex(stepIndex, ONBOARDING_STEPS_COUNT);
-  const [step3ActiveTab, setStep3ActiveTab] = useState<"sites" | "new">("sites");
+  // الافتراضي: إنشاء عقار جديد (واجهة التبديل بين المواقع/جديد معلّقة أدناه)
+  const [step3ActiveTab, setStep3ActiveTab] = useState<"sites" | "new">("new");
   const isCompletionStep = currentStepIndex === ONBOARDING_STEPS_COUNT - 1;
   const completionSteps = ONBOARDING_STEPS.filter((s) => s.id !== "step-5");
 
@@ -54,6 +56,15 @@ export function OnboardingFlow({
   const [savingStep1, setSavingStep1] = useState(false);
   const [savingStep3, setSavingStep3] = useState(false);
   const [helpOfferDialogOpen, setHelpOfferDialogOpen] = useState(false);
+
+  // Step 2 (بيانات التواصل) — merged into POST /onboarding
+  const [step2Phone, setStep2Phone] = useState("");
+  const [step2Email, setStep2Email] = useState("");
+  const [step2Address, setStep2Address] = useState("");
+  const [step2WorkingHours, setStep2WorkingHours] = useState("");
+  const [step2ValLicense, setStep2ValLicense] = useState("");
+  const [step2FaviconFile, setStep2FaviconFile] = useState<File | null>(null);
+  const [step2FaviconPreview, setStep2FaviconPreview] = useState<string | null>(null);
 
   // Step 3 (new property) state from property form store
   const step3FormData = usePropertyFormStore((s) => s.formData);
@@ -119,11 +130,16 @@ export function OnboardingFlow({
     }
   };
 
-  /** Step 2 (بيانات التواصل): POST /onboarding from session cache. */
+  /** Step 2 (بيانات التواصل): POST /onboarding — يتضمن دائماً `category: "realestate"`. */
   const postOnboardingFromCachedStep1 = async () => {
     const cached = readOnboardingStep1Cache();
     if (!cached?.siteName?.trim()) {
       toast.error("يرجى إكمال خطوة هوية الموقع أولاً");
+      return false;
+    }
+
+    if (!step2Phone.trim()) {
+      toast.error("يرجى إدخال رقم الجوال");
       return false;
     }
 
@@ -136,13 +152,29 @@ export function OnboardingFlow({
         logoUrl = uploaded?.url ?? null;
       }
 
-      const { primary, secondary, accent } = cached.colors;
+      let faviconUrl: string | null = null;
+      if (step2FaviconFile) {
+        const uploaded = await uploadSingleFile(step2FaviconFile, "logo");
+        faviconUrl = uploaded?.url ?? null;
+      }
 
-      await axiosInstance.post("/onboarding", {
+      const primary = normalizeHexForPreview(cached.colors.primary, "#5BC4C0");
+      const secondary = normalizeHexForPreview(cached.colors.secondary, "#4CAF82");
+      const accent = normalizeHexForPreview(cached.colors.accent, "#1A3C34");
+
+      const body = buildOnboardingPostBody({
         title: cached.siteName.trim(),
         colors: { primary, secondary, accent },
-        logo: logoUrl,
+        logoUrl,
+        faviconUrl,
+        address: step2Address,
+        email: step2Email,
+        workingHours: step2WorkingHours,
+        valLicense: step2ValLicense,
+        allowUpdate: true,
       });
+
+      await axiosInstance.post("/onboarding", body);
 
       clearOnboardingStep1Cache();
       toast.success("تم حفظ بيانات الموقع");
@@ -334,6 +366,7 @@ export function OnboardingFlow({
           />
         )}
 
+        {/* مبدل خطوة 3 (مخفي مؤقتاً): إضافة عقار من مواقع أخري | إنشاء عقار جديد
         {currentStepIndex === 2 && !isCompletionStep && (
           <div className="bg-white rounded-full p-1 max-w-[500px] justify-start mt-8">
             <div className="flex gap-2 rounded-full">
@@ -365,6 +398,7 @@ export function OnboardingFlow({
             </div>
           </div>
         )}
+        */}
 
         <section
           className={[
@@ -394,6 +428,21 @@ export function OnboardingFlow({
                 selectedPaletteName,
                 setSelectedPaletteName,
                 normalizeHexForPreview,
+              }}
+              step2Props={{
+                phone: step2Phone,
+                setPhone: setStep2Phone,
+                email: step2Email,
+                setEmail: setStep2Email,
+                address: step2Address,
+                setAddress: setStep2Address,
+                valLicense: step2ValLicense,
+                setValLicense: setStep2ValLicense,
+                faviconPreviewUrl: step2FaviconPreview,
+                setFaviconPreviewUrl: setStep2FaviconPreview,
+                setFaviconFile: setStep2FaviconFile,
+                workingHours: step2WorkingHours,
+                setWorkingHours: setStep2WorkingHours,
               }}
             >
               <OnboardingNavigation
