@@ -1,0 +1,24 @@
+2026-03-18 00:00:00
+Update Type: Feature
+Implemented multi-step registration flow (phone → OTP → profile) using react-hook-form, zod, and react-query. Created types, schemas, API service, mutation hooks, and step components. Flow: 1) Enter phone → send OTP, 2) Verify OTP → get verified_token, 3) Enter email/password → register → redirect to thank-you.
+app/register/page.tsx, app/register/types/register-types.ts, app/register/schemas/register-schemas.ts, app/register/services/auth-api.ts, app/register/hooks/useSendOtp.ts, app/register/hooks/useVerifyOtp.ts, app/register/hooks/useRegister.ts, app/register/hooks/useRegisterFlow.ts, app/register/hooks/index.ts, app/register/components/RegisterProvider.tsx, app/register/components/PhoneStep.tsx, app/register/components/OtpStep.tsx, app/register/components/ProfileStep.tsx, app/register/components/index.ts
+
+2026-03-19 00:00:00
+Update Type: Bug Fix + Refactor
+1) Created shared ErrorBanner component in stories/AuthPages/components. 2) Refactored step components (PhoneStep, OtpStep, ProfileStep) to use stories presentational components (SignUp, OTPVerification, CompleteProfile) instead of duplicating UI. 3) Fixed OTP unlimited API calls bug by tracking last submitted OTP with ref and preventing re-submission of same code.
+stories/AuthPages/components/ErrorBanner/ErrorBanner.tsx, stories/AuthPages/components/ErrorBanner/ErrorBanner.types.ts, stories/AuthPages/components/ErrorBanner/index.ts, stories/AuthPages/components/index.ts, stories/AuthPages/SignUp/SignUp.tsx, stories/AuthPages/OTPVerification/OTPVerification.tsx, stories/AuthPages/CompleteProfile/CompleteProfile.tsx, app/register/components/PhoneStep.tsx, app/register/components/OtpStep.tsx, app/register/components/ProfileStep.tsx
+
+2026-03-19 12:00:00
+Update Type: Enhancement
+Changed OTP length from 6 to 5 digits across register flow, shared OTPInput/OTPVerification, forgot-password reset step, zod schemas, i18n (auth.otp, auth.reset_password), Storybook stories, and apis.md verify-otp example.
+stories/AuthPages/components/OTPInput/OTPInput.tsx, stories/AuthPages/OTPVerification/OTPVerification.tsx, stories/AuthPages/OTPVerification/data.ts, stories/AuthPages/OTPVerification/OTPVerification.stories.tsx, stories/AuthPages/ResetPassword/ResetPassword.tsx, stories/AuthPages/ResetPassword/data.ts, app/register/schemas/register-schemas.ts, app/register/components/OtpStep.tsx, app/forgot-password/schemas/forgot-password-schemas.ts, lib/i18n/locales/en.json, lib/i18n/locales/ar.json, app/register/apis.md
+
+2026-03-19 14:00:00
+Update Type: Feature
+Added username (subdomain) field to register profile step and CompleteProfile story component; extended profileSchema validation (same rules as legacy subdomain); RegisterRequest and register API payload include username; i18n auth.complete_profile.username_placeholder in en/ar.
+app/register/components/ProfileStep.tsx, app/register/types/register-types.ts, app/register/schemas/register-schemas.ts, stories/AuthPages/CompleteProfile/CompleteProfile.tsx, stories/AuthPages/CompleteProfile/CompleteProfile.types.ts, stories/AuthPages/CompleteProfile/data.ts, lib/i18n/locales/en.json, lib/i18n/locales/ar.json
+
+2026-03-19 15:00:00
+Update Type: Enhancement
+Register API errors: parse Laravel-style validation payload (status error, message Validation failed, errors object with field arrays). getErrorMessage prioritizes errors map, ordered fields, Arabic mapping for common messages (email/username/phone taken, etc.).
+app/register/types/register-types.ts, app/register/services/auth-api.ts

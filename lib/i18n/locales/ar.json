@@ -3950,5 +3950,71 @@
     "projectDisplay": {
       "display_name": "عرض المشاريع"
     }
+  },
+  "auth": {
+    "layout": {
+      "brand_name": "تعاريف",
+      "title": "ابنِ حضورك الرقمي بثقة",
+      "subtitle": "أنشئ موقعك العقاري الاحترافي في دقائق، وإدارته بسهولة من مكان واحد.",
+      "feature_1": "موقع احترافي جاهز في دقائق",
+      "feature_2": "لوحة تحكم ذكية وسهلة الاستخدام",
+      "feature_3": "دعم كامل للغة العربية",
+      "feature_4": "تحليلات وتقارير مباشرة",
+      "feature_5": "التوافق الذكي بالطلبات والعروض",
+      "copyright": "كل الحقوق محفوظة © ٢٠٢٦"
+    },
+    "signup": {
+      "title": "إنشاء حساب",
+      "subtitle": "ابدأ بتأكيد رقم جوالك",
+      "phone_placeholder": "5xxxxxxxx",
+      "submit_button": "إرسال رمز التحقق",
+      "has_account": "لديك حساب؟",
+      "login_link": "سجل الدخول",
+      "phone_error": "رقم الجوال غير صالح يجب أن يبدأ بـ 5 ويتكون من 9 أرقام"
+    },
+    "otp": {
+      "title": "ادخل رمز التحقق",
+      "subtitle": "أرسلنا رمزاً مكوناً من 5 أرقام إلى",
+      "resend_available_in": "إعادة الإرسال متاحة بعد {{seconds}} ثانية",
+      "resend_now": "إعادة الإرسال",
+      "change_phone": "تغيير رقم الهاتف",
+      "test_code_label": "الرمز للاختبار:"
+    },
+    "complete_profile": {
+      "title": "أكمل بياناتك",
+      "subtitle": "خطوة أخيرة لإنشاء حسابك",
+      "username_placeholder": "اسم المستخدم (اسم الموقع الفرعي)",
+      "email_placeholder": "أدخل البريد الألكتروني....",
+      "password_placeholder": "أدخل كلمة المرور ( ٨ أحرف على الأقل)",
+      "submit_button": "إنشاء حساب"
+    },
+    "signin": {
+      "title": "تسجيل الدخول",
+      "subtitle": "مرحباً بعودتك",
+      "identifier_placeholder": "البريد الألكتروني إو رقم الجوال....",
+      "password_placeholder": "كلمة المرور",
+      "forgot_password": "نسيت كلمة السر؟",
+      "submit_button": "تسجيل دخول",
+      "no_account": "ليس لديك حساب؟",
+      "register_link": "سجل مجاناً"
+    },
+    "forgot_password": {
+      "title": "نسيت كلمة المرور؟",
+      "identifier_placeholder": "البريد الألكتروني إو رقم الجوال",
+      "submit_button": "إرسال رمز إعادة التعيين",
+      "remember_password": "تذكر كلمة المرور؟",
+      "login_link": "تسجيل الدخول"
+    },
+    "reset_password": {
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "أدخل رمز التحقق وكلمة المرور الجديدة",
+      "code_placeholder": "رمز التحقق (5 أرقام)",
+      "new_password_placeholder": "كلمة المرور الجديدة",
+      "confirm_password_placeholder": "تأكيد كلمة المرور",
+      "submit_button": "إعادة تعيين كلمة المرور",
+      "resend_code": "إعادة إرسال الرمز",
+      "resend_available_in": "إعادة الإرسال متاحة بعد {{seconds}} ثانية",
+      "back_link": "العودة"
+    }
   }
 }

@@ -1,7 +1,17 @@
-import { LoginPage } from "@/components/signin-up/login-page";
-export const metadata = {
-  title: "تسجيل الدخول",
-};
+"use client";
+
+import AuthLayout from "@/stories/AuthPages/AuthLayout/AuthLayout";
+import { LoginProvider, LoginForm } from "./components";
+import { useLocaleSync } from "./hooks";
+
 export default function Login() {
-  return <LoginPage />;
+  useLocaleSync();
+
+  return (
+    <LoginProvider>
+      <AuthLayout>
+        <LoginForm />
+      </AuthLayout>
+    </LoginProvider>
+  );
 }
