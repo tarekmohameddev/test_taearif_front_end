@@ -57,3 +57,8 @@ components/property/property-form/components/PropertyDetailsCard.tsx
 Update Type: Update
 Increase onboarding add-feature button border thickness
 components/property/property-form/components/PropertyDetailsCard.tsx
+
+2026-03-19 22:18:17
+Update Type: Update
+Reduce onboarding add-feature button and icon size
+components/property/property-form/components/PropertyDetailsCard.tsx

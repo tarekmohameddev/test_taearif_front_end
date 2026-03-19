@@ -68,7 +68,9 @@ export default function PropertyDetailsCard({
   variant = "card",
   onboardingRoundedVariant,
 }: PropertyDetailsCardProps) {
-  const roundedClass = onboardingRoundedVariant === "xl" ? "rounded-xl" : "";
+  const roundedClass = onboardingRoundedVariant === "xl" ? "rounded-full" : "";
+  const selectRoundedClass =
+    onboardingRoundedVariant === "xl" ? "rounded-xl" : "";
   const facilityRoundedClass =
     onboardingRoundedVariant === "xl" ? "rounded-xl" : "rounded-md";
   const isOnboarding = onboardingRoundedVariant === "xl";
@@ -174,7 +176,7 @@ export default function PropertyDetailsCard({
                     }}
                     className={
                       isOnboarding
-                        ? "bg-transparent border-2 text-[#4F9E8E] hover:bg-transparent"
+                        ? "bg-transparent border-2 text-[#4F9E8E] hover:bg-transparent rounded-2xl"
                         : ""
                     }
                     style={isOnboarding ? { borderColor: "#4F9E8E" } : undefined}
@@ -375,7 +377,7 @@ export default function PropertyDetailsCard({
                       <SelectTrigger
                         id="facade_id"
                         dir="rtl"
-                        className={roundedClass}
+                        className={selectRoundedClass}
                       >
                         <SelectValue placeholder="اختر الواجهة" />
                       </SelectTrigger>
@@ -533,7 +535,7 @@ export default function PropertyDetailsCard({
                       <SelectTrigger
                         id="building_age"
                         dir="rtl"
-                        className={roundedClass}
+                        className={selectRoundedClass}
                       >
                         <SelectValue placeholder="اختر سنة البناء" />
                       </SelectTrigger>
