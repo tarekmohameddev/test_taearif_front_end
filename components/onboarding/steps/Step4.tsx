@@ -15,7 +15,7 @@ export default function OnboardingStep4() {
     <div className="w-[90%] text-white mx-auto flex flex-col items-center justify-center gap-6 py-6">
       {/* Top badge */}
       <div className="bg-[#ffd285]/70 text-[#895129] rounded-full px-6 py-2 text-[14px] font-medium">
-      خطوة اختيارية - نقدر تتجاوزها وتعود لاحقا
+      خطوة اختيارية - يمكنك تجاوزها وتعود لاحقا
       </div>
 
       {/* Main card */}
@@ -35,8 +35,7 @@ export default function OnboardingStep4() {
         <div className="mt-6 text-[24px] font-bold text-black">واتساب</div>
 
         <p className="mt-3 text-center text-black/40 text-[16px] max-w-[560px]">
-          يرجى مراسلتنا في حال كانت لديك شكوى مباشرة أو وضح لنا
-          المشكلة التي تواجهها!
+        يضيف زر واتساب في موقعك عشان عملاؤك يرسلون لك مباشرة بضغطة زر واحدة — سهل جداً!
         </p>
 
         <a
@@ -45,7 +44,7 @@ export default function OnboardingStep4() {
           rel="noreferrer"
           className="mt-7 rounded-full bg-[#4F9E8E] text-white px-12 py-3 text-[16px] font-semibold transition-colors hover:bg-[#3a8075]"
         >
-          تواصل واتساب الآن
+          إعداد واتساب الآن
         </a>
       </div>
     </div>

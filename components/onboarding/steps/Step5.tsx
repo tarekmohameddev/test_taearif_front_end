@@ -35,7 +35,7 @@ export default function OnboardingStep5({
         </p>
       </div>
 
-      <div className="w-full max-w-[860px] grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+      <div className="w-full max-w-[860px] grid grid-cols-1 md:grid-cols-2 gap-10 items-start" >
         
         <div className="flex flex-col items-start gap-4">
           <div className="text-[22px] font-semibold">
@@ -43,21 +43,21 @@ export default function OnboardingStep5({
           </div>
           <ul className="space-y-4 text-[24px]">
             {steps.map((s) => (
-              <li key={s.title} className="flex items-center gap-3 justify-end">
-                <span>{s.title}</span>
+              <li key={s.title} className="flex items-center gap-3 justify-start">
                 <span className="h-2 w-2 rounded-full bg-white/80" aria-hidden="true" />
+                <span>{s.title}</span>
               </li>
             ))}
           </ul>
         </div>
-        <div className="flex flex-col items-end gap-4">
+
+        <div className="flex flex-col items-end gap-4 mt-[50px]">
           {steps.map((s) => (
             <div key={s.title} className="text-[24px] leading-tight">
               تم
             </div>
           ))}
         </div>
-
       </div>
 
       <button
