@@ -71,13 +71,29 @@ export const updateProperty = async (
   return response;
 };
 
+/** In-flight dedupe per id+draft (Strict Mode / double effects). See PREVENT_DUPLICATE_API_PROMPT.md */
+const propertyGetInFlight = new Map<string, Promise<any>>();
+
 export const getProperty = async (
   id: string | number,
   isDraft: boolean = false,
 ): Promise<any> => {
-  const endpoint = isDraft ? `/properties/drafts/${id}` : `/properties/${id}`;
-  const response = await axiosInstance.get(endpoint);
-  return isDraft ? response.data.data : response.data.data.property;
+  const key = `${isDraft ? "d" : "p"}:${id}`;
+  const existing = propertyGetInFlight.get(key);
+  if (existing) return existing;
+
+  const p = (async () => {
+    try {
+      const endpoint = isDraft ? `/properties/drafts/${id}` : `/properties/${id}`;
+      const response = await axiosInstance.get(endpoint);
+      return isDraft ? response.data.data : response.data.data.property;
+    } finally {
+      propertyGetInFlight.delete(key);
+    }
+  })();
+
+  propertyGetInFlight.set(key, p);
+  return p;
 };
 
 export const completeDraft = async (

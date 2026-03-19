@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/context/AuthContext";
 import { ONBOARDING_STEPS, ONBOARDING_STEPS_COUNT } from "@/lib/onboarding/steps";
@@ -75,6 +75,11 @@ export function OnboardingFlow({
   const step3Faqs = usePropertyFormStore((s) => s.faqs);
   const setStep3Errors = usePropertyFormStore((s) => s.setErrors);
 
+  /** Synchronous in-flight guards — blocks double-submit before React re-renders (PREVENT_DUPLICATE_API_PROMPT). */
+  const persistStep1InFlightRef = useRef(false);
+  const postOnboardingInFlightRef = useRef(false);
+  const saveStep3InFlightRef = useRef(false);
+
   const normalizeHexForPreview = (hex: string, fallback: string) => {
     const raw = hex.trim().toUpperCase();
     const withHash = raw.startsWith("#") ? raw : `#${raw}`;
@@ -83,11 +88,13 @@ export function OnboardingFlow({
 
   /** Step 1 (هوية الموقع): cache only — no API. */
   const persistStep1ToSession = async () => {
+    if (persistStep1InFlightRef.current) return false;
     if (!siteName.trim()) {
       toast.error("يرجى إدخال اسم الموقع");
       return false;
     }
 
+    persistStep1InFlightRef.current = true;
     setSavingStep1(true);
     try {
       let logoDataUrl: string | null = null;
@@ -126,12 +133,14 @@ export function OnboardingFlow({
       toast.error(err?.message || "تعذر حفظ بيانات الموقع مؤقتاً");
       return false;
     } finally {
+      persistStep1InFlightRef.current = false;
       setSavingStep1(false);
     }
   };
 
   /** Step 2 (بيانات التواصل): POST /onboarding — يتضمن دائماً `category: "realestate"`. */
   const postOnboardingFromCachedStep1 = async () => {
+    if (postOnboardingInFlightRef.current) return false;
     const cached = readOnboardingStep1Cache();
     if (!cached?.siteName?.trim()) {
       toast.error("يرجى إكمال خطوة هوية الموقع أولاً");
@@ -143,6 +152,7 @@ export function OnboardingFlow({
       return false;
     }
 
+    postOnboardingInFlightRef.current = true;
     setSavingStep1(true);
     try {
       let logoUrl: string | null = null;
@@ -187,11 +197,14 @@ export function OnboardingFlow({
       toast.error(message);
       return false;
     } finally {
+      postOnboardingInFlightRef.current = false;
       setSavingStep1(false);
     }
   };
 
   const saveStep3NewPropertyToBackend = async () => {
+    if (saveStep3InFlightRef.current) return false;
+    saveStep3InFlightRef.current = true;
     setSavingStep3(true);
     try {
       const newErrors = validatePropertyForm(
@@ -230,6 +243,7 @@ export function OnboardingFlow({
       toast.error(message);
       return false;
     } finally {
+      saveStep3InFlightRef.current = false;
       setSavingStep3(false);
     }
   };
