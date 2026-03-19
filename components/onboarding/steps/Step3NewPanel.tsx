@@ -8,6 +8,28 @@ export default function Step3NewPanel() {
 
   return (
     <div className="w-full md:w-1/2">
+      <style jsx global>{`
+        .step3-scroll-thin {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(79, 158, 142, 0.7) transparent;
+        }
+        .step3-scroll-thin::-webkit-scrollbar {
+          width: 2px;
+          height: 2px;
+        }
+        .step3-scroll-thin::-webkit-scrollbar-thumb {
+          background-color: rgba(79, 158, 142, 0.75);
+          border-radius: 9999px;
+        }
+        .step3-scroll-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .step3-scroll-thin::-webkit-scrollbar-button {
+          display: none;
+          width: 0;
+          height: 0;
+        }
+      `}</style>
       {/* One collapsible card */}
       <div
         className={[
@@ -25,7 +47,7 @@ export default function Step3NewPanel() {
         </button>
 
         {commonTimesOpen && (
-          <div className="mt-3 p-5 space-y-5">
+          <div className="mt-3 p-5 space-y-5 max-h-[40vh] overflow-y-auto step3-scroll-thin">
           <div className="">
           <div className="text-[14px] text-black font-semibold text-right">
               اسم الوحدة <span className="text-red-500">*</span>
