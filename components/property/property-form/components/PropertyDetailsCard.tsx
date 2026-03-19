@@ -598,7 +598,7 @@ export default function PropertyDetailsCard({
                       <Badge
                         key={facility.key}
                         variant={isSelected ? "default" : "outline"}
-                        className="cursor-pointer text-sm py-2 px-4 hover:bg-primary/80 transition-colors"
+                        className="cursor-pointer text-sm  py-2 px-4 hover:bg-primary/80 transition-colors"
                         onClick={() => {
                           if (!isSelected) {
                             // تفعيل المرفق بقيمة 0
