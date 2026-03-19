@@ -7,6 +7,7 @@ type Step1BasicsPanelProps = {
   setSiteName: React.Dispatch<React.SetStateAction<string>>;
   logoPreviewUrl: string | null;
   setLogoPreviewUrl: React.Dispatch<React.SetStateAction<string | null>>;
+  setLogoFile: React.Dispatch<React.SetStateAction<File | null>>;
 };
 
 export default function Step1BasicsPanel({
@@ -14,6 +15,7 @@ export default function Step1BasicsPanel({
   setSiteName,
   logoPreviewUrl,
   setLogoPreviewUrl,
+  setLogoFile,
 }: Step1BasicsPanelProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -32,6 +34,7 @@ export default function Step1BasicsPanel({
 
     const url = URL.createObjectURL(file);
     setLogoPreviewUrl(url);
+    setLogoFile(file);
   };
 
   return (
@@ -46,7 +49,7 @@ export default function Step1BasicsPanel({
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
             placeholder="مثال: مكتب الرفاعي"
-          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
+            className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
           />
         </div>
 
@@ -77,6 +80,8 @@ export default function Step1BasicsPanel({
             onChange={onLogoChange}
           />
 
+{!logoPreviewUrl && (
+
           <div className="flex flex-col items-center gap-2 text-center">
             <div
               className="flex items-center justify-center rounded-full bg-white/10"
@@ -102,9 +107,10 @@ export default function Step1BasicsPanel({
               <div>PNG، JPG (موصى به: 200×200 بكسل)</div>
             </div>
           </div>
+        )}
 
           {logoPreviewUrl && (
-            <div className="mt-4 flex items-center justify-center">
+            <div className=" flex items-center justify-center">
               <img
                 src={logoPreviewUrl}
                 alt="شعار الموقع"

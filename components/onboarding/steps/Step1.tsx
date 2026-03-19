@@ -1,25 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Step1ColorsPanel from "./Step1ColorsPanel";
 import Step1BasicsPanel from "./Step1BasicsPanel";
 
-export default function OnboardingStep1() {
-  const [siteName, setSiteName] = useState("");
-  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
-  const [manualColorsVisible, setManualColorsVisible] = useState(false);
-  const [manualHexes, setManualHexes] = useState<string[]>([
-    "#5BC4C0",
-    "#4CAF82",
-    "#1A3C34",
-  ]);
+type OnboardingStep1Props = {
+  siteName: string;
+  setSiteName: React.Dispatch<React.SetStateAction<string>>;
+  logoPreviewUrl: string | null;
+  setLogoPreviewUrl: React.Dispatch<React.SetStateAction<string | null>>;
+  setLogoFile: React.Dispatch<React.SetStateAction<File | null>>;
+  manualColorsVisible: boolean;
+  setManualColorsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  manualHexes: string[];
+  setManualHexes: React.Dispatch<React.SetStateAction<string[]>>;
+  normalizeHexForPreview: (hex: string, fallback: string) => string;
+};
 
-  const normalizeHexForPreview = (hex: string, fallback: string) => {
-    const raw = hex.trim().toUpperCase();
-    const withHash = raw.startsWith("#") ? raw : `#${raw}`;
-    return /^#[0-9A-F]{6}$/.test(withHash) ? withHash : fallback;
-  };
-
+export default function OnboardingStep1({
+  siteName,
+  setSiteName,
+  logoPreviewUrl,
+  setLogoPreviewUrl,
+  setLogoFile,
+  manualColorsVisible,
+  setManualColorsVisible,
+  manualHexes,
+  setManualHexes,
+  normalizeHexForPreview,
+}: OnboardingStep1Props) {
   return (
     <div className="w-[90%] text-white mx-auto">
       <div className="flex flex-col md:flex-row  gap-8">
@@ -29,6 +38,7 @@ export default function OnboardingStep1() {
           setSiteName={setSiteName}
           logoPreviewUrl={logoPreviewUrl}
           setLogoPreviewUrl={setLogoPreviewUrl}
+          setLogoFile={setLogoFile}
         />
 
         <div className="hidden md:block  min-h-[50%] max-h-[50%] w-[1px] bg-white/50 shrink-0 px-[0.6px]" />

@@ -10,17 +10,19 @@ interface OnboardingStepPanelProps {
   stepIndex: number;
   children?: ReactNode;
   step3ActiveTab?: "sites" | "new";
+  step1Props: React.ComponentProps<typeof OnboardingStep1>;
 }
 
 export function OnboardingStepPanel({
   stepIndex,
   children,
   step3ActiveTab = "sites",
+  step1Props,
 }: OnboardingStepPanelProps) {
   return (
     <div className="flex flex-col flex-1 gap-10 ">
       <div className="flex-1">
-        {stepIndex === 0 && <OnboardingStep1 />}
+        {stepIndex === 0 && <OnboardingStep1 {...step1Props} />}
         {stepIndex === 1 && <OnboardingStep2 />}
         {stepIndex === 2 && <OnboardingStep3 activeTab={step3ActiveTab} />}
         {stepIndex === 3 && <OnboardingStep4 />}

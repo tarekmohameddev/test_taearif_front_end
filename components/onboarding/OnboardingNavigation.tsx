@@ -9,6 +9,8 @@ interface OnboardingNavigationProps {
   onNext: () => void;
   onFinish: () => void;
   onSkip: () => void;
+  nextDisabled?: boolean;
+  nextLoading?: boolean;
 }
 
 export function OnboardingNavigation({
@@ -18,6 +20,8 @@ export function OnboardingNavigation({
   onNext,
   onFinish,
   onSkip,
+  nextDisabled = false,
+  nextLoading = false,
 }: OnboardingNavigationProps) {
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === stepsLength - 1;
@@ -41,9 +45,10 @@ export function OnboardingNavigation({
       <button
         type="button"
         onClick={isLast ? onFinish : onNext}
+        disabled={nextDisabled || nextLoading}
         className="rounded-full bg-foreground px-20 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {isLast ? "حفظ ومتابعة" : "حفظ ومتابعة"}
+        {nextLoading ? "جاري الحفظ..." : "حفظ ومتابعة"}
       </button>
 
 

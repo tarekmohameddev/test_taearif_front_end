@@ -9,6 +9,9 @@ import { OnboardingNavigation } from "./OnboardingNavigation";
 import { OnboardingStepPanel } from "./OnboardingStepPanel";
 import { OnboardingStepsHeader } from "./OnboardingStepsHeader";
 import OnboardingStep5 from "./steps/Step5";
+import toast from "react-hot-toast";
+import axiosInstance from "@/lib/axiosInstance";
+import { uploadSingleFile } from "@/utils/uploadSingle";
 
 export function OnboardingFlow({
   disableCompletionRedirect = false,
@@ -24,6 +27,62 @@ export function OnboardingFlow({
   const [step3ActiveTab, setStep3ActiveTab] = useState<"sites" | "new">("sites");
   const isCompletionStep = currentStepIndex === ONBOARDING_STEPS_COUNT - 1;
   const completionSteps = ONBOARDING_STEPS.filter((s) => s.id !== "step-5");
+
+  // Step 1 state (name + logo + colors)
+  const [siteName, setSiteName] = useState("");
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [manualColorsVisible, setManualColorsVisible] = useState(false);
+  const [manualHexes, setManualHexes] = useState<string[]>([
+    "#5BC4C0",
+    "#4CAF82",
+    "#1A3C34",
+  ]);
+  const [savingStep1, setSavingStep1] = useState(false);
+
+  const normalizeHexForPreview = (hex: string, fallback: string) => {
+    const raw = hex.trim().toUpperCase();
+    const withHash = raw.startsWith("#") ? raw : `#${raw}`;
+    return /^#[0-9A-F]{6}$/.test(withHash) ? withHash : fallback;
+  };
+
+  const saveStep1ToBackend = async () => {
+    if (!siteName.trim()) {
+      toast.error("يرجى إدخال اسم الموقع");
+      return false;
+    }
+
+    setSavingStep1(true);
+    try {
+      let logoUrl: string | null = null;
+      if (logoFile) {
+        const uploaded = await uploadSingleFile(logoFile, "logo");
+        logoUrl = uploaded?.url ?? null;
+      }
+
+      const primary = normalizeHexForPreview(manualHexes[0] ?? "", "#5BC4C0");
+      const secondary = normalizeHexForPreview(manualHexes[1] ?? "", "#4CAF82");
+      const accent = normalizeHexForPreview(manualHexes[2] ?? "", "#1A3C34");
+
+      await axiosInstance.post("/onboarding", {
+        title: siteName.trim(),
+        colors: { primary, secondary, accent },
+        logo: logoUrl,
+      });
+
+      toast.success("تم حفظ بيانات الموقع");
+      return true;
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "حدث خطأ أثناء حفظ بيانات الموقع";
+      toast.error(message);
+      return false;
+    } finally {
+      setSavingStep1(false);
+    }
+  };
 
   const handleContactUs = () => {
     const phoneNumber = "966592960339";
@@ -45,7 +104,7 @@ export function OnboardingFlow({
   };
 
   const handleSkip = () => {
-    finishOnboarding();
+    setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
   };
 
   const handleBack = () => {
@@ -53,6 +112,16 @@ export function OnboardingFlow({
   };
 
   const handleNext = () => {
+    // Step 1: upload logo (optional) then save onboarding settings.
+    if (currentStepIndex === 0) {
+      void (async () => {
+        const ok = await saveStep1ToBackend();
+        if (!ok) return;
+        setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
+      })();
+      return;
+    }
+
     setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
   };
 
@@ -156,6 +225,18 @@ export function OnboardingFlow({
             <OnboardingStepPanel
               stepIndex={currentStepIndex}
               step3ActiveTab={step3ActiveTab}
+              step1Props={{
+                siteName,
+                setSiteName,
+                logoPreviewUrl,
+                setLogoPreviewUrl,
+                setLogoFile,
+                manualColorsVisible,
+                setManualColorsVisible,
+                manualHexes,
+                setManualHexes,
+                normalizeHexForPreview,
+              }}
             >
               <OnboardingNavigation
                 stepIndex={currentStepIndex}
@@ -164,6 +245,8 @@ export function OnboardingFlow({
                 onNext={handleNext}
                 onFinish={finishOnboarding}
                 onSkip={handleSkip}
+                nextDisabled={currentStepIndex === 0 && savingStep1}
+                nextLoading={currentStepIndex === 0 && savingStep1}
               />
             </OnboardingStepPanel>
           )}
