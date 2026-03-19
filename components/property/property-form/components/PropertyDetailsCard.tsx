@@ -71,6 +71,7 @@ export default function PropertyDetailsCard({
   const roundedClass = onboardingRoundedVariant === "xl" ? "rounded-xl" : "";
   const facilityRoundedClass =
     onboardingRoundedVariant === "xl" ? "rounded-xl" : "rounded-md";
+  const isOnboarding = onboardingRoundedVariant === "xl";
 
   return (
     <Card
@@ -171,8 +172,16 @@ export default function PropertyDetailsCard({
                         setCurrentFeature("");
                       }
                     }}
+                    className={
+                      isOnboarding
+                        ? "bg-transparent border-2 text-[#4F9E8E] hover:bg-transparent"
+                        : ""
+                    }
+                    style={isOnboarding ? { borderColor: "#4F9E8E" } : undefined}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus
+                      className={`h-4 w-4 ${isOnboarding ? "text-[#4F9E8E]" : ""}`}
+                    />
                   </Button>
                 </div>
                 {errors.features && (

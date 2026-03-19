@@ -47,3 +47,13 @@ components/property/location-card.tsx
 Update Type: Update
 Force solid black labels and input text in onboarding location fields
 components/property/location-card.tsx
+
+2026-03-19 22:13:50
+Update Type: Update
+Style onboarding add-feature button transparent with #4F9E8E border/icon
+components/property/property-form/components/PropertyDetailsCard.tsx
+
+2026-03-19 22:14:20
+Update Type: Update
+Increase onboarding add-feature button border thickness
+components/property/property-form/components/PropertyDetailsCard.tsx
