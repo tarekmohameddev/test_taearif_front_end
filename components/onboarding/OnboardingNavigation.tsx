@@ -32,7 +32,7 @@ export function OnboardingNavigation({
     !isFirst && !(hideSkipOnSecondStep && stepIndex === 1);
 
   return (
-    <footer className="mt-auto flex w-full items-center justify-center gap-4">
+    <footer className="mt-auto flex w-full items-center justify-center flex-col sm:flex-row sm:gap-4 gap-2">
       {!isFirst && (
         <button
           type="button"
@@ -51,7 +51,7 @@ export function OnboardingNavigation({
         type="button"
         onClick={isLast ? onFinish : onNext}
         disabled={nextDisabled || nextLoading}
-        className="rounded-full bg-foreground px-20 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="rounded-full bg-foreground md:px-20 px-10 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {nextLoading
           ? "جاري الحفظ..."

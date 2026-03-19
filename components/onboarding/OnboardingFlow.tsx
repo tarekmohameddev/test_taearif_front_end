@@ -452,7 +452,7 @@ export function OnboardingFlow({
         <section
           className={[
             "mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full",
-            currentStepIndex === 2 ? "px-6" : "",
+            currentStepIndex === 2 ? "px-0 md:px-6" : "",
           ].join(" ")}
         >
           {isCompletionStep ? (
