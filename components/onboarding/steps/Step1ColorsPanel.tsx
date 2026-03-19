@@ -38,7 +38,7 @@ export default function Step1ColorsPanel({
 
       {/* Palette cards row (matches the provided design) */}
       <div
-        className="mt-5 flex flex-nowrap items-stretch gap-3 overflow-x-auto"
+        className="mt-5 grid grid-cols-3 items-stretch gap-3 min-[1300px]:grid-cols-5"
         dir="rtl"
       >
         {[
@@ -65,13 +65,13 @@ export default function Step1ColorsPanel({
         ].map((card) => (
           <div
             key={card.label}
-            className="w-fit rounded-xl border border-white/60 bg-white/95 px-1 py-1"
+            className="w-full rounded-xl border border-white/60 bg-white/95 px-1 py-1"
           >
-            <div className="flex items-center justify-center gap-1 dir-ltr">
-              {card.colors.map((c) => (
+            <div className="flex items-center justify-center gap-[2px] dir-ltr">
+              {card.colors.map((c, idx) => (
                 <span
                   key={c}
-                  className="h-6 w-4 rounded-[5px] bg-opacity-100"
+                  className={`h-6 w-4 bg-opacity-100 ${idx === 1 && ""} ${idx === 0 && "rounded-r-[5px]"} ${idx === 2 && "rounded-l-[5px]"}`}
                   style={{ backgroundColor: c }}
                   aria-hidden="true"
                 />

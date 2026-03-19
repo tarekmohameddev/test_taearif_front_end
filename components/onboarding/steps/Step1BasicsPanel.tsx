@@ -46,7 +46,7 @@ export default function Step1BasicsPanel({
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
             placeholder="مثال: مكتب الرفاعي"
-            className="mt-2 w-full rounded-lg bg-white/10 border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
+          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
           />
         </div>
 
@@ -67,7 +67,7 @@ export default function Step1BasicsPanel({
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") openPicker();
           }}
-          className="mt-1 cursor-pointer select-none bg-white rounded-lg p-5 text-gray-400"
+          className="mt-1 cursor-pointer select-none bg-white rounded-3xl p-5 text-gray-400"
         >
           <input
             ref={fileInputRef}
