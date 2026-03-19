@@ -8,6 +8,7 @@ import { clampStepIndex } from "@/utils/onboarding/stepNavigation";
 import { OnboardingNavigation } from "./OnboardingNavigation";
 import { OnboardingStepPanel } from "./OnboardingStepPanel";
 import { OnboardingStepsHeader } from "./OnboardingStepsHeader";
+import OnboardingStep5 from "./steps/Step5";
 
 export function OnboardingFlow({
   disableCompletionRedirect = false,
@@ -21,6 +22,8 @@ export function OnboardingFlow({
   const [stepIndex, setStepIndex] = useState(0);
   const currentStepIndex = clampStepIndex(stepIndex, ONBOARDING_STEPS_COUNT);
   const [step3ActiveTab, setStep3ActiveTab] = useState<"sites" | "new">("sites");
+  const isCompletionStep = currentStepIndex === ONBOARDING_STEPS_COUNT - 1;
+  const completionSteps = ONBOARDING_STEPS.filter((s) => s.id !== "step-5");
 
   const handleContactUs = () => {
     const phoneNumber = "966592960339";
@@ -93,21 +96,25 @@ export function OnboardingFlow({
       </div>
 
       <div className="relative z-10 w-full max-w-[75%]">
-        <div className="text-center mb-6">
-          <h1 className="text-[48px] font-bold text-white">
-          موقعك الاحترافي جاهز خلال دقائق
-          </h1>
-          <p className="text-[24px] text-white mt-2">
-          سنوجّهك لإعداد موقعك خطوة بخطوة بطريقة سهلة وسريعة
-          </p>
-        </div>
+        {!isCompletionStep && (
+          <div className="text-center mb-6">
+            <h1 className="text-[48px] font-bold text-white">
+              موقعك الاحترافي جاهز خلال دقائق
+            </h1>
+            <p className="text-[24px] text-white mt-2">
+              سنوجّهك لإعداد موقعك خطوة بخطوة بطريقة سهلة وسريعة
+            </p>
+          </div>
+        )}
 
-        <OnboardingStepsHeader
-          steps={ONBOARDING_STEPS}
-          currentStepIndex={currentStepIndex}
-        />
+        {!isCompletionStep && (
+          <OnboardingStepsHeader
+            steps={ONBOARDING_STEPS}
+            currentStepIndex={currentStepIndex}
+          />
+        )}
 
-        {currentStepIndex === 2 && (
+        {currentStepIndex === 2 && !isCompletionStep && (
           <div className="bg-white rounded-full p-1 max-w-[500px] justify-start mt-8">
             <div className="flex gap-2 rounded-full">
               <button
@@ -139,24 +146,27 @@ export function OnboardingFlow({
           </div>
         )}
 
-
-
-
         <section className="mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 p-6 w-full ">
-          <OnboardingStepPanel
-            stepIndex={currentStepIndex}
-            step3ActiveTab={step3ActiveTab}
-          >
-            <OnboardingNavigation
-              stepIndex={currentStepIndex}
-              stepsLength={ONBOARDING_STEPS_COUNT}
-              onBack={handleBack}
-              onNext={handleNext}
-              onFinish={finishOnboarding}
-              onSkip={handleSkip}
+          {isCompletionStep ? (
+            <OnboardingStep5
+              onExploreDashboard={finishOnboarding}
+              steps={completionSteps}
             />
-            
-          </OnboardingStepPanel>
+          ) : (
+            <OnboardingStepPanel
+              stepIndex={currentStepIndex}
+              step3ActiveTab={step3ActiveTab}
+            >
+              <OnboardingNavigation
+                stepIndex={currentStepIndex}
+                stepsLength={ONBOARDING_STEPS_COUNT}
+                onBack={handleBack}
+                onNext={handleNext}
+                onFinish={finishOnboarding}
+                onSkip={handleSkip}
+              />
+            </OnboardingStepPanel>
+          )}
         </section>
       </div>
     </main>
