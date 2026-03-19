@@ -41,7 +41,7 @@ export function OnboardingNavigation({
       <button
         type="button"
         onClick={isLast ? onFinish : onNext}
-        className="rounded-full bg-foreground px-8 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="rounded-full bg-foreground px-20 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {isLast ? "حفظ ومتابعة" : "حفظ ومتابعة"}
       </button>

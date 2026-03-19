@@ -157,7 +157,7 @@ export default function Step3PropertyEditorPanel() {
         </button>
 
         {editorOpen && (
-          <div className="mt-3 p-5 space-y-5 max-h-[55vh] overflow-y-auto step3-scroll-thin">
+          <div className="mt-3 p-5 space-y-5 max-h-[30vh] overflow-y-auto step3-scroll-thin">
             <PropertyDetailsCard
               formData={formData}
               errors={errors}
@@ -177,6 +177,7 @@ export default function Step3PropertyEditorPanel() {
               setSelectedFacilities={setSelectedFacilities}
               isFieldMissing={isFieldMissing}
               cardHasMissingFields={cardHasMissingFields}
+              variant="plain"
             />
 
             <div className="space-y-2">

@@ -48,7 +48,7 @@ export default function Step3NewPanel() {
         </button>
 
         {commonTimesOpen && (
-          <div className="mt-3 p-5 space-y-5 max-h-[40vh] overflow-y-auto step3-scroll-thin">
+          <div className="mt-3 p-5 space-y-5 max-h-[30vh] overflow-y-auto step3-scroll-thin">
           <div className="">
           <div className="text-[14px] text-black font-semibold text-right">
               اسم الوحدة <span className="text-red-500">*</span>
