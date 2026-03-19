@@ -10,7 +10,8 @@ type OnboardingHelpOfferDialogProps = {
 };
 
 /**
- * لوحة مساعدة ملاصقة لزر الدائرة (على يمين الزر)، بدون overlay منبثق.
+ * لوحة مساعدة بجانب زر الدائرة (على يمين الزر)، بدون overlay.
+ * موضع fixed ملاصق لإطار العرض حتى تبقى الزر واللوحة ظاهرتين أثناء تمرير الصفحة.
  */
 export function OnboardingHelpOfferDialog({
   open,
@@ -44,14 +45,14 @@ export function OnboardingHelpOfferDialog({
   return (
     <div
       ref={containerRef}
-      className="absolute bottom-20 left-2 z-20"
+      className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-[max(0.5rem,env(safe-area-inset-left,0px))] z-20"
       dir="ltr"
     >
       <div className="relative inline-block">
         <button
           type="button"
           onClick={() => onOpenChange(!open)}
-          className="cursor-pointer rounded-full border-0 bg-transparent p-0 shadow-none transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4F9E8E]"
+          className="cursor-pointer rounded-full border-0 bg-transparent p-0 shadow-none transition hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-1 focus-visible:ring-offset-[#4F9E8E] md:focus-visible:ring-offset-2"
           aria-expanded={open}
           aria-haspopup="dialog"
           aria-label="عرض عرض المساعدة من الفريق"
@@ -59,7 +60,7 @@ export function OnboardingHelpOfferDialog({
           <img
             src="/onboarding-test-bottom-left-circle.svg"
             alt=""
-            className="pointer-events-none h-[134px] w-[134px] object-contain"
+            className="pointer-events-none h-20 w-20 object-contain md:h-[134px] md:w-[134px]"
             aria-hidden
           />
         </button>
@@ -69,38 +70,38 @@ export function OnboardingHelpOfferDialog({
             role="dialog"
             aria-modal="false"
             aria-labelledby="onboarding-help-offer-title"
-            className="absolute bottom-0 left-full z-30 ms-3 w-[300px] rounded-[2rem] border border-black/5 bg-white p-6 text-center shadow-xl dir-rtl"
+            className="absolute bottom-0 left-full z-30 ms-2 w-[min(260px,calc(100vw-6rem))] rounded-2xl border border-black/5 bg-white p-3 text-center shadow-xl dir-rtl sm:w-[min(280px,calc(100vw-6rem))] sm:rounded-[1.75rem] sm:p-4 md:ms-3 md:w-[300px] md:rounded-[2rem] md:p-6"
             dir="rtl"
           >
 
-            <div className="flex flex-col items-center gap-4 pt-2">
+            <div className="flex flex-col items-center gap-2 pt-1 md:gap-4 md:pt-2">
               <div
-                className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[#9FFFCB]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#9FFFCB] md:h-[72px] md:w-[72px]"
                 aria-hidden
               >
                 <Headphones
-                  className="h-9 w-9 text-[#1a1a1a]"
+                  className="h-5 w-5 text-[#1a1a1a] md:h-9 md:w-9"
                   strokeWidth={1.5}
                 />
               </div>
 
               <h2
                 id="onboarding-help-offer-title"
-                className="text-lg font-bold leading-snug text-black"
+                className="text-sm font-bold leading-snug text-black md:text-lg"
               >
                 تبي أحد يسويّه لك؟
               </h2>
 
-              <p className="px-1 text-[14px] leading-relaxed text-[#6b7280]">
+              <p className="px-0.5 text-xs leading-relaxed text-[#6b7280] md:px-1 md:text-[14px]">
                 فريقنا يقدر يساعدك وينهي كل الإعداد عنك
               </p>
 
-              <div className="flex items-center justify-center gap-2 text-[26px] font-bold text-black">
+              <div className="flex items-center justify-center gap-1.5 text-lg font-bold text-black md:gap-2 md:text-[26px]">
                 <span>50</span>
                 <img
                   src="/Saudi_Riyal_Symbol.svg"
                   alt=""
-                  className="h-7 w-7 object-contain"
+                  className="h-5 w-5 object-contain md:h-7 md:w-7"
                   aria-hidden
                 />
                 <span>فقط</span>
@@ -112,10 +113,10 @@ export function OnboardingHelpOfferDialog({
                   onContactWhatsApp();
                   onOpenChange(false);
                 }}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#4F9E8E] px-5 py-3 text-[14px] font-semibold text-white transition hover:bg-[#458f80] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                className="flex w-full items-center justify-center gap-1.5 rounded-full bg-[#4F9E8E] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#458f80] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 md:gap-2 md:px-5 md:py-3 md:text-[14px]"
               >
                 <svg
-                  className="h-5 w-5 shrink-0 text-white"
+                  className="h-4 w-4 shrink-0 text-white md:h-5 md:w-5"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                   aria-hidden

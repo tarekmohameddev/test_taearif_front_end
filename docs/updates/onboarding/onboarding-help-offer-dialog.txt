@@ -9,3 +9,13 @@ Update Type: Update
 Replaced modal popup with an anchored panel to the right of the circle button (no overlay); click-outside and Escape close.
 components/onboarding/OnboardingHelpOfferDialog.tsx
 components/onboarding/OnboardingFlow.tsx
+
+2026-03-20
+Update Type: Update
+Help offer control uses position fixed (viewport) with safe-area insets so it stays visible while the page scrolls.
+components/onboarding/OnboardingHelpOfferDialog.tsx
+
+2026-03-20
+Update Type: Update
+Smaller circle asset, dialog panel, typography, and CTA on viewports below md; full size from md up.
+components/onboarding/OnboardingHelpOfferDialog.tsx
