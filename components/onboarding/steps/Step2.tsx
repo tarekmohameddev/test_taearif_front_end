@@ -2,16 +2,18 @@
 
 import React from "react";
 import Step2BasicsPanel, { type Step2BasicsPanelProps } from "./Step2BasicsPanel";
-import Step2ColorsPanel from "./Step2ColorsPanel";
+import Step2ColorsPanel, { type Step2ColorsPanelProps } from "./Step2ColorsPanel";
 
-export type OnboardingStep2Props = Step2BasicsPanelProps & {
-  workingHours: string;
-  setWorkingHours: React.Dispatch<React.SetStateAction<string>>;
-};
+export type OnboardingStep2Props = Step2BasicsPanelProps & Step2ColorsPanelProps;
 
 export default function OnboardingStep2({
   workingHours,
   setWorkingHours,
+  valLicense,
+  setValLicense,
+  faviconPreviewUrl,
+  setFaviconPreviewUrl,
+  setFaviconFile,
   ...basicsProps
 }: OnboardingStep2Props) {
   return (
@@ -21,7 +23,15 @@ export default function OnboardingStep2({
 
         <div className="hidden md:block self-stretch min-h-[240px] w-[1px] bg-white/50 shrink-0" />
 
-        <Step2ColorsPanel workingHours={workingHours} setWorkingHours={setWorkingHours} />
+        <Step2ColorsPanel
+          workingHours={workingHours}
+          setWorkingHours={setWorkingHours}
+          valLicense={valLicense}
+          setValLicense={setValLicense}
+          faviconPreviewUrl={faviconPreviewUrl}
+          setFaviconPreviewUrl={setFaviconPreviewUrl}
+          setFaviconFile={setFaviconFile}
+        />
       </div>
     </div>
   );
