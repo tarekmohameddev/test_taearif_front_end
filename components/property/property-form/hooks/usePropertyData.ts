@@ -31,10 +31,6 @@ export const usePropertyData = (
 ) => {
   // Fetch categories
   useEffect(() => {
-    if (authLoading || !userToken) {
-      return;
-    }
-
     const loadCategories = async () => {
       try {
         const categories = await fetchCategories();
@@ -44,14 +40,10 @@ export const usePropertyData = (
       }
     };
     loadCategories();
-  }, [userToken, authLoading, setCategories]);
+  }, [setCategories]);
 
   // Fetch facades
   useEffect(() => {
-    if (authLoading || !userToken) {
-      return;
-    }
-
     const loadFacades = async () => {
       try {
         const facades = await fetchFacades();
@@ -61,14 +53,10 @@ export const usePropertyData = (
       }
     };
     loadFacades();
-  }, [userToken, authLoading, setFacades]);
+  }, [setFacades]);
 
   // Fetch projects
   useEffect(() => {
-    if (authLoading || !userToken) {
-      return;
-    }
-
     const loadProjects = async () => {
       try {
         const projects = await fetchProjects();
@@ -80,14 +68,10 @@ export const usePropertyData = (
     if (mode === "add") {
       loadProjects();
     }
-  }, [userToken, authLoading, mode, setProjects]);
+  }, [mode, setProjects]);
 
   // Fetch buildings
   useEffect(() => {
-    if (authLoading || !userToken) {
-      return;
-    }
-
     const loadBuildings = async () => {
       try {
         const buildings = await fetchBuildings();
@@ -97,7 +81,7 @@ export const usePropertyData = (
       }
     };
     loadBuildings();
-  }, [userToken, authLoading, setBuildings]);
+  }, [setBuildings]);
 
   // Fetch property for edit mode
   useEffect(() => {
