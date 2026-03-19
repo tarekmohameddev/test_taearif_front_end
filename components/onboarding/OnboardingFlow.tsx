@@ -368,7 +368,7 @@ export function OnboardingFlow({
       
 
       <div className="absolute top-10 left-10 z-20 flex items-center gap-2">
-        <span className="text-[14px] leading-none font-medium text-white whitespace-nowrap">
+        <span className="text-[14px] leading-none font-medium text-white whitespace-nowrap  sm:block hidden">
           هل تحتاج مساعدة؟
         </span>
 
@@ -396,13 +396,13 @@ export function OnboardingFlow({
         </button>
       </div>
 
-      <div className="relative z-10 w-full max-w-[75%]">
+      <div className="relative z-10 w-full max-w-[75%] mt-[100px] sm:mt-0">
         {!isCompletionStep && (
           <div className="text-center mb-6">
-            <h1 className="text-[48px] font-bold text-white">
+            <h1 className="text-[24px] sm:text-[32px] md:text-[40px] lg:text-[48px] font-bold text-white">
               موقعك الاحترافي جاهز خلال دقائق
             </h1>
-            <p className="text-[24px] text-white mt-2">
+            <p className="text-[16px] lg:text-[24px] text-white mt-2">
               سنوجّهك لإعداد موقعك خطوة بخطوة بطريقة سهلة وسريعة
             </p>
           </div>
@@ -523,11 +523,12 @@ export function OnboardingFlow({
       />
 
       <div
-        className="absolute bottom-5  z-20 left-6"
+        className="absolute bottom-5 sm:mx-0 mx-auto z-20 sm:left-6"
         dir="ltr"
       >
         <OnboardingSocialLinksRow links={ONBOARDING_HELP_SOCIAL_LINKS} />
       </div>
+
     </main>
   );
 }
