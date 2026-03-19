@@ -12,3 +12,8 @@ components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
 Update Type: Update
 Add repeatable image tiles with add-card up to 10 for gallery and floor plans
 components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
+
+2026-03-19 22:45:00
+Update Type: Update
+Bind onboarding media uploads to property form store and shared file-upload handler
+components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx

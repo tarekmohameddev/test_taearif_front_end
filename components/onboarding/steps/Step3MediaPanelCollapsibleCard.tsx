@@ -1,37 +1,36 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ImageIcon, Video } from "lucide-react";
+import { usePropertyFormState } from "@/components/property/property-form/hooks/usePropertyFormState";
+import { useFileUpload } from "@/components/property/property-form/hooks/useFileUpload";
 
 export default function Step3MediaPanelCollapsibleCard() {
   const [mediaOpen, setMediaOpen] = useState(false);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
-  const [floorPlanPreviews, setFloorPlanPreviews] = useState<string[]>([]);
-  const thumbnailInputRef = useRef<HTMLInputElement>(null);
-  const galleryInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
-  const floorPlansInputRef = useRef<HTMLInputElement>(null);
+  const state = usePropertyFormState("add");
+  const fileUpload = useFileUpload(
+    state.images,
+    state.setImages,
+    state.previews,
+    state.setPreviews,
+    state.setVideo,
+    state.setVideoPreview,
+    state.errors,
+    state.setErrors,
+  );
+
+  const thumbnailPreview =
+    typeof state.previews.thumbnail === "string" ? state.previews.thumbnail : null;
+  const galleryPreviews = Array.isArray(state.previews.gallery)
+    ? state.previews.gallery
+    : [];
+  const floorPlanPreviews = Array.isArray(state.previews.floorPlans)
+    ? state.previews.floorPlans
+    : [];
 
   const openFilePicker = (ref: React.RefObject<HTMLInputElement | null>) => {
     ref.current?.click();
   };
-
-  const appendImagePreviews = (files: FileList | null, maxItems = 10) => {
-    if (!files || files.length === 0) return [] as string[];
-    const imageFiles = Array.from(files).filter((file) =>
-      file.type.startsWith("image/"),
-    );
-    return imageFiles.slice(0, maxItems).map((file) => URL.createObjectURL(file));
-  };
-
-  useEffect(() => {
-    return () => {
-      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-      galleryPreviews.forEach((url) => URL.revokeObjectURL(url));
-      floorPlanPreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [thumbnailPreview, galleryPreviews, floorPlanPreviews]);
 
   return (
     <>
@@ -87,7 +86,7 @@ export default function Step3MediaPanelCollapsibleCard() {
 
                 <div
                   className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-4 py-3 cursor-pointer"
-                  onClick={() => openFilePicker(thumbnailInputRef)}
+                  onClick={() => openFilePicker(state.thumbnailInputRef)}
                 >
                   {thumbnailPreview ? (
                     <img
@@ -113,19 +112,11 @@ export default function Step3MediaPanelCollapsibleCard() {
                   )}
                 </div>
                 <input
-                  ref={thumbnailInputRef}
+                  ref={state.thumbnailInputRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-                      setThumbnailPreview(URL.createObjectURL(file));
-                    }
-                    // Keep picker reusable even when selecting same file repeatedly.
-                    e.currentTarget.value = "";
-                  }}
+                  onChange={(e) => fileUpload.handleFileChange(e, "thumbnail")}
                 />
               </div>  
 
@@ -155,7 +146,7 @@ export default function Step3MediaPanelCollapsibleCard() {
                   {galleryPreviews.length < 10 && (
                     <div
                       className="rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 h-16 cursor-pointer"
-                      onClick={() => openFilePicker(galleryInputRef)}
+                      onClick={() => openFilePicker(state.galleryInputRef)}
                     >
                       <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
                         <ImageIcon className="h-4 w-4 text-black" />
@@ -169,21 +160,12 @@ export default function Step3MediaPanelCollapsibleCard() {
                   ميجابايتز.
                 </div>
                 <input
-                  ref={galleryInputRef}
+                  ref={state.galleryInputRef}
                   type="file"
                   accept="image/*"
                   multiple
                   className="hidden"
-                  onChange={(e) => {
-                    const newPreviews = appendImagePreviews(e.target.files, 10);
-                    if (newPreviews.length > 0) {
-                      setGalleryPreviews((prev) => [
-                        ...prev,
-                        ...newPreviews.slice(0, Math.max(0, 10 - prev.length)),
-                      ]);
-                    }
-                    e.currentTarget.value = "";
-                  }}
+                  onChange={(e) => fileUpload.handleFileChange(e, "gallery")}
                 />
               </div>
 
@@ -198,7 +180,7 @@ export default function Step3MediaPanelCollapsibleCard() {
 
                 <div
                   className="mt-5 rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-4 py-3 cursor-pointer"
-                  onClick={() => openFilePicker(videoInputRef)}
+                  onClick={() => openFilePicker(state.videoInputRef)}
                 >
                   <div className="h-11 w-11 rounded-full bg-[#d8f1ea] flex items-center justify-center">
                     <Video className="h-6 w-6 text-black" />
@@ -214,13 +196,11 @@ export default function Step3MediaPanelCollapsibleCard() {
                   </div>
                 </div>
                 <input
-                  ref={videoInputRef}
+                  ref={state.videoInputRef}
                   type="file"
                   accept="video/*"
                   className="hidden"
-                  onChange={(e) => {
-                    e.currentTarget.value = "";
-                  }}
+                  onChange={(e) => fileUpload.handleFileChange(e, "video")}
                 />
               </div>
 
@@ -250,7 +230,7 @@ export default function Step3MediaPanelCollapsibleCard() {
                   {floorPlanPreviews.length < 10 && (
                     <div
                       className="rounded-2xl border border-black/15 bg-transparent flex flex-col items-center justify-center px-1 py-1 w-16 h-16 cursor-pointer"
-                      onClick={() => openFilePicker(floorPlansInputRef)}
+                      onClick={() => openFilePicker(state.floorPlansInputRef)}
                     >
                       <div className="h-8 w-8 rounded-full bg-[#d8f1ea] flex items-center justify-center">
                         <ImageIcon className="h-4 w-4 text-black" />
@@ -264,21 +244,12 @@ export default function Step3MediaPanelCollapsibleCard() {
                   ميجابايتز.
                 </div>
                 <input
-                  ref={floorPlansInputRef}
+                  ref={state.floorPlansInputRef}
                   type="file"
                   accept="image/*,.pdf"
                   multiple
                   className="hidden"
-                  onChange={(e) => {
-                    const newPreviews = appendImagePreviews(e.target.files, 10);
-                    if (newPreviews.length > 0) {
-                      setFloorPlanPreviews((prev) => [
-                        ...prev,
-                        ...newPreviews.slice(0, Math.max(0, 10 - prev.length)),
-                      ]);
-                    }
-                    e.currentTarget.value = "";
-                  }}
+                  onChange={(e) => fileUpload.handleFileChange(e, "floorPlans")}
                 />
               </div>
             </div>

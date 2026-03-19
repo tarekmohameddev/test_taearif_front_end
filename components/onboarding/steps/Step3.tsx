@@ -11,7 +11,7 @@ export default function OnboardingStep3({
 }) {
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-4 ">
       {/* Step content container (placeholder) */}
         {activeTab === "sites" ? <Step3SitesPanel /> : <Step3NewPanel />}
     </div>
