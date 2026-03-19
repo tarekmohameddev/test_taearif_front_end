@@ -40,14 +40,21 @@ export default function Step3FaqPanelCollapsibleCard() {
           type="button"
           onClick={() => setFaqOpen((v) => !v)}
           aria-expanded={faqOpen}
-          className="w-full rounded-full px-5 text-right text-[14px] text-black transition-colors"
+          className="w-full rounded-full px-5 text-right transition-colors"
         >
-          الأسئلة الشائعة الخاصة بالوحدة
+          <div className="flex flex-col items-start py-2">
+            <span className="text-[14px] text-black text-right">الأسئلة الشائعة الخاصة بالوحدة</span>
+        {faqOpen && (
+            <span className="text-[12px] text-black/60 text-right">
+              أضف أسئلة وأجوبة شائعة حول هذه الوحدة لمساعدة المشترين المحتملين
+            </span>
+        )}
+        </div>
         </button>
 
         {faqOpen && (
           <div className="mt-3 p-5 space-y-5 max-h-[30vh] overflow-y-auto step3-scroll-thin">
-            {/* Content is empty for now */}
+            
             <div className="min-h-[20px]" aria-hidden="true" />
           </div>
         )}
