@@ -14,6 +14,8 @@ type OnboardingStep1Props = {
   setManualColorsVisible: React.Dispatch<React.SetStateAction<boolean>>;
   manualHexes: string[];
   setManualHexes: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedPaletteName: string;
+  setSelectedPaletteName: React.Dispatch<React.SetStateAction<string>>;
   normalizeHexForPreview: (hex: string, fallback: string) => string;
 };
 
@@ -27,6 +29,8 @@ export default function OnboardingStep1({
   setManualColorsVisible,
   manualHexes,
   setManualHexes,
+  selectedPaletteName,
+  setSelectedPaletteName,
   normalizeHexForPreview,
 }: OnboardingStep1Props) {
   return (
@@ -45,10 +49,13 @@ export default function OnboardingStep1({
 
         {/* Left side (desktop): title only */}
         <Step1ColorsPanel
+          siteName={siteName}
           manualColorsVisible={manualColorsVisible}
           setManualColorsVisible={setManualColorsVisible}
           manualHexes={manualHexes}
           setManualHexes={setManualHexes}
+          selectedPaletteName={selectedPaletteName}
+          setSelectedPaletteName={setSelectedPaletteName}
           normalizeHexForPreview={normalizeHexForPreview}
         />
       </div>

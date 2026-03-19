@@ -3,22 +3,55 @@
 import React from "react";
 
 type Step1ColorsPanelProps = {
+  siteName: string;
   manualColorsVisible: boolean;
   setManualColorsVisible: React.Dispatch<React.SetStateAction<boolean>>;
   manualHexes: string[];
   setManualHexes: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedPaletteName: string;
+  setSelectedPaletteName: React.Dispatch<React.SetStateAction<string>>;
   normalizeHexForPreview: (hex: string, fallback: string) => string;
 };
 
 export default function Step1ColorsPanel({
+  siteName,
   manualColorsVisible,
   setManualColorsVisible,
   manualHexes,
   setManualHexes,
+  selectedPaletteName,
+  setSelectedPaletteName,
   normalizeHexForPreview,
 }: Step1ColorsPanelProps) {
+  const paletteCards = [
+    {
+      colors: ["#C9C9CC", "#6D7482", "#0B2230"],
+      label: "ملائم أنيق",
+    },
+    {
+      colors: ["#F4A5A4", "#C8732F", "#6B2B1F"],
+      label: "روقان خاص",
+    },
+    {
+      colors: ["#B8A5FF", "#6B2BCF", "#2B2B7A"],
+      label: "بسيط ملكي",
+    },
+    {
+      colors: ["#7CC9EE", "#4C7C8C", "#1D3E66"],
+      label: "أرتق الطبيعة",
+    },
+    {
+      colors: ["#6FE1C5", "#46B56F", "#1B4A35"],
+      label: "قصور البادية",
+    },
+  ] as const;
+
+  const primary = normalizeHexForPreview(manualHexes[0] ?? "", "#5BC4C0");
+  const secondary = normalizeHexForPreview(manualHexes[1] ?? "", "#4CAF82");
+  const accent = normalizeHexForPreview(manualHexes[2] ?? "", "#1A3C34");
+
   return (
-    <div className="w-full md:w-1/2">
+    <div className="w-full ">
       <div className="flex items-center justify-between gap-4">
         <div className="text-[20px] font-bold">ألوان الموقع</div>
 
@@ -41,32 +74,26 @@ export default function Step1ColorsPanel({
         className="mt-5 grid grid-cols-3 items-stretch gap-3 min-[1300px]:grid-cols-5"
         dir="rtl"
       >
-        {[
-          {
-            colors: ["#C9C9CC", "#6D7482", "#0B2230"],
-            label: "ملائم أنيق",
-          },
-          {
-            colors: ["#F4A5A4", "#C8732F", "#6B2B1F"],
-            label: "روقان خاص",
-          },
-          {
-            colors: ["#B8A5FF", "#6B2BCF", "#2B2B7A"],
-            label: "بسيط ملكي",
-          },
-          {
-            colors: ["#7CC9EE", "#4C7C8C", "#1D3E66"],
-            label: "أرتق الطبيعة",
-          },
-          {
-            colors: ["#6FE1C5", "#46B56F", "#1B4A35"],
-            label: "قصور البادية",
-          },
-        ].map((card) => (
-          <div
-            key={card.label}
-            className="w-full rounded-xl border border-white/60 bg-white/95 px-1 py-1"
-          >
+        {paletteCards.map((card) => {
+          const isSelected = selectedPaletteName === card.label;
+          return (
+            <button
+              key={card.label}
+              type="button"
+              onClick={() => {
+                setManualHexes([...card.colors]);
+                setSelectedPaletteName(card.label);
+                setManualColorsVisible(false);
+              }}
+              className={[
+                "w-full rounded-xl border bg-white/95 px-1 py-1 transition-all",
+                isSelected
+                  ? "border-[#0B5B3A] ring-2 ring-[#0B5B3A]/30"
+                  : "border-white/60 hover:border-white",
+              ].join(" ")}
+              aria-pressed={isSelected}
+              title={card.label}
+            >
             <div className="flex items-center justify-center gap-[2px] dir-ltr">
               {card.colors.map((c, idx) => (
                 <span
@@ -84,8 +111,9 @@ export default function Step1ColorsPanel({
             >
               {card.label}
             </div>
-          </div>
-        ))}
+            </button>
+          );
+        })}
       </div>
 
       <div className="mt-5 h-px w-full bg-white" />
@@ -122,11 +150,25 @@ export default function Step1ColorsPanel({
                   />
 
                   {/* Color square on the right */}
-                  <span
-                    className="inline-block h-8 w-8 flex-shrink-0 rounded-lg"
+                  <label
+                    className="inline-block h-8 w-8 flex-shrink-0 cursor-pointer rounded-lg"
                     style={{ backgroundColor: previewColor }}
-                    aria-hidden="true"
-                  />
+                    title="اختر لون"
+                  >
+                    <input
+                      type="color"
+                      value={previewColor}
+                      onChange={(e) => {
+                        const next = e.target.value?.toUpperCase?.() ?? e.target.value;
+                        setManualHexes((prev) =>
+                          prev.map((v, i) => (i === idx ? next : v)),
+                        );
+                        setSelectedPaletteName("");
+                      }}
+                      className="sr-only"
+                      aria-label="اختيار لون"
+                    />
+                  </label>
                 </div>
               );
             })}
@@ -142,30 +184,38 @@ export default function Step1ColorsPanel({
         {/* Small palette dots (left side) */}
         <div className="flex items-center gap-1">
           <span
-            className="h-6 w-6 rounded-full bg-[#72D0C0]"
+            className="h-6 w-6 rounded-full"
+            style={{ backgroundColor: primary }}
             aria-hidden="true"
           />
           <span
-            className="h-6 w-6 rounded-full bg-[#55C78A]"
+            className="h-6 w-6 rounded-full"
+            style={{ backgroundColor: secondary }}
             aria-hidden="true"
           />
           <span
-            className="h-6 w-6 rounded-full bg-[#1E4F3F]"
+            className="h-6 w-6 rounded-full"
+            style={{ backgroundColor: accent }}
             aria-hidden="true"
           />
         </div>
 
         {/* Text (center/right side, keep Arabic RTL) */}
         <div className="flex-1" dir="rtl">
-          <div className="text-[15px] font-bold text-[#0B5B3A]">اسم الموقع</div>
+          <div className="text-[15px] font-bold text-[#0B5B3A]">
+            {siteName?.trim() ? siteName.trim() : "اسم الموقع"}
+          </div>
           <div className="text-[14px] font-normal text-[#0B5B3A]/70">
-            معالجة الألوان
+            {selectedPaletteName?.trim()
+              ? selectedPaletteName.trim()
+              : "معالجة الألوان"}
           </div>
         </div>
 
         {/* Big dot (right side) */}
         <div
-          className="h-12 w-12 rounded-full bg-[#1E4F3F]"
+          className="h-12 w-12 rounded-full"
+          style={{ backgroundColor: accent }}
           aria-hidden="true"
         />
       </div>

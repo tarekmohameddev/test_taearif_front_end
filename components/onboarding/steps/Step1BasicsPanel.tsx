@@ -49,7 +49,7 @@ export default function Step1BasicsPanel({
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
             placeholder="مثال: مكتب الرفاعي"
-            className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
+            className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-black placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
           />
         </div>
 

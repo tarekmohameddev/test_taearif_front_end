@@ -38,6 +38,7 @@ export function OnboardingFlow({
     "#4CAF82",
     "#1A3C34",
   ]);
+  const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
   const [savingStep1, setSavingStep1] = useState(false);
 
   const normalizeHexForPreview = (hex: string, fallback: string) => {
@@ -215,7 +216,7 @@ export function OnboardingFlow({
           </div>
         )}
 
-        <section className="mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 p-6 w-full ">
+        <section className="mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full ">
           {isCompletionStep ? (
             <OnboardingStep5
               onExploreDashboard={finishOnboarding}
@@ -235,6 +236,8 @@ export function OnboardingFlow({
                 setManualColorsVisible,
                 manualHexes,
                 setManualHexes,
+                selectedPaletteName,
+                setSelectedPaletteName,
                 normalizeHexForPreview,
               }}
             >
