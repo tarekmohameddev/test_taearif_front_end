@@ -357,7 +357,7 @@ export function OnboardingFlow({
   };
 
   return (
-    <main className="relative min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E] overflow-hidden">
+    <main className="relative min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E] overflow-hidden pb-20 md:pb-0">
       <div className="pointer-events-none absolute  z-0 max-w-[70%]  bottom-0" aria-hidden="true">
         <img
           src="/onboardingBackground.svg"
@@ -451,7 +451,7 @@ export function OnboardingFlow({
 
         <section
           className={[
-            "mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full",
+            "mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full ",
             currentStepIndex === 2 ? "px-0 md:px-6" : "",
           ].join(" ")}
         >
