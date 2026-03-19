@@ -12,6 +12,7 @@ type OnboardingHelpOfferDialogProps = {
 /**
  * لوحة مساعدة بجانب زر الدائرة (على يمين الزر)، بدون overlay.
  * موضع fixed ملاصق لإطار العرض حتى تبقى الزر واللوحة ظاهرتين أثناء تمرير الصفحة.
+ * موضع السفل/اليسار بقيم Tailwind ثابتة (بدون calc).
  */
 export function OnboardingHelpOfferDialog({
   open,
@@ -45,7 +46,7 @@ export function OnboardingHelpOfferDialog({
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-[max(0.5rem,env(safe-area-inset-left,0px))] z-20"
+      className="fixed bottom-3 left-2 z-20 md:bottom-12 md:left-4"
       dir="ltr"
     >
       <div className="relative inline-block">
@@ -60,7 +61,7 @@ export function OnboardingHelpOfferDialog({
           <img
             src="/onboarding-test-bottom-left-circle.svg"
             alt=""
-            className="pointer-events-none h-20 w-20 object-contain md:h-[134px] md:w-[134px]"
+            className="pointer-events-none h-24 w-24 object-contain md:h-[134px] md:w-[134px]"
             aria-hidden
           />
         </button>
@@ -70,38 +71,38 @@ export function OnboardingHelpOfferDialog({
             role="dialog"
             aria-modal="false"
             aria-labelledby="onboarding-help-offer-title"
-            className="absolute bottom-0 left-full z-30 ms-2 w-[min(260px,calc(100vw-6rem))] rounded-2xl border border-black/5 bg-white p-3 text-center shadow-xl dir-rtl sm:w-[min(280px,calc(100vw-6rem))] sm:rounded-[1.75rem] sm:p-4 md:ms-3 md:w-[300px] md:rounded-[2rem] md:p-6"
+            className="absolute bottom-0 left-full z-30 ms-2 w-[272px] max-w-[90vw] rounded-2xl border border-black/5 bg-white p-4 text-center shadow-xl dir-rtl sm:w-[288px] sm:max-w-[90vw] sm:rounded-[1.75rem] sm:p-5 md:ms-3 md:w-[300px] md:max-w-[300px] md:rounded-[2rem] md:p-6"
             dir="rtl"
           >
 
-            <div className="flex flex-col items-center gap-2 pt-1 md:gap-4 md:pt-2">
+            <div className="flex flex-col items-center gap-2.5 pt-1 md:gap-4 md:pt-2">
               <div
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#9FFFCB] md:h-[72px] md:w-[72px]"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-[#9FFFCB] md:h-[72px] md:w-[72px]"
                 aria-hidden
               >
                 <Headphones
-                  className="h-5 w-5 text-[#1a1a1a] md:h-9 md:w-9"
+                  className="h-6 w-6 text-[#1a1a1a] md:h-9 md:w-9"
                   strokeWidth={1.5}
                 />
               </div>
 
               <h2
                 id="onboarding-help-offer-title"
-                className="text-sm font-bold leading-snug text-black md:text-lg"
+                className="text-base font-bold leading-snug text-black md:text-lg"
               >
                 تبي أحد يسويّه لك؟
               </h2>
 
-              <p className="px-0.5 text-xs leading-relaxed text-[#6b7280] md:px-1 md:text-[14px]">
+              <p className="px-0.5 text-[13px] leading-relaxed text-[#6b7280] md:px-1 md:text-[14px]">
                 فريقنا يقدر يساعدك وينهي كل الإعداد عنك
               </p>
 
-              <div className="flex items-center justify-center gap-1.5 text-lg font-bold text-black md:gap-2 md:text-[26px]">
+              <div className="flex items-center justify-center gap-2 text-xl font-bold text-black md:gap-2 md:text-[26px]">
                 <span>50</span>
                 <img
                   src="/Saudi_Riyal_Symbol.svg"
                   alt=""
-                  className="h-5 w-5 object-contain md:h-7 md:w-7"
+                  className="h-6 w-6 object-contain md:h-7 md:w-7"
                   aria-hidden
                 />
                 <span>فقط</span>
@@ -113,10 +114,10 @@ export function OnboardingHelpOfferDialog({
                   onContactWhatsApp();
                   onOpenChange(false);
                 }}
-                className="flex w-full items-center justify-center gap-1.5 rounded-full bg-[#4F9E8E] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#458f80] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 md:gap-2 md:px-5 md:py-3 md:text-[14px]"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#4F9E8E] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#458f80] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 md:gap-2 md:px-5 md:py-3 md:text-[14px]"
               >
                 <svg
-                  className="h-4 w-4 shrink-0 text-white md:h-5 md:w-5"
+                  className="h-[18px] w-[18px] shrink-0 text-white md:h-5 md:w-5"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                   aria-hidden

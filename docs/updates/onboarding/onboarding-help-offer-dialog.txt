@@ -19,3 +19,18 @@ components/onboarding/OnboardingHelpOfferDialog.tsx
 Update Type: Update
 Smaller circle asset, dialog panel, typography, and CTA on viewports below md; full size from md up.
 components/onboarding/OnboardingHelpOfferDialog.tsx
+
+2026-03-20
+Update Type: Update
+Slightly increased mobile sizes (h-24 circle, panel padding/width, typography, CTA) vs prior phone pass.
+components/onboarding/OnboardingHelpOfferDialog.tsx
+
+2026-03-20
+Update Type: Update
+Fixed position: smaller bottom offset on viewports below md (closer to screen bottom + safe area); md+ keeps 5rem offset.
+components/onboarding/OnboardingHelpOfferDialog.tsx
+
+2026-03-20
+Update Type: Update
+Fixed position uses plain Tailwind spacing only (bottom-3 / md:bottom-12, left-2 / md:left-4); dialog width uses max-w-[90vw] instead of calc/min viewport math.
+components/onboarding/OnboardingHelpOfferDialog.tsx
