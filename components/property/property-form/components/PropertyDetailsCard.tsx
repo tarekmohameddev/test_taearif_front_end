@@ -42,6 +42,8 @@ interface PropertyDetailsCardProps {
   isFieldMissing: (field: string) => boolean;
   cardHasMissingFields: (fields: string[]) => boolean;
   variant?: "card" | "plain";
+  // Used in onboarding to adjust UI styling only.
+  onboardingRoundedVariant?: "xl";
 }
 
 export default function PropertyDetailsCard({
@@ -64,7 +66,12 @@ export default function PropertyDetailsCard({
   isFieldMissing,
   cardHasMissingFields,
   variant = "card",
+  onboardingRoundedVariant,
 }: PropertyDetailsCardProps) {
+  const roundedClass = onboardingRoundedVariant === "xl" ? "rounded-xl" : "";
+  const facilityRoundedClass =
+    onboardingRoundedVariant === "xl" ? "rounded-xl" : "rounded-md";
+
   return (
     <Card
       className={[
@@ -143,7 +150,11 @@ export default function PropertyDetailsCard({
                         }
                       }
                     }}
-                    className={errors.features ? "border-red-500" : ""}
+                    className={
+                      errors.features
+                        ? `border-red-500 ${roundedClass}`
+                        : roundedClass
+                    }
                   />
                   <Button
                     onClick={() => {
@@ -250,11 +261,11 @@ export default function PropertyDetailsCard({
                       pattern="[0-9]*\.?[0-9]*"
                       className={
                         errors.size
-                          ? "border-red-500"
+                          ? `border-red-500 ${roundedClass}`
                           : isDraft &&
                               (isFieldMissing("area") || isFieldMissing("size"))
-                            ? "border-orange-400 bg-orange-50"
-                            : ""
+                            ? `border-orange-400 bg-orange-50 ${roundedClass}`
+                            : roundedClass
                       }
                       onChange={(e) => {
                         const numbersAndDecimal =
@@ -306,6 +317,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -338,6 +350,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -350,7 +363,11 @@ export default function PropertyDetailsCard({
                       value={formData.facade_id?.toString() || ""}
                       onValueChange={(value) => onSelectChange("facade_id", value)}
                     >
-                      <SelectTrigger id="facade_id" dir="rtl">
+                      <SelectTrigger
+                        id="facade_id"
+                        dir="rtl"
+                        className={roundedClass}
+                      >
                         <SelectValue placeholder="اختر الواجهة" />
                       </SelectTrigger>
                       <SelectContent>
@@ -392,6 +409,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -424,6 +442,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -456,6 +475,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -488,6 +508,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -500,7 +521,11 @@ export default function PropertyDetailsCard({
                       value={formData.building_age}
                       onValueChange={(value) => onSelectChange("building_age", value)}
                     >
-                      <SelectTrigger id="building_age" dir="rtl">
+                      <SelectTrigger
+                        id="building_age"
+                        dir="rtl"
+                        className={roundedClass}
+                      >
                         <SelectValue placeholder="اختر سنة البناء" />
                       </SelectTrigger>
                       <SelectContent>
@@ -536,7 +561,7 @@ export default function PropertyDetailsCard({
                         return (
                           <div
                             key={facilityKey}
-                            className="flex items-center justify-between p-3 border rounded-md bg-muted/30"
+                            className={`flex items-center justify-between p-3 border ${facilityRoundedClass} bg-muted/30`}
                           >
                             <div className="flex items-center gap-3">
                               <span className="font-medium">{facility.label}</span>

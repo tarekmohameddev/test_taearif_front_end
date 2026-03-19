@@ -32,3 +32,18 @@ components/property/property-form/components/BasicInfoCard.tsx
 Update Type: Update
 Make description textarea shorter in onboarding
 components/property/property-form/components/BasicInfoCard.tsx
+
+2026-03-19 22:02:34
+Update Type: Update
+Make onboarding property editor fields rounded-xl
+components/property/property-form/components/PropertyDetailsCard.tsx, components/property/location-card.tsx, components/onboarding/steps/Step3PropertyEditorPanel.tsx
+
+2026-03-19 22:03:51
+Update Type: Update
+Set onboarding location field text color to black
+components/property/location-card.tsx
+
+2026-03-19 22:05:22
+Update Type: Update
+Force solid black labels and input text in onboarding location fields
+components/property/location-card.tsx

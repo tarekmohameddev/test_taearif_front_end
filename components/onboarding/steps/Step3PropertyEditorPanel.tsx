@@ -178,6 +178,7 @@ export default function Step3PropertyEditorPanel() {
               isFieldMissing={isFieldMissing}
               cardHasMissingFields={cardHasMissingFields}
               variant="plain"
+              onboardingRoundedVariant="xl"
             />
 
             <div className="space-y-2">
@@ -188,6 +189,7 @@ export default function Step3PropertyEditorPanel() {
                 propertyData={propertyDataForLocation}
                 hideHeader={true}
                 isDetailsPage={false}
+                onboardingRoundedVariant="xl"
               />
             </div>
 
