@@ -28,7 +28,7 @@ export default function Step2BasicsPanel() {
         </div>
         <input
           placeholder="05xxxxxxxx"
-          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
+          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-black placeholder:black outline-none focus:ring-2 focus:ring-white/60"
         />
         </div>
       </div>
@@ -41,7 +41,7 @@ export default function Step2BasicsPanel() {
         </div>
         <input
           placeholder="info@yourcompany.sa"
-          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
+          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-black placeholder:black outline-none focus:ring-2 focus:ring-white/60"
         />
       </div>
 
@@ -53,7 +53,7 @@ export default function Step2BasicsPanel() {
         </div>
         <input
           placeholder="مثال: حي العليا، شارع الملك فهد، الرياض"
-          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-white placeholder:gray-500 outline-none focus:ring-2 focus:ring-white/60"
+          className="mt-2 w-full rounded-full bg-white border border-white/30 px-4 py-3 text-[16px] text-black placeholder:black outline-none focus:ring-2 focus:ring-white/60"
         />
       </div>
     </div>

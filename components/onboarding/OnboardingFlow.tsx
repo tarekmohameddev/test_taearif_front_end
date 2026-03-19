@@ -17,6 +17,13 @@ import { usePropertyFormStore } from "@/context/store/dashboard/properties/prope
 import { validateForm as validatePropertyForm } from "@/components/property/property-form/utils/validation";
 import { formatPropertyData } from "@/components/property/property-form/utils/formatters";
 import { createProperty } from "@/components/property/property-form/services/propertyApi";
+import {
+  clearOnboardingStep1Cache,
+  dataUrlToFile,
+  readFileAsDataUrl,
+  readOnboardingStep1Cache,
+  writeOnboardingStep1Cache,
+} from "@/lib/onboarding/step1SessionCache";
 
 export function OnboardingFlow({
   disableCompletionRedirect = false,
@@ -63,7 +70,8 @@ export function OnboardingFlow({
     return /^#[0-9A-F]{6}$/.test(withHash) ? withHash : fallback;
   };
 
-  const saveStep1ToBackend = async () => {
+  /** Step 1 (هوية الموقع): cache only — no API. */
+  const persistStep1ToSession = async () => {
     if (!siteName.trim()) {
       toast.error("يرجى إدخال اسم الموقع");
       return false;
@@ -71,22 +79,72 @@ export function OnboardingFlow({
 
     setSavingStep1(true);
     try {
-      let logoUrl: string | null = null;
+      let logoDataUrl: string | null = null;
       if (logoFile) {
-        const uploaded = await uploadSingleFile(logoFile, "logo");
-        logoUrl = uploaded?.url ?? null;
+        logoDataUrl = await readFileAsDataUrl(logoFile);
+        if (logoPreviewUrl?.startsWith("blob:")) {
+          URL.revokeObjectURL(logoPreviewUrl);
+        }
+      } else if (logoPreviewUrl?.startsWith("data:")) {
+        logoDataUrl = logoPreviewUrl;
       }
 
       const primary = normalizeHexForPreview(manualHexes[0] ?? "", "#5BC4C0");
       const secondary = normalizeHexForPreview(manualHexes[1] ?? "", "#4CAF82");
       const accent = normalizeHexForPreview(manualHexes[2] ?? "", "#1A3C34");
 
+      const written = writeOnboardingStep1Cache({
+        siteName: siteName.trim(),
+        colors: { primary, secondary, accent },
+        logoDataUrl,
+        manualHexes: [...manualHexes],
+        selectedPaletteName,
+        manualColorsVisible,
+      });
+      if (!written) {
+        toast.error(
+          "تعذر حفظ البيانات مؤقتاً (قد يكون الشعار كبيراً جداً). جرّب صورة أصغر أو تخطّ الشعار.",
+        );
+        return false;
+      }
+
+      setLogoFile(null);
+      setLogoPreviewUrl(logoDataUrl);
+      return true;
+    } catch (err: any) {
+      toast.error(err?.message || "تعذر حفظ بيانات الموقع مؤقتاً");
+      return false;
+    } finally {
+      setSavingStep1(false);
+    }
+  };
+
+  /** Step 2 (بيانات التواصل): POST /onboarding from session cache. */
+  const postOnboardingFromCachedStep1 = async () => {
+    const cached = readOnboardingStep1Cache();
+    if (!cached?.siteName?.trim()) {
+      toast.error("يرجى إكمال خطوة هوية الموقع أولاً");
+      return false;
+    }
+
+    setSavingStep1(true);
+    try {
+      let logoUrl: string | null = null;
+      if (cached.logoDataUrl) {
+        const file = await dataUrlToFile(cached.logoDataUrl);
+        const uploaded = await uploadSingleFile(file, "logo");
+        logoUrl = uploaded?.url ?? null;
+      }
+
+      const { primary, secondary, accent } = cached.colors;
+
       await axiosInstance.post("/onboarding", {
-        title: siteName.trim(),
+        title: cached.siteName.trim(),
         colors: { primary, secondary, accent },
         logo: logoUrl,
       });
 
+      clearOnboardingStep1Cache();
       toast.success("تم حفظ بيانات الموقع");
       return true;
     } catch (err: any) {
@@ -151,6 +209,18 @@ export function OnboardingFlow({
     window.open(whatsappUrl, "_blank");
   };
 
+  // Hydrate step 1 fields from session (refresh / return to flow).
+  useEffect(() => {
+    const c = readOnboardingStep1Cache();
+    if (!c) return;
+    setSiteName(c.siteName);
+    setLogoPreviewUrl(c.logoDataUrl);
+    setManualHexes(c.manualHexes);
+    setSelectedPaletteName(c.selectedPaletteName);
+    setManualColorsVisible(c.manualColorsVisible);
+    setLogoFile(null);
+  }, []);
+
   // Prevent onboarding-test from redirecting if onboarding is already completed.
   useEffect(() => {
     if (!disableCompletionRedirect && onboardingCompleted) {
@@ -172,10 +242,20 @@ export function OnboardingFlow({
   };
 
   const handleNext = () => {
-    // Step 1: upload logo (optional) then save onboarding settings.
+    // Step 1 (هوية الموقع): write to sessionStorage only.
     if (currentStepIndex === 0) {
       void (async () => {
-        const ok = await saveStep1ToBackend();
+        const ok = await persistStep1ToSession();
+        if (!ok) return;
+        setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
+      })();
+      return;
+    }
+
+    // Step 2 (بيانات التواصل): upload logo + POST /onboarding from cache.
+    if (currentStepIndex === 1) {
+      void (async () => {
+        const ok = await postOnboardingFromCachedStep1();
         if (!ok) return;
         setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
       })();
@@ -324,11 +404,11 @@ export function OnboardingFlow({
                 onFinish={finishOnboarding}
                 onSkip={handleSkip}
                 nextDisabled={
-                  (currentStepIndex === 0 && savingStep1) ||
+                  ((currentStepIndex === 0 || currentStepIndex === 1) && savingStep1) ||
                   (currentStepIndex === 2 && step3ActiveTab === "new" && savingStep3)
                 }
                 nextLoading={
-                  (currentStepIndex === 0 && savingStep1) ||
+                  ((currentStepIndex === 0 || currentStepIndex === 1) && savingStep1) ||
                   (currentStepIndex === 2 && step3ActiveTab === "new" && savingStep3)
                 }
               />
