@@ -1,0 +1,4 @@
+2026-03-19 22:35:24
+Update Type: Update
+Enable file picker opening on media upload cards click
+components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
