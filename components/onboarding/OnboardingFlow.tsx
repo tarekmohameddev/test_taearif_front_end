@@ -17,6 +17,7 @@ import { usePropertyFormStore } from "@/context/store/dashboard/properties/prope
 import { validateForm as validatePropertyForm } from "@/components/property/property-form/utils/validation";
 import { formatPropertyData } from "@/components/property/property-form/utils/formatters";
 import { createProperty } from "@/components/property/property-form/services/propertyApi";
+import { setPropertyReferenceDataToastsSuppressed } from "@/components/property/property-form/services/dataService";
 import { buildOnboardingPostBody } from "@/lib/onboarding/onboardingPayload";
 import {
   clearOnboardingStep1Cache,
@@ -266,6 +267,16 @@ export function OnboardingFlow({
     setManualColorsVisible(c.manualColorsVisible);
     setLogoFile(null);
   }, []);
+
+  // Step 3 loads property reference GETs; suppress their toast.error (dashboard form still toasts).
+  useEffect(() => {
+    const isPropertyStep = currentStepIndex === 2;
+    if (isPropertyStep) {
+      setPropertyReferenceDataToastsSuppressed(true);
+      return () => setPropertyReferenceDataToastsSuppressed(false);
+    }
+    setPropertyReferenceDataToastsSuppressed(false);
+  }, [currentStepIndex]);
 
   // Prevent onboarding-test from redirecting if onboarding is already completed.
   useEffect(() => {
