@@ -10,7 +10,7 @@ const defaultLocale = "en";
 // Default locale for live-editor pages
 const liveEditorDefaultLocale = "ar";
 
-// Cache environment variables to avoid repeated access
+// Cache environment variables to avoid repeated access 
 const PRODUCTION_DOMAIN =
   process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || "taearif.com";
 const LOCAL_DOMAIN = process.env.NEXT_PUBLIC_LOCAL_DOMAIN || "localhost";
