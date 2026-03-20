@@ -396,6 +396,91 @@ export default function Footer2(props: Footer2Props) {
         : "#8b5f46", // Brown fallback
   };
 
+  // Contact fallback logic:
+  // If footer contact fields are missing / placeholder, we use tenantData.WebsiteLayout.companyInfo.
+  const websiteCompanyInfo =
+    (tenantData as any)?.WebsiteLayout?.companyInfo ||
+    (tenantData as any)?.websiteLayout?.companyInfo ||
+    (tenantData as any)?.companyInfo ||
+    (tenantData as any)?.WebsiteLayout?.CustomBranding?.companyInfo ||
+    (tenantData as any)?.WebsiteLayout?.CustomBranding?.footer?.companyInfo;
+
+  // Optional shape for type-safety (runtime data can vary).
+  const websiteCompanyInfoTyped = websiteCompanyInfo as
+    | {
+        email?: unknown;
+        phone?: unknown;
+        address?: unknown;
+      }
+    | undefined;
+
+  const normalizeToString = (value: unknown): string => {
+    if (value === null || value === undefined) return "";
+    if (typeof value === "string") return value.trim();
+    return String(value).trim();
+  };
+
+  const isMissingOrNA = (value: string): boolean => {
+    const v = value.trim();
+    if (!v) return true;
+    const lower = v.toLowerCase();
+    // Covers "N/A", "N/A ", "n / a", "NA", etc.
+    return (
+      lower === "n/a" ||
+      lower === "na" ||
+      /^n\s*\/\s*a$/i.test(v) ||
+      /^n\s*a$/i.test(v)
+    );
+  };
+
+  const isPhonePlaceholder = (value: string): boolean => {
+    const v = value.trim();
+    return v === "" || v === "0000";
+  };
+
+  const contactInfo = mergedData?.content?.contactInfo as
+    | {
+        address?: unknown;
+        email?: unknown;
+        whatsapp?: unknown;
+      }
+    | undefined;
+
+  const companyAddress = normalizeToString(websiteCompanyInfoTyped?.address);
+  const companyPhone = normalizeToString(websiteCompanyInfoTyped?.phone);
+  const companyEmail = normalizeToString(websiteCompanyInfoTyped?.email);
+
+  const addressRaw = normalizeToString(contactInfo?.address);
+  const emailRaw = normalizeToString(contactInfo?.email);
+  const whatsappRaw = normalizeToString(contactInfo?.whatsapp);
+
+  const displayAddress = isMissingOrNA(addressRaw) ? companyAddress || "" : addressRaw;
+
+  const displayEmail = (() => {
+    // Footer2 defaults to a hardcoded email ("contact@baheya.co") in getDefaultFooter2Data().
+    const FOOTER2_STATIC_EMAIL = "contact@baheya.co";
+    const hardcodedEmails = new Set([FOOTER2_STATIC_EMAIL, "info@example.com"]);
+
+    if (isMissingOrNA(emailRaw) || hardcodedEmails.has(emailRaw)) {
+      return companyEmail || emailRaw;
+    }
+    return emailRaw;
+  })();
+
+  const displayWhatsapp = isPhonePlaceholder(whatsappRaw)
+    ? companyPhone || whatsappRaw
+    : whatsappRaw;
+
+  const showWhatsapp = !isPhonePlaceholder(displayWhatsapp);
+
+  // Used by the WhatsApp inquiry button (prefer inquiry phoneNumber, but fall back to contact whatsapp).
+  const whatsappInquiryPhoneRaw = normalizeToString(
+    mergedData?.content?.socialMedia?.whatsappInquiry?.phoneNumber,
+  );
+  const effectiveWhatsAppInquiryPhone = isPhonePlaceholder(whatsappInquiryPhoneRaw)
+    ? displayWhatsapp
+    : whatsappInquiryPhoneRaw;
+
   // Helper function to get background color based on useDefaultColor and globalColorType
   const getBackgroundColor = (): string => {
     const colorField = mergedData?.background?.color;
@@ -618,7 +703,7 @@ export default function Footer2(props: Footer2Props) {
     
     return (
       <a
-        href={`https://wa.me/${(mergedData.content?.socialMedia?.whatsappInquiry?.phoneNumber || mergedData.content?.contactInfo?.whatsapp || "").replace(/\D/g, "")}?text=${encodeURIComponent(
+        href={`https://wa.me/${(effectiveWhatsAppInquiryPhone || "").replace(/\D/g, "")}?text=${encodeURIComponent(
           mergedData.content?.socialMedia?.whatsappInquiry?.message || "مرحباً، أريد الاستفسار عن"
         )}`}
         target="_blank"
@@ -849,12 +934,12 @@ export default function Footer2(props: Footer2Props) {
                     </svg>
                   </span>
                   <span className="text-base" style={{ color: textAndLinksColor }}>
-                    {replaceBaheya(mergedData.content?.contactInfo?.address)}
+                    {replaceBaheya(displayAddress)}
                   </span>
                 </li>
                 <li className="flex items-center gap-3">
                   <a
-                    href={`mailto:${mergedData.content?.contactInfo?.email}`}
+                    href={`mailto:${displayEmail}`}
                     className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                   >
                     <span className="flex-shrink-0">
@@ -868,32 +953,34 @@ export default function Footer2(props: Footer2Props) {
                       </svg>
                     </span>
                     <span className="text-base" style={{ color: textAndLinksColor }}>
-                      {replaceBaheya(mergedData.content?.contactInfo?.email)}
+                      {replaceBaheya(displayEmail)}
                     </span>
                   </a>
                 </li>
-                <li className="flex items-center gap-3">
-                  <a
-                    href={`https://wa.me/${mergedData.content?.contactInfo?.whatsapp?.replace(/\D/g, "") || ""}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-                  >
-                    <span className="flex-shrink-0">
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5 fill-current"
-                        viewBox="0 0 512 512"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M497.39 361.8l-112-48a24 24 0 0 0-28 6.9l-49.6 60.6A370.66 370.66 0 0 1 130.6 204.11l60.6-49.6a23.94 23.94 0 0 0 6.9-28l-48-112A24.16 24.16 0 0 0 122.6.61l-104 24A24 24 0 0 0 0 48c0 256.5 207.9 464 464 464a24 24 0 0 0 23.4-18.6l24-104a24.29 24.29 0 0 0-14.01-27.6z"></path>
-                      </svg>
-                    </span>
-                    <span className="text-base" style={{ color: textAndLinksColor }}>
-                      {replaceBaheya(mergedData.content?.contactInfo?.whatsapp)}
-                    </span>
-                  </a>
-                </li>
+                {showWhatsapp && (
+                  <li className="flex items-center gap-3">
+                    <a
+                      href={`https://wa.me/${(displayWhatsapp || "").replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                    >
+                      <span className="flex-shrink-0">
+                        <svg
+                          aria-hidden="true"
+                          className="w-5 h-5 fill-current"
+                          viewBox="0 0 512 512"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M497.39 361.8l-112-48a24 24 0 0 0-28 6.9l-49.6 60.6A370.66 370.66 0 0 1 130.6 204.11l60.6-49.6a23.94 23.94 0 0 0 6.9-28l-48-112A24.16 24.16 0 0 0 122.6.61l-104 24A24 24 0 0 0 0 48c0 256.5 207.9 464 464 464a24 24 0 0 0 23.4-18.6l24-104a24.29 24.29 0 0 0-14.01-27.6z"></path>
+                        </svg>
+                      </span>
+                      <span className="text-base" style={{ color: textAndLinksColor }}>
+                        {replaceBaheya(displayWhatsapp)}
+                      </span>
+                    </a>
+                  </li>
+                )}
               </ul>
 
               {/* Social Media - Right Side Position (below contact numbers) */}
