@@ -10,6 +10,8 @@ import {
   staticMenuItems,
   type MainNavItem,
 } from "@/components/mainCOMP/sidebarComponents/menu-items";
+import { useDashboardMobileMenuStore } from "@/context/dashboardMobileMenuStore";
+import { Menu } from "lucide-react";
 
 function isActivePath(pathWithoutLocale: string, href: string, items: MainNavItem[]) {
   if (pathWithoutLocale === href) return true;
@@ -79,6 +81,7 @@ function openTenantSite(pathname: string) {
 export function DashboardHeader() {
   const pathname = usePathname() || "/";
   const pathWithoutLocale = removeLocaleFromPathname(pathname);
+  const setMobileMenuOpen = useDashboardMobileMenuStore((s) => s.setOpen);
 
   const title = useMemo(
     () => pageTitleForPath(pathWithoutLocale),
@@ -140,6 +143,14 @@ export function DashboardHeader() {
         role="separator"
         aria-hidden
       />
+      <button
+            type="button"
+            aria-label="فتح القائمة"
+            onClick={() => setMobileMenuOpen(true)}
+            className="absolute top-5 right-5 h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-800 shadow-sm transition hover:bg-gray-50 lg:hidden"
+          >
+            <Menu className="h-5 w-5 mx-auto" strokeWidth={2} />
+          </button>
     </header>
   );
 }

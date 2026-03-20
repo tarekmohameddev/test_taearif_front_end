@@ -4,7 +4,8 @@ import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, User } from "lucide-react";
+import { ExternalLink, User, X } from "lucide-react";
+import { useDashboardMobileMenuStore } from "@/context/dashboardMobileMenuStore";
 import useAuthStore from "@/context/AuthContext";
 import { selectUserData, selectUserIsLogged } from "@/context/auth/selectors";
 import { cn } from "@/lib/utils";
@@ -137,22 +138,12 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
             alt="تعريف"
             width={123}
             height={99}
-            className="h-28 w-auto max-w-[400px] object-contain sm:h-24"
+            className="h-16 md:h-28 w-auto max-w-[400px] object-contain sm:h-24"
             priority
           />
         </Link>
       </div>
 
-      <div className="shrink-0 p-3">
-        <button
-          type="button"
-          onClick={() => openPreviewSite(pathname)}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-3 py-2.5 text-sm font-medium text-[#3d7d70] shadow-sm transition hover:bg-white/95"
-        >
-          <ExternalLink className="h-4 w-4 shrink-0 text-[#4F9E8E]" />
-          معاينة الموقع
-        </button>
-      </div>
 
       <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-2 pb-3 pt-1">
         {staticMenuItems.map((item) => {
@@ -241,12 +232,55 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
 
 export function DashboardSideMenu() {
   const pathname = usePathname() || "/";
+  const mobileOpen = useDashboardMobileMenuStore((s) => s.open);
+  const setMobileOpen = useDashboardMobileMenuStore((s) => s.setOpen);
 
   return (
-    <aside className="relative hidden w-[260px] shrink-0 lg:flex lg:flex-col lg:self-stretch lg:border-l lg:border-white/25">
-      <div className="sticky top-0 flex h-[100dvh] max-h-screen flex-col">
-        <NavPanel pathname={pathname} />
-      </div>
-    </aside>
+    <>
+      <aside className="relative hidden w-[270px] shrink-0 lg:flex lg:flex-col lg:self-stretch lg:border-l lg:border-white/25">
+        <div className="sticky top-0 flex h-[100dvh] max-h-screen flex-col">
+          <NavPanel pathname={pathname} />
+        </div>
+      </aside>
+
+      {mobileOpen ? (
+        <div
+          className="fixed inset-0 z-[100] lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="قائمة لوحة التحكم"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/50"
+            aria-label="إغلاق القائمة"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="absolute right-0 top-0 z-[1] flex h-[100dvh] w-[min(280px,88vw)] flex-col shadow-xl">
+            <div
+              className="flex shrink-0 items-center justify-between border-b border-white/20 px-2 py-2"
+              style={{ backgroundColor: MENU_BG }}
+            >
+              <span className="px-2 text-sm font-medium text-white">القائمة</span>
+              <button
+                type="button"
+                className="rounded-lg p-2 text-white transition hover:bg-white/10"
+                aria-label="إغلاق"
+                onClick={() => setMobileOpen(false)}
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-hidden">
+              <NavPanel
+                pathname={pathname}
+                onNavigate={() => setMobileOpen(false)}
+                className="h-full rounded-none"
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
