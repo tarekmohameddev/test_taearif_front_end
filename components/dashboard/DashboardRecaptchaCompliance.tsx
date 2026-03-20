@@ -22,32 +22,35 @@ export function useDashboardHideRecaptchaBadge(hide: boolean) {
   }, [hide]);
 }
 
-/** Visible reCAPTCHA / Google disclosure (required when badge is hidden). */
+/** Visible reCAPTCHA / Google disclosure (required when badge is hidden). Fixed to viewport so it does not sit after long scrollable content. */
 export function DashboardRecaptchaCompliance() {
   return (
     <p
-      className="mt-4 border-t border-gray-100 pt-3 text-center text-[11px] leading-relaxed text-gray-500"
+      className="pointer-events-none fixed bottom-0 left-0 right-0 z-30 border-t border-border/50 bg-background/95 px-3 pt-1.5 text-center text-[10px] leading-snug text-muted-foreground shadow-[0_-1px_0_rgba(0,0,0,0.04)] backdrop-blur-sm pb-[max(0.375rem,env(safe-area-inset-bottom,0px))]"
       dir="rtl"
+      role="note"
     >
-      هذا الموقع محمي بواسطة reCAPTCHA، وتنطبق{" "}
-      <a
-        href="https://policies.google.com/privacy"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-gray-600 underline underline-offset-2 hover:text-gray-800"
-      >
-        سياسة خصوصية Google
-      </a>{" "}
-      و{" "}
-      <a
-        href="https://policies.google.com/terms"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-gray-600 underline underline-offset-2 hover:text-gray-800"
-      >
-        شروط الخدمة
-      </a>
-      .
+      <span className="pointer-events-auto">
+        هذا الموقع محمي بواسطة reCAPTCHA، وتنطبق{" "}
+        <a
+          href="https://policies.google.com/privacy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-foreground/70 underline underline-offset-2 hover:text-foreground"
+        >
+          سياسة خصوصية Google
+        </a>{" "}
+        و{" "}
+        <a
+          href="https://policies.google.com/terms"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-foreground/70 underline underline-offset-2 hover:text-foreground"
+        >
+          شروط الخدمة
+        </a>
+        .
+      </span>
     </p>
   );
 }
