@@ -357,7 +357,7 @@ export function OnboardingFlow({
   };
 
   return (
-    <main className="relative min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E] overflow-hidden pb-20 md:pb-0">
+    <main className="relative min-h-screen flex flex-1 items-center justify-center md:p-4 bg-[#4F9E8E] overflow-hidden pb-20 md:pb-0">
       <div className="pointer-events-none absolute  z-0 max-w-[70%]  bottom-0" aria-hidden="true">
         <img
           src="/onboarding-mask-group-18.svg"
@@ -396,7 +396,7 @@ export function OnboardingFlow({
         </button>
       </div>
 
-      <div className="relative z-10 w-full max-w-[75%] mt-[100px] sm:mt-0">
+      <div className="relative z-10 w-full max-w-[90%] md:max-w-[75%] mt-[100px] sm:mt-0">
         {!isCompletionStep && (
           <div className="text-center mb-6">
             <h1 className="text-[24px] sm:text-[32px] md:text-[40px] lg:text-[48px] font-bold text-white">
