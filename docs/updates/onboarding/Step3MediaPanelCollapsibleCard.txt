@@ -1,0 +1,19 @@
+2026-03-19 22:35:24
+Update Type: Update
+Enable file picker opening on media upload cards click
+components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
+
+2026-03-19 22:38:27
+Update Type: Update
+Replace media placeholder content with preview after image selection
+components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
+
+2026-03-19 22:41:36
+Update Type: Update
+Add repeatable image tiles with add-card up to 10 for gallery and floor plans
+components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx
+
+2026-03-19 22:45:00
+Update Type: Update
+Bind onboarding media uploads to property form store and shared file-upload handler
+components/onboarding/steps/Step3MediaPanelCollapsibleCard.tsx

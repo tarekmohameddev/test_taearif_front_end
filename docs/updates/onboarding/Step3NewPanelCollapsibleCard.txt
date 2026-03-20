@@ -1,0 +1,64 @@
+2026-03-19 21:42:41
+Update Type: Update
+Hide BasicInfoCard intro texts in onboarding new-property step
+components/property/property-form/components/BasicInfoCard.tsx, components/onboarding/steps/Step3NewPanelCollapsibleCard.tsx
+
+2026-03-19 21:43:12
+Update Type: Update
+Keep featured switch visible in onboarding, hide only its label text
+components/property/property-form/components/BasicInfoCard.tsx
+
+2026-03-19 21:44:13
+Update Type: Update
+Hide featured switch in onboarding so only CardContent shows
+components/property/property-form/components/BasicInfoCard.tsx
+
+2026-03-19 21:51:54
+Update Type: Update
+In onboarding, remove Card wrapper styling and make fields rounded-full
+components/property/property-form/components/BasicInfoCard.tsx
+
+2026-03-19 21:52:21
+Update Type: Update
+Remove card rounding too (rounded-none) in onboarding
+components/property/property-form/components/BasicInfoCard.tsx
+
+2026-03-19 21:55:11
+Update Type: Update
+Apply rounded-full only during onboarding (hideOnboardingIntro)
+components/property/property-form/components/BasicInfoCard.tsx
+
+2026-03-19 21:57:37
+Update Type: Update
+Make description textarea shorter in onboarding
+components/property/property-form/components/BasicInfoCard.tsx
+
+2026-03-19 22:02:34
+Update Type: Update
+Make onboarding property editor fields rounded-xl
+components/property/property-form/components/PropertyDetailsCard.tsx, components/property/location-card.tsx, components/onboarding/steps/Step3PropertyEditorPanel.tsx
+
+2026-03-19 22:03:51
+Update Type: Update
+Set onboarding location field text color to black
+components/property/location-card.tsx
+
+2026-03-19 22:05:22
+Update Type: Update
+Force solid black labels and input text in onboarding location fields
+components/property/location-card.tsx
+
+2026-03-19 22:13:50
+Update Type: Update
+Style onboarding add-feature button transparent with #4F9E8E border/icon
+components/property/property-form/components/PropertyDetailsCard.tsx
+
+2026-03-19 22:14:20
+Update Type: Update
+Increase onboarding add-feature button border thickness
+components/property/property-form/components/PropertyDetailsCard.tsx
+
+2026-03-19 22:18:17
+Update Type: Update
+Reduce onboarding add-feature button and icon size
+components/property/property-form/components/PropertyDetailsCard.tsx

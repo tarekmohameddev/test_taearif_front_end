@@ -42,6 +42,8 @@ interface PropertyDetailsCardProps {
   isFieldMissing: (field: string) => boolean;
   cardHasMissingFields: (fields: string[]) => boolean;
   variant?: "card" | "plain";
+  // Used in onboarding to adjust UI styling only.
+  onboardingRoundedVariant?: "xl";
 }
 
 export default function PropertyDetailsCard({
@@ -64,7 +66,15 @@ export default function PropertyDetailsCard({
   isFieldMissing,
   cardHasMissingFields,
   variant = "card",
+  onboardingRoundedVariant,
 }: PropertyDetailsCardProps) {
+  const roundedClass = onboardingRoundedVariant === "xl" ? "rounded-full" : "";
+  const selectRoundedClass =
+    onboardingRoundedVariant === "xl" ? "rounded-xl" : "";
+  const facilityRoundedClass =
+    onboardingRoundedVariant === "xl" ? "rounded-xl" : "rounded-md";
+  const isOnboarding = onboardingRoundedVariant === "xl";
+
   return (
     <Card
       className={[
@@ -143,7 +153,11 @@ export default function PropertyDetailsCard({
                         }
                       }
                     }}
-                    className={errors.features ? "border-red-500" : ""}
+                    className={
+                      errors.features
+                        ? `border-red-500 ${roundedClass}`
+                        : roundedClass
+                    }
                   />
                   <Button
                     onClick={() => {
@@ -160,8 +174,16 @@ export default function PropertyDetailsCard({
                         setCurrentFeature("");
                       }
                     }}
+                    className={
+                      isOnboarding
+                        ? "bg-transparent border-2 text-[#4F9E8E] hover:bg-transparent rounded-2xl"
+                        : ""
+                    }
+                    style={isOnboarding ? { borderColor: "#4F9E8E" } : undefined}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus
+                      className={`h-4 w-4 ${isOnboarding ? "text-[#4F9E8E]" : ""}`}
+                    />
                   </Button>
                 </div>
                 {errors.features && (
@@ -170,23 +192,23 @@ export default function PropertyDetailsCard({
               </div>
 
               <div className="mt-4">
-                <Label className="text-foreground">الميزات المضافة</Label>
+                <Label className={isOnboarding ? "text-[#4F9E8E]" : "text-foreground"}>
+                  الميزات المضافة
+                </Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.features.map((feature: string, index: number) => (
                     <div
                       key={index}
-                      className="
-                            bg-gray-200 dark:bg-gray-700
-                            text-gray-800 dark:text-gray-200
+                      className={`
+                            ${isOnboarding ? "bg-[#4F9E8E]/50 text-black hover:bg-[#4F9E8E]" : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"}
                             px-2 sm:px-3 
                             py-1 sm:py-1.5
                             text-sm sm:text-base
                             rounded-full 
                             flex items-center gap-1 sm:gap-2
                             transition-all duration-200
-                            hover:bg-gray-300 dark:hover:bg-gray-600
                             group
-                          "
+                          `}
                     >
                       <span className="max-w-[100px] sm:max-w-none truncate">
                         {feature}
@@ -212,7 +234,7 @@ export default function PropertyDetailsCard({
                               transition-colors duration-200
                             "
                       >
-                        <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <X className="h-2 w-2 sm:h-3 sm:w-3" />
                       </Button>
                     </div>
                   ))}
@@ -250,11 +272,11 @@ export default function PropertyDetailsCard({
                       pattern="[0-9]*\.?[0-9]*"
                       className={
                         errors.size
-                          ? "border-red-500"
+                          ? `border-red-500 ${roundedClass}`
                           : isDraft &&
                               (isFieldMissing("area") || isFieldMissing("size"))
-                            ? "border-orange-400 bg-orange-50"
-                            : ""
+                            ? `border-orange-400 bg-orange-50 ${roundedClass}`
+                            : roundedClass
                       }
                       onChange={(e) => {
                         const numbersAndDecimal =
@@ -306,6 +328,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -338,6 +361,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -350,7 +374,11 @@ export default function PropertyDetailsCard({
                       value={formData.facade_id?.toString() || ""}
                       onValueChange={(value) => onSelectChange("facade_id", value)}
                     >
-                      <SelectTrigger id="facade_id" dir="rtl">
+                      <SelectTrigger
+                        id="facade_id"
+                        dir="rtl"
+                        className={selectRoundedClass}
+                      >
                         <SelectValue placeholder="اختر الواجهة" />
                       </SelectTrigger>
                       <SelectContent>
@@ -392,6 +420,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -424,6 +453,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -456,6 +486,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -488,6 +519,7 @@ export default function PropertyDetailsCard({
                         });
                       }}
                       dir="rtl"
+                      className={roundedClass}
                     />
                     <span className="text-sm text-gray-500 block text-right">
                       متر
@@ -500,7 +532,11 @@ export default function PropertyDetailsCard({
                       value={formData.building_age}
                       onValueChange={(value) => onSelectChange("building_age", value)}
                     >
-                      <SelectTrigger id="building_age" dir="rtl">
+                      <SelectTrigger
+                        id="building_age"
+                        dir="rtl"
+                        className={selectRoundedClass}
+                      >
                         <SelectValue placeholder="اختر سنة البناء" />
                       </SelectTrigger>
                       <SelectContent>
@@ -521,10 +557,14 @@ export default function PropertyDetailsCard({
                 {/* قائمة المرافق المضافة */}
                 {Array.isArray(selectedFacilities) && selectedFacilities.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="text-md font-medium text-right">
+                    <h4
+                      className={`${isOnboarding ? "text-sm" : "text-md"} font-medium text-right`}
+                    >
                       المرافق المضافة:
                     </h4>
-                    <div className="grid gap-3 grid-cols-3">
+                    <div
+                      className={`grid ${isOnboarding ? "gap-2" : "gap-3"} grid-cols-3`}
+                    >
                       {selectedFacilities.map((facilityKey) => {
                         const facility = facilitiesList.find(
                           (f) => f.key === facilityKey,
@@ -536,20 +576,31 @@ export default function PropertyDetailsCard({
                         return (
                           <div
                             key={facilityKey}
-                            className="flex items-center justify-between p-3 border rounded-md bg-muted/30"
+                            className={`flex items-center justify-between ${isOnboarding ? "p-2" : "p-3"} border ${facilityRoundedClass} bg-muted/30`}
                           >
-                            <div className="flex items-center gap-3">
-                              <span className="font-medium">{facility.label}</span>
-                              <Badge variant="secondary" className="text-lg">
+                            <div className={`flex items-center ${isOnboarding ? "gap-2" : "gap-3"}`}>
+                              <span
+                                className={`${isOnboarding ? "text-xs" : "text-sm"} font-medium`}
+                              >
+                                {facility.label}
+                              </span>
+                              <Badge
+                                variant="secondary"
+                                className={
+                                  isOnboarding ? "text-xs px-1.5 py-0" : "text-lg"
+                                }
+                              >
                                 {currentValue}
                               </Badge>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div
+                              className={`flex items-center ${isOnboarding ? "gap-1" : "gap-2"}`}
+                            >
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="icon"
-                                className="h-8 w-8"
+                                className={isOnboarding ? "h-6 w-6" : "h-8 w-8"}
                                 onClick={() => {
                                   if (currentValue === 0) {
                                     // إذا كانت القيمة 0، إلغاء تفعيل المرفق
@@ -564,13 +615,15 @@ export default function PropertyDetailsCard({
                                   }
                                 }}
                               >
-                                <Minus className="h-4 w-4" />
+                                <Minus
+                                  className={isOnboarding ? "h-3 w-3" : "h-4 w-4"}
+                                />
                               </Button>
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="icon"
-                                className="h-8 w-8"
+                                className={isOnboarding ? "h-6 w-6" : "h-8 w-8"}
                                 onClick={() => {
                                   onCounterChange(
                                     facilityKey,
@@ -578,7 +631,9 @@ export default function PropertyDetailsCard({
                                   );
                                 }}
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus
+                                  className={isOnboarding ? "h-3 w-3" : "h-4 w-4"}
+                                />
                               </Button>
                             </div>
                           </div>
@@ -598,7 +653,11 @@ export default function PropertyDetailsCard({
                       <Badge
                         key={facility.key}
                         variant={isSelected ? "default" : "outline"}
-                        className="cursor-pointer text-sm  py-2 px-4 hover:bg-primary/80 transition-colors"
+                        className={
+                          isOnboarding
+                            ? "cursor-pointer text-xs py-1 px-2 hover:bg-primary/20 transition-colors"
+                            : "cursor-pointer text-sm py-2 px-4 hover:bg-primary/20 transition-colors"
+                        }
                         onClick={() => {
                           if (!isSelected) {
                             // تفعيل المرفق بقيمة 0

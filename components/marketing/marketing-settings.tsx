@@ -95,7 +95,7 @@ export function MarketingSettingsComponent() {
       maxMessagesPerDay: 1000,
     },
     templates: {
-      welcomeMessage: "مرحباً بك في {company_name}! نحن سعداء لخدمتك.",
+      welcomeMessage: "مرحباً, {company_name}! نحن سعداء لخدمتك.",
       thankYouMessage: "شكراً لك على اختيارك {company_name}. نقدر ثقتك بنا.",
       orderConfirmation:
         "تم تأكيد طلبك رقم {order_id}. سيتم التوصيل خلال {delivery_time}.",

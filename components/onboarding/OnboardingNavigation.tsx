@@ -9,6 +9,8 @@ interface OnboardingNavigationProps {
   onNext: () => void;
   onFinish: () => void;
   onSkip: () => void;
+  /** When true, hides the skip control on the second step (stepIndex === 1). */
+  hideSkipOnSecondStep?: boolean;
   nextDisabled?: boolean;
   nextLoading?: boolean;
 }
@@ -20,14 +22,17 @@ export function OnboardingNavigation({
   onNext,
   onFinish,
   onSkip,
+  hideSkipOnSecondStep = false,
   nextDisabled = false,
   nextLoading = false,
 }: OnboardingNavigationProps) {
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === stepsLength - 1;
+  const showSkip =
+    !isFirst && !(hideSkipOnSecondStep && stepIndex === 1);
 
   return (
-    <footer className="mt-auto flex w-full items-center justify-center gap-4">
+    <footer className="mt-auto flex w-full items-center justify-center flex-col sm:flex-row sm:gap-4 gap-2">
       {!isFirst && (
         <button
           type="button"
@@ -46,19 +51,24 @@ export function OnboardingNavigation({
         type="button"
         onClick={isLast ? onFinish : onNext}
         disabled={nextDisabled || nextLoading}
-        className="rounded-full bg-foreground px-20 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="rounded-full bg-foreground md:px-20 px-10 py-2 text-sm text-background transition-colors hover:bg-foreground/90 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {nextLoading ? "جاري الحفظ..." : "حفظ ومتابعة"}
+        {nextLoading
+          ? "جاري الحفظ..."
+          : isFirst
+            ? "متابعة"
+            : "حفظ ومتابعة"}
       </button>
 
-
-      <button
-        type="button"
-        onClick={onSkip}
-        className="rounded-full border border-white bg-white px-8 py-2 text-sm text-[#4F9E8E] transition-colors hover:border-white hover:bg-white/90"
-      >
-        تخطي 
-      </button>
+      {showSkip && (
+        <button
+          type="button"
+          onClick={onSkip}
+          className="rounded-full border border-white bg-white px-8 py-2 text-sm text-[#4F9E8E] transition-colors hover:border-white hover:bg-white/90"
+        >
+          تخطي
+        </button>
+      )}
 
     </footer>
   );

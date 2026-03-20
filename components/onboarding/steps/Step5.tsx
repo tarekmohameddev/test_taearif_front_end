@@ -29,35 +29,33 @@ export default function OnboardingStep5({
       </div>
 
       <div className="text-center">
-        <h2 className="text-[48px] font-bold leading-tight">أحسنت! موقعك جاهز</h2>
-        <p className="mt-2 text-[22px] text-white/90">
+        <h2 className="md:text-[48px] text-[30px] font-bold leading-tight">أحسنت! موقعك جاهز</h2>
+        <p className="mt-2 md:text-[22px] text-[15px] text-white/90 px-4">
           لقد أكملت إعداد موقعك، يمكنك الآن البدء في استقبال العملاء ونشر العقارات.
         </p>
       </div>
 
-      <div className="w-full max-w-[860px] grid grid-cols-1 md:grid-cols-2 gap-10 items-start" >
-        
-        <div className="flex flex-col items-start gap-4">
-          <div className="text-[22px] font-semibold">
-            الخطوات المكتملة ({completedCount} من {steps.length})
-          </div>
-          <ul className="space-y-4 text-[24px]">
-            {steps.map((s) => (
-              <li key={s.title} className="flex items-center gap-3 justify-start">
-                <span className="h-2 w-2 rounded-full bg-white/80" aria-hidden="true" />
-                <span>{s.title}</span>
-              </li>
-            ))}
-          </ul>
+      <div className="w-full max-w-[860px] flex flex-col gap-4">
+        <div className="md:text-[22px] text-[18px] font-semibold sm:mt-0 mt-5 px-5">
+          الخطوات المكتملة ({completedCount} من {steps.length})
         </div>
-
-        <div className="flex flex-col items-end gap-4 mt-[50px]">
+        <ul className="w-full space-y-4 text-[18px] md:text-[24px] sm:px-0 px-8" dir="rtl">
           {steps.map((s) => (
-            <div key={s.title} className="text-[24px] leading-tight">
-              تم
-            </div>
+            <li
+              key={s.title}
+              className="flex w-full items-center justify-between gap-4"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full bg-white/80"
+                  aria-hidden="true"
+                />
+                <span>{s.title}</span>
+              </div>
+              <span className="shrink-0 leading-tight">تم</span>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       <button

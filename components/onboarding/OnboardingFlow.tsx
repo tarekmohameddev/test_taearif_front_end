@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/context/AuthContext";
 import { ONBOARDING_STEPS, ONBOARDING_STEPS_COUNT } from "@/lib/onboarding/steps";
@@ -9,6 +9,8 @@ import { OnboardingNavigation } from "./OnboardingNavigation";
 import { OnboardingStepPanel } from "./OnboardingStepPanel";
 import { OnboardingStepsHeader } from "./OnboardingStepsHeader";
 import OnboardingStep5 from "./steps/Step5";
+import { OnboardingHelpOfferDialog } from "./OnboardingHelpOfferDialog";
+import { OnboardingSocialLinksRow } from "./OnboardingSocialLinksRow";
 import toast from "react-hot-toast";
 import axiosInstance from "@/lib/axiosInstance";
 import { uploadSingleFile } from "@/utils/uploadSingle";
@@ -16,11 +18,32 @@ import { usePropertyFormStore } from "@/context/store/dashboard/properties/prope
 import { validateForm as validatePropertyForm } from "@/components/property/property-form/utils/validation";
 import { formatPropertyData } from "@/components/property/property-form/utils/formatters";
 import { createProperty } from "@/components/property/property-form/services/propertyApi";
+import { setPropertyReferenceDataToastsSuppressed } from "@/components/property/property-form/services/dataService";
+import { buildOnboardingPostBody } from "@/lib/onboarding/onboardingPayload";
+import {
+  clearOnboardingStep1Cache,
+  dataUrlToFile,
+  readFileAsDataUrl,
+  readOnboardingStep1Cache,
+  writeOnboardingStep1Cache,
+} from "@/lib/onboarding/step1SessionCache";
+
+const ONBOARDING_HELP_SOCIAL_LINKS = {
+  instagram:
+    process.env.NEXT_PUBLIC_ONBOARDING_INSTAGRAM_URL?.trim() || undefined,
+  facebook:
+    process.env.NEXT_PUBLIC_ONBOARDING_FACEBOOK_URL?.trim() || undefined,
+  linkedin:
+    process.env.NEXT_PUBLIC_ONBOARDING_LINKEDIN_URL?.trim() || undefined,
+};
 
 export function OnboardingFlow({
   disableCompletionRedirect = false,
+  hideSkipOnSecondStep = false,
 }: {
   disableCompletionRedirect?: boolean;
+  /** e.g. onboarding-test: require completing step 2 (contact) without skip. */
+  hideSkipOnSecondStep?: boolean;
 }) {
   const router = useRouter();
   const setOnboardingCompleted = useAuthStore((s) => s.setOnboardingCompleted);
@@ -28,7 +51,8 @@ export function OnboardingFlow({
 
   const [stepIndex, setStepIndex] = useState(0);
   const currentStepIndex = clampStepIndex(stepIndex, ONBOARDING_STEPS_COUNT);
-  const [step3ActiveTab, setStep3ActiveTab] = useState<"sites" | "new">("sites");
+  // الافتراضي: إنشاء عقار جديد (واجهة التبديل بين المواقع/جديد معلّقة أدناه)
+  const [step3ActiveTab, setStep3ActiveTab] = useState<"sites" | "new">("new");
   const isCompletionStep = currentStepIndex === ONBOARDING_STEPS_COUNT - 1;
   const completionSteps = ONBOARDING_STEPS.filter((s) => s.id !== "step-5");
 
@@ -45,6 +69,24 @@ export function OnboardingFlow({
   const [selectedPaletteName, setSelectedPaletteName] = useState<string>("");
   const [savingStep1, setSavingStep1] = useState(false);
   const [savingStep3, setSavingStep3] = useState(false);
+  const [helpOfferDialogOpen, setHelpOfferDialogOpen] = useState(false);
+
+  // Step 2 (بيانات التواصل) — merged into POST /onboarding
+  const [step2Phone, setStep2Phone] = useState("");
+  const [step2PhoneHasError, setStep2PhoneHasError] = useState(false);
+  const setStep2PhoneClearingError = useCallback(
+    (value: React.SetStateAction<string>) => {
+      setStep2PhoneHasError(false);
+      setStep2Phone(value);
+    },
+    [],
+  );
+  const [step2Email, setStep2Email] = useState("");
+  const [step2Address, setStep2Address] = useState("");
+  const [step2WorkingHours, setStep2WorkingHours] = useState("");
+  const [step2ValLicense, setStep2ValLicense] = useState("");
+  const [step2FaviconFile, setStep2FaviconFile] = useState<File | null>(null);
+  const [step2FaviconPreview, setStep2FaviconPreview] = useState<string | null>(null);
 
   // Step 3 (new property) state from property form store
   const step3FormData = usePropertyFormStore((s) => s.formData);
@@ -55,36 +97,121 @@ export function OnboardingFlow({
   const step3Faqs = usePropertyFormStore((s) => s.faqs);
   const setStep3Errors = usePropertyFormStore((s) => s.setErrors);
 
+  /** Synchronous in-flight guards — blocks double-submit before React re-renders (PREVENT_DUPLICATE_API_PROMPT). */
+  const persistStep1InFlightRef = useRef(false);
+  const postOnboardingInFlightRef = useRef(false);
+  const saveStep3InFlightRef = useRef(false);
+
   const normalizeHexForPreview = (hex: string, fallback: string) => {
     const raw = hex.trim().toUpperCase();
     const withHash = raw.startsWith("#") ? raw : `#${raw}`;
     return /^#[0-9A-F]{6}$/.test(withHash) ? withHash : fallback;
   };
 
-  const saveStep1ToBackend = async () => {
+  /** Step 1 (هوية الموقع): cache only — no API. */
+  const persistStep1ToSession = async () => {
+    if (persistStep1InFlightRef.current) return false;
     if (!siteName.trim()) {
       toast.error("يرجى إدخال اسم الموقع");
       return false;
     }
 
+    persistStep1InFlightRef.current = true;
     setSavingStep1(true);
     try {
-      let logoUrl: string | null = null;
+      let logoDataUrl: string | null = null;
       if (logoFile) {
-        const uploaded = await uploadSingleFile(logoFile, "logo");
-        logoUrl = uploaded?.url ?? null;
+        logoDataUrl = await readFileAsDataUrl(logoFile);
+        if (logoPreviewUrl?.startsWith("blob:")) {
+          URL.revokeObjectURL(logoPreviewUrl);
+        }
+      } else if (logoPreviewUrl?.startsWith("data:")) {
+        logoDataUrl = logoPreviewUrl;
       }
 
       const primary = normalizeHexForPreview(manualHexes[0] ?? "", "#5BC4C0");
       const secondary = normalizeHexForPreview(manualHexes[1] ?? "", "#4CAF82");
       const accent = normalizeHexForPreview(manualHexes[2] ?? "", "#1A3C34");
 
-      await axiosInstance.post("/onboarding", {
-        title: siteName.trim(),
+      const written = writeOnboardingStep1Cache({
+        siteName: siteName.trim(),
         colors: { primary, secondary, accent },
-        logo: logoUrl,
+        logoDataUrl,
+        manualHexes: [...manualHexes],
+        selectedPaletteName,
+        manualColorsVisible,
+      });
+      if (!written) {
+        toast.error(
+          "تعذر حفظ البيانات مؤقتاً (قد يكون الشعار كبيراً جداً). جرّب صورة أصغر أو تخطّ الشعار.",
+        );
+        return false;
+      }
+
+      setLogoFile(null);
+      setLogoPreviewUrl(logoDataUrl);
+      return true;
+    } catch (err: any) {
+      toast.error(err?.message || "تعذر حفظ بيانات الموقع مؤقتاً");
+      return false;
+    } finally {
+      persistStep1InFlightRef.current = false;
+      setSavingStep1(false);
+    }
+  };
+
+  /** Step 2 (بيانات التواصل): POST /onboarding — يتضمن دائماً `category: "realestate"`. */
+  const postOnboardingFromCachedStep1 = async () => {
+    if (postOnboardingInFlightRef.current) return false;
+    const cached = readOnboardingStep1Cache();
+    if (!cached?.siteName?.trim()) {
+      toast.error("يرجى إكمال خطوة هوية الموقع أولاً");
+      return false;
+    }
+
+    if (!step2Phone.trim()) {
+      setStep2PhoneHasError(true);
+      toast.error("يرجى إدخال رقم الجوال");
+      return false;
+    }
+
+    postOnboardingInFlightRef.current = true;
+    setSavingStep1(true);
+    try {
+      let logoUrl: string | null = null;
+      if (cached.logoDataUrl) {
+        const file = await dataUrlToFile(cached.logoDataUrl);
+        const uploaded = await uploadSingleFile(file, "logo");
+        logoUrl = uploaded?.url ?? null;
+      }
+
+      let faviconUrl: string | null = null;
+      if (step2FaviconFile) {
+        const uploaded = await uploadSingleFile(step2FaviconFile, "logo");
+        faviconUrl = uploaded?.url ?? null;
+      }
+
+      const primary = normalizeHexForPreview(cached.colors.primary, "#5BC4C0");
+      const secondary = normalizeHexForPreview(cached.colors.secondary, "#4CAF82");
+      const accent = normalizeHexForPreview(cached.colors.accent, "#1A3C34");
+
+      const body = buildOnboardingPostBody({
+        title: cached.siteName.trim(),
+        colors: { primary, secondary, accent },
+        logoUrl,
+        faviconUrl,
+        address: step2Address,
+        email: step2Email,
+        phone: step2Phone,
+        workingHours: step2WorkingHours,
+        valLicense: step2ValLicense,
+        allowUpdate: true,
       });
 
+      await axiosInstance.post("/onboarding", body);
+
+      clearOnboardingStep1Cache();
+      setStep2PhoneHasError(false);
       toast.success("تم حفظ بيانات الموقع");
       return true;
     } catch (err: any) {
@@ -95,11 +222,14 @@ export function OnboardingFlow({
       toast.error(message);
       return false;
     } finally {
+      postOnboardingInFlightRef.current = false;
       setSavingStep1(false);
     }
   };
 
   const saveStep3NewPropertyToBackend = async () => {
+    if (saveStep3InFlightRef.current) return false;
+    saveStep3InFlightRef.current = true;
     setSavingStep3(true);
     try {
       const newErrors = validatePropertyForm(
@@ -138,6 +268,7 @@ export function OnboardingFlow({
       toast.error(message);
       return false;
     } finally {
+      saveStep3InFlightRef.current = false;
       setSavingStep3(false);
     }
   };
@@ -148,6 +279,28 @@ export function OnboardingFlow({
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
+
+  // Hydrate step 1 fields from session (refresh / return to flow).
+  useEffect(() => {
+    const c = readOnboardingStep1Cache();
+    if (!c) return;
+    setSiteName(c.siteName);
+    setLogoPreviewUrl(c.logoDataUrl);
+    setManualHexes(c.manualHexes);
+    setSelectedPaletteName(c.selectedPaletteName);
+    setManualColorsVisible(c.manualColorsVisible);
+    setLogoFile(null);
+  }, []);
+
+  // Step 3 loads property reference GETs; suppress their toast.error (dashboard form still toasts).
+  useEffect(() => {
+    const isPropertyStep = currentStepIndex === 2;
+    if (isPropertyStep) {
+      setPropertyReferenceDataToastsSuppressed(true);
+      return () => setPropertyReferenceDataToastsSuppressed(false);
+    }
+    setPropertyReferenceDataToastsSuppressed(false);
+  }, [currentStepIndex]);
 
   // Prevent onboarding-test from redirecting if onboarding is already completed.
   useEffect(() => {
@@ -170,10 +323,20 @@ export function OnboardingFlow({
   };
 
   const handleNext = () => {
-    // Step 1: upload logo (optional) then save onboarding settings.
+    // Step 1 (هوية الموقع): write to sessionStorage only.
     if (currentStepIndex === 0) {
       void (async () => {
-        const ok = await saveStep1ToBackend();
+        const ok = await persistStep1ToSession();
+        if (!ok) return;
+        setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
+      })();
+      return;
+    }
+
+    // Step 2 (بيانات التواصل): upload logo + POST /onboarding from cache.
+    if (currentStepIndex === 1) {
+      void (async () => {
+        const ok = await postOnboardingFromCachedStep1();
         if (!ok) return;
         setStepIndex((prev) => clampStepIndex(prev + 1, ONBOARDING_STEPS_COUNT));
       })();
@@ -194,17 +357,18 @@ export function OnboardingFlow({
   };
 
   return (
-    <main className="relative min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E] overflow-hidden">
+    <main className="relative min-h-screen flex flex-1 items-center justify-center md:p-4 bg-[#4F9E8E] overflow-hidden pb-20 md:pb-0">
       <div className="pointer-events-none absolute  z-0 max-w-[70%]  bottom-0" aria-hidden="true">
         <img
-          src="/onboardingBackground.svg"
+          src="/onboarding-mask-group-18.svg"
           alt=""
           className="h-full w-full object-contain"
         />
       </div>
+      
 
       <div className="absolute top-10 left-10 z-20 flex items-center gap-2">
-        <span className="text-[14px] leading-none font-medium text-white whitespace-nowrap">
+        <span className="text-[14px] leading-none font-medium text-white whitespace-nowrap  sm:block hidden">
           هل تحتاج مساعدة؟
         </span>
 
@@ -232,13 +396,13 @@ export function OnboardingFlow({
         </button>
       </div>
 
-      <div className="relative z-10 w-full max-w-[75%]">
+      <div className="relative z-10 w-full max-w-[90%] md:max-w-[75%] mt-[100px] sm:mt-0">
         {!isCompletionStep && (
           <div className="text-center mb-6">
-            <h1 className="text-[48px] font-bold text-white">
+            <h1 className="text-[24px] sm:text-[32px] md:text-[40px] lg:text-[48px] font-bold text-white">
               موقعك الاحترافي جاهز خلال دقائق
             </h1>
-            <p className="text-[24px] text-white mt-2">
+            <p className="text-[16px] lg:text-[22px] text-gray-100/60 mb-2 pb-3">
               سنوجّهك لإعداد موقعك خطوة بخطوة بطريقة سهلة وسريعة
             </p>
           </div>
@@ -251,6 +415,7 @@ export function OnboardingFlow({
           />
         )}
 
+        {/* مبدل خطوة 3 (مخفي مؤقتاً): إضافة عقار من مواقع أخري | إنشاء عقار جديد
         {currentStepIndex === 2 && !isCompletionStep && (
           <div className="bg-white rounded-full p-1 max-w-[500px] justify-start mt-8">
             <div className="flex gap-2 rounded-full">
@@ -282,11 +447,12 @@ export function OnboardingFlow({
             </div>
           </div>
         )}
+        */}
 
         <section
           className={[
-            "mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full",
-            currentStepIndex === 2 ? "px-6" : "",
+            "mt-5 flex flex-col rounded-[2rem] border border-white bg-white/20 py-3 w-full ",
+            currentStepIndex === 2 ? "px-0 md:px-6" : "",
           ].join(" ")}
         >
           {isCompletionStep ? (
@@ -312,6 +478,22 @@ export function OnboardingFlow({
                 setSelectedPaletteName,
                 normalizeHexForPreview,
               }}
+              step2Props={{
+                phone: step2Phone,
+                setPhone: setStep2PhoneClearingError,
+                phoneHasError: step2PhoneHasError,
+                email: step2Email,
+                setEmail: setStep2Email,
+                address: step2Address,
+                setAddress: setStep2Address,
+                valLicense: step2ValLicense,
+                setValLicense: setStep2ValLicense,
+                faviconPreviewUrl: step2FaviconPreview,
+                setFaviconPreviewUrl: setStep2FaviconPreview,
+                setFaviconFile: setStep2FaviconFile,
+                workingHours: step2WorkingHours,
+                setWorkingHours: setStep2WorkingHours,
+              }}
             >
               <OnboardingNavigation
                 stepIndex={currentStepIndex}
@@ -320,18 +502,37 @@ export function OnboardingFlow({
                 onNext={handleNext}
                 onFinish={finishOnboarding}
                 onSkip={handleSkip}
+                hideSkipOnSecondStep={hideSkipOnSecondStep}
                 nextDisabled={
-                  (currentStepIndex === 0 && savingStep1) ||
+                  ((currentStepIndex === 0 || currentStepIndex === 1) && savingStep1) ||
                   (currentStepIndex === 2 && step3ActiveTab === "new" && savingStep3)
                 }
                 nextLoading={
-                  (currentStepIndex === 0 && savingStep1) ||
+                  ((currentStepIndex === 0 || currentStepIndex === 1) && savingStep1) ||
                   (currentStepIndex === 2 && step3ActiveTab === "new" && savingStep3)
                 }
               />
             </OnboardingStepPanel>
           )}
         </section>
+      </div>
+      <OnboardingHelpOfferDialog
+        open={helpOfferDialogOpen}
+        onOpenChange={setHelpOfferDialogOpen}
+        onContactWhatsApp={handleContactUs}
+      />
+
+      <div
+        className="absolute bottom-5 sm:mx-0 mx-auto z-20 sm:left-6"
+        dir="ltr"
+      >
+        <OnboardingSocialLinksRow links={ONBOARDING_HELP_SOCIAL_LINKS} />
+      </div>
+      <div
+        className="absolute bottom-5 z-20 hidden text-xl text-white sm:right-6 sm:mx-0 sm:block"
+        dir="ltr"
+      >
+        كل الحقوق محفوظة @٢٠٢٦
       </div>
     </main>
   );

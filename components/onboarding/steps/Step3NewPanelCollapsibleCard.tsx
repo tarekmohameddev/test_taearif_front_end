@@ -117,6 +117,7 @@ export default function Step3NewPanelCollapsibleCard() {
               categories={categories as any}
               projects={projects as any}
               buildings={buildings as any}
+              hideOnboardingIntro
               onInputChange={handleInputChange as any}
               onSwitchChange={handleSwitchChange}
               onSelectChange={handleSelectChange}

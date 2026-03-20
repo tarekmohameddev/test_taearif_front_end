@@ -25,7 +25,7 @@ export function OnboardingStepsHeader({
     switch (id) {
       case "step-1":
         return (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-8 w-8" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-6 w-6 md:h-8 md:w-8" aria-hidden="true">
             <circle cx="12" cy="12" r="10" />
             <path d="M2 12h20" />
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10" />
@@ -33,21 +33,21 @@ export function OnboardingStepsHeader({
         );
       case "step-2":
         return (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-8 w-8" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-6 w-6 md:h-8 md:w-8" aria-hidden="true">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
           </svg>
         );
       case "step-3":
         return (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-8 w-8" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-6 w-6 md:h-8 md:w-8" aria-hidden="true">
             <path d="M3 10.5L12 3l9 7.5" />
             <path d="M5 10v11h14V10" />
           </svg>
         );
       case "step-4":
         return (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-8 w-8" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="block h-6 w-6 md:h-8 md:w-8" aria-hidden="true">
             <path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1" />
             <path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1" />
           </svg>
@@ -60,7 +60,7 @@ export function OnboardingStepsHeader({
   };
 
   return (
-    <header className="flex items-start justify-between gap-0 text-white">
+    <header className="flex items-start justify-between gap-3 text-white md:gap-0">
       {stepsToRender.map((step, index) => {
         const isActive = index === displayStepIndex;
         const isPassedOrCurrent = index <= displayStepIndex;
@@ -69,10 +69,10 @@ export function OnboardingStepsHeader({
         return (
           <React.Fragment key={step.id}>
             {/* ── Step ── */}
-            <div className="relative z-10 flex flex-col items-center">
+            <div className="relative z-10 flex min-w-0 flex-1 flex-col items-center px-0.5">
               {/* Circle */}
               <div
-                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-transparent"
+                className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-[length:100%_100%] md:h-12 md:w-12"
                 aria-current={isActive ? "step" : undefined}
                 style={{
                   backgroundImage: `url("${isPassedOrCurrent ? activeCircleBg : inactiveCircleBg}")`,
@@ -83,13 +83,13 @@ export function OnboardingStepsHeader({
               >
                 <div
                   className={cn(
-                    "relative flex h-10 w-10 items-center justify-center",
+                    "relative flex h-6 w-6 items-center justify-center md:h-10 md:w-10",
                     isPassedOrCurrent ? "text-[#4F9E8E]" : "text-white"
                   )}
                 >
                   <div
                     className={cn(
-                      "absolute rounded-full p-10",
+                      "absolute rounded-full p-8 md:p-10",
                       isPassedOrCurrent
                         ? "bg-white"
                         : "border border-white bg-white/20"
@@ -104,7 +104,7 @@ export function OnboardingStepsHeader({
               </div>
 
               {/* Title */}
-              <div className="mt-5 text-center text-[22px] font-bold leading-tight text-white">
+              <div className="mt-6 w-full text-center text-[12px] font-bold leading-tight text-white sm:text-sm md:mt-5 md:text-[22px] whitespace-nowrap">
                 {step.title}
               </div>
             </div>

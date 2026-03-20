@@ -32,6 +32,8 @@ interface BasicInfoCardProps {
   categories: any[];
   projects: any[];
   buildings: any[];
+  // When rendering this card inside onboarding, hide the intro header texts.
+  hideOnboardingIntro?: boolean;
   onInputChange: (e: any) => void;
   onSwitchChange: (name: string, checked: boolean) => void;
   onSelectChange: (name: string, value: string) => void;
@@ -49,6 +51,7 @@ export default function BasicInfoCard({
   categories,
   projects,
   buildings,
+  hideOnboardingIntro = false,
   onInputChange,
   onSwitchChange,
   onSelectChange,
@@ -58,44 +61,60 @@ export default function BasicInfoCard({
   cardHasMissingFields,
 }: BasicInfoCardProps) {
   return (
-    <Card className="w-full">
+    <Card
+      className={
+        hideOnboardingIntro
+          ? "w-full border-none bg-transparent p-0 rounded-none"
+          : "w-full"
+      }
+    >
+            {!hideOnboardingIntro && (
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-xl">معلومات الوحدة الأساسية</CardTitle>
-              {isDraft &&
-                cardHasMissingFields([
-                  "title",
-                  "description",
-                  "address",
-                  "purpose",
-                  "category",
-                  "city_id",
-                ]) && (
-                  <Badge
-                    variant="outline"
-                    className="bg-orange-100 text-orange-800 border-orange-300"
-                  >
-                    حقول مطلوبة
-                  </Badge>
-                )}
+              <>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-xl">
+                    معلومات الوحدة الأساسية
+                  </CardTitle>
+                  {isDraft &&
+                    cardHasMissingFields([
+                      "title",
+                      "description",
+                      "address",
+                      "purpose",
+                      "category",
+                      "city_id",
+                    ]) && (
+                      <Badge
+                        variant="outline"
+                        className="bg-orange-100 text-orange-800 border-orange-300"
+                      >
+                        حقول مطلوبة
+                      </Badge>
+                    )}
+                </div>
+                <CardDescription>أدخل المعلومات الأساسية للوحدة</CardDescription>
+              </>
+          </div>
+            <div className="flex items-center space-x-2 gap-2">
+              <Switch
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={(checked) =>
+                  onSwitchChange("featured", checked)
+                }
+              />
+              <Label htmlFor="featured" className="mr-2">
+                عرض هذه الوحدة في الصفحة الرئيسية (مميزة)
+              </Label>
             </div>
-            <CardDescription>أدخل المعلومات الأساسية للوحدة</CardDescription>
-          </div>
-          <div className="flex items-center space-x-2 gap-2">
-            <Switch
-              id="featured"
-              checked={formData.featured}
-              onCheckedChange={(checked) => onSwitchChange("featured", checked)}
-            />
-            <Label htmlFor="featured" className="mr-2">
-              عرض هذه الوحدة في الصفحة الرئيسية (مميزة)
-            </Label>
-          </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+          )}
+      <CardContent
+        className={hideOnboardingIntro ? "space-y-4 p-0" : "space-y-4"}
+      >
         <div className="space-y-2">
           <Label htmlFor="title">
             اسم الوحدة <span className="text-red-500">*</span>
@@ -116,10 +135,16 @@ export default function BasicInfoCard({
             onChange={onInputChange}
             className={
               errors.title
-                ? "border-red-500"
+                ? hideOnboardingIntro
+                  ? "border-red-500 rounded-xl"
+                  : "border-red-500"
                 : isDraft && isFieldMissing("title")
-                  ? "border-orange-400 bg-orange-50"
-                  : ""
+                  ? hideOnboardingIntro
+                    ? "border-orange-400 bg-orange-50 rounded-xl"
+                    : "border-orange-400 bg-orange-50"
+                  : hideOnboardingIntro
+                    ? "rounded-xl"
+                    : ""
             }
           />
           {errors.title && (
@@ -143,15 +168,21 @@ export default function BasicInfoCard({
             id="description"
             name="description"
             placeholder="شقة جميلة مع تشطيبات حديثة وإطلالات رائعة على المدينة"
-            rows={25}
+            rows={hideOnboardingIntro ? 3 : 25}
             value={formData.description}
             onChange={onInputChange}
             className={
               errors.description
-                ? "border-red-500"
+                ? hideOnboardingIntro
+                  ? "border-red-500 rounded-xl"
+                  : "border-red-500"
                 : isDraft && isFieldMissing("description")
-                  ? "border-orange-400 bg-orange-50"
-                  : ""
+                  ? hideOnboardingIntro
+                    ? "border-orange-400 bg-orange-50 rounded-xl"
+                    : "border-orange-400 bg-orange-50"
+                  : hideOnboardingIntro
+                    ? "rounded-xl"
+                    : ""
             }
           />
           {errors.description && (
@@ -179,10 +210,16 @@ export default function BasicInfoCard({
               onChange={onInputChange}
               className={
                 errors.address
-                  ? "border-red-500"
+                  ? hideOnboardingIntro
+                    ? "border-red-500 rounded-xl"
+                    : "border-red-500"
                   : isDraft && isFieldMissing("address")
-                    ? "border-orange-400 bg-orange-50"
-                    : ""
+                    ? hideOnboardingIntro
+                      ? "border-orange-400 bg-orange-50 rounded-xl"
+                      : "border-orange-400 bg-orange-50"
+                    : hideOnboardingIntro
+                      ? "rounded-xl"
+                      : ""
               }
             />
             {errors.address && (
@@ -202,7 +239,15 @@ export default function BasicInfoCard({
             >
               <SelectTrigger
                 id="building_id"
-                className={errors.building_id ? "border-red-500" : ""}
+                className={
+                  errors.building_id
+                    ? hideOnboardingIntro
+                      ? "border-red-500 rounded-xl"
+                      : "border-red-500"
+                    : hideOnboardingIntro
+                      ? "rounded-xl"
+                      : ""
+                }
               >
                 <SelectValue placeholder="اختر العمارة" />
               </SelectTrigger>
@@ -230,7 +275,15 @@ export default function BasicInfoCard({
               placeholder="750000"
               value={formData.price}
               onChange={onInputChange}
-              className={errors.price ? "border-red-500" : ""}
+              className={
+                errors.price
+                  ? hideOnboardingIntro
+                    ? "border-red-500 rounded-xl"
+                    : "border-red-500"
+                  : hideOnboardingIntro
+                    ? "rounded-xl"
+                    : ""
+              }
             />
             {errors.price && (
               <p className="text-sm text-red-500">{errors.price}</p>
@@ -250,7 +303,15 @@ export default function BasicInfoCard({
             >
               <SelectTrigger
                 id="payment_method"
-                className={errors.payment_method ? "border-red-500" : ""}
+                className={
+                  errors.payment_method
+                    ? hideOnboardingIntro
+                      ? "border-red-500 rounded-xl"
+                      : "border-red-500"
+                    : hideOnboardingIntro
+                      ? "rounded-xl"
+                      : ""
+                }
               >
                 <SelectValue placeholder="اختر طريقة الدفع" />
               </SelectTrigger>
@@ -277,7 +338,15 @@ export default function BasicInfoCard({
               placeholder="750000"
               value={formData.pricePerMeter}
               onChange={onInputChange}
-              className={errors.pricePerMeter ? "border-red-500" : ""}
+              className={
+                errors.pricePerMeter
+                  ? hideOnboardingIntro
+                    ? "border-red-500 rounded-xl"
+                    : "border-red-500"
+                  : hideOnboardingIntro
+                    ? "rounded-xl"
+                    : ""
+              }
             />
             {errors.pricePerMeter && (
               <p className="text-sm text-red-500">{errors.pricePerMeter}</p>
@@ -309,10 +378,16 @@ export default function BasicInfoCard({
                 id="purpose"
                 className={
                   errors.purpose
-                    ? "border-red-500"
+                    ? hideOnboardingIntro
+                      ? "border-red-500 rounded-xl"
+                      : "border-red-500"
                     : isDraft && isFieldMissing("purpose")
-                      ? "border-orange-400 bg-orange-50"
-                      : ""
+                      ? hideOnboardingIntro
+                        ? "border-orange-400 bg-orange-50 rounded-xl"
+                        : "border-orange-400 bg-orange-50"
+                      : hideOnboardingIntro
+                        ? "rounded-xl"
+                        : ""
                 }
               >
                 <SelectValue placeholder="اختر النوع" />
@@ -342,7 +417,15 @@ export default function BasicInfoCard({
             >
               <SelectTrigger
                 id="category"
-                className={errors.category ? "border-red-500" : ""}
+                className={
+                  errors.category
+                    ? hideOnboardingIntro
+                      ? "border-red-500 rounded-xl"
+                      : "border-red-500"
+                    : hideOnboardingIntro
+                      ? "rounded-xl"
+                      : ""
+                }
               >
                 <SelectValue placeholder="اختر الفئة" />
               </SelectTrigger>
@@ -371,7 +454,15 @@ export default function BasicInfoCard({
             >
               <SelectTrigger
                 id="project"
-                className={errors.project_id ? "border-red-500" : ""}
+                className={
+                  errors.project_id
+                    ? hideOnboardingIntro
+                      ? "border-red-500 rounded-xl"
+                      : "border-red-500"
+                    : hideOnboardingIntro
+                      ? "rounded-xl"
+                      : ""
+                }
               >
                 <SelectValue placeholder="اختر المشروع" />
               </SelectTrigger>
@@ -406,13 +497,16 @@ export default function BasicInfoCard({
               <div
                 className={
                   isDraft && isFieldMissing("city_id")
-                    ? "border-2 border-orange-400 rounded-md"
+                    ? hideOnboardingIntro
+                      ? "border-2 border-orange-400 rounded-xl"
+                      : "border-2 border-orange-400 rounded-md"
                     : ""
                 }
               >
                 <CitySelector
                   selectedCityId={formData.city_id}
                   onCitySelect={onCitySelect}
+                  className={hideOnboardingIntro ? "rounded-xl" : undefined}
                 />
               </div>
             </div>
@@ -425,6 +519,7 @@ export default function BasicInfoCard({
                 selectedCityId={formData.city_id}
                 selectedDistrictId={formData.district_id}
                 onDistrictSelect={onDistrictSelect}
+                className={hideOnboardingIntro ? "rounded-xl" : undefined}
               />
             </div>
           </div>
@@ -456,10 +551,16 @@ export default function BasicInfoCard({
                 id="PropertyType"
                 className={
                   errors.PropertyType
-                    ? "border-red-500"
+                    ? hideOnboardingIntro
+                      ? "border-red-500 rounded-xl"
+                      : "border-red-500"
                     : isDraft && isFieldMissing("type")
-                      ? "border-orange-400 bg-orange-50"
-                      : ""
+                      ? hideOnboardingIntro
+                        ? "border-orange-400 bg-orange-50 rounded-xl"
+                        : "border-orange-400 bg-orange-50"
+                      : hideOnboardingIntro
+                        ? "rounded-xl"
+                        : ""
                 }
               >
                 <SelectValue placeholder="اختر النوع" />
@@ -485,7 +586,15 @@ export default function BasicInfoCard({
               value={formData.advertising_license}
               onChange={onInputChange}
               placeholder="أدخل رقم الترخيص الاعلاني"
-              className={errors.advertising_license ? "border-red-500" : ""}
+              className={
+                errors.advertising_license
+                  ? hideOnboardingIntro
+                    ? "border-red-500 rounded-xl"
+                    : "border-red-500"
+                  : hideOnboardingIntro
+                    ? "rounded-xl"
+                    : ""
+              }
               dir="rtl"
             />
             {errors.advertising_license && (

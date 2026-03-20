@@ -125,9 +125,9 @@ export function WelcomeDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          مرحباً بك في {userData?.username || "لوحة التحكم"}!
+          مرحباً, {userData?.username || "لوحة التحكم"}!
         </h1>
-        <p className="text-muted-foreground">هذه نظرة عامة على موقعك وأدائه.</p>
+        <p className="text-muted-foreground">إليك ملخص لوحة تحكمك العقارية اليوم</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

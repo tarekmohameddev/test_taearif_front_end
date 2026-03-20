@@ -121,7 +121,7 @@ export default function Step1ColorsPanel({
       {/* التخصيص اليدوي */}
       {manualColorsVisible && (
         <>
-          <div className="mt-5 dir-ltr flex items-center gap-1">
+          <div className="mt-5 dir-ltr grid grid-cols-2 gap-3 sm:grid-cols-3 sm:items-center sm:gap-1">
             {manualHexes.map((hex, idx) => {
               const fallback =
                 ["#5BC4C0", "#4CAF82", "#1A3C34"][idx] ?? "#000000";
@@ -131,7 +131,10 @@ export default function Step1ColorsPanel({
                 <div
                   // Key must be stable so React doesn't remount the input while typing.
                   key={idx}
-                  className="flex h-[38px] w-[150px] flex-row-reverse items-center justify-center gap-4"
+                  className={[
+                    "flex h-[38px] w-full min-w-0 max-w-[150px] flex-row-reverse items-center justify-center gap-4 sm:w-[150px] sm:justify-self-auto",
+                    idx === 2 ? "col-span-2 justify-self-center sm:col-span-1" : "justify-self-center",
+                  ].join(" ")}
                 >
                   {/* Hex input on the left */}
                   <input
