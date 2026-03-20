@@ -402,7 +402,7 @@ export function OnboardingFlow({
             <h1 className="text-[24px] sm:text-[32px] md:text-[40px] lg:text-[48px] font-bold text-white">
               موقعك الاحترافي جاهز خلال دقائق
             </h1>
-            <p className="text-[16px] lg:text-[24px] text-white mt-2">
+            <p className="text-[16px] lg:text-[22px] text-gray-100/60 mb-2 pb-3">
               سنوجّهك لإعداد موقعك خطوة بخطوة بطريقة سهلة وسريعة
             </p>
           </div>
