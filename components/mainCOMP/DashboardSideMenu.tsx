@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, User, X } from "lucide-react";
+import { LogOut, User, X } from "lucide-react";
 import { useDashboardMobileMenuStore } from "@/context/dashboardMobileMenuStore";
 import useAuthStore from "@/context/AuthContext";
 import { selectUserData, selectUserIsLogged } from "@/context/auth/selectors";
@@ -118,6 +118,15 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
     [onNavigate],
   );
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await useAuthStore.getState().logout();
+      onNavigate?.();
+    } catch (error) {
+      console.error(error);
+    }
+  }, [onNavigate]);
+
   return (
     <div
       style={{ backgroundColor: MENU_BG }}
@@ -200,7 +209,7 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
       </nav>
 
       {isLogged && (
-        <footer className="shrink-0 border-t border-white/20 p-3">
+        <footer className="shrink-0 space-y-1 border-t border-white/20 p-3">
           <Link
             href="/dashboard/settings"
             onClick={() => onNavigate?.()}
@@ -209,6 +218,14 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
             <User className="h-5 w-5 shrink-0" />
             حسابي
           </Link>
+          <button
+            type="button"
+            onClick={() => void handleLogout()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-white/90 transition hover:bg-white/15 hover:text-white"
+          >
+            <LogOut className="h-5 w-5 shrink-0" />
+            تسجيل خروج
+          </button>
         </footer>
       )}
       </div>
