@@ -21,6 +21,7 @@ import {
   ContactCardsSkeleton1,
 } from "@/components/skeleton";
 import { I18nProvider } from "@/components/providers/I18nProvider";
+import { AuthProvider } from "@/context/AuthContext";
 import GA4Provider from "@/components/GA4Provider";
 import GTMProvider from "@/components/GTMProvider";
 import { LanguageSwitcher } from "@/components/tenant/LanguageSwitcher";
@@ -523,11 +524,12 @@ export default function HomePageWrapper({
   );
 
   return (
-    <GTMProvider>
-      <GA4Provider tenantId={tenantId} domainType={domainType}>
-        <PixelScripts tenantId={tenantId} />
-        <I18nProvider>
-          <div className="min-h-screen flex flex-col" dir="rtl">
+    <AuthProvider>
+      <GTMProvider>
+        <GA4Provider tenantId={tenantId} domainType={domainType}>
+          <PixelScripts tenantId={tenantId} />
+          <I18nProvider>
+            <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header from globalComponentsData */}
             <div className="relative">
               <Suspense fallback={<SkeletonLoader componentName="header" />}>
@@ -673,8 +675,9 @@ export default function HomePageWrapper({
               })()}
             </Suspense>
           </div>
-        </I18nProvider>
-      </GA4Provider>
-    </GTMProvider>
+          </I18nProvider>
+        </GA4Provider>
+      </GTMProvider>
+    </AuthProvider>
   );
 }

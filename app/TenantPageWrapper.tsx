@@ -37,6 +37,7 @@ import {
 } from "@/lib/ComponentsInCenter";
 import GA4Provider from "@/components/GA4Provider";
 import GTMProvider from "@/components/GTMProvider";
+import { AuthProvider } from "@/context/AuthContext";
 import { trackProjectView } from "@/lib/ga4-tracking";
 import {
   isMultiLevelPage,
@@ -586,11 +587,12 @@ export default function TenantPageWrapper({
   });
 
   return (
-    <GTMProvider>
-      <GA4Provider tenantId={tenantId} domainType={domainType}>
-        <PixelScripts tenantId={tenantId} pageType={slug} />
-        <I18nProvider>
-          <div className="min-h-screen flex flex-col" dir="rtl">
+    <AuthProvider>
+      <GTMProvider>
+        <GA4Provider tenantId={tenantId} domainType={domainType}>
+          <PixelScripts tenantId={tenantId} pageType={slug} />
+          <I18nProvider>
+            <div className="min-h-screen flex flex-col" dir="rtl">
             {/* Header with i18n support */}
             <div className="relative">
               <Suspense fallback={<SkeletonLoader componentName="header" />}>
@@ -784,8 +786,9 @@ export default function TenantPageWrapper({
               })()}
             </Suspense>
           </div>
-        </I18nProvider>
-      </GA4Provider>
-    </GTMProvider>
+          </I18nProvider>
+        </GA4Provider>
+      </GTMProvider>
+    </AuthProvider>
   );
 }
