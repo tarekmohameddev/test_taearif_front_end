@@ -93,9 +93,9 @@ export function DashboardHeader() {
   }, [pathname]);
 
   return (
-    <header className="flex w-full shrink-0 flex-col bg-transparent px-0 sm:px-5">
+    <header className="sticky lg:mt-5 py-2 px-4 top-0 z-20 flex w-full shrink-0 flex-col bg-gray-50/95 sm:py-0 shadow-[0_1px_0_0_rgb(229_231_235)] backdrop-blur-sm sm:px-5 lg:static lg:top-auto lg:z-auto lg:bg-transparent lg:shadow-none lg:backdrop-blur-none ">
       <div
-        className="flex w-full items-center justify-center lg:hidden"
+        className="flex w-full items-center justify-center lg:hidden pt-3"
         aria-hidden
       >
         <Image
@@ -139,7 +139,7 @@ export function DashboardHeader() {
         </div>
       </div>
       <div
-        className="h-px w-full shrink-0 bg-gray-200 mt-2"
+        className="h-px w-full shrink-0 bg-gray-200 mt-2 hidden lg:block"
         role="separator"
         aria-hidden
       />

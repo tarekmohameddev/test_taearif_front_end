@@ -238,7 +238,7 @@ export default function DashboardLayout({
         <PermissionWrapper>
           <div className="flex min-h-screen flex-col lg:flex-row" dir="rtl">
             <DashboardSideMenu />
-            <main className="flex min-w-0 flex-1 flex-col p-4">
+            <main className="flex min-w-0 flex-1 flex-col ">
               <DashboardHeader />
               <div className="min-h-0 flex-1">{children}</div>
             </main>
