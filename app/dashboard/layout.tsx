@@ -21,8 +21,7 @@ const PermissionWrapper = dynamic(
     ),
   },
 );
-import { DashboardHeader } from "@/components/mainCOMP/dashboard-header";
-import { DashboardSidebar } from "@/components/mainCOMP/DashboardSidebar";
+import { DashboardSideMenu } from "@/components/mainCOMP/DashboardSideMenu";
 import useSidebarStore from "@/context/sidebarStore";
 
 // مفتاح sessionStorage لتخزين حالة التحقق
@@ -236,14 +235,9 @@ export default function DashboardLayout({
     <GTMProvider containerId="GTM-KBL37C9T">
       <div dir="rtl" style={{ direction: "rtl" }}>
         <PermissionWrapper>
-          <div className="flex min-h-screen flex-col" dir="rtl">
-            <DashboardHeader />
-            <div className="flex flex-1 flex-col md:flex-row">
-              <DashboardSidebar />
-              <main className="flex-1 p-4">
-                {children}
-              </main>
-            </div>
+          <div className="flex min-h-screen flex-col lg:flex-row" dir="rtl">
+            <DashboardSideMenu />
+            <main className="min-w-0 flex-1 p-4">{children}</main>
           </div>
         </PermissionWrapper>
       </div>
