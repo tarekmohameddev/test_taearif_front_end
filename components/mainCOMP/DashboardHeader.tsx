@@ -90,7 +90,20 @@ export function DashboardHeader() {
   }, [pathname]);
 
   return (
-    <header className="flex w-full shrink-0 flex-col bg-transparent px-8">
+    <header className="flex w-full shrink-0 flex-col bg-transparent px-0 sm:px-8">
+      <div
+        className="flex w-full items-center justify-center py-2 lg:hidden"
+        aria-hidden
+      >
+        <Image
+          src="/logo.svg"
+          alt=""
+          width={280}
+          height={120}
+          className="h-10 w-auto max-w-[min(100%,280px)] object-contain object-center "
+        />
+      </div>
+
       <div
         className="flex w-full items-center justify-between gap-4 py-2"
         dir="rtl"
