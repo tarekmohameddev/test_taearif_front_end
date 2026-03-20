@@ -27,6 +27,12 @@ function isActivePath(pathWithoutLocale: string, href: string, items: MainNavIte
 }
 
 function pageTitleForPath(pathWithoutLocale: string): string {
+  const normalized =
+    pathWithoutLocale.replace(/\/+$/, "") || "/";
+  if (normalized === "/dashboard") {
+    return "الرئيسية";
+  }
+
   const matches = staticMenuItems.filter((item) =>
     isActivePath(pathWithoutLocale, item.path, staticMenuItems),
   );
