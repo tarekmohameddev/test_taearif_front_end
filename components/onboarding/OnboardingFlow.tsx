@@ -360,9 +360,9 @@ export function OnboardingFlow({
     <main className="relative min-h-screen flex flex-1 items-center justify-center p-4 bg-[#4F9E8E] overflow-hidden pb-20 md:pb-0">
       <div className="pointer-events-none absolute  z-0 max-w-[70%]  bottom-0" aria-hidden="true">
         <img
-          src="/onboardingBackground.svg"
+          src="/onboarding-mask-group-18.svg"
           alt=""
-          className="h-full w-full object-contain "
+          className="h-full w-full object-contain"
         />
       </div>
       
