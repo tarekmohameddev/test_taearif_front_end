@@ -154,7 +154,7 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
       </div>
 
 
-      <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-2 pb-3 pt-1">
+      <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto hide-scrollbar px-2 pb-3 pt-1">
         {staticMenuItems.map((item) => {
           const active = isActivePath(pathWithoutLocale, item.path, staticMenuItems);
           const Icon = item.icon;
