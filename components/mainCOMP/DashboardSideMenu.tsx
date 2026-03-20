@@ -243,7 +243,7 @@ export function DashboardSideMenu() {
   const pathname = usePathname() || "/";
 
   return (
-    <aside className="relative hidden w-[280px] shrink-0 lg:flex lg:flex-col lg:self-stretch lg:border-l lg:border-white/25">
+    <aside className="relative hidden w-[260px] shrink-0 lg:flex lg:flex-col lg:self-stretch lg:border-l lg:border-white/25">
       <div className="sticky top-0 flex h-[100dvh] max-h-screen flex-col">
         <NavPanel pathname={pathname} />
       </div>
