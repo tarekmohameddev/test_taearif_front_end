@@ -1,22 +1,15 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, Menu, User } from "lucide-react";
+import { ExternalLink, User } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
 import { selectUserData, selectUserIsLogged } from "@/context/auth/selectors";
 import { cn } from "@/lib/utils";
 import { getLocaleFromPathname, removeLocaleFromPathname } from "@/lib/i18n/config";
 import { getPreviewSiteUrl } from "@/lib/utils/previewDomain";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 import {
   staticMenuItems,
   type MainNavItem,
@@ -248,62 +241,12 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
 
 export function DashboardSideMenu() {
   const pathname = usePathname() || "/";
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const userData = useAuthStore(selectUserData);
-  const stored = readStoredTenant();
-  const shortTitle =
-    userData?.company_name || stored.company_name || "لوحة التحكم";
 
   return (
-    <>
-      <div
-        style={{ backgroundColor: MENU_BG }}
-        className="sticky top-0 z-40 flex items-center gap-3 border-b border-white/20 px-3 py-3.5 lg:hidden"
-      >
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="text-white"
-              aria-label="فتح القائمة"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            style={{ backgroundColor: MENU_BG }}
-            className="w-[min(100%,320px)] p-0"
-          >
-            <SheetTitle className="sr-only">قائمة لوحة التحكم</SheetTitle>
-            <NavPanel pathname={pathname} onNavigate={() => setMobileOpen(false)} />
-          </SheetContent>
-        </Sheet>
-        <Link
-          href="/dashboard"
-          className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 rounded-sm"
-        >
-          <Image
-            src={LOGO_SRC}
-            alt="تعريف"
-            width={123}
-            height={99}
-            className="h-10 w-auto max-w-[160px] object-contain"
-            priority
-          />
-        </Link>
-        <p className="min-w-0 flex-1 truncate text-start text-sm font-semibold text-white">
-          {shortTitle}
-        </p>
+    <aside className="relative hidden w-[280px] shrink-0 lg:flex lg:flex-col lg:self-stretch lg:border-l lg:border-white/25">
+      <div className="sticky top-0 flex h-[100dvh] max-h-screen flex-col">
+        <NavPanel pathname={pathname} />
       </div>
-
-      <aside className="relative hidden w-[280px] shrink-0 lg:flex lg:flex-col lg:self-stretch lg:border-l lg:border-white/25">
-        <div className="sticky top-0 flex h-[100dvh] max-h-screen flex-col">
-          <NavPanel pathname={pathname} className="h-full" />
-        </div>
-      </aside>
-    </>
+    </aside>
   );
 }
