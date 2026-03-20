@@ -477,6 +477,84 @@ export default function Footer(props: FooterProps = {}) {
         : "#1f2937", // fallback to original color
   };
 
+  // Contact fallback logic:
+  // If footer contact fields are missing / placeholder, we use tenantData.WebsiteLayout.companyInfo.
+  const websiteCompanyInfo =
+    (tenantData as any)?.WebsiteLayout?.companyInfo ||
+    (tenantData as any)?.websiteLayout?.companyInfo ||
+    (tenantData as any)?.companyInfo ||
+    (tenantData as any)?.WebsiteLayout?.CustomBranding?.companyInfo ||
+    (tenantData as any)?.WebsiteLayout?.CustomBranding?.footer?.companyInfo;
+
+  // Optional shape for type-safety (runtime data can vary).
+  const websiteCompanyInfoTyped = websiteCompanyInfo as
+    | {
+        email?: unknown;
+        phone?: unknown;
+        address?: unknown;
+      }
+    | undefined;
+
+  const normalizeToString = (value: unknown): string => {
+    if (value === null || value === undefined) return "";
+    if (typeof value === "string") return value.trim();
+    return String(value).trim();
+  };
+
+  const isMissingOrNA = (value: string): boolean => {
+    const v = value.trim();
+    if (!v) return true;
+    const lower = v.toLowerCase();
+    // Covers "N/A", "N/A ", "n / a", "NA", etc.
+    return (
+      lower === "n/a" ||
+      lower === "na" ||
+      /^n\s*\/\s*a$/i.test(v) ||
+      /^n\s*a$/i.test(v)
+    );
+  };
+
+  const isPhonePlaceholder = (value: string): boolean => {
+    const v = value.trim();
+    return v === "" || v === "0000";
+  };
+
+  const contactInfo = mergedData?.content?.contactInfo as
+    | {
+        address?: unknown;
+        phone1?: unknown;
+        phone2?: unknown;
+        email?: unknown;
+      }
+    | undefined;
+
+  const companyAddress = normalizeToString(websiteCompanyInfoTyped?.address);
+  const companyPhone = normalizeToString(websiteCompanyInfoTyped?.phone);
+  const companyEmail = normalizeToString(websiteCompanyInfoTyped?.email);
+
+  const addressRaw = normalizeToString(contactInfo?.address);
+  const phone1Raw = normalizeToString(contactInfo?.phone1);
+  const phone2Raw = normalizeToString(contactInfo?.phone2);
+  const emailRaw = normalizeToString(contactInfo?.email);
+
+  const displayAddress = isMissingOrNA(addressRaw)
+    ? companyAddress || ""
+    : addressRaw;
+
+  const displayPhone1 = isPhonePlaceholder(phone1Raw)
+    ? companyPhone || phone1Raw
+    : phone1Raw;
+
+  const showPhone2 = !isPhonePlaceholder(phone2Raw);
+  const displayPhone2 = phone2Raw;
+
+  // Footer1 uses a hardcoded default email in defaults ("info@example.com").
+  const FOOTER1_STATIC_EMAIL = "info@example.com";
+  const displayEmail =
+    isMissingOrNA(emailRaw) || emailRaw === FOOTER1_STATIC_EMAIL
+      ? companyEmail || emailRaw
+      : emailRaw;
+
   // Helper function to get background color based on useDefaultColor and globalColorType
   const getBackgroundColor = (): string => {
     const colorField = mergedData?.background?.color;
@@ -860,42 +938,44 @@ export default function Footer(props: FooterProps = {}) {
                   <span
                     className={`text-${mergedData.styling.typography.bodySize} text-white/90`}
                   >
-                    {mergedData.content.contactInfo.address}
+                    {displayAddress}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Phone className="size-5" />
                   <div className="space-y-1">
                     <a
-                      href={`tel:${mergedData.content.contactInfo.phone1}`}
+                      href={`tel:${displayPhone1}`}
                       className={`block text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
                       style={{
                         transition: mergedData.styling.effects.hoverTransition,
                       }}
                     >
-                      {mergedData.content.contactInfo.phone1}
+                      {displayPhone1}
                     </a>
-                    <a
-                      href={`tel:${mergedData.content.contactInfo.phone2}`}
-                      className={`block text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
-                      style={{
-                        transition: mergedData.styling.effects.hoverTransition,
-                      }}
-                    >
-                      {mergedData.content.contactInfo.phone2}
-                    </a>
+                    {showPhone2 && (
+                      <a
+                        href={`tel:${displayPhone2}`}
+                        className={`block text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
+                        style={{
+                          transition: mergedData.styling.effects.hoverTransition,
+                        }}
+                      >
+                        {displayPhone2}
+                      </a>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="size-5" />
                   <a
-                    href={`mailto:${mergedData.content.contactInfo.email}`}
+                    href={`mailto:${displayEmail}`}
                     className={`text-${mergedData.styling.typography.bodySize} text-white/90 hover:text-emerald-400`}
                     style={{
                       transition: mergedData.styling.effects.hoverTransition,
                     }}
                   >
-                    {mergedData.content.contactInfo.email}
+                    {displayEmail}
                   </a>
                 </div>
               </div>
@@ -947,7 +1027,11 @@ export default function Footer(props: FooterProps = {}) {
                   {/* WhatsApp Inquiry Button */}
                   {mergedData.content.socialMedia.whatsappInquiry?.enabled && (
                     <a
-                      href={`https://wa.me/${(mergedData.content.socialMedia.whatsappInquiry?.phoneNumber || mergedData.content.contactInfo.phone1 || "").replace(/\D/g, "")}?text=${encodeURIComponent(
+                      href={`https://wa.me/${(
+                        mergedData.content.socialMedia.whatsappInquiry?.phoneNumber ||
+                        displayPhone1 ||
+                        ""
+                      ).replace(/\D/g, "")}?text=${encodeURIComponent(
                         mergedData.content.socialMedia.whatsappInquiry?.message || "مرحباً، أريد الاستفسار عن"
                       )}`}
                       target="_blank"
