@@ -84,12 +84,12 @@ export function DashboardHeader() {
   }, [pathname]);
 
   return (
-    <header className="w-full shrink-0 border-b border-gray-200 bg-transparent">
+    <header className="flex w-full shrink-0 flex-col bg-transparent px-8">
       <div
         className="flex w-full items-center justify-between gap-4 py-2"
         dir="rtl"
       >
-        <h1 className="min-w-0 max-w-[55%] shrink truncate text-lg font-semibold text-gray-900 sm:text-[30px]">
+        <h1 className="min-w-0 max-w-[55%] shrink truncate py-2 text-lg font-semibold text-gray-900 sm:text-[30px]">
           {title}
         </h1>
 
@@ -97,25 +97,30 @@ export function DashboardHeader() {
           <button
             type="button"
             onClick={onVisitSite}
-            className="rounded-full border border-[#4F9E8E] bg-white px-4 py-2 text-sm font-medium text-[#3d7d70] shadow-sm transition hover:bg-[#4F9E8E]/10"
+            className="rounded-full border border-black bg-black px-10 py-1 text-sm font-medium text-white shadow-sm transition hover:bg-neutral-900"
           >
             زيارة الموقع
           </button>
           <button
             type="button"
             aria-label="الإشعارات"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white/80 text-gray-700 shadow-sm transition hover:bg-gray-50"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/80 text-gray-700 shadow-sm transition hover:bg-gray-50"
           >
             <Image
               src="/icons/dashboard-bell.svg"
               alt=""
               width={20}
               height={20}
-              className="h-5 w-5 object-contain"
+              className="h-8 w-8 object-contain"
             />
           </button>
         </div>
       </div>
+      <div
+        className="h-px w-full shrink-0 bg-gray-200 mt-2"
+        role="separator"
+        aria-hidden
+      />
     </header>
   );
 }
