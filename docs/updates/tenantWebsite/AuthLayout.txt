@@ -1,0 +1,29 @@
+2025-03-19 00:00:00
+Update Type: Feature
+Implemented AuthLayout left panel: RTL, teal background, building-bg.svg, logo, title, subtitle, 5 feature bullets (#B5FCCF), footer. Added Storybook staticDirs for stories/assets.
+.storybook/main.ts, stories/AuthPages/AuthLayout/AuthLayout.tsx
+
+2025-03-19 12:00:00
+Update Type: Enhancement
+Added auth.layout translations (en/ar), wired AuthLayout to use client i18n and locale-based dir; replaced text-right/pr with text-start/pe/text-end for RTL/LTR.
+lib/i18n/locales/en.json, lib/i18n/locales/ar.json, stories/AuthPages/AuthLayout/AuthLayout.tsx
+
+2025-03-19 14:00:00
+Update Type: Bug Fix
+Fixed building background: CSS backgroundImage must use url(); use /assets/AuthPages/building-bg.svg. Copied logo.svg and building-bg.svg to public/assets/AuthPages for Next.js.
+stories/AuthPages/AuthLayout/AuthLayout.tsx, public/assets/AuthPages/building-bg.svg, public/assets/AuthPages/logo.svg
+
+2025-03-19 15:00:00
+Update Type: Refactor
+Extracted AuthLayout static data to data.ts and types to AuthLayout.types.ts (AUTH_KEYS, FALLBACKS_AR, asset URLs, feature key arrays).
+stories/AuthPages/AuthLayout/AuthLayout.tsx, stories/AuthPages/AuthLayout/data.ts, stories/AuthPages/AuthLayout/AuthLayout.types.ts
+
+2025-03-19 17:35:00
+Update Type: Feature
+Added #F7F7F7 background and social icons (Instagram, Facebook, LinkedIn) to AuthLayout right panel. Created SignUp component with phone input, error banner, and pagination dots. Added auth.signup translations.
+stories/AuthPages/AuthLayout/AuthLayout.tsx, stories/AuthPages/AuthLayout/data.ts, stories/AuthPages/SignUp/SignUp.tsx, stories/AuthPages/SignUp/SignUp.types.ts, stories/AuthPages/SignUp/data.ts, stories/AuthPages/SignUp/SignUp.stories.tsx, lib/i18n/locales/en.json, lib/i18n/locales/ar.json
+
+2026-03-18 00:00:00
+Update Type: Feature
+Created shared AuthPages components (AuthButton, AuthInput, OTPInput, StepIndicator) under stories/AuthPages/components/. Created OTPVerification (step 2) and CompleteProfile (step 3) components. Refactored SignUp to use shared components. Added phone-icon.svg asset. Added auth.otp and auth.complete_profile translations.
+stories/AuthPages/components/AuthButton/AuthButton.tsx, stories/AuthPages/components/AuthButton/AuthButton.types.ts, stories/AuthPages/components/AuthInput/AuthInput.tsx, stories/AuthPages/components/AuthInput/AuthInput.types.ts, stories/AuthPages/components/OTPInput/OTPInput.tsx, stories/AuthPages/components/OTPInput/OTPInput.types.ts, stories/AuthPages/components/StepIndicator/StepIndicator.tsx, stories/AuthPages/components/StepIndicator/StepIndicator.types.ts, stories/AuthPages/components/index.ts, stories/AuthPages/OTPVerification/OTPVerification.tsx, stories/AuthPages/OTPVerification/OTPVerification.types.ts, stories/AuthPages/OTPVerification/data.ts, stories/AuthPages/OTPVerification/OTPVerification.stories.tsx, stories/AuthPages/CompleteProfile/CompleteProfile.tsx, stories/AuthPages/CompleteProfile/CompleteProfile.types.ts, stories/AuthPages/CompleteProfile/data.ts, stories/AuthPages/CompleteProfile/CompleteProfile.stories.tsx, stories/AuthPages/SignUp/SignUp.tsx, public/assets/AuthPages/phone-icon.svg, lib/i18n/locales/en.json, lib/i18n/locales/ar.json

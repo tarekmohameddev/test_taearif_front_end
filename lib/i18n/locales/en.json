@@ -3931,5 +3931,71 @@
     "projectDisplay": {
       "display_name": "Project Display"
     }
+  },
+  "auth": {
+    "layout": {
+      "brand_name": "Ta'arif",
+      "title": "Build your digital presence with confidence",
+      "subtitle": "Create your professional real estate website in minutes, and manage it easily from one place.",
+      "feature_1": "Professional website ready in minutes",
+      "feature_2": "Smart and easy-to-use control panel",
+      "feature_3": "Full support for the Arabic language",
+      "feature_4": "Live analytics and reports",
+      "feature_5": "Smart matching of requests and offers",
+      "copyright": "All rights reserved © 2026"
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Start by confirming your phone number",
+      "phone_placeholder": "5xxxxxxxx",
+      "submit_button": "Send Verification Code",
+      "has_account": "Already have an account?",
+      "login_link": "Log in",
+      "phone_error": "Invalid phone number. Must start with 5 and be 9 digits."
+    },
+    "otp": {
+      "title": "Enter Verification Code",
+      "subtitle": "We sent a 5-digit code to",
+      "resend_available_in": "Resend available in {{seconds}} seconds",
+      "resend_now": "Resend",
+      "change_phone": "Change phone number",
+      "test_code_label": "Test code:"
+    },
+    "complete_profile": {
+      "title": "Complete Your Profile",
+      "subtitle": "Final step to create your account",
+      "username_placeholder": "Username (subdomain)",
+      "email_placeholder": "Enter your email...",
+      "password_placeholder": "Enter password (8+ characters)",
+      "submit_button": "Create Account"
+    },
+    "signin": {
+      "title": "Sign In",
+      "subtitle": "Welcome back",
+      "identifier_placeholder": "Email or phone number...",
+      "password_placeholder": "Password",
+      "forgot_password": "Forgot password?",
+      "submit_button": "Sign In",
+      "no_account": "Don't have an account?",
+      "register_link": "Register for free"
+    },
+    "forgot_password": {
+      "title": "Forgot Password?",
+      "identifier_placeholder": "Email or phone number",
+      "submit_button": "Send Reset Code",
+      "remember_password": "Remember your password?",
+      "login_link": "Sign In"
+    },
+    "reset_password": {
+      "title": "Reset Password",
+      "subtitle": "Enter the verification code and your new password",
+      "code_placeholder": "Verification code (5 digits)",
+      "new_password_placeholder": "New password",
+      "confirm_password_placeholder": "Confirm password",
+      "submit_button": "Reset Password",
+      "resend_code": "Resend Code",
+      "resend_available_in": "Resend available in {{seconds}} seconds",
+      "back_link": "Back"
+    }
   }
 }

@@ -1,35 +1,62 @@
-import { RegisterPage } from "@/components/signin-up/register-page";
-import Script from "next/script";
-import WhatsAppFloatingBubble from "@/components/WhatsAppFloatingBubble";
+"use client";
 
-export const metadata = {
-  title: "تسجيل حساب جديد",
-};
+import AuthLayout from "@/stories/AuthPages/AuthLayout/AuthLayout";
+import {
+  RegisterProvider,
+  PhoneStep,
+  OtpStep,
+  ProfileStep,
+} from "./components";
+import { useRegisterFlow, useLocaleSync } from "./hooks";
+
+function RegisterContent() {
+  useLocaleSync();
+
+  const {
+    step,
+    phone,
+    verifiedToken,
+    setPhone,
+    setVerifiedToken,
+    nextStep,
+    goToStep,
+  } = useRegisterFlow();
+
+  const handlePhoneSuccess = (phoneNumber: string) => {
+    setPhone(phoneNumber);
+    nextStep();
+  };
+
+  const handleOtpSuccess = (token: string) => {
+    setVerifiedToken(token);
+    nextStep();
+  };
+
+  const handleChangePhone = () => {
+    goToStep(1);
+  };
+
+  return (
+    <AuthLayout>
+      {step === 1 && <PhoneStep onSuccess={handlePhoneSuccess} />}
+      {step === 2 && (
+        <OtpStep
+          phone={phone}
+          onSuccess={handleOtpSuccess}
+          onChangePhone={handleChangePhone}
+        />
+      )}
+      {step === 3 && verifiedToken && (
+        <ProfileStep phone={phone} verifiedToken={verifiedToken} />
+      )}
+    </AuthLayout>
+  );
+}
 
 export default function Register() {
   return (
-    <>
-      {/* Snap Pixel Code */}
-      <Script
-        id="snap-pixel"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
-            {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
-            a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
-            r.src=n;var u=t.getElementsByTagName(s)[0];
-            u.parentNode.insertBefore(r,u);})(window,document,
-            'https://sc-static.net/scevent.min.js');
-
-            snaptr('init', '12aec193-f115-47a4-a37d-deb2f0947c08', {});
-
-            snaptr('track', 'PAGE_VIEW');
-          `,
-        }}
-      />
-      <RegisterPage />
-      <WhatsAppFloatingBubble />
-    </>
+    <RegisterProvider>
+      <RegisterContent />
+    </RegisterProvider>
   );
 }

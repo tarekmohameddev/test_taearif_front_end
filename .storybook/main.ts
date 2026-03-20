@@ -6,7 +6,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const config: StorybookConfig = {
   "stories": [
-    "../stories/**/*.mdx",
     "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
   "addons": [
@@ -15,7 +14,8 @@ const config: StorybookConfig = {
   ],
   "framework": "@storybook/nextjs",
   "staticDirs": [
-    "..\\public"
+    path.join(__dirname, '..', 'public'),
+    { from: path.join(__dirname, '..', 'stories', 'assets'), to: '/assets' }
   ],
   webpackFinal: async (config) => {
     config.resolve = config.resolve || {};

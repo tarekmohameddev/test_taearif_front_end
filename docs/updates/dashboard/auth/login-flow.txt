@@ -1,0 +1,19 @@
+2026-03-19 00:00:00
+Update Type: Feature
+Implemented SignIn flow following the same structure as register flow. Created SignIn story component (stories/AuthPages/SignIn/) with types, data, tsx, and stories. Created app/login/ flow with types, schemas (zod), services (API), hooks (react-query), and LoginForm component. Added auth.signin translations to en.json and ar.json.
+stories/AuthPages/SignIn/SignIn.types.ts, stories/AuthPages/SignIn/data.ts, stories/AuthPages/SignIn/SignIn.tsx, stories/AuthPages/SignIn/SignIn.stories.tsx, app/login/types/login-types.ts, app/login/schemas/login-schemas.ts, app/login/services/login-api.ts, app/login/hooks/useLogin.ts, app/login/hooks/index.ts, app/login/components/LoginProvider.tsx, app/login/components/LoginForm.tsx, app/login/components/index.ts, app/login/page.tsx, lib/i18n/locales/en.json, lib/i18n/locales/ar.json
+
+2026-03-19 00:05:00
+Update Type: Enhancement
+Added static recaptcha_token to login API for testing. Fixed locale-based fallbacks in SignIn component - added SIGNIN_FALLBACKS_EN and updated component to use locale-aware fallback selection (isArabic check) instead of key-matching only.
+app/login/services/login-api.ts, stories/AuthPages/SignIn/data.ts, stories/AuthPages/SignIn/SignIn.tsx
+
+2026-03-19 00:10:00
+Update Type: Bug Fix
+Fixed locale not syncing from URL path for auth pages. The clientI18nStore was defaulting to 'en' from localStorage instead of detecting locale from URL path (/ar/login). Created useLocaleSync hook that syncs URL-based locale with the i18n store on page load. Applied to both login and register pages.
+app/login/hooks/useLocaleSync.ts, app/login/hooks/index.ts, app/login/page.tsx, app/register/hooks/useLocaleSync.ts, app/register/hooks/index.ts, app/register/page.tsx
+
+2026-03-19 00:20:00
+Update Type: Bug Fix
+Fixed login not redirecting to dashboard after success. The new login page was using direct API call and client-side cookie instead of the existing useAuthStore which handles server-side auth cookies, localStorage persistence, and Zustand store state. Updated LoginForm to use useAuthStore.getState().login() and window.location.assign() for proper full page navigation after successful login.
+app/login/components/LoginForm.tsx
