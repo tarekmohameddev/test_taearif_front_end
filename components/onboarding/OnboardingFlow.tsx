@@ -362,7 +362,7 @@ export function OnboardingFlow({
         <img
           src="/onboardingBackground.svg"
           alt=""
-          className="h-full w-full object-contain"
+          className="h-full w-full object-contain "
         />
       </div>
       

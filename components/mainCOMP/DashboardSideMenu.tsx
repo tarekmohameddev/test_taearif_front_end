@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, LogOut, Menu } from "lucide-react";
+import { ExternalLink, Menu, User } from "lucide-react";
 import useAuthStore from "@/context/AuthContext";
 import { selectUserData, selectUserIsLogged } from "@/context/auth/selectors";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,9 @@ const USER_STORAGE_KEY = "user";
 const MENU_BG = "#4F9E8E";
 
 const LOGO_SRC = "/images/taearif1column.svg";
+
+/** زخرفة خلفية أسفل القائمة (لا تشغل مساحة في التخطيط) */
+const SIDEBAR_DECORATION_SRC = "/onboardingBackground.svg";
 
 function readStoredTenant(): { company_name: string | null; domain: string | null } {
   if (typeof window === "undefined") return { company_name: null, domain: null };
@@ -121,20 +124,15 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
     [onNavigate],
   );
 
-  const logout = useCallback(async () => {
-    try {
-      await useAuthStore.getState().logout();
-    } catch (e) {
-      console.error(e);
-    }
-    onNavigate?.();
-  }, [onNavigate]);
-
   return (
     <div
       style={{ backgroundColor: MENU_BG }}
-      className={cn("flex h-full min-h-0 flex-col text-white", className)}
+      className={cn(
+        "relative flex h-full min-h-0 flex-col overflow-hidden text-white",
+        className,
+      )}
     >
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 justify-center px-4 py-4">
         <Link
           href="/dashboard"
@@ -219,17 +217,31 @@ function NavPanel({ pathname, onNavigate, className }: NavPanelProps) {
 
       {isLogged && (
         <footer className="shrink-0 border-t border-white/20 p-3">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full justify-center gap-2 border-white/40 bg-transparent text-white hover:bg-white/15 hover:text-white"
-            onClick={logout}
+          <Link
+            href="/dashboard/settings"
+            onClick={() => onNavigate?.()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-white transition hover:bg-white/15"
           >
-            <LogOut className="h-4 w-4" />
-            تسجيل الخروج
-          </Button>
+            <User className="h-5 w-5 shrink-0" />
+            حسابي
+          </Link>
         </footer>
       )}
+      </div>
+
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 flex w-full select-none justify-center"
+      >
+        <Image
+          src={SIDEBAR_DECORATION_SRC}
+          alt=""
+          width={257}
+          height={388}
+          sizes="(max-width: 1023px) 100vw, 280px"
+          className="h-auto w-full max-h-[min(52vh,460px)] object-contain object-bottom brightness-100 opacity-[0.8]"
+        />
+      </div>
     </div>
   );
 }
