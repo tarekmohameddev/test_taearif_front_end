@@ -528,7 +528,12 @@ export function OnboardingFlow({
       >
         <OnboardingSocialLinksRow links={ONBOARDING_HELP_SOCIAL_LINKS} />
       </div>
-
+      <div
+        className="absolute bottom-5 z-20 hidden text-xl text-white sm:right-6 sm:mx-0 sm:block"
+        dir="ltr"
+      >
+        كل الحقوق محفوظة @٢٠٢٦
+      </div>
     </main>
   );
 }
