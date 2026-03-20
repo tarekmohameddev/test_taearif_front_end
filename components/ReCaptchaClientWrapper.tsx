@@ -15,7 +15,7 @@ export function ReCaptchaClientWrapper({ children }: { children: ReactNode }) {
       }}
       container={{
         parameters: {
-          badge: "bottomright",
+          badge: "bottomleft",
           theme: "light",
         },
       }}

@@ -291,7 +291,7 @@ function LocalReCaptchaWrapper({ children }: { children: ReactNode }) {
     <GoogleReCaptchaProvider
       reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
       scriptProps={{ async: true, defer: true, appendTo: "head" }}
-      container={{ parameters: { badge: 'bottomright', theme: 'light' } }}
+      container={{ parameters: { badge: 'bottomleft', theme: 'light' } }}
     >
       {children}
     </GoogleReCaptchaProvider>
@@ -470,7 +470,7 @@ export function ReCaptchaClientWrapper({ children }: { children: ReactNode }) {
       key={key} // Force remount on route change
       reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
       scriptProps={{ async: true, defer: true, appendTo: "head" }}
-      container={{ parameters: { badge: 'bottomright', theme: 'light' } }}
+      container={{ parameters: { badge: 'bottomleft', theme: 'light' } }}
     >
       {children}
     </GoogleReCaptchaProvider>
@@ -512,7 +512,7 @@ export function ReCaptchaWrapper({ children }: { children: ReactNode }) {
     <GoogleReCaptchaProvider
       reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
       scriptProps={{ async: true, defer: true, appendTo: "head" }}
-      container={{ parameters: { badge: 'bottomright', theme: 'light' } }}
+      container={{ parameters: { badge: 'bottomleft', theme: 'light' } }}
     >
       {children}
     </GoogleReCaptchaProvider>
@@ -1383,7 +1383,7 @@ useEffect(() => {
   reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
   container={{
     parameters: {
-      badge: 'bottomright', // Position: bottomright, bottomleft, inline
+      badge: 'bottomleft', // Position: bottomright, bottomleft, inline
       theme: 'light',       // Theme: light or dark
     },
   }}
@@ -1394,8 +1394,8 @@ useEffect(() => {
 
 **Badge Positions:**
 
-- `bottomright` - Bottom right corner (default)
-- `bottomleft` - Bottom left corner
+- `bottomright` - Bottom right corner
+- `bottomleft` - Bottom left corner (used in this project)
 - `inline` - Inline with form (for custom positioning)
 
 ---

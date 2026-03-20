@@ -21,10 +21,6 @@ const PermissionWrapper = dynamic(
     ),
   },
 );
-import {
-  DashboardRecaptchaCompliance,
-  useDashboardHideRecaptchaBadge,
-} from "@/components/dashboard/DashboardRecaptchaCompliance";
 import { DashboardHeader } from "@/components/mainCOMP/DashboardHeader";
 import { DashboardSideMenu } from "@/components/mainCOMP/DashboardSideMenu";
 import useSidebarStore from "@/context/sidebarStore";
@@ -75,9 +71,6 @@ export default function DashboardLayout({
   const hydrateUserFromStorage = useAuthStore(
     (state) => state.hydrateUserFromStorage,
   );
-
-  // إخفاء شارة reCAPTCHA على الدومين الأساسي فقط؛ على دومين المستأجر تبقى الشارة الظاهرة
-  useDashboardHideRecaptchaBadge(isValidDomain !== false);
 
   // تهيئة الـ store من localStorage فوراً لعرض اسم الـ tenant والرابط في الـ sidebar قبل وصول استجابة API
   useEffect(() => {
@@ -245,10 +238,9 @@ export default function DashboardLayout({
         <PermissionWrapper>
           <div className="flex min-h-screen flex-col lg:flex-row" dir="rtl">
             <DashboardSideMenu />
-            <main className="flex min-w-0 flex-1 flex-col px-4 pb-12 pt-4">
+            <main className="flex min-w-0 flex-1 flex-col p-4">
               <DashboardHeader />
               <div className="min-h-0 flex-1">{children}</div>
-              <DashboardRecaptchaCompliance />
             </main>
           </div>
         </PermissionWrapper>

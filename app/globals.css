@@ -82,13 +82,6 @@
   scrollbar-width: none;
 }
 
-/* Dashboard: hide reCAPTCHA v3 floating badge (disclosure: DashboardRecaptchaCompliance) */
-html.dashboard-hide-recaptcha-badge .grecaptcha-badge {
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
 @media (min-width: 640px) {
   .center-component-wrapper {
     padding-left: 48px;

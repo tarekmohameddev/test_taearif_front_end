@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { OnboardingMainWithRecaptcha } from "@/components/onboarding/OnboardingMainWithRecaptcha";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import TenantPageWrapper from "../TenantPageWrapper";
 
 export const metadata: Metadata = {
@@ -19,9 +19,6 @@ export default async function OnboardingRoute() {
 
   // إذا لم يكن هناك subdomain، افتح صفحة الـ onboarding العادية
   return (
-    <OnboardingMainWithRecaptcha
-      disableCompletionRedirect
-      hideSkipOnSecondStep
-    />
+    <OnboardingFlow disableCompletionRedirect hideSkipOnSecondStep />
   );
 }
