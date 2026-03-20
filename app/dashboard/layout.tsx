@@ -21,6 +21,7 @@ const PermissionWrapper = dynamic(
     ),
   },
 );
+import { DashboardHeader } from "@/components/mainCOMP/DashboardHeader";
 import { DashboardSideMenu } from "@/components/mainCOMP/DashboardSideMenu";
 import useSidebarStore from "@/context/sidebarStore";
 
@@ -237,7 +238,10 @@ export default function DashboardLayout({
         <PermissionWrapper>
           <div className="flex min-h-screen flex-col lg:flex-row" dir="rtl">
             <DashboardSideMenu />
-            <main className="min-w-0 flex-1 p-4">{children}</main>
+            <main className="flex min-w-0 flex-1 flex-col p-4">
+              <DashboardHeader />
+              <div className="min-h-0 flex-1">{children}</div>
+            </main>
           </div>
         </PermissionWrapper>
       </div>
